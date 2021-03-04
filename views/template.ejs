@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang='<%- locals.lang %>'>
+<head>
+
+<%- include ('partials/head.ejs') %> 
+
+<script type='text/javascript' src='/js/template.js'></script>
+
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
+	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
+	crossorigin=''/>
+<script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
+	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
+	crossorigin=''></script>
+
+</head>
+
+<body>
+
+<%- include ('partials/navigate.ejs') %> 
+<% if (!locals.activity) locals.activity = locals.path[1] %>
+
+<!-- NOT SURE THIS IS NECESSARY -->
+<nav>
+	<div class='inner'>
+	</div>
+</nav>
+
+
+<main id='template' class='template'>
+	<div class='inner'>
+		<div class='head'>
+			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+				<% if (locals.activity === 'edit') { %>
+					<a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+				<% } %>
+				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.lang] %>' onblur='partialSave("title")' contenteditable></div>
+			<% } else { %>
+				<a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.lang] %>'></div>
+				<div class='contributor'><%- vocabulary['credit'][locals.lang](locals.data.contributor, locals.data.contributorname) %></div>
+			<% } %>
+		</div>
+		<div class='body'>
+			<section class='description-layout layout <%- locals.activity %>'>
+				<div class='input-type'>
+					<label><%- vocabulary['description'][locals.lang] %></label>
+				</div>
+				<!-- TO DO: TRANSLATE THIS -->
+				<div class='media-container txt-container' onclick='d3.select(this).classed("focus", true)'>
+					<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][locals.lang] %>' onblur='partialSave("description")' contenteditable><%- locals.template_description %></div>
+				</div>
+			</section>
+
+			<section class='media-layout layout <%- locals.activity %>'>
+				<div class='input-type'>
+					<label><%- vocabulary['media'][locals.lang] %></label>
+				</div>
+			</section>
+
+			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+				<div class='media-input-group input-group'>
+					<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></button>
+					<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
+					<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
+					<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>library_add_check</i></button>
+				</div>
+			<% } %>
+			
+			<!-- <section class='meta-layout layout <%- locals.activity %>'>
+				<div class='input-type'>
+					<label><%- vocabulary['metadata'][locals.lang] %></label>
+				</div>
+			</section>
+			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+				<div class='meta-input-group input-group'>
+					<button id='input-meta-location' title='Request a location.'><i class='material-icons'>add_location</i></button>
+					<button id='input-meta-sdgs' title='Request one or more SDG tag(s).'><i class='material-icons'>public</i></button>
+					<button id='input-meta-tags' title='Request one or more thematic area tag(s).'><i class='material-icons'>style</i></button>
+				</div>
+			<% } %> -->
+
+			<div class='foot'>
+				<% if (locals.data && locals.data.status > 0) { %>
+					<div class='deploy <% if (!locals.template) { %>hide<% }%>'>
+						
+						<ul>
+							<li><a id='template-use'>
+								<button>Use template</button>
+							</a></li>
+							<li><a id='template-deploy'>
+								<button>Deploy template</button>
+							</a></li>
+						</ul>
+					</div>
+				<% } %>
+			</div>
+		</div>
+		
+	</div>
+</main>
+
+<footer>
+	<!-- USED BY N PEOPLE IN X EXRCISES -->
+</footer>
+
+
+<script type='text/javascript'>
+	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
+	d3.select('.media-input-group #input-media-img')
+	.on('click', _ => addImg(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addImg(null, '<%- locals.lang %>', true))
+	
+	d3.select('.media-input-group #input-media-txt')
+	.on('click', _ => addTxt(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addTxt(null, '<%- locals.lang %>', true))
+	
+	d3.select('.media-input-group #input-media-embed')
+	.on('click', _ => addEmbed(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addEmbed(null, '<%- locals.lang %>', true))
+	
+	d3.select('.media-input-group #input-media-checklist')
+	.on('click', _ => addChecklist(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addChecklist(null, '<%- locals.lang %>', true))
+
+	// d3.select('.meta-input-group #input-meta-location')
+	// .on('click', _ => addMap(null, '<%- locals.lang %>', true))
+	// .on('touchend', _ => addMap(null, '<%- locals.lang %>', true))
+
+	// d3.select('.meta-input-group #input-meta-sdgs')
+	// .on('click', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.lang %>', true))
+	// .on('touchend', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.lang %>', true))
+
+	// d3.select('.meta-input-group #input-meta-tags')
+	// .on('click', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
+	// .on('touchend', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
+
+	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
+	d3.select('.foot .deploy ul li a#template-deploy')
+	.on('click', _ => {
+		const message = 'Mobilize:' // TO DO: TRANSLATE
+		const form = { action: '#', method: 'GET' }
+		const opts = (<%- JSON.stringify(locals.cohort) %>).map(c => {
+			return { node: 'input', type: 'checkbox', name: 'cohort', label: c.name, value: c.id }
+		})
+		const foot = { node: 'button', type: 'submit', label: 'Deploy' }
+
+		renderContactList({ message: message, formdata: form, opts: opts, foot: foot })
+	})
+
+
+	
+	var lang = '<%- locals.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
+	
+
+	let activity = '<%- locals.activity %>';
+	let published = false
+	const editing = ['contribute', 'edit'].includes(activity)
+
+	const main = d3.select('main')
+	const head = main.select('.head')
+	const body = main.select('.body')
+	const descriptionLayout = body.select('.description-layout')
+	const mediaLayout = body.select('.media-layout')
+	const metaLayout = body.select('.meta-layout')
+	const foot = main.select('.foot')
+	const footer = d3.select('footer')
+
+
+	head.select('.title')
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
+		}
+	})
+	
+	let keyTrack = []
+	window.addEventListener('keydown', function (e) {
+		e = e || event
+		keyTrack.push(e.keyCode)
+
+		if (editing) {
+			// SHIFT + ENTER LEAVES THE FOCUSED CELL
+			if (keyTrack.includes(16) && e.keyCode === 13 
+				&& (descriptionLayout.selectAll('.media.focus').size() || mediaLayout.selectAll('.media.focus').size() || metaLayout.selectAll('.meta.focus').size())
+			) { 
+				e.preventDefault()
+				descriptionLayout.selectAll('.media').classed('focus', false)
+					.selectAll('.media-txt').each(function () { this.blur() })
+				mediaLayout.selectAll('.media').classed('focus', false)
+					.selectAll('.media-title, .media-txt, .media-img').each(function () { this.blur() })
+				const metas = metaLayout.selectAll('.meta').classed('focus', false)
+				main.selectAll('.inset').style('max-height', null)
+				main.selectAll('.media-checklist, .meta-checklist').each(function () { this.blur() })
+				autofillTitle()
+			}
+			// PROVIDE HIGHLIGHT FEEDBACK
+			if (
+				![head.select('div.title').node(), metaLayout.select('input[type=text]').node()].includes(document.activeElement) 
+				&& !(descriptionLayout.selectAll('.media.focus').size() || descriptionLayout.selectAll('.media *:focus').size())
+				&& !(mediaLayout.selectAll('.media.focus').size() || mediaLayout.selectAll('.media *:focus').size())
+				&& !(metaLayout.selectAll('.meta.focus').size() || metaLayout.selectAll('.meta *:focus').size())
+				&& !d3.select('.modal').node()
+			) {
+				if (e.key === 'i' || e.keyCode === 73) main.select('.media-input-group label[for=input-media-img]').classed('highlight', true)
+				if (e.key === 't' || e.keyCode === 84) main.select('.media-input-group label[for=input-media-txt]').classed('highlight', true)
+				if (e.key === 'l' || e.keyCode === 76) main.select('.media-input-group label[for=input-media-checklist]').classed('highlight', true)
+			}
+		}
+	})
+	window.addEventListener('keyup', function (e) {
+		e = e || event
+		if (editing) {
+			if (
+				![head.select('div.title').node(), metaLayout.select('input[type=text]').node()].includes(document.activeElement) 
+				&& !(descriptionLayout.selectAll('.media-container.focus').size() || descriptionLayout.selectAll('.media-container *:focus').size())
+				&& !(mediaLayout.selectAll('.media-container.focus').size() || mediaLayout.selectAll('.media-container *:focus').size())
+				&& !(metaLayout.selectAll('.meta-container.focus').size() || metaLayout.selectAll('.meta-container *:focus').size())
+				// && !d3.select('.modal').node() // THIS IS IF WE ADD THE MODAL FOR SELECTING A COHORT
+			) {
+				if (e.key === 'i' || e.keyCode === 73) {
+					main.select('label[for=input-media-img]').classed('highlight', false)
+					d3.select('#input-media-img').node().click()
+				}
+				if (e.key === 't' || e.keyCode === 84) {
+					main.select('label[for=input-media-txt]').classed('highlight', false)
+					d3.select('#input-media-txt').node().click()
+				}
+				if (e.key === 'l' || e.keyCode === 76) {
+					main.select('label[for=input-media-checklist]').classed('highlight', false)
+					d3.select('#input-media-checklist').node().click()
+				}
+				if (e.key === 'e' || e.keyCode === 69) {
+					main.select('label[for=input-media-embed]').classed('highlight', false)
+					d3.select('#input-media-embed').node().click()
+				}
+			} else {
+				switchButtons('<%- locals.lang %>')
+			}
+		}
+
+		keyTrack = keyTrack.filter(d => d !== e.keyCode)
+	})
+	window.addEventListener('mouseup', function (e) {
+		e = e || event
+		if (editing) {
+			const target = d3.select(e.target)
+			const media = target.findAncestor('media')
+			const meta = target.findAncestor('meta')
+			const containers = main.selectAll('.media-container, .meta-container')
+				.filter(function () { return media ? this !== media.node() : meta ? this !== meta.node() : true })
+			containers.classed('focus', false)
+				.selectAll('.inset')
+				.style('max-height', null)
+			main.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
+			autofillTitle()
+		}
+	})
+
+	function autofillTitle () {
+		if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
+			let firstText = main.select('.description-layout .txt-container .media-txt').node()
+			if (!firstText.innerText || !firstText.innerText.length) firstText = main.selectAll('.media, .meta').filter(function () { return this.innerText && this.innerText.length }).node()
+			if (firstText && firstText.innerText) head.select('.title').html(_ => {
+				const cutoff = 75
+				if (firstText.innerText.split('\n').length > 1) {
+					if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
+					else return `${firstText.innerText.split('\n')[0]}`
+				} else {
+					if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
+					else return `${firstText.innerText}`
+				}
+				partialSave('title')
+			})
+		}
+	}
+
+	function extractContent (attr) {
+		const content = {}
+		// COLLECT TITLE
+		const title = head.select('.title').node().innerText
+		const description = descriptionLayout.select('.media-container .media-txt').node().innerText
+		console.log('description')
+		console.log(description)
+		// MAYBE INCLUDE ALERT IF title IS EMPTY
+		// COLLECT ALL MEDIA
+		const items = []
+		mediaLayout.selectAll('.media-container')
+		.each(function (d) {
+			const sel = d3.select(this)
+			d.level = 'media'
+			
+			if (d.type === 'title') {
+				d.instruction = sel.select('.media-title').node().innerText
+				items.push(d)
+			}
+			else if (d.type === 'img') {
+				d.instruction = sel.select('.media-img').node().innerText
+				items.push(d)
+			}
+			else if (d.type === 'txt') {
+				d.instruction = sel.select('.media-txt').node().innerText
+				items.push(d)
+			}
+			else if (d.type === 'embed') {
+				d.instruction = sel.select('.media-embed').node().innerText
+				items.push(d)
+			}
+			else if (d.type === 'checklist') {
+				d.instruction = sel.select('.media-checklist .instruction').node().innerText
+				d.options = d.options.filter(c => c.name && c.name.length)
+				items.push(d)
+			}
+		})
+		// COLLECT ALL META
+		metaLayout.selectAll('.meta-container')
+		.each(function (d) {
+			const sel = d3.select(this)
+			d.level = 'meta'
+			
+			if (d.type === 'location') {
+				d.instruction = sel.select('.meta-location').node().innerText
+				items.push(d)
+			}
+			else if (d.type === 'sdgs') {
+				d.instruction = sel.select('.meta-sdgs').node().innerText
+				d.options = sel.selectAll('.inset-sdgs .panel .opt').data()
+				items.push(d)
+			}
+			else if (d.type === 'tags') {
+				d.instruction = sel.select('.meta-tags').node().innerText
+				d.options = sel.selectAll('.inset-tags .panel .opt').data()
+				items.push(d)
+			}
+		})
+		// COMPILE FULL TXT FOR SEARCH
+		const fullTxt = `${title}\n\n
+			${description}\n\n
+			${items.filter(d => d.type === 'title').map(d => d.instruction).join('\n\n').trim()}\n\n
+			${items.filter(d => d.type === 'txt').map(d => d.instruction).join('\n\n').trim()}\n\n
+			${items.filter(d => d.type === 'embed').map(d => d.instruction).join('\n\n').trim()}\n\n
+			${items.filter(d => d.type === 'checklist').map(d => d.instruction).join('\n\n').trim()}\n\n
+			${items.filter(d => d.type === 'checklist').map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
+		
+		// COMPILE THE CONTENT
+		if (!attr || attr === 'title') content.title = title
+		if (!attr || attr === 'description') content.description = description
+		if (!attr || ['media', 'meta'].includes(attr) || items.unique('type', true).includes(attr)) content.items = JSON.stringify(items)
+		// ALWAYS SEND fullTxt
+		content.full_text = fullTxt
+
+		// // TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
+		// // ALWAYS SEND status
+		let status = 0
+		if (!published) {
+			if (title && title.trim().length) status = 1
+		} else status = 2
+		content.status = status
+
+		return content
+	}
+
+	function partialSave (attr) {
+		console.log('saving')
+		// FIRST CHECK IF THIS IS A NEW PAD
+		const content = extractContent(attr)
+		console.log(content)
+		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		const id = queryparams.get('id')
+		if (id) content.id = +id
+
+		POST('/save/template', content)
+		.then(res => {
+			// ADD THE NOTIFICATION
+			const header = d3.select('header ul.primary')
+			header.select('.placeholder').classed('saved', true)
+				.select('a button')
+				.html(vocabulary['changes saved'][lang])
+			window.setTimeout(_ => {
+				header.select('.placeholder').classed('hide', true)
+				header.selectAll('li:not(.placeholder)').classed('hide', false)
+			}, 1000)
+			// CHANGE THE URL TO INCLUDE THE PAD ID
+			if (!id) { // INSERT
+				queryparams.append('id', res.object)
+				url.search = queryparams.toString()
+				// BASED ON:
+				// https://usefulangle.com/post/81/javascript-change-url-parameters
+				// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
+				const nextURL = url.toString().replace('contribute', 'edit')
+				const nextTitle = 'Update template'
+				const nextState = { additionalInformation: 'Updated the URL with JS' }
+				window.history.pushState(nextState, nextTitle, nextURL)
+				// REMOVE THE templates MENU
+				d3.select('nav#filter').remove()
+			}
+		}).catch(err => { throw err })
+	}
+
+
+
+
+
+	// POPULATE THE PAGE
+	if (['edit', 'view'].includes(activity)) {
+		const data = <% if (locals.data) { %><%- JSON.stringify(locals.data) %><% } else { %>null<% } %>;
+		if (data) {
+			published = data.published
+
+			head.select('.title').html(data.title)
+			descriptionLayout.select('.media-container .media-txt').text(data.description)
+			if (data.items) data.items.forEach(d => {
+				console.log(d)
+				if (d.type === 'title') addTitle(d, '<%- locals.lang %>')
+				if (d.type === 'img') addImg(d, '<%- locals.lang %>')
+				if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
+				if (d.type === 'embed') addEmbed(d, '<%- locals.lang %>')
+				if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
+				if (d.type === 'location') addMap(d, '<%- locals.lang %>')
+				if (d.type === 'sdgs') addSDGs(d, '<%- locals.lang %>')
+				if (d.type === 'tags') addTags(d, '<%- locals.lang %>')
+			})
+		}
+	} else {
+		addTitle(null, '<%- locals.lang %>')
+	}
+
+</script>
+</body>
+</html>

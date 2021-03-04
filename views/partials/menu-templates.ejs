@@ -1,0 +1,71 @@
+<% 
+	if (!locals.query) locals.query = {}
+	if (!locals.templates) locals.templates = []
+%>
+<% if (locals.path.includes('contribute')) { %>
+<nav id='filter'>
+	<div class='handle' onclick='this.parentNode.classList.toggle("open")'><div>Templates</div></div>
+	<form>
+		<!-- <div class='query'>
+			<%# if (locals.query.query && locals.query.query.length) { %>
+				<input type='text' name='query' id='search-field' class='has-value' value='<%# locals.query.query.join(" OR ") %>' onblur='fixLabel(this)'>
+			<%# } else { %>
+				<input type='text' name='query' id='search-field' onblur='fixLabel(this)'>
+			<%# } %>
+			<label for='search-field'><%# vocabulary["search"][locals.lang] %></label>
+			<button id='search'><i class='material-icons'>search</i></button>
+		</div> -->
+		<ul class='filters full-height'>
+			<li class='title'>
+				<h1><%- vocabulary['load template'][locals.lang] %></h1>
+				<div class='active'>
+					<% for (let key in locals.query) { %>
+						<div class='tag'>
+							<label>
+								<%
+									let t = locals.templates.find(c => +c.id == +locals.query[key])
+									let title = ''
+									if (t) title = t.title.capitalize()
+									else title = vocabulary['untitled template'][locals.lang]
+								%><%- title %>
+							</label>
+							<a href='?'><i class='material-icons'>close</i></a>
+						</div>
+					<% } %>
+				</div>
+			</li>
+			<li class='filter'>
+				<button type='button' class='accordion open'>
+					<i class='material-icons'>keyboard_arrow_right</i>
+					<%- vocabulary['template'][locals.lang](false, true).capitalize() %>
+				</button>
+				<ul class='panel'>
+					<a href='?'>
+						<li class='opt <% if (!locals.query.template) { %>checked<% } %>'>
+							<div class='grow'><%- vocabulary['free pad'][locals.lang] %></div>
+						</li>
+					</a>
+					<% locals.templates.unique('id').forEach((t, i) => { %>
+						<a href='?template=<%- t.id %>'>
+							<li class='opt <% if (locals.query.template && +locals.query.template === t.id) { %>checked<% } %>'>
+								<div class='grow'>
+									<% if (t.title) { %>
+										<label for='templates-<%- i %>' title='<%- t.title %>'><%- t.title %></label>
+									<% } else { %>
+										<label for='templates-<%- i %>' title='Untitled template'><%- vocabulary['untitled template'][locals.lang] %></label>
+									<% } %>
+								</div>
+								<div class='count'><label for='template-<%- i %>'><%- t.count %></label></div>
+							</li>
+						</a>
+					<% }) %>
+				</ul>
+			</li>
+		</ul>
+	</form>
+</nav>
+<% } %>
+<script type='text/javascript'>
+	const panel = d3.select('.filters .filter .panel').node()
+	if (panel) panel.style.maxHeight = panel.style.maxHeight ? null : `${panel.scrollHeight}px`
+</script>

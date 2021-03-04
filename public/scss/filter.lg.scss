@@ -1,0 +1,242 @@
+nav#filter {
+	position: fixed;
+	top: 30px;
+	left: 0;
+	width: 375px;
+	height: calc(100vh - 30px);
+	background-color: $c-mid-1;
+	/*box-shadow: 10px 0 10px rgba(175,175,175,.15);*/
+	transform: translateX(-375px);
+	transition: transform .5s;
+	z-index: 10001;
+
+	.handle {
+		position: absolute;
+		display: flex;
+		justify-content: center;
+		left: 100%;
+		width: 30px;
+		height: 65px;
+		background-color: $c-mid-1;
+		font-size: $t-small;
+		line-height: 65px;
+		text-align: center;
+		cursor: e-resize;
+
+		div {
+			color: #FFF;
+			cursor: e-resize;
+			transform: rotate(-90deg);
+		}
+	}
+	form {
+		width: 100%;
+		height: 100%;
+
+		.query {
+			width: 375px;
+			height: 65px;
+			background-color: $c-mid-1;
+
+			input[type=text] {
+				float: left;
+				position: relative;
+				width: calc(100% - 30px - 65px);
+				height: 50px;
+				margin: 15px 0 0 30px;
+				border: none;
+				border-bottom: 1px solid #FFF;
+				outline: none;
+				background-color: transparent;
+				font-size: $t-large; 
+				color: #FFF;
+			}
+			label[for=search-field] {
+				position: absolute;
+				top: 5px;
+				left: 30px;
+				font-size: $t-main;
+				color: #FFF;
+				transform: translateY(calc(#{$t-main}));
+				transition: transform .25s, font-size .25s;
+			}
+			input[type=text]:focus + label,
+			input[type=text].has-value + label {
+				font-size: $t-small;
+				transform: translateY(0px);
+			}
+			input:-webkit-autofill,
+			input:-webkit-autofill:hover, 
+			input:-webkit-autofill:focus, 
+			input:-webkit-autofill:active  {
+				-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;
+				-webkit-text-fill-color: #FFF !important;
+			}
+			button {
+				float: left;
+				width: 65px;
+				height: 60px;
+				margin-top: 5px;
+				background-color: transparent;
+				border: none;
+				outline: none;
+				color: #FFF;
+				cursor: pointer;
+			}
+		}
+		.filters {
+			clear: both;
+			height: calc(100% - 65px - 10px * 2);
+			padding: 10px 30px;
+			overflow: scroll;
+
+			.title {
+				h1 {
+					font-size: $t-main;
+					font-style: italic;
+					color: $c-light-1;
+					/*text-decoration: underline;*/
+				}
+				.active {
+					margin-bottom: 10px;
+					
+					.tag {
+						display: inline-block;
+						margin: 5px 5px 0 0;
+						text-decoration: none;
+						padding: 3px 5px;
+						background-color: transparent;
+						border: 1px solid $c-dark-1;
+						border-radius: 5px;
+						font-size: $t-small;
+						color: $c-dark-1;
+						transition: background-color .25s;
+						cursor: pointer;
+
+						label {
+							cursor: pointer;
+						}
+						i {
+							vertical-align: middle;
+							font-size: $t-main;
+							margin-left: 5px;
+						}
+						a {
+							color: $c-dark-1;
+						}
+					}
+					.tag:hover {
+						background-color: $c-dark-1;
+						color: #FFF;
+
+						a {
+							color: #FFF;
+						}
+					}
+				}
+			}
+			.filter {				
+				.accordion {
+					width: 100%;
+					padding: 10px 10px 0 0;
+					border: none;
+					outline: none;
+					background-color: transparent;
+					text-align: left;
+					font-size: $t-main;
+					font-weight: 700;
+					color: #FFF;
+					cursor: pointer;
+
+					i {
+						vertical-align: middle;
+						transition: transform .25s;
+					}
+				}
+				.accordion:hover {
+					text-decoration: underline;
+				}
+				.accordion.open {
+					i {
+						transform: rotate(90deg);
+					}
+				}
+				.panel {
+					max-height: 0;
+					overflow: hidden;
+					/*background-color: $c-light-2;*/
+					margin-left: 12px;
+					border-left: 1px solid $c-light-1;
+					transition: max-height .25s ease-out;
+					margin-bottom: 10px;
+
+					a {
+						text-decoration: none;
+					}
+					.opt {
+						display: flex;
+						align-items: center;
+						color: $c-light-2;
+						margin: 10px 0;
+
+						div {
+							padding: 0 5px;
+							cursor: pointer;
+							
+							label {
+								display: inline-block;
+								width: 100%;
+								cursor: pointer;
+							}
+						}
+						div:nth-child(2) {
+							margin-left: 5px;
+						}
+						div:last-child {
+							margin-right: 5px;
+						}
+						.grow {
+							flex-grow: 1;
+						}
+						.count {
+							vertical-align: baseline;
+							color: $c-light-1;
+							font-size: $t-small;
+						}
+					}
+					.opt.checked {
+						background-color: #FFF;
+						color: $c-dark-1;
+
+						.count {
+							color: $c-mid-2;
+						}
+					}
+					.opt:not(.checked):hover {
+						background-color: $c-light-1;
+						color: $c-dark-1;
+
+						.count {
+							color: $c-mid-2;
+						}
+					}
+				}
+			}
+		}
+		.filters.full-height {
+			height: calc(100% - 10px * 2);
+		}
+
+	}
+}
+nav#filter.open {
+	transform: translateX(0);
+
+	.handle {
+		cursor: w-resize;
+		
+		div {
+			cursor: w-resize;
+		}
+	}
+}

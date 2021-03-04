@@ -1,0 +1,62 @@
+/* LEAFLET ADJUSTMENTS */
+/* =================== */
+
+/* BASE MAP: THIS IS THE BASE FOR THE browse ACTIVITY */
+.map-container {
+	#map {
+		min-height: 50vh;
+		background-color: $c-light-2;
+	}
+}
+/* POPUPS */
+.leaflet-popup {
+	.leaflet-popup-content-wrapper {
+		border-radius: 0;
+		font-family: 'Overpass', Helvetica, Arial, sans-serif;
+		color: $c-dark-1;
+
+		.leaflet-popup-content {
+			button {
+				background-color: transparent;
+				border: none;
+				outline: none;
+				color: $c-mid-1;
+				font-size: $t-small;
+				cursor: pointer;
+			}
+			button:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+}
+/* PINS */
+.single-pin {
+	outline: none;
+
+	i {
+		position: absolute; 
+		left: -125%; 
+		top: -50%; 
+		font-size: 2rem;
+	}
+}
+.single-pin.selected {
+	i {
+		color: orange;
+	}
+}
+.cluster-pin {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 700;
+	border: 5px solid $c-dark-1;
+	background-color: $c-dark-1;
+	border-radius: 100%;
+	text-align: center;
+	color: #FFF;
+}
+.cluster-pin.selected {
+	background-color: orange;
+}

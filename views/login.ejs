@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title><%= title %></title>
+
+<link rel='stylesheet' type='text/css' href='./css/main.css'>
+
+</head>
+
+<body>
+
+<form action='/login' method='POST'>
+	<input type='text' name='username' placeholder='User name'>
+	<input type='password' name='password' placeholder='Password'>
+	<input type='hidden' name='originalUrl' value='<%- locals.originalUrl %>'>
+	<button type='submit'>Log in</button>
+</form>
+
+<p>Find your username and password on <a href="https://teams.microsoft.com/l/file/9A826391-6A69-4226-AC46-5D8D67BF2098?tenantId=b3e5db5e-2944-4837-99f5-7488ace54319&fileType=xlsx&objectUrl=https%3A%2F%2Fundp.sharepoint.com%2Fsites%2FAcceleratorLabsNetwork%2FShared%20Documents%2FTopic%20-%20Solutions%20Mapping%2F_00_Global%20platform%2Fcredentials.xlsx&baseUrl=https%3A%2F%2Fundp.sharepoint.com%2Fsites%2FAcceleratorLabsNetwork&serviceName=teams&threadId=19:5d78c11fe5f64c88857a7ec09391ac0d@thread.skype&groupId=b782e7b6-ccb8-4517-9759-5ad9b9785013" target='_blank' style='color: blue; text-decoration: underline;'>Teams</a>, under:</p>
+<p>Accelerator Labs Network > Topic - Solutions Mapping > Files > credentials.xlsx</p>
+
+</body>

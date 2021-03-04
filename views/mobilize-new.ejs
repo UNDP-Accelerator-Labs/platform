@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang='<%- locals.lang %>'>
+<head>
+
+	<%- include ('partials/head.ejs') %>
+	<script type='text/javascript' src='/js/template.js'></script>
+
+</head>
+
+
+<body>
+
+<%- include ('partials/navigate.ejs') %>
+<% if (!locals.activity) locals.activity = locals.path[1] %>
+
+<main id='mobilize-new'>
+	<!-- FIRST MODAL: TITLE -->
+	<form action='/deploy' method='POST'>
+		<div class='modal m-1'>
+			<div class='inner'>
+				<div class='body'>
+					<input id='title' type='text' name='title' onblur='fixLabel(this); enableNext(this)'>
+					<label class='placeholder' for='title'>Provide a title for the mobilization</label>
+				</div>
+				<div class='foot'>
+					<button type='button' disabled onclick='advanceTo(2)'>
+						<label>Next</label>
+						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- SECOND MODAL: TEMPLATE -->
+		<div class='modal m-2 hide'>
+			<button type='button' class='back' onclick='advanceTo(1)'>
+				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
+				<label>Back</label>
+			</button>
+			<div class='inner'>
+				<div class='head'>
+					<div class='title'>
+						<i class='material-icons'>keyboard_arrow_right</i>
+						Templates <!-- TO DO: TRANSLATION -->
+					</div>
+				</div>
+				<div class='body'>
+					<ul class='opts'>
+						<% locals.templates.forEach(t => { %>
+							<li class='opt'>
+								<div class='hide'>
+									<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>' onchange='toggleChecked(this); enableNext(this)'>
+								</div>
+								<div class='preview' onclick='previewTemplate(<%- t.id %>)' title='Preview template.'>
+									<i class='material-icons'>visibility</i>
+								</div>
+								<div class='grow'>
+									<label for='t-<%- t.id %>'><%- t.title %></label>
+								</div>
+								<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
+							</li>
+						<% }) %>
+					</ul>
+				</div>
+				<div class='foot'>
+					<button type='button' disabled onclick='advanceTo(3)'>
+						<label>Next</label>
+						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- THIRD MODAL: COHORT -->
+		<div class='modal m-3 hide'>
+			<button type='button' class='back' onclick='advanceTo(2)'>
+				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
+				<label>Back</label>
+			</button>
+			<div class='inner'>
+				<div class='head'>
+					<div class='title'>
+						<i class='material-icons'>keyboard_arrow_right</i>
+						Cohort <!-- TO DO: TRANSLATION -->
+					</div>
+					<div class='contributor-count'>0 invited contributors</div><!-- TO DO: TRANSLATION -->
+					<div class='global-opt'>
+						<input type='checkbox' id='select-all' onchange='selectAllOpts(this); enableNext(this)'>
+						<label for='select-all'>Select all</label>
+					</div>
+				</div>
+				<div class='body'>
+					<ul class='opts'>
+						<% locals.cohort.forEach(c => { %>
+							<li class='opt'>
+								<div class='hide'>
+									<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)'>
+								</div>
+								<div class='grow'><label for='c-<%- c.id %>'><%- c.name %></label></div>
+							</li>
+						<% }) %>
+					</ul>
+				</div>
+				<div class='foot'>
+					<button type='submit' disabled>Deploy</button>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
+</main>
+
+<footer>
+</footer>
+
+<script type='text/javascript'>
+	const activity = '<%- locals.activity %>';
+	const lang = '<%- locals.lang %>';
+	const editing = false
+	
+	function enableNext (node) {
+		const parent = d3.select(node).findAncestor('modal')
+		const button = parent.select('.foot button').node()
+		button.disabled = (node.type === 'text' && node.value.trim().length === 0)
+			|| (parent.selectAll('.opt').node() !== null && parent.selectAll('.opt.checked').size() === 0)
+	}
+	function advanceTo (id) {
+		// d3.select('#mobilize-new').attr('class', `screen-${id}`)
+		d3.selectAll('.modal').classed('hide', true)
+		d3.select(`.modal.m-${id}`).classed('hide', false)
+	}
+	function toggleChecked (node) {
+		const parent = d3.select(node).findAncestor('modal')
+		parent.selectAll('.opt').classed('checked', function () { return d3.select(this).select('input').node().checked })
+		const count = parent.selectAll('.opt.checked').size()
+		parent.select('.contributor-count').html(`${count} invited contributor${count !== 1 ? 's' : ''}`) // TO DO: TRANSLATION
+	}
+	async function previewTemplate (id) {
+		const template = await POST(`/${lang}/preview/template`, { id: id })
+
+		const screen = d3.select('div.screen.ter').classed('hide', false)
+		const modal = screen.addElems('div', 'modal template-preview')
+		modal.addElems('button', 'close')
+		.on('click', function () {
+			modal.remove()
+			screen.classed('hide', true)
+		}).html('Close')
+
+		const main = modal.addElems('main', 'template')
+			.attr('id', 'template')
+		const inner = main.addElems('div', 'inner')
+		
+		if (template) {
+			const head = inner.addElems('div', 'head')
+			head.addElems('div', 'title')
+				.attr('data-placeholder', vocabulary['untitled template'][lang])
+			.html(template.title)
+
+			const body = inner.addElems('div', 'body')
+			const descriptionLayout = body.addElems('div', `description-layout layout ${activity}`)
+			descriptionLayout.addElems('div', 'input-type')
+				.addElems('label').html(vocabulary['description'][lang])
+			const mediaLayout = body.addElems('div', `media-layout layout ${activity}`)
+			mediaLayout.addElems('div', 'input-type')
+				.addElems('label').html(vocabulary['media'][lang])
+			const metaLayout = body.addElems('div', `meta-layout layout ${activity}`)
+			metaLayout.addElems('div', 'input-type')
+				.addElems('label').html(vocabulary['metadata'][lang])
+
+			head.select('.title').html(template.title)
+			descriptionLayout.addElems('div', 'media-container')
+				.addElems('div', 'media-txt')
+				.text(template.description || vocabulary["missing template description"][lang])
+			if (template.items) template.items.forEach(d => {
+				if (d.type === 'title') addTitle(d)
+				if (d.type === 'img') addImg(d)
+				if (d.type === 'txt') addTxt(d)
+				if (d.type === 'checklist') addChecklist(d)
+				if (d.type === 'location') addMap(d)
+				if (d.type === 'sdgs') addSDGs(d)
+				if (d.type === 'tags') addTags(d)
+			})
+		}
+	}
+	function selectAllOpts (node) {
+		const parent = d3.select(node).findAncestor('modal')
+		parent.select('.global-opt').classed('active', node.checked)
+		parent.selectAll('.opt input[type=checkbox]').each(function () { 
+			this.checked = node.checked
+			toggleChecked(this) 
+		})
+	}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+/*@import 'vars';*/
+
+$t-xsmall: 9px;
+$t-small: 12px;
+$t-main: 16px;
+$t-mid: 20px;
+$t-large: 24px;
+$t-xlarge: 36px;
+$t-xxlarge: 60px;
+$t-xxxlarge: 90px;
+
+html, body {
+	font-size: $t-main;
+}
+
+.modal {
+	width: 300px;
+	margin-bottom: 75px;
+	/*animation: anim-up 1s;*/
+
+	.close {
+		padding: 5px 10px;
+		font-size: $t-small;
+	}
+	/*.close:hover {
+		text-decoration: underline;
+	}*/
+	.inner {
+		clear: both;
+		padding: 10px;
+		background-color: #FFF;
+
+		.headline {
+			margin-bottom: 15px;
+			padding-bottom: 10px;
+			border-bottom: 1px solid $c-light-1;
+			font-size: $t-main;
+			text-align: center;
+		}
+		.message {
+			margin-bottom: 15px;
+			font-size: $t-main;
+
+			input[type=text] {
+				width: 65px;
+				border: none;
+				border-bottom: 1px solid $c-mid-1;
+				outline: none;
+				text-align: center;
+				font-weight: 700;
+				color: $c-mid-1;
+			}
+			small {
+				font-size: $t-small;
+				color: $c-light-1;
+			}
+		}
+		ul {
+
+			li {
+				position: relative;
+				margin-bottom: 10px;
+				text-align: center;
+				font-size: $t-main;
+
+				button {
+					width: 100%;
+					min-height: 45px;
+					border: none;
+					outline: none;
+					background-color: $c-light-2;
+					border-radius: 5px;
+					padding: 0 30px;
+					font-size: $t-main;
+					cursor: pointer;
+					transition: background-color .25s;
+
+					.sub {
+						font-size: $t-small;
+						color: $c-light-1;
+					}
+				}
+				button.padded {
+					padding: 10px 30px;
+				}
+				textarea {
+					width: 100%;
+					min-height: 300px;
+					border: none;
+					border-bottom: 1px solid $c-light-1;
+					outline: none;
+					background-color: transparent;
+					font-size: $t-large; 
+					resize: none;
+					box-sizing: border-box;
+				}
+				label {
+					position: absolute;
+					top: -15px;
+					left: 0;
+					font-size: $t-main;
+					color: $c-mid-2;
+					transform: translateY(calc(#{$t-main}));
+					transition: transform .25s, font-size .25s;
+					cursor: pointer;
+				}
+				textarea:focus + label,
+				textarea.has-value + label {
+					font-size: $t-small;
+					transform: translateY(0px);
+				}
+			}
+			li:hover {
+				button {
+					background-color: $c-dark-1;
+					color: #FFF;
+				}
+			}
+		}
+		.foot {
+			margin: 10px 0;
+			text-align: center;
+
+			button {
+				border: none;
+				outline: none;
+				height: 45px;
+				width: 100%;
+				border-radius: 5px;
+				padding: 0 30px;
+				font-size: $t-main;
+				background-color: $c-light-2;
+				color: $c-dark-1;
+				cursor: pointer;
+				transition: background-color .25s;
+			}
+			button:hover {
+				background-color: $c-dark-1;
+				color: #FFF;
+			}
+		}
+	}
+}

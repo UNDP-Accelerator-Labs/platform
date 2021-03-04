@@ -1,0 +1,287 @@
+<%
+	vocabulary = {
+		"contribute": {
+			"en": "Contribute",
+			"fr": "Contribuer",
+			"es": "Contribuir",
+			"pt": "Contribuir"
+		},
+		"browse": {
+			"en": "Browse",
+			"fr": "Parcourir",
+			"es": "Navegar",
+			"pt": "Navegar"
+		},
+		"mobilize": {
+			"en": "Mobilize",
+			"fr": "Mobiliser",
+			"es": "Movilizar",
+			"pt": "Mobilizar"
+		},
+		"participate": {
+			"en": "Participate",
+			"fr": "Participer",
+			"es": "Participar",
+			"pt": "Participar"
+		},
+		"explore": {
+			"en": "Explore",
+			"fr": "Explorer",
+			"es": "Explorar",
+			"pt": "Explorar"
+		},
+		"public": {
+			"en": "Contributions from the network",
+			"fr": "Contributions du réseau",
+			"es": "Contribuciones de la red",
+			"pt": "Contribuições da rede"
+		},
+		"public templates": {
+			"en": "Templates from the network",
+			"fr": "Gabarits du réseau",
+			"es": "Plantillas de la red",
+			"pt": "Modelos da rede"
+		},
+		"bookmarks": {
+			"en": "My bookmarks",
+			"fr": "Mes favoris",
+			"es": "Mis favoritos",
+			"pt": "Meus favoritos"
+		},
+		"private": {
+			"en": "My pads",
+			"fr": "Mes bloc-notes",
+			"es": "Mis libretas",
+			"pt": "Blocos de notas"
+		},
+		"private templates": {
+			"en": "My templates",
+			"fr": "Mes gabarits",
+			"es": "Mis plantillas",
+			"pt": "Meus modelos"
+		},
+		"logged in": {
+			"en": user => { return `You are logged in as <u>${user}</u>` },
+			"fr": user => { return `Vous êtes identifé.e en tant que <u>${user}</u>` },
+			"es": user => { return `Has iniciado sesión como <u>${user}</u>` },
+			"pt": user => { return `Você está logado como <u>${user}</u>` }
+		},
+		"log out": {
+			"en": "Log out",
+			"fr": "Déconnexion",
+			"es": "Cerrar sesión",
+			"pt": "Sair"
+		},
+		"SDG": {
+			"en": plural => { return plural ? "SDGs": "SDG" },
+			"fr": plural => { return plural ? "ODD": "ODD" },
+			"es": plural => { return plural ? "ODS": "ODS" },
+			"pt": plural => { return plural ? "ODS": "ODS" }
+		},
+		"thematic area": {
+			"en": plural => { return `Thematic area${plural ? 's' : ''}` },
+			"fr": plural => { return `Thématique${plural ? 's' : ''}` },
+			"es": plural => { return `Tema${plural ? 's' : ''}` },
+			"pt": plural => { return `Tema${plural ? 's' : ''}` }
+		},
+		"templated doc": {
+			"en": plural => { return `Templated pad${plural ? 's' : ''}` },
+			"fr": plural => { return `Bloc-note${plural ? 's' : ''} à partir de gabarit` },
+			"es": plural => { return `Libreta${plural ? 's' : ''} con plantilla` },
+			"pt": plural => { return `Bloco${plural ? 's' : ''} de notas com modelo` }
+		},
+		"contributor": {
+			"en": plural => { return `Contributor${plural ? 's' : ''}` },
+			"fr": plural => { return `Contributeur${plural ? 's' : ''}` },
+			"es": plural => { return `Contribuyente${plural ? 's' : ''}` },
+			"pt": plural => { return `Contribuidor${plural ? 'es' : ''}` }
+		},
+		"solution": {
+			"en": (article, plural) => { 
+				if (plural) {
+					if (article) return "multiple solutions"
+					else return "solutions"
+				} else {
+					if (article) return "a solution"
+					else return "solution"
+				}
+			},
+			"fr": (article, plural) => { 
+				if (plural) {
+					if (article) return "plusieurs solutions"
+					else return "solutions"
+				} else {
+					if (article) return "une solution"
+					else return "solution"
+				}
+			},
+			"es": (article, plural) => { 
+				if (plural) {
+					if (article) return "múltiple soluciones"
+					else return "soluciones"
+				} else {
+					if (article) return "una solución"
+					else return "solución"
+				}
+			},
+			"pt": (article, plural) => { 
+				if (plural) {
+					if (article) return "múltiplas soluçōes"
+					else return "soluçōes"
+				} else {
+					if (article) return "uma solução"
+					else return "solução"
+				}
+			}
+		},
+		"pad": {
+			"en": plural => { return plural ? "Pads" : "Pad" },
+			"fr": plural => { return plural ? "Bloc-notes" : "Bloc-note" },
+			"es": plural => { return plural ? "Libretas" : "Libreta" },
+			"pt": plural => { return plural ? "Blocos de notas" : "Bloco de nota" }
+		},
+		"free pad": {
+			"en": "Blank pad",
+			"fr": "Bloc-note vierge",
+			"es": "Libreta en blanco",
+			"pt": "bloco de notas em branco"
+		},
+		"untitled pad": {
+			"en": "Untitled pad",
+			"fr": "Bloc-note sans titre",
+			"es": "Libreta sin título",
+			"pt": "Bloco de notas sem título"
+		},
+		"untitled solution": {
+			"en": "Untitled solution",
+			"fr": "Solution sans titre",
+			"es": "Solución sin título",
+			"pt": "Solução sem título"
+		},
+		"template": {
+			"en": (article, plural) => { 
+				if (plural) {
+					if (article) return "multiple templates"
+					else return "templates"
+				} else {
+					if (article) return "a template"
+					else return "template"
+				}
+			},
+			"fr": (article, plural) => { 
+				if (plural) {
+					if (article) return "plusieurs gabarits"
+					else return "gabarits"
+				} else {
+					if (article) return "un gabarit"
+					else return "gabarit"
+				}
+			},
+			"es": (article, plural) => { 
+				if (plural) {
+					if (article) return "múltiples plantillas"
+					else return "plantillas"
+				} else {
+					if (article) return "una plantilla"
+					else return "plantilla"
+				}
+			},
+			"pt": (article, plural) => { 
+				if (plural) {
+					if (article) return "vários modelos"
+					else return "modelos"
+				} else {
+					if (article) return "um modelo"
+					else return "modelo"
+				}
+			}
+		},
+		"untitled template": {
+			"en": "Untitled template",
+			"fr": "Gabarit sans titre",
+			"es": "Plantilla sin título",
+			"pt": "Modelo sem título"
+		},
+		"missing template description": {
+			"en": "Missing description of the template.",
+			"fr": "Description du gabarit manquante.",
+			"es": "Descripción vacía de la plantilla",
+			"pt": "Falta descrição do modelo"
+		},
+		"load template": {
+			"en": "Load a template",
+			"fr": "Charger un gabarit",
+			"es": "Cargar una plantilla",
+			"pt": "Carregar um modelo"
+		},
+		"cohort": {
+			"en": plural => { return plural ? "Cohorts" : "Cohort" },
+			"fr": plural => { return plural ? "Cohorte" : "Cohorts" },
+			"es": plural => { return plural ? "Cohorte" : "Cohortes" },
+			"pt": plural => { return plural ? "Coorte" : "Coortes" }
+		},
+		"credit": {
+			"en": (cid, name) => { return `Contributed by <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
+			"fr": (cid, name) => { return `Contribué par <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
+			"es": (cid, name) => { return `Contribuido por <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
+			"pt": (cid, name) => { return `Contribuíram por <a href='../browse/public?mappers=${cid}'>${name}</a>.` }
+		},
+		"missing contributor": {
+
+		},
+		"filter": {
+			"en": (verb, plural) => { return verb ? "Filter" : plural ? "Filters" : "Filter" },
+			"fr": (verb, plural) => { return verb ? "Filtrer" : plural ? "Filtres" : "Filtre" },
+			"es": (verb, plural) => { return verb ? "Filtrar" : plural ? "Filtros" : "Filtro" },
+			"pt": (verb, plural) => { return verb ? "Filtro" : plural ? "Filtros" : "Filtro" }
+		},
+		"search": {
+			"en": 'Looking for something?',
+			"fr": 'À la recherche de quelque chose ?',
+			"es": '¿Buscando algo?',
+			"pt": 'Procurando por algo?'
+		},
+		"description": {
+			"en": 'Description',
+			"fr": 'Description',
+			"es": 'Descripción',
+			"pt": 'Descrição'
+		},
+		"media": {
+			"en": 'Media',
+			"fr": 'Média',
+			"es": 'Medios',
+			"pt": 'Meios'
+		},
+		"metadata": {
+			"en": "Metadata",
+			"fr": "Métadonnées",
+			"es": "Metadatos",
+			"pt": "Metadatos"
+		},
+		"save": {
+			"en": "Save",
+			"fr": "Enregistrer",
+			"es": "Salvar",
+			"pt": "Salve"
+		},
+		"back to browse": {
+			"en": "Return to browsing",
+			"fr": "Retour à la galerie",
+			"es": "De vuelta a la galería",
+			"pt": "De volta à galeria"
+		},
+		"bookmark": {
+			"en": active => { return active ? "Bookmarked" : "Bookmark" },
+			"fr": active => { return active ? "Favori" : "Marquer" },
+			"es": active => { return active ? "Favorito" : "Marcador" },
+			"pt": active => { return active ? "Favorito" : "Marcar" }
+		},
+		"tested and approved": {
+			"en": (cid, name) => { return `This solution has been tested and approved by <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
+			"fr": (cid, name) => { return `Cette solution a été testée et approuvée par <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
+			"es": (cid, name) => { return `Esta solución ha sido probada y aprobada por <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
+			"pt": (cid, name) => { return `Esta solução foi testada e aprovada por <a href='../browse/public?mappers=${cid}'>${name}</a>.` }
+		}
+	}
+%>

@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+$c-dark-1: #333D51;
+$c-mid-1: #934A5F;
+$c-mid-2: #57648C;
+$c-mid-2-light: rgba(87,100,140,.25);
+$c-mid-3: #F4ED6E;
+$c-light-1: #C2B4D6;
+$c-light-2: #E5E5E5;
+$c-light-3: #F0F0F0;
+
+@keyframes fade-in {
+	from { opacity: 0 }
+	to { opacity: 1 }
+}
+@keyframes anim-up {
+	from { transform: translateY(100px); }
+	to { transform: translateY(0); }
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
+	font-family: 'Overpass', Helvetica, Arial, sans-serif;
+	color: $c-dark-1;
+}
+ul {
+	list-style: none;
+}
+a {
+	color: $c-mid-1;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+.hide {
+	display: none !important;
+}
+/* https://stackoverflow.com/questions/2781549/removing-input-background-colour-for-chrome-autocomplete */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+	-webkit-box-shadow: 0 0 0 60px white inset !important;
+}
+.screen {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top: 95px;
+	left: 0;
+	width: 100vw;
+	height: calc(100vh - 95px);
+	overflow: scroll;
+	background-color: $c-mid-2;
+	/*background: $c-dark-1;*/
+	/*background: linear-gradient(315deg, $c-dark-1 0%, $c-mid-2 100%);*/
+
+	animation: fade-in .25s;
+	z-index: 9999;
+
+	.modal {
+		.close {
+			float: right;
+			border: none;
+			outline: none;
+			background-color: $c-mid-1;
+			color: #FFF;
+			cursor: pointer;
+		}
+		.inner {
+			border-top: 3px solid $c-mid-1;
+		}
+	}
+}
+.screen.bis {
+	background-color: $c-mid-1;
+	/*background: $c-mid-1;*/
+	/*background: linear-gradient(315deg, $c-light-1 0%, $c-mid-1 100%);*/
+
+	.modal {
+		.close {
+			background-color: $c-mid-2;
+		}
+		.inner {
+			border-top: 3px solid $c-mid-2;
+		}
+	}
+}
+.screen.ter {
+	background-color: $c-light-3;
+	/*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
+
+	.modal {
+		.close {
+			background-color: $c-dark-1;
+		}
+		.inner {
+			border-top: 3px solid $c-dark-1;
+		}
+	}
+}
+*:empty:not(:focus):before {
+	content: attr(data-placeholder);
+	font-weight: 400;
+	color: $c-light-1;
+	pointer-events: none;
+}
+/* https://loading.io/css/ */
+.lds-ellipsis {
+	display: block;
+	position: relative;
+	width: 80px;
+	height: 80px;
+	margin: auto;
+	text-align: center;
+}
+.lds-ellipsis div {
+	position: absolute;
+	top: 33px;
+	width: 13px;
+	height: 13px;
+	border-radius: 50%;
+	background: $c-mid-2;
+	animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+	left: 8px;
+	animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+	left: 8px;
+	animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+	left: 32px;
+	animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+	left: 56px;
+	animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+	0% {
+		transform: scale(0);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+@keyframes lds-ellipsis3 {
+	0% {
+		transform: scale(1);
+	}
+	100% {
+		transform: scale(0);
+	}
+}
+@keyframes lds-ellipsis2 {
+	0% {
+		transform: translate(0, 0);
+	}
+	100% {
+		transform: translate(24px, 0);
+	}
+}

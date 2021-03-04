@@ -1,0 +1,150 @@
+nav#languages {
+	position: fixed;
+	width: 100%;
+	height: 30px;
+	top: 0;
+	font-size: $t-small;
+	background-color: $c-dark-1;
+	text-align: center;
+	z-index: 10000;
+
+
+	ul {
+		padding: 5px 15px;
+		li {
+			display: inline-block;
+			width: 30px;
+
+			a {
+				color: #FFF;
+			}
+			a.active {
+				text-decoration: underline;
+			}
+		}
+		li.disabled {
+			a {
+				color: $c-mid-2;
+				cursor: default;
+			}
+			a.active {
+				text-decoration: underline;
+			}
+		}
+	}
+}
+header {
+	position: fixed;
+	width: 100%;
+	height: 65px;
+	top: 30px;
+	background-color: #FFF;
+	box-shadow: 0 10px 10px rgba(175,175,175,.15);
+	z-index: 10000;
+
+	.primary {
+		width: 100%;
+		height: 45px;
+		padding: 10px 0;
+		overflow: hidden;
+		text-align: center;
+		font-size: 0;
+
+		li {
+			display: inline-block;
+			vertical-align: top;
+			height: 45px;
+			margin-right: 15px;
+			text-align: center;
+			font-size: $t-main;
+
+			a {
+				position: relative;
+				
+				button {
+					border: none;
+					outline: none;
+					height: 45px;
+					background-color: transparent;
+					border-radius: 5px;
+					padding: 0 30px;
+					font-size: $t-main;
+					cursor: pointer;
+					transition: background-color .25s;
+				}
+				i {
+					vertical-align: middle;
+					margin: 0 -5px 0 5px;
+					color: $c-mid-1;
+				}
+			}
+		}
+		li:not(.active):not(.temp-active):hover {
+			button {
+				background-color: $c-light-2;
+			}
+		}
+		li.active {
+			/*border-color: $c-dark-1;*/
+			button {
+				background-color: $c-dark-1;
+				color: #FFF;
+			}
+		}
+		li.temp-active {
+			/*border-color: $c-mid-2;*/
+			button {
+				/*background-color: $c-mid-2-light;*/
+				background-color: $c-light-2;
+				/*color: $c-mid-2;*/
+			}
+		}
+		li.user-id {
+			position: absolute;
+			right: 0;
+			font-size: $t-small;
+			line-height: 45px;
+		}
+		li.pending-save {
+			/*button {
+				font-size: $t-small;
+			}*/
+		}
+		li.pending-save.saved {
+			pointer-events: none;
+		}
+	}
+	.secondary {
+		width: 100%;
+		height: 30px;
+		overflow: hidden;
+		box-shadow: 0 10px 10px rgba(175,175,175,.15);
+		background-color: $c-light-2;
+		z-index: 1000;
+
+		.inner {
+			display: flex;
+			width: 615px;
+			height: 100%;
+			margin: auto;
+			text-align: center;
+
+			a {
+				flex-grow: 1;
+				color: $c-dark-1;
+
+				li {
+					height: 30px;
+					background-color: $c-light-2;
+					line-height: 30px;
+					font-size: $t-small;
+				}
+			}
+			li.active {
+				background-color: #FFF;
+				text-decoration: underline;
+				font-weight: 700;
+			}
+		}
+	}
+}

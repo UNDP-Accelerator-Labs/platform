@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang='<%- locals.lang %>'>
+<head>
+
+<%- include ('partials/head.ejs') %> 
+
+<script type='text/javascript' src='../../scripts/xlsx/dist/xlsx.full.min.js'></script>
+
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
+	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
+	crossorigin=''/>
+<script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
+	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
+	crossorigin=''></script>
+
+<script type='text/javascript' src='/js/pad.js'></script>
+
+
+</head>
+
+<body>
+
+<%- include ('partials/navigate.ejs') %> 
+
+<nav id='import'>
+	<div class='input-group'>
+		<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
+			<i class='material-icons'>layers</i>
+		</button>
+		<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
+			<i class='material-icons'>delete_forever</i>
+		</button>
+			
+			<!-- <button type='button' class='dropdown' title='Preview all.' onclick='compileTemplates()' ontouchend='compileTemplates()'>
+				<i class='material-icons'>preview</i>
+			</button> -->
+		<form>
+			<button title='Publish pads.' type='submit'><i class='material-icons'>publish</i></button>
+		</form>
+	</div>
+</nav>
+
+<main id='import' class='import'>
+	<div class='inner'>
+		<div class='input-group'>
+			<input type='file' id='upload' onchange='parseXLSX(event, this)' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
+			<!-- <label class='new-import' for='upload'><i class='material-icons'>cloud_upload</i></label> -->
+			<button><label class='new-import' for='upload'>Upload .xlsx</label></button>
+		</div>
+		<table border=0 cellpadding=0 cellspacing=0>
+			<thead>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+</main>
+
+<script type='text/javascript'>
+	const pagebody = d3.select('body')
+	const searchForm = pagebody.select('nav#import form')
+	const main = pagebody.select('main')
+	const tableModule = pagebody.select('table')
+	const moduleHead = tableModule.select('thead')
+	const moduleBody = tableModule.select('tbody')
+
+	// THE FOLLOWING VARIABLES ARE FOR THE pad PREVIEW
+	let activity = 'preview'
+	let templated = true
+	// let previewing = false
+	const editing = false
+
+	var lang = '<%- locals.lang %>'
+
+	const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg']
+
+	function parseXLSX (e, node) {
+		const files = e.target.files
+		const f = files[0]
+		const reader = new FileReader()
+
+		d3.select(node).attr('data-fname', f.name)
+
+		reader.onload = function (e) {
+			var data = new Uint8Array(e.target.result)
+			var workbook = XLSX.read(data, { type: 'array', bookFiles: true })
+			console.log(workbook)
+
+			let images = []
+			if (workbook.keys) {
+				const media = workbook.keys.filter(k => k.includes('media/image'))
+				console.log(media.sort())
+				images = media.map((m, i) => {
+					const name = workbook.files[m].name.split('media/')[1]
+					const buffer = workbook.files[m]._data.getContent()
+					// const loc = path.join(__dirname, `../tmp/${name}`)
+					// console.log(buffer)
+					// const buffer = new Uint8ClampedArray(40000);
+
+					// for (let i = 0; i < buffer.length; i += 4) {
+					// 	buffer[i + 0] = 0;    // R value
+					// 	buffer[i + 1] = 190;  // G value
+					// 	buffer[i + 2] = 0;    // B value
+					// 	buffer[i + 3] = 255;  // A value
+					// }
+					// // Initialize a new ImageData object
+					// let imageData = new ImageData(buffer, 200)
+					const blob = new Blob([buffer], {'type': 'image/png'})
+					const urlCreator = window.URL || window.webkitURL
+					const imageUrl = urlCreator.createObjectURL(blob)
+					return { id: name.extractDigits(), type: 'img', src: imageUrl }	
+					// const img = document.querySelector( "#photo" );
+					// img.src = imageUrl
+					// fs.writeFile(loc, buffer, 'binary', function () { console.log('file written') })
+				})
+			}
+			console.log(images)
+			// TO DO: SELECT SHEET MENU
+			workbook.SheetNames.forEach((s, i) => {
+				const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], { defval: null })
+
+				console.log(json)
+				let keys = Object.keys(json[0])
+				if (images.length) {
+					// WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
+					// THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
+					const cols = keys.map(d => {
+						const obj = {}
+						obj.key = d
+						obj.values = json.map(c => c[d]).filter(c => c)
+						return obj
+					})
+					const imageCol = cols.find(d => !d.values.length) ? cols.find(d => !d.values.length).key : null
+					if (imageCol) {
+						json.forEach((d, i) => {
+							d[imageCol] = images.find(c => c.id === i + 1)
+						})
+					}
+				}
+				// const isEmpty = keys.filter(k => k.includes('__EMPTY'))
+				// if (isEmpty.length) {
+				// 	json.forEach(d => {
+				// 		isEmpty.forEach(c => {
+				// 			delete d[c]
+				// 		})
+				// 	})
+				// 	keys = keys.filter(k => !k.includes('__EMPTY'))
+				// }
+				if (i === 0) parseColumns(json, keys) // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+			})
+			// HIDE THE LOADING BUTTON
+			main.select('.input-group').classed('hide', true)
+		}
+		reader.readAsArrayBuffer(f)
+	}
+
+	function parseColumns (dict, keys) {
+		const cols = keys.map(d => {
+			const obj = {}
+			obj.key = d
+			obj.entries = dict.map(c => {
+				// CHECK IF DATE
+				const testdate = ExcelDateToJSDate(c[d])
+				if (isValidDate(testdate) && testdate.getFullYear() >= 2019) {
+					return testdate.toISOString()
+				}
+				else {
+					const e = c[d]
+					if (e !== null && e !== undefined && !isNaN(e)) return +e // VERIFY IF e IS A NUMBER
+					else return e
+				}
+			})
+			let ref = obj.entries.filter(c => c).map(c => typeof c === 'string' ? c.trim().toLowerCase() : c)
+			obj.values = ref.unique()
+			obj.types = ref.map(c => typeof c).unique()
+			
+			if (obj.types.length > 1 && obj.types.includes('string')) {
+				obj.entries = obj.entries.map(c => {
+					if (c === undefined || c === null) return c
+					else return String(c).trim().toLowerCase()
+				})
+				ref = obj.entries.filter(c => c)
+				obj.values = ref.unique()
+				obj.types = ['string']
+			}
+			else if (obj.types.length === 0) {
+				if (obj.entries.filter(c => c !== null && c !== undefined).unique()[0] === 0) {
+					obj.entries = obj.entries.map(c => 0)
+					ref = obj.entries.filter(c => c === 0)
+					obj.values = ref.unique()
+					obj.types = ['number']
+				} else {
+					obj.types = [typeof null]
+				}
+			}
+			// CHECK IF THERE ARE ARRAYS/ LISTS
+			obj.types.forEach(c => {
+				if (Array.isArray(c)) {
+					const listcontent = c.map(b => typeof b).unique()
+					return `list of ${listcontent}s`
+				} else return c
+			})
+
+
+
+			// CHECK IF BOOLEAN COLUMN
+			if (obj.values.length === 1 && ref.length !== dict.map(c => c[d]).length) obj.bool = true
+			else obj.bool = false
+			// INFER TYPE
+			if (obj.entries.map(c => c ? typeof c === 'object' ? c.type === 'img' ? c.type : null : null : null).filter(c => c).unique().length 
+				|| !obj.entries.filter(c => c !== null && c !== undefined).length // THERE IS ANY ENTRY THAT HAS A VALUE (CASE FOR ENTIRELY EMPTY COLUMN)
+			) {
+				obj.inferredtype = 'img'
+				console.log(obj)
+			}
+			else if (ref.length - obj.values.length > parseInt(ref.length * .25)) obj.inferredtype = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
+			else obj.inferredtype = 'txt'
+
+			console.log(obj)
+
+			return obj
+		})
+		return renderTable(cols)
+	}
+	function parseGroups (dict, keys) {
+		const cols = keys.map(d => {
+			return new Promise(async resolve => {
+				// CHECK IF KEY IS UNIQUE, OR GROUPED
+				// TO DO: INPUT NAME OF GROUP
+				if (typeof d === 'object') {
+					const obj = {}
+					obj.key = `Group [${d.join(', ')}]`
+					const prefix = seekPrefix(d)
+
+					const cols = dict.filter(c => d.includes(c.key))
+					const zip = []
+
+					let rmprefix = false
+					let mklist = true
+					const types = cols.map(c => c.types).flat().unique()
+					
+					if (cols.map(c => c.bool).unique().includes(true)) {
+						const message = `The prefix <em>${prefix}</em> was detected. Should it be removed from cell values?`
+						const opts = [
+							{ node: 'button', type: 'button', label: 'Keep it', resolve: false }, 
+							{ node: 'button', type: 'button', label: 'Drop it', resolve: true }
+						]
+						rmprefix = await renderPromiseModal({ message: message, opts: opts })
+					}
+					else if (types.length === 1 && types[0] === 'string') {
+						const message = `Merge columns into a list, or keep a single ${types[0]} with all the values?`
+						const opts = [
+							{ node: 'button', type: 'button', label: 'Make a list', resolve: true }, 
+							{ node: 'button', type: 'button', label: `Keep as ${types[0]}`, resolve: false }
+						]
+						mklist = await renderPromiseModal({ message: message, opts: opts })
+					}
+
+					cols.forEach(c => {
+						// IF THE VALUES ARE BOLEAN, PIVOT
+						if (c.bool) {
+							c.entries = c.entries.map(b => {
+								if (b) {
+									// if (typeof b !== 'string')
+									// else if (typeof b === 'string' && b.toLowerCase() !== 'no') return c.key
+									// else return null
+									return rmprefix ? c.key.replace(prefix, '') : c.key
+								}
+								else return null
+							})
+						}
+						// ZIP THE entries
+						for (let i = 0; i < c.entries.length; i ++) {
+							if (c.entries[i]) {
+								if (!isNaN(c.entries[i])) c.entries[i] = +c.entries[i]
+								if (!zip[i]) zip[i] = [c.entries[i]]
+								else zip[i].push(c.entries[i])
+							}
+						}
+					})
+					obj.entries = mklist ? zip : zip.map(c => c.join(', '))
+					obj.values = cols.map(c => c.entries.map(b => typeof b === 'string' ? b.trim().toLowerCase() : b)).flat().unique().sort()
+					obj.types = obj.entries.map(c => {
+						if (Array.isArray(c)) {
+							const listcontent = c.map(b => typeof b).unique()
+							return `list of ${listcontent}s`
+						} else return typeof c
+					}).unique() 
+					obj.bool = false
+					obj.inferredtype = 'checklist'
+					resolve(obj)
+				}
+				else resolve(dict.find(c => c.key === d))
+			})
+		})
+		Promise.all(cols).then(data => renderTable(data))
+	}
+	function renderTable (cols) {
+		moduleHead.html('').datum(cols)
+		const selectCols = moduleHead.addElem('tr', 'column-selection')
+		selectCols.addElems('th', 'selection', d => d)
+			.attr('title', 'Select column.')
+		.on('click', function (d) {
+			const evt = d3.event
+			const node = this
+			const sel = d3.select(this)
+
+			if ((evt.shiftKey || evt.metaKey || evt.ctrlKey) && sel.classed('disabled')) return null
+			if (!evt.shiftKey && !evt.metaKey && !evt.ctrlKey) moduleHead.selectAll('.selected').classed('selected', false)
+
+			toggleClass(this, 'selected')
+
+			moduleHead.selectAll('th')
+			.classed('disabled', function (c) { 
+				if (this === node) return false
+				if (c.types) {
+					if (!d.types.length) {
+						if (!c.types.length) return false
+						else if (c.types.includes('number')) return false
+						else return true
+					} else {
+						if (!c.types.length) return false
+						else if (c.types.intersection(d.types).length > 0) return false
+						else return true
+					}
+				}
+			})
+
+			// THIS IS FOR RANGE SELECTIONS
+			let idxs = []
+			let currentidx = 0
+			if (sel.classed('selected') && evt.shiftKey) {
+				moduleHead.selectAll('th').each(function (c, j) {
+					if (d3.select(this).classed('selected')) idxs.push(j)
+					if (this === node) currentidx = j
+				})
+
+				idxs.sort((a, b) => a - b)
+				let location = idxs.indexOf(currentidx)
+				if (location === -1) {
+					idxs.push(currentidx)
+					idxs.sort((a, b) => a - b)
+					location = idxs.indexOf(currentidx)
+				}
+
+				if (location !== 0) idxs = idxs.slice(0, location + 1)
+					
+				moduleHead.selectAll('th').classed('selected', function (c, j) { return j >= d3.min(idxs) && j <= d3.max(idxs) && !d3.select(this).classed('disabled') })
+			}
+		}).addElems('i', 'material-icons')
+			.html('tab_unselected')
+		
+		selectCols.insertElem(':first-child', 'th', 'preview')
+			.attr('rowspan', 4)
+
+		const columnheaders = moduleHead.addElem('tr', 'column-names')
+		columnheaders.addElems('th', 'name', d => d)
+			.attrs({ 'title': d => d.key, 'contenteditable': true })
+			.html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
+		.on('focus', function (d) {
+			d3.select(this).html(d.key)
+		})
+		.on('blur', function (d) {
+			d.key = this.innerText
+			d3.select(this).html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
+		})
+
+		const datatypes = moduleHead.addElem('tr', 'data-types')
+			.addElems('th', 'data', d => d)
+		datatypes.addElems('label').html(d => d.types)
+		datatypes.addElems('button', 'parse', d => d.types.includes('string') ? [d] : [])
+			.addElems('i', 'material-icons')
+			.html('list')
+		.on('click', async function (d) {
+			const message = `Split the string data in this column into a list using <input type='text' name='separator' value=',' minlength=1 maxlength=1> separators.`
+			const opts = [{ node: 'button', type: 'button', label: 'Split strings', resolve: _ => d3.select('.modal input[name="separator"]').node().value }]
+			const separator = await renderPromiseModal({ message: message, opts: opts })
+			splitValues(d.key, separator)
+		})
+
+		// columnheaders.insertElem(':first-child', 'th', 'preview')
+			// .attr('rowspan', 3)
+
+		const columntypes = moduleHead.addElem('tr', 'media-types')
+			.addElems('th', 'type', d => d)
+		.addElems('select')
+		.on('change', function (d) {
+			const selection = this.options[this.selectedIndex].value
+			if (columntypes.selectAll('option[value="title"]:checked').size()) {
+				columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', c => c.disabled)
+			if (columntypes.selectAll('option[value="location"]:checked').size()) {
+				columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', c => c.disabled)
+			if (columntypes.selectAll('option[value="sdgs"]:checked').size()) {
+				columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', c => c.disabled)
+			if (columntypes.selectAll('option[value="tags"]:checked').size()) {
+				columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', c => c.disabled)
+			// console.log(d)
+			// console.log(d.types)
+			// if (selection === 'sdgs' && (d.types.includes('string') || d.types.includes('list of strings'))) {
+			// 	const message = `The current data type of your column is <em>${d.types[0]}</em>. To submit <em>${selection === 'sdgs' ? 'SDGs' : selection}</em> you need a <em>list</em> data type. Make sure the entries in this column are ${selection === 'sdgs' ? 'numbers (the SDG id) ' : ''}separated by e.g., a comma, a semi column, or simply a space.`
+			// 	if (d.types[0] === 'string') message += ' If this is the case, you can parse the data by clicking below.'
+			// 	const opts = [{ label: 'Parse data' }]
+			// 	modal(message, opts)
+			// }
+			d.inferredtype = selection
+		})
+		columntypes.addElems('optgroup', 'group-media')
+			.attr('label', 'media')
+		.addElems('option', 'opt', d => {
+				const obj = []
+
+				if (d.types.includes('string') || d.types.includes('number')) {
+					obj.push({ label: 'title', value: 'title', disabled: null })
+					obj.push({ label: 'text', value: 'txt', disabled: null })
+					obj.push({ label: 'embedding', value: 'embed', disabled: null })
+				} else if (d.types.includes('list of strings') || d.types.includes('list of numbers')) {
+					obj.push({ label: 'title', value: 'title', disabled: true })
+					obj.push({ label: 'text', value: 'txt', disabled: null })
+					obj.push({ label: 'embedding', value: 'embed', disabled: true })
+				} else {
+					obj.push({ label: 'title', value: 'title', disabled: true })
+					obj.push({ label: 'text', value: 'txt', disabled: true })
+					obj.push({ label: 'embedding', value: 'embed', disabled: true })
+				}
+				// else obj.push({ label: 'text (there is no text in this column)', value: 'txt', disabled: true })
+				
+				if (d.types.includes('object') && ['img', 'video'].includes(d.inferredtype)) {
+					obj.push({ label: 'image', value: 'img', disabled: null })
+					obj.push({ label: 'video', value: 'video', disabled: null })
+					obj.push({ label: 'checklist', value: 'checklist', disabled: true })
+				} else if (d.types.includes('string') || d.types.includes('list of strings')) {
+					// IF URL MAYBE IMAGE OR LIST OF URLS
+					const containsURLs = d.entries.flat().filter(c => c).map(c => c.isURL()).unique()
+					console.log('look here')
+					console.log(d.entries.flat())
+					console.log(d.entries.flat().filter(c => c).map(c => { return { original: c, url: c.isURL() } }).filter(c => !c.url))
+					console.log(containsURLs)
+					obj.push({ label: 'image', value: 'img', disabled: containsURLs.length === 1 && containsURLs.includes(true) ? null : true })
+					obj.push({ label: 'video', value: 'video', disabled: containsURLs.length === 1 && containsURLs.includes(true) ? null : true })
+					obj.push({ label: 'checklist', value: 'checklist', disabled: null })
+				} else {
+					obj.push({ label: 'image', value: 'img', disabled: true })
+					obj.push({ label: 'video', value: 'video', disabled: true })
+					obj.push({ label: 'checklist', value: 'checklist', disabled: null })
+				}
+				// else obj.push({ label: 'image (there are other media in this column)', value: 'img', disabled: true })
+				return obj
+			}).attrs({ 
+				'value': d => d.value,
+				'selected': function (d) {
+					const inferredtype = d3.select(this).findAncestor('type').datum().inferredtype
+					if (inferredtype === d.value) return true
+					else return null
+				}, 'disabled': d => d.disabled
+			}).html(d => d.label)
+		const metaOpts = columntypes.addElems('optgroup', 'group-meta')
+			.attr('label', 'meta')
+		.addElems('option', 'opt', d => {
+				const obj = []
+				// CHECK FOR LOCATIONS
+				if (d.types.includes('string') || d.types.includes('list of strings')) { 
+					obj.push({ label: 'location', value: 'location', disabled: null })
+				} else obj.push({ label: 'location', value: 'location', disabled: true })
+				// CHECK FOR SDG
+				if (d.types.includes('number')) {
+					if (!d.values.filter(c => c !== null && c !== undefined).map(c => +c > 0 && +c <= 17).includes(false)) {
+						obj.push({ label: 'SDGs', value: 'sdgs', disabled: null })
+					} else obj.push({ label: 'SDGs', value: 'sdgs', disabled: true })
+				} else if (d.types.includes('list of numbers')) {
+					if (!d.values.flat().filter(c => c !== null && c !== undefined).map(c => +c > 0 && +c <= 17).includes(false)) {
+						obj.push({ label: 'SDGs', value: 'sdgs', disabled: null })
+					} else obj.push({ label: 'SDGs', value: 'sdgs', disabled: true })
+				} else obj.push({ label: 'SDGs', value: 'sdgs', disabled: true })
+				// CHECK FOR THEMATIC AREA
+				if (d.types.includes('string') || d.types.includes('list of strings')) { 
+					obj.push({ label: 'thematic area(s)', value: 'tags', disabled: null })
+				} else obj.push({ label: 'thematic area(s)', value: 'tags', disabled: true })
+				return obj
+			}).attrs({
+				'value': d => d.value,
+				'selected': function (d) {
+					const inferredtype = d3.select(this).findAncestor('type').datum().inferredtype
+					if (inferredtype === d.value) return true
+					else return null
+				}, 'disabled': d => d.disabled
+			}).html(d => d.label)
+
+		columntypes.each(function (d) {
+			const selection = this.options[this.selectedIndex].value
+			if (columntypes.selectAll('option[value="title"]:checked').size()) {
+				columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', c => c.disabled)
+			if (columntypes.selectAll('option[value="location"]:checked').size()) {
+				columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', c => c.disabled)
+			if (columntypes.selectAll('option[value="sdgs"]:checked').size()) {
+				columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', c => c.disabled)
+			if (columntypes.selectAll('option[value="tags"]:checked').size()) {
+				columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', true)
+			} else columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', c => c.disabled)
+		})
+
+		const show = 5
+		moduleBody.html('').datum(cols)
+		
+		const bodyRows = moduleBody.addElems('tr', 'column-values', d => {
+			const slices = d.map(c => { return { key: c.key, entries: c.entries.slice(0, show) } })
+			const zip = []
+			slices.forEach(c => {
+				for (let i = 0; i < c.entries.length; i ++) {
+					if (!zip[i]) zip[i] = [{ key: c.key, cell: c.entries[i] }]
+					else zip[i].push({ key: c.key, cell: c.entries[i] })
+				}
+			})
+			return zip
+		})
+		bodyRows.addElems('td', 'value',  d => d)
+			.style('word-break', d => typeof d.cell === 'string' && d.cell.split(' ').length === 1 ? 'break-all' : null)
+			.html(d => {
+				if (d.cell && typeof d.cell === 'string' && d.cell.length > 100) return `${d.cell.slice(0, 100)}…` 
+				else if (d.cell && typeof d.cell === 'object') {
+					if (Array.isArray(d.cell)) {
+						return d.cell.join(', ').length > 100 ? `${d.cell.join(', ').slice(0, 100)}…` : d.cell.join(', ')
+					} else if (Object.keys(d.cell).includes('src')) { // LIKELY AN IMAGE
+						return `<img src='${d.cell.src}'>`
+					}
+				}
+				else return d.cell
+			})
+		bodyRows.insertElem(':first-child', 'td', 'preview')
+			.attr('title', 'Preview pad.')
+		.on('click', function () {
+			// if (!previewing) {
+				const sel = d3.select(this)
+				const node = sel.findAncestor('column-values').node()
+				
+				let currentidx = 0
+				d3.select(node.parentNode).selectAll('tr').each(function (c, j) { if (this === node) currentidx = j })
+				
+				previewPad(currentidx)
+			// }
+		}).addElems('i', 'material-icons')
+			.html('visibility')
+
+		main.select('.inner').addElems('p', 'summary')
+			.html(`${d3.max(cols, c => c.entries.length)} entries and ${cols.length} columns (${d3.max(cols, c => c.entries.length)} x ${cols.length} table) were detected. ${d3.min([show, d3.max(cols, c => c.entries.length)])} entries are shown.`)
+	}
+	// THE FOLLOWING FUNCTION IS INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
+	function seekPrefix (arr) {
+		const A = arr.filter(d => d).concat().sort()
+		const a1 = A[0]
+		const a2 = A[A.length-1]
+		const L = a1.length
+		let i = 0
+		while (i < L && a1.charAt(i) === a2.charAt(i)) i++
+		return a1.substring(0, i)
+	}
+	// function modal (message, opts) {
+	// 	return new Promise (resolve => {
+	// 		const overlay = pagebody.addElems('div', 'modal')
+	// 		overlay.addElem('div', 'veil')
+			
+	// 		const menu = overlay.addElem('div', 'menu')
+	// 		menu.addElem('div', 'exit')
+	// 			.on('click', _ => d3.selectAll('.modal').remove())
+	// 		.addElem('i', 'material-icons')
+	// 			.html('clear')
+
+	// 		menu.addElems('div', 'modal-instruction')
+	// 			.html(message)
+
+	// 		const form = menu.addElem('form')
+	// 			// .attrs({ 'action': '/delete', 'method': 'DELETE' })
+	// 		menu.addElems('button', 'save', opts)
+	// 			.addElem('div')
+	// 			.html(d => d.label)
+	// 		.on('click', d => {
+	// 			if (typeof d.resolve === 'function') {
+	// 				const resolved = d.resolve()
+	// 				d3.selectAll('.modal').remove()
+	// 				resolve(resolved)
+
+	// 			}
+	// 			else {
+	// 				d3.selectAll('.modal').remove()
+	// 				resolve(d.resolve)
+	// 			}
+	// 		})
+	// 	})
+	// }
+
+	function splitValues (col, separator) {
+		const cols = moduleHead.datum()
+		cols.forEach(d => {
+			if (d.key === col) {
+				// CHECK IF THE SPARATOR WAS INPUT TWICE (OR MORE)
+				const regex = new RegExp(`${RegExp.escape(separator)}${RegExp.escape(separator)}+`, 'gi')
+				d.entries = d.entries.map(c => {
+					if (c) {
+						c = c.replace(/\n/g, ' ')
+						let e = c.replace(regex, separator).split(separator)
+						if (Array.isArray(e)) { // NOTE THIS SHOULD ALWAYS BE THE CASE
+							e = e.map(b => {
+								if (!isNaN(b)) return +b
+								else return b
+							})
+						}
+						return e
+					} else return undefined
+				})
+				d.values = d.values.map(c => c.replace(regex, separator).split(separator)).flat().unique()
+				d.types = d.entries.filter(c => c !== undefined).map(c => {
+					if (Array.isArray(c)) {
+						const listcontent = c.map(b => typeof b).unique()
+						return `list of ${listcontent}s`
+					} else return typeof c
+				}).unique()
+				d.inferredtype = 'checklist'
+			}
+		})
+		renderTable(cols)
+	}
+	function groupColumns () {
+		const cols = moduleHead.datum()
+		const selected = moduleHead.selectAll('.selected')
+
+		if (selected.size() > 1) {
+			const groupedkeys = selected.data().map(d => d.key)
+			const keys = cols.map(d => d.key).diff(groupedkeys)
+			keys.push(groupedkeys)
+			parseGroups(cols, keys)
+		}
+	}
+	function dropColumns () {
+		let cols = moduleHead.datum()
+		const dropkeys = moduleHead.selectAll('.selected').data().map(d => d.key)
+		renderTable(cols.filter(d => !dropkeys.includes(d.key)))
+	}
+	function compilePads (idx) {
+		const cols = moduleHead.datum()
+		let extractLocations = false
+		if (idx !== null && idx !== undefined) extractLocations = true
+		// 1 - PREPARE DATA FOR THE TEMPLATE
+		// 2 - PREPARE DATA FOR THE PAD
+		const entriesLength = cols[0].entries.length
+		const pads = d3.range(entriesLength)
+		.filter(i => {
+			if (idx !== null && idx !== undefined) return i === idx
+			else return true
+		}).map(i => {
+			return new Promise(async resolve0 => {
+				// TO DO: PROBLEM WITH TITLE
+				// IT SHOULD BE THE FIRST ITEM IN THE PAD
+				const items = cols.map(c => {
+					return new Promise(async resolve1 => {
+						const item = {}
+						const type = moduleHead.selectAll('.type').filter(d => d.key === c.key).select('select option:checked').node().value
+						if (['txt', 'title'].includes(type)) {
+							if (Array.isArray(c.entries[i])) item.txt = c.entries[i].sort((a, b) => {
+									if (typeof a === 'string' && typeof b === 'string') {
+										if (a < b) return -1
+										else if (a > b) return 1
+										else return 0
+									} else {
+										return a - b
+									}
+								}).join(', ')
+							else item.txt = c.entries[i]
+							item.type = type
+						}
+						if (type === 'embed') {
+							item.html = c.entries[i]
+							item.type = type
+						}
+						if (type === 'img') {
+							item.type = type // THIS COMES FIRST HERE AS WE UPDATE IT IN THE CASE OF A mosaic
+							if (c.entries[i] && c.entries[i].src) item.src = c.entries[i].src
+							else {
+								if (Array.isArray(c.entries[i])) { 
+									const containsURLs = c.entries[i].map(b => b.isURL()).unique()
+									if (containsURLs.length === 1 && containsURLs.includes(true)) { // A MOSAIC OF URLS
+										item.srcs = c.entries[i].map(b => b.trim())
+										item.type = 'mosaic'
+									} else item.src = null
+								} else if (c.entries[i] && c.entries[i].isURL()) item.src = c.entries[i].trim()
+								else item.src = null
+							}
+						}
+						if (type === 'video') { // THERE CAN BE NO VIDEO UPLOAD FROM EXCEL: THIS IS ONLY A PLACEHOLDER IN THE TABLE/ PAD
+							item.src = null
+							item.type = type
+						}
+						if (type === 'checklist') {
+							item.options = c.values.filter(d => d !== null && d !== undefined).unique()
+								.sort((a, b) => {
+									if (typeof a === 'string' && typeof b === 'string') {
+										if (a < b) return -1
+										else if (a > b) return 1
+										else return 0
+									} else {
+										return a - b
+									}
+								}).map(d => { 
+									const obj = {}
+									obj.name = d.toString()
+									if (c.entries[i]) {
+										if (typeof c.entries[i] !== 'object') {
+											obj.checked = typeof c.entries[i] === 'string' ? c.entries[i].toLowerCase().trim() === d ? true : null : c.entries[i] === d ? true : null
+										} else obj.checked = c.entries[i].map(b => typeof b === 'string' ? b.toLowerCase().trim() : b).includes(d) ? true : null
+									}
+									return obj
+								})
+							item.type = type
+						}
+						if (type === 'location') {
+							let locations = []
+							if (Array.isArray(c.entries[i])) locations = c.entries[i]
+							else locations = [c.entries[i]]
+							locations = locations.filter(d => d)
+
+							if (extractLocations && locations.length) {
+								const results = await POST('/forwardGeocoding', { locations: locations })
+					 			item.centerpoints = results.map(c => c.centerpoint)
+					 			item.caption = `Originally input location${locations.length > 1 ? 's' : ''}: <strong>${locations.map(l => l.trim().capitalize()).join('</strong>, <strong>')}</strong>.<br/>`
+					 			if (results.filter(c => c.found).length > 1) item.caption += `Multiple locations found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`
+					 			else if ((results.filter(c => c.found).length === 1)) item.caption += results.find(c => c.found).caption
+					 			if (results.filter(c => !c.found).length) {
+					 				item.caption += results.filter(c => !c.found).map(c => c.caption).join(' ')
+					 				item.caption += '<br/>Defaulted to UNDP <% if (locals.country) { %><%= country %> <% } else { %><% } %>Country Office location.'
+					 			}
+					 		} else item.locations = locations
+					 		item.type = type
+						}
+						if (type === 'sdgs') {
+							if (Array.isArray(c.entries[i])) item.sdgs = c.entries[i]
+							else item.sdgs = [c.entries[i]]
+							item.sdgs = item.sdgs.filter(d => d)
+							item.type = type
+						}
+						if (type === 'tags') {
+							if (Array.isArray(c.entries[i])) item.tags = c.entries[i].map(b => { return { name: b } })
+							else item.tags = [{ name: c.entries[i] }]
+							item.tags = item.tags.filter(d => d.name)
+							item.type = type
+						}
+						item.instruction = c.key
+						resolve1(item)
+					})
+				})
+				const results = await Promise.all(items)
+
+				resolve0({ 
+					title: results.find(c => c.type === 'title') ? results.find(c => c.type === 'title').txt : null, 
+					media: results.filter(c => ['img', 'mosaic', 'video', 'checklist', 'txt', 'title', 'embed'].includes(c.type)), 
+					meta: results.filter(c => ['location', 'sdgs', 'tags'].includes(c.type)) 
+				})
+			})
+		})
+		return Promise.all(pads)
+	}
+	function compileTemplates () {
+		const cols = moduleHead.datum()
+
+		const template = {}
+
+		// COPY THIS FROM template.ejs
+		const title = d3.select('input#upload').attr('data-fname').slice(0, 99) // THIS IS NECESSARY BECAUSE THE DB IS ONLY SET TO STORE 99 VARCHAR
+		const description = `Template generated from the columns in the “${title.trim()}” file.`
+		const items = cols.map(d => {
+			const item = {}
+			if (['location', 'sdgs', 'tags'].includes(d.inferredtype)) item.level = 'meta'
+			else item.level = 'media'
+			item.instruction = d.key
+			item.type = d.inferredtype
+			if (['checklist', 'tags'].includes(d.inferredtype)) item.options = d.entries.unique().map(c => { return { name: c } })
+			if (d.inferredtype === 'sdgs') {} // TO DO: GET SDGs DETAILS FROM BACKEND
+			
+			return item
+		})
+
+		let fullTxt = `${title}\n\n${description}`
+		items.forEach(d => {
+			fullTxt += `\n\n${d.instruction.trim()}`
+			if (d.options) fullTxt += `\n\n${d.options.map(c => c.name).flat().map(c => typeof c === 'string' ? c.trim() : c).join('\n\n').trim()}`
+		})
+		fullTxt = fullTxt.trim()
+
+		let tags = cols.find(d => d.inferredtype === 'tags') ? cols.find(d => d.inferredtype === 'tags').entries.flat().unique().filter(d => d) : null
+		if (tags && !tags.length) tags = null
+
+		const medium = 'xlsx'
+
+		template.title = title
+		template.description = description
+		template.items = items
+		template.fullTxt = fullTxt
+		template.tags = tags
+		template.medium = medium
+
+		console.log(template)
+		return template
+	}
+
+	async function previewPad (idx) {
+		// previewing = true
+		const cols = moduleHead.datum()
+		const pads = await compilePads(idx)
+		const pad = pads[0]
+
+		const screen = d3.select('div.screen.ter').classed('hide', false)
+		const modal = screen.addElems('div', 'modal pad-preview')
+		modal.addElems('button', 'close')
+		.on('click', function () {
+			let orderedCols = []
+			if (pad.media.find(d => d.type === 'title')) orderedCols.push(pad.media.find(d => d.type === 'title').instruction)
+			
+			d3.selectAll('div.media-layout div.media-container').data().forEach(d => orderedCols.push(d.instruction))
+			d3.selectAll('div.meta-layout div.meta-container').data().forEach(d => orderedCols.push(d.instruction))
+
+			orderedCols = orderedCols.map(d => {
+				return cols.find(c => c.key === d)
+			})
+
+			renderTable(orderedCols)
+
+			modal.remove()
+			screen.classed('hide', true)
+		}).html('Close')
+
+		const main = modal.addElems('main', 'pad')
+			.attr('id', 'pad')
+		const inner = main.addElems('div', 'inner')
+		
+		if (pad) {
+			console.log(pad)
+
+			const head = inner.addElems('div', 'head')
+			head.addElems('div', 'title')
+				.attr('data-placeholder', vocabulary['untitled pad'][lang])
+			.html(pad.title)
+
+			const body = inner.addElems('div', 'body')
+			const mediaLayout = body.addElems('div', `media-layout layout ${activity}`, pad.media.length ? [true] : [])
+			mediaLayout.addElems('div', 'input-type')
+				.addElems('label').html(vocabulary['media'][lang])
+			// body.addElems('div', 'page-separator')
+			// body.addElems('div', 'page-label').addElems('span').html('Meta data')
+			const metaLayout = body.addElems('div', `meta-layout layout ${activity}`, pad.meta.length ? [true] : [])
+			metaLayout.addElems('div', 'input-type')
+				.addElems('label').html(vocabulary['metadata'][lang])
+
+			pad.media.forEach(d => {
+				if (d.type === 'img') addImg(d)
+				if (d.type === 'mosaic') addMosaic(d)
+				if (d.type === 'video') addVideo(d)
+				// if (['txt', 'title'].includes(d.type)) addTxt(d)
+				if (d.type === 'txt') addTxt(d)
+				if (d.type === 'embed') addEmbed(d)
+				if (d.type === 'checklist') addChecklist(d)
+			})
+			pad.meta.forEach(d => {
+				if (d.type === 'location') {
+					// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+					if ((!d.centerpoint && !d.centerpoints) || (d.centerpoint && (!d.centerpoint.lat || !d.centerpoint.lng))) {
+						d.centerpoints = [<%- centerpoint %>]
+					} else if (d.centerpoint && !d.centerpoints) d.centerpoints = [d.centerpoint]
+					addMap(d)
+				}
+				if (d.type === 'sdgs') addSDGs(d, false)
+				if (d.type === 'tags') {
+					addTags(d, false)
+				}
+			})
+		}
+	}
+
+	// CATCH THE SEARCH PARAMS
+	// INSPIRED BY https://stackoverflow.com/questions/5384712/intercept-a-form-submit-in-javascript-and-prevent-normal-submission
+	async function catchSubmit (evt) {
+		if (evt.preventDefault) evt.preventDefault()
+		const cols = moduleHead.datum()
+		let fls = null
+		
+		if (cols.find(d => d.inferredtype === 'img')) {
+			const imgs = cols.find(d => d.inferredtype === 'img').entries
+			console.log(imgs)
+			const title = d3.select('input#upload').attr('data-fname').slice(0, 20).simplify()
+			const fd = new FormData()
+			const promises = []
+			imgs.filter(d => d && d.src).forEach(d => {
+				// TO DO: FOR MOSAIC, NEED TO ITERATE OVER ARRAYS OF IMAGES WITHOUT src KEY AND SEND THOSE TO BE COLLECTED IN THE BACKEND
+				// ++ STICTH TOGETHER BELOW
+				promises.push(new Promise(async resolve => {
+					const blob = await fetch(d.src).then(res => res.blob())
+					const ts = new Date().getTime()
+					const originalname = d.src //`xlsx-${title}-${d.id}-${ts}.png`
+					resolve({ blob: blob, originalname: originalname })
+				}))
+			})
+			imgs.filter(d => Array.isArray(d) && d.map(c => c.isURL()).unique().length === 1 && d.map(c => c.isURL()).unique().includes(true))
+			.flat().forEach((d, i) => {
+				promises.push(new Promise(async resolve => {
+					const blob = await fetch(d).then(res => res.blob())
+					const originalname = d
+					resolve({ blob: blob, originalname: d })
+				}))
+			})
+			const blobs = await Promise.all(promises)
+			blobs.forEach(b => {
+				// console.log(`xlsx-${title}-${b.id}-${ts}.png`)
+				fd.append('img', b.blob, b.originalname)
+			})
+
+			fls = await fetch('/upload/img', { method: 'POST', body: fd })
+			.then(response => response.json())
+			.then(results => {
+				const notification = d3.select('body').addElem('div', 'notification')
+					.addElem('div')
+					.html('Image successfully uploaded.<i class="material-icons">done</i>') // TO DO: TRANSLATE
+				setTimeout(_ => notification.remove(), 4000)
+				return results
+			}).catch(err => { if (err) throw (err) })
+		}
+		const pads = await compilePads()
+		if (fls) {
+			pads.forEach((d, i) => {
+				// EDIT IMG src
+				d.media.filter(c => c.type === 'img').forEach(c => {
+					c.src = fls.find(b => c.src.includes(b.originalname)).src
+				})
+				// EDIT MOSAIC srcs
+				d.media.filter(c => c.type === 'mosaic').forEach(c => {
+					c.srcs = c.srcs.map(b => fls.find(a => b.includes(a.originalname)).src)
+				})
+			})
+		}
+		const template = compileTemplates()
+		const results = await POST('/storeImport', { pads: pads, template: template })
+		window.location.href = `/${lang}/browse/private`
+		return false
+	}
+	if (searchForm.node().attachEvent) searchForm.node().attachEvent('submit', catchSubmit)
+	else searchForm.node().addEventListener('submit', catchSubmit)
+
+	// window.addEventListener('keyup', function (e) {
+	// 	e = e || event
+	// 	if (e.key === 'Escape' || e.keyCode === 27) {
+	// 		if (d3.selectAll('.modal').size()) {
+	// 			// d3.selectAll('.modal').remove()
+	// 			// previewing = false
+	// 		}
+	// 	}
+	// })
+</script>
+</body>
+</html>

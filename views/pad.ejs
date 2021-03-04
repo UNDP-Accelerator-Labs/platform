@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang='<%- locals.lang %>'>
+<head>
+
+<%- include ('partials/head.ejs') %> 
+<script type='text/javascript' src='/js/pad.js'></script>
+
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
+	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
+	crossorigin=''/>
+<script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
+	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
+	crossorigin=''></script>
+
+</head>
+
+<body>
+
+<%- include ('partials/navigate.ejs') %> 
+<%- include ('partials/menu-templates.ejs') %>
+<% 
+	if (!locals.activity) locals.activity = locals.path[1] 
+	if (!locals.templated) locals.templated = locals.display_template !== null
+%>
+
+<main id='pad' class='pad'>
+	<!-- BELOW ARE ENGAGEMENT FEATURES -->
+	<!-- <% if (['edit', 'view'].includes(locals.activity) && (locals.data && locals.data.published)) { %>
+		<div class='engagement-input-group'>
+			<div class='engagement bookmark <% if (locals.data.bookmarked) { %>active<% } %>' data-type='bookmark' data-count='<%- locals.engagement["bookmark"] %>'>
+				<div class='label'><%- vocabulary['bookmark'][locals.lang](locals.data.bookmarked) %></div>
+			</div>
+			<ul>
+				<% ['inspiration', 'approval', 'flag'].forEach(type => { 
+					let count = locals.engagement[`${type}s`] || 0
+					let icon
+					let label
+					let active = false
+
+					if (type === 'bookmark') {
+						icon = 'bookmark'
+						label = 'Bookmark'
+						active = locals.data.bookmarked
+					}
+					else if (type === 'inspiration') {
+						icon = 'wb_sunny'
+						label = 'Inspiring'
+						active = locals.data.inspired
+					}
+					else if (type === 'approval') {
+						icon = 'thumb_up'
+						label = 'Tested and validated'
+						active = locals.data.approved
+					}
+					else if (type === 'flag') {
+						icon = '()'
+						label = 'For Tomorrow'
+						active = locals.data.flagged
+					}
+				%>
+					<li>
+						<button class='engagement <% if (active) { %>active<% } %>' data-type='<%- type %>' data-count='<%- count %>'>
+							<i class='material-icons-outlined'><%- icon %></i>
+							<small><%- label %></small>
+						</button>
+					</li>
+				<% }) %>
+			</ul>
+		</div>
+	<% } %> -->
+	<div class='inner'>
+		<div class='head'>
+			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+				<% if (locals.activity === 'edit') { %>
+					<a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+				<% } %>
+				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.lang] %>' onblur='partialSave("title")' contenteditable></div>
+			<% } else { %>
+				<a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.lang] %>'></div>
+				<div class='contributor'><%- vocabulary['credit'][locals.lang](locals.data.contributor, locals.data.contributorname) %></div>
+			<% } %>
+		</div>
+		<div class='body'>
+			<% if (locals.templated) { %>
+				<div class='description-layout'>
+					<!-- TO DO: TRANSLATE THIS -->
+					<p><i>This pad is based on: </i>
+						<a href='/<%- locals.lang %>/edit/template?id=<%- locals.display_template.id %>'>
+						<%- locals.display_template.title %></a>
+					</p>
+					<p><%- locals.template_description %></p>
+				</div>
+			<% } %>
+			
+			<section class='media-layout layout <%- locals.activity %>'>
+				<div class='input-type'>
+					<label><%- vocabulary['media'][locals.lang] %></label>
+				</div>
+			</section>
+			<% if (['contribute', 'edit'].includes(locals.activity) && (!locals.templated)) { %>
+				<div class='media-input-group input-group'>
+					<!-- TO DO: TRANSLATE title INFO -->
+					<form action='/upload/img' method='POST' enctype='multipart/form-data'>
+						<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' onchange='uploadImg(this.form, "<%- locals.lang %>")' multiple>
+						<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></label>
+					</form>
+					<form action='/upload/video' method='POST' enctype='multipart/form-data'>
+						<input type='file' id='input-media-video' name='video' accept='video/mp4,video/x-m4v,video/webm,video/*' onchange='uploadVideo(this.form, "<%- locals.lang %>")'>
+						<label for='input-media-video' title='Add a video. You can also use the “v” key as a keyboard shortcut.'><i class='material-icons'>ondemand_video</i></label>
+					</form>
+
+					<button id='input-media-txt' title='Add a text block. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
+					<button id='input-media-embed' title='Embed a link or HTML code. Simply paste the link to the video to see it displayed. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
+					<button id='input-media-checklist' title='Add a checklist. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>library_add_check</i></button>
+				</div>
+			<% } %>
+			<!-- <section class='meta-layout layout <%- locals.activity %>'>
+				<div class='input-type'>
+					<label><%- vocabulary['metadata'][locals.lang] %></label>
+				</div>
+			</section>
+			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+				<div class='meta-input-group input-group'>
+					<button id='input-meta-location' title='Add a location.'><i class='material-icons'>add_location</i></button>
+					<button id='input-meta-sdgs' title='Add one or more SDG tag(s).'><i class='material-icons'>public</i></button>
+					<button id='input-meta-tags' title='Add one or more thematic area tag(s).'><i class='material-icons'>style</i></button>
+				</div>
+			<% } %> -->
+		</div>
+		
+	</div>
+</main>
+
+<% if (locals.messages && locals.messages.length) { %>
+<footer id='pad'>
+	<div class='inner'>
+		<% locals.messages.forEach(m => { %>
+			<div class='approval-message'>
+				<small><%- vocabulary['tested and approved'][locals.lang](m.commentator, m.name) %></small>
+				<p><%- m.message %></p>
+			</div>
+		<% }) %>
+	</div>
+</footer>
+<% } %>
+
+
+<script type='text/javascript'>
+	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
+	d3.select('.media-input-group #input-media-txt')
+	.on('click', _ => addTxt(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addTxt(null, '<%- locals.lang %>', true))
+
+	d3.select('.media-input-group #input-media-embed')
+	.on('click', _ => addEmbed(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addEmbed(null, '<%- locals.lang %>', true))
+
+	d3.select('.media-input-group #input-media-checklist')
+	.on('click', _ => addChecklist(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addChecklist(null, '<%- locals.lang %>', true))
+
+	// const centerpoint = <% if (locals.centerpoint) { %>[<%- JSON.stringify(locals.centerpoint) %>]<% } else { %>[]<% } %>;
+	// d3.select('.meta-input-group #input-meta-location')
+	// .on('click', _ => addMap({ centerpoints: centerpoint }, '<%- locals.lang %>', true))
+	// .on('touchend', _ => addMap({ centerpoints: centerpoint }, '<%- locals.lang %>', true))
+
+	// d3.select('.meta-input-group #input-meta-sdgs')
+	// .on('click', _ => addSDGs(null, '<%- locals.lang %>', true))
+	// .on('touchend', _ => addSDGs(null, '<%- locals.lang %>', true))
+
+	// const themes = <% if (locals.themes) { %><%- JSON.stringify(locals.themes) %><% } else { %>[]<% } %>;
+	// d3.select('.meta-input-group #input-meta-tags')
+	// .on('click', _ => addTags({ themes: themes }, '<%- locals.lang %>', true))
+	// .on('touchend', _ => addTags({ themes: themes }, '<%- locals.lang %>', true))
+
+	// const people = <% if (locals.people) { %><%- JSON.stringify(locals.people) %><% } else { %>[]<% } %>;
+	// const contributors = <% if (locals.contributors) { %><%- JSON.stringify(locals.contributors) %><% } else { %>[]<% } %>;
+	// d3.select('.meta-input-group #input-meta-personas')
+	// .on('click', _ => addPersonas({ people: people, contributors: contributors }, true))
+	// .on('touchend', _ => addPersonas({ people: people, contributors: contributors }, true))
+
+	// ADD ALL INTERACTION WITH ENGAGEMENT BUTTONS
+	// d3.selectAll('.engagement-input-group .engagement')
+	// .on('click', async function () {
+	// 	const sel = d3.select(this)
+	// 	const type = sel.attr('data-type')
+	// 	let count = parseInt(sel.attr('data-count'))
+	// 	let active = sel.classed('active')
+
+	// 	if (type === 'approval') {
+	// 		if (!active) {
+	// 			const message = 'Describe in a few sentences how you tested and validated this solution.' // TO DO: TRANSLATE
+	// 			const form = { action: '/validate',  method: 'POST' }
+	// 			const opts = []
+	// 			opts.push({ node: 'input', type: 'hidden', name: 'pad', value: <%- locals.pad || JSON.stringify(null) %> })
+	// 			opts.push({ node: 'input', type: 'hidden', name: 'active', value: !active })
+	// 			opts.push({ node: 'input', type: 'hidden', name: 'type', value: type })
+	// 			opts.push({ node: 'input', type: 'hidden', name: 'path', value: new URL(window.location) })
+	// 			opts.push({ node: 'textarea', name: 'message', placeholder: 'What did you do?' }) // TO DO: TRANSLATE
+	// 			opts.push({ node: 'button', type: 'submit', label: 'Validate the solution', resolve: true }) // TO DO: TRANSLATE
+	// 			renderFormModal({ message: message, formdata: form, opts: opts })
+	// 		}
+	// 	} else {
+	// 		const result = await POST('/engage', { pad: <%- locals.pad || JSON.stringify(null) %>, active: !active, type: type })
+	// 		active = result.bool
+	// 		count = active ? count + 1 : count - 1
+	// 		sel.classed('active', active)
+	// 			.attr('data-count', count)
+	// 		if (type === 'bookmark') sel.select('div.label').html(vocabulary['bookmark']['<%- locals.lang %>'](active))
+	// 	}
+	// })
+
+
+	const templated = <%- locals.templated %>;
+		
+	let activity = '<%- locals.activity %>';
+	const editing = ['contribute', 'edit'].includes(activity)
+
+	let published = false
+
+	const main = d3.select('#pad')
+	const head = main.select('.head')
+	const body = main.select('.body')
+	const mediaLayout = body.select('.media-layout')
+	const metaLayout = body.select('.meta-layout')
+	const foot = main.select('.foot')
+	const footer = d3.select('footer')
+
+	// ADD THE INTERACTION BEHAVIOR FOR THE TITLE INPUT
+	head.select('.title')
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
+		}
+	})
+
+	function extractContent (attr) {
+		const content = {}
+		// COLLECT TITLE
+		const title = head.select('.title').node().innerText
+		// MAYBE INCLUDE ALERT IF title IS EMPTY
+		// COLLECT ALL MEDIA
+		const media = []
+		mediaLayout.selectAll('.media-container')
+		.each(function (d) {
+			const sel = d3.select(this)
+			if (['img', 'mosaic', 'video'].includes(d.type)) {
+				media.push(d)
+			}
+			else if (d.type === 'txt') {
+				d.txt = sel.select('.media-txt').node().innerText
+				media.push(d)
+			}
+			else if (d.type === 'embed') {
+				d.html = sel.select('.media-embed').node().innerHTML
+				media.push(d)
+			}
+			else if (d.type === 'checklist') {
+				d.options = d.options.filter(c => c.name && c.name.length)
+				media.push(d)
+			}
+		})
+		// COLLECT ALL META
+		const meta = metaLayout.selectAll('.meta-container').data()
+		const location = metaLayout.select('.location-container').node() ? metaLayout.select('.location-container').datum() : null
+		let sdgs = metaLayout.select('.sdgs-container').node() ? metaLayout.select('.sdgs-container').datum().sdgs : null
+		if (sdgs && !sdgs.length) sdgs = null
+		let tags = metaLayout.select('.tags-container').node() ? metaLayout.select('.tags-container').datum().tags.map(d => d.name) : null
+		if (tags && !tags.length) tags = null
+		// COMPILE FULL TXT FOR SEARCH
+		const fullTxt = `${title}\n\n
+			${media.filter(d => d.type === 'txt').map(d => d.txt).join('\n\n').trim()}\n\n
+			${media.filter(d => d.type === 'embed').map(d => d.html).join('\n\n').trim()}\n\n
+			${media.filter(d => d.type === 'checklist').map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
+		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
+		// COMPILE THE CONTENT
+		if (!attr || attr === 'title') {
+			content.title = title
+			// THIS IS IN CASE THE PAD IS BASED ON A TEMPLATE .. TO DO: SEE IF THIS LOGIC CAN BE IMPROVED
+			content.media = JSON.stringify(media)
+			content.meta = JSON.stringify(meta)
+		}
+		if (!attr || attr === 'media' || media.unique('type', true).includes(attr)) content.media = JSON.stringify(media)
+		if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
+		if (!attr || attr === 'location') content.location = JSON.stringify(location)
+		if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
+		if (!attr || attr === 'tags') content.tags = JSON.stringify(tags)
+		if (!attr || ['title', 'txt', 'embed', 'checklist', 'tags'].includes(attr)) content.full_text = fullTxt
+
+		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
+		// ALWAYS SEND status
+		let status = 0
+		if (!published) {
+			if (title && title.trim().length
+				// && location && location.centerpoints && location.centerpoints.length 
+				// && sdgs && sdgs.length && sdgs.length <= 5
+				// && tags && tags.length && tags.length <= 5
+			) status = 1
+		} else status = 2
+		content.status = status
+		// ALWAYS SEND deletion IF THERE IS SOMETHING TO DELET
+		if (deletion.length) content.deletion = deletion
+
+		return content
+	}
+	function partialSave (attr) {
+		console.log('saving')
+		// FIRST CHECK IF THIS IS A NEW PAD
+		const content = extractContent(attr)
+		console.log(content)
+		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		const id = queryparams.get('id')
+		if (id) content.id = +id
+		const template = queryparams.get('template')
+		if (template) content.template = +template
+		const mobilization = queryparams.get('mobilization')
+		if (mobilization) content.mobilization = +mobilization
+
+		POST('/save/pad', content)
+		.then(res => {
+			// ADD THE NOTIFICATION
+			const header = d3.select('header ul.primary')
+			header.select('.placeholder').classed('saved', true)
+				.select('a button')
+				.html(vocabulary['changes saved']['<%- locals.lang %>'])
+			window.setTimeout(_ => {
+				header.select('.placeholder').classed('hide', true)
+				header.selectAll('li:not(.placeholder)').classed('hide', false)
+			}, 1000)
+			// REMOVE ITEMS TO DELETE
+			window.sessionStorage.removeItem('deleted')
+			// CHANGE THE URL TO INCLUDE THE PAD ID
+			if (!id) { // INSERT
+				queryparams.append('id', res.object)
+				url.search = queryparams.toString()
+				// BASED ON:
+				// https://usefulangle.com/post/81/javascript-change-url-parameters
+				// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
+				const nextURL = url.toString().replace('contribute', 'edit')
+				const nextTitle = 'Update pad' // TO DO: RESET FOR TEMPLATE
+				const nextState = { additionalInformation: 'Updated the URL with JS' }
+				window.history.pushState(nextState, nextTitle, nextURL)
+				// REMOVE THE templates MENU
+				d3.select('nav#filter').remove()
+			}
+		}).catch(err => { throw err })
+	}
+
+	// POPULATE THE PAGE
+	if (activity === 'contribute' && templated) {
+		const data = (<%- JSON.stringify(locals.display_template || {}) %>).items
+		head.select('.title').attr('data-placeholder', data.find(d => d.type === 'title').instruction)
+
+		data.forEach(d => {
+			if (d.type === 'img') addImg(d, '<%- locals.lang %>')
+			if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
+			if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
+			if (d.type === 'location') {
+				// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+				if ((!d.centerpoint && !d.centerpoints) || (d.centerpoint && (!d.centerpoint.lat || !d.centerpoint.lng))) {
+					d.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+				} else if (d.centerpoint && !d.centerpoints) d.centerpoints = [d.centerpoint]
+				addMap(d, '<%- locals.lang %>')
+			}
+			if (d.type === 'sdgs') addSDGs(d, '<%- locals.lang %>')
+			if (d.type === 'tags') {
+				d.themes = <%- JSON.stringify(locals.themes || []) %>;
+				addTags(d, '<%- locals.lang %>')
+			}
+		})
+		// CLEAR CHANGES
+		window.sessionStorage.removeItem('changed-content')
+	}
+	else if (['edit', 'view'].includes(activity)) {
+		const data = <%- JSON.stringify(locals.data || {}) %>;
+
+		if (data.title) head.select('.title').html(data.title)
+		published = data.published
+
+		if (data.media) data.media.forEach(d => {
+			if (d.type === 'img') addImg(d, '<%- locals.lang %>')
+			if (d.type === 'mosaic') addMosaic(d, '<%- locals.lang %>')
+			if (d.type === 'video') addVideo(d, '<%- locals.lang %>')
+			if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
+			if (d.type === 'embed') addEmbed(d, '<%- locals.lang %>')
+			if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
+		})
+		if (data.meta) data.meta.forEach(d => {
+			if (d.type === 'location') {
+				// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+				if ((!d.centerpoint && !d.centerpoints) || (d.centerpoint && (!d.centerpoint.lat || !d.centerpoint.lng)) || !d.centerpoints.length) {
+					d.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+				} else if (d.centerpoint && !d.centerpoints) d.centerpoints = [d.centerpoint]
+				addMap(d, '<%- locals.lang %>')
+			}
+			if (d.type === 'sdgs') addSDGs(d, '<%- locals.lang %>')
+			if (d.type === 'tags') {
+				d.themes = <%- JSON.stringify(locals.themes || []) %>;
+				addTags(d, '<%- locals.lang %>')
+			}
+		})
+		// CLEAR CHANGES
+		window.sessionStorage.removeItem('changed-content')
+	}
+
+	let keyTrack = []
+	window.addEventListener('keydown', function (e) {
+		e = e || event
+		keyTrack.push(e.keyCode)
+
+		if (editing) {
+			// SHIFT + ENTER LEAVES THE FOCUSED CELL
+			if (keyTrack.includes(16) && e.keyCode === 13 && (mediaLayout.selectAll('.media-container.focus').size() || metaLayout.selectAll('.meta-container.focus').size())) { 
+				e.preventDefault()
+				mediaLayout.selectAll('.media-container').classed('focus', false)
+					.selectAll('.media-txt, .media-embed, .media-checklist .list-item').each(function () { this.blur() })
+				metaLayout.selectAll('.meta-container').classed('focus', false)
+					.selectAll('.inset').style('max-height', null)
+				autofillTitle()
+			}
+			// PROVIDE HIGHLIGHT FEEDBACK
+			if (
+				![head.select('div.title').node(), metaLayout.select('input[type=text]').node()].includes(document.activeElement) 
+				&& !(mediaLayout.selectAll('.media-container.focus').size() || mediaLayout.selectAll('.media-container *:focus').size())
+				&& !(metaLayout.selectAll('.meta-container.focus').size() || metaLayout.selectAll('.meta-container *:focus').size())
+				&& !templated
+			) {
+				if (e.key === 'i' || e.keyCode === 73) main.select('label[for=input-media-img]').classed('highlight', true)
+				if (e.key === 't' || e.keyCode === 84) main.select('label[for=input-media-txt]').classed('highlight', true)
+				if (e.key === 'l' || e.keyCode === 76) main.select('label[for=input-media-checklist]').classed('highlight', true)
+				if (e.key === 'v' || e.keyCode === 86) main.select('label[for=input-media-video]').classed('highlight', true)
+				if (e.key === 'e' || e.keyCode === 69) main.select('label[for=input-media-embed]').classed('highlight', true)
+			}
+		}
+	})
+	window.addEventListener('keyup', function (e) {
+		e = e || event
+		if (editing) {
+			if (
+				![head.select('div.title').node(), metaLayout.select('input[type=text]').node()].includes(document.activeElement) 
+				&& !(mediaLayout.selectAll('.media-container.focus').size() || mediaLayout.selectAll('.media-container *:focus').size())
+				&& !(metaLayout.selectAll('.meta-container.focus').size() || metaLayout.selectAll('.meta-container *:focus').size())
+			) {
+				if (!templated) {
+					if (e.key === 'i' || e.keyCode === 73) {
+						main.select('label[for=input-media-img]').classed('highlight', false)
+						d3.select('#input-media-img').node().click()
+					}
+					if (e.key === 'v' || e.keyCode === 86) {
+						main.select('label[for=input-media-video]').classed('highlight', false)
+						d3.select('#input-media-video').node().click()
+					}
+					if (e.key === 't' || e.keyCode === 84) {
+						main.select('label[for=input-media-txt]').classed('highlight', false)
+						d3.select('#input-media-txt').node().click()
+					}
+					if (e.key === 'e' || e.keyCode === 69) {
+						main.select('label[for=input-media-embed]').classed('highlight', false)
+						d3.select('#input-media-embed').node().click()
+					}
+					if (e.key === 'l' || e.keyCode === 76) {
+						main.select('label[for=input-media-checklist]').classed('highlight', false)
+						d3.select('#input-media-checklist').node().click()
+					}
+				}
+			} else {
+				if (!(
+					[e.srcElement.nodeName, e.srcElement.tagName].map(d => d.toLowerCase()).includes('input') 
+					&& (
+						d3.select(e.srcElement).findAncestor('search') && d3.select(e.srcElement).findAncestor('search').node() 
+						|| d3.select(e.srcElement).findAncestor('filter-or-add') && d3.select(e.srcElement).findAncestor('filter-or-add').node()
+					)
+				)) {
+					switchButtons('<%- locals.lang %>') // THIS PICKS UP ON KEYSTROKES OUTSIDE OF INPUT FIELDS
+				}
+			}
+		}
+			
+		keyTrack = keyTrack.filter(d => d !== e.keyCode)
+	})
+	window.addEventListener('mouseup', function (e) {
+		e = e || event
+		if (editing) {
+			const target = d3.select(e.target)
+			const media = target.findAncestor('media')
+			const meta = target.findAncestor('meta')
+			const containers = main.selectAll('.media-container, .meta-container')
+				.filter(function () { return media ? this !== media.node() : meta ? this !== meta.node() : true })
+			containers.classed('focus', false)
+				.selectAll('.inset')
+				.style('max-height', null)
+			main.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
+			autofillTitle()
+		}
+	})
+
+</script>
+</body>
+</html>

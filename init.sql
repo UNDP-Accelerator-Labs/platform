@@ -1,0 +1,107 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE contributors (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	name VARCHAR(99),
+	position VARCHAR(99),
+	country VARCHAR(99),
+	email VARCHAR(99) UNIQUE,
+	password VARCHAR(99) NOT NULL,
+	uuid uuid UNIQUE DEFAULT uuid_generate_v4(),
+	rights SMALLINT DEFAULT 0,
+	lang VARCHAR(9) DEFAULT 'en'
+);
+
+CREATE TABLE centerpoints (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	country VARCHAR(99),
+	lat DOUBLE PRECISION,
+	lng DOUBLE PRECISION
+);
+
+CREATE TABLE templates (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	medium VARCHAR(9),
+	title VARCHAR(99),
+	description TEXT,
+	items JSONB,
+	full_text TEXT,
+	language VARCHAR(9),
+	status INT DEFAULT 0,
+	date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	published BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE pads (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	title VARCHAR(99),
+	media JSONB,
+	meta JSONB,
+	full_text TEXT,
+	location JSONB,
+	sdgs JSONB,
+	tags JSONB,
+	impact SMALLINT,
+	personas JSONB,
+	status INT DEFAULT 0,
+	date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	template INT REFERENCES templates(id) DEFAULT NULL,
+	published BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE cohorts (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	source INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	target INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE mobilizations (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	title VARCHAR(99),
+	host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	status INT DEFAULT 1, 
+	start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	end_date TIMESTAMPTZ
+);
+CREATE TABLE mobilization_contributors (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE mobilization_contributions (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE engagement_pads (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	type VARCHAR(19),
+	date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	message TEXT,
+	CONSTRAINT unique_pads_engagement UNIQUE (contributor, pad, type)
+);
+CREATE TABLE engagement_templates (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	type VARCHAR(19),
+	date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	message TEXT,
+	CONSTRAINT unique_template_engagement UNIQUE (contributor, template, type)
+);
+
+CREATE TABLE "session" (
+ 	"sid" varchar NOT NULL COLLATE "default",
+	"sess" json NOT NULL,
+	"expire" timestamp(6) NOT NULL
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX "IDX_session_expire" ON "session" ("expire");

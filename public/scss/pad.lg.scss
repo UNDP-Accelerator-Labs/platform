@@ -383,7 +383,8 @@ main#template {
 					.media-embed.padded {
 						padding: 5px 10px;
 					}
-					.media-checklist {
+					.media-checklist,
+					.media-radiolist {
 						width: 100%;
 						outline: none;
 						white-space: pre-wrap;
@@ -392,9 +393,11 @@ main#template {
 							outline: none;
 						}
 						ol {
+							display: block;
 							.opt { /* CHANGE THE .option CLASS IN TEMPLATE TO STANDARDIZE TO .opt (ALREADY DONE IN pad.js) */
 								display: flex;
 								align-items: center;
+								/*width: 100%;*/
 								margin: 10px 0;
 
 								div {
@@ -409,6 +412,7 @@ main#template {
 									margin-right: 5px;
 								}
 								.checkbox,
+								.radio,
 								.rm {
 									color: $c-light-1;
 									pointer-events: none;
@@ -427,6 +431,7 @@ main#template {
 							}
 							.opt.valid {
 								.checkbox,
+								.radio,
 								.rm {
 									color: $c-dark-1;
 									pointer-events: all;

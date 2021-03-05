@@ -113,6 +113,7 @@
 					<button id='input-media-txt' title='Add a text block. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
 					<button id='input-media-embed' title='Embed a link or HTML code. Simply paste the link to the video to see it displayed. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
 					<button id='input-media-checklist' title='Add a checklist. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>library_add_check</i></button>
+					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
 				</div>
 			<% } %>
 			<!-- <section class='meta-layout layout <%- locals.activity %>'>
@@ -159,6 +160,10 @@
 	d3.select('.media-input-group #input-media-checklist')
 	.on('click', _ => addChecklist(null, '<%- locals.lang %>', true))
 	.on('touchend', _ => addChecklist(null, '<%- locals.lang %>', true))
+
+	d3.select('.media-input-group #input-media-radiolist')
+	.on('click', _ => addRadiolist(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addRadiolist(null, '<%- locals.lang %>', true))
 
 	// const centerpoint = <% if (locals.centerpoint) { %>[<%- JSON.stringify(locals.centerpoint) %>]<% } else { %>[]<% } %>;
 	// d3.select('.meta-input-group #input-meta-location')
@@ -258,7 +263,7 @@
 				d.html = sel.select('.media-embed').node().innerHTML
 				media.push(d)
 			}
-			else if (d.type === 'checklist') {
+			else if (['checklist', 'radiolist'].includes(d.type)) {
 				d.options = d.options.filter(c => c.name && c.name.length)
 				media.push(d)
 			}
@@ -274,7 +279,8 @@
 		const fullTxt = `${title}\n\n
 			${media.filter(d => d.type === 'txt').map(d => d.txt).join('\n\n').trim()}\n\n
 			${media.filter(d => d.type === 'embed').map(d => d.html).join('\n\n').trim()}\n\n
-			${media.filter(d => d.type === 'checklist').map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+			${media.filter(d => ['checklist', 'radiolist'].includes(d.type))
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
 		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
 		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
 		// COMPILE THE CONTENT
@@ -289,7 +295,7 @@
 		if (!attr || attr === 'location') content.location = JSON.stringify(location)
 		if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
 		if (!attr || attr === 'tags') content.tags = JSON.stringify(tags)
-		if (!attr || ['title', 'txt', 'embed', 'checklist', 'tags'].includes(attr)) content.full_text = fullTxt
+		if (!attr || ['title', 'txt', 'embed', 'checklist', 'radiolist', 'tags'].includes(attr)) content.full_text = fullTxt
 
 		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
 		// ALWAYS SEND status
@@ -361,6 +367,7 @@
 			if (d.type === 'img') addImg(d, '<%- locals.lang %>')
 			if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
 			if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
+			if (d.type === 'radiolist') addRadiolist(d, '<%- locals.lang %>')
 			if (d.type === 'location') {
 				// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
 				if ((!d.centerpoint && !d.centerpoints) || (d.centerpoint && (!d.centerpoint.lat || !d.centerpoint.lng))) {
@@ -390,6 +397,7 @@
 			if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
 			if (d.type === 'embed') addEmbed(d, '<%- locals.lang %>')
 			if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
+			if (d.type === 'radiolist') addRadiolist(d, '<%- locals.lang %>')
 		})
 		if (data.meta) data.meta.forEach(d => {
 			if (d.type === 'location') {
@@ -419,7 +427,7 @@
 			if (keyTrack.includes(16) && e.keyCode === 13 && (mediaLayout.selectAll('.media-container.focus').size() || metaLayout.selectAll('.meta-container.focus').size())) { 
 				e.preventDefault()
 				mediaLayout.selectAll('.media-container').classed('focus', false)
-					.selectAll('.media-txt, .media-embed, .media-checklist .list-item').each(function () { this.blur() })
+					.selectAll('.media-txt, .media-embed, .media-checklist .list-item, .media-radiolist .list-item').each(function () { this.blur() })
 				metaLayout.selectAll('.meta-container').classed('focus', false)
 					.selectAll('.inset').style('max-height', null)
 				autofillTitle()
@@ -434,6 +442,7 @@
 				if (e.key === 'i' || e.keyCode === 73) main.select('label[for=input-media-img]').classed('highlight', true)
 				if (e.key === 't' || e.keyCode === 84) main.select('label[for=input-media-txt]').classed('highlight', true)
 				if (e.key === 'l' || e.keyCode === 76) main.select('label[for=input-media-checklist]').classed('highlight', true)
+				if (e.key === 'r' || e.keyCode === 82) main.select('label[for=input-media-radiolist]').classed('highlight', true)
 				if (e.key === 'v' || e.keyCode === 86) main.select('label[for=input-media-video]').classed('highlight', true)
 				if (e.key === 'e' || e.keyCode === 69) main.select('label[for=input-media-embed]').classed('highlight', true)
 			}
@@ -467,6 +476,10 @@
 					if (e.key === 'l' || e.keyCode === 76) {
 						main.select('label[for=input-media-checklist]').classed('highlight', false)
 						d3.select('#input-media-checklist').node().click()
+					}
+					if (e.key === 'r' || e.keyCode === 82) {
+						main.select('label[for=input-media-radiolist]').classed('highlight', false)
+						d3.select('#input-media-radiolist').node().click()
 					}
 				}
 			} else {

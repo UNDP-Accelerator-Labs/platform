@@ -1206,89 +1206,180 @@ main#template .inner .body .layout .meta-container .media-embed.padded {
     padding: 5px 10px;
   }
   main#pad .inner .body .layout .media-container .media-checklist,
+main#pad .inner .body .layout .media-container .media-radiolist,
 main#pad .inner .body .layout .meta-container .media-checklist,
+main#pad .inner .body .layout .meta-container .media-radiolist,
 main#template .inner .body .layout .media-container .media-checklist,
-main#template .inner .body .layout .meta-container .media-checklist {
+main#template .inner .body .layout .media-container .media-radiolist,
+main#template .inner .body .layout .meta-container .media-checklist,
+main#template .inner .body .layout .meta-container .media-radiolist {
     width: 100%;
     outline: none;
     white-space: pre-wrap;
   }
   main#pad .inner .body .layout .media-container .media-checklist .instruction,
+main#pad .inner .body .layout .media-container .media-radiolist .instruction,
 main#pad .inner .body .layout .meta-container .media-checklist .instruction,
+main#pad .inner .body .layout .meta-container .media-radiolist .instruction,
 main#template .inner .body .layout .media-container .media-checklist .instruction,
-main#template .inner .body .layout .meta-container .media-checklist .instruction {
+main#template .inner .body .layout .media-container .media-radiolist .instruction,
+main#template .inner .body .layout .meta-container .media-checklist .instruction,
+main#template .inner .body .layout .meta-container .media-radiolist .instruction {
     outline: none;
   }
+  main#pad .inner .body .layout .media-container .media-checklist ol,
+main#pad .inner .body .layout .media-container .media-radiolist ol,
+main#pad .inner .body .layout .meta-container .media-checklist ol,
+main#pad .inner .body .layout .meta-container .media-radiolist ol,
+main#template .inner .body .layout .media-container .media-checklist ol,
+main#template .inner .body .layout .media-container .media-radiolist ol,
+main#template .inner .body .layout .meta-container .media-checklist ol,
+main#template .inner .body .layout .meta-container .media-radiolist ol {
+    display: block;
+  }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt,
 main#template .inner .body .layout .media-container .media-checklist ol .opt,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt {
+main#template .inner .body .layout .media-container .media-radiolist ol .opt,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt {
     /* CHANGE THE .option CLASS IN TEMPLATE TO STANDARDIZE TO .opt (ALREADY DONE IN pad.js) */
     display: flex;
     align-items: center;
+    /*width: 100%;*/
     margin: 10px 0;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt div,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt div,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt div,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt div,
 main#template .inner .body .layout .media-container .media-checklist ol .opt div,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt div {
+main#template .inner .body .layout .media-container .media-radiolist ol .opt div,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt div,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt div {
     padding: 0 5px;
     cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt div label,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt div label,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt div label,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt div label,
 main#template .inner .body .layout .media-container .media-checklist ol .opt div label,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt div label {
+main#template .inner .body .layout .media-container .media-radiolist ol .opt div label,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt div label,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt div label {
     cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt div:last-child,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt div:last-child,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt div:last-child,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt div:last-child,
 main#template .inner .body .layout .media-container .media-checklist ol .opt div:last-child,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt div:last-child {
+main#template .inner .body .layout .media-container .media-radiolist ol .opt div:last-child,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt div:last-child,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt div:last-child {
     margin-right: 5px;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt .checkbox,
+main#pad .inner .body .layout .media-container .media-checklist ol .opt .radio,
 main#pad .inner .body .layout .media-container .media-checklist ol .opt .rm,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .checkbox,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .radio,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .rm,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt .checkbox,
+main#pad .inner .body .layout .meta-container .media-checklist ol .opt .radio,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt .rm,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .checkbox,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .radio,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .rm,
 main#template .inner .body .layout .media-container .media-checklist ol .opt .checkbox,
+main#template .inner .body .layout .media-container .media-checklist ol .opt .radio,
 main#template .inner .body .layout .media-container .media-checklist ol .opt .rm,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .checkbox,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .radio,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .rm,
 main#template .inner .body .layout .meta-container .media-checklist ol .opt .checkbox,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt .rm {
+main#template .inner .body .layout .meta-container .media-checklist ol .opt .radio,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt .rm,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .checkbox,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .radio,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .rm {
     color: #C2B4D6;
     pointer-events: none;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt .checkbox i,
+main#pad .inner .body .layout .media-container .media-checklist ol .opt .radio i,
 main#pad .inner .body .layout .media-container .media-checklist ol .opt .rm i,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .checkbox i,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .radio i,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .rm i,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt .checkbox i,
+main#pad .inner .body .layout .meta-container .media-checklist ol .opt .radio i,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt .rm i,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .checkbox i,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .radio i,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .rm i,
 main#template .inner .body .layout .media-container .media-checklist ol .opt .checkbox i,
+main#template .inner .body .layout .media-container .media-checklist ol .opt .radio i,
 main#template .inner .body .layout .media-container .media-checklist ol .opt .rm i,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .checkbox i,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .radio i,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .rm i,
 main#template .inner .body .layout .meta-container .media-checklist ol .opt .checkbox i,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt .rm i {
+main#template .inner .body .layout .meta-container .media-checklist ol .opt .radio i,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt .rm i,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .checkbox i,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .radio i,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .rm i {
     font-size: 24px;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt .grow,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .grow,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt .grow,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .grow,
 main#template .inner .body .layout .media-container .media-checklist ol .opt .grow,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt .grow {
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .grow,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt .grow,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .grow {
     flex-grow: 1;
     outline: none;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt:last-child,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt:last-child,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt:last-child,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt:last-child,
 main#template .inner .body .layout .media-container .media-checklist ol .opt:last-child,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt:last-child {
+main#template .inner .body .layout .media-container .media-radiolist ol .opt:last-child,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt:last-child,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt:last-child {
     margin-bottom: 0;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt.valid .checkbox,
+main#pad .inner .body .layout .media-container .media-checklist ol .opt.valid .radio,
 main#pad .inner .body .layout .media-container .media-checklist ol .opt.valid .rm,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt.valid .checkbox,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt.valid .radio,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt.valid .rm,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt.valid .checkbox,
+main#pad .inner .body .layout .meta-container .media-checklist ol .opt.valid .radio,
 main#pad .inner .body .layout .meta-container .media-checklist ol .opt.valid .rm,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt.valid .checkbox,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt.valid .radio,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt.valid .rm,
 main#template .inner .body .layout .media-container .media-checklist ol .opt.valid .checkbox,
+main#template .inner .body .layout .media-container .media-checklist ol .opt.valid .radio,
 main#template .inner .body .layout .media-container .media-checklist ol .opt.valid .rm,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt.valid .checkbox,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt.valid .radio,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt.valid .rm,
 main#template .inner .body .layout .meta-container .media-checklist ol .opt.valid .checkbox,
-main#template .inner .body .layout .meta-container .media-checklist ol .opt.valid .rm {
+main#template .inner .body .layout .meta-container .media-checklist ol .opt.valid .radio,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt.valid .rm,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt.valid .checkbox,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt.valid .radio,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt.valid .rm {
     color: #333D51;
     pointer-events: all;
   }

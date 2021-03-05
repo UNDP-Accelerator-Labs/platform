@@ -64,6 +64,7 @@
 					<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
 					<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
 					<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>library_add_check</i></button>
+					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
 				</div>
 			<% } %>
 			
@@ -122,6 +123,10 @@
 	d3.select('.media-input-group #input-media-checklist')
 	.on('click', _ => addChecklist(null, '<%- locals.lang %>', true))
 	.on('touchend', _ => addChecklist(null, '<%- locals.lang %>', true))
+
+	d3.select('.media-input-group #input-media-radiolist')
+	.on('click', _ => addRadiolist(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addRadiolist(null, '<%- locals.lang %>', true))
 
 	// d3.select('.meta-input-group #input-meta-location')
 	// .on('click', _ => addMap(null, '<%- locals.lang %>', true))
@@ -193,7 +198,7 @@
 					.selectAll('.media-title, .media-txt, .media-img').each(function () { this.blur() })
 				const metas = metaLayout.selectAll('.meta').classed('focus', false)
 				main.selectAll('.inset').style('max-height', null)
-				main.selectAll('.media-checklist, .meta-checklist').each(function () { this.blur() })
+				main.selectAll('.media-checklist, .media-radiolist, .meta-checklist').each(function () { this.blur() })
 				autofillTitle()
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
@@ -207,6 +212,7 @@
 				if (e.key === 'i' || e.keyCode === 73) main.select('.media-input-group label[for=input-media-img]').classed('highlight', true)
 				if (e.key === 't' || e.keyCode === 84) main.select('.media-input-group label[for=input-media-txt]').classed('highlight', true)
 				if (e.key === 'l' || e.keyCode === 76) main.select('.media-input-group label[for=input-media-checklist]').classed('highlight', true)
+				if (e.key === 'r' || e.keyCode === 82) main.select('.media-input-group label[for=input-media-radiolist]').classed('highlight', true)
 			}
 		}
 	})
@@ -231,6 +237,10 @@
 				if (e.key === 'l' || e.keyCode === 76) {
 					main.select('label[for=input-media-checklist]').classed('highlight', false)
 					d3.select('#input-media-checklist').node().click()
+				}
+				if (e.key === 'r' || e.keyCode === 82) {
+					main.select('label[for=input-media-radiolist]').classed('highlight', false)
+					d3.select('#input-media-radiolist').node().click()
 				}
 				if (e.key === 'e' || e.keyCode === 69) {
 					main.select('label[for=input-media-embed]').classed('highlight', false)
@@ -313,6 +323,11 @@
 				d.options = d.options.filter(c => c.name && c.name.length)
 				items.push(d)
 			}
+			else if (d.type === 'radiolist') {
+				d.instruction = sel.select('.media-radiolist .instruction').node().innerText
+				d.options = d.options.filter(c => c.name && c.name.length)
+				items.push(d)
+			}
 		})
 		// COLLECT ALL META
 		metaLayout.selectAll('.meta-container')
@@ -342,7 +357,9 @@
 			${items.filter(d => d.type === 'txt').map(d => d.instruction).join('\n\n').trim()}\n\n
 			${items.filter(d => d.type === 'embed').map(d => d.instruction).join('\n\n').trim()}\n\n
 			${items.filter(d => d.type === 'checklist').map(d => d.instruction).join('\n\n').trim()}\n\n
-			${items.filter(d => d.type === 'checklist').map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
+			${items.filter(d => d.type === 'checklist').map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
+			${items.filter(d => d.type === 'radiolist').map(d => d.instruction).join('\n\n').trim()}\n\n
+			${items.filter(d => d.type === 'radiolist').map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
 		
 		// COMPILE THE CONTENT
 		if (!attr || attr === 'title') content.title = title
@@ -420,6 +437,7 @@
 				if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
 				if (d.type === 'embed') addEmbed(d, '<%- locals.lang %>')
 				if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
+				if (d.type === 'radiolist') addRadiolist(d, '<%- locals.lang %>')
 				if (d.type === 'location') addMap(d, '<%- locals.lang %>')
 				if (d.type === 'sdgs') addSDGs(d, '<%- locals.lang %>')
 				if (d.type === 'tags') addTags(d, '<%- locals.lang %>')

@@ -312,23 +312,145 @@ function addChecklist (data, lang = 'en', focus = false) {
 			.attrs({ 
 				'type': 'checkbox', 
 				'id': d => d.name ? d.name.simplify() : `item-${checklist_id}-${d.id}`, 
+				'value': d => d.name,
 				'name': `checklist-${checklist_id}`, 
 				'checked': d => d.checked || null,
-				'disabled': editing ? null : true
+				'disabled': true
 			})
-		.on('change', function (d) {
-			d.checked = this.checked
-			const sel = d3.select(this)
-			sel.findAncestor('opt').select('.checkbox label i')
-				.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
+		// .on('change', function (d) {
+		// 	d.checked = this.checked
+		// 	const sel = d3.select(this)
+		// 	sel.findAncestor('opt').select('.checkbox label i')
+		// 		.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
 
-			if (editing) switchButtons(lang)
-		})
+		// 	if (editing) switchButtons(lang)
+		// })
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
 			.attr('for', d => d.name ? d.name.simplify() : `item-${checklist_id}-${d.id}`)
 		.addElems('i', 'material-icons')
 			.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
+		opts.addElems('div', 'grow list-item')
+			.attrs({ 
+				'data-placeholder': vocabulary['new checklist item'][lang],
+				'contenteditable': activity !== 'view' ? true : null
+			})
+		.on('keydown', function () {
+			const evt = d3.event
+			if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
+				evt.preventDefault()
+				this.blur()
+				
+				media.container.each(d => {
+					d.options = d.options.filter(c => c.name && c.name.length)
+					d.options.push({ checked: false })
+				})
+				list.call(addItem)
+			}
+		}).on('blur', function (d) {
+			d.name = this.innerText.trim()
+			d3.select(this).findAncestor('opt').classed('valid', d => d.name && d.name.length)
+
+			if (editing) switchButtons(lang)
+		}).html(d => d.name)
+
+		if (editing) {
+			opts.addElems('div', 'rm')
+				.addElems('i', 'material-icons')
+				.html('clear')
+			.on('click', function (d) {
+				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
+				list.call(addItem)
+				
+				if (editing) switchButtons(lang)
+			})
+		}
+
+		const emptyOpts = opts.filter(d => !d.name)
+		if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
+	}
+}
+function addRadiolist (data, lang = 'en', focus = false) { 
+	let { type, options, instruction } = data || {}
+	if (!type) type = 'radiolist'
+	if (!options) options = []
+	else {
+		// THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
+		options.sort((a, b) => {
+			if (a.name === b.name) return 0
+			else if (!a.name || !a.name.trim().length) return 1
+			else if (!b.name || !b.name.trim().length) return -1
+			else return a.id < b.id ? -1 : 1
+		})
+	}
+	if (!instruction) instruction = ''
+
+	if (editing && !options.find(d => !d.name)) options.push({ checked: false })
+	if (!editing) options = options.filter(d => d.name)
+
+	const media = new Media({
+		parent: d3.select('.media-layout'), 
+		type: type, 
+		datum: { type: type, options: options, instruction: instruction },
+		focus: focus,
+		lang: lang
+	})
+	
+	// DETERMINE ID FOR THE INPUT NAME
+	let radiolist_id = 0
+	d3.selectAll('.media-container.radiolist-container').each(function (d, i) {
+		if (this === media.container.node()) radiolist_id = i
+	})
+
+	media.media.addElem('div', 'instruction')
+		.attrs({ 
+			'data-placeholder': d => vocabulary[`request ${type}`][lang],
+			'contenteditable': editing ? true : null 
+		}).html(d => d.instruction)
+
+	const list = media.media.addElem('ol')
+	list.call(addItem)	
+
+	if (editing) {
+		media.media.addElems('div', 'add-opt')
+			.addElems('i', 'material-icons')
+			.html('add_circle')
+		.on('click', function () {
+			media.container.each(d => {
+				d.options = d.options.filter(c => c.name && c.name.length)
+				d.options.push({ checked: false })
+			})
+			list.call(addItem)
+		})
+	}
+
+	function addItem (sel) {
+		const opts = sel.addElems('li', 'opt', d => d.options)
+			.classed('valid', d => d.name && d.name.length)
+			.each((d, i) => d.id = i)
+		opts.addElems('div', 'hide')
+			.addElems('input')
+			.attrs({ 
+				'type': 'checkbox', 
+				'id': d => d.name ? d.name.simplify() : `item-${radiolist_id}-${d.id}`, 
+				'value': d => d.name,
+				'name': `radiolist-${radiolist_id}`, 
+				'checked': d => d.checked || null,
+				'disabled': true
+			})
+		// .on('change', function (d) {
+		// 	d.checked = this.checked
+		// 	const sel = d3.select(this)
+		// 	sel.findAncestor('opt').select('.checkbox label i')
+		// 		.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
+
+		// 	if (editing) switchButtons(lang)
+		// })
+		opts.addElems('div', 'checkbox')
+			.addElems('label')
+			.attr('for', d => d.name ? d.name.simplify() : `item-${radiolist_id}-${d.id}`)
+		.addElems('i', 'material-icons')
+			.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
 		opts.addElems('div', 'grow list-item')
 			.attrs({ 
 				'data-placeholder': vocabulary['new checklist item'][lang],

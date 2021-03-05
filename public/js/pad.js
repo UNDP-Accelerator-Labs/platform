@@ -706,7 +706,7 @@ function addChecklist (data, lang = 'en', focus = false) {
 		})
 	}
 
-	if (editing && !options.find(d => !d.name)) options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && !templated) options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
@@ -775,7 +775,7 @@ function addChecklist (data, lang = 'en', focus = false) {
 		})
 	list.call(addItem)	
 
-	if (editing) {
+	if (editing && !templated) {
 		media.media.addElems('div', 'add-opt')
 			.addElems('i', 'material-icons')
 			.html('add_circle')
@@ -839,7 +839,7 @@ function addChecklist (data, lang = 'en', focus = false) {
 			if (editing) switchButtons(lang)
 		}).html(d => d.name)
 
-		if (editing) {
+		if (editing && !templated) {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons')
 				.html('clear')
@@ -872,7 +872,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 		})
 	}
 
-	if (editing && !options.find(d => !d.name)) options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && !templated) options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
@@ -941,7 +941,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 		})
 	list.call(addItem)	
 
-	if (editing) {
+	if (editing && !templated) {
 		media.media.addElems('div', 'add-opt')
 			.addElems('i', 'material-icons')
 			.html('add_circle')
@@ -1002,7 +1002,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 			if (editing) switchButtons(lang)
 		}).html(d => d.name)
 
-		if (editing) {
+		if (editing && !templated) {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons')
 				.html('clear')

@@ -271,6 +271,18 @@ const vocabulary = {
 		"es": "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados.",
 		"pt": "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
 	},
+	"request radiolist": {
+		"en": "request a unique response from multiple choices",
+		"fr": "demander une réponse unique parmi plusieurs choix",
+		"es": "solicitar una única respuesta entre varias opciones",
+		"pt": "poproś o jedną odpowiedź spośród kilku opcji"
+	},
+	"expect radiolist": {
+		"en": "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected.",
+		"fr": "<strong>Entrée directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
+		"es": "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados.",
+		"pt": "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
+	},
 	"request location": {
 		"en": "request a location",
 		"fr": "demander un emplacement",

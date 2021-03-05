@@ -823,6 +823,14 @@ main#template {
 					}
 				}
 			}
+			.layout.description-layout.view {
+				margin-top: 0px;
+
+				.media-container,
+				.meta-container {
+					padding-top: 15px;
+				}
+			}
 			.layout.preview {
 				.media-container,
 				.meta-container {

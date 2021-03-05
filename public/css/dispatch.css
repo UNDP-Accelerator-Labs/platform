@@ -2036,6 +2036,16 @@ main#template .inner .body .layout.view .meta-container .media,
 main#template .inner .body .layout.view .meta-container .meta {
     border-top: none;
   }
+  main#pad .inner .body .layout.description-layout.view,
+main#template .inner .body .layout.description-layout.view {
+    margin-top: 0px;
+  }
+  main#pad .inner .body .layout.description-layout.view .media-container,
+main#pad .inner .body .layout.description-layout.view .meta-container,
+main#template .inner .body .layout.description-layout.view .media-container,
+main#template .inner .body .layout.description-layout.view .meta-container {
+    padding-top: 15px;
+  }
   main#pad .inner .body .layout.preview .media-container,
 main#pad .inner .body .layout.preview .meta-container,
 main#template .inner .body .layout.preview .media-container,

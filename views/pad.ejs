@@ -83,13 +83,20 @@
 		</div>
 		<div class='body'>
 			<% if (locals.templated) { %>
-				<div class='description-layout'>
+				<div class='description-layout layout view'><!-- THIS IS ALWAYS IN VIEW MODE IF DISPLAYED -->
 					<!-- TO DO: TRANSLATE THIS -->
-					<p><i>This pad is based on: </i>
-						<a href='/<%- locals.lang %>/edit/template?id=<%- locals.display_template.id %>'>
-						<%- locals.display_template.title %></a>
-					</p>
-					<p><%- locals.template_description %></p>
+					<div class='media-container txt-container'>
+						<div class='media media-txt'>
+							<i>This pad is based on: </i>
+							<a href='/<%- locals.lang %>/edit/template?id=<%- locals.display_template.id %>'>
+							<%- locals.display_template.title %></a>
+						</div>
+					</div>
+					<div class='media-container txt-container'>
+						<div class='media media-txt'>
+							<%- locals.display_template.description %>
+						</div>
+					</div>
 				</div>
 			<% } %>
 			

@@ -12,20 +12,17 @@ CREATE TABLE contributors (
 	rights SMALLINT DEFAULT 0,
 	lang VARCHAR(9) DEFAULT 'en'
 );
-
 CREATE TABLE centerpoints (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	country VARCHAR(99),
 	lat DOUBLE PRECISION,
 	lng DOUBLE PRECISION
 );
-
 CREATE TABLE templates (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	medium VARCHAR(9),
 	title VARCHAR(99),
 	description TEXT,
-	-- items JSONB,
 	sections JSONB,
 	full_text TEXT,
 	language VARCHAR(9),
@@ -34,12 +31,9 @@ CREATE TABLE templates (
 	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	published BOOLEAN DEFAULT FALSE
 );
-
 CREATE TABLE pads (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	title VARCHAR(99),
-	-- media JSONB,
-	-- meta JSONB,
 	sections JSONB,
 	full_text TEXT,
 	location JSONB,
@@ -53,13 +47,11 @@ CREATE TABLE pads (
 	template INT REFERENCES templates(id) DEFAULT NULL,
 	published BOOLEAN DEFAULT FALSE
 );
-
 CREATE TABLE cohorts (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	source INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	target INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
 CREATE TABLE mobilizations (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	title VARCHAR(99),
@@ -79,7 +71,6 @@ CREATE TABLE mobilization_contributions (
 	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
 CREATE TABLE engagement_pads (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -98,7 +89,6 @@ CREATE TABLE engagement_templates (
 	message TEXT,
 	CONSTRAINT unique_template_engagement UNIQUE (contributor, template, type)
 );
-
 CREATE TABLE "session" (
  	"sid" varchar NOT NULL COLLATE "default",
 	"sess" json NOT NULL,

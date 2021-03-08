@@ -407,7 +407,7 @@
 		}).catch(err => { throw err })
 		// POST NEW TAGS (THIS USED TO BE IN THE BACKEND, BUT MOVED IT HERE)
 		if (content.tags) {
-			POST('http://localhost:3000/api/thematic_areas', { tags: content.tags }).then(res => console.log(res))
+			POST('https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas', { tags: content.tags }).then(res => console.log(res))
 		}
 	}
 

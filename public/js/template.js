@@ -607,7 +607,7 @@ function addSDGs (data, lang = 'en', focus = false) {
 	if (!type) type = 'sdgs'
 	if (!instruction) instruction = ''
 
-	GET(`http://localhost:3000/api/sdgs?lang=lang`)
+	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
 	.then(sdgs => {
 		// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
 		const input = d3.select('.media-input-group #input-meta-sdgs').node()
@@ -651,7 +651,7 @@ function addTags (data, lang = 'en', focus = false) {
 	if (!themes) themes = []
 	if (!instruction) instruction = ''
 
-	GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
+	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
 	.then(themes => {
 		// const input = d3.select('.meta-input-group #input-meta-tags').node()
 		const input = d3.select('.media-input-group #input-meta-tags').node()

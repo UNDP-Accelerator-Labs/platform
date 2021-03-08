@@ -30,7 +30,8 @@ const observer = new MutationObserver(evt => {
 })
 // MEDIA PROTOTYPE
 const Media = function (kwargs) {
-	const { parent, container, type, datum, focus, lang } = kwargs || {}
+	let { parent, container, type, datum, focus, lang } = kwargs || {}
+	parent = d3.select(parent).classed('focus', focus)
 	
 	// if (container) console.log(container.node())
 	// NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
@@ -42,6 +43,9 @@ const Media = function (kwargs) {
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) }) // TO DO: CHANGE EDITING VAR HERE > PLACE IT IN BACK END, LIKE FOR THE browse VIEW
 	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
+	if (templated) this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
+		.attr('data-placeholder', d => d.instruction)
+		.text(d => d.instruction)
 	this.media = this.container.addElems('div', 'media', d => [d], d => d.type)
 		.classed(`media-${type}`, true)
 	if ((editing && !templated) || activity === 'preview') this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
@@ -267,6 +271,50 @@ function autofillTitle () {
 	}
 }
 
+function addSection (data, lang = 'en', focus = false) {
+	const { title, lead } = data || {}
+	d3.selectAll('.media-layout').classed('focus', false)
+
+	const section = d3.select('main#pad div.inner div.body')
+		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
+		.classed('focus', focus && !templated)
+		.datum({ type: 'section', title: title, lead: lead })
+	.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
+
+	const header = section.addElems('div', 'section-header')
+		.addElems('label')
+		.attrs({ 
+			// 'data-placeholder': d => vocabulary[`request ${type}`][lang],
+			'data-placeholder': d => 'Section header', // TO DO: TRANSLATION
+			'contenteditable': editing && !templated ? true : null 
+		}).html(d => d.title)
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
+		}
+	}).on('blur', _ => partialSave('media'))
+
+	if (templated && lead) {
+		const media = new Media({
+			parent: section.node(), 
+			type: 'lead', 
+			datum: { type: 'lead', lead: lead },
+			lang: lang
+		})
+		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+		media.opts.remove()
+
+		media.media.attrs({ 
+			'data-placeholder': d => 'Lead paragraph', // TO DO: TRANSLATION
+			'contenteditable': editing && !templated ? true : null 
+		}).html(d => d.lead)
+	}
+
+	// if (focus) header.node().focus()
+	// if (editing) observer.observe(section.node(), obsvars)
+}
 function addImgs (array, lang = 'en', container = null, focus = false) {
 	const fls = array.filter(d => d.status === 200)
 	if (fls.length === 1) fls.forEach(f => addImg({ src: f.src }, lang, container, focus)) // ONLY ONE IMAGE SO NO MOSAIC
@@ -279,7 +327,8 @@ function addImg (data, lang = 'en', container = null, focus = false) {
 	if (!scale) scale = 'original'
 	
 	const media = new Media({ 
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
 		datum: { type: type, textalign: textalign, scale: scale, src: src, instruction: instruction },
@@ -366,7 +415,8 @@ function addMosaic (data, lang = 'en', container = null, focus = false) {
 	if (!verticalalign) verticalalign = 'center'
 
 	const media = new Media({ 
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
 		datum: { type: type, verticalalign: verticalalign, srcs: srcs, instruction: instruction },
@@ -451,7 +501,8 @@ function addVideo (data, lang = 'en', container = null, focus = false) {
 	if (!textalign) textalign = 'left'
 	
 	const media = new Media({ 
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
 		datum: { type: type, textalign: textalign, src: src, instruction: instruction },
@@ -530,7 +581,8 @@ function addTxt (data, lang = 'en', focus = false) {
 	if (!txt) txt = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, textalign: textalign, txt: txt, instruction: instruction },
 		focus: focus,
@@ -579,7 +631,8 @@ function addTxt (data, lang = 'en', focus = false) {
 	}
 	
 	media.media.attrs({ 
-		'data-placeholder': d => d.instruction || vocabulary['empty txt'][lang], 
+		// 'data-placeholder': d => d.instruction || vocabulary['empty txt'][lang], 
+		'data-placeholder': vocabulary['empty txt'][lang], 
 		'contenteditable': editing ? true : null 
 	}).styles({	
 		'min-height': d => `${d.fontsize}rem`, 
@@ -599,7 +652,8 @@ function addEmbed (data, lang = 'en', focus = false) {
 	if (!html) html = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, src: src, textalign: textalign, html: html, instruction: instruction },
 		focus: focus,
@@ -627,7 +681,8 @@ function addEmbed (data, lang = 'en', focus = false) {
 	}
 
 	media.media.attrs({
-		'data-placeholder': d => d.instruction || vocabulary['empty embed'][lang], 
+		// 'data-placeholder': d => d.instruction || vocabulary['empty embed'][lang], 
+		'data-placeholder': vocabulary['empty embed'][lang], 
 		'contenteditable': editing
 	}).classed('padded', true)
 	.style('text-align', d => d.textalign)
@@ -710,7 +765,8 @@ function addChecklist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction },
 		focus: focus,
@@ -758,11 +814,11 @@ function addChecklist (data, lang = 'en', focus = false) {
 	})
 
 	// media.media.attr('data-placeholder', d => d.instruction)
-	if (instruction) {
-		media.media.addElem('div', 'instruction')
-			.attr('data-placeholder', d => d.instruction)
-			.text(d => d.instruction)
-	}
+	// if (instruction) {
+	// 	media.instruction.addElem('div', 'instruction')
+	// 		.attr('data-placeholder', d => d.instruction)
+	// 		.text(d => d.instruction)
+	// }
 
 	const list = media.media.addElem('ol')
 		.styles({	
@@ -796,7 +852,7 @@ function addChecklist (data, lang = 'en', focus = false) {
 			.addElems('input')
 			.attrs({ 
 				'type': 'checkbox', 
-				'id': d => d.name ? d.name.simplify() : `item-${checklist_id}-${d.id}`, 
+				'id': d => `check-item-${checklist_id}-${d.id}`, 
 				'value': d => d.name,
 				'name': `checklist-${checklist_id}`, 
 				'checked': d => d.checked || null,
@@ -808,17 +864,20 @@ function addChecklist (data, lang = 'en', focus = false) {
 			sel.findAncestor('opt').select('.checkbox label i')
 				.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
 
-			if (editing) switchButtons(lang)
+			// if (editing) switchButtons(lang)
+			if (editing) partialSave('media')
 		})
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
-			.attr('for', d => d.name ? d.name.simplify() : `item-${checklist_id}-${d.id}`)
+			.attr('for', d => `check-item-${checklist_id}-${d.id}`)
 		.addElems('i', 'material-icons')
 			.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
-		opts.addElems('div', 'grow list-item')
+		opts.addElems('div', 'grow')
+			.addElems('label',  'list-item')
 			.attrs({ 
+				'for': d => `check-item-${checklist_id}-${d.id}`,
 				'data-placeholder': vocabulary['new checklist item'][lang],
-				'contenteditable': activity !== 'view' ? true : null
+				'contenteditable': activity !== 'view' && !templated ? true : null
 			})
 		.on('keydown', function () {
 			const evt = d3.event
@@ -876,7 +935,8 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		// parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction },
 		focus: focus,
@@ -924,11 +984,11 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	})
 
 	// media.media.attr('data-placeholder', d => d.instruction)
-	if (instruction) {
-		media.media.addElem('div', 'instruction')
-			.attr('data-placeholder', d => d.instruction)
-			.text(d => d.instruction)
-	}
+	// if (instruction) {
+	// 	media.media.addElem('div', 'instruction')
+	// 		.attr('data-placeholder', d => d.instruction)
+	// 		.text(d => d.instruction)
+	// }
 
 	const list = media.media.addElem('ol')
 		.styles({	
@@ -962,7 +1022,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 			.addElems('input')
 			.attrs({ 
 				'type': 'radio', 
-				'id': d => d.name ? d.name.simplify() : `item-${radiolist_id}-${d.id}`, 
+				'id': d => `radio-item-${radiolist_id}-${d.id}`, 
 				'value': d => d.name,
 				'name': `radiolist-${radiolist_id}`, 
 				'checked': d => d.checked || null,
@@ -971,17 +1031,20 @@ function addRadiolist (data, lang = 'en', focus = false) {
 		.on('change', _ => {
 			opts.selectAll('input[type=radio]').each(function (d) { d.checked = this.checked })
 			opts.selectAll('label i').html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
-			if (editing) switchButtons(lang)
+			// if (editing) switchButtons(lang)
+			if (editing) partialSave('media')
 		})
 		opts.addElems('div', 'radio')
 			.addElems('label')
-			.attr('for', d => d.name ? d.name.simplify() : `item-${radiolist_id}-${d.id}`)
+			.attr('for', d => `radio-item-${radiolist_id}-${d.id}`)
 		.addElems('i', 'material-icons')
 			.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
-		opts.addElems('div', 'grow list-item')
+		opts.addElems('div', 'grow')
+			.addElems('label', 'list-item')
 			.attrs({ 
+				'for': d => `radio-item-${radiolist_id}-${d.id}`,
 				'data-placeholder': vocabulary['new checklist item'][lang],
-				'contenteditable': activity !== 'view' ? true : null
+				'contenteditable': activity !== 'view' && !templated ? true : null
 			})
 		.on('keydown', function () {
 			const evt = d3.event
@@ -1024,11 +1087,13 @@ function addMap (data, lang = 'en', focus = false) {
 	if (!type) type = 'location'
 	let dragging = false
 
-	const input = d3.select('.meta-input-group #input-meta-location').node()
+	// const input = d3.select('.meta-input-group #input-meta-location').node()
+	const input = d3.select('.media-input-group #input-meta-location').node()
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
-		parent: d3.select('.meta-layout'), 
+		// parent: d3.select('.meta-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, centerpoints: centerpoints, caption: caption, instruction: instruction },
 		focus: focus,
@@ -1117,7 +1182,8 @@ function addMap (data, lang = 'en', focus = false) {
 
 		filter.addElem('label')
 			.attr('for', 'search-field')
-			.html(d => d.instruction || vocabulary['search place'][lang])
+			// .html(d => d.instruction || vocabulary['search place'][lang])
+			.html(vocabulary['search place'][lang])
 
 		filter.addElems('button',  'search')
 			.on('click', searchLocation)
@@ -1221,11 +1287,13 @@ function addSDGs (data, lang = 'en', focus = false) {
 	if (!type) type = 'sdgs'
 	if (!sdgs) sdgs = []
 
-	const input = d3.select('.meta-input-group #input-meta-sdgs').node()
+	// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
+	const input = d3.select('.media-input-group #input-meta-sdgs').node()
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
-		parent: d3.select('.meta-layout'), 
+		// parent: d3.select('.meta-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, sdgs: sdgs, instruction: instruction },
 		focus: focus,
@@ -1238,7 +1306,8 @@ function addSDGs (data, lang = 'en', focus = false) {
 			.html(d => d)
 	}
 
-	meta.media.attr('data-placeholder', d => d.instruction || vocabulary['missing SDG'][lang])
+	// meta.media.attr('data-placeholder', d => d.instruction || vocabulary['missing SDG'][lang])
+	meta.media.attr('data-placeholder', vocabulary['missing SDG'][lang])
 	.addElems('img', 'icon', c => c.sdgs, c => c)
 	.each(function (c) {
 		const sel = d3.select(this)
@@ -1292,13 +1361,15 @@ function addTags (data, lang = 'en', focus = false) {
 	let { type, instruction, tags, themes } = data || {}
 	if (!type) type = 'tags'
 	if (!tags) tags = []
-	if (!themes) themes = []
+	// if (!themes) themes = []
 
-	const input = d3.select('.meta-input-group #input-meta-tags').node()
+	// const input = d3.select('.meta-input-group #input-meta-tags').node()
+	const input = d3.select('.media-input-group #input-meta-tags').node()
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
-		parent: d3.select('.meta-layout'), 
+		// parent: d3.select('.meta-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, tags: tags, instruction: instruction },
 		focus: focus,
@@ -1311,146 +1382,150 @@ function addTags (data, lang = 'en', focus = false) {
 			.html(d => d)
 	}
 
-	meta.media.attr('data-placeholder', d => d.instruction || vocabulary['missing tag'][lang])
+	// meta.media.attr('data-placeholder', d => d.instruction || vocabulary['missing tag'][lang])
+	meta.media.attr('data-placeholder', vocabulary['missing tag'][lang])
 	.addElems('div', 'tag', c => c.tags, c => c)
 	.addElems('label')
 		.html(c => c.name ? c.name.capitalize() : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
 
 	if (meta.inset) {
-		const opts = meta.inset.addElem('div', 'inset-tags')
-			.addElems('div', 'tag', themes)
-			.classed('selected', d => tags.map(c => c.name.simplify()).includes(d.name.simplify()))
-		opts.addElem('input')
-			.attrs({ 
-				'id': d => `theme-${d.name.simplify()}`, 
-				'type': 'checkbox', 
-				'name': 'theme', 
-				'value': d => d.name, 
-				'checked': d => tags.map(c => c.name.simplify()).includes(d.name.simplify()) || null 
-			})
-		.on('change', function (d) { 
-			toggleClass(this.parentNode, 'selected')
-			const sel = d3.select(this)
-
-			const checked = sel.findAncestor('inset-tags').selectAll('.tag input:checked').data()
-			sel.findAncestor('tags-container')
-				.each(c => c.tags = checked)
-				.select('.meta-tags')
-				.addElems('div', 'tag', c => c.tags, c => c)
-			.addElems('label')
-				.html(c => c.name.capitalize())
-			
-			sel.findAncestor('inset-tags').selectAll('.tag').classed('hide', false)
-			sel.findAncestor('inset').select('input[type=text]').node().value = ''
-			if (editing) switchButtons(lang)
-		})
-		opts.addElem('label')
-			.attrs({ 'for': d => `theme-${d.name.simplify()}` })
-			.html(d => d.name.capitalize())
-
-		const filter = meta.inset.addElem('div', 'filter-or-add')
-		filter.addElem('input')
-			.attrs({ 'type': 'text', 'name': 'theme', 'id': 'filter-field' })
-		.on('keyup', function () {
-			const evt = d3.event
-			const val = this.value.trim().toLowerCase()
-			const sel = d3.select(this)
-			const parent = sel.findAncestor('inset').select('.inset-tags')
-
-			if (val.length) {
-				const existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
-				parent.selectAll('.tag input').each(function () { 
-					existingTags.push(this.value.toLowerCase())
-					if (!this.value.toLowerCase().includes(val)) {
-						d3.select(this.parentNode).classed('hide', true)
-					}
+		GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
+		.then(themes => {
+			const opts = meta.inset.addElem('div', 'inset-tags')
+				.addElems('div', 'tag', themes)
+				.classed('selected', d => tags.map(c => c.name.simplify()).includes(d.name.simplify()))
+			opts.addElem('input')
+				.attrs({ 
+					'id': d => `theme-${d.name.simplify()}`, 
+					'type': 'checkbox', 
+					'name': 'theme', 
+					'value': d => d.name, 
+					'checked': d => tags.map(c => c.name.simplify()).includes(d.name.simplify()) || null 
 				})
-				if (evt.code === 'Enter' || evt.keyCode === 13) addTag(existingTags)
-			}
-		}).on('input', function () {
-			const evt = d3.event
-			const val = this.value.trim().toLowerCase()
-			const sel = d3.select(this)
-			const parent = meta.inset.select('.inset-tags')
+			.on('change', function (d) { 
+				toggleClass(this.parentNode, 'selected')
+				const sel = d3.select(this)
 
-			if (evt.inputType === 'deleteContentBackward') {
-				parent.selectAll('.tag input').each(function () { 
-					if (this.value.toLowerCase().includes(val) || !(val && val.length)) {
-						d3.select(this.parentNode).classed('hide', false)
-					}
-				})
-				// UPDATE THE MAX HEIGHT OF THE INSET
-				meta.expand({ forceopen: true })
-			}
-		}).on('blur', function () {
-			fixLabel(this)
-		})
-
-		filter.addElem('label')
-			.attr('for', 'filter-field')
-			.html(vocabulary['looking for something'][lang])
-
-		filter.addElems('button',  'add')
-			.on('click', _ => addTag())
-		.addElems('i', 'material-icons')
-			.html('add_circle_outline')
-
-		function addTag (existingTags) {
-			const sel = d3.select('input#filter-field')
-			const val = sel.node().value.trim().toLowerCase()
-			const parent = meta.inset.select('.inset-tags')
-
-			if (!existingTags) {
-				existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
-				parent.selectAll('.tag input').each(function () { 
-					existingTags.push(this.value.toLowerCase())
-				})
-			}
-
-			if (!existingTags.includes(val)) {
-				const opt = parent.insertElem('input[type=text]', 'div', 'tag selected')
-					.datum({ name: val })
-				opt.addElem('input')
-					.attrs({ 'id': c => c.name.simplify(), 'type': 'checkbox', 'name': 'theme', 'value': c => c.name, 'checked': true })
-				.on('change', function () { 
-					toggleClass(this.parentNode, 'selected') 
-					const sel = d3.select(this)
-
-					const checked = sel.findAncestor('inset-tags').selectAll('.tag input:checked').data()
-					meta.container
-						.each(c => c.tags = checked)
-						.select('.meta-tags')
-						.addElems('div', 'tag', c => c.tags, c => c)
-					.addElems('label')
-						.html(c => c.name.capitalize())
-
-					sel.findAncestor('inset-tags').selectAll('.tag').classed('hide', false)	
-					sel.findAncestor('inset-tags').select('#filter-field').node().value = ''
-					if (editing) switchButtons(lang)
-				})
-				opt.addElem('label')
-					.attr('for', c => c.name.simplify())
+				const checked = sel.findAncestor('inset-tags').selectAll('.tag input:checked').data()
+				sel.findAncestor('tags-container')
+					.each(c => c.tags = checked)
+					.select('.meta-tags')
+					.addElems('div', 'tag', c => c.tags, c => c)
+				.addElems('label')
 					.html(c => c.name.capitalize())
-			} else {
-				parent.selectAll('.tag input[type=checkbox]').filter(function () { return this.value.simplify() === val.simplify() })
-					.attr('checked', true)
-				.each(function () { d3.select(this.parentNode).classed('selected', true) })
-			}
-			// UPDATE THE CHIPS THAT ARE DISPLAYED
-			const checked = parent.selectAll('.tag input:checked').data()
-			meta.container
-				.each(c => c.tags = checked)
-				.select('.meta-tags')
-				.addElems('div', 'tag', c => c.tags, c => c)
-			.addElems('label')
-				.html(c => c.name.capitalize())
-			// UPDATE THE MAX HEIGHT OF THE INSET
-			meta.expand({ timeout: 250, forceopen: true })
+				
+				sel.findAncestor('inset-tags').selectAll('.tag').classed('hide', false)
+				sel.findAncestor('inset').select('input[type=text]').node().value = ''
+				if (editing) switchButtons(lang)
+			})
+			opts.addElem('label')
+				.attrs({ 'for': d => `theme-${d.name.simplify()}` })
+				.html(d => d.name.capitalize())
 
-			sel.node().value = ''
-			parent.selectAll('.tag').classed('hide', false)
-			if (editing) switchButtons(lang)	
-		}
+			const filter = meta.inset.addElem('div', 'filter-or-add')
+			filter.addElem('input')
+				.attrs({ 'type': 'text', 'name': 'theme', 'id': 'filter-field' })
+			.on('keyup', function () {
+				const evt = d3.event
+				const val = this.value.trim().toLowerCase()
+				const sel = d3.select(this)
+				const parent = sel.findAncestor('inset').select('.inset-tags')
+
+				if (val.length) {
+					const existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
+					parent.selectAll('.tag input').each(function () { 
+						existingTags.push(this.value.toLowerCase())
+						if (!this.value.toLowerCase().includes(val)) {
+							d3.select(this.parentNode).classed('hide', true)
+						}
+					})
+					if (evt.code === 'Enter' || evt.keyCode === 13) addTag(existingTags)
+				}
+			}).on('input', function () {
+				const evt = d3.event
+				const val = this.value.trim().toLowerCase()
+				const sel = d3.select(this)
+				const parent = meta.inset.select('.inset-tags')
+
+				if (evt.inputType === 'deleteContentBackward') {
+					parent.selectAll('.tag input').each(function () { 
+						if (this.value.toLowerCase().includes(val) || !(val && val.length)) {
+							d3.select(this.parentNode).classed('hide', false)
+						}
+					})
+					// UPDATE THE MAX HEIGHT OF THE INSET
+					meta.expand({ forceopen: true })
+				}
+			}).on('blur', function () {
+				fixLabel(this)
+			})
+
+			filter.addElem('label')
+				.attr('for', 'filter-field')
+				.html(vocabulary['looking for something'][lang])
+
+			filter.addElems('button',  'add')
+				.on('click', _ => addTag())
+			.addElems('i', 'material-icons')
+				.html('add_circle_outline')
+
+			function addTag (existingTags) {
+				const sel = d3.select('input#filter-field')
+				const val = sel.node().value.trim().toLowerCase()
+				const parent = meta.inset.select('.inset-tags')
+
+				if (!existingTags) {
+					existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
+					parent.selectAll('.tag input').each(function () { 
+						existingTags.push(this.value.toLowerCase())
+					})
+				}
+
+				if (!existingTags.includes(val)) {
+					const opt = parent.insertElem('input[type=text]', 'div', 'tag selected')
+						.datum({ name: val })
+					opt.addElem('input')
+						.attrs({ 'id': c => c.name.simplify(), 'type': 'checkbox', 'name': 'theme', 'value': c => c.name, 'checked': true })
+					.on('change', function () { 
+						toggleClass(this.parentNode, 'selected') 
+						const sel = d3.select(this)
+
+						const checked = sel.findAncestor('inset-tags').selectAll('.tag input:checked').data()
+						meta.container
+							.each(c => c.tags = checked)
+							.select('.meta-tags')
+							.addElems('div', 'tag', c => c.tags, c => c)
+						.addElems('label')
+							.html(c => c.name.capitalize())
+
+						sel.findAncestor('inset-tags').selectAll('.tag').classed('hide', false)	
+						sel.findAncestor('inset-tags').select('#filter-field').node().value = ''
+						if (editing) switchButtons(lang)
+					})
+					opt.addElem('label')
+						.attr('for', c => c.name.simplify())
+						.html(c => c.name.capitalize())
+				} else {
+					parent.selectAll('.tag input[type=checkbox]').filter(function () { return this.value.simplify() === val.simplify() })
+						.attr('checked', true)
+					.each(function () { d3.select(this.parentNode).classed('selected', true) })
+				}
+				// UPDATE THE CHIPS THAT ARE DISPLAYED
+				const checked = parent.selectAll('.tag input:checked').data()
+				meta.container
+					.each(c => c.tags = checked)
+					.select('.meta-tags')
+					.addElems('div', 'tag', c => c.tags, c => c)
+				.addElems('label')
+					.html(c => c.name.capitalize())
+				// UPDATE THE MAX HEIGHT OF THE INSET
+				meta.expand({ timeout: 250, forceopen: true })
+
+				sel.node().value = ''
+				parent.selectAll('.tag').classed('hide', false)
+				if (editing) switchButtons(lang)	
+			}
+		})
 	}
 }
 // SAVING BUTTON

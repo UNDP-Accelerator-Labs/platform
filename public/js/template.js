@@ -28,10 +28,11 @@ const observer = new MutationObserver(evt => {
 		}
 	}, 100)
 })
-
+// MEDIA PROTOTYPE
 const Media = function (kwargs) {
-	const { parent, container, type, datum, focus, lang } = kwargs || {}
-	
+	let { parent, container, type, datum, focus, lang } = kwargs || {}
+	parent = d3.select(parent).classed('focus', focus)
+
 	if (container) console.log(container.node())
 	// NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
 	this.container = (container || parent.addElem('div', `media-container ${type}-container template`)) // MAYBE ADD ACTIVITY AS CLASS HERE
@@ -39,29 +40,37 @@ const Media = function (kwargs) {
 		.datum(datum)
 	.each(d => d.level = 'media')
 		.style('text-align', d => d.textalign)
-	.on('click.focus', function () { d3.select(this).classed('focus', editing) }) // TO DO: CHANGE EDITING VAR HERE > PLACE IT IN BACK END, LIKE FOR THE browse VIEW
+	.on('click.focus', function () { 
+		const sel = d3.select(this)
+		sel.classed('focus', editing)
+		sel.findAncestor('layout').classed('focus', editing)
+	}) // TO DO: CHANGE EDITING VAR HERE > PLACE IT IN BACK END, LIKE FOR THE browse VIEW
 	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
-	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-		.addElems('div', 'opt-group', [vocabulary['write instruction'][lang]])
-		.addElems('label')
-			.html(d => d)
+	if (editing) {
+		this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
+		this.opts.addElems('div', 'opt-group', [vocabulary['write instruction'][lang]])
+			.addElems('label')
+				.html(d => d)
+	}
 	this.media = this.container.addElems('div', 'media template', d => [d], d => d.type)
 		.classed(`media-${type}`, true)
-	if (editing || activity === 'preview') this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
+	if (editing || activity === 'preview') {
+		this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
 		// .classed('hide', instruction && activity !== 'preview')
-	.addElems('div', 'opt', [
-		{ label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
-		{ label: 'close', value: 'delete', fn: _ => this.rmMedia() }, 
-		{ label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
-	]).on('click', d => {
-		d3.event.stopPropagation()
-		d.fn()
-		if (editing) switchButtons(lang)
-	}).on('mouseup', _ => d3.event.stopPropagation())
-		.addElems('i', 'material-icons')
-		.html(d => d.label)
+		this.placement.addElems('div', 'opt', [
+			{ label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
+			{ label: 'close', value: 'delete', fn: _ => this.rmMedia() }, 
+			{ label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+		]).on('click', d => {
+			d3.event.stopPropagation()
+			d.fn()
+			if (editing) switchButtons(lang)
+		}).on('mouseup', _ => d3.event.stopPropagation())
+			.addElems('i', 'material-icons')
+			.html(d => d.label)
+	}
 	// THE FOLLOWING IS DIFFERENT FROM THE Media CONSTRUCTOR IN pads.js
-	this.reponse = this.container.addElems('div', 'response template', [type])
+	this.response = this.container.addElems('div', 'response template', [type])
 		.html(d => vocabulary[`expect ${d}`][lang])
 
 	if (editing) observer.observe(this.container.node(), obsvars)
@@ -83,11 +92,11 @@ Media.prototype.move = function (dir) {
 	let sourceMargin = parseInt(getComputedStyle(this.container.node()).marginBottom)
 	const level = this.container.datum().level
 
-	const metaLayout = d3.select('.meta-layout')
-	const openInset = metaLayout.selectAll('.inset').filter(function () { return this.style.maxHeight.length })
+	const layout = this.container.findAncestor('layout')
+	const openInset = layout.selectAll('.inset').filter(function () { return this.style.maxHeight.length })
 	// CHECK WHETHER AN INSET IS OPEN
 	new Promise(resolve => {
-		if (openInset.node() && this.container.classed('meta-container')) {
+		if (openInset.node()) {
 			openInset.node().style.maxHeight = null
 			window.setTimeout(_ => { 
 				sourceTop = this.container.node().offsetTop
@@ -99,7 +108,11 @@ Media.prototype.move = function (dir) {
 	}).then(_ => {
 		if (dir.includes('up')) { // THE SOURCE IS MOVING UP AND THE TARGET IS MOVING DOWN
 			const target = this.container.node().previousSibling
-			if (target) {
+			if (target 
+				&& target.classList !== undefined 
+				&& !target.classList.contains('title-container') 
+				&& !target.classList.contains('lead-container')
+			) {
 				const targetTop = target.offsetTop
 				const moveSource = targetTop - sourceTop
 				const moveTarget = sourceHeight + sourceMargin
@@ -166,13 +179,76 @@ Meta.prototype.expand = function (kwargs) {
 	}, timeout)
 }
 
+function autofillTitle () {
+	if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
+		let firstText = main.select('.description-layout .txt-container .media-txt').node()
+		if (!firstText.innerText || !firstText.innerText.length) firstText = main.selectAll('.media, .meta').filter(function () { return this.innerText && this.innerText.length }).node()
+		if (firstText && firstText.innerText) head.select('.title').html(_ => {
+			const cutoff = 75
+			if (firstText.innerText.split('\n').length > 1) {
+				if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
+				else return `${firstText.innerText.split('\n')[0]}`
+			} else {
+				if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
+				else return `${firstText.innerText}`
+			}
+			partialSave('title')
+		})
+	}
+}
+
+function addSection (data, lang = 'en', focus = false) {
+	const { title, lead } = data || {}
+	d3.selectAll('.media-layout').classed('focus', false)
+
+	const section = d3.select('main#template div.inner div.body')
+		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
+		.classed('focus', focus)
+		.datum({ type: 'section', title: title, lead: lead })
+	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
+
+	const header = section.addElems('div', 'section-header')
+		.addElems('label')
+		.attrs({ 
+			// 'data-placeholder': d => vocabulary[`request ${type}`][lang],
+			'data-placeholder': d => 'Section header', // TO DO: TRANSLATION
+			'contenteditable': editing ? true : null 
+		}).html(d => d.title)
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
+		}
+	}).on('blur', _ => partialSave('media'))
+
+	const media = new Media({
+		parent: section.node(), 
+		type: 'lead', 
+		datum: { type: 'lead', lead: lead },
+		lang: lang
+	})
+	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+	media.opts.remove()
+	media.placement.remove()
+	media.response.remove()
+
+	media.media.attrs({ 
+		'data-placeholder': d => 'Lead paragraph', // TO DO: TRANSLATION
+		'contenteditable': editing ? true : null 
+	}).html(d => d.lead)
+
+	// if (focus) header.node().focus()
+	// if (editing) observer.observe(section.node(), obsvars)
+}
+
 function addTitle (data, lang = 'en', focus = false) {
 	let { type, instruction } = data || {}
 	if (!type) type = 'title'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
 		focus: focus,
@@ -194,7 +270,7 @@ function addImg (data, lang = 'en', focus = false) {
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
 		focus: focus,
@@ -214,7 +290,7 @@ function addTxt (data, lang = 'en', focus = false) {
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
 		focus: focus,
@@ -234,7 +310,7 @@ function addEmbed (data, lang = 'en', focus = false) {
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
 		focus: focus,
@@ -268,7 +344,7 @@ function addChecklist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, options: options, instruction: instruction },
 		focus: focus,
@@ -311,7 +387,7 @@ function addChecklist (data, lang = 'en', focus = false) {
 			.addElems('input')
 			.attrs({ 
 				'type': 'checkbox', 
-				'id': d => d.name ? d.name.simplify() : `item-${checklist_id}-${d.id}`, 
+				'id': d => `check-item-${checklist_id}-${d.id}`, 
 				'value': d => d.name,
 				'name': `checklist-${checklist_id}`, 
 				'checked': d => d.checked || null,
@@ -327,11 +403,13 @@ function addChecklist (data, lang = 'en', focus = false) {
 		// })
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
-			.attr('for', d => d.name ? d.name.simplify() : `item-${checklist_id}-${d.id}`)
+			.attr('for', d => `check-item-${checklist_id}-${d.id}`)
 		.addElems('i', 'material-icons')
 			.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
-		opts.addElems('div', 'grow list-item')
+		opts.addElems('div', 'grow')
+			.addElems('label', 'list-item')
 			.attrs({ 
+				'for': d => `check-item-${checklist_id}-${d.id}`,
 				'data-placeholder': vocabulary['new checklist item'][lang],
 				'contenteditable': activity !== 'view' ? true : null
 			})
@@ -389,7 +467,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		parent: d3.select('.media-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, options: options, instruction: instruction },
 		focus: focus,
@@ -432,7 +510,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 			.addElems('input')
 			.attrs({ 
 				'type': 'checkbox', 
-				'id': d => d.name ? d.name.simplify() : `item-${radiolist_id}-${d.id}`, 
+				'id': d => `radio-item-${radiolist_id}-${d.id}`, 
 				'value': d => d.name,
 				'name': `radiolist-${radiolist_id}`, 
 				'checked': d => d.checked || null,
@@ -448,11 +526,13 @@ function addRadiolist (data, lang = 'en', focus = false) {
 		// })
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
-			.attr('for', d => d.name ? d.name.simplify() : `item-${radiolist_id}-${d.id}`)
+			.attr('for', d => `radio-item-${radiolist_id}-${d.id}`)
 		.addElems('i', 'material-icons')
 			.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
-		opts.addElems('div', 'grow list-item')
+		opts.addElems('div', 'grow')
+			.addElems('label', 'list-item')
 			.attrs({ 
+				'for': d => `radio-item-${radiolist_id}-${d.id}`,
 				'data-placeholder': vocabulary['new checklist item'][lang],
 				'contenteditable': activity !== 'view' ? true : null
 			})
@@ -497,11 +577,13 @@ function addMap (data, lang = 'en', focus = false) {
 	if (!type) type = 'location'
 	if (!instruction) instruction = ''
 
-	const input = d3.select('.meta-input-group #input-meta-location').node()
+	// const input = d3.select('.meta-input-group #input-meta-location').node()
+	const input = d3.select('.media-input-group #input-meta-location').node()
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
-		parent: d3.select('.meta-layout'), 
+		// parent: d3.select('.meta-layout'), 
+		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
 		focus: focus,
@@ -521,43 +603,47 @@ function addMap (data, lang = 'en', focus = false) {
 	}
 }
 function addSDGs (data, lang = 'en', focus = false) {
-	let { type, sdgs, instruction } = data || {}
+	let { type, instruction } = data || {}
 	if (!type) type = 'sdgs'
-	if (!sdgs) sdgs = []
 	if (!instruction) instruction = ''
 
-	const input = d3.select('.meta-input-group #input-meta-sdgs').node()
-	if (input) input.disabled = true
+	GET(`http://localhost:3000/api/sdgs?lang=lang`)
+	.then(sdgs => {
+		// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
+		const input = d3.select('.media-input-group #input-meta-sdgs').node()
+		if (input) input.disabled = true
 
-	const meta = new Meta({ 
-		parent: d3.select('.meta-layout'), 
-		type: type, 
-		datum: { type: type, sdgs: sdgs, instruction: instruction },
-		focus: focus,
-		lang: lang
-	})
-
-	meta.media.attrs({ 
-		'data-placeholder': d => vocabulary[`request ${type}`][lang],
-		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
-
-	if (meta.inset) {
-		const panel = meta.inset.addElems('div', `inset-${type}`)
-			.addElems('ul', 'panel')
-		panel.addElems('li', 'instruction', [{ value: vocabulary['sdgs instruction'][lang] }])
-			.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
-		panel.addElems('li', 'opt', d => d.sdgs)
-		.each(function (d, i) {
-			const sel = d3.select(this)
-			sel.addElems('div')
-				.addElems('label')
-				.html(`<strong>${i + 1}.</strong>`)
-			sel.addElems('div', 'grow')
-				.addElems('label')
-				.html(d.name.capitalize())
+		const meta = new Meta({ 
+			// parent: d3.select('.meta-layout'), 
+			parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+			type: type, 
+			datum: { type: type, sdgs: sdgs, instruction: instruction },
+			focus: focus,
+			lang: lang
 		})
-	}
+
+		meta.media.attrs({ 
+			'data-placeholder': d => vocabulary[`request ${type}`][lang],
+			'contenteditable': editing ? true : null 
+		}).html(d => d.instruction)
+
+		if (meta.inset) {
+			const panel = meta.inset.addElems('div', `inset-${type}`)
+				.addElems('ul', 'panel')
+			panel.addElems('li', 'instruction', [{ value: vocabulary['sdgs instruction'][lang] }])
+				.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
+			panel.addElems('li', 'opt', d => d.sdgs)
+			.each(function (d, i) {
+				const sel = d3.select(this)
+				sel.addElems('div')
+					.addElems('label')
+					.html(`<strong>${i + 1}.</strong>`)
+				sel.addElems('div', 'grow')
+					.addElems('label')
+					.html(d.name.capitalize())
+			})
+		}
+	})
 }
 function addTags (data, lang = 'en', focus = false) {
 	let { type, themes, instruction } = data || {}
@@ -565,38 +651,43 @@ function addTags (data, lang = 'en', focus = false) {
 	if (!themes) themes = []
 	if (!instruction) instruction = ''
 
-	const input = d3.select('.meta-input-group #input-meta-tags').node()
-	if (input) input.disabled = true
+	GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
+	.then(themes => {
+		// const input = d3.select('.meta-input-group #input-meta-tags').node()
+		const input = d3.select('.media-input-group #input-meta-tags').node()
+		if (input) input.disabled = true
 
-	const meta = new Meta({ 
-		parent: d3.select('.meta-layout'), 
-		type: type, 
-		datum: { type: type, themes: themes, instruction: instruction },
-		focus: focus,
-		lang: lang
-	})
-
-	meta.media.attrs({ 
-		'data-placeholder': d => vocabulary[`request ${type}`][lang],
-		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
-
-	if (meta.inset) {
-		const panel = meta.inset.addElems('div', `inset-${type}`)
-			.addElems('ul', 'panel')
-		panel.addElems('li', 'instruction', [{ value: vocabulary['tags instruction'][lang] }])
-			.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
-		panel.addElems('li', 'opt', d => d.themes)
-		.each(function (d, i) {
-			const sel = d3.select(this)
-			sel.addElems('div')
-				.addElems('label')
-				.html(`<strong>${i + 1}.</strong>`)
-			sel.addElems('div', 'grow')
-				.addElems('label')
-				.html(d.name.capitalize())
+		const meta = new Meta({ 
+			// parent: d3.select('.meta-layout'), 
+			parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+			type: type, 
+			datum: { type: type, themes: themes, instruction: instruction },
+			focus: focus,
+			lang: lang
 		})
-	}
+
+		meta.media.attrs({ 
+			'data-placeholder': d => vocabulary[`request ${type}`][lang],
+			'contenteditable': editing ? true : null 
+		}).html(d => d.instruction)
+
+		if (meta.inset) {
+			const panel = meta.inset.addElems('div', `inset-${type}`)
+				.addElems('ul', 'panel')
+			panel.addElems('li', 'instruction', [{ value: vocabulary['tags instruction'][lang] }])
+				.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
+			panel.addElems('li', 'opt', d => d.themes)
+			.each(function (d, i) {
+				const sel = d3.select(this)
+				sel.addElems('div')
+					.addElems('label')
+					.html(`<strong>${i + 1}.</strong>`)
+				sel.addElems('div', 'grow')
+					.addElems('label')
+					.html(d.name.capitalize())
+			})
+		}
+	})
 }
 
 function switchButtons (lang = 'en') {

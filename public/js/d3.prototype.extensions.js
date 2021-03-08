@@ -39,3 +39,7 @@ d3.selection.prototype.moveToFront = function() {
 d3.selection.prototype.toggleClass = function (_class) {
 	return this.classed(_class, !this.classed(_class))
 }
+// https://stackoverflow.com/questions/25405359/how-can-i-select-last-child-in-d3-js
+d3.selection.prototype.last = function() {
+	return d3.select(this.nodes()[this.size() - 1])
+}

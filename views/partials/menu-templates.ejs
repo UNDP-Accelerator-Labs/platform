@@ -2,19 +2,10 @@
 	if (!locals.query) locals.query = {}
 	if (!locals.templates) locals.templates = []
 %>
-<% if (locals.path.includes('contribute')) { %>
+<% if (locals.path.includes('contribute') && !locals.queryparams.mobilization) { %>
 <nav id='filter'>
 	<div class='handle' onclick='this.parentNode.classList.toggle("open")'><div>Templates</div></div>
 	<form>
-		<!-- <div class='query'>
-			<%# if (locals.query.query && locals.query.query.length) { %>
-				<input type='text' name='query' id='search-field' class='has-value' value='<%# locals.query.query.join(" OR ") %>' onblur='fixLabel(this)'>
-			<%# } else { %>
-				<input type='text' name='query' id='search-field' onblur='fixLabel(this)'>
-			<%# } %>
-			<label for='search-field'><%# vocabulary["search"][locals.lang] %></label>
-			<button id='search'><i class='material-icons'>search</i></button>
-		</div> -->
 		<ul class='filters full-height'>
 			<li class='title'>
 				<h1><%- vocabulary['load template'][locals.lang] %></h1>

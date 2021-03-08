@@ -94,7 +94,9 @@
 								<div class='hide'>
 									<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)'>
 								</div>
-								<div class='grow'><label for='c-<%- c.id %>'><%- c.name %></label></div>
+								<div><label for='c-<%- c.id %>'><%- c.name %></label></div>
+								<div class='grow count'><label for='c-<%- c.id %>'><%- c.position %></label></div>
+								<div class='count'><label for='c-<%- c.id %>'><%- c.country %></label></div>
 							</li>
 						<% }) %>
 					</ul>

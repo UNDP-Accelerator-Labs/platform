@@ -47,24 +47,31 @@
 					<label><%- vocabulary['description'][locals.lang] %></label>
 				</div>
 				<!-- TO DO: TRANSLATE THIS -->
-				<div class='media-container txt-container' onclick='d3.select(this).classed("focus", true)'>
+				<div class='media-container txt-container lead' onclick='d3.select(this).classed("focus", true)'>
 					<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][locals.lang] %>' onblur='partialSave("description")' contenteditable><%- locals.template_description %></div>
 				</div>
 			</section>
 
-			<section class='media-layout layout <%- locals.activity %>'>
+			<!-- <section class='media-layout layout <%- locals.activity %>'>
 				<div class='input-type'>
 					<label><%- vocabulary['media'][locals.lang] %></label>
 				</div>
-			</section>
+			</section> -->
 
 			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
 				<div class='media-input-group input-group'>
-					<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></button>
+					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
+						
+					<div class='vertical-separator'></div>
 					<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
-					<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
-					<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>library_add_check</i></button>
+					<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
 					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
+					<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>insert_photo</i></button>
+					<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
+						
+					<div class='vertical-separator'></div>
+					<button id='input-meta-sdgs' title='Request one or more SDG tag(s).'><i class='material-icons'>public</i></button>
+					<button id='input-meta-tags' title='Request one or more thematic area tag(s).'><i class='material-icons'>style</i></button>
 				</div>
 			<% } %>
 			
@@ -108,6 +115,10 @@
 
 <script type='text/javascript'>
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
+	d3.select('.media-input-group #input-media-section')
+	.on('click', _ => addSection(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addSection(null, '<%- locals.lang %>', true))
+
 	d3.select('.media-input-group #input-media-img')
 	.on('click', _ => addImg(null, '<%- locals.lang %>', true))
 	.on('touchend', _ => addImg(null, '<%- locals.lang %>', true))
@@ -128,17 +139,26 @@
 	.on('click', _ => addRadiolist(null, '<%- locals.lang %>', true))
 	.on('touchend', _ => addRadiolist(null, '<%- locals.lang %>', true))
 
-	// d3.select('.meta-input-group #input-meta-location')
+	// d3.select('.media-input-group #input-meta-location')
 	// .on('click', _ => addMap(null, '<%- locals.lang %>', true))
 	// .on('touchend', _ => addMap(null, '<%- locals.lang %>', true))
 
-	// d3.select('.meta-input-group #input-meta-sdgs')
+	// d3.select('.media-input-group #input-meta-sdgs')
 	// .on('click', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.lang %>', true))
 	// .on('touchend', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.lang %>', true))
 
-	// d3.select('.meta-input-group #input-meta-tags')
+	// d3.select('.media-input-group #input-meta-tags')
 	// .on('click', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
 	// .on('touchend', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
+
+	d3.select('.media-input-group #input-meta-sdgs')
+	.on('click', _ => addSDGs(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addSDGs(null, '<%- locals.lang %>', true))
+
+	// d3.select('.meta-input-group #input-meta-tags')
+	d3.select('.media-input-group #input-meta-tags')
+	.on('click', _ => addTags(null, '<%- locals.lang %>', true))
+	.on('touchend', _ => addTags(null, '<%- locals.lang %>', true))
 
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
 	d3.select('.foot .deploy ul li a#template-deploy')
@@ -166,8 +186,8 @@
 	const head = main.select('.head')
 	const body = main.select('.body')
 	const descriptionLayout = body.select('.description-layout')
-	const mediaLayout = body.select('.media-layout')
-	const metaLayout = body.select('.meta-layout')
+	// const mediaLayout = body.select('.media-layout')
+	// const metaLayout = body.select('.meta-layout')
 	const foot = main.select('.foot')
 	const footer = d3.select('footer')
 
@@ -189,24 +209,21 @@
 		if (editing) {
 			// SHIFT + ENTER LEAVES THE FOCUSED CELL
 			if (keyTrack.includes(16) && e.keyCode === 13 
-				&& (descriptionLayout.selectAll('.media.focus').size() || mediaLayout.selectAll('.media.focus').size() || metaLayout.selectAll('.meta.focus').size())
-			) { 
+				&& main.selectAll('.media-container.focus, .meta-container.focus').size()
+			) { 	
 				e.preventDefault()
-				descriptionLayout.selectAll('.media').classed('focus', false)
-					.selectAll('.media-txt').each(function () { this.blur() })
-				mediaLayout.selectAll('.media').classed('focus', false)
-					.selectAll('.media-title, .media-txt, .media-img').each(function () { this.blur() })
-				const metas = metaLayout.selectAll('.meta').classed('focus', false)
-				main.selectAll('.inset').style('max-height', null)
-				main.selectAll('.media-checklist, .media-radiolist, .meta-checklist').each(function () { this.blur() })
+				main.selectAll('.media-container, .meta-container').classed('focus', false)
+					.selectAll('.media-title, .media-txt, .media-embed, .media-checklist .list-item, .media-checklist .instruction, .media-radiolist .list-item, .media-radiolist .instruction, .meta-checklist .instruction')
+					.each(function () { this.blur() })
+				main.selectAll('.media-container .inset, .meta-container .inset').style('max-height', null)
 				autofillTitle()
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.select('div.title').node(), metaLayout.select('input[type=text]').node()].includes(document.activeElement) 
-				&& !(descriptionLayout.selectAll('.media.focus').size() || descriptionLayout.selectAll('.media *:focus').size())
-				&& !(mediaLayout.selectAll('.media.focus').size() || mediaLayout.selectAll('.media *:focus').size())
-				&& !(metaLayout.selectAll('.meta.focus').size() || metaLayout.selectAll('.meta *:focus').size())
+				![head.select('div.title').node(), main.select('.section-header label').node(), main.select('input[type=text]').node()].includes(document.activeElement)
+				&& !(main.selectAll('.layout.focus *:focus').size())
+				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
+					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
 				&& !d3.select('.modal').node()
 			) {
 				if (e.key === 'i' || e.keyCode === 73) main.select('.media-input-group label[for=input-media-img]').classed('highlight', true)
@@ -220,11 +237,11 @@
 		e = e || event
 		if (editing) {
 			if (
-				![head.select('div.title').node(), metaLayout.select('input[type=text]').node()].includes(document.activeElement) 
-				&& !(descriptionLayout.selectAll('.media-container.focus').size() || descriptionLayout.selectAll('.media-container *:focus').size())
-				&& !(mediaLayout.selectAll('.media-container.focus').size() || mediaLayout.selectAll('.media-container *:focus').size())
-				&& !(metaLayout.selectAll('.meta-container.focus').size() || metaLayout.selectAll('.meta-container *:focus').size())
-				// && !d3.select('.modal').node() // THIS IS IF WE ADD THE MODAL FOR SELECTING A COHORT
+				![head.select('div.title').node(), main.select('.section-header label').node(), main.select('input[type=text]').node()].includes(document.activeElement)
+				&& !(main.selectAll('.layout.focus *:focus').size())
+				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
+					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
+				&& !d3.select('.modal').node() // THIS IS IF WE ADD THE MODAL FOR SELECTING A COHORT
 			) {
 				if (e.key === 'i' || e.keyCode === 73) {
 					main.select('label[for=input-media-img]').classed('highlight', false)
@@ -259,6 +276,12 @@
 			const target = d3.select(e.target)
 			const media = target.findAncestor('media')
 			const meta = target.findAncestor('meta')
+			const section = target.findAncestor('layout')
+			const inputgroup = target.findAncestor('input-group')
+			if (!inputgroup) {
+				main.selectAll('.layout').filter(function () { return section ? this !== section.node() : true })
+					.classed('focus', false)
+			}
 			const containers = main.selectAll('.media-container, .meta-container')
 				.filter(function () { return media ? this !== media.node() : meta ? this !== meta.node() : true })
 			containers.classed('focus', false)
@@ -269,102 +292,97 @@
 		}
 	})
 
-	function autofillTitle () {
-		if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
-			let firstText = main.select('.description-layout .txt-container .media-txt').node()
-			if (!firstText.innerText || !firstText.innerText.length) firstText = main.selectAll('.media, .meta').filter(function () { return this.innerText && this.innerText.length }).node()
-			if (firstText && firstText.innerText) head.select('.title').html(_ => {
-				const cutoff = 75
-				if (firstText.innerText.split('\n').length > 1) {
-					if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
-					else return `${firstText.innerText.split('\n')[0]}`
-				} else {
-					if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
-					else return `${firstText.innerText}`
-				}
-				partialSave('title')
-			})
-		}
-	}
-
 	function extractContent (attr) {
 		const content = {}
 		// COLLECT TITLE
 		const title = head.select('.title').node().innerText
 		const description = descriptionLayout.select('.media-container .media-txt').node().innerText
-		console.log('description')
-		console.log(description)
 		// MAYBE INCLUDE ALERT IF title IS EMPTY
 		// COLLECT ALL MEDIA
-		const items = []
-		mediaLayout.selectAll('.media-container')
+		const sections = []
+		main.selectAll('.layout:not(.description-layout)')
 		.each(function (d) {
+			const items = []
 			const sel = d3.select(this)
-			d.level = 'media'
-			
-			if (d.type === 'title') {
-				d.instruction = sel.select('.media-title').node().innerText
-				items.push(d)
-			}
-			else if (d.type === 'img') {
-				d.instruction = sel.select('.media-img').node().innerText
-				items.push(d)
-			}
-			else if (d.type === 'txt') {
-				d.instruction = sel.select('.media-txt').node().innerText
-				items.push(d)
-			}
-			else if (d.type === 'embed') {
-				d.instruction = sel.select('.media-embed').node().innerText
-				items.push(d)
-			}
-			else if (d.type === 'checklist') {
-				d.instruction = sel.select('.media-checklist .instruction').node().innerText
-				d.options = d.options.filter(c => c.name && c.name.length)
-				items.push(d)
-			}
-			else if (d.type === 'radiolist') {
-				d.instruction = sel.select('.media-radiolist .instruction').node().innerText
-				d.options = d.options.filter(c => c.name && c.name.length)
-				items.push(d)
-			}
+			sel.selectAll('.media-container, .meta-container')
+			.each(function (c) {
+				const sel = d3.select(this)
+
+				if (c.type === 'title') {
+					c.instruction = sel.select('.media-title').node().innerText
+					items.push(c)
+				}
+				else if (c.type === 'img') {
+					c.instruction = sel.select('.media-img').node().innerText
+					items.push(c)
+				}
+				else if (c.type === 'txt') {
+					c.instruction = sel.select('.media-txt').node().innerText
+					items.push(c)
+				}
+				else if (c.type === 'embed') {
+					c.instruction = sel.select('.media-embed').node().innerText
+					items.push(c)
+				}
+				else if (c.type === 'checklist') {
+					c.instruction = sel.select('.media-checklist .instruction').node().innerText
+					c.options = c.options.filter(b => b.name && b.name.length)
+					items.push(c)
+				}
+				else if (c.type === 'radiolist') {
+					c.instruction = sel.select('.media-radiolist .instruction').node().innerText
+					c.options = c.options.filter(b => b.name && b.name.length)
+					items.push(c)
+				}
+				// META
+				// else if (c.type === 'location') {
+				// 	c.instruction = sel.select('.meta-location').node().innerText
+				// 	items.push(c)
+				// }
+				else if (c.type === 'sdgs') {
+					c.instruction = sel.select('.meta-sdgs').node().innerText
+					// c.options = sel.selectAll('.inset-sdgs .panel .opt').data()
+					// WE DO NOT KEEP A COPY HERE OF ALL sdgs
+					items.push({ type: c.type, level: c.level, instruction: c.instruction })
+				}
+				else if (c.type === 'tags') {
+					c.instruction = sel.select('.meta-tags').node().innerText
+					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
+					// WE DO NOT KEEP A COPY HERE OF ALL tags
+					items.push({ type: c.type, level: c.level, instruction: c.instruction })
+				}
+				return c
+			})
+
+			d.title = sel.select('.section-header label').node().innerText
+			d.lead = (sel.select('.media-lead').node() || {}).innerText
+			d.items = items
+			sections.push(d)
 		})
-		// COLLECT ALL META
-		metaLayout.selectAll('.meta-container')
-		.each(function (d) {
-			const sel = d3.select(this)
-			d.level = 'meta'
-			
-			if (d.type === 'location') {
-				d.instruction = sel.select('.meta-location').node().innerText
-				items.push(d)
-			}
-			else if (d.type === 'sdgs') {
-				d.instruction = sel.select('.meta-sdgs').node().innerText
-				d.options = sel.selectAll('.inset-sdgs .panel .opt').data()
-				items.push(d)
-			}
-			else if (d.type === 'tags') {
-				d.instruction = sel.select('.meta-tags').node().innerText
-				d.options = sel.selectAll('.inset-tags .panel .opt').data()
-				items.push(d)
-			}
-		})
+
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
 			${description}\n\n
-			${items.filter(d => d.type === 'title').map(d => d.instruction).join('\n\n').trim()}\n\n
-			${items.filter(d => d.type === 'txt').map(d => d.instruction).join('\n\n').trim()}\n\n
-			${items.filter(d => d.type === 'embed').map(d => d.instruction).join('\n\n').trim()}\n\n
-			${items.filter(d => d.type === 'checklist').map(d => d.instruction).join('\n\n').trim()}\n\n
-			${items.filter(d => d.type === 'checklist').map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
-			${items.filter(d => d.type === 'radiolist').map(d => d.instruction).join('\n\n').trim()}\n\n
-			${items.filter(d => d.type === 'radiolist').map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
+			${sections.map(d => d.items).flat().filter(d => d.type === 'title')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'txt')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'embed')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
+				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
+				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
 		
 		// COMPILE THE CONTENT
 		if (!attr || attr === 'title') content.title = title
 		if (!attr || attr === 'description') content.description = description
-		if (!attr || ['media', 'meta'].includes(attr) || items.unique('type', true).includes(attr)) content.items = JSON.stringify(items)
+		if (!attr || ['media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) { content.sections = JSON.stringify(sections)
+		}
 		// ALWAYS SEND fullTxt
 		content.full_text = fullTxt
 
@@ -418,33 +436,37 @@
 		}).catch(err => { throw err })
 	}
 
-
-
-
-
 	// POPULATE THE PAGE
 	if (['edit', 'view'].includes(activity)) {
-		const data = <% if (locals.data) { %><%- JSON.stringify(locals.data) %><% } else { %>null<% } %>;
-		if (data) {
-			published = data.published
+		const data = <%- JSON.stringify(locals.data || {}) %>;
+		published = data.published
 
-			head.select('.title').html(data.title)
-			descriptionLayout.select('.media-container .media-txt').text(data.description)
-			if (data.items) data.items.forEach(d => {
-				console.log(d)
-				if (d.type === 'title') addTitle(d, '<%- locals.lang %>')
-				if (d.type === 'img') addImg(d, '<%- locals.lang %>')
-				if (d.type === 'txt') addTxt(d, '<%- locals.lang %>')
-				if (d.type === 'embed') addEmbed(d, '<%- locals.lang %>')
-				if (d.type === 'checklist') addChecklist(d, '<%- locals.lang %>')
-				if (d.type === 'radiolist') addRadiolist(d, '<%- locals.lang %>')
-				if (d.type === 'location') addMap(d, '<%- locals.lang %>')
-				if (d.type === 'sdgs') addSDGs(d, '<%- locals.lang %>')
-				if (d.type === 'tags') addTags(d, '<%- locals.lang %>')
+		head.select('.title').html(data.title)
+		descriptionLayout.select('.media-container .media-txt').text(data.description)
+		if (data.sections) {
+			data.sections.forEach(d => {
+				addSection(d, '<%- locals.lang %>')
+				d.items.forEach(c => {
+					if (c.type === 'title') addTitle(c, '<%- locals.lang %>')
+					if (c.type === 'img') addImg(c, '<%- locals.lang %>')
+					if (c.type === 'txt') addTxt(c, '<%- locals.lang %>')
+					if (c.type === 'embed') addEmbed(c, '<%- locals.lang %>')
+					if (c.type === 'checklist') addChecklist(c, '<%- locals.lang %>')
+					if (c.type === 'radiolist') addRadiolist(c, '<%- locals.lang %>')
+					// META
+					if (c.type === 'location') addMap(c, '<%- locals.lang %>')
+					if (c.type === 'sdgs') addSDGs(c, '<%- locals.lang %>')
+					if (c.type === 'tags') addTags(c, '<%- locals.lang %>')
+				})
 			})
 		}
+		// CLEAR CHANGES
+		window.sessionStorage.removeItem('changed-content')
 	} else {
+		addSection(null, '<%- locals.lang %>')
 		addTitle(null, '<%- locals.lang %>')
+		// CLEAR CHANGES
+		window.sessionStorage.removeItem('changed-content')
 	}
 
 </script>

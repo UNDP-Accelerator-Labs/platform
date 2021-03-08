@@ -223,6 +223,12 @@ const vocabulary = {
 		"es": "<strong>Texto</strong> esperado.",
 		"pt": "<strong>Texto</strong> esperado."
 	},
+	"expect lead": {
+		"en": "<strong>Text</strong> expected.",
+		"fr": "<strong>Texte</strong> attendu.",
+		"es": "<strong>Texto</strong> esperado.",
+		"pt": "<strong>Texto</strong> esperado."
+	},
 	"request img": {
 		"en": "request one or several images",
 		"fr": "demander une ou plusieurs images",

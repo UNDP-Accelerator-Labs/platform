@@ -222,11 +222,11 @@
 		const count = templates.addElems('div', 'foot')
 			.addElems('div', 'media meta-stats')
 			.addElems('h1')
-			.html(d => d.items ? d.items.length : 0)
+			.html(d => d.sections ? d.sections.map(d => d.items).flat().length : 0)
 		count.addElems('small')
 		count.addElems('br')
 		count.addElems('small', 'light')
-			.html(d => vocabulary['item']['<%- locals.lang %>'](d.items && d.items.length !== 1))
+			.html(d => vocabulary['item']['<%- locals.lang %>'](d.sections ? d.sections.map(d => d.items).flat().length !== 1 : true))
 	}
 
 	window.onscroll = async function (ev) {

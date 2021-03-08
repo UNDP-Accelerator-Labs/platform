@@ -884,7 +884,7 @@ main#template .inner {
 main#template .inner .head {
     position: relative;
     width: 100%;
-    margin-bottom: 45px;
+    /*margin-bottom: 45px;*/
   }
   main#pad .inner .head i,
 main#template .inner .head i {
@@ -933,12 +933,15 @@ main#template .inner .body .layout.description-layout .media-container .media.fo
   }
   main#pad .inner .body .layout,
 main#template .inner .body .layout {
+    display: inline-block;
     clear: both;
     position: relative;
     width: 100%;
-    margin-top: 45px;
+    margin: 45px 0 30px 0;
     padding-top: 5px;
-    border-top: 1px solid #E5E5E5;
+    /*border-top: 1px solid $c-light-2;*/
+    border-top: 1px solid #57648C;
+    transition: background-color 0.25s;
   }
   main#pad .inner .body .layout .input-type,
 main#template .inner .body .layout .input-type {
@@ -951,8 +954,27 @@ main#template .inner .body .layout .input-type label {
     bottom: 100%;
     left: 0;
     padding: 5px 10px;
+    outline: none;
     background-color: #E5E5E5;
     font-size: 12px;
+    white-space: nowrap;
+  }
+  main#pad .inner .body .layout .section-header,
+main#template .inner .body .layout .section-header {
+    display: block;
+    /*margin-top: 10px;*/
+    text-align: center;
+  }
+  main#pad .inner .body .layout .section-header label,
+main#template .inner .body .layout .section-header label {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    padding: 5px 10px;
+    outline: none;
+    background-color: #57648C;
+    font-size: 16px;
+    color: #FFF;
     white-space: nowrap;
   }
   main#pad .inner .body .layout .media-container,
@@ -971,6 +993,7 @@ main#template .inner .body .layout .meta-container .opts {
     justify-content: space-between;
     width: 100%;
     height: 30px;
+    border-bottom: 1px solid transparent;
   }
   main#pad .inner .body .layout .media-container .opts .opt-group,
 main#pad .inner .body .layout .meta-container .opts .opt-group,
@@ -1081,8 +1104,27 @@ main#template .inner .body .layout .meta-container .media,
 main#template .inner .body .layout .meta-container .meta {
     clear: both;
     position: relative;
-    border-top: 1px solid transparent;
+    /*border-top: 1px solid transparent;*/
     outline: none;
+  }
+  main#pad .inner .body .layout .media-container .media-title,
+main#pad .inner .body .layout .meta-container .media-title,
+main#template .inner .body .layout .media-container .media-title,
+main#template .inner .body .layout .meta-container .media-title {
+    font-size: 24px;
+  }
+  main#pad .inner .body .layout .media-container .media-lead,
+main#pad .inner .body .layout .media-container .media-lead.focus,
+main#pad .inner .body .layout .meta-container .media-lead,
+main#pad .inner .body .layout .meta-container .media-lead.focus,
+main#template .inner .body .layout .media-container .media-lead,
+main#template .inner .body .layout .media-container .media-lead.focus,
+main#template .inner .body .layout .meta-container .media-lead,
+main#template .inner .body .layout .meta-container .media-lead.focus {
+    margin-top: 10px;
+    font-size: 24px;
+    color: #57648C;
+    border-top: none;
   }
   main#pad .inner .body .layout .media-container .media-img,
 main#pad .inner .body .layout .meta-container .media-img,
@@ -1344,6 +1386,18 @@ main#template .inner .body .layout .media-container .media-radiolist ol .opt .gr
 main#template .inner .body .layout .meta-container .media-checklist ol .opt .grow,
 main#template .inner .body .layout .meta-container .media-radiolist ol .opt .grow {
     flex-grow: 1;
+    align-self: flex-start;
+    /*vertical-align: middle;*/
+  }
+  main#pad .inner .body .layout .media-container .media-checklist ol .opt .grow .list-item,
+main#pad .inner .body .layout .media-container .media-radiolist ol .opt .grow .list-item,
+main#pad .inner .body .layout .meta-container .media-checklist ol .opt .grow .list-item,
+main#pad .inner .body .layout .meta-container .media-radiolist ol .opt .grow .list-item,
+main#template .inner .body .layout .media-container .media-checklist ol .opt .grow .list-item,
+main#template .inner .body .layout .media-container .media-radiolist ol .opt .grow .list-item,
+main#template .inner .body .layout .meta-container .media-checklist ol .opt .grow .list-item,
+main#template .inner .body .layout .meta-container .media-radiolist ol .opt .grow .list-item {
+    width: 100%;
     outline: none;
   }
   main#pad .inner .body .layout .media-container .media-checklist ol .opt:last-child,
@@ -1949,6 +2003,16 @@ main#template .inner .body .layout .meta-container .response.template {
     /*text-align: right;*/
     font-size: 12px;
   }
+  main#pad .inner .body .layout .media-container.focus .opts,
+main#pad .inner .body .layout .media-container:hover .opts,
+main#pad .inner .body .layout .meta-container.focus .opts,
+main#pad .inner .body .layout .meta-container:hover .opts,
+main#template .inner .body .layout .media-container.focus .opts,
+main#template .inner .body .layout .media-container:hover .opts,
+main#template .inner .body .layout .meta-container.focus .opts,
+main#template .inner .body .layout .meta-container:hover .opts {
+    border-bottom-color: #E5E5E5;
+  }
   main#pad .inner .body .layout .media-container.focus .opts .opt-group,
 main#pad .inner .body .layout .media-container:hover .opts .opt-group,
 main#pad .inner .body .layout .meta-container.focus .opts .opt-group,
@@ -1981,29 +2045,14 @@ main#template .inner .body .layout .meta-container.focus .add-opt i,
 main#template .inner .body .layout .meta-container:hover .add-opt i {
     display: block;
   }
-  main#pad .inner .body .layout .media-container.focus .media,
-main#pad .inner .body .layout .media-container.focus .meta,
-main#pad .inner .body .layout .media-container:hover .media,
-main#pad .inner .body .layout .media-container:hover .meta,
-main#pad .inner .body .layout .meta-container.focus .media,
-main#pad .inner .body .layout .meta-container.focus .meta,
-main#pad .inner .body .layout .meta-container:hover .media,
-main#pad .inner .body .layout .meta-container:hover .meta,
-main#template .inner .body .layout .media-container.focus .media,
-main#template .inner .body .layout .media-container.focus .meta,
-main#template .inner .body .layout .media-container:hover .media,
-main#template .inner .body .layout .media-container:hover .meta,
-main#template .inner .body .layout .meta-container.focus .media,
-main#template .inner .body .layout .meta-container.focus .meta,
-main#template .inner .body .layout .meta-container:hover .media,
-main#template .inner .body .layout .meta-container:hover .meta {
-    border-top-color: #E5E5E5;
-  }
   main#pad .inner .body .layout .media-container.focus .media-embed,
+main#pad .inner .body .layout .media-container:hover .media-embed,
 main#pad .inner .body .layout .meta-container.focus .media-embed,
+main#pad .inner .body .layout .meta-container:hover .media-embed,
 main#template .inner .body .layout .media-container.focus .media-embed,
-main#template .inner .body .layout .meta-container.focus .media-embed {
-    /*padding: 5px 10px;*/
+main#template .inner .body .layout .media-container:hover .media-embed,
+main#template .inner .body .layout .meta-container.focus .media-embed,
+main#template .inner .body .layout .meta-container:hover .media-embed {
     background-color: #F0F0F0;
   }
   main#pad .inner .body .layout .media-container.move,
@@ -2011,6 +2060,10 @@ main#pad .inner .body .layout .meta-container.move,
 main#template .inner .body .layout .media-container.move,
 main#template .inner .body .layout .meta-container.move {
     transition: transform 0.75s;
+  }
+  main#pad .inner .body .layout.focus,
+main#template .inner .body .layout.focus {
+    background-color: #F0F0F0;
   }
   main#pad .inner .body .layout.view,
 main#template .inner .body .layout.view {
@@ -2070,11 +2123,15 @@ main#template .inner .body .layout.preview .meta-container .placement-opts {
   }
   main#pad .inner .body .input-group,
 main#template .inner .body .input-group {
-    clear: both;
+    /*clear: both;*/
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
     display: flex;
     justify-content: center;
-    margin: 30px 0;
+    padding-bottom: 15px;
+    /*margin: 30px 0;*/
   }
   main#pad .inner .body .input-group input,
 main#template .inner .body .input-group input {
@@ -2131,6 +2188,13 @@ main#template .inner .body .input-group input:disabled,
 main#template .inner .body .input-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
+  }
+  main#pad .inner .body .input-group .vertical-separator,
+main#template .inner .body .input-group .vertical-separator {
+    height: 35px;
+    width: 1px;
+    background-color: #E5E5E5;
+    margin: 15px 15px;
   }
   main#pad .inner .body .input-group.fixed,
 main#template .inner .body .input-group.fixed {
@@ -3211,6 +3275,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   }
 
   main#mobilize-new {
+    position: fixed;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3304,12 +3369,16 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   }
   main#mobilize-new .modal .inner .body .opts .opt {
     display: flex;
+    max-width: 100%;
     align-items: center;
+    justify-content: space-around;
     color: #E5E5E5;
     margin: 10px 0;
   }
   main#mobilize-new .modal .inner .body .opts .opt div {
+    /*display: table-cell;*/
     padding: 0 5px;
+    text-align: left;
     cursor: pointer;
   }
   main#mobilize-new .modal .inner .body .opts .opt div label {
@@ -3357,7 +3426,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   main#mobilize-new .modal .inner .body .opts .opt.checked .preview {
     color: #57648C;
   }
-  main#mobilize-new .modal .inner .body .opts .opt.checked .grow label {
+  main#mobilize-new .modal .inner .body .opts .opt.checked div label {
     color: #333D51;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked .count label {
@@ -3370,7 +3439,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover .preview {
     color: #57648C;
   }
-  main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover .grow label {
+  main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover div label {
     color: #333D51;
   }
   main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover .count label {

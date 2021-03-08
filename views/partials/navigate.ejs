@@ -35,14 +35,14 @@
 				<a href='/<%- locals.lang %>/browse/pads/private'><button><%- vocabulary['pad'][locals.lang](true).capitalize() %></button></a>
 			</li>
 		<% } %>
-		<% if (locals.rights > 0) { %>
+		<% if (locals.rights > 1) { %>
 			<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.activity) && ['templates', 'template'].includes(locals.object)) { %>
 				<li class='active'>
 			<% } else { %><li><% } %>
 				<a href='/<%- locals.lang %>/browse/templates/private'><button><%- vocabulary['template'][locals.lang](false, true).capitalize() %></button></a>
 			</li>
 		<% } %>
-		<% if (locals.rights > 0) { %>
+		<% if (locals.rights > 1) { %>
 			<% if (locals.activity === "mobilize") { %><li class='active'>
 			<% } else { %><li><% } %>
 				<a href='/<%- locals.lang %>/mobilize/existing'><button><%- vocabulary['cohort'][locals.lang](true).capitalize() %></button></a>

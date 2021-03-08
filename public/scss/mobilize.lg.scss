@@ -1,4 +1,5 @@
 main#mobilize-new {
+	position: fixed;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -101,12 +102,16 @@ main#mobilize-new {
 
 					.opt {
 						display: flex;
+						max-width: 100%;
 						align-items: center;
+						justify-content: space-around;
 						color: $c-light-2;
 						margin: 10px 0;
 
 						div {
+							/*display: table-cell;*/
 							padding: 0 5px;
+							text-align: left;
 							cursor: pointer;
 							
 							label {
@@ -159,7 +164,7 @@ main#mobilize-new {
 						.preview {
 							color: $c-mid-2;
 						}
-						.grow {
+						div {
 							label {
 								color: $c-dark-1;
 							}
@@ -177,7 +182,7 @@ main#mobilize-new {
 						.preview {
 							color: $c-mid-2;
 						}
-						.grow {
+						div {
 							label {
 								color: $c-dark-1;
 							}

@@ -381,7 +381,7 @@ function lazyLoadPads (kwargs) {
 	const [f_search, f_sdgs, f_thematic_areas, f_contributors, f_template, f_mobilizations, f_space, order, page] = parsePadFilters(kwargs.req)
  
 	return conn.any(`
-		SELECT p.id, p.media, p.meta, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.inspirations, 0)::INT AS inspirations, 
 			COALESCE(ce.approvals, 0)::INT AS approvals, 
@@ -575,7 +575,7 @@ function lazyLoadTemplates (kwargs) {
 	const [f_search, f_contributors, f_mobilizations, f_space, order, page] = parseTemplateFilters(kwargs.req)
 	
 	return conn.any(`
-		SELECT t.id, t.title, t.description, t.items, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.applications, 0)::INT AS applications,
 			CASE WHEN t.contributor = (SELECT id FROM contributors WHERE uuid = $1)
@@ -685,14 +685,14 @@ function createMobilization (req, res) {
 
 		const batch = []
 		batch.push(t.any(`
-			SELECT co.target AS id, c.name FROM cohorts co
+			SELECT co.target AS id, c.name, c.country, c.position FROM cohorts co
 			INNER JOIN contributors c
 				ON c.id = co.target
 			WHERE co.source IN (SELECT id FROM contributors WHERE uuid = $1)
-			ORDER BY c.name
+			ORDER BY c.country
 		;`, [uuid]))
 		batch.push(t.any(`
-			SELECT t.id, t.title, t.description, t.items, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+			SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
 				COALESCE(ce.applications, 0)::INT AS applications
 			FROM templates t
 			INNER JOIN contributors c
@@ -976,7 +976,7 @@ function createPad (req, res) {
 		;`, [req.session.rights < 3 ? template_filter : '']))
 		if (template) {
 			batch.push(t.oneOrNone(`
-				SELECT id, title, description, items FROM templates
+				SELECT id, title, description, sections FROM templates
 				WHERE id = $1
 			;`, [+template]))
 		} else batch.push(null)
@@ -1031,7 +1031,7 @@ function editPad (req, res) {
 
 		const batch = []
 		batch.push(t.oneOrNone(`
-			SELECT id, title, description, items FROM templates
+			SELECT id, title, description, sections FROM templates
 			WHERE id IN (
 				SELECT template FROM pads p
 				WHERE p.id = $1
@@ -1072,7 +1072,7 @@ function editPad (req, res) {
 			AND e.message IS NOT NULL
 		;`, [+id]))
 		batch.push(t.oneOrNone(`
-			SELECT p.title, p.media, p.meta, p.location, p.template, p.published, p.contributor, c.name AS contributorname,
+			SELECT p.title, p.sections, p.location, p.template, p.published, p.contributor, c.name AS contributorname,
 				CASE WHEN p.status = 2 
 					AND 'bookmark' = ANY(e.types)
 						THEN TRUE 
@@ -1190,7 +1190,7 @@ function editTemplate (req, res) {
 		// batch.push(t.many(`SELECT name FROM thematic_areas ORDER BY name;`)) // TO DO: API
 		// batch.push(t.many(`SELECT id, key, name FROM sdgs WHERE lang = $1;`, [lang])) // TO DO: API
 		batch.push(t.oneOrNone(`
-			SELECT title, description, items, status, published FROM templates
+			SELECT title, description, sections, status, published FROM templates
 			WHERE id = $1
 		;`, [+id]))
 		return t.batch(batch)
@@ -1222,7 +1222,7 @@ function previewTemplate (req, res) {
 	const { id } = req.body || {}
 	
 	DB.conn.oneOrNone(`
-		SELECT title, description, items, status, published FROM templates
+		SELECT title, description, sections, status, published FROM templates
 		WHERE id = $1
 	;`, [+id])
 	.then(result => {
@@ -1297,10 +1297,10 @@ exports.storeImport = (req, res) => {
 				SELECT id FROM contributors
 				WHERE uuid = $1
 			)
-			INSERT INTO templates (medium, title, description, items, full_text, status, contributor)
+			INSERT INTO templates (medium, title, description, sections, full_text, status, contributor)
 			SELECT $2, $3, $4, $5, $6, $7, contributor.id FROM contributor
 			RETURNING id
-		;`, [req.session.uuid, template.medium, template.title, template.description, JSON.stringify(template.items), template.fullTxt, template.status]))
+		;`, [req.session.uuid, template.medium, template.title, template.description, JSON.stringify(template.sections), template.fullTxt, template.status]))
 
 		if (template.tags) {
 			template.tags.forEach(d => {
@@ -1334,7 +1334,7 @@ exports.storeImport = (req, res) => {
 						}
 						delete item.locations	
 					}
-					p.fullTxt = `${p.title}\n\n${p.media.filter(d => d.type === 'txt').map(d => d.txt).join('\n\n').trim()}\n\n${p.media.filter(d => d.type === 'checklist').map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+					p.fullTxt = `${p.title}\n\n${p.sections.map(d => d.items).flat().filter(d => d.type === 'txt').map(d => d.txt).join('\n\n').trim()}\n\n${p.sections.map(d => d.items).flat().filter(d => d.type === 'checklist').map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
 					p.location = p.meta.find(d => d.type === 'location')
 					p.sdgs = p.meta.find(d => d.type === 'sdgs') ? p.meta.find(d => d.type === 'sdgs').sdgs : null
 					if (p.sdgs && !p.sdgs.length) p.sdgs = null
@@ -1361,10 +1361,10 @@ exports.storeImport = (req, res) => {
 						SELECT id FROM contributors
 						WHERE uuid = $1
 					)
-					INSERT INTO pads (title, media, meta, full_text, location, sdgs, tags, template, status, contributor)
-					SELECT $2, $3, $4, $5, $6, $7, $8, $9, $10, contributor.id FROM contributor
+					INSERT INTO pads (title, sections, full_text, location, sdgs, tags, template, status, contributor)
+					SELECT $2, $3, $4, $5, $6, $7, $8, $9, contributor.id FROM contributor
 					RETURNING pads.id
-				;`, [req.session.uuid, d.title, JSON.stringify(d.media), JSON.stringify(d.meta), d.fullTxt, JSON.stringify(d.location), JSON.stringify(d.sdgs), JSON.stringify(d.tags), template.id, status])
+				;`, [req.session.uuid, d.title, JSON.stringify(d.sections), d.fullTxt, JSON.stringify(d.location), JSON.stringify(d.sdgs), JSON.stringify(d.tags), template.id, status])
 			}))
 		})
 	}).then(results => res.json({ pads: results.map(d => d.id) }))
@@ -1516,18 +1516,8 @@ exports.process.save = (req, res) => { // TO DO: SAVE PAD TO MOBILIZATION IF REL
 		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization'].includes(d)), `${object}s`) + condition
 	}	
 
-	DB.conn.tx(t => {
+	DB.conn.tx(t => { // TO DO: CLEAN THIS UP: NO NEED FOR THE batch
 		const batch = []
-		if (tags) {
-			JSON.parse(tags).forEach(d => { // TO DO: API
-				batch.push(t.none(`
-					INSERT INTO thematic_areas (name)
-					VALUES ($1)
-						ON CONFLICT ON CONSTRAINT thematic_areas_name_key
-						DO NOTHING
-				;`, [d.toLowerCase()]))
-			})
-		}
 		batch.push(t.oneOrNone(saveSQL))
 		
 		return t.batch(batch)
@@ -1562,50 +1552,26 @@ exports.process.publish = (req, res) => {
 	const { lang, activity, object } = req.params || {}
 	
 	let saveSQL
-	// if (object === 'solution') { // IF WE CHANGE solution TO pads, WE DO NOT NEED THE if else: WE CAN REPLACE THE TABLE NAME WITH object:raw
-		if (id) {
-			saveSQL = DB.pgp.as.format(`
-				UPDATE $1:name
-				SET status = 2,
-					published = TRUE
-				WHERE id = $2
-					AND status = 1
-					AND (contributor = (SELECT id FROM contributors WHERE uuid = $3)
-						OR $4 > 2)
-			;`, [object, +id, uuid, rights])
-		} else { // PUBLISH ALL
-			saveSQL = DB.pgp.as.format(`
-				UPDATE $1:name
-				SET status = 2,
-					published = TRUE
-				WHERE status = 1
-					AND (contributor = (SELECT id FROM contributors WHERE uuid = $2)
-						OR $3 > 2)
-			;`, [object, uuid, rights])
-		}
-	// }
-	// else if (object === 'template') {
-	// 	if (id) {
-	// 		saveSQL = DB.pgp.as.format(`
-	// 			UPDATE templates
-	// 			SET status = 2,
-	// 				published = TRUE
-	// 			WHERE id = $1
-	// 				AND status = 1
-	// 				AND (contributor = (SELECT id FROM contributors WHERE uuid = $2)
-	// 					OR $3 > 2)
-	// 		;`, [+id, uuid, rights])
-	// 	} else { // PUBLISH ALL
-	// 		saveSQL = DB.pgp.as.format(`
-	// 			UPDATE templates
-	// 			SET status = 2,
-	// 				published = TRUE
-	// 			WHERE status = 1
-	// 				AND (contributor = (SELECT id FROM contributors WHERE uuid = $2)
-	// 					OR $3 > 2)
-	// 		;`, [+id, uuid, rights])
-	// 	}
-	// }
+	if (id) {
+		saveSQL = DB.pgp.as.format(`
+			UPDATE $1:name
+			SET status = 2,
+				published = TRUE
+			WHERE id = $2
+				AND status = 1
+				AND (contributor = (SELECT id FROM contributors WHERE uuid = $3)
+					OR $4 > 2)
+		;`, [object, +id, uuid, rights])
+	} else { // PUBLISH ALL
+		saveSQL = DB.pgp.as.format(`
+			UPDATE $1:name
+			SET status = 2,
+				published = TRUE
+			WHERE status = 1
+				AND (contributor = (SELECT id FROM contributors WHERE uuid = $2)
+					OR $3 > 2)
+		;`, [object, uuid, rights])
+	}
 	// EXECUTE SQL
 	DB.conn.none(saveSQL)
 	.then(_ => res.redirect(referer))
@@ -1652,7 +1618,7 @@ exports.process.download = (req, res) => {
 	let saveSQL
 	if (source === 'bookmarks') { // DOWNLOAD MULTIPLE PADS
 		saveSQL = DB.pgp.as.format(`
-			SELECT p.id, p.title, p.media, c.name AS contributor, p.date, p.full_text, p.location, p.sdgs, p.tags FROM pads p
+			SELECT p.id, p.title, p.sections, c.name AS contributor, p.date, p.full_text, p.location, p.sdgs, p.tags FROM pads p
 			INNER JOIN contributors c
 				ON p.contributor = c.id
 			WHERE p.id IN (
@@ -1663,7 +1629,7 @@ exports.process.download = (req, res) => {
 		;`, [uuid])
 	} else { // DOWNLOAD SINGLE PAD
 		saveSQL = DB.pgp.as.format(`
-			SELECT p.id, p.title, p.media, c.name AS contributor, p.date, p.full_text, p.location, p.sdgs, p.tags FROM pads p
+			SELECT p.id, p.title, p.sections, c.name AS contributor, p.date, p.full_text, p.location, p.sdgs, p.tags FROM pads p
 			INNER JOIN contributors c
 				ON p.contributor = c.id
 			WHERE p.id = $1
@@ -1673,10 +1639,10 @@ exports.process.download = (req, res) => {
 	DB.conn.any(saveSQL).then(async results => {
 		if (format === 'raw') {
 			function getImg (d) {
-				if (d && d.media) {
-					const img = d.media.filter(c => c.type === 'img' && c.src)
-					const mosaic = d.media.filter(c => c.type === 'mosaic' && c.srcs)
-					const embed = d.media.filter(c => c.type === 'embed' && c.src)
+				if (d && d.sections) {
+					const img = d.sections.map(d => d.items).flat().filter(c => c.type === 'img' && c.src)
+					const mosaic = d.sections.map(d => d.items).flat().filter(c => c.type === 'mosaic' && c.srcs)
+					const embed = d.sections.map(d => d.items).flat().filter(c => c.type === 'embed' && c.src)
 					if (img.length) return img.map(c => c.src)
 					else if (mosaic.length) return mosaic.map(c => c.srcs).flat()
 					else if (embed.length) return embed.map(c => c.src)

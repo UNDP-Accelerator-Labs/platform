@@ -116,28 +116,28 @@
 <script type='text/javascript'>
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
-	.on('click', _ => addSection(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addSection(null, '<%- locals.lang %>', true))
+	.on('click', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-img')
-	.on('click', _ => addImg(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addImg(null, '<%- locals.lang %>', true))
+	.on('click', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
 	
 	d3.select('.media-input-group #input-media-txt')
-	.on('click', _ => addTxt(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addTxt(null, '<%- locals.lang %>', true))
+	.on('click', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
 	
 	d3.select('.media-input-group #input-media-embed')
-	.on('click', _ => addEmbed(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addEmbed(null, '<%- locals.lang %>', true))
+	.on('click', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
 	
 	d3.select('.media-input-group #input-media-checklist')
-	.on('click', _ => addChecklist(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addChecklist(null, '<%- locals.lang %>', true))
+	.on('click', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-radiolist')
-	.on('click', _ => addRadiolist(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addRadiolist(null, '<%- locals.lang %>', true))
+	.on('click', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
 
 	// d3.select('.media-input-group #input-meta-location')
 	// .on('click', _ => addMap(null, '<%- locals.lang %>', true))
@@ -152,13 +152,13 @@
 	// .on('touchend', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
 
 	d3.select('.media-input-group #input-meta-sdgs')
-	.on('click', _ => addSDGs(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addSDGs(null, '<%- locals.lang %>', true))
+	.on('click', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
 
 	// d3.select('.meta-input-group #input-meta-tags')
 	d3.select('.media-input-group #input-meta-tags')
-	.on('click', _ => addTags(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addTags(null, '<%- locals.lang %>', true))
+	.on('click', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
 
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
 	d3.select('.foot .deploy ul li a#template-deploy')
@@ -363,6 +363,8 @@
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
 			${description}\n\n
+			${sections.map(d => d.title).join('\n\n').trim()}\n\n
+			${sections.map(d => d.lead).join('\n\n').trim()}\n\n
 			${sections.map(d => d.items).flat().filter(d => d.type === 'title')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
 			${sections.map(d => d.items).flat().filter(d => d.type === 'txt')
@@ -381,7 +383,7 @@
 		// COMPILE THE CONTENT
 		if (!attr || attr === 'title') content.title = title
 		if (!attr || attr === 'description') content.description = description
-		if (!attr || ['media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) { content.sections = JSON.stringify(sections)
+		if (!attr || ['lead', 'media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) { content.sections = JSON.stringify(sections)
 		}
 		// ALWAYS SEND fullTxt
 		content.full_text = fullTxt
@@ -445,26 +447,26 @@
 		descriptionLayout.select('.media-container .media-txt').text(data.description)
 		if (data.sections) {
 			data.sections.forEach(d => {
-				addSection(d, '<%- locals.lang %>')
+				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
 				d.items.forEach(c => {
-					if (c.type === 'title') addTitle(c, '<%- locals.lang %>')
-					if (c.type === 'img') addImg(c, '<%- locals.lang %>')
-					if (c.type === 'txt') addTxt(c, '<%- locals.lang %>')
-					if (c.type === 'embed') addEmbed(c, '<%- locals.lang %>')
-					if (c.type === 'checklist') addChecklist(c, '<%- locals.lang %>')
-					if (c.type === 'radiolist') addRadiolist(c, '<%- locals.lang %>')
+					if (c.type === 'title') addTitle({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
 					// META
-					if (c.type === 'location') addMap(c, '<%- locals.lang %>')
-					if (c.type === 'sdgs') addSDGs(c, '<%- locals.lang %>')
-					if (c.type === 'tags') addTags(c, '<%- locals.lang %>')
+					if (c.type === 'location') addMap({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
 				})
 			})
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	} else {
-		addSection(null, '<%- locals.lang %>')
-		addTitle(null, '<%- locals.lang %>')
+		addSection({ lang: '<%- locals.lang %>' })
+		addTitle({ lang: '<%- locals.lang %>' })
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	}

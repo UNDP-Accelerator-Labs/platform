@@ -165,24 +165,24 @@
 <script type='text/javascript'>
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
-	.on('click', _ => addSection(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addSection(null, '<%- locals.lang %>', true))
+	.on('click', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-txt')
-	.on('click', _ => addTxt(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addTxt(null, '<%- locals.lang %>', true))
+	.on('click', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-embed')
-	.on('click', _ => addEmbed(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addEmbed(null, '<%- locals.lang %>', true))
+	.on('click', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-checklist')
-	.on('click', _ => addChecklist(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addChecklist(null, '<%- locals.lang %>', true))
+	.on('click', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-radiolist')
-	.on('click', _ => addRadiolist(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addRadiolist(null, '<%- locals.lang %>', true))
+	.on('click', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
 
 	// const centerpoint = <% if (locals.centerpoint) { %>[<%- JSON.stringify(locals.centerpoint) %>]<% } else { %>[]<% } %>;
 	// d3.select('.media-input-group #input-meta-location')
@@ -191,13 +191,13 @@
 
 	// d3.select('.meta-input-group #input-meta-sdgs')
 	d3.select('.media-input-group #input-meta-sdgs')
-	.on('click', _ => addSDGs(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addSDGs(null, '<%- locals.lang %>', true))
+	.on('click', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
 
 	// d3.select('.meta-input-group #input-meta-tags')
 	d3.select('.media-input-group #input-meta-tags')
-	.on('click', _ => addTags(null, '<%- locals.lang %>', true))
-	.on('touchend', _ => addTags(null, '<%- locals.lang %>', true))
+	.on('click', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
 
 	// const people = <% if (locals.people) { %><%- JSON.stringify(locals.people) %><% } else { %>[]<% } %>;
 	// const contributors = <% if (locals.contributors) { %><%- JSON.stringify(locals.contributors) %><% } else { %>[]<% } %>;
@@ -321,6 +321,8 @@
 		
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
+			${sections.map(d => d.title).join('\n\n').trim()}\n\n
+			${sections.map(d => d.lead).join('\n\n').trim()}\n\n
 			${sections.map(d => d.items).flat().filter(d => d.type === 'txt')
 				.map(d => d.txt).join('\n\n').trim()}\n\n
 			${sections.map(d => d.items).flat().filter(d => d.type === 'embed')
@@ -337,7 +339,7 @@
 			// content.meta = JSON.stringify(meta)
 			content.sections = JSON.stringify(sections)
 		}
-		if (!attr || ['media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
+		if (!attr || ['lead', 'media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
 			content.sections = JSON.stringify(sections)
 		}
 		// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
@@ -529,24 +531,24 @@
 			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items).flat().find(d => d.type === 'title').instruction)
 
 			data.sections.forEach(d => {
-				addSection(d, '<%- locals.lang %>')
+				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
 				d.items.forEach(c => {
-					if (c.type === 'img') addImg(c, '<%- locals.lang %>')
-					if (c.type === 'txt') addTxt(c, '<%- locals.lang %>')
-					if (c.type === 'checklist') addChecklist(c, '<%- locals.lang %>')
-					if (c.type === 'radiolist') addRadiolist(c, '<%- locals.lang %>')
-					if (d.type === 'location') {
-						// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-						if ((!c.centerpoint && !c.centerpoints) || 
-							(c.centerpoint && (!c.centerpoint.lat || 
-							!c.centerpoint.lng))
-						) {
-							c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-						} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-						addMap(c, '<%- locals.lang %>')
-					}
-					if (c.type === 'sdgs') addSDGs(c, '<%- locals.lang %>')
-					if (c.type === 'tags') addTags(c, '<%- locals.lang %>')
+					if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (d.type === 'location') {
+					// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+					// 	if ((!c.centerpoint && !c.centerpoints) || 
+					// 		(c.centerpoint && (!c.centerpoint.lat || 
+					// 		!c.centerpoint.lng))
+					// 	) {
+					// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+					// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
+					// 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
+					// }
+					if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
 				})
 			})
 		}
@@ -562,28 +564,28 @@
 
 		if (data.sections) {
 			data.sections.forEach(d => {
-				addSection(d, '<%- locals.lang %>')
+				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
 				d.items.forEach(c => {
-					if (c.type === 'img') addImg(c, '<%- locals.lang %>')
-					if (c.type === 'mosaic') addMosaic(c, '<%- locals.lang %>')
-					if (c.type === 'video') addVideo(c, '<%- locals.lang %>')
-					if (c.type === 'txt') addTxt(c, '<%- locals.lang %>')
-					if (c.type === 'embed') addEmbed(c, '<%- locals.lang %>')
-					if (c.type === 'checklist') addChecklist(c, '<%- locals.lang %>')
-					if (c.type === 'radiolist') addRadiolist(c, '<%- locals.lang %>')
+					if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'mosaic') addMosaic({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'video') addVideo({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
 					// META
-					if (c.type === 'location') {
-						// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-						if ((!c.centerpoint && !c.centerpoints) || 
-							(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
-							!c.centerpoints.length
-						) {
-							c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-						} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-						addMap(c, '<%- locals.lang %>')
-					}
-					if (c.type === 'sdgs') addSDGs(c, '<%- locals.lang %>')
-					if (c.type === 'tags') addTags(c, '<%- locals.lang %>')
+					// if (c.type === 'location') {
+					// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+					// 	if ((!c.centerpoint && !c.centerpoints) || 
+					// 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
+					// 		!c.centerpoints.length
+					// 	) {
+					// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+					// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
+					// 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
+					// }
+					if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
+					if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
 				})
 			})
 		}

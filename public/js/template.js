@@ -197,13 +197,15 @@ function autofillTitle () {
 	}
 }
 
-function addSection (data, lang = 'en', focus = false) {
+function addSection (kwargs) {
+	const { data, lang, focus } = kwargs || {}
 	const { title, lead } = data || {}
+
 	d3.selectAll('.media-layout').classed('focus', false)
 
 	const section = d3.select('main#template div.inner div.body')
 		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
-		.classed('focus', focus)
+		.classed('focus', focus || false)
 		.datum({ type: 'section', title: title, lead: lead })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
@@ -240,18 +242,21 @@ function addSection (data, lang = 'en', focus = false) {
 
 	// if (focus) header.node().focus()
 	// if (editing) observer.observe(section.node(), obsvars)
+
+	return section.node()
 }
 
-function addTitle (data, lang = 'en', focus = false) {
+function addTitle (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction } = data || {}
 	if (!type) type = 'title'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
@@ -264,16 +269,17 @@ function addTitle (data, lang = 'en', focus = false) {
 
 	if (focus) media.media.node().focus()
 }
-function addImg (data, lang = 'en', focus = false) {
+function addImg (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction } = data || {}
 	if (!type) type = 'img'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	
@@ -284,16 +290,17 @@ function addImg (data, lang = 'en', focus = false) {
 
 	if (focus) media.media.node().focus()
 }
-function addTxt (data, lang = 'en', focus = false) {
+function addTxt (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction } = data || {}
 	if (!type) type = 'txt'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -304,16 +311,17 @@ function addTxt (data, lang = 'en', focus = false) {
 
 	if (focus) media.media.node().focus()
 }
-function addEmbed (data, lang = 'en', focus = false) {
+function addEmbed (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction } = data || {}
 	if (!type) type = 'embed'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -325,7 +333,8 @@ function addEmbed (data, lang = 'en', focus = false) {
 
 	if (focus) media.media.node().focus()
 }
-function addChecklist (data, lang = 'en', focus = false) { 
+function addChecklist (kwargs) { 
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, options, instruction } = data || {}
 	if (!type) type = 'checklist'
 	if (!options) options = []
@@ -344,10 +353,10 @@ function addChecklist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, options: options, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	
@@ -448,7 +457,8 @@ function addChecklist (data, lang = 'en', focus = false) {
 		if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
 	}
 }
-function addRadiolist (data, lang = 'en', focus = false) { 
+function addRadiolist (kwargs) { 
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, options, instruction } = data || {}
 	if (!type) type = 'radiolist'
 	if (!options) options = []
@@ -467,10 +477,10 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, options: options, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	
@@ -572,7 +582,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	}
 }
 // META ELEMENTS
-function addMap (data, lang = 'en', focus = false) {
+function addMap (data, lang = 'en', focus = false) { // TO DO
 	let { type, instruction } = data || {}
 	if (!type) type = 'location'
 	if (!instruction) instruction = ''
@@ -602,23 +612,24 @@ function addMap (data, lang = 'en', focus = false) {
 			.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END FOR SMS DEPLOYMENT
 	}
 }
-function addSDGs (data, lang = 'en', focus = false) {
+function addSDGs (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction } = data || {}
 	if (!type) type = 'sdgs'
 	if (!instruction) instruction = ''
 
-	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+	// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+	GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
 	.then(sdgs => {
 		// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
 		const input = d3.select('.media-input-group #input-meta-sdgs').node()
 		if (input) input.disabled = true
 
 		const meta = new Meta({ 
-			// parent: d3.select('.meta-layout'), 
-			parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 			type: type, 
 			datum: { type: type, sdgs: sdgs, instruction: instruction },
-			focus: focus,
+			focus: focus || false,
 			lang: lang
 		})
 
@@ -645,24 +656,25 @@ function addSDGs (data, lang = 'en', focus = false) {
 		}
 	})
 }
-function addTags (data, lang = 'en', focus = false) {
+function addTags (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, themes, instruction } = data || {}
 	if (!type) type = 'tags'
 	if (!themes) themes = []
 	if (!instruction) instruction = ''
 
-	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
+	// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
+	GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
 	.then(themes => {
 		// const input = d3.select('.meta-input-group #input-meta-tags').node()
 		const input = d3.select('.media-input-group #input-meta-tags').node()
 		if (input) input.disabled = true
 
 		const meta = new Meta({ 
-			// parent: d3.select('.meta-layout'), 
-			parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 			type: type, 
 			datum: { type: type, themes: themes, instruction: instruction },
-			focus: focus,
+			focus: focus || false,
 			lang: lang
 		})
 

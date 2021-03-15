@@ -198,7 +198,7 @@ function uploadImg (form, lang = 'en', container = null, focus = true) {
 		setTimeout(_ => notification.remove(), 4000)
 		switchButtons(lang)
 		return json
-	}).then(data => addImgs(data, '<%- locals.lang %>', container, focus))
+	}).then(data => addImgs(data, lang, container, focus))
 	.catch(err => { if (err) throw err })
 }
 function deleteImg (sel, lang = 'en') {
@@ -223,7 +223,7 @@ function deleteImg (sel, lang = 'en') {
 		if (items.size() === 0) container.remove()
 		else if (items.size() === 1) {
 			// REPLACE THE MOSAIC WITH A SINGLE IMAGE
-			addImg({ src: items.select('img').datum() }, '<%- locals.lang %>', container, true)
+			addImg({ data: { src: items.select('img').datum() }, lang: lang, container: container, focus: true })
 		}
 		else mosaic.classed('x2', items.size() < 3)
 		switchButtons(lang)
@@ -250,7 +250,7 @@ function uploadVideo (form, lang = 'en', container = null, focus = true) {
 		return json
 	}).then(data => {
 		const fls = data.filter(d => d.status === 200)
-		if (fls.length === 1) fls.forEach(f => addVideo({ src: f.src }, '<%- locals.lang %>', container, focus))
+		if (fls.length === 1) fls.forEach(f => addVideo({ data: { src: f.src }, lang: lang, container: container, focus: focus }))
 	})
 	.catch(err => { if (err) throw err })
 }
@@ -271,7 +271,8 @@ function autofillTitle () {
 	}
 }
 
-function addSection (data, lang = 'en', focus = false) {
+function addSection (kwargs) {
+	const { data, lang, focus } = kwargs || {}
 	const { title, lead } = data || {}
 	d3.selectAll('.media-layout').classed('focus', false)
 
@@ -314,25 +315,27 @@ function addSection (data, lang = 'en', focus = false) {
 
 	// if (focus) header.node().focus()
 	// if (editing) observer.observe(section.node(), obsvars)
+
+	return section.node()
 }
 function addImgs (array, lang = 'en', container = null, focus = false) {
 	const fls = array.filter(d => d.status === 200)
-	if (fls.length === 1) fls.forEach(f => addImg({ src: f.src }, lang, container, focus)) // ONLY ONE IMAGE SO NO MOSAIC
-	else addMosaic({ srcs: fls.map(f => f.src) }, lang, container, focus)
+	if (fls.length === 1) fls.forEach(f => addImg({ data: { src: f.src }, lang: lang, container: container, focus: focus })) // ONLY ONE IMAGE SO NO MOSAIC
+	else addMosaic({ data: { srcs: fls.map(f => f.src) }, lang: lang, container: container, focus: focus })
 }
-function addImg (data, lang = 'en', container = null, focus = false) { 
+function addImg (kwargs) { 
+	const { data, lang, section, container, focus } = kwargs || {}
 	let { type, src, instruction, textalign, scale } = data
 	if (!type) type = 'img'
 	if (!textalign) textalign = 'left'
 	if (!scale) scale = 'original'
 	
 	const media = new Media({ 
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
 		datum: { type: type, textalign: textalign, scale: scale, src: src, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	
@@ -409,18 +412,18 @@ function addImg (data, lang = 'en', container = null, focus = false) {
 		}
 	}
 }
-function addMosaic (data, lang = 'en', container = null, focus = false) {
+function addMosaic (kwargs) {
+	const { data, lang, section, container, focus } = kwargs || {}
 	let { type, srcs, instruction, verticalalign } = data
 	if (!type) type = 'mosaic'
 	if (!verticalalign) verticalalign = 'center'
 
 	const media = new Media({ 
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
 		datum: { type: type, verticalalign: verticalalign, srcs: srcs, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -495,18 +498,18 @@ function addMosaic (data, lang = 'en', container = null, focus = false) {
 		img.src = `/${d}`
 	})
 }
-function addVideo (data, lang = 'en', container = null, focus = false) { 
+function addVideo (kwargs) { 
+	const { data, lang, section, container, focus } = kwargs || {}
 	let { type, src, instruction, textalign } = data
 	if (!type) type = 'video'
 	if (!textalign) textalign = 'left'
 	
 	const media = new Media({ 
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
 		datum: { type: type, textalign: textalign, src: src, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -571,7 +574,8 @@ function addVideo (data, lang = 'en', container = null, focus = false) {
 		}
 	}
 }
-function addTxt (data, lang = 'en', focus = false) {
+function addTxt (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, fontsize, fontweight, fontstyle, textalign, txt, instruction } = data || {}
 	if (!type) type = 'txt'
 	if (!fontsize) fontsize = 1
@@ -581,11 +585,10 @@ function addTxt (data, lang = 'en', focus = false) {
 	if (!txt) txt = ''
 
 	const media = new Media({
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, textalign: textalign, txt: txt, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -645,18 +648,18 @@ function addTxt (data, lang = 'en', focus = false) {
 
 	if (focus) media.media.node().focus()
 }
-function addEmbed (data, lang = 'en', focus = false) {
+function addEmbed (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, textalign, instruction, html, src } = data || {}
 	if (!type) type = 'embed'
 	if (!textalign) textalign = 'left'
 	if (!html) html = ''
 
 	const media = new Media({
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, src: src, textalign: textalign, html: html, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -744,7 +747,8 @@ function addEmbed (data, lang = 'en', focus = false) {
 
 	if (focus) media.media.node().focus()
 }
-function addChecklist (data, lang = 'en', focus = false) { 
+function addChecklist (kwargs) { 
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, fontsize, fontweight, fontstyle, options, instruction } = data || {}
 	if (!type) type = 'checklist'
 	if (!fontsize) fontsize = 1
@@ -765,11 +769,10 @@ function addChecklist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	
@@ -914,7 +917,8 @@ function addChecklist (data, lang = 'en', focus = false) {
 		if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
 	}
 }
-function addRadiolist (data, lang = 'en', focus = false) { 
+function addRadiolist (kwargs) { 
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, fontsize, fontweight, fontstyle, options, instruction } = data || {}
 	if (!type) type = 'radiolist'
 	if (!fontsize) fontsize = 1
@@ -935,11 +939,10 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	if (!editing) options = options.filter(d => d.name)
 
 	const media = new Media({
-		// parent: d3.select('.media-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 	
@@ -1082,7 +1085,7 @@ function addRadiolist (data, lang = 'en', focus = false) {
 	}
 }
 // META ELEMENTS
-function addMap (data, lang = 'en', focus = false) {
+function addMap (data, lang = 'en', focus = false) { // TO DO
 	let { type, instruction, centerpoints, caption } = data || {}
 	if (!type) type = 'location'
 	let dragging = false
@@ -1282,7 +1285,8 @@ function addMap (data, lang = 'en', focus = false) {
 		}
 	}
 }
-function addSDGs (data, lang = 'en', focus = false) {
+function addSDGs (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction, sdgs } = data || {}
 	if (!type) type = 'sdgs'
 	if (!sdgs) sdgs = []
@@ -1292,11 +1296,10 @@ function addSDGs (data, lang = 'en', focus = false) {
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
-		// parent: d3.select('.meta-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, sdgs: sdgs, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang
 	})
 
@@ -1357,22 +1360,20 @@ function addSDGs (data, lang = 'en', focus = false) {
 		})
 	}
 }
-function addTags (data, lang = 'en', focus = false) {
+function addTags (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
 	let { type, instruction, tags, themes } = data || {}
 	if (!type) type = 'tags'
 	if (!tags) tags = []
-	// if (!themes) themes = []
 
-	// const input = d3.select('.meta-input-group #input-meta-tags').node()
 	const input = d3.select('.media-input-group #input-meta-tags').node()
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
-		// parent: d3.select('.meta-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
 		datum: { type: type, tags: tags, instruction: instruction },
-		focus: focus,
+		focus: focus || false,
 		lang: lang 
 	})
 
@@ -1389,7 +1390,8 @@ function addTags (data, lang = 'en', focus = false) {
 		.html(c => c.name ? c.name.capitalize() : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
 
 	if (meta.inset) {
-		GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
+		GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
+		// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
 		.then(themes => {
 			const opts = meta.inset.addElem('div', 'inset-tags')
 				.addElems('div', 'tag', themes)

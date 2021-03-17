@@ -841,6 +841,9 @@ main#template {
 					}
 				}
 			}
+			.layout.animate-in {
+				animation: slide-down 1s;
+			}
 			.input-group {
 				/*clear: both;*/
 				position: fixed;

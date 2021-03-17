@@ -309,6 +309,7 @@
 
 			d.title = sel.select('.section-header label').node().innerText
 			d.lead = (sel.select('.media-lead').node() || {}).innerText
+			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
 			d.items = items
 			sections.push(d)
 		})
@@ -533,22 +534,23 @@
 			data.sections.forEach(d => {
 				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
 				d.items.forEach(c => {
-					if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (d.type === 'location') {
-					// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-					// 	if ((!c.centerpoint && !c.centerpoints) || 
-					// 		(c.centerpoint && (!c.centerpoint.lat || 
-					// 		!c.centerpoint.lng))
-					// 	) {
-					// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-					// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-					// 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
-					// }
-					if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
+					populateSection (c, '<%- locals.lang %>', section)
+					// if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
+					// // if (d.type === 'location') {
+					// // 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+					// // 	if ((!c.centerpoint && !c.centerpoints) || 
+					// // 		(c.centerpoint && (!c.centerpoint.lat || 
+					// // 		!c.centerpoint.lng))
+					// // 	) {
+					// // 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+					// // 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
+					// // 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
+					// // }
+					// if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
 				})
 			})
 		}
@@ -563,29 +565,31 @@
 		published = data.published
 
 		if (data.sections) {
+			console.log(data.sections)
 			data.sections.forEach(d => {
 				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
 				d.items.forEach(c => {
-					if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'mosaic') addMosaic({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'video') addVideo({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// META
-					// if (c.type === 'location') {
-					// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-					// 	if ((!c.centerpoint && !c.centerpoints) || 
-					// 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
-					// 		!c.centerpoints.length
-					// 	) {
-					// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-					// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-					// 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
-					// }
-					if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
+					populateSection (c, '<%- locals.lang %>', section)
+					// if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'mosaic') addMosaic({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'video') addVideo({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
+					// // META
+					// // if (c.type === 'location') {
+					// // 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+					// // 	if ((!c.centerpoint && !c.centerpoints) || 
+					// // 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
+					// // 		!c.centerpoints.length
+					// // 	) {
+					// // 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+					// // 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
+					// // 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
+					// // }
+					// if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
+					// if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
 				})
 			})
 		}

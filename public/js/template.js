@@ -178,6 +178,18 @@ Meta.prototype.expand = function (kwargs) {
 	}, timeout)
 }
 
+function populateSection (data, lang = 'en', section) {
+	if (data.type === 'title') addTitle({ data: data, lang: lang, section: section })
+	if (data.type === 'img') addImg({ data: data, lang: lang, section: section })
+	if (data.type === 'txt') addTxt({ data: data, lang: lang, section: section })
+	if (data.type === 'embed') addEmbed({ data: data, lang: lang, section: section })
+	if (data.type === 'checklist') addChecklist({ data: data, lang: lang, section: section })
+	if (data.type === 'radiolist') addRadiolist({ data: data, lang: lang, section: section })
+	// META
+	if (data.type === 'location') addMap({ data: data, lang: lang, section: section })
+	if (data.type === 'sdgs') addSDGs({ data: data, lang: lang, section: section })
+	if (data.type === 'tags') addTags({ data: data, lang: lang, section: section })
+}
 function autofillTitle () {
 	if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
 		let firstText = main.select('.description-layout .txt-container .media-txt').node()
@@ -198,17 +210,21 @@ function autofillTitle () {
 
 function addSection (kwargs) {
 	const { data, lang, focus } = kwargs || {}
-	const { title, lead, repeat, instruction } = data || {}
+	let { title, lead, repeat, group, instruction } = data || {}
 
 	d3.selectAll('.media-layout').classed('focus', false)
+
+	// DETERMINE THE GROUP IF REPEAT SECTION
+	if (repeat && !group) group = (d3.max(d3.selectAll('.layout.repeat').data().map(d => d ? d.group || 0 : 0)) + 1) || 0
 
 	const section = d3.select('main#template div.inner div.body')
 		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
 		.classed('repeat', repeat || false)
 		.classed('focus', focus || false)
-		.datum({ type: 'section', title: title, lead: lead, repeat: repeat })
+		.datum({ type: 'section', title: title, lead: lead, repeat: repeat, group: group })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
+	console.log(section.datum())
 
 	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
 	let section_id = 0
@@ -345,17 +361,38 @@ function addImg (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction } = data || {}
+	let { type, instruction, condition } = data || {}
 	if (!type) type = 'txt'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction },
+		datum: { type: type, instruction: instruction, condition: condition },
 		focus: focus || false,
 		lang: lang
 	})
+
+	if (media.opts) {
+		media.opts.addElems('div', 'opt-group', [
+			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+			[{ key: 'h-align', label: 'report', value: 'condition' }]
+		]).addElems('button', 'opt', d => d)
+		.classed('active', d => {
+			// if (d.key === 'h-align') return textalign ? d.value === textalign : d.value === 'left'
+		}).attr('type', 'button')
+			.each(function (d) { d3.select(this).classed(d.value, true) })
+		.on('click', function (d) {
+			const sel = d3.select(this)
+			if (d.key === 'h-align') {
+				sel.findAncestor('opt-group').selectAll('.opt').classed('active', function () { return this == sel.node() })
+				media.media.style('text-align', c => c.textalign = d.value)
+			}
+
+			if (editing) switchButtons(lang)
+		}).addElems('i', 'material-icons')
+			.html(d => d.label)
+	}
 
 	media.media.attrs({ 
 		'data-placeholder': d => vocabulary[`request ${type}`][lang],

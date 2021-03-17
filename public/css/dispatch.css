@@ -16,6 +16,16 @@
     transform: translateY(0);
   }
 }
+@keyframes slide-down {
+  from {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 * {
   margin: 0;
   padding: 0;
@@ -2057,6 +2067,10 @@ main#pad .inner .body .layout.preview .meta-container .placement-opts,
 main#template .inner .body .layout.preview .media-container .placement-opts,
 main#template .inner .body .layout.preview .meta-container .placement-opts {
     top: 15px;
+  }
+  main#pad .inner .body .layout.animate-in,
+main#template .inner .body .layout.animate-in {
+    animation: slide-down 1s;
   }
   main#pad .inner .body .input-group,
 main#template .inner .body .input-group {

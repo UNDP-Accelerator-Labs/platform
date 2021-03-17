@@ -455,18 +455,7 @@
 		if (data.sections) {
 			data.sections.forEach(d => {
 				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
-				d.items.forEach(c => {
-					if (c.type === 'title') addTitle({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// META
-					if (c.type === 'location') addMap({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
-					if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
-				})
+				d.items.forEach(c => populateSection(c, '<%- locals.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES

@@ -17,6 +17,10 @@ $c-light-3: #F0F0F0;
 	from { transform: translateY(100px); }
 	to { transform: translateY(0); }
 }
+@keyframes slide-down {
+	from { transform: translateY(-60px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
 
 * {
 	margin: 0;

@@ -186,6 +186,28 @@ function addLoader (sel) {
 	return loader
 }
 
+function populateSection (data, lang = 'en', section) {
+	if (data.type === 'img') addImg({ data: data, lang: lang, section: section })
+	if (data.type === 'mosaic') addMosaic({ data: data, lang: lang, section: section })
+	if (data.type === 'video') addVideo({ data: data, lang: lang, section: section })
+	if (data.type === 'txt') addTxt({ data: data, lang: lang, section: section })
+	if (data.type === 'embed') addEmbed({ data: data, lang: lang, section: section })
+	if (data.type === 'checklist') addChecklist({ data: data, lang: lang, section: section })
+	if (data.type === 'radiolist') addRadiolist({ data: data, lang: lang, section: section })
+	// META
+	// if (data.type === 'location') {
+	// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+	// 	if ((!c.centerpoint && !c.centerpoints) || 
+	// 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
+	// 		!c.centerpoints.length
+	// 	) {
+	// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+	// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
+	// 	addMap({ data: data, lang: lang, section: section })
+	// }
+	if (data.type === 'sdgs') addSDGs({ data: data, lang: lang, section: section })
+	if (data.type === 'tags') addTags({ data: data, lang: lang, section: section })
+}
 function uploadImg (form, lang = 'en', container = null, focus = true) {
 	fetch(form.action, {
 		method: form.method,
@@ -273,17 +295,20 @@ function autofillTitle () {
 
 function addSection (kwargs) {
 	const { data, lang, sibling, focus } = kwargs || {}
-	const { title, lead, items, repeat, instruction } = data || {}
+	const { title, lead, items, repeat, group, instruction } = data || {}
 	d3.selectAll('.media-layout').classed('focus', false)
 
 	console.log(sibling)
+	if (sibling) console.log(d3.select(`main#pad div.inner div.body section${sibling}`))
 
 	const section = d3.select('main#pad div.inner div.body')
-		.insertElem(Number.isInteger(sibling) ? `:nth-child(${sibling})` : '.media-input-group', 'section', `media-layout layout ${activity}`)
+		.insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
 		.classed('repeat', repeat || false)
 		.classed('focus', focus && !templated)
-		.datum({ type: 'section', title: title, lead: lead })
+		.datum({ type: 'section', title: title, lead: lead, repeat: repeat, group: group })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
+
+	console.log(section)
 
 	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
 	let section_id = 0
@@ -291,7 +316,14 @@ function addSection (kwargs) {
 		if (this === section.node()) section_id = i
 	})
 	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
-	if ((editing || activity === 'preview') && section_id !== 0 && !templated) {
+	if (
+		((editing || activity === 'preview') && section_id !== 0 && !templated)
+		|| (templated 
+			&& repeat 
+			&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
+				.filter((d, i) => i === 0).node() !== section.node()
+		)
+	) {
 		const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
 		placement.addElems('div', 'opt', [
 			// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
@@ -314,6 +346,11 @@ function addSection (kwargs) {
 			})
 
 			section.remove()
+			// MAKE SURE THE OPTION TO REPEAT IS DISPLAYED
+			const section_group = d3.selectAll('.layout.repeat').filter(d => d.group === group)
+			section_group.filter((d, i) => i === section_group.size() - 1)
+				.select('.repeat-container').classed('hide', false)
+
 			if (editing) partialSave('media')
 		}
 	}
@@ -321,7 +358,6 @@ function addSection (kwargs) {
 	const header = section.addElems('div', 'section-header')
 		.addElems('label')
 		.attrs({ 
-			// 'data-placeholder': d => vocabulary[`request ${type}`][lang],
 			'data-placeholder': d => 'Section header', // TO DO: TRANSLATION
 			'contenteditable': editing && !templated ? true : null 
 		}).html(d => d.title)
@@ -349,6 +385,10 @@ function addSection (kwargs) {
 		}).html(d => d.lead)
 	}
 	if (templated && repeat) {
+		// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
+		d3.selectAll('.layout.repeat').filter(d => d.group === group)
+			.select('.repeat-container').classed('hide', true)
+
 		const mediarepeat = new Media({
 			parent: section.node(), 
 			type: 'repeat', 
@@ -366,36 +406,18 @@ function addSection (kwargs) {
 			section.findAncestor('pad').selectAll('.body>*')
 			.each(function (d, i) {
 				if (this === section.node()) {
-					kwargs.sibling = i + 2
+					console.log(section.findAncestor('pad').selectAll('.body>*').size())
+					kwargs.sibling = `section:nth-child(${i + 2})`
 					kwargs.focus = true
 					
 					const new_section = addSection(kwargs)
-					items.forEach(c => {
-						if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'mosaic') addMosaic({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'video') addVideo({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						// META
-						// if (c.type === 'location') {
-						// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-						// 	if ((!c.centerpoint && !c.centerpoints) || 
-						// 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
-						// 		!c.centerpoints.length
-						// 	) {
-						// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-						// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-						// 	addMap({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						// }
-						if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: new_section })
-						if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: new_section })
-					})
+					d3.select(new_section).classed('animate-in', true)
+
+					items.forEach(c => populateSection (c, '<%- locals.lang %>', new_section))
+					partialSave('media')
 				}
 			})
-		})
-		.addElems('div').attrs({ 
+		}).addElems('div').attrs({ 
 			'data-placeholder': d => 'Repeat section' // TO DO: TRANSLATION
 		}).html(d => d.instruction)
 	}

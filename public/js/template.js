@@ -35,7 +35,7 @@ const Media = function (kwargs) {
 
 	if (container) console.log(container.node())
 	// NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
-	this.container = (container || parent.addElem('div', `media-container ${type}-container template`)) // MAYBE ADD ACTIVITY AS CLASS HERE
+	this.container = (container || parent.insertElem('.repeat-container', 'div', `media-container ${type}-container template`)) // MAYBE ADD ACTIVITY AS CLASS HERE
 		.classed('focus', focus)
 		.datum(datum)
 	.each(d => d.level = 'media')
@@ -56,7 +56,6 @@ const Media = function (kwargs) {
 		.classed(`media-${type}`, true)
 	if (editing || activity === 'preview') {
 		this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
-		// .classed('hide', instruction && activity !== 'preview')
 		this.placement.addElems('div', 'opt', [
 			{ label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
 			{ label: 'close', value: 'delete', fn: _ => this.rmMedia() }, 
@@ -199,15 +198,50 @@ function autofillTitle () {
 
 function addSection (kwargs) {
 	const { data, lang, focus } = kwargs || {}
-	const { title, lead } = data || {}
+	const { title, lead, repeat, instruction } = data || {}
 
 	d3.selectAll('.media-layout').classed('focus', false)
 
 	const section = d3.select('main#template div.inner div.body')
 		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
+		.classed('repeat', repeat || false)
 		.classed('focus', focus || false)
-		.datum({ type: 'section', title: title, lead: lead })
+		.datum({ type: 'section', title: title, lead: lead, repeat: repeat })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
+
+
+	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+	let section_id = 0
+	d3.selectAll('.media-layout').each(function (d, i) {
+		if (this === section.node()) section_id = i
+	})
+	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
+	if ((editing || activity === 'preview') && section_id !== 0) {
+		const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
+		placement.addElems('div', 'opt', [
+			// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
+			{ label: 'close', value: 'delete', fn: _ => rmSection() }, 
+			// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+		]).on('click', d => {
+			d3.event.stopPropagation()
+			d.fn()
+			if (editing) switchButtons(lang)
+		}).on('mouseup', _ => d3.event.stopPropagation())
+			.addElems('i', 'material-icons')
+			.html(d => d.label)
+
+		function rmSection () {
+			// FOR META INPUT
+			section.selectAll('.media-container, .meta-container').data()
+			.forEach(d => {
+				const input = d3.select(`#input-meta-${d.type}`).node()
+				if (input) input.disabled = false
+			})
+
+			section.remove()
+			if (editing) partialSave('media')
+		}
+	}
 
 	const header = section.addElems('div', 'section-header')
 		.addElems('label')
@@ -224,21 +258,40 @@ function addSection (kwargs) {
 		}
 	}).on('blur', _ => partialSave('media'))
 
-	const media = new Media({
+	const medialead = new Media({
 		parent: section.node(), 
 		type: 'lead', 
 		datum: { type: 'lead', lead: lead },
 		lang: lang
 	})
 	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-	media.opts.remove()
-	media.placement.remove()
-	media.response.remove()
+	medialead.opts.remove()
+	medialead.placement.remove()
+	medialead.response.remove()
 
-	media.media.attrs({ 
+	medialead.media.attrs({ 
 		'data-placeholder': d => 'Lead paragraph', // TO DO: TRANSLATION
 		'contenteditable': editing ? true : null 
 	}).html(d => d.lead)
+
+	if (repeat) {
+		const mediarepeat = new Media({
+			parent: section.node(), 
+			type: 'repeat', 
+			datum: { type: 'repeat', instruction: instruction },
+			lang: lang
+		})
+		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+		mediarepeat.opts.remove()
+		mediarepeat.placement.remove()
+		mediarepeat.response.remove()
+
+		mediarepeat.media.addElems('button')
+		.addElems('div').attrs({ 
+			'data-placeholder': d => 'Repeat section', // TO DO: TRANSLATION
+			'contenteditable': editing ? true : null 
+		}).html(d => d.instruction)
+	}
 
 	// if (focus) header.node().focus()
 	// if (editing) observer.observe(section.node(), obsvars)

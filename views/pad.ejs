@@ -433,7 +433,7 @@
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.select('div.title').node(), main.select('.section-header label').node(), main.select('input[type=text]').node()].includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -453,7 +453,7 @@
 		e = e || event
 		if (editing) {
 			if (
-				![head.select('div.title').node(), main.select('.section-header label').node(), main.select('input[type=text]').node()].includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())

@@ -343,7 +343,12 @@ const vocabulary = {
 		"es": "Lista de posibles respuestas:",
 		"pt": "Lista de respostas possíveis:"
 	},
-
+	"expect repeat": {
+		"en": "<strong>Direct input</strong> expected.",
+		"fr": "<strong>Entrée directe</strong> attendu.",
+		"es": "<strong>Entrada directa</strong> esperada.",
+		"pt": "<strong>Entrada direta</strong> esperada."
+	},
 	"search place": {
 		"en": "Looking for a place?",
 		"fr": "À la recherche d’un emplacement ?",

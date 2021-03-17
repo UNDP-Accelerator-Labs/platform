@@ -61,6 +61,7 @@
 			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
 				<div class='media-input-group input-group'>
 					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
+					<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
 						
 					<div class='vertical-separator'></div>
 					<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
@@ -118,6 +119,10 @@
 	d3.select('.media-input-group #input-media-section')
 	.on('click', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
 	.on('touchend', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
+
+	d3.select('.media-input-group #input-media-repeat-section')
+	.on('click', _ => addSection({ data: { repeat: true }, lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addSection({ data: { repeat: true }, lang: '<%- locals.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-img')
 	.on('click', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
@@ -220,7 +225,7 @@
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.select('div.title').node(), main.select('.section-header label').node(), main.select('input[type=text]').node()].includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -235,9 +240,10 @@
 	})
 	window.addEventListener('keyup', function (e) {
 		e = e || event
+
 		if (editing) {
 			if (
-				![head.select('div.title').node(), main.select('.section-header label').node(), main.select('input[type=text]').node()].includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -356,6 +362,7 @@
 
 			d.title = sel.select('.section-header label').node().innerText
 			d.lead = (sel.select('.media-lead').node() || {}).innerText
+			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
 			d.items = items
 			sections.push(d)
 		})

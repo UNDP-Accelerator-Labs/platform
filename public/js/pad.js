@@ -35,7 +35,7 @@ const Media = function (kwargs) {
 	
 	// if (container) console.log(container.node())
 	// NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
-	this.container = (container || parent.addElem('div', `media-container ${type}-container`)) // MAYBE ADD ACTIVITY AS CLASS HERE
+	this.container = (container || parent.insertElem('.repeat-container', 'div', `media-container ${type}-container`)) // MAYBE ADD ACTIVITY AS CLASS HERE
 		.classed('focus', focus)
 		.datum(datum)
 	.each(d => d.level = 'media')
@@ -272,15 +272,51 @@ function autofillTitle () {
 }
 
 function addSection (kwargs) {
-	const { data, lang, focus } = kwargs || {}
-	const { title, lead } = data || {}
+	const { data, lang, sibling, focus } = kwargs || {}
+	const { title, lead, items, repeat, instruction } = data || {}
 	d3.selectAll('.media-layout').classed('focus', false)
 
+	console.log(sibling)
+
 	const section = d3.select('main#pad div.inner div.body')
-		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
+		.insertElem(Number.isInteger(sibling) ? `:nth-child(${sibling})` : '.media-input-group', 'section', `media-layout layout ${activity}`)
+		.classed('repeat', repeat || false)
 		.classed('focus', focus && !templated)
 		.datum({ type: 'section', title: title, lead: lead })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
+
+	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+	let section_id = 0
+	d3.selectAll('.media-layout').each(function (d, i) {
+		if (this === section.node()) section_id = i
+	})
+	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
+	if ((editing || activity === 'preview') && section_id !== 0 && !templated) {
+		const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
+		placement.addElems('div', 'opt', [
+			// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
+			{ label: 'close', value: 'delete', fn: _ => rmSection() }, 
+			// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+		]).on('click', d => {
+			d3.event.stopPropagation()
+			d.fn()
+			if (editing) switchButtons(lang)
+		}).on('mouseup', _ => d3.event.stopPropagation())
+			.addElems('i', 'material-icons')
+			.html(d => d.label)
+
+		function rmSection () {
+			// FOR META INPUT
+			section.selectAll('.media-container, .meta-container').data()
+			.forEach(d => {
+				const input = d3.select(`#input-meta-${d.type}`).node()
+				if (input) input.disabled = false
+			})
+
+			section.remove()
+			if (editing) partialSave('media')
+		}
+	}
 
 	const header = section.addElems('div', 'section-header')
 		.addElems('label')
@@ -298,19 +334,70 @@ function addSection (kwargs) {
 	}).on('blur', _ => partialSave('media'))
 
 	if (templated && lead) {
-		const media = new Media({
+		const medialead = new Media({
 			parent: section.node(), 
 			type: 'lead', 
 			datum: { type: 'lead', lead: lead },
 			lang: lang
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		media.opts.remove()
+		medialead.opts.remove()
 
-		media.media.attrs({ 
+		medialead.media.attrs({ 
 			'data-placeholder': d => 'Lead paragraph', // TO DO: TRANSLATION
 			'contenteditable': editing && !templated ? true : null 
 		}).html(d => d.lead)
+	}
+	if (templated && repeat) {
+		const mediarepeat = new Media({
+			parent: section.node(), 
+			type: 'repeat', 
+			datum: { type: 'repeat', instruction: instruction },
+			lang: lang
+		})
+		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+		mediarepeat.opts.remove()
+		mediarepeat.instruction.remove()
+
+		mediarepeat.media.addElems('button')
+		.on('click', function () {
+			const sel = d3.select(this)
+			
+			section.findAncestor('pad').selectAll('.body>*')
+			.each(function (d, i) {
+				if (this === section.node()) {
+					kwargs.sibling = i + 2
+					kwargs.focus = true
+					
+					const new_section = addSection(kwargs)
+					items.forEach(c => {
+						if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'mosaic') addMosaic({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'video') addVideo({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						// META
+						// if (c.type === 'location') {
+						// 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
+						// 	if ((!c.centerpoint && !c.centerpoints) || 
+						// 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
+						// 		!c.centerpoints.length
+						// 	) {
+						// 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
+						// 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
+						// 	addMap({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						// }
+						if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: new_section })
+						if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: new_section })
+					})
+				}
+			})
+		})
+		.addElems('div').attrs({ 
+			'data-placeholder': d => 'Repeat section' // TO DO: TRANSLATION
+		}).html(d => d.instruction)
 	}
 
 	// if (focus) header.node().focus()
@@ -360,7 +447,7 @@ function addImg (kwargs) {
 			.html(d => d.label)
 	}
 
-	media.media.attr('data-placeholder', d => d.instruction)
+	media.media.attr('data-placeholder', d => vocabulary['missing image'][lang])
 	
 	if (src) {
 		const img = new Image()
@@ -378,7 +465,7 @@ function addImg (kwargs) {
 	// THE PAD IS BASED ON A TEMPLATE: templated
 	// THE PAD IS IN create, preview MODE
 	// THERE IS NOT IMAGE YET
-	if (instruction && (activity !== 'view' || (activity === 'preview' && !src))) { 		
+	if (templated && (activity !== 'view' || (activity === 'preview' && !src))) { 		
 		let form_id = 0
 		d3.selectAll('.media-container.img-container').each(function (d, i) {
 			if (this === media.container.node()) form_id = i
@@ -542,7 +629,7 @@ function addVideo (kwargs) {
 			.node().load()
 	}
 
-	if (instruction && (activity !== 'view' || (activity === 'preview' && !src))) { 
+	if (templated && (activity !== 'view' || (activity === 'preview' && !src))) { 
 		let form_id = 0
 		d3.selectAll('.media-container.video-container').each(function (d, i) {
 			if (this === container.node()) form_id = i

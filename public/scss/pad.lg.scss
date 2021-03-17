@@ -148,7 +148,6 @@ main#template {
 		.head {
 			position: relative;
 			width: 100%;
-			/*margin-bottom: 45px;*/
 			
 			i {
 				position: absolute;
@@ -214,9 +213,29 @@ main#template {
 						white-space: nowrap;
 					}
 				}
+				.placement-opts {
+					position: absolute;
+					display: none;
+					top: calc(-#{$t-large});
+					right: 100%;
+					height: 100%;
+					color: $c-mid-2;
+
+					.opt {
+						display: inline-block;
+						width: 30px; 
+						height: 30px;
+						text-align: center;
+						cursor: pointer;
+
+						i {
+							font-size: $t-large;
+							line-height: 30px;
+						}
+					}
+				}
 				.section-header {
 					display: block;
-					/*margin-top: 10px;*/
 					text-align: center;
 
 					label {
@@ -279,23 +298,12 @@ main#template {
 						}
 					}
 					.placement-opts {
-						position: absolute;
-						display: none;
 						top: 0;
-						right: 100%;
-						height: 100%;
 						color: $c-light-1;
 
 						.opt {
-							display: inline-block;
-							width: 30px; 
-							height: 30px;
-							text-align: center;
-							cursor: pointer;
-
 							i {
 								font-size: $t-main;
-								line-height: 30px;
 							}
 						}
 					}
@@ -545,36 +553,27 @@ main#template {
 					.meta-tags.template:empty:not(:focus):before {
 						line-height: initial;
 					}
-					.meta-personas {
-						width: 100%;
-						display: grid;
-						grid-template-columns: repeat(3, 1fr);
-						grid-gap: 15px;
+					.media-repeat {
+						button {
+							width: 100%;
+							min-height: 25px;
+							padding: 10px;
+							margin-top: 30px;
+							background-color: $c-light-2;
+							border: none;
+							border-radius: 5px;
+							outline: none;
+							font-size: $t-main;
+							cursor: pointer;
 
-						.persona-list {
-							padding: 10px 0;
-
-							.node {
-								position: relative;
-								display: flex;
-								flex-direction: column;
-								justify-content: space-around;
-								height: 65px;
-								text-align: center;
-								
-								i {
-									font-size: $t-large;
-								}
-								label {
-									font-size: $t-small;
-								}
+							div {
+								outline: none;
 							}
-							.panel {
-
-								.opt {
-									text-align: center;
-								}
-							}
+						}
+					}
+					.media-repeat.template {
+						button {
+							cursor: text;
 						}
 					}
 					.inset {
@@ -711,46 +710,6 @@ main#template {
 								color: #FFF;
 							}
 						}
-						.inset-personas {
-							display: grid;
-							grid-template-columns: repeat(3, 1fr);
-							grid-gap: 15px;
-							padding: 0 0 10px 0;
-
-							.persona-menu {
-								display: flex;
-								flex-direction: column;
-
-								.panel {
-									flex-grow: 1;
-									max-height: calc(300px - 75px - 20px);
-									/*padding: 0 0 10px 0;*/
-									margin-left: 10px;
-									border-left: 1px solid $c-light-1;
-									overflow: scroll;
-
-									.opt {
-										padding: 0 10px;
-										margin: 5px 0;
-										color: $c-light-1;
-
-										div {
-											label {
-												cursor: pointer;
-											}
-										}
-									}
-									.opt:not(.selected):hover {
-										background-color: $c-light-2;
-										color: $c-mid-2;
-									}
-									.opt.selected {
-										background-color: $c-light-1;
-										color: #FFF;
-									}
-								}
-							}
-						}
 					}
 					.inset.template {  /* THIS IS FOR TEMPLATES */
 						div {
@@ -797,8 +756,7 @@ main#template {
 						}
 						.inset-tags {
 							max-height: calc(300px);
-						}
-						
+						}	
 					}
 					figcaption {
 						font-size: $t-small;
@@ -838,6 +796,9 @@ main#template {
 				.meta-container.move {
 					transition: transform .75s;
 				}
+			}
+			.layout:hover > .placement-opts {
+				display: block;
 			}
 			.layout.focus {
 				background-color: $c-light-3;
@@ -944,8 +905,11 @@ main#template {
 				}
 			}
 			.input-group.fixed {
+				display: flex;
+				align-items: center;
 				position: absolute;
-				top: calc(50% - 65px / 2 - 30px / 2);
+				height: 100%;
+				padding-bottom: 0;
 				pointer-events: none;
 				z-index: 100;
 

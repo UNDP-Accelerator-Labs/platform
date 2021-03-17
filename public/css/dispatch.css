@@ -884,7 +884,6 @@ main#template .inner {
 main#template .inner .head {
     position: relative;
     width: 100%;
-    /*margin-bottom: 45px;*/
   }
   main#pad .inner .head i,
 main#template .inner .head i {
@@ -959,10 +958,31 @@ main#template .inner .body .layout .input-type label {
     font-size: 12px;
     white-space: nowrap;
   }
+  main#pad .inner .body .layout .placement-opts,
+main#template .inner .body .layout .placement-opts {
+    position: absolute;
+    display: none;
+    top: calc(-24px);
+    right: 100%;
+    height: 100%;
+    color: #57648C;
+  }
+  main#pad .inner .body .layout .placement-opts .opt,
+main#template .inner .body .layout .placement-opts .opt {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .placement-opts .opt i,
+main#template .inner .body .layout .placement-opts .opt i {
+    font-size: 24px;
+    line-height: 30px;
+  }
   main#pad .inner .body .layout .section-header,
 main#template .inner .body .layout .section-header {
     display: block;
-    /*margin-top: 10px;*/
     text-align: center;
   }
   main#pad .inner .body .layout .section-header label,
@@ -1048,29 +1068,14 @@ main#template .inner .body .layout .meta-container .opts .opt-group label {
 main#pad .inner .body .layout .meta-container .placement-opts,
 main#template .inner .body .layout .media-container .placement-opts,
 main#template .inner .body .layout .meta-container .placement-opts {
-    position: absolute;
-    display: none;
     top: 0;
-    right: 100%;
-    height: 100%;
     color: #C2B4D6;
-  }
-  main#pad .inner .body .layout .media-container .placement-opts .opt,
-main#pad .inner .body .layout .meta-container .placement-opts .opt,
-main#template .inner .body .layout .media-container .placement-opts .opt,
-main#template .inner .body .layout .meta-container .placement-opts .opt {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .placement-opts .opt i,
 main#pad .inner .body .layout .meta-container .placement-opts .opt i,
 main#template .inner .body .layout .media-container .placement-opts .opt i,
 main#template .inner .body .layout .meta-container .placement-opts .opt i {
     font-size: 16px;
-    line-height: 30px;
   }
   main#pad .inner .body .layout .media-container .align-opts .opt i,
 main#pad .inner .body .layout .meta-container .align-opts .opt i,
@@ -1543,49 +1548,32 @@ main#template .inner .body .layout .media-container .meta-tags.template:empty:no
 main#template .inner .body .layout .meta-container .meta-tags.template:empty:not(:focus):before {
     line-height: initial;
   }
-  main#pad .inner .body .layout .media-container .meta-personas,
-main#pad .inner .body .layout .meta-container .meta-personas,
-main#template .inner .body .layout .media-container .meta-personas,
-main#template .inner .body .layout .meta-container .meta-personas {
+  main#pad .inner .body .layout .media-container .media-repeat button,
+main#pad .inner .body .layout .meta-container .media-repeat button,
+main#template .inner .body .layout .media-container .media-repeat button,
+main#template .inner .body .layout .meta-container .media-repeat button {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 15px;
+    min-height: 25px;
+    padding: 10px;
+    margin-top: 30px;
+    background-color: #E5E5E5;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    font-size: 16px;
+    cursor: pointer;
   }
-  main#pad .inner .body .layout .media-container .meta-personas .persona-list,
-main#pad .inner .body .layout .meta-container .meta-personas .persona-list,
-main#template .inner .body .layout .media-container .meta-personas .persona-list,
-main#template .inner .body .layout .meta-container .meta-personas .persona-list {
-    padding: 10px 0;
+  main#pad .inner .body .layout .media-container .media-repeat button div,
+main#pad .inner .body .layout .meta-container .media-repeat button div,
+main#template .inner .body .layout .media-container .media-repeat button div,
+main#template .inner .body .layout .meta-container .media-repeat button div {
+    outline: none;
   }
-  main#pad .inner .body .layout .media-container .meta-personas .persona-list .node,
-main#pad .inner .body .layout .meta-container .meta-personas .persona-list .node,
-main#template .inner .body .layout .media-container .meta-personas .persona-list .node,
-main#template .inner .body .layout .meta-container .meta-personas .persona-list .node {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    height: 65px;
-    text-align: center;
-  }
-  main#pad .inner .body .layout .media-container .meta-personas .persona-list .node i,
-main#pad .inner .body .layout .meta-container .meta-personas .persona-list .node i,
-main#template .inner .body .layout .media-container .meta-personas .persona-list .node i,
-main#template .inner .body .layout .meta-container .meta-personas .persona-list .node i {
-    font-size: 24px;
-  }
-  main#pad .inner .body .layout .media-container .meta-personas .persona-list .node label,
-main#pad .inner .body .layout .meta-container .meta-personas .persona-list .node label,
-main#template .inner .body .layout .media-container .meta-personas .persona-list .node label,
-main#template .inner .body .layout .meta-container .meta-personas .persona-list .node label {
-    font-size: 12px;
-  }
-  main#pad .inner .body .layout .media-container .meta-personas .persona-list .panel .opt,
-main#pad .inner .body .layout .meta-container .meta-personas .persona-list .panel .opt,
-main#template .inner .body .layout .media-container .meta-personas .persona-list .panel .opt,
-main#template .inner .body .layout .meta-container .meta-personas .persona-list .panel .opt {
-    text-align: center;
+  main#pad .inner .body .layout .media-container .media-repeat.template button,
+main#pad .inner .body .layout .meta-container .media-repeat.template button,
+main#template .inner .body .layout .media-container .media-repeat.template button,
+main#template .inner .body .layout .meta-container .media-repeat.template button {
+    cursor: text;
   }
   main#pad .inner .body .layout .media-container .inset,
 main#pad .inner .body .layout .meta-container .inset,
@@ -1843,61 +1831,6 @@ main#template .inner .body .layout .meta-container .inset .inset-tags .tag.selec
     background-color: #C2B4D6;
     color: #FFF;
   }
-  main#pad .inner .body .layout .media-container .inset .inset-personas,
-main#pad .inner .body .layout .meta-container .inset .inset-personas,
-main#template .inner .body .layout .media-container .inset .inset-personas,
-main#template .inner .body .layout .meta-container .inset .inset-personas {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 15px;
-    padding: 0 0 10px 0;
-  }
-  main#pad .inner .body .layout .media-container .inset .inset-personas .persona-menu,
-main#pad .inner .body .layout .meta-container .inset .inset-personas .persona-menu,
-main#template .inner .body .layout .media-container .inset .inset-personas .persona-menu,
-main#template .inner .body .layout .meta-container .inset .inset-personas .persona-menu {
-    display: flex;
-    flex-direction: column;
-  }
-  main#pad .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel,
-main#pad .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel,
-main#template .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel,
-main#template .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel {
-    flex-grow: 1;
-    max-height: calc(300px - 75px - 20px);
-    /*padding: 0 0 10px 0;*/
-    margin-left: 10px;
-    border-left: 1px solid #C2B4D6;
-    overflow: scroll;
-  }
-  main#pad .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt,
-main#pad .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt,
-main#template .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt,
-main#template .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt {
-    padding: 0 10px;
-    margin: 5px 0;
-    color: #C2B4D6;
-  }
-  main#pad .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt div label,
-main#pad .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt div label,
-main#template .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt div label,
-main#template .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt div label {
-    cursor: pointer;
-  }
-  main#pad .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt:not(.selected):hover,
-main#pad .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt:not(.selected):hover,
-main#template .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt:not(.selected):hover,
-main#template .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt:not(.selected):hover {
-    background-color: #E5E5E5;
-    color: #57648C;
-  }
-  main#pad .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt.selected,
-main#pad .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt.selected,
-main#template .inner .body .layout .media-container .inset .inset-personas .persona-menu .panel .opt.selected,
-main#template .inner .body .layout .meta-container .inset .inset-personas .persona-menu .panel .opt.selected {
-    background-color: #C2B4D6;
-    color: #FFF;
-  }
   main#pad .inner .body .layout .media-container .inset.template,
 main#pad .inner .body .layout .meta-container .inset.template,
 main#template .inner .body .layout .media-container .inset.template,
@@ -2061,6 +1994,10 @@ main#template .inner .body .layout .media-container.move,
 main#template .inner .body .layout .meta-container.move {
     transition: transform 0.75s;
   }
+  main#pad .inner .body .layout:hover > .placement-opts,
+main#template .inner .body .layout:hover > .placement-opts {
+    display: block;
+  }
   main#pad .inner .body .layout.focus,
 main#template .inner .body .layout.focus {
     background-color: #F0F0F0;
@@ -2198,8 +2135,11 @@ main#template .inner .body .input-group .vertical-separator {
   }
   main#pad .inner .body .input-group.fixed,
 main#template .inner .body .input-group.fixed {
+    display: flex;
+    align-items: center;
     position: absolute;
-    top: calc(50% - 65px / 2 - 30px / 2);
+    height: 100%;
+    padding-bottom: 0;
     pointer-events: none;
     z-index: 100;
   }

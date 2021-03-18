@@ -267,6 +267,7 @@ main#template {
 							display: none;
 
 							.opt {
+								position: relative;
 								width: 30px; 
 								height: 30px;
 								border: none;
@@ -277,6 +278,15 @@ main#template {
 								i {
 									font-size: $t-main;
 									line-height: 30px;
+								}
+								.constraint {
+									position: absolute;
+									bottom: 100%;
+									left: 0;
+									width: 100%;
+									text-align: center;
+									font-size: $t-xsmall;
+									color: $c-mid-1;
 								}
 							}
 							.opt:last-child {
@@ -673,7 +683,7 @@ main#template {
 							/*.sdg:not(.selected):hover {
 								background-color: $c-light-2;
 							}*/
-							.sdg:hover,
+							.sdg:hover:not(.disabled),
 							.sdg.selected {
 								background-color: $c-light-1;
 
@@ -704,7 +714,7 @@ main#template {
 									cursor: pointer;
 								}
 							}
-							.tag:hover,
+							.tag:hover:not(.disabled),
 							.tag.selected {
 								background-color: $c-light-1;
 								color: #FFF;

@@ -434,7 +434,7 @@
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text], input[type=number]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -454,7 +454,7 @@
 		e = e || event
 		if (editing) {
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text], input[type=number]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())

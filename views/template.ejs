@@ -225,7 +225,7 @@
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text], input[type=number]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -243,7 +243,7 @@
 
 		if (editing) {
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text]').nodes()].flat().includes(document.activeElement)
+				![head.selectAll('div.title').nodes(), main.selectAll('.section-header label').nodes(), main.selectAll('input[type=text], input[type=number]').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -324,6 +324,7 @@
 				}
 				else if (c.type === 'txt') {
 					c.instruction = sel.select('.media-txt').node().innerText
+					console.log(c)
 					items.push(c)
 				}
 				else if (c.type === 'embed') {
@@ -349,13 +350,13 @@
 					c.instruction = sel.select('.meta-sdgs').node().innerText
 					// c.options = sel.selectAll('.inset-sdgs .panel .opt').data()
 					// WE DO NOT KEEP A COPY HERE OF ALL sdgs
-					items.push({ type: c.type, level: c.level, instruction: c.instruction })
+					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
 				}
 				else if (c.type === 'tags') {
 					c.instruction = sel.select('.meta-tags').node().innerText
 					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
 					// WE DO NOT KEEP A COPY HERE OF ALL tags
-					items.push({ type: c.type, level: c.level, instruction: c.instruction })
+					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
 				}
 				return c
 			})
@@ -448,6 +449,8 @@
 	// POPULATE THE PAGE
 	if (['edit', 'view'].includes(activity)) {
 		const data = <%- JSON.stringify(locals.data || {}) %>;
+		console.log(data)
+
 		published = data.published
 
 		head.select('.title').html(data.title)

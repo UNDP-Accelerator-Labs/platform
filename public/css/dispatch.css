@@ -221,7 +221,8 @@ input:-webkit-autofill:active {
     margin-bottom: 15px;
     font-size: 16px;
   }
-  .modal .inner .message input[type=text] {
+  .modal .inner .message input[type=text],
+.modal .inner .message input[type=number] {
     width: 65px;
     border: none;
     border-bottom: 1px solid #934A5F;
@@ -1035,6 +1036,7 @@ main#template .inner .body .layout .meta-container .opts .opt-group {
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt,
 main#template .inner .body .layout .media-container .opts .opt-group .opt,
 main#template .inner .body .layout .meta-container .opts .opt-group .opt {
+    position: relative;
     width: 30px;
     height: 30px;
     border: none;
@@ -1048,6 +1050,18 @@ main#template .inner .body .layout .media-container .opts .opt-group .opt i,
 main#template .inner .body .layout .meta-container .opts .opt-group .opt i {
     font-size: 16px;
     line-height: 30px;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt .constraint,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt .constraint,
+main#template .inner .body .layout .media-container .opts .opt-group .opt .constraint,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt .constraint {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 9px;
+    color: #934A5F;
   }
   main#pad .inner .body .layout .media-container .opts .opt-group .opt:last-child,
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt:last-child,
@@ -1777,23 +1791,23 @@ main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg labe
 main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg label {
     cursor: pointer;
   }
-  main#pad .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover,
+  main#pad .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover:not(.disabled),
 main#pad .inner .body .layout .media-container .inset .inset-sdgs .sdg.selected,
-main#pad .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover,
+main#pad .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover:not(.disabled),
 main#pad .inner .body .layout .meta-container .inset .inset-sdgs .sdg.selected,
-main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover,
+main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover:not(.disabled),
 main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg.selected,
-main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover,
+main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover:not(.disabled),
 main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg.selected {
     background-color: #C2B4D6;
   }
-  main#pad .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover img,
+  main#pad .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover:not(.disabled) img,
 main#pad .inner .body .layout .media-container .inset .inset-sdgs .sdg.selected img,
-main#pad .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover img,
+main#pad .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover:not(.disabled) img,
 main#pad .inner .body .layout .meta-container .inset .inset-sdgs .sdg.selected img,
-main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover img,
+main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg:hover:not(.disabled) img,
 main#template .inner .body .layout .media-container .inset .inset-sdgs .sdg.selected img,
-main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover img,
+main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg:hover:not(.disabled) img,
 main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg.selected img {
     filter: brightness(300%);
   }
@@ -1830,13 +1844,13 @@ main#template .inner .body .layout .meta-container .inset .inset-tags .tag label
     padding: 3px 5px;
     cursor: pointer;
   }
-  main#pad .inner .body .layout .media-container .inset .inset-tags .tag:hover,
+  main#pad .inner .body .layout .media-container .inset .inset-tags .tag:hover:not(.disabled),
 main#pad .inner .body .layout .media-container .inset .inset-tags .tag.selected,
-main#pad .inner .body .layout .meta-container .inset .inset-tags .tag:hover,
+main#pad .inner .body .layout .meta-container .inset .inset-tags .tag:hover:not(.disabled),
 main#pad .inner .body .layout .meta-container .inset .inset-tags .tag.selected,
-main#template .inner .body .layout .media-container .inset .inset-tags .tag:hover,
+main#template .inner .body .layout .media-container .inset .inset-tags .tag:hover:not(.disabled),
 main#template .inner .body .layout .media-container .inset .inset-tags .tag.selected,
-main#template .inner .body .layout .meta-container .inset .inset-tags .tag:hover,
+main#template .inner .body .layout .meta-container .inset .inset-tags .tag:hover:not(.disabled),
 main#template .inner .body .layout .meta-container .inset .inset-tags .tag.selected {
     background-color: #C2B4D6;
     color: #FFF;

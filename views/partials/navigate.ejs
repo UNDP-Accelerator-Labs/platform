@@ -302,7 +302,9 @@
 	window.addEventListener('keyup', function (e) {
 		e = e || event
 		if (e.key === 'Escape' || e.keyCode === 27) {
-			d3.select('div.screen div.modal button.close').node().click()
+			if (d3.select('div.screen div.modal button.close').node()) {
+				d3.select('div.screen div.modal button.close').node().click()
+			}
 		}
 	})
 </script>

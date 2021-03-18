@@ -224,8 +224,6 @@ function addSection (kwargs) {
 		.datum({ type: 'section', title: title, lead: lead, repeat: repeat, group: group })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
-	console.log(section.datum())
-
 	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
 	let section_id = 0
 	d3.selectAll('.media-layout').each(function (d, i) {
@@ -272,7 +270,7 @@ function addSection (kwargs) {
 			evt.preventDefault()
 			this.blur()
 		}
-	}).on('blur', _ => partialSave('media'))
+	}).on('blur', _ => { if (editing) partialSave('media') })
 
 	const medialead = new Media({
 		parent: section.node(), 
@@ -308,7 +306,6 @@ function addSection (kwargs) {
 			'contenteditable': editing ? true : null 
 		}).html(d => d.instruction)
 	}
-
 	// if (focus) header.node().focus()
 	// if (editing) observer.observe(section.node(), obsvars)
 
@@ -361,37 +358,52 @@ function addImg (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, condition } = data || {}
+	let { type, instruction, constraint } = data || {}
 	if (!type) type = 'txt'
 	if (!instruction) instruction = ''
 
 	const media = new Media({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction, condition: condition },
+		datum: { type: type, instruction: instruction, constraint: constraint },
 		focus: focus || false,
 		lang: lang
 	})
 
 	if (media.opts) {
-		media.opts.addElems('div', 'opt-group', [
+		const opts = media.opts.addElems('div', 'opt-group', [
 			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
-			[{ key: 'h-align', label: 'report', value: 'condition' }]
+			[{ key: 'constraint', label: 'block', value: constraint }]
 		]).addElems('button', 'opt', d => d)
 		.classed('active', d => {
-			// if (d.key === 'h-align') return textalign ? d.value === textalign : d.value === 'left'
+			if (d.key === 'constraint') return constraint ? true : false
 		}).attr('type', 'button')
 			.each(function (d) { d3.select(this).classed(d.value, true) })
-		.on('click', function (d) {
+		.on('click', async function (d) {
 			const sel = d3.select(this)
-			if (d.key === 'h-align') {
-				sel.findAncestor('opt-group').selectAll('.opt').classed('active', function () { return this == sel.node() })
-				media.media.style('text-align', c => c.textalign = d.value)
+			const datum = media.container.datum()
+			
+			if (d.key === 'constraint') {
+				if (!sel.classed('active')) {
+					const message = `Limit the input to <input type='number' name='length' value=${datum.constraint || 9999} min=1> characters.`
+					const opts = [{ node: 'button', type: 'button', label: 'Limit length', resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+					const new_constraint = await renderPromiseModal({ message: message, opts: opts })
+
+					datum.constraint = +new_constraint
+					sel.addElems('span', 'constraint').html(new_constraint)
+				} else {
+					datum.constraint = null
+					sel.select('span', 'constraint').remove()
+				}
+				toggleClass(this, 'active')
 			}
 
-			if (editing) switchButtons(lang)
-		}).addElems('i', 'material-icons')
+			if (editing) partialSave('media')
+		})
+		opts.addElems('i', 'material-icons')
 			.html(d => d.label)
+		opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+			.html(d => d.value)
 	}
 
 	media.media.attrs({ 
@@ -704,12 +716,12 @@ function addMap (data, lang = 'en', focus = false) { // TO DO
 }
 function addSDGs (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction } = data || {}
+	let { type, instruction, constraint } = data || {}
 	if (!type) type = 'sdgs'
 	if (!instruction) instruction = ''
 
-	// GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
-	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+	GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
+	// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
 	.then(sdgs => {
 		// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
 		const input = d3.select('.media-input-group #input-meta-sdgs').node()
@@ -718,10 +730,46 @@ function addSDGs (kwargs) {
 		const meta = new Meta({ 
 			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 			type: type, 
-			datum: { type: type, sdgs: sdgs, instruction: instruction },
+			datum: { type: type, sdgs: sdgs, instruction: instruction, constraint: constraint },
 			focus: focus || false,
 			lang: lang
 		})
+
+		if (meta.opts) {
+			const opts = meta.opts.addElems('div', 'opt-group', [
+				[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+				[{ key: 'constraint', label: 'block', value: constraint }]
+			]).addElems('button', 'opt', d => d)
+			.classed('active', d => {
+				if (d.key === 'constraint') return constraint ? true : false
+			}).attr('type', 'button')
+				.each(function (d) { d3.select(this).classed(d.value, true) })
+			.on('click', async function (d) {
+				const sel = d3.select(this)
+				const datum = meta.container.datum()
+				
+				if (d.key === 'constraint') {
+					if (!sel.classed('active')) {
+						const message = `Limit the input to <input type='number' name='length' value=${datum.constraint || sdgs.length} min=1> tags.`
+						const opts = [{ node: 'button', type: 'button', label: 'Limit length', resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+						const new_constraint = await renderPromiseModal({ message: message, opts: opts })
+
+						datum.constraint = +new_constraint
+						sel.addElems('span', 'constraint').html(new_constraint)
+					} else {
+						datum.constraint = null
+						sel.select('span', 'constraint').remove()
+					}
+					toggleClass(this, 'active')
+				}
+
+				if (editing) partialSave('media')
+			})
+			opts.addElems('i', 'material-icons')
+				.html(d => d.label)
+			opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+				.html(d => d.value)
+		}
 
 		meta.media.attrs({ 
 			'data-placeholder': d => vocabulary[`request ${type}`][lang],
@@ -748,13 +796,13 @@ function addSDGs (kwargs) {
 }
 function addTags (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, themes, instruction } = data || {}
+	let { type, themes, instruction, constraint } = data || {}
 	if (!type) type = 'tags'
 	if (!themes) themes = []
 	if (!instruction) instruction = ''
 
-	// GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
-	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
+	GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
+	// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
 	.then(themes => {
 		// const input = d3.select('.meta-input-group #input-meta-tags').node()
 		const input = d3.select('.media-input-group #input-meta-tags').node()
@@ -763,10 +811,46 @@ function addTags (kwargs) {
 		const meta = new Meta({ 
 			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 			type: type, 
-			datum: { type: type, themes: themes, instruction: instruction },
+			datum: { type: type, themes: themes, instruction: instruction, constraint: constraint },
 			focus: focus || false,
 			lang: lang
 		})
+
+		if (meta.opts) {
+			const opts = meta.opts.addElems('div', 'opt-group', [
+				[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+				[{ key: 'constraint', label: 'block', value: constraint }]
+			]).addElems('button', 'opt', d => d)
+			.classed('active', d => {
+				if (d.key === 'constraint') return constraint ? true : false
+			}).attr('type', 'button')
+				.each(function (d) { d3.select(this).classed(d.value, true) })
+			.on('click', async function (d) {
+				const sel = d3.select(this)
+				const datum = meta.container.datum()
+				
+				if (d.key === 'constraint') {
+					if (!sel.classed('active')) {
+						const message = `Limit the input to <input type='number' name='length' value=${datum.constraint || themes.length} min=1> tags.`
+						const opts = [{ node: 'button', type: 'button', label: 'Limit length', resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+						const new_constraint = await renderPromiseModal({ message: message, opts: opts })
+
+						datum.constraint = +new_constraint
+						sel.addElems('span', 'constraint').html(new_constraint)
+					} else {
+						datum.constraint = null
+						sel.select('span', 'constraint').remove()
+					}
+					toggleClass(this, 'active')
+				}
+
+				if (editing) partialSave('media')
+			})
+			opts.addElems('i', 'material-icons')
+				.html(d => d.label)
+			opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+				.html(d => d.value)
+		}
 
 		meta.media.attrs({ 
 			'data-placeholder': d => vocabulary[`request ${type}`][lang],

@@ -1561,8 +1561,8 @@ function addTags (kwargs) {
 		.html(c => c.name ? c.name.capitalize() : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
 
 	if (meta.inset) {
-		GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
-		// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
+		// GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
+		GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
 		.then(themes => {
 			const opts = meta.inset.addElem('div', 'inset-tags')
 				.addElems('div', 'tag', themes)

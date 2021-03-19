@@ -1506,12 +1506,16 @@ main#template .inner .body .layout .meta-container .meta-sdgs.template {
   }
   main#pad .inner .body .layout .media-container .meta-tags,
 main#pad .inner .body .layout .media-container .meta-skills,
+main#pad .inner .body .layout .media-container .meta-datasources,
 main#pad .inner .body .layout .meta-container .meta-tags,
 main#pad .inner .body .layout .meta-container .meta-skills,
+main#pad .inner .body .layout .meta-container .meta-datasources,
 main#template .inner .body .layout .media-container .meta-tags,
 main#template .inner .body .layout .media-container .meta-skills,
+main#template .inner .body .layout .media-container .meta-datasources,
 main#template .inner .body .layout .meta-container .meta-tags,
-main#template .inner .body .layout .meta-container .meta-skills {
+main#template .inner .body .layout .meta-container .meta-skills,
+main#template .inner .body .layout .meta-container .meta-datasources {
     width: 100%;
     min-height: 31px;
     padding: 5px 0 10px 0;
@@ -1519,12 +1523,16 @@ main#template .inner .body .layout .meta-container .meta-skills {
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag,
 main#pad .inner .body .layout .media-container .meta-skills .tag,
+main#pad .inner .body .layout .media-container .meta-datasources .tag,
 main#pad .inner .body .layout .meta-container .meta-tags .tag,
 main#pad .inner .body .layout .meta-container .meta-skills .tag,
+main#pad .inner .body .layout .meta-container .meta-datasources .tag,
 main#template .inner .body .layout .media-container .meta-tags .tag,
 main#template .inner .body .layout .media-container .meta-skills .tag,
+main#template .inner .body .layout .media-container .meta-datasources .tag,
 main#template .inner .body .layout .meta-container .meta-tags .tag,
-main#template .inner .body .layout .meta-container .meta-skills .tag {
+main#template .inner .body .layout .meta-container .meta-skills .tag,
+main#template .inner .body .layout .meta-container .meta-datasources .tag {
     display: inline-block;
     /*padding: 3px 5px;*/
     margin: 5px 5px 0 0;
@@ -1537,22 +1545,30 @@ main#template .inner .body .layout .meta-container .meta-skills .tag {
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag input,
 main#pad .inner .body .layout .media-container .meta-skills .tag input,
+main#pad .inner .body .layout .media-container .meta-datasources .tag input,
 main#pad .inner .body .layout .meta-container .meta-tags .tag input,
 main#pad .inner .body .layout .meta-container .meta-skills .tag input,
+main#pad .inner .body .layout .meta-container .meta-datasources .tag input,
 main#template .inner .body .layout .media-container .meta-tags .tag input,
 main#template .inner .body .layout .media-container .meta-skills .tag input,
+main#template .inner .body .layout .media-container .meta-datasources .tag input,
 main#template .inner .body .layout .meta-container .meta-tags .tag input,
-main#template .inner .body .layout .meta-container .meta-skills .tag input {
+main#template .inner .body .layout .meta-container .meta-skills .tag input,
+main#template .inner .body .layout .meta-container .meta-datasources .tag input {
     display: none;
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag label,
 main#pad .inner .body .layout .media-container .meta-skills .tag label,
+main#pad .inner .body .layout .media-container .meta-datasources .tag label,
 main#pad .inner .body .layout .meta-container .meta-tags .tag label,
 main#pad .inner .body .layout .meta-container .meta-skills .tag label,
+main#pad .inner .body .layout .meta-container .meta-datasources .tag label,
 main#template .inner .body .layout .media-container .meta-tags .tag label,
 main#template .inner .body .layout .media-container .meta-skills .tag label,
+main#template .inner .body .layout .media-container .meta-datasources .tag label,
 main#template .inner .body .layout .meta-container .meta-tags .tag label,
-main#template .inner .body .layout .meta-container .meta-skills .tag label {
+main#template .inner .body .layout .meta-container .meta-skills .tag label,
+main#template .inner .body .layout .meta-container .meta-datasources .tag label {
     padding: 3px 5px;
     cursor: pointer;
   }
@@ -1560,39 +1576,55 @@ main#template .inner .body .layout .meta-container .meta-skills .tag label {
 main#pad .inner .body .layout .media-container .meta-tags .tag.selected,
 main#pad .inner .body .layout .media-container .meta-skills .tag:hover,
 main#pad .inner .body .layout .media-container .meta-skills .tag.selected,
+main#pad .inner .body .layout .media-container .meta-datasources .tag:hover,
+main#pad .inner .body .layout .media-container .meta-datasources .tag.selected,
 main#pad .inner .body .layout .meta-container .meta-tags .tag:hover,
 main#pad .inner .body .layout .meta-container .meta-tags .tag.selected,
 main#pad .inner .body .layout .meta-container .meta-skills .tag:hover,
 main#pad .inner .body .layout .meta-container .meta-skills .tag.selected,
+main#pad .inner .body .layout .meta-container .meta-datasources .tag:hover,
+main#pad .inner .body .layout .meta-container .meta-datasources .tag.selected,
 main#template .inner .body .layout .media-container .meta-tags .tag:hover,
 main#template .inner .body .layout .media-container .meta-tags .tag.selected,
 main#template .inner .body .layout .media-container .meta-skills .tag:hover,
 main#template .inner .body .layout .media-container .meta-skills .tag.selected,
+main#template .inner .body .layout .media-container .meta-datasources .tag:hover,
+main#template .inner .body .layout .media-container .meta-datasources .tag.selected,
 main#template .inner .body .layout .meta-container .meta-tags .tag:hover,
 main#template .inner .body .layout .meta-container .meta-tags .tag.selected,
 main#template .inner .body .layout .meta-container .meta-skills .tag:hover,
-main#template .inner .body .layout .meta-container .meta-skills .tag.selected {
+main#template .inner .body .layout .meta-container .meta-skills .tag.selected,
+main#template .inner .body .layout .meta-container .meta-datasources .tag:hover,
+main#template .inner .body .layout .meta-container .meta-datasources .tag.selected {
     background-color: #934A5F;
     color: #FFF;
   }
   main#pad .inner .body .layout .media-container .meta-tags:empty:not(:focus):before,
 main#pad .inner .body .layout .media-container .meta-skills:empty:not(:focus):before,
+main#pad .inner .body .layout .media-container .meta-datasources:empty:not(:focus):before,
 main#pad .inner .body .layout .meta-container .meta-tags:empty:not(:focus):before,
 main#pad .inner .body .layout .meta-container .meta-skills:empty:not(:focus):before,
+main#pad .inner .body .layout .meta-container .meta-datasources:empty:not(:focus):before,
 main#template .inner .body .layout .media-container .meta-tags:empty:not(:focus):before,
 main#template .inner .body .layout .media-container .meta-skills:empty:not(:focus):before,
+main#template .inner .body .layout .media-container .meta-datasources:empty:not(:focus):before,
 main#template .inner .body .layout .meta-container .meta-tags:empty:not(:focus):before,
-main#template .inner .body .layout .meta-container .meta-skills:empty:not(:focus):before {
+main#template .inner .body .layout .meta-container .meta-skills:empty:not(:focus):before,
+main#template .inner .body .layout .meta-container .meta-datasources:empty:not(:focus):before {
     line-height: 31px;
   }
   main#pad .inner .body .layout .media-container .meta-tags.template,
 main#pad .inner .body .layout .media-container .meta-skills.template,
+main#pad .inner .body .layout .media-container .meta-datasources.template,
 main#pad .inner .body .layout .meta-container .meta-tags.template,
 main#pad .inner .body .layout .meta-container .meta-skills.template,
+main#pad .inner .body .layout .meta-container .meta-datasources.template,
 main#template .inner .body .layout .media-container .meta-tags.template,
 main#template .inner .body .layout .media-container .meta-skills.template,
+main#template .inner .body .layout .media-container .meta-datasources.template,
 main#template .inner .body .layout .meta-container .meta-tags.template,
-main#template .inner .body .layout .meta-container .meta-skills.template {
+main#template .inner .body .layout .meta-container .meta-skills.template,
+main#template .inner .body .layout .meta-container .meta-datasources.template {
     min-height: initial;
     padding: 0;
     line-height: inherit;
@@ -1600,12 +1632,16 @@ main#template .inner .body .layout .meta-container .meta-skills.template {
   }
   main#pad .inner .body .layout .media-container .meta-tags.template:empty:not(:focus):before,
 main#pad .inner .body .layout .media-container .meta-skills.template:empty:not(:focus):before,
+main#pad .inner .body .layout .media-container .meta-datasources.template:empty:not(:focus):before,
 main#pad .inner .body .layout .meta-container .meta-tags.template:empty:not(:focus):before,
 main#pad .inner .body .layout .meta-container .meta-skills.template:empty:not(:focus):before,
+main#pad .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before,
 main#template .inner .body .layout .media-container .meta-tags.template:empty:not(:focus):before,
 main#template .inner .body .layout .media-container .meta-skills.template:empty:not(:focus):before,
+main#template .inner .body .layout .media-container .meta-datasources.template:empty:not(:focus):before,
 main#template .inner .body .layout .meta-container .meta-tags.template:empty:not(:focus):before,
-main#template .inner .body .layout .meta-container .meta-skills.template:empty:not(:focus):before {
+main#template .inner .body .layout .meta-container .meta-skills.template:empty:not(:focus):before,
+main#template .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before {
     line-height: initial;
   }
   main#pad .inner .body .layout .media-container .media-repeat button,
@@ -1849,22 +1885,30 @@ main#template .inner .body .layout .meta-container .inset .inset-sdgs .sdg.selec
   }
   main#pad .inner .body .layout .media-container .inset .inset-tags,
 main#pad .inner .body .layout .media-container .inset .inset-skills,
+main#pad .inner .body .layout .media-container .inset .inset-datasources,
 main#pad .inner .body .layout .meta-container .inset .inset-tags,
 main#pad .inner .body .layout .meta-container .inset .inset-skills,
+main#pad .inner .body .layout .meta-container .inset .inset-datasources,
 main#template .inner .body .layout .media-container .inset .inset-tags,
 main#template .inner .body .layout .media-container .inset .inset-skills,
+main#template .inner .body .layout .media-container .inset .inset-datasources,
 main#template .inner .body .layout .meta-container .inset .inset-tags,
-main#template .inner .body .layout .meta-container .inset .inset-skills {
+main#template .inner .body .layout .meta-container .inset .inset-skills,
+main#template .inner .body .layout .meta-container .inset .inset-datasources {
     padding: 5px 10px 10px 10px;
   }
   main#pad .inner .body .layout .media-container .inset .inset-tags .tag,
 main#pad .inner .body .layout .media-container .inset .inset-skills .tag,
+main#pad .inner .body .layout .media-container .inset .inset-datasources .tag,
 main#pad .inner .body .layout .meta-container .inset .inset-tags .tag,
 main#pad .inner .body .layout .meta-container .inset .inset-skills .tag,
+main#pad .inner .body .layout .meta-container .inset .inset-datasources .tag,
 main#template .inner .body .layout .media-container .inset .inset-tags .tag,
 main#template .inner .body .layout .media-container .inset .inset-skills .tag,
+main#template .inner .body .layout .media-container .inset .inset-datasources .tag,
 main#template .inner .body .layout .meta-container .inset .inset-tags .tag,
-main#template .inner .body .layout .meta-container .inset .inset-skills .tag {
+main#template .inner .body .layout .meta-container .inset .inset-skills .tag,
+main#template .inner .body .layout .meta-container .inset .inset-datasources .tag {
     display: inline-block;
     /*padding: 3px 5px;*/
     margin: 5px 5px 0 0;
@@ -1877,22 +1921,30 @@ main#template .inner .body .layout .meta-container .inset .inset-skills .tag {
   }
   main#pad .inner .body .layout .media-container .inset .inset-tags .tag input,
 main#pad .inner .body .layout .media-container .inset .inset-skills .tag input,
+main#pad .inner .body .layout .media-container .inset .inset-datasources .tag input,
 main#pad .inner .body .layout .meta-container .inset .inset-tags .tag input,
 main#pad .inner .body .layout .meta-container .inset .inset-skills .tag input,
+main#pad .inner .body .layout .meta-container .inset .inset-datasources .tag input,
 main#template .inner .body .layout .media-container .inset .inset-tags .tag input,
 main#template .inner .body .layout .media-container .inset .inset-skills .tag input,
+main#template .inner .body .layout .media-container .inset .inset-datasources .tag input,
 main#template .inner .body .layout .meta-container .inset .inset-tags .tag input,
-main#template .inner .body .layout .meta-container .inset .inset-skills .tag input {
+main#template .inner .body .layout .meta-container .inset .inset-skills .tag input,
+main#template .inner .body .layout .meta-container .inset .inset-datasources .tag input {
     display: none;
   }
   main#pad .inner .body .layout .media-container .inset .inset-tags .tag label,
 main#pad .inner .body .layout .media-container .inset .inset-skills .tag label,
+main#pad .inner .body .layout .media-container .inset .inset-datasources .tag label,
 main#pad .inner .body .layout .meta-container .inset .inset-tags .tag label,
 main#pad .inner .body .layout .meta-container .inset .inset-skills .tag label,
+main#pad .inner .body .layout .meta-container .inset .inset-datasources .tag label,
 main#template .inner .body .layout .media-container .inset .inset-tags .tag label,
 main#template .inner .body .layout .media-container .inset .inset-skills .tag label,
+main#template .inner .body .layout .media-container .inset .inset-datasources .tag label,
 main#template .inner .body .layout .meta-container .inset .inset-tags .tag label,
-main#template .inner .body .layout .meta-container .inset .inset-skills .tag label {
+main#template .inner .body .layout .meta-container .inset .inset-skills .tag label,
+main#template .inner .body .layout .meta-container .inset .inset-datasources .tag label {
     padding: 3px 5px;
     cursor: pointer;
   }
@@ -1900,18 +1952,26 @@ main#template .inner .body .layout .meta-container .inset .inset-skills .tag lab
 main#pad .inner .body .layout .media-container .inset .inset-tags .tag.selected,
 main#pad .inner .body .layout .media-container .inset .inset-skills .tag:hover:not(.disabled),
 main#pad .inner .body .layout .media-container .inset .inset-skills .tag.selected,
+main#pad .inner .body .layout .media-container .inset .inset-datasources .tag:hover:not(.disabled),
+main#pad .inner .body .layout .media-container .inset .inset-datasources .tag.selected,
 main#pad .inner .body .layout .meta-container .inset .inset-tags .tag:hover:not(.disabled),
 main#pad .inner .body .layout .meta-container .inset .inset-tags .tag.selected,
 main#pad .inner .body .layout .meta-container .inset .inset-skills .tag:hover:not(.disabled),
 main#pad .inner .body .layout .meta-container .inset .inset-skills .tag.selected,
+main#pad .inner .body .layout .meta-container .inset .inset-datasources .tag:hover:not(.disabled),
+main#pad .inner .body .layout .meta-container .inset .inset-datasources .tag.selected,
 main#template .inner .body .layout .media-container .inset .inset-tags .tag:hover:not(.disabled),
 main#template .inner .body .layout .media-container .inset .inset-tags .tag.selected,
 main#template .inner .body .layout .media-container .inset .inset-skills .tag:hover:not(.disabled),
 main#template .inner .body .layout .media-container .inset .inset-skills .tag.selected,
+main#template .inner .body .layout .media-container .inset .inset-datasources .tag:hover:not(.disabled),
+main#template .inner .body .layout .media-container .inset .inset-datasources .tag.selected,
 main#template .inner .body .layout .meta-container .inset .inset-tags .tag:hover:not(.disabled),
 main#template .inner .body .layout .meta-container .inset .inset-tags .tag.selected,
 main#template .inner .body .layout .meta-container .inset .inset-skills .tag:hover:not(.disabled),
-main#template .inner .body .layout .meta-container .inset .inset-skills .tag.selected {
+main#template .inner .body .layout .meta-container .inset .inset-skills .tag.selected,
+main#template .inner .body .layout .meta-container .inset .inset-datasources .tag:hover:not(.disabled),
+main#template .inner .body .layout .meta-container .inset .inset-datasources .tag.selected {
     background-color: #C2B4D6;
     color: #FFF;
   }
@@ -1947,29 +2007,37 @@ main#template .inner .body .layout .meta-container .inset.template div .panel .i
   main#pad .inner .body .layout .media-container .inset.template .inset-sdgs,
 main#pad .inner .body .layout .media-container .inset.template .inset-tags,
 main#pad .inner .body .layout .media-container .inset.template .inset-skills,
+main#pad .inner .body .layout .media-container .inset.template .inset-datasources,
 main#pad .inner .body .layout .meta-container .inset.template .inset-sdgs,
 main#pad .inner .body .layout .meta-container .inset.template .inset-tags,
 main#pad .inner .body .layout .meta-container .inset.template .inset-skills,
+main#pad .inner .body .layout .meta-container .inset.template .inset-datasources,
 main#template .inner .body .layout .media-container .inset.template .inset-sdgs,
 main#template .inner .body .layout .media-container .inset.template .inset-tags,
 main#template .inner .body .layout .media-container .inset.template .inset-skills,
+main#template .inner .body .layout .media-container .inset.template .inset-datasources,
 main#template .inner .body .layout .meta-container .inset.template .inset-sdgs,
 main#template .inner .body .layout .meta-container .inset.template .inset-tags,
-main#template .inner .body .layout .meta-container .inset.template .inset-skills {
+main#template .inner .body .layout .meta-container .inset.template .inset-skills,
+main#template .inner .body .layout .meta-container .inset.template .inset-datasources {
     display: block;
   }
   main#pad .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt,
 main#pad .inner .body .layout .media-container .inset.template .inset-tags .panel .opt,
 main#pad .inner .body .layout .media-container .inset.template .inset-skills .panel .opt,
+main#pad .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt,
 main#pad .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt,
 main#pad .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt,
 main#pad .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt,
+main#pad .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt,
 main#template .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt,
 main#template .inner .body .layout .media-container .inset.template .inset-tags .panel .opt,
 main#template .inner .body .layout .media-container .inset.template .inset-skills .panel .opt,
+main#template .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt,
 main#template .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt,
 main#template .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt,
-main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt {
+main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt,
+main#template .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt {
     display: flex;
     align-items: center;
     padding: 0;
@@ -1980,54 +2048,70 @@ main#template .inner .body .layout .meta-container .inset.template .inset-skills
   main#pad .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt div,
 main#pad .inner .body .layout .media-container .inset.template .inset-tags .panel .opt div,
 main#pad .inner .body .layout .media-container .inset.template .inset-skills .panel .opt div,
+main#pad .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt div,
 main#pad .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt div,
 main#pad .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt div,
 main#pad .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt div,
+main#pad .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt div,
 main#template .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt div,
 main#template .inner .body .layout .media-container .inset.template .inset-tags .panel .opt div,
 main#template .inner .body .layout .media-container .inset.template .inset-skills .panel .opt div,
+main#template .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt div,
 main#template .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt div,
 main#template .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt div,
-main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt div {
+main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt div,
+main#template .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt div {
     padding: 0 5px;
   }
   main#pad .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt .grow,
 main#pad .inner .body .layout .media-container .inset.template .inset-tags .panel .opt .grow,
 main#pad .inner .body .layout .media-container .inset.template .inset-skills .panel .opt .grow,
+main#pad .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt .grow,
 main#pad .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt .grow,
 main#pad .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt .grow,
 main#pad .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt .grow,
+main#pad .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt .grow,
 main#template .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt .grow,
 main#template .inner .body .layout .media-container .inset.template .inset-tags .panel .opt .grow,
 main#template .inner .body .layout .media-container .inset.template .inset-skills .panel .opt .grow,
+main#template .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt .grow,
 main#template .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt .grow,
 main#template .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt .grow,
-main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt .grow {
+main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt .grow,
+main#template .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt .grow {
     flex-grow: 1;
   }
   main#pad .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt:not(.selected):hover,
 main#pad .inner .body .layout .media-container .inset.template .inset-tags .panel .opt:not(.selected):hover,
 main#pad .inner .body .layout .media-container .inset.template .inset-skills .panel .opt:not(.selected):hover,
+main#pad .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt:not(.selected):hover,
 main#pad .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt:not(.selected):hover,
 main#pad .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt:not(.selected):hover,
 main#pad .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt:not(.selected):hover,
+main#pad .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt:not(.selected):hover,
 main#template .inner .body .layout .media-container .inset.template .inset-sdgs .panel .opt:not(.selected):hover,
 main#template .inner .body .layout .media-container .inset.template .inset-tags .panel .opt:not(.selected):hover,
 main#template .inner .body .layout .media-container .inset.template .inset-skills .panel .opt:not(.selected):hover,
+main#template .inner .body .layout .media-container .inset.template .inset-datasources .panel .opt:not(.selected):hover,
 main#template .inner .body .layout .meta-container .inset.template .inset-sdgs .panel .opt:not(.selected):hover,
 main#template .inner .body .layout .meta-container .inset.template .inset-tags .panel .opt:not(.selected):hover,
-main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt:not(.selected):hover {
+main#template .inner .body .layout .meta-container .inset.template .inset-skills .panel .opt:not(.selected):hover,
+main#template .inner .body .layout .meta-container .inset.template .inset-datasources .panel .opt:not(.selected):hover {
     background-color: transparent;
     color: #C2B4D6;
   }
   main#pad .inner .body .layout .media-container .inset.template .inset-tags,
 main#pad .inner .body .layout .media-container .inset.template .inset-skills,
+main#pad .inner .body .layout .media-container .inset.template .inset-datasources,
 main#pad .inner .body .layout .meta-container .inset.template .inset-tags,
 main#pad .inner .body .layout .meta-container .inset.template .inset-skills,
+main#pad .inner .body .layout .meta-container .inset.template .inset-datasources,
 main#template .inner .body .layout .media-container .inset.template .inset-tags,
 main#template .inner .body .layout .media-container .inset.template .inset-skills,
+main#template .inner .body .layout .media-container .inset.template .inset-datasources,
 main#template .inner .body .layout .meta-container .inset.template .inset-tags,
-main#template .inner .body .layout .meta-container .inset.template .inset-skills {
+main#template .inner .body .layout .meta-container .inset.template .inset-skills,
+main#template .inner .body .layout .meta-container .inset.template .inset-datasources {
     max-height: calc(300px);
   }
   main#pad .inner .body .layout .media-container figcaption,

@@ -74,6 +74,7 @@
 					<button id='input-meta-sdgs' title='Request one or more SDG tag(s).'><i class='material-icons'>public</i></button>
 					<button id='input-meta-tags' title='Request one or more thematic area tag(s).'><i class='material-icons'>style</i></button>
 					<button id='input-meta-skills' title='Request one or more skill tag(s).'><i class='material-icons'>engineering</i></button>
+					<button id='input-meta-datasources' title='Request one or more data source(s).'><i class='material-icons'>analytics</i></button>
 				</div>
 			<% } %>
 			
@@ -169,6 +170,10 @@
 	d3.select('.media-input-group #input-meta-skills')
 	.on('click', _ => addSkills({ lang: '<%- locals.lang %>', focus: true }))
 	.on('touchend', _ => addSkills({ lang: '<%- locals.lang %>', focus: true }))
+
+	d3.select('.media-input-group #input-meta-datasources')
+	.on('click', _ => addDataSources({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addDataSources({ lang: '<%- locals.lang %>', focus: true }))
 
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
 	d3.select('.foot .deploy ul li a#template-deploy')
@@ -366,6 +371,12 @@
 				}
 				else if (c.type === 'skills') {
 					c.instruction = sel.select('.meta-skills').node().innerText
+					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
+					// WE DO NOT KEEP A COPY HERE OF ALL tags
+					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
+				}
+				else if (c.type === 'datasources') {
+					c.instruction = sel.select('.meta-datasources').node().innerText
 					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
 					// WE DO NOT KEEP A COPY HERE OF ALL tags
 					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })

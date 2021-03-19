@@ -361,6 +361,24 @@ const vocabulary = {
 		"es": "Lista de posibles respuestas:",
 		"pt": "Lista de respostas possíveis:"
 	},
+	"request datasources": {
+		"en": "request one or more data source(s)",
+		"fr": "demander une ou des source.s de données",
+		"es": "solicitar una o más fuente(s) de datos",
+		"pt": "solicitar uma ou mais fonte(s) de dados"
+	},
+	"expect datasources": {
+		"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
+		"fr": "<strong>Entrée directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, oru <strong>texte</strong> attendu.",
+		"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
+		"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+	},
+	"datasources instruction": { // TO DO: HOMOGENIZE THIS AS IT IS THE SAME FOR ALL META LISTS
+		"en": "List of possible responses:",
+		"fr": "Liste de réponses possibles:",
+		"es": "Lista de posibles respuestas:",
+		"pt": "Lista de respostas possíveis:"
+	},
 	"expect repeat": {
 		"en": "<strong>Direct input</strong> expected.",
 		"fr": "<strong>Entrée directe</strong> attendu.",

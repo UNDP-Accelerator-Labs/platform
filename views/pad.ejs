@@ -308,6 +308,10 @@
 					// d.options = d.options.filter(c => c.name && c.name.length)
 					items.push(c)
 				}
+				else if (c.type === 'datasources') {
+					// d.options = d.options.filter(c => c.name && c.name.length)
+					items.push(c)
+				}
 				return c
 			})
 
@@ -323,6 +327,10 @@
 		if (sdgs && !sdgs.length) sdgs = null
 		let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
 		if (tags && !tags.length) tags = null
+		let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
+		if (datasources && !datasources.length) datasources = null
+
+			console.log(datasources)
 		
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
@@ -351,6 +359,7 @@
 		if (!attr || attr === 'location') content.location = JSON.stringify(location)
 		if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
 		if (!attr || attr === 'tags') content.tags = JSON.stringify(tags)
+		if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
 		if (!attr || ['title', 'txt', 'embed', 'checklist', 'radiolist', 'tags'].includes(attr)) content.full_text = fullTxt
 
 		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS

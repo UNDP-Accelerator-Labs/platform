@@ -521,7 +521,8 @@ main#template {
 						text-align: left;
 					}
 					.meta-tags,
-					.meta-skills {
+					.meta-skills,
+					.meta-datasources {
 						width: 100%;
 						min-height: 31px;
 						padding: 5px 0 10px 0;
@@ -553,18 +554,21 @@ main#template {
 						}
 					}
 					.meta-tags:empty:not(:focus):before,
-					.meta-skills:empty:not(:focus):before {
+					.meta-skills:empty:not(:focus):before,
+					.meta-datasources:empty:not(:focus):before {
 						line-height: 31px;
 					}
 					.meta-tags.template,
-					.meta-skills.template {
+					.meta-skills.template,
+					.meta-datasources.template {
 						min-height: initial;
 						padding: 0;
 						line-height: inherit;
 						text-align: left;
 					}
 					.meta-tags.template:empty:not(:focus):before,
-					.meta-skills.template:empty:not(:focus):before {
+					.meta-skills.template:empty:not(:focus):before,
+					.meta-datasources.template:empty:not(:focus):before {
 						line-height: initial;
 					}
 					.media-repeat {
@@ -697,7 +701,8 @@ main#template {
 							}
 						}
 						.inset-tags,
-						.inset-skills {
+						.inset-skills,
+						.inset-datasources {
 							padding: 5px 10px 10px 10px;
 
 							.tag {
@@ -745,7 +750,8 @@ main#template {
 						}
 						.inset-sdgs,
 						.inset-tags,
-						.inset-skills {
+						.inset-skills,
+						.inset-datasources {
 							display: block;
 
 							.panel {
@@ -771,7 +777,8 @@ main#template {
 							}
 						}
 						.inset-tags,
-						.inset-skills {
+						.inset-skills,
+						.inset-datasources {
 							max-height: calc(300px);
 						}	
 					}

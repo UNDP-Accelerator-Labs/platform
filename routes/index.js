@@ -1494,13 +1494,13 @@ exports.process.save = (req, res) => { // TO DO: SAVE PAD TO MOBILIZATION IF REL
 	// CHECK THE PAD EXISTS
 	const { uuid } = req.session || {}
 	const { object } = req.params || {}
-	const { tags, deletion, id, mobilization } = req.body || {}
+	const { datasources, deletion, id, mobilization } = req.body || {}
 	let saveSQL
 
 	if (!id) { // INSERT OBJECT
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
-			.filter(key => !['id', 'deletion', 'mobilization'].includes(key))
+			.filter(key => !['id', 'deletion', 'mobilization', 'datasources'].includes(key))
 			.reduce((obj, key) => {
 				obj[key] = req.body[key]
 				return obj
@@ -1513,13 +1513,23 @@ exports.process.save = (req, res) => { // TO DO: SAVE PAD TO MOBILIZATION IF REL
 		;`, [`${object}s`, insert, uuid])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1;`, [id])
-		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization'].includes(d)), `${object}s`) + condition
+		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'datasources'].includes(d)), `${object}s`) + condition
 	}	
 
-	DB.conn.tx(t => { // TO DO: CLEAN THIS UP: NO NEED FOR THE batch
+	DB.conn.tx(t => { 
 		const batch = []
+		if (datasources) {
+			JSON.parse(datasources).forEach(d => {
+				batch.push(t.none(`
+					INSERT INTO datasources (name)
+					VALUES ($1)
+						ON CONFLICT ON CONSTRAINT datasources_name_key
+						DO NOTHING
+				;`, [d.toLowerCase()]))
+			})
+		}
+
 		batch.push(t.oneOrNone(saveSQL))
-		
 		return t.batch(batch)
 		.then(results => {
 			const newObject = results[results.length - 1]
@@ -1765,6 +1775,12 @@ if (!exports.api) exports.api = {}
 exports.api.skills = (req, res) => {
 	DB.conn.any(`
 		SELECT id, category, name FROM skills ORDER BY category, name
+	;`).then(results => res.status(200).json(results))
+	.catch(err => res.status(500).send(err))
+}
+exports.api.datasources = (req, res) => {
+	DB.conn.any(`
+		SELECT id, name, description FROM datasources ORDER BY name
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }

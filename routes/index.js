@@ -1758,6 +1758,17 @@ exports.process.validate = (req, res) => {
 		res.redirect(path)
 	}).catch(err => console.log(err))
 }
+/* =============================================================== */
+/* ============================= API ============================= */
+/* =============================================================== */
+if (!exports.api) exports.api = {}
+exports.api.skills = (req, res) => {
+	DB.conn.any(`
+		SELECT id, category, name FROM skills ORDER BY category, name
+	;`).then(results => res.status(200).json(results))
+	.catch(err => res.status(500).send(err))
+}
+
 
 // THIS WILL BE DEPRECATED
 // exports.unpublish = (req, res) => {

@@ -167,12 +167,13 @@ Meta.prototype.constructor = Meta
 Meta.prototype.expand = function (kwargs) {
 	let { timeout, maxheight, forceopen } = kwargs
 	if (!timeout) timeout = 0
+
 	window.setTimeout(_ => {
 		if (this.inset.node().style.maxHeight && !forceopen) this.inset.node().style.maxHeight = null
 		else {
 			this.inset.node().style.maxHeight = `${maxheight ? Math.min(this.inset.node().scrollHeight, maxheight) : this.inset.node().scrollHeight}px`
 			const input = this.inset.select('input[type=text]').node()
-			if (input) input.focus()
+			// if (input) input.focus()
 		}
 	}, timeout)
 }
@@ -207,6 +208,7 @@ function populateSection (data, lang = 'en', section) {
 	// }
 	if (data.type === 'sdgs') addSDGs({ data: data, lang: lang, section: section })
 	if (data.type === 'tags') addTags({ data: data, lang: lang, section: section })
+	if (data.type === 'skills') addSkills({ data: data, lang: lang, section: section })
 }
 function uploadImg (form, lang = 'en', container = null, focus = true) {
 	fetch(form.action, {
@@ -1527,7 +1529,7 @@ function addTags (kwargs) {
 	if (!type) type = 'tags'
 	if (!tags) tags = []
 
-	const input = d3.select('.media-input-group #input-meta-tags').node()
+	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
 
 	const meta = new Meta({ 
@@ -1564,7 +1566,7 @@ function addTags (kwargs) {
 		// GET(`http://localhost:3000/api/thematic_areas?lang=${lang}`)
 		GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas?lang=${lang}`)
 		.then(themes => {
-			const opts = meta.inset.addElem('div', 'inset-tags')
+			const opts = meta.inset.addElem('div', `inset-${type}`)
 				.addElems('div', 'tag', themes)
 				.classed('selected', d => tags.map(c => c.name.simplify()).includes(d.name.simplify()))
 			opts.addElem('input')
@@ -1576,35 +1578,38 @@ function addTags (kwargs) {
 					'checked': d => tags.map(c => c.name.simplify()).includes(d.name.simplify()) || null 
 				})
 			.on('change', function (d) { 
-				const checked = meta.container.selectAll('.tags-inset-container .inset-tags .tag input:checked').data()
+				const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
 				// sel.findAncestor('inset-tags').selectAll('.tag input:checked').data()
 
-				if (checked.length >= constraint) {
-					meta.container.selectAll('.tags-inset-container .inset-tags .tag input:not(:checked)')
+				if (constraint && checked.length >= constraint) {
+					meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:not(:checked)`)
 					.each(function () { 
 						this.disabled = true 
 						d3.select(this.parentNode).classed('disabled', true)
 					})
 				} else {
-					meta.container.selectAll('.tags-inset-container .inset-tags .tag input')
+					meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input`)
 					.each(function () { 
 						this.disabled = false 
 						d3.select(this.parentNode).classed('disabled', false)
 					})
 				}
-				if (checked.length <= constraint) {
+				if (!constraint || checked.length <= constraint) {
 					toggleClass(this.parentNode, 'selected')
 					const sel = d3.select(this)
 
-					sel.findAncestor('tags-container')
+					sel.findAncestor(`${type}-container`)
 						.each(c => c.tags = checked)
-						.select('.meta-tags')
+						.select(`.meta-${type}`)
 						.addElems('div', 'tag', c => c.tags, c => c)
 					.addElems('label')
 						.html(c => c.name.capitalize())
 					
-					sel.findAncestor('inset-tags').selectAll('.tag').classed('hide', false)
+					sel.findAncestor(`inset-${type}`).selectAll('.tag').classed('hide', false)
 					sel.findAncestor('inset').select('input[type=text]').node().value = ''
+					// const filter = sel.findAncestor('inset').select('input[type=text]').node()
+					// filter.value = ''
+					// filter.blur()
 
 					if (meta.opts) {
 						meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
@@ -1615,18 +1620,19 @@ function addTags (kwargs) {
 					if (editing) switchButtons(lang)
 				}
 			})
+
 			opts.addElem('label')
 				.attrs({ 'for': d => `theme-${d.name.simplify()}` })
 				.html(d => d.name.capitalize())
 
 			const filter = meta.inset.addElem('div', 'filter-or-add')
 			filter.addElem('input')
-				.attrs({ 'type': 'text', 'name': 'theme', 'id': 'filter-field' })
+				.attrs({ 'type': 'text', 'name': 'theme', 'id': `filter-${type}-field` })
 			.on('keyup', function () {
 				const evt = d3.event
 				const val = this.value.trim().toLowerCase()
 				const sel = d3.select(this)
-				const parent = sel.findAncestor('inset').select('.inset-tags')
+				const parent = sel.findAncestor('inset').select(`.inset-${type}`)
 
 				if (val.length) {
 					const existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
@@ -1642,7 +1648,7 @@ function addTags (kwargs) {
 				const evt = d3.event
 				const val = this.value.trim().toLowerCase()
 				const sel = d3.select(this)
-				const parent = meta.inset.select('.inset-tags')
+				const parent = meta.inset.select(`.inset-${type}`)
 
 				if (evt.inputType === 'deleteContentBackward') {
 					parent.selectAll('.tag input').each(function () { 
@@ -1658,7 +1664,7 @@ function addTags (kwargs) {
 			})
 
 			filter.addElem('label')
-				.attr('for', 'filter-field')
+				.attr('for', `filter-${type}-field`)
 				.html(vocabulary['looking for something'][lang])
 
 			filter.addElems('button',  'add')
@@ -1667,10 +1673,10 @@ function addTags (kwargs) {
 				.html('add_circle_outline')
 
 			function addTag (existingTags) {
-				const sel = d3.select('input#filter-field')
+				const sel = d3.select(`input#filter-${type}-field`)
 				const val = sel.node().value.trim().toLowerCase()
-				const parent = meta.inset.select('.inset-tags')
-				const prechecked = meta.container.selectAll('.tags-inset-container .inset-tags .tag input:checked').data()
+				const parent = meta.inset.select(`.inset-${type}`)
+				const prechecked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
 
 				if (!existingTags) {
 					existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
@@ -1679,10 +1685,10 @@ function addTags (kwargs) {
 					})
 				}
 
-				if (!existingTags.includes(val)) { // TO DO: PREVENT ADDING EXTRA TAGS HERE
+				if (!existingTags.includes(val)) { 
 					const opt = parent.insertElem('input[type=text]', 'div', 'tag')
 						.datum({ name: val })
-						.classed('selected', prechecked.length < constraint)
+						.classed('selected', !constraint || prechecked.length < constraint)
 					opt.addElem('input')
 					.attrs({ 
 						'id': c => c.name.simplify(), 
@@ -1691,51 +1697,54 @@ function addTags (kwargs) {
 						'value': c => c.name
 					}).each(function () {
 						const sel = d3.select(this)
-						if (prechecked.length >= constraint) {
-							meta.container.selectAll('.tags-inset-container .inset-tags .tag input:not(:checked)')
+						if (constraint && prechecked.length >= constraint) {
+							meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:not(:checked)`)
 							.each(function () { 
 								this.disabled = true 
 								d3.select(this.parentNode).classed('disabled', true)
 							})
 						} else {
 							sel.attr('checked', true)
-							meta.container.selectAll('.tags-inset-container .inset-tags .tag input')
+							meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input`)
 							.each(function () { 
 								this.disabled = false 
 								d3.select(this.parentNode).classed('disabled', false)
 							})
 						}
 					}).on('change', function () { 
-						const checked = meta.container.selectAll('.tags-inset-container .inset-tags .tag input:checked').data()
+						const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
 
-						if (checked.length >= constraint) {
-							meta.container.selectAll('.tags-inset-container .inset-tags .tag input:not(:checked)')
+						if (constraint && checked.length >= constraint) {
+							meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:not(:checked)`)
 							.each(function () { 
 								this.disabled = true 
 								d3.select(this.parentNode).classed('disabled', true)
 							})
 						} else {
-							meta.container.selectAll('.tags-inset-container .inset-tags .tag input')
+							meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input`)
 							.each(function () { 
 								this.disabled = false 
 								d3.select(this.parentNode).classed('disabled', false)
 							})
 						}
-						if (checked.length <= constraint) {
+						if (!constraint || checked.length <= constraint) {
 							toggleClass(this.parentNode, 'selected')
 							const sel = d3.select(this)
 
 							meta.container
 								.each(c => c.tags = checked)
-								.select('.meta-tags')
+								.select(`.meta-${type}`)
 								.addElems('div', 'tag', c => c.tags, c => c)
 							.addElems('label')
 								.html(c => c.name.capitalize())
 							
-							sel.findAncestor('inset-tags').selectAll('.tag').classed('hide', false)
+							sel.findAncestor(`inset-${type}`).selectAll('.tag').classed('hide', false)
 							sel.findAncestor('inset').select('input[type=text]').node().value = ''
+							// const filter = sel.findAncestor('inset').select('input[type=text]').node()
+							// filter.value = ''
+							// filter.blur()
 
-							if (meta.opts) {
+							if (meta.opts && constraint) {
 								meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
 									return d.value - checked.length
 								})
@@ -1744,21 +1753,22 @@ function addTags (kwargs) {
 							if (editing) switchButtons(lang)
 						}
 					})
+
 					opt.addElem('label')
 						.attr('for', c => c.name.simplify())
 						.html(c => c.name.capitalize())
 				} else {
-					if (prechecked.length < constraint) {
+					if (!constraint || prechecked.length < constraint) {
 						parent.selectAll('.tag input[type=checkbox]').filter(function () { return this.value.simplify() === val.simplify() })
 							.attr('checked', true)
 						.each(function () { d3.select(this.parentNode).classed('selected', true) })
 					}
 				}
 				// UPDATE THE CHIPS THAT ARE DISPLAYED
-				const checked = meta.container.selectAll('.tags-inset-container .inset-tags .tag input:checked').data()
+				const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
 				meta.container
 					.each(c => c.tags = checked)
-					.select('.meta-tags')
+					.select(`.meta-${type}`)
 					.addElems('div', 'tag', c => c.tags, c => c)
 				.addElems('label')
 					.html(c => c.name.capitalize())
@@ -1768,8 +1778,202 @@ function addTags (kwargs) {
 				sel.node().value = ''
 				parent.selectAll('.tag').classed('hide', false)
 
-				if (meta.opts) {
-					const checked = meta.container.selectAll('.tags-inset-container .inset-tags .tag input:checked').data()
+				if (meta.opts && constraint) {
+					const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
+					meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
+						return d.value - checked.length
+					})
+				}
+
+				if (editing) switchButtons(lang)	
+			}
+		})
+	}
+}
+function addSkills (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
+	let { type, instruction, tags, skills, constraint } = data || {}
+	if (!type) type = 'skills'
+	if (!tags) tags = []
+
+	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
+	if (input) input.disabled = true
+
+	const meta = new Meta({ 
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		type: type, 
+		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint },
+		focus: focus || false,
+		lang: lang 
+	})
+
+	if (meta.opts) {
+		meta.opts.addElem('div', 'opt-group')
+			.datum(vocabulary['click to see options'][lang])
+		.addElems('label', 'instruction')
+			.html(d => d)
+
+		if (constraint) {
+			const opt = meta.opts.addElem('div', 'opt-group')
+				.datum({ key: 'constraint', label: 'block', value: constraint })
+				.addElems('button', 'opt active')
+			opt.addElems('i', 'material-icons')
+				.html(d => d.label)
+			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+				.html(d => d.value - tags.length)
+		}
+	}
+
+	meta.media.attr('data-placeholder', vocabulary['missing tag'][lang])
+	.addElems('div', 'tag', c => c.tags, c => c)
+	.addElems('label')
+		.html(c => c.name ? `${c.category.capitalize()}: <strong>${c.name.capitalize()}</strong>` : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
+		// .html(c => c.name ? c.name.capitalize() : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
+
+	if (meta.inset) {
+		GET(`/api/skills?lang=${lang}`)
+		.then(skills => {
+			const opts = meta.inset.addElem('div', `inset-${type}`)
+				.addElems('div', 'tag', skills)
+				.classed('selected', d => tags.map(c => c.name.simplify()).includes(d.name.simplify()))
+			opts.addElem('input')
+				.attrs({ 
+					'id': d => `theme-${d.name.simplify()}`, 
+					'type': 'checkbox', 
+					'name': 'theme', 
+					'value': d => d.name, 
+					'checked': d => tags.map(c => c.name.simplify()).includes(d.name.simplify()) || null 
+				})
+			.on('change', function (d) { 
+				const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
+
+				if (constraint && checked.length >= constraint) { // TO DO: CHECK
+					meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:not(:checked)`)
+					.each(function () { 
+						this.disabled = true 
+						d3.select(this.parentNode).classed('disabled', true)
+					})
+				} else {
+					meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input`)
+					.each(function () { 
+						this.disabled = false 
+						d3.select(this.parentNode).classed('disabled', false)
+					})
+				}
+				if (!constraint || checked.length <= constraint) { // TO DO: CHECK
+					toggleClass(this.parentNode, 'selected')
+					const sel = d3.select(this)
+
+					sel.findAncestor(`${type}-container`)
+						.each(c => c.tags = checked)
+						.select(`.meta-${type}`)
+						.addElems('div', 'tag', c => c.tags, c => c)
+					.addElems('label')
+						.html(c => `${c.category.capitalize()}: <strong>${c.name.capitalize()}</strong>`)
+					
+					sel.findAncestor(`inset-${type}`).selectAll('.tag').classed('hide', false)
+					sel.findAncestor('inset').select('input[type=text]').node().value = ''
+					// const filter = sel.findAncestor('inset').select('input[type=text]').node()
+					// filter.value = ''
+					// filter.blur()
+
+					if (meta.opts && constraint) {
+						meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
+							return d.value - checked.length
+						})
+					}
+					
+					if (editing) switchButtons(lang)
+				}
+			})
+
+			opts.addElem('label')
+				.attrs({ 'for': d => `theme-${d.name.simplify()}` })
+				.html(d => `${d.category.capitalize()}: <strong>${d.name.capitalize()}</strong>`)
+
+			const filter = meta.inset.addElem('div', 'filter-or-add')
+			filter.addElem('input')
+				.attrs({ 'type': 'text', 'name': 'theme', 'id': `filter-${type}-field` })
+			.on('keyup', function () {
+				const evt = d3.event
+				const val = this.value.trim().toLowerCase()
+				const sel = d3.select(this)
+				const parent = sel.findAncestor('inset').select(`.inset-${type}`)
+
+				if (val.length) {
+					const existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
+					parent.selectAll('.tag input').each(function () { 
+						existingTags.push(this.value.toLowerCase())
+						if (!this.value.toLowerCase().includes(val)) {
+							d3.select(this.parentNode).classed('hide', true)
+						}
+					})
+					if (evt.code === 'Enter' || evt.keyCode === 13) addTag(existingTags)
+				}
+			}).on('input', function () {
+				const evt = d3.event
+				const val = this.value.trim().toLowerCase()
+				const sel = d3.select(this)
+				const parent = meta.inset.select(`.inset-${type}`)
+
+				if (evt.inputType === 'deleteContentBackward') {
+					parent.selectAll('.tag input').each(function () { 
+						if (this.value.toLowerCase().includes(val) || !(val && val.length)) {
+							d3.select(this.parentNode).classed('hide', false)
+						}
+					})
+					// UPDATE THE MAX HEIGHT OF THE INSET
+					meta.expand({ forceopen: true })
+				}
+			}).on('blur', function () {
+				fixLabel(this)
+			})
+
+			filter.addElem('label')
+				.attr('for', `filter-${type}-field`)
+				.html(vocabulary['looking for something'][lang])
+
+			filter.addElems('button',  'add')
+				.on('click', _ => addTag())
+			.addElems('i', 'material-icons')
+				.html('add_circle_outline')
+
+			function addTag (existingTags) {
+				const sel = d3.select(`input#filter-${type}-field`) // TO DO: THIS IS NO LONGER UNIQUE
+				const val = sel.node().value.trim().toLowerCase()
+				const parent = meta.inset.select(`.inset-${type}`)
+				const prechecked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
+
+				if (!existingTags) {
+					existingTags = [] // THIS HELPS FILTER OUT TAGS AS THE USER IS TYPING
+					parent.selectAll('.tag input').each(function () { 
+						existingTags.push(this.value.toLowerCase())
+					})
+				}
+
+				if (existingTags.includes(val)) { 
+					if (prechecked.length < constraint || !constraint) { // TO DO: CHECK
+						parent.selectAll('.tag input[type=checkbox]').filter(function () { return this.value.simplify() === val.simplify() })
+							.attr('checked', true)
+						.each(function () { d3.select(this.parentNode).classed('selected', true) })
+					}
+				}
+				// UPDATE THE CHIPS THAT ARE DISPLAYED
+				const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
+				meta.container
+					.each(c => c.tags = checked)
+					.select(`.meta-${type}`)
+					.addElems('div', 'tag', c => c.tags, c => c)
+				.addElems('label')
+					.html(c => `${c.category.capitalize()}: <strong>${c.name.capitalize()}</strong>`)
+				// UPDATE THE MAX HEIGHT OF THE INSET
+				meta.expand({ timeout: 250, forceopen: true })
+
+				sel.node().value = ''
+				parent.selectAll('.tag').classed('hide', false)
+
+				if (meta.opts && constraint) {
+					const checked = meta.container.selectAll(`.${type}-inset-container .inset-${type} .tag input:checked`).data()
 					meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
 						return d.value - checked.length
 					})

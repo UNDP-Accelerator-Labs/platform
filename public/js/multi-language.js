@@ -343,6 +343,24 @@ const vocabulary = {
 		"es": "Lista de posibles respuestas:",
 		"pt": "Lista de respostas possíveis:"
 	},
+	"request skills": {
+		"en": "request one or more skill tag(s)",
+		"fr": "demander une ou des étiquette.s de compétence.s",
+		"es": "solicitar una o más etiqueta(s) de habilidades",
+		"pt": "solicitar uma ou mais etiqueta(s) de habilidades"
+	},
+	"expect skills": {
+		"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
+		"fr": "<strong>Entrée directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, oru <strong>texte</strong> attendu.",
+		"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
+		"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+	},
+	"skills instruction": {
+		"en": "List of possible responses:",
+		"fr": "Liste de réponses possibles:",
+		"es": "Lista de posibles respuestas:",
+		"pt": "Lista de respostas possíveis:"
+	},
 	"expect repeat": {
 		"en": "<strong>Direct input</strong> expected.",
 		"fr": "<strong>Entrée directe</strong> attendu.",

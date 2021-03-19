@@ -189,6 +189,7 @@ function populateSection (data, lang = 'en', section) {
 	if (data.type === 'location') addMap({ data: data, lang: lang, section: section })
 	if (data.type === 'sdgs') addSDGs({ data: data, lang: lang, section: section })
 	if (data.type === 'tags') addTags({ data: data, lang: lang, section: section })
+	if (data.type === 'skills') addSkills({ data: data, lang: lang, section: section })
 }
 function autofillTitle () {
 	if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
@@ -871,6 +872,85 @@ function addTags (kwargs) {
 				sel.addElems('div', 'grow')
 					.addElems('label')
 					.html(d.name.capitalize())
+			})
+		}
+	})
+}
+function addSkills (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
+	let { type, skills, instruction, constraint } = data || {}
+	if (!type) type = 'skills'
+	if (!skills) skills = []
+	if (!instruction) instruction = ''
+
+	GET(`/api/skills?lang=${lang}`) // TECHNICALLY lang HERE DOES NOT DO ANYTHING
+	.then(skills => {
+		const input = d3.select('.media-input-group #input-meta-skills').node()
+		if (input) input.disabled = true
+
+		const meta = new Meta({ 
+			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+			type: type, 
+			datum: { type: type, skills: skills, instruction: instruction, constraint: constraint },
+			focus: focus || false,
+			lang: lang
+		})
+
+		if (meta.opts) {
+			const opts = meta.opts.addElems('div', 'opt-group', [
+				[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+				[{ key: 'constraint', label: 'block', value: constraint }]
+			]).addElems('button', 'opt', d => d)
+			.classed('active', d => {
+				if (d.key === 'constraint') return constraint ? true : false
+			}).attr('type', 'button')
+				.each(function (d) { d3.select(this).classed(d.value, true) })
+			.on('click', async function (d) {
+				const sel = d3.select(this)
+				const datum = meta.container.datum()
+				
+				if (d.key === 'constraint') {
+					if (!sel.classed('active')) {
+						const message = `Limit the input to <input type='number' name='length' value=${datum.constraint || skills.length} min=1> tags.`
+						const opts = [{ node: 'button', type: 'button', label: 'Limit length', resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+						const new_constraint = await renderPromiseModal({ message: message, opts: opts })
+
+						datum.constraint = +new_constraint
+						sel.addElems('span', 'constraint').html(new_constraint)
+					} else {
+						datum.constraint = null
+						sel.select('span', 'constraint').remove()
+					}
+					toggleClass(this, 'active')
+				}
+
+				if (editing) partialSave('media')
+			})
+			opts.addElems('i', 'material-icons')
+				.html(d => d.label)
+			opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+				.html(d => d.value)
+		}
+
+		meta.media.attrs({ 
+			'data-placeholder': d => vocabulary[`request ${type}`][lang], // TO DO
+			'contenteditable': editing ? true : null 
+		}).html(d => d.instruction)
+
+		if (meta.inset) {
+			const panel = meta.inset.addElems('div', `inset-${type}`)
+				.addElems('ul', 'panel')
+			panel.addElems('li', 'instruction', [{ value: vocabulary['tags instruction'][lang] }]) // TO DO: CHANGE THIS
+				.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
+			panel.addElems('li', 'opt', d => d.skills)
+			.each(function (d, i) {
+				const sel = d3.select(this)
+				sel.addElems('div')
+					.addElems('label')
+					.html(`<strong>${i + 1}.</strong>`)
+				sel.addElems('div', 'grow')
+					.addElems('label')
+					.html(`${d.category.capitalize()}: ${d.name.capitalize()}`)
 			})
 		}
 	})

@@ -79,20 +79,17 @@ app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOU
 
 
 
-
-
 // THIS IS DEPRECATED
-
-
 app.post('/upload/img', upload.array('img'), routes.process.upload)
 app.post('/upload/video', upload.array('video'), routes.process.upload)
 app.post('/screenshot', routes.process.screenshot)
 
-// app.put('/unpublish', routes.unpublish)
-
 app.post('/storeImport', routes.render.login, routes.storeImport)
 app.post('/forwardGeocoding', routes.forwardGeocoding) // TO DO: SET THIS UP IN PAD
 
+
+// API
+app.get('/api/skills', routes.api.skills)
 
 
 

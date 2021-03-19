@@ -73,6 +73,7 @@
 					<div class='vertical-separator'></div>
 					<button id='input-meta-sdgs' title='Request one or more SDG tag(s).'><i class='material-icons'>public</i></button>
 					<button id='input-meta-tags' title='Request one or more thematic area tag(s).'><i class='material-icons'>style</i></button>
+					<button id='input-meta-skills' title='Request one or more skill tag(s).'><i class='material-icons'>engineering</i></button>
 				</div>
 			<% } %>
 			
@@ -165,6 +166,10 @@
 	.on('click', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
 	.on('touchend', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
 
+	d3.select('.media-input-group #input-meta-skills')
+	.on('click', _ => addSkills({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addSkills({ lang: '<%- locals.lang %>', focus: true }))
+
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
 	d3.select('.foot .deploy ul li a#template-deploy')
 	.on('click', _ => {
@@ -235,6 +240,7 @@
 				if (e.key === 't' || e.keyCode === 84) main.select('.media-input-group label[for=input-media-txt]').classed('highlight', true)
 				if (e.key === 'l' || e.keyCode === 76) main.select('.media-input-group label[for=input-media-checklist]').classed('highlight', true)
 				if (e.key === 'r' || e.keyCode === 82) main.select('.media-input-group label[for=input-media-radiolist]').classed('highlight', true)
+				if (e.key === 'e' || e.keyCode === 69) main.select('.media-input-group label[for=input-media-embed]').classed('highlight', true)
 			}
 		}
 	})
@@ -354,6 +360,12 @@
 				}
 				else if (c.type === 'tags') {
 					c.instruction = sel.select('.meta-tags').node().innerText
+					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
+					// WE DO NOT KEEP A COPY HERE OF ALL tags
+					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
+				}
+				else if (c.type === 'skills') {
+					c.instruction = sel.select('.meta-skills').node().innerText
 					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
 					// WE DO NOT KEEP A COPY HERE OF ALL tags
 					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })

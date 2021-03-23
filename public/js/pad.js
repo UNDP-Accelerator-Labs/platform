@@ -1911,7 +1911,6 @@ function addGroup (kwargs) {
 
 	if (templated && repeat) {
 		if (editing) {
-			console.log(media.media.node())
 			media.media.addElems('div', 'add-opt')
 				.on('click', function (d) {
 					const sel = d3.select(this)

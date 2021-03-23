@@ -4,7 +4,8 @@ nav#languages {
 	height: 30px;
 	top: 0;
 	font-size: $t-small;
-	background-color: $c-dark-1;
+	/*background-color: $c-dark-1;*/
+	background-color: $c-dark-blue;
 	text-align: center;
 	z-index: 10000;
 
@@ -19,12 +20,14 @@ nav#languages {
 				color: #FFF;
 			}
 			a.active {
+				color: $c-light-green;
 				text-decoration: underline;
 			}
 		}
 		li.disabled {
 			a {
-				color: $c-mid-2;
+				/*color: $c-mid-2;*/
+				color: $c-mid-grey;
 				cursor: default;
 			}
 			a.active {
@@ -36,7 +39,7 @@ nav#languages {
 header {
 	position: fixed;
 	width: 100%;
-	height: 65px;
+	height: 45px;
 	top: 30px;
 	background-color: #FFF;
 	box-shadow: 0 10px 10px rgba(175,175,175,.15);
@@ -45,7 +48,7 @@ header {
 	.primary {
 		width: 100%;
 		height: 45px;
-		padding: 10px 0;
+		padding: 0;
 		overflow: hidden;
 		text-align: center;
 		font-size: 0;
@@ -54,9 +57,10 @@ header {
 			display: inline-block;
 			vertical-align: top;
 			height: 45px;
-			margin-right: 15px;
+			/*margin-right: 15px;*/
 			text-align: center;
 			font-size: $t-main;
+			border-top: 5px solid transparent;
 
 			a {
 				position: relative;
@@ -66,7 +70,8 @@ header {
 					outline: none;
 					height: 45px;
 					background-color: transparent;
-					border-radius: 5px;
+					/*border-radius: 5px;*/
+					margin-top: -5px;
 					padding: 0 30px;
 					font-size: $t-main;
 					cursor: pointer;
@@ -75,27 +80,34 @@ header {
 				i {
 					vertical-align: middle;
 					margin: 0 -5px 0 5px;
-					color: $c-mid-1;
+					/*color: $c-mid-1;*/
+					color: $c-light-red;
 				}
 			}
 		}
+		li.user-id {
+			border-top: 0;
+			margin-right: 15px;
+		}
 		li:not(.active):not(.temp-active):hover {
+			border-top-color: $c-mid-blue;
 			button {
-				background-color: $c-light-2;
+				/*background-color: $c-light-2;*/
+				/*background-color: $c-light-red;*/
 			}
 		}
 		li.active {
-			/*border-color: $c-dark-1;*/
+			background-color: $c-dark-blue;
 			button {
-				background-color: $c-dark-1;
+				/*background-color: $c-dark-1;*/
+				
 				color: #FFF;
 			}
 		}
 		li.temp-active {
-			/*border-color: $c-mid-2;*/
+			border-color: $c-mid-blue;
 			button {
 				/*background-color: $c-mid-2-light;*/
-				background-color: $c-light-2;
 				/*color: $c-mid-2;*/
 			}
 		}
@@ -131,10 +143,12 @@ header {
 
 			a {
 				flex-grow: 1;
-				color: $c-dark-1;
+				/*color: $c-dark-1;*/
+				color: $c-dark-blue;
 
 				li {
 					height: 30px;
+					/*background-color: $c-light-2;*/
 					background-color: $c-light-2;
 					line-height: 30px;
 					font-size: $t-small;

@@ -1909,55 +1909,9 @@ function addGroup (kwargs) {
 		lang: lang
 	})
 
-	// if (media.opts) {
-	// 	const opts = media.opts.addElems('div', 'opt-group', _ => {
-	// 		const font_styles = [ { key: 'font-properties', label: 'add', value: 'scale-up' }, { key: 'font-properties', label: 'remove', value: 'scale-down' }, { key: 'font-properties', label: 'format_bold', value: 'bold' }, { key: 'font-properties', label: 'format_italic', value: 'italic' } ]
-	// 		const para_styles = [ { key: 'h-align', label: 'format_align_left', value: 'left' }, { key: 'h-align', label: 'format_align_center', value: 'center' }, { key: 'h-align', label: 'format_align_right', value: 'right' } ]
-	// 		if (constraint) para_styles.push({ key: 'constraint', label: 'block', value: constraint })
-	// 		return [font_styles, para_styles]
-	// 	}).addElems('button', 'opt', d => d)
-	// 		.classed('active', d => {
-	// 			if (d.key === 'font-properties') {
-	// 				if (d.value.includes('scale')) return true
-	// 				if (fontweight && d.value === fontweight) return true
-	// 				if (fontstyle && d.value === fontstyle) return true
-	// 			} else if (d.key === 'h-align') return textalign ? d.value === textalign : d.value === 'left'
-	// 			else if (d.key === 'constraint') return constraint ? true : false
-	// 		}).attr('type', 'button')
-	// 	.each(function (d) { d3.select(this).classed(d.value, true) })
-	// 	.on('click', function (d) {
-	// 		const sel = d3.select(this)
-	// 		if (d.key === 'font-properties') {
-	// 			sel.classed('active', d.value.includes('scale') || !sel.classed('active'))
-
-	// 			media.media.each(c => {
-	// 				if (d.value === 'scale-up') c.fontsize += .1	
-	// 				if (d.value === 'scale-down') c.fontsize -= .1	
-	// 				if (d.value === 'bold') c.fontweight = sel.classed('active') ? d.value : 'normal'
-	// 				if (d.value === 'italic') c.fontstyle = sel.classed('active') ? d.value : 'normal'
-	// 			}).styles({	
-	// 				'min-height': c => `${c.fontsize}rem`, 
-	// 				'font-size': c => `${c.fontsize}rem`, 
-	// 				'line-height': c => `${c.fontsize * 1.35}rem`,
-	// 				'font-weight': c => c.fontweight,
-	// 				'font-style': c => c.fontstyle,
-	// 				'text-align': c => c.textalign
-	// 			}).node().focus()
-	// 		} else if (d.key === 'h-align') {
-	// 			sel.findAncestor('opt-group').selectAll('.opt').classed('active', function () { return this == sel.node() })
-	// 			media.media.style('text-align', c => c.textalign = d.value).node().focus()
-	// 		}
-			
-	// 		if (editing && d.key !== 'constraint') switchButtons(lang)
-	// 	})
-	// 	opts.addElems('i', 'material-icons')
-	// 		.html(d => d.label)
-	// 	opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
-	// 		.html(d => d.value - txt.length)
-	// }
-
 	if (templated && repeat) {
 		if (editing) {
+			console.log(media.media.node())
 			media.media.addElems('div', 'add-opt')
 				.on('click', function (d) {
 					const sel = d3.select(this)
@@ -2009,7 +1963,6 @@ function addGroup (kwargs) {
 			if (editing) partialSave('media')
 		}
 	}
-
 }
 
 // SAVING BUTTON

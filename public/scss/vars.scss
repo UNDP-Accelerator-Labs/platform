@@ -60,13 +60,13 @@ $c-light-3: #F0F0F0;
 }
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
 	font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
-	color: $c-dark-1;
+	color: $c-dark-blue;
 }
 ul {
 	list-style: none;
 }
 a {
-	color: $c-mid-1;
+	color: $c-light-red;
 	text-decoration: none;
 }
 a:hover {
@@ -143,7 +143,8 @@ input:-webkit-autofill:active  {
 *:empty:not(:focus):before {
 	content: attr(data-placeholder);
 	font-weight: 400;
-	color: $c-light-1;
+	/*color: $c-light-1;*/
+	color: $c-light-grey;
 	pointer-events: none;
 }
 /* https://loading.io/css/ */
@@ -161,7 +162,8 @@ input:-webkit-autofill:active  {
 	width: 13px;
 	height: 13px;
 	border-radius: 50%;
-	background: $c-mid-2;
+	/*background: $c-mid-2;*/
+	background: $c-light-green;
 	animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 .lds-ellipsis div:nth-child(1) {

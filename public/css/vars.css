@@ -41,7 +41,7 @@ $c-light-3: #F0F0F0;*/
 
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
   font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-  color: #333D51;
+  color: #0A4C73;
 }
 
 ul {
@@ -49,7 +49,7 @@ ul {
 }
 
 a {
-  color: #934A5F;
+  color: #F03C8C;
   text-decoration: none;
 }
 
@@ -123,7 +123,8 @@ input:-webkit-autofill:active {
 *:empty:not(:focus):before {
   content: attr(data-placeholder);
   font-weight: 400;
-  color: #C2B4D6;
+  /*color: $c-light-1;*/
+  color: #969696;
   pointer-events: none;
 }
 
@@ -143,7 +144,8 @@ input:-webkit-autofill:active {
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: #57648C;
+  /*background: $c-mid-2;*/
+  background: #B4DC28;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 

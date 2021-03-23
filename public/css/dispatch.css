@@ -1,5 +1,14 @@
 @charset "UTF-8";
-@import url("https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
+/*@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');*/
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+/*$c-dark-1: $c-dark-blue;
+$c-mid-1: $c-dark-red;
+$c-mid-2: $c-light-green;
+$c-mid-2-light: rgba(87,100,140,.25);
+$c-mid-3: #F4ED6E;
+$c-light-1: $c-light-red;
+$c-light-2: #E5E5E5;
+$c-light-3: #F0F0F0;*/
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -32,7 +41,7 @@
 }
 
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
-  font-family: "Overpass", Helvetica, Arial, sans-serif;
+  font-family: "Noto Sans", Helvetica, Arial, sans-serif;
   color: #333D51;
 }
 
@@ -1003,6 +1012,7 @@ main#template .inner .body .layout .section-header label {
     left: 0;
     padding: 5px 10px;
     outline: none;
+    /*background-color: $c-dark-blue;*/
     background-color: #57648C;
     font-size: 16px;
     color: #FFF;
@@ -1052,9 +1062,13 @@ main#template .inner .body .layout .meta-container .opts .opt-group .opt i {
     line-height: 30px;
   }
   main#pad .inner .body .layout .media-container .opts .opt-group .opt .constraint,
+main#pad .inner .body .layout .media-container .opts .opt-group .opt .repeat,
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt .constraint,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt .repeat,
 main#template .inner .body .layout .media-container .opts .opt-group .opt .constraint,
-main#template .inner .body .layout .meta-container .opts .opt-group .opt .constraint {
+main#template .inner .body .layout .media-container .opts .opt-group .opt .repeat,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt .constraint,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt .repeat {
     position: absolute;
     bottom: 100%;
     left: 0;
@@ -1122,6 +1136,14 @@ main#template .inner .body .layout .meta-container .add-opt i {
     display: none;
     line-height: 30px;
     cursor: pointer;
+  }
+  main#pad .inner .body .layout .media-container .instruction,
+main#pad .inner .body .layout .meta-container .instruction,
+main#template .inner .body .layout .media-container .instruction,
+main#template .inner .body .layout .meta-container .instruction {
+    /*font-size: $t-small;*/
+    /*font-weight: 700;*/
+    color: #934A5F;
   }
   main#pad .inner .body .layout .media-container .media,
 main#pad .inner .body .layout .media-container .meta,
@@ -2127,6 +2149,27 @@ main#template .inner .body .layout .meta-container .response.template {
     color: #57648C;
     /*text-align: right;*/
     font-size: 12px;
+  }
+  main#pad .inner .body .layout .group-container .media-group,
+main#template .inner .body .layout .group-container .media-group {
+    /*font-size: $t-mid;*/
+    margin-bottom: 15px;
+  }
+  main#pad .inner .body .layout .group-container .media-group-items,
+main#template .inner .body .layout .group-container .media-group-items {
+    width: calc(100% - 30px);
+    margin: 15px 0 15px 30px;
+  }
+  main#pad .inner .body .layout .group-container .media-group-items .media-container::before,
+main#pad .inner .body .layout .group-container .media-group-items .meta-container::before,
+main#template .inner .body .layout .group-container .media-group-items .media-container::before,
+main#template .inner .body .layout .group-container .media-group-items .meta-container::before {
+    content: "";
+    position: absolute;
+    left: -30px;
+    width: 1px;
+    height: 100%;
+    background-color: #C2B4D6;
   }
   main#pad .inner .body .layout .media-container.focus .opts,
 main#pad .inner .body .layout .media-container:hover .opts,

@@ -1,4 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
+/*@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');*/
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+/*$c-dark-1: $c-dark-blue;
+$c-mid-1: $c-dark-red;
+$c-mid-2: $c-light-green;
+$c-mid-2-light: rgba(87,100,140,.25);
+$c-mid-3: #F4ED6E;
+$c-light-1: $c-light-red;
+$c-light-2: #E5E5E5;
+$c-light-3: #F0F0F0;*/
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -31,7 +40,7 @@
 }
 
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
-  font-family: "Overpass", Helvetica, Arial, sans-serif;
+  font-family: "Noto Sans", Helvetica, Arial, sans-serif;
   color: #333D51;
 }
 

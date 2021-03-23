@@ -244,6 +244,7 @@ main#template {
 						left: 0;
 						padding: 5px 10px;
 						outline: none;
+						/*background-color: $c-dark-blue;*/
 						background-color: $c-mid-2;
 						font-size: $t-main;
 						color: #FFF;
@@ -279,7 +280,8 @@ main#template {
 									font-size: $t-main;
 									line-height: 30px;
 								}
-								.constraint {
+								.constraint,
+								.repeat {
 									position: absolute;
 									bottom: 100%;
 									left: 0;
@@ -334,6 +336,11 @@ main#template {
 							line-height: 30px;
 							cursor: pointer;
 						}
+					}
+					.instruction {
+						/*font-size: $t-small;*/
+						/*font-weight: 700;*/
+						color: $c-mid-1;
 					}
 					.media,
 					.meta {
@@ -789,6 +796,26 @@ main#template {
 						color: $c-mid-2;
 						/*text-align: right;*/
 						font-size: $t-small;
+					}
+				}
+				.group-container {
+					.media-group {
+						/*font-size: $t-mid;*/
+						margin-bottom: 15px;
+					}
+					.media-group-items {
+						width: calc(100% - 30px);
+						margin: 15px 0 15px 30px;
+
+						.media-container::before,
+						.meta-container::before {
+							content: '';
+							position: absolute;
+							left: -30px;
+							width: 1px;
+							height: 100%;
+							background-color: $c-light-1;
+						}
 					}
 				}
 				.media-container.focus,

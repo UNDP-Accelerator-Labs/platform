@@ -62,6 +62,7 @@
 				<div class='media-input-group input-group'>
 					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
 					<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
+					<button id='input-meta-group' title='Add a group of inputs.'><i class='material-icons'>dynamic_form</i></button>
 						
 					<div class='vertical-separator'></div>
 					<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
@@ -126,6 +127,11 @@
 	.on('click', _ => addSection({ data: { repeat: true }, lang: '<%- locals.lang %>', focus: true }))
 	.on('touchend', _ => addSection({ data: { repeat: true }, lang: '<%- locals.lang %>', focus: true }))
 
+	d3.select('.media-input-group #input-meta-group')
+	.on('click', _ => addGroup({ lang: '<%- locals.lang %>', focus: true }))
+	.on('touchend', _ => addGroup({ lang: '<%- locals.lang %>', focus: true }))
+
+
 	d3.select('.media-input-group #input-media-img')
 	.on('click', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
 	.on('touchend', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
@@ -174,6 +180,7 @@
 	d3.select('.media-input-group #input-meta-datasources')
 	.on('click', _ => addDataSources({ lang: '<%- locals.lang %>', focus: true }))
 	.on('touchend', _ => addDataSources({ lang: '<%- locals.lang %>', focus: true }))
+
 
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
 	d3.select('.foot .deploy ul li a#template-deploy')
@@ -290,6 +297,7 @@
 	window.addEventListener('mouseup', function (e) {
 		e = e || event
 		if (editing) {
+			console.log(e.target)
 			const target = d3.select(e.target)
 			const media = target.findAncestor('media')
 			const meta = target.findAncestor('meta')
@@ -300,7 +308,12 @@
 					.classed('focus', false)
 			}
 			const containers = main.selectAll('.media-container, .meta-container')
-				.filter(function () { return media ? this !== media.node() : meta ? this !== meta.node() : true })
+				.filter(function () { 
+					if (media) return this !== media.node()
+					else if (meta) return this !== meta.node()
+					else if (d3.select(this).classed('group-container focus') && inputgroup) return false
+					else return true
+				})
 			containers.classed('focus', false)
 				.selectAll('.inset')
 				.style('max-height', null)
@@ -309,7 +322,66 @@
 		}
 	})
 
-	function extractContent (attr) {
+	function retrieveItems (sel, datum, items) {
+		// MEDIA
+		if (datum.type === 'title') {
+			datum.instruction = sel.select('.media-title').node().innerText
+			items.push(datum)
+		}
+		else if (datum.type === 'img') {
+			datum.instruction = sel.select('.media-img').node().innerText
+			items.push(datum)
+		}
+		else if (datum.type === 'txt') {
+			datum.instruction = sel.select('.media-txt').node().innerText
+			items.push(datum)
+		}
+		else if (datum.type === 'embed') {
+			datum.instruction = sel.select('.media-embed').node().innerText
+			items.push(datum)
+		}
+		else if (datum.type === 'checklist') {
+			datum.instruction = sel.select('.media-checklist .instruction').node().innerText
+			datum.options = datum.options.filter(b => b.name && b.name.length)
+			items.push(datum)
+		}
+		else if (datum.type === 'radiolist') {
+			datum.instruction = sel.select('.media-radiolist .instruction').node().innerText
+			datum.options = datum.options.filter(b => b.name && b.name.length)
+			items.push(datum)
+		}
+		// META
+		// else if (datum.type === 'location') {
+		// 	datum.instruction = sel.select('.meta-location').node().innerText
+		// 	items.push(datum)
+		// }
+		else if (datum.type === 'sdgs') {
+			datum.instruction = sel.select('.meta-sdgs').node().innerText
+			// datum.options = sel.selectAll('.inset-sdgs .panel .opt').data()
+			// WE DO NOT KEEP A COPY HERE OF ALL sdgs
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+		}
+		else if (datum.type === 'tags') {
+			datum.instruction = sel.select('.meta-tags').node().innerText
+			// datum.options = sel.selectAll('.inset-tags .panel .opt').data()
+			// WE DO NOT KEEP A COPY HERE OF ALL tags
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+		}
+		else if (datum.type === 'skills') {
+			datum.instruction = sel.select('.meta-skills').node().innerText
+			// datum.options = sel.selectAll('.inset-tags .panel .opt').data()
+			// WE DO NOT KEEP A COPY HERE OF ALL tags
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+		}
+		else if (datum.type === 'datasources') {
+			datum.instruction = sel.select('.meta-datasources').node().innerText
+			// datum.options = sel.selectAll('.inset-tags .panel .opt').data()
+			// WE DO NOT KEEP A COPY HERE OF ALL tags
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+		}
+	}
+
+	function compileContent (attr) {
 		const content = {}
 		// COLLECT TITLE
 		const title = head.select('.title').node().innerText
@@ -324,70 +396,24 @@
 			sel.selectAll('.media-container, .meta-container')
 			.each(function (c) {
 				const sel = d3.select(this)
-
-				if (c.type === 'title') {
-					c.instruction = sel.select('.media-title').node().innerText
+				const ingroup = sel.findAncestor('group-container')	
+				// GROUPS
+				if (c.type === 'group') {
+					const groupitems = []
+					sel.selectAll('.media-group-items .media-container, .media-group-items .meta-container')
+						.each(function (b) { retrieveItems(d3.select(this), b, groupitems) })
+					c.instruction = sel.select('.media-group').node().innerText
+					c.structure = groupitems
 					items.push(c)
+				} else {
+					if (!ingroup) retrieveItems(sel, c, items)
 				}
-				else if (c.type === 'img') {
-					c.instruction = sel.select('.media-img').node().innerText
-					items.push(c)
-				}
-				else if (c.type === 'txt') {
-					c.instruction = sel.select('.media-txt').node().innerText
-					console.log(c)
-					items.push(c)
-				}
-				else if (c.type === 'embed') {
-					c.instruction = sel.select('.media-embed').node().innerText
-					items.push(c)
-				}
-				else if (c.type === 'checklist') {
-					c.instruction = sel.select('.media-checklist .instruction').node().innerText
-					c.options = c.options.filter(b => b.name && b.name.length)
-					items.push(c)
-				}
-				else if (c.type === 'radiolist') {
-					c.instruction = sel.select('.media-radiolist .instruction').node().innerText
-					c.options = c.options.filter(b => b.name && b.name.length)
-					items.push(c)
-				}
-				// META
-				// else if (c.type === 'location') {
-				// 	c.instruction = sel.select('.meta-location').node().innerText
-				// 	items.push(c)
-				// }
-				else if (c.type === 'sdgs') {
-					c.instruction = sel.select('.meta-sdgs').node().innerText
-					// c.options = sel.selectAll('.inset-sdgs .panel .opt').data()
-					// WE DO NOT KEEP A COPY HERE OF ALL sdgs
-					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
-				}
-				else if (c.type === 'tags') {
-					c.instruction = sel.select('.meta-tags').node().innerText
-					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
-					// WE DO NOT KEEP A COPY HERE OF ALL tags
-					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
-				}
-				else if (c.type === 'skills') {
-					c.instruction = sel.select('.meta-skills').node().innerText
-					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
-					// WE DO NOT KEEP A COPY HERE OF ALL tags
-					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
-				}
-				else if (c.type === 'datasources') {
-					c.instruction = sel.select('.meta-datasources').node().innerText
-					// c.options = sel.selectAll('.inset-tags .panel .opt').data()
-					// WE DO NOT KEEP A COPY HERE OF ALL tags
-					items.push({ type: c.type, level: c.level, instruction: c.instruction, constraint: c.constraint })
-				}
-				return c
 			})
 
 			d.title = sel.select('.section-header label').node().innerText
 			d.lead = (sel.select('.media-lead').node() || {}).innerText
 			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
-			d.items = items
+			d.structure = items
 			sections.push(d)
 		})
 
@@ -396,25 +422,26 @@
 			${description}\n\n
 			${sections.map(d => d.title).join('\n\n').trim()}\n\n
 			${sections.map(d => d.lead).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'title')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'title')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'txt')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'txt')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'embed')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'embed')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'checklist')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'checklist')
 				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
-			${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
 				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
+			// TO DO: REPLICATE ABOVE FOR GROUPS
 		
 		// COMPILE THE CONTENT
 		if (!attr || attr === 'title') content.title = title
 		if (!attr || attr === 'description') content.description = description
-		if (!attr || ['lead', 'media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) { content.sections = JSON.stringify(sections)
+		if (!attr || ['lead', 'media', 'meta'].includes(attr) || sections.map(d => d.structure).flat().unique('type', true).includes(attr)) { content.sections = JSON.stringify(sections)
 		}
 		// ALWAYS SEND fullTxt
 		content.full_text = fullTxt
@@ -433,7 +460,7 @@
 	function partialSave (attr) {
 		console.log('saving')
 		// FIRST CHECK IF THIS IS A NEW PAD
-		const content = extractContent(attr)
+		const content = compileContent(attr)
 		console.log(content)
 		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
 		const url = new URL(window.location)
@@ -481,7 +508,7 @@
 		if (data.sections) {
 			data.sections.forEach(d => {
 				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
-				d.items.forEach(c => populateSection(c, '<%- locals.lang %>', section))
+				d.structure.forEach(c => populateSection(c, '<%- locals.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES

@@ -262,7 +262,48 @@
 		}
 	})
 
-	function extractContent (attr) {
+	function retrieveItems (sel, datum, items) {
+		// MEDIA
+		if (['img', 'mosaic', 'video'].includes(datum.type)) {
+			items.push(datum)
+		}
+		else if (datum.type === 'txt') {
+			datum.txt = sel.select('.media-txt').node().innerText
+			items.push(datum)
+		}
+		else if (datum.type === 'embed') {
+			datum.html = sel.select('.media-embed').node().innerHTML
+			items.push(datum)
+		}
+		else if (['checklist', 'radiolist'].includes(datum.type)) {
+			datum.options = datum.options.filter(b => b.name && b.name.length)
+			items.push(datum)
+		}
+		// META
+		// else if (datum.type === 'location') {
+		// 	items.push(datum)
+		// }
+		else if (datum.type === 'sdgs') {
+			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			items.push(datum)
+		}
+		else if (datum.type === 'tags') {
+			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			items.push(datum)
+		}
+		else if (datum.type === 'skills') {
+			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			items.push(datum)
+		}
+		else if (datum.type === 'datasources') {
+			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			items.push(datum)
+		}
+	}
+
+	// TO DO: STILL A PB HERE WHEN SAVING REPEAT SECTIONS OR GROUPS
+	// THE ENTERED CONTENT GETS COPIED FOR ALL REPETITIONS
+	function compileContent (attr) {
 		const content = {}
 		// COLLECT TITLE
 		const title = head.select('.title').node().innerText
@@ -273,46 +314,29 @@
 		.each(function (d) {
 			const items = []
 			const sel = d3.select(this)
+			
 			sel.selectAll('.media-container, .meta-container')
 			.each(function (c) {
 				const sel = d3.select(this)
-
-				if (['img', 'mosaic', 'video'].includes(c.type)) {
+				const ingroup = sel.findAncestor('group-container')	
+				// GROUPS
+				if (c.type === 'group') {
+					const groupitems = []
+					sel.selectAll('.media-group-items')
+						.each(function () { 
+							const sel = d3.select(this)
+							const subitems = []
+							sel.selectAll('.media-container, .meta-container')
+								.each(function (b) { 
+									retrieveItems(d3.select(this), b, subitems) 
+								})
+							groupitems.push(subitems)
+						})
+					c.items = groupitems
 					items.push(c)
+				} else {
+					if (!ingroup) retrieveItems(sel, c, items)
 				}
-				else if (c.type === 'txt') {
-					c.txt = sel.select('.media-txt').node().innerText
-					items.push(c)
-				}
-				else if (c.type === 'embed') {
-					c.html = sel.select('.media-embed').node().innerHTML
-					items.push(c)
-				}
-				else if (['checklist', 'radiolist'].includes(c.type)) {
-					c.options = c.options.filter(b => b.name && b.name.length)
-					items.push(c)
-				}
-				// META
-				// else if (c.type === 'location') {
-				// 	items.push(c)
-				// }
-				else if (c.type === 'sdgs') {
-					// d.options = d.options.filter(c => c.name && c.name.length)
-					items.push(c)
-				}
-				else if (c.type === 'tags') {
-					// d.options = d.options.filter(c => c.name && c.name.length)
-					items.push(c)
-				}
-				else if (c.type === 'skills') {
-					// d.options = d.options.filter(c => c.name && c.name.length)
-					items.push(c)
-				}
-				else if (c.type === 'datasources') {
-					// d.options = d.options.filter(c => c.name && c.name.length)
-					items.push(c)
-				}
-				return c
 			})
 
 			d.title = sel.select('.section-header label').node().innerText
@@ -322,7 +346,7 @@
 			sections.push(d)
 		})
 		
-		const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null
+		const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
 		let sdgs = main.select('.sdgs-container').node() ? main.select('.sdgs-container').datum().sdgs : null
 		if (sdgs && !sdgs.length) sdgs = null
 		let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
@@ -330,7 +354,6 @@
 		let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
 		if (datasources && !datasources.length) datasources = null
 
-			console.log(datasources)
 		
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
@@ -340,8 +363,23 @@
 				.map(d => d.txt).join('\n\n').trim()}\n\n
 			${sections.map(d => d.items).flat().filter(d => d.type === 'embed')
 				.map(d => d.html).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => ['checklist', 'radiolist'].includes(d.type))
+			${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
+				.filter(d => d.type === 'txt')
+				.map(d => d.txt).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
+				.filter(d => d.type === 'embed')
+				.map(d => d.html).join('\n\n').trim()}\n\n
+			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
+				.filter(d => d.type === 'checklist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
+				.filter(d => d.type === 'radiolist')
 				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+
 		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
 		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
 		// COMPILE THE CONTENT
@@ -352,7 +390,7 @@
 			// content.meta = JSON.stringify(meta)
 			content.sections = JSON.stringify(sections)
 		}
-		if (!attr || ['lead', 'media', 'meta'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
+		if (!attr || ['lead', 'media', 'meta', 'group'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
 			content.sections = JSON.stringify(sections)
 		}
 		// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
@@ -360,7 +398,7 @@
 		if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
 		if (!attr || attr === 'tags') content.tags = JSON.stringify(tags)
 		if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
-		if (!attr || ['title', 'txt', 'embed', 'checklist', 'radiolist', 'tags'].includes(attr)) content.full_text = fullTxt
+		if (!attr || ['title', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr)) content.full_text = fullTxt
 
 		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
 		// ALWAYS SEND status
@@ -381,7 +419,7 @@
 	function partialSave (attr) {
 		console.log('saving')
 		// FIRST CHECK IF THIS IS A NEW PAD
-		const content = extractContent(attr)
+		const content = compileContent(attr)
 		console.log(content)
 		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
 		const url = new URL(window.location)
@@ -528,7 +566,13 @@
 					.classed('focus', false)
 			}
 			const containers = main.selectAll('.media-container, .meta-container')
-				.filter(function () { return media ? this !== media.node() : meta ? this !== meta.node() : true })
+				.filter(function () { 
+					// return media ? this !== media.node() : meta ? this !== meta.node() : true 
+					if (media) return this !== media.node()
+					else if (meta) return this !== meta.node()
+					else if (d3.select(this).classed('group-container focus') && inputgroup) return false
+					else return true
+				})
 			containers.classed('focus', false)
 				.selectAll('.inset')
 				.style('max-height', null)
@@ -542,28 +586,13 @@
 		const data = <%- JSON.stringify(locals.display_template || {}) %>;
 		console.log(data)
 		if (data.sections) {
-			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items).flat().find(d => d.type === 'title').instruction)
+			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat().find(d => d.type === 'title').instruction)
 
 			data.sections.forEach(d => {
 				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
-				d.items.forEach(c => {
-					populateSection (c, '<%- locals.lang %>', section)
-					// if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// // if (d.type === 'location') {
-					// // 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-					// // 	if ((!c.centerpoint && !c.centerpoints) || 
-					// // 		(c.centerpoint && (!c.centerpoint.lat || 
-					// // 		!c.centerpoint.lng))
-					// // 	) {
-					// // 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-					// // 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-					// // 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
-					// // }
-					// if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
+				// const content = d.items || d.structure
+				d3.select(section).each(function (c) {
+					c.items.forEach(b => populateSection (b, '<%- locals.lang %>', this))	
 				})
 			})
 		}
@@ -578,32 +607,9 @@
 		published = data.published
 
 		if (data.sections) {
-			console.log(data.sections)
 			data.sections.forEach(d => {
 				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
-				d.items.forEach(c => {
-					populateSection (c, '<%- locals.lang %>', section)
-					// if (c.type === 'img') addImg({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'mosaic') addMosaic({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'video') addVideo({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'txt') addTxt({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'embed') addEmbed({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'checklist') addChecklist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'radiolist') addRadiolist({ data: c, lang: '<%- locals.lang %>', section: section })
-					// // META
-					// // if (c.type === 'location') {
-					// // 	// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-					// // 	if ((!c.centerpoint && !c.centerpoints) || 
-					// // 		(c.centerpoint && (!c.centerpoint.lat || !c.centerpoint.lng)) || 
-					// // 		!c.centerpoints.length
-					// // 	) {
-					// // 		c.centerpoints = [<%- JSON.stringify(locals.centerpoint) %>]
-					// // 	} else if (c.centerpoint && !c.centerpoints) c.centerpoints = [c.centerpoint]
-					// // 	addMap({ data: c, lang: '<%- locals.lang %>', section: section })
-					// // }
-					// if (c.type === 'sdgs') addSDGs({ data: c, lang: '<%- locals.lang %>', section: section })
-					// if (c.type === 'tags') addTags({ data: c, lang: '<%- locals.lang %>', section: section })
-				})
+				d.items.forEach(c => populateSection (c, '<%- locals.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES

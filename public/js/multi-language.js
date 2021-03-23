@@ -211,6 +211,18 @@ const vocabulary = {
 		"es": "etiqueta(s) faltante(s)",
 		"pt": "etiqueta(s) faltando"
 	},
+	"request group": { // TO DO
+		"en": "Group description",
+		"fr": "demander un titre",
+		"es": "solicitar un título",
+		"pt": "solicite um título"
+	},
+	"expect group": { // TO DO
+		"en": "<strong>Text</strong> expected.",
+		"fr": "<strong>Texte</strong> attendu.",
+		"es": "<strong>Texto</strong> esperado.",
+		"pt": "<strong>Texto</strong> esperado."
+	},
 	"request title": {
 		"en": "request a title",
 		"fr": "demander un titre",
@@ -416,6 +428,12 @@ const vocabulary = {
 		"pt": "Escreva uma instrução"
 	},
 	"looking for something": {
+		"en": "Looking for something?",
+		"fr": "À la recherche de quleque chose ?",
+		"es": "¿Busca algo?",
+		"pt": "Procurando por algo?"
+	},
+	"looking for something or add": {
 		"en": "Looking for something or want to add it?",
 		"fr": "À la recherche de quleque chose ou besoin de l’ajouter ?",
 		"es": "¿Busca algo o necesita agregarlo?",

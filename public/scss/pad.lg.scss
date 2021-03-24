@@ -425,7 +425,7 @@ main#template {
 									i {
 										font-size: $t-main;
 										line-height: 30px;
-										color: #FFF;
+										color: $c-dark-blue;
 									}
 								}
 							}
@@ -436,7 +436,7 @@ main#template {
 								
 								.opt {
 									/*background-color: $c-dark-1;*/
-									background-color: $c-dark-blue;
+									background-color: $c-light-yellow;
 								}
 							}
 						}
@@ -550,10 +550,11 @@ main#template {
 						.tag {
 							display: inline-block;
 							margin: 5px 5px 0 0;
-							border: 1px solid $c-light-green;
-							/*background-color: $c-light-blue;*/
+							padding: 5px 10px;
+							/*border: 1px solid $c-light-blue;*/
+							background-color: $c-light-blue;
 							border-radius: 5px;
-							color: $c-light-green;
+							/*color: $c-light-green;*/
 							color: #FFF;
 							font-size: $t-small;
 							transition: background-color .25s;
@@ -569,7 +570,7 @@ main#template {
 						}
 						.tag:hover,
 						.tag.selected {
-							background-color: $c-mid-1;
+							background-color: $c-dark-blue;
 							color: #FFF;
 						}
 					}
@@ -850,7 +851,7 @@ main#template {
 				.media-container:not(.group-container):hover,
 				.meta-container:not(.group-container).focus,
 				.meta-container:not(.group-container):hover {
-					.opts {
+					.opts:not(.index-opts) {
 						/*border-bottom-color: $c-light-2;*/
 						border-bottom-color: $c-light-yellow;
 
@@ -895,6 +896,12 @@ main#template {
 					.opt-group {
 						display: block;
 					}
+				}
+				.media-container.focus > .placement-opts,
+				.media-container:hover > .placement-opts {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
 				}
 				.media-container.move,
 				.meta-container.move {

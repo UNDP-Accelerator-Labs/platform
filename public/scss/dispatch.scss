@@ -2,7 +2,15 @@
 
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {
-
+	@import 'vars.lg';
+	@import 'navigate.lg';
+	@import 'filter.lg';
+	@import 'map.lg';
+	
+	@import 'pad.lg';
+	@import 'import.lg';
+	@import 'browse.lg';
+	@import 'mobilize.lg';
 }
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) {

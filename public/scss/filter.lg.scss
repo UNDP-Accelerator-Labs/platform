@@ -1,10 +1,12 @@
 nav#filter {
 	position: fixed;
-	top: 30px;
+	top: 0;
 	left: 0;
 	width: 375px;
-	height: calc(100vh - 30px);
-	background-color: $c-mid-1;
+	/*height: calc(100vh - 30px);*/
+	height: 100vh;
+	/*background-color: $c-mid-1;*/
+	background-color: $c-dark-green;
 	/*box-shadow: 10px 0 10px rgba(175,175,175,.15);*/
 	transform: translateX(-375px);
 	transition: transform .5s;
@@ -16,10 +18,11 @@ nav#filter {
 		justify-content: center;
 		left: 100%;
 		width: 30px;
-		height: 65px;
-		background-color: $c-mid-1;
+		height: 75px;
+		/*background-color: $c-mid-1;*/
+		background-color: $c-dark-green;
 		font-size: $t-small;
-		line-height: 65px;
+		line-height: 75px;
 		text-align: center;
 		cursor: e-resize;
 

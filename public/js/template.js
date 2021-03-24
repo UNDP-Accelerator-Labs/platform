@@ -288,7 +288,7 @@ function autofillTitle () {
 
 function addSection (kwargs) {
 	const { data, lang, focus } = kwargs || {}
-	let { title, lead, repeat, group, instruction } = data || {}
+	let { title, lead, structure, repeat, group, instruction } = data || {}
 
 	d3.selectAll('.media-layout').classed('focus', false)
 
@@ -299,7 +299,7 @@ function addSection (kwargs) {
 		.insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
 		.classed('repeat', repeat || false)
 		.classed('focus', focus || false)
-		.datum({ type: 'section', title: title, lead: lead, repeat: repeat, group: group })
+		.datum({ type: 'section', title: title, lead: lead, structure: structure, repeat: repeat, group: group })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
 	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
@@ -387,6 +387,11 @@ function addSection (kwargs) {
 	}
 	// if (focus) header.node().focus()
 	// if (editing) observer.observe(section.node(), obsvars)
+
+	// console.log(structure)
+	if (structure) section.each(function (d) {
+		d.structure.forEach(c => populateSection(c, lang, this))
+	})
 
 	return section.node()
 }
@@ -801,8 +806,8 @@ function addSDGs (kwargs) {
 	if (!type) type = 'sdgs'
 	if (!instruction) instruction = ''
 
-	// GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
-	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+	GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
+	// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
 	.then(sdgs => {
 		// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
 		const input = d3.select(`.media-input-group #input-meta-${type}`).node()
@@ -891,8 +896,8 @@ async function addTags (kwargs) {
 		datum: { type: type, instruction: instruction, constraint: constraint },
 		focus: focus || false,
 		lang: lang,
-		url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
-		// url: 'http://localhost:3000/api/thematic_areas'
+		// url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
+		url: 'http://localhost:3000/api/thematic_areas'
 	})
 }
 async function addSkills (kwargs) {
@@ -993,7 +998,7 @@ function addGroup (kwargs) {
 		'contenteditable': editing ? true : null 
 	}).html(d => d.instruction)
 
-	// if (focus) media.media.node().focus()
+	if (focus) media.media.node().focus()
 
 	// items.forEach(c => populateSection(c, lang, media.container.node()))
 	media.container.call(addItems)

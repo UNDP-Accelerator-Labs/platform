@@ -576,6 +576,7 @@ function lazyLoadTemplates (kwargs) {
 	
 	return conn.any(`
 		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+			COUNT(p.id)::INT AS associated_pads,
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.applications, 0)::INT AS applications,
 			CASE WHEN t.contributor = (SELECT id FROM contributors WHERE uuid = $1)
@@ -596,6 +597,8 @@ function lazyLoadTemplates (kwargs) {
 		FROM templates t
 		INNER JOIN contributors c
 			ON c.id = t.contributor
+		LEFT JOIN pads p
+			ON p.template = t.id
 		LEFT JOIN (
 			SELECT template, contributor, array_agg(DISTINCT type) AS types FROM engagement_templates
 			WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1)
@@ -614,6 +617,7 @@ function lazyLoadTemplates (kwargs) {
 			ON mob.template = t.id
 		WHERE TRUE 
 			$3:raw $4:raw $5:raw $6:raw
+		GROUP BY (t.id, c.name, ce.bookmarks, ce.applications, e.types, p.id)
 		$7:raw
 		LIMIT $8 OFFSET $9
 		;`, [uuid, rights, f_search, f_contributors, f_mobilizations, f_space, order, lazyLimit, (page - 1) * lazyLimit])

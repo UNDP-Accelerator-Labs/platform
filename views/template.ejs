@@ -417,6 +417,9 @@
 			sections.push(d)
 		})
 
+		console.log(sections)
+		console.log(sections.map(d => d.structure).flat())
+
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
 			${description}\n\n
@@ -435,7 +438,19 @@
 			${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
 				.map(d => d.instruction).join('\n\n').trim()}\n\n
 			${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
-				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}`
+				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'txt')
+				.map(d => d.txt).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'embed')
+				.map(d => d.html).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'checklist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'radiolist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
 			// TO DO: REPLICATE ABOVE FOR GROUPS
 		
 		// COMPILE THE CONTENT
@@ -507,8 +522,8 @@
 		descriptionLayout.select('.media-container .media-txt').text(data.description)
 		if (data.sections) {
 			data.sections.forEach(d => {
-				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
-				d.structure.forEach(c => populateSection(c, '<%- locals.lang %>', section))
+				addSection({ data: d, lang: '<%- locals.lang %>' })
+				// d.structure.forEach(c => populateSection(c, '<%- locals.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES

@@ -589,11 +589,11 @@
 			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat().find(d => d.type === 'title').instruction)
 
 			data.sections.forEach(d => {
-				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
+				addSection({ data: d, lang: '<%- locals.lang %>' })
 				// const content = d.items || d.structure
-				d3.select(section).each(function (c) {
-					c.items.forEach(b => populateSection (b, '<%- locals.lang %>', this))	
-				})
+				// d3.select(section).each(function (c) {
+				// 	c.items.forEach(b => populateSection (b, '<%- locals.lang %>', this))	
+				// })
 			})
 		}
 		// CLEAR CHANGES
@@ -608,8 +608,8 @@
 
 		if (data.sections) {
 			data.sections.forEach(d => {
-				const section = addSection({ data: d, lang: '<%- locals.lang %>' })
-				d.items.forEach(c => populateSection (c, '<%- locals.lang %>', section))
+				addSection({ data: d, lang: '<%- locals.lang %>' })
+				// d.items.forEach(c => populateSection (c, '<%- locals.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES

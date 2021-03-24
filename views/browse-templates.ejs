@@ -14,17 +14,17 @@
 
 <main id='browse-templates'>
 	<div class='inner'>
+		<% if (locals.space === 'private') { %>
+			<section class='new'>
+				<a href='../../contribute/template'><button id='add'><div>+</div></button></a>
+			</section>
+		<% } %>
 		<section class='overview'></section>
 	</div>
 	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 </main>
 
 <footer>
-	<% if (locals.space === 'private') { %>
-		<section class='new'>
-			<a href='../../contribute/template'><button id='add'>+</button></a>
-		</section>
-	<% } %>
 </footer>
 
 
@@ -95,6 +95,7 @@
 	}
 
 	function renderVignette (section, data) {
+		console.log(data)
 		
 		// function getTags(d) {
 		// 	if (d && d.meta) {
@@ -201,7 +202,7 @@
 			const opts = []
 			if (d.editable && d.status === 1) opts.push({ action: '/publish/templates', method: 'GET', node: 'button', type: 'submit', label: 'Publish' })
 			// TO DO: UNPUBLISH
-			if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteTemplates })
+			if (d.editable && d.associated_pads === 0) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteTemplates })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
@@ -222,11 +223,11 @@
 		const count = templates.addElems('div', 'foot')
 			.addElems('div', 'media meta-stats')
 			.addElems('h1')
-			.html(d => d.sections ? d.sections.map(d => d.items).flat().length : 0)
+			.html(d => d.sections ? d.sections.map(d => d.structure).flat().length : 0)
 		count.addElems('small')
 		count.addElems('br')
 		count.addElems('small', 'light')
-			.html(d => vocabulary['item']['<%- locals.lang %>'](d.sections ? d.sections.map(d => d.items).flat().length !== 1 : true))
+			.html(d => vocabulary['item']['<%- locals.lang %>'](d.sections ? d.sections.map(d => d.structure).flat().length !== 1 : true))
 	}
 
 	window.onscroll = async function (ev) {

@@ -676,8 +676,9 @@ function addSection (kwargs) {
 		}).html(d => d.instruction)
 	}
 
-	// if (focus) header.node().focus()
-	// if (editing) observer.observe(section.node(), obsvars)
+	if (items.length) section.each(function (d) {
+		d.items.forEach(c => populateSection (c, lang, this))	
+	})
 
 	return section.node()
 }
@@ -1797,8 +1798,8 @@ async function addTags (kwargs) {
 		opencode: true,
 		focus: focus || false,
 		lang: lang,
-		// url: 'http://localhost:3000/api/thematic_areas'
-		url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
+		url: 'http://localhost:3000/api/thematic_areas'
+		// url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
 	})
 
 	if (list.opts) {

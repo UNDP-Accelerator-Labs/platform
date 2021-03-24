@@ -14,36 +14,37 @@
 
 <main id='browse-pads'>
 	<div class='inner'>
+		<% if (locals.space === 'private') { %>
+			<section class='new'>
+			<% if (locals.participations.length > 0) { %>
+				<% 
+					const mobs = locals.participations.map(m => { 
+						console.log(m)
+						return { 
+							label: `${m.title}<div class="sub">Shared by ${m.host_name} on ${m.start_date}</div>`, 
+							class: 'padded',
+							href: `/${locals.lang}/contribute/pad?mobilization=${m.id}&template=${m.template}` 
+						}
+					})
+					if (locals.rights > 1) {
+						mobs.push({ label: vocabulary['free pad'][locals.lang], href: `/${locals.lang}/contribute/pad` })
+					}
+				%>
+				<a onclick='renderModal({ headline: "<%- vocabulary[`contribute`][locals.lang] %>", opts: <%- JSON.stringify(mobs) %>, theme: "blue", node: this.parentNode })'>
+					<button><div>+</div></button>
+				</a>
+			<% } else if (locals.rights > 1) { %>
+				<a href='/<%- locals.lang %>/contribute/pad'><button id='add'>+</button></a>
+			<% } %>
+			</section>
+		<% } %>
 		<section class='overview'></section>
 	</div>
 	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 </main>
 
 <footer>
-	<% if (locals.space === 'private') { %>
-		<section class='new'>
-		<% if (locals.participations.length > 0) { %>
-			<% 
-				const mobs = locals.participations.map(m => { 
-					console.log(m)
-					return { 
-						label: `${m.title}<div class="sub">Shared by ${m.host_name} on ${m.start_date}</div>`, 
-						class: 'padded',
-						href: `/${locals.lang}/contribute/pad?mobilization=${m.id}&template=${m.template}` 
-					}
-				})
-				if (locals.rights > 1) {
-					mobs.push({ label: vocabulary['free pad'][locals.lang], href: `/${locals.lang}/contribute/pad` })
-				}
-			%>
-			<a onclick='renderModal({ headline: "<%- vocabulary[`contribute`][locals.lang] %>", opts: <%- JSON.stringify(mobs) %>, theme: "blue", node: this.parentNode })'>
-				<button>+</button>
-			</a>
-		<% } else if (locals.rights > 1) { %>
-			<a href='/<%- locals.lang %>/contribute/pad'><button id='add'>+</button></a>
-		<% } %>
-		</section>
-	<% } %>
+	
 </footer>
 
 

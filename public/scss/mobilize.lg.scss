@@ -662,20 +662,23 @@ main#mobilize-existing {
 	}
 }
 footer {
-	margin-top: 30px;
+	/*margin-top: 30px;*/
 	.new {
 		text-align: center;
 		a {
 			button {
 				width: 90px;
 				height: 90px;
-				border-radius: 90px;
+				/*border-radius: 90px;*/
 				border: none;
 				outline: none;
-				background-color: transparent;
+				/*background-color: transparent;*/
+				background-color: $c-mid-yellow;
 				font-size: $t-xlarge;
-				color: $c-mid-1;
+				/*color: $c-mid-1;*/
+				color: $c-mid-green;
 				cursor: pointer;
+				transform: rotate(45deg);
 				transition: background-color .25s;
 			}
 			button:hover {

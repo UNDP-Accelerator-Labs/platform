@@ -1798,8 +1798,8 @@ async function addTags (kwargs) {
 		opencode: true,
 		focus: focus || false,
 		lang: lang,
-		// url: 'http://localhost:3000/api/thematic_areas'
-		url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
+		url: 'http://localhost:3000/api/thematic_areas'
+		// url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
 	})
 
 	if (list.opts) {

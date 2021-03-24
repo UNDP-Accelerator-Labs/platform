@@ -39,7 +39,7 @@ nav#filter {
 		.query {
 			width: 375px;
 			height: 65px;
-			background-color: $c-mid-1;
+			background-color: $c-dark-green;
 
 			input[type=text] {
 				float: left;
@@ -72,7 +72,7 @@ nav#filter {
 			input:-webkit-autofill:hover, 
 			input:-webkit-autofill:focus, 
 			input:-webkit-autofill:active  {
-				-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;
+				-webkit-box-shadow: 0 0 0 40px $c-dark-green inset !important;
 				-webkit-text-fill-color: #FFF !important;
 			}
 			button {

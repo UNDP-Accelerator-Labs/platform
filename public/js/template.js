@@ -916,7 +916,7 @@ async function addSkills (kwargs) {
 		datum: { type: type, instruction: instruction, constraint: constraint },
 		focus: focus || false,
 		lang: lang,
-		url: '/api/skills'
+		url: '/api/methods'
 	})
 }
 async function addDataSources (kwargs) {

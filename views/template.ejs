@@ -32,11 +32,13 @@
 		<div class='head'>
 			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
 				<% if (locals.activity === 'edit') { %>
-					<a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+					<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a> -->
+					<a href='<%- locals.originalUrl || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
 				<% } %>
 				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.lang] %>' onblur='partialSave("title")' contenteditable></div>
 			<% } else { %>
-				<a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+				<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a> -->
+				<a href='<%- locals.originalUrl || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
 				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.lang] %>'></div>
 				<div class='contributor'><%- vocabulary['credit'][locals.lang](locals.data.contributor, locals.data.contributorname) %></div>
 			<% } %>

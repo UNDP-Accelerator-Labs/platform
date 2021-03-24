@@ -141,7 +141,7 @@ exports.redirect.home = (req, res, next) => {
 
 function navigationData (kwargs) {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	let { path, query } = kwargs.req
+	let { path, query, headers } = kwargs.req || {}
 	path = path.substring(1).split('/')
 	const { uuid, username, rights } = kwargs.req.session || {}
 	let { lang } = kwargs.req.params || kwargs.req.session || {}
@@ -167,7 +167,7 @@ function navigationData (kwargs) {
 		WHERE mc.contributor = (SELECT id FROM contributors WHERE uuid = $1)
 	;`, [uuid])
 	.then(results => {
-		return { path: path, uuid: uuid, username: username, rights: rights, lang: lang, query: parsedQuery, participations: results }
+		return { path: path, uuid: uuid, originalUrl: headers.referer, username: username, rights: rights, lang: lang, query: parsedQuery, participations: results }
 	}).catch(err => console.log(err))
 }
 /* =============================================================== */
@@ -950,10 +950,10 @@ exports.dispatch.preview = (req, res) => {
 
 
 function createPad (req, res) {	
-	const { template } = req.query
+	const { template } = req.query || {}
 
 	DB.conn.tx(async t => {
-		const { path, uuid, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
+		const { path, uuid, originalUrl, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
 		// FILTERS
 		// INTERCEPT FOR EXERCISE
 		let template_filter
@@ -1008,6 +1008,8 @@ function createPad (req, res) {
 				lang: lang,
 				path: path,
 				queryparams: query,
+				originalUrl: originalUrl,
+
 				user: username,
 				centerpoint: centerpoint,
 				rights: rights,
@@ -1031,7 +1033,7 @@ function editPad (req, res) {
 	const { id } = req.query || {}
 
 	DB.conn.tx(async t => {
-		const { path, uuid, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
+		const { path, uuid, originalUrl, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
 
 		const batch = []
 		batch.push(t.oneOrNone(`
@@ -1119,6 +1121,7 @@ function editPad (req, res) {
 				lang: lang,
 				path: path,
 				queryparams: query,
+				originalUrl: originalUrl,
 				user: username,
 				centerpoint: centerpoint,
 				rights: rights,
@@ -1143,7 +1146,7 @@ function editPad (req, res) {
 /* =============================================================== */
 function createTemplate (req, res) {	
 	DB.conn.tx(async t => {
-		const { path, uuid, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
+		const { path, uuid, originalUrl, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
 
 		const batch = []
 		batch.push(t.any(`
@@ -1166,6 +1169,8 @@ function createTemplate (req, res) {
 				lang: lang,
 				path: path,
 				queryparams: query,
+				originalUrl: originalUrl,
+
 				user: username,
 				rights: rights,
 				participations: participations
@@ -1181,7 +1186,7 @@ function editTemplate (req, res) {
 	const { id } = req.query || {}
 	
 	DB.conn.tx(async t => {
-		const { path, uuid, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
+		const { path, uuid, originalUrl, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
 
 		const batch = []
 		batch.push(t.any(`
@@ -1209,6 +1214,8 @@ function editTemplate (req, res) {
 				lang: lang,
 				path: path,
 				queryparams: query,
+				originalUrl: originalUrl,
+
 				user: username,
 				rights: rights,
 				participations: participations,
@@ -1779,6 +1786,12 @@ if (!exports.api) exports.api = {}
 exports.api.skills = (req, res) => {
 	DB.conn.any(`
 		SELECT id, category, name FROM skills ORDER BY category, name
+	;`).then(results => res.status(200).json(results))
+	.catch(err => res.status(500).send(err))
+}
+exports.api.methods = (req, res) => {
+	DB.conn.any(`
+		SELECT id, name FROM methods ORDER BY name
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }

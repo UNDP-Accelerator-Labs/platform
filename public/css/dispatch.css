@@ -3671,7 +3671,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     height: calc(100vh - 95px);
     margin-top: 95px;
     overflow: scroll;
-    background-color: #934A5F;
+    background-color: #F03C8C;
     animation: fade-in 0.25s;
     transition: background 1s;
     z-index: 999;
@@ -3721,7 +3721,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   main#mobilize-new .modal .inner .head .contributor-count {
     flex-grow: 1;
     text-align: center;
-    color: #C2B4D6;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .head .global-opt {
     padding: 0 7px 0 5px;
@@ -3733,7 +3733,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     cursor: pointer;
     font-weight: 700;
     font-style: italic;
-    color: #C2B4D6;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .head .global-opt:hover label {
     text-decoration: underline;
@@ -3753,7 +3753,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     max-height: 500px;
     overflow: scroll;
     padding-right: 10px;
-    border-left: 1px solid #C2B4D6;
+    border-left: 1px solid #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt {
     display: flex;
@@ -3783,7 +3783,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     margin-right: 5px;
   }
   main#mobilize-new .modal .inner .body .opts .opt .preview {
-    color: #C2B4D6;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt .preview i {
     vertical-align: middle;
@@ -3804,24 +3804,24 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     vertical-align: baseline;
   }
   main#mobilize-new .modal .inner .body .opts .opt .count label {
-    color: #C2B4D6;
+    color: #0A4C73;
     font-size: 12px;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked {
     background-color: #FFF;
-    color: #333D51;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked .preview {
-    color: #57648C;
+    color: #A51E41;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked div label {
-    color: #333D51;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked .count label {
-    color: #57648C;
+    color: #A51E41;
   }
   main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover {
-    background-color: #C2B4D6;
+    background-color: #32BEE1;
     color: #333D51;
   }
   main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover .preview {
@@ -3919,6 +3919,34 @@ main#mobilize-new .modal .inner .body input:-webkit-autofill:active {
     width: calc(300px * 4 + 3 * 15px);
     margin: 125px auto 0 auto;
     padding: 60px 0 0 0;
+  }
+  main#mobilize-existing .inner {
+    position: relative;
+  }
+  main#mobilize-existing .inner .new {
+    position: fixed;
+    top: 30px;
+    margin-left: -45px;
+    z-index: 10000;
+    text-align: center;
+  }
+  main#mobilize-existing .inner .new a button {
+    width: 90px;
+    height: 90px;
+    border: none;
+    outline: none;
+    background-color: #F03C8C;
+    font-size: 36px;
+    color: #FFF;
+    cursor: pointer;
+    transform: rotate(45deg);
+    transition: background-color 0.25s;
+  }
+  main#mobilize-existing .inner .new a button div {
+    transform: rotate(-45deg);
+  }
+  main#mobilize-existing .inner .new a button:hover {
+    background-color: #A51E41;
   }
   main#mobilize-existing .inner .overview .summary-statistics {
     width: 100%;
@@ -4225,31 +4253,6 @@ main#mobilize-new .modal .inner .body input:-webkit-autofill:active {
   }
   main#mobilize-existing .inner .mobilizations-container .mobilization-layout.publishable .mobilization {
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(163, 198, 196, 0.15) 10px, rgba(163, 198, 196, 0.15) 20px);
-  }
-
-  footer {
-    /*margin-top: 30px;*/
-  }
-  footer .new {
-    text-align: center;
-  }
-  footer .new a button {
-    width: 90px;
-    height: 90px;
-    /*border-radius: 90px;*/
-    border: none;
-    outline: none;
-    /*background-color: transparent;*/
-    background-color: #FFC10E;
-    font-size: 36px;
-    /*color: $c-mid-1;*/
-    color: #61B233;
-    cursor: pointer;
-    transform: rotate(45deg);
-    transition: background-color 0.25s;
-  }
-  footer .new a button:hover {
-    background-color: #E5E5E5;
   }
 }
 /* Medium devices (tablets, 768px and up) */
@@ -7731,7 +7734,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     height: calc(100vh - 95px);
     margin-top: 95px;
     overflow: scroll;
-    background-color: #934A5F;
+    background-color: #F03C8C;
     animation: fade-in 0.25s;
     transition: background 1s;
     z-index: 999;
@@ -7781,7 +7784,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   main#mobilize-new .modal .inner .head .contributor-count {
     flex-grow: 1;
     text-align: center;
-    color: #C2B4D6;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .head .global-opt {
     padding: 0 7px 0 5px;
@@ -7793,7 +7796,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     cursor: pointer;
     font-weight: 700;
     font-style: italic;
-    color: #C2B4D6;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .head .global-opt:hover label {
     text-decoration: underline;
@@ -7813,7 +7816,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     max-height: 500px;
     overflow: scroll;
     padding-right: 10px;
-    border-left: 1px solid #C2B4D6;
+    border-left: 1px solid #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt {
     display: flex;
@@ -7843,7 +7846,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     margin-right: 5px;
   }
   main#mobilize-new .modal .inner .body .opts .opt .preview {
-    color: #C2B4D6;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt .preview i {
     vertical-align: middle;
@@ -7864,24 +7867,24 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
     vertical-align: baseline;
   }
   main#mobilize-new .modal .inner .body .opts .opt .count label {
-    color: #C2B4D6;
+    color: #0A4C73;
     font-size: 12px;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked {
     background-color: #FFF;
-    color: #333D51;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked .preview {
-    color: #57648C;
+    color: #A51E41;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked div label {
-    color: #333D51;
+    color: #0A4C73;
   }
   main#mobilize-new .modal .inner .body .opts .opt.checked .count label {
-    color: #57648C;
+    color: #A51E41;
   }
   main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover {
-    background-color: #C2B4D6;
+    background-color: #32BEE1;
     color: #333D51;
   }
   main#mobilize-new .modal .inner .body .opts .opt:not(.checked):hover .preview {
@@ -7979,6 +7982,34 @@ main#mobilize-new .modal .inner .body input:-webkit-autofill:active {
     width: calc(300px * 4 + 3 * 15px);
     margin: 125px auto 0 auto;
     padding: 60px 0 0 0;
+  }
+  main#mobilize-existing .inner {
+    position: relative;
+  }
+  main#mobilize-existing .inner .new {
+    position: fixed;
+    top: 30px;
+    margin-left: -45px;
+    z-index: 10000;
+    text-align: center;
+  }
+  main#mobilize-existing .inner .new a button {
+    width: 90px;
+    height: 90px;
+    border: none;
+    outline: none;
+    background-color: #F03C8C;
+    font-size: 36px;
+    color: #FFF;
+    cursor: pointer;
+    transform: rotate(45deg);
+    transition: background-color 0.25s;
+  }
+  main#mobilize-existing .inner .new a button div {
+    transform: rotate(-45deg);
+  }
+  main#mobilize-existing .inner .new a button:hover {
+    background-color: #A51E41;
   }
   main#mobilize-existing .inner .overview .summary-statistics {
     width: 100%;
@@ -8285,31 +8316,6 @@ main#mobilize-new .modal .inner .body input:-webkit-autofill:active {
   }
   main#mobilize-existing .inner .mobilizations-container .mobilization-layout.publishable .mobilization {
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(163, 198, 196, 0.15) 10px, rgba(163, 198, 196, 0.15) 20px);
-  }
-
-  footer {
-    /*margin-top: 30px;*/
-  }
-  footer .new {
-    text-align: center;
-  }
-  footer .new a button {
-    width: 90px;
-    height: 90px;
-    /*border-radius: 90px;*/
-    border: none;
-    outline: none;
-    /*background-color: transparent;*/
-    background-color: #FFC10E;
-    font-size: 36px;
-    /*color: $c-mid-1;*/
-    color: #61B233;
-    cursor: pointer;
-    transform: rotate(45deg);
-    transition: background-color 0.25s;
-  }
-  footer .new a button:hover {
-    background-color: #E5E5E5;
   }
 }
 

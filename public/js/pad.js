@@ -526,7 +526,7 @@ function uploadVideo (form, lang = 'en', container = null, focus = true) {
 }
 function autofillTitle () {
 	if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
-		const firstText = main.select('.media-txt').node()
+		const firstText = main.select('.layout:not(.description-layout) .media-txt').node()
 		if (firstText && firstText.innerText) head.select('.title').html(_ => {
 			const cutoff = 75
 			if (firstText.innerText.split('\n').length > 1) {
@@ -1835,7 +1835,7 @@ async function addSkills (kwargs) {
 		opencode: false,
 		focus: focus || false,
 		lang: lang,
-		url: '/api/skills'
+		url: '/api/methods'
 	})
 
 	if (list.opts) {

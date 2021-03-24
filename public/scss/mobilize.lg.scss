@@ -7,7 +7,7 @@ main#mobilize-new {
 	height: calc(100vh - 95px);
 	margin-top: 95px;
 	overflow: scroll;
-	background-color: $c-mid-1;
+	background-color: $c-light-red;
 	animation: fade-in .25s;
 	transition: background 1s;
 	z-index: 999;
@@ -61,7 +61,7 @@ main#mobilize-new {
 				.contributor-count {
 					flex-grow: 1;
 					text-align: center;
-					color: $c-light-1;
+					color: $c-dark-blue;
 				}
 				.global-opt {
 					padding: 0 7px 0 5px;
@@ -73,7 +73,7 @@ main#mobilize-new {
 						cursor: pointer;
 						font-weight: 700;
 						font-style: italic;
-						color: $c-light-1;
+						color: $c-dark-blue;
 					}
 				}
 				.global-opt:hover {
@@ -98,7 +98,7 @@ main#mobilize-new {
 					max-height: 500px;
 					overflow: scroll;
 					padding-right: 10px;
-					border-left: 1px solid $c-light-1;
+					border-left: 1px solid $c-dark-blue;
 
 					.opt {
 						display: flex;
@@ -129,7 +129,7 @@ main#mobilize-new {
 							margin-right: 5px;
 						}
 						.preview {
-							color: $c-light-1;
+							color: $c-dark-blue;
 
 							i {
 								vertical-align: middle;
@@ -152,31 +152,31 @@ main#mobilize-new {
 							vertical-align: baseline;
 							
 							label { 
-								color: $c-light-1;
+								color: $c-dark-blue;
 								font-size: $t-small;
 							}
 						}
 					}
 					.opt.checked {
 						background-color: #FFF;
-						color: $c-dark-1;
+						color: $c-dark-blue;
 						
 						.preview {
-							color: $c-mid-2;
+							color: $c-dark-red;
 						}
 						div {
 							label {
-								color: $c-dark-1;
+								color: $c-dark-blue;
 							}
 						}
 						.count {
 							label {
-								color: $c-mid-2;
+								color: $c-dark-red;
 							}
 						}
 					}
 					.opt:not(.checked):hover {
-						background-color: $c-light-1;
+						background-color: $c-light-blue;
 						color: $c-dark-1;
 
 						.preview {
@@ -295,6 +295,36 @@ main#mobilize-existing {
 	padding:  60px 0 0 0;
 	
 	.inner {
+		position: relative;
+		.new {
+			position: fixed;
+			top: 30px;
+			margin-left: -45px;
+			z-index: 10000;
+
+			text-align: center;
+			a {
+				button {
+					width: 90px;
+					height: 90px;
+					border: none;
+					outline: none;
+					background-color: $c-light-red;
+					font-size: $t-xlarge;
+					color: #FFF;
+					cursor: pointer;
+					transform: rotate(45deg);
+					transition: background-color .25s;
+
+					div {
+						transform: rotate(-45deg);
+					}
+				}
+				button:hover {
+					background-color: $c-dark-red;
+				}
+			}
+		}
 		.overview {
 
 			.summary-statistics {
@@ -662,28 +692,5 @@ main#mobilize-existing {
 	}
 }
 footer {
-	/*margin-top: 30px;*/
-	.new {
-		text-align: center;
-		a {
-			button {
-				width: 90px;
-				height: 90px;
-				/*border-radius: 90px;*/
-				border: none;
-				outline: none;
-				/*background-color: transparent;*/
-				background-color: $c-mid-yellow;
-				font-size: $t-xlarge;
-				/*color: $c-mid-1;*/
-				color: $c-mid-green;
-				cursor: pointer;
-				transform: rotate(45deg);
-				transition: background-color .25s;
-			}
-			button:hover {
-				background-color: $c-light-2;
-			}
-		}
-	}
+
 }

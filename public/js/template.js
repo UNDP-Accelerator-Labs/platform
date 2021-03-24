@@ -806,8 +806,8 @@ function addSDGs (kwargs) {
 	if (!type) type = 'sdgs'
 	if (!instruction) instruction = ''
 
-	GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
-	// GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+	// GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
+	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
 	.then(sdgs => {
 		// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
 		const input = d3.select(`.media-input-group #input-meta-${type}`).node()
@@ -896,8 +896,8 @@ async function addTags (kwargs) {
 		datum: { type: type, instruction: instruction, constraint: constraint },
 		focus: focus || false,
 		lang: lang,
-		// url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
-		url: 'http://localhost:3000/api/thematic_areas'
+		url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
+		// url: 'http://localhost:3000/api/thematic_areas'
 	})
 }
 async function addSkills (kwargs) {

@@ -324,7 +324,7 @@ Taglist.prototype.recode = function (opencode = true) {
 		.attrs({ 
 			'id': c => `${meta.id}-${c.name.simplify()}`, 
 			'type': 'checkbox', 
-			'name': type.slice(0, -1), 
+			'name': meta.type.slice(0, -1), 
 			'value': c => c.name
 		}).each(function () {
 			const sel = d3.select(this)

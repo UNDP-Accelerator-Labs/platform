@@ -71,7 +71,7 @@
 		data = data.filter(d => counts.map(c => c.status).includes(d.status))
 		const sections = templatesLayout.addElems('section', 'templates-container', data)
 		sections.addElems('div', 'pub-status')
-			.addElems('label')
+			.addElems('div')
 			.html(d => {
 				const count = counts.find(c => c.status === d.status).count
 				return vocabulary['template publication status']['<%- locals.lang %>'](count, d.status)
@@ -218,14 +218,20 @@
 			})
 		})
 
-		const count = templates.addElems('div', 'foot')
+		const statistics = templates.addElems('div', 'foot')
 			.addElems('div', 'media meta-stats')
-			.addElems('h1')
+		const itemcount = statistics.addElems('h1', 'item-count')
 			.html(d => d.sections ? d.sections.map(d => d.structure).flat().length : 0)
-		count.addElems('small')
-		count.addElems('br')
-		count.addElems('small', 'light')
+		// itemcount.addElems('small')
+		itemcount.addElems('br')
+		itemcount.addElems('small', 'light')
 			.html(d => vocabulary['item']['<%- locals.lang %>'](d.sections ? d.sections.map(d => d.structure).flat().length !== 1 : true))
+		const padcount = statistics.addElems('h1', 'pads-count')
+				.html(d => d.associated_pads)
+			// padcount.addElems('small')
+			padcount.addElems('br')
+			padcount.addElems('small', 'light')
+				.html(d => vocabulary['pad']['<%- locals.lang %>'](d.associated_pads !== 1))
 	}
 
 	window.onscroll = async function (ev) {

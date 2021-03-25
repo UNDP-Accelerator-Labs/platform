@@ -846,6 +846,9 @@ main#template {
 							z-index: -1;
 						}
 					}
+					.media-group-items.animate-in {
+						animation: slide-down 1s;
+					}
 				}
 				.media-container:not(.group-container).focus,
 				.media-container:not(.group-container):hover,

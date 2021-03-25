@@ -211,13 +211,13 @@ const vocabulary = {
 		"es": "etiqueta(s) faltante(s)",
 		"pt": "etiqueta(s) faltando"
 	},
-	"request group": { // TO DO
-		"en": "Group description",
-		"fr": "demander un titre",
-		"es": "solicitar un título",
-		"pt": "solicite um título"
+	"request group": {
+		"en": "describe group",
+		"fr": "décrire le groupe",
+		"es": "describir grupo",
+		"pt": "descrever o grupo"
 	},
-	"expect group": { // TO DO
+	"expect group": {
 		"en": "<strong>Text</strong> expected.",
 		"fr": "<strong>Texte</strong> attendu.",
 		"es": "<strong>Texto</strong> esperado.",

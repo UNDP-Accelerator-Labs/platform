@@ -31,10 +31,18 @@
 					}
 				%>
 				<a onclick='renderModal({ headline: "<%- vocabulary[`contribute`][locals.lang] %>", opts: <%- JSON.stringify(mobs) %>, theme: "blue", node: this.parentNode })'>
-					<button><div>+</div></button>
+					<button>
+						<div>+</div>
+						<!-- <div><i class='material-icons'>create</i></div> -->
+					</button>
 				</a>
 			<% } else if (locals.rights > 1) { %>
-				<a href='/<%- locals.lang %>/contribute/pad'><button id='add'><div>+</div></button></a>
+				<a href='/<%- locals.lang %>/contribute/pad'>
+					<button id='add'>
+						<div>+</div>
+						<!-- <div><i class='material-icons'>create</i></div> -->
+					</button>
+				</a>
 			<% } %>
 			</section>
 		<% } %>
@@ -88,7 +96,7 @@
 		data = data.filter(d => counts.map(c => c.status).includes(d.status))
 		const sections = layout.addElems('section', 'pads-container', data)
 		sections.addElems('div', 'pub-status')
-			.addElems('label')
+			.addElems('div')
 			.html(d => {
 				const count = counts.find(c => c.status === d.status).count
 				return vocabulary['pad publication status']['<%- locals.lang %>'](count, d.status)

@@ -2217,6 +2217,10 @@ main#template .inner .body .layout .group-container .media-group-items .meta-con
     background: linear-gradient(90deg, #FFF32A 0%, rgba(255, 255, 255, 0) 100%);
     z-index: -1;
   }
+  main#pad .inner .body .layout .group-container .media-group-items.animate-in,
+main#template .inner .body .layout .group-container .media-group-items.animate-in {
+    animation: slide-down 1s;
+  }
   main#pad .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts),
 main#pad .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 main#pad .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
@@ -2736,22 +2740,29 @@ main#template .inner .body .input-group.fixed label {
     text-align: center;
   }
   main#browse-pads .inner .new a button {
-    width: 90px;
-    height: 90px;
+    width: 75px;
+    height: 75px;
     border: none;
     outline: none;
-    background-color: #B4DC28;
+    background-color: #61B233;
     font-size: 36px;
     color: #FFF;
     cursor: pointer;
-    transform: rotate(45deg);
-    transition: background-color 0.25s;
+    transform: translateY(7px) rotate(45deg);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.25s, transform 0.25s;
   }
   main#browse-pads .inner .new a button div {
     transform: rotate(-45deg);
+    transition: color 0.5s, transform 0.5s;
   }
   main#browse-pads .inner .new a button:hover {
-    background-color: #61B233;
+    background-color: #B4DC28;
+    transform: rotate(180deg);
+  }
+  main#browse-pads .inner .new a button:hover div {
+    transform: rotate(-180deg);
+    color: #000000;
   }
   main#browse-pads .inner .overview .summary-statistics {
     width: 100%;
@@ -2827,34 +2838,40 @@ main#template .inner .body .input-group.fixed label {
   main#browse-pads .inner .pads-container {
     clear: both;
     position: relative;
-    margin: 60px 0 60px 0;
+    margin: 60px 0;
     /*border-top: 1px solid $c-mid-2;*/
-    border-top: 1px solid #0A4C73;
+    /*border-top: 1px solid $c-dark-blue;*/
   }
   main#browse-pads .inner .pads-container .pub-status {
     display: block;
-    text-align: center;
+    /*text-align: center;*/
     margin-bottom: 30px;
   }
-  main#browse-pads .inner .pads-container .pub-status label {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
+  main#browse-pads .inner .pads-container .pub-status div {
+    /*position: absolute;*/
+    /*bottom: 100%;*/
+    /*left: 0;*/
+    position: relative;
+    width: 175px;
     white-space: nowrap;
-    padding: 5px 10px;
-    /*background-color: $c-mid-2;*/
+    padding: 5px 0;
     background-color: #0A4C73;
     font-size: 12px;
+    text-align: center;
     color: #FFF;
   }
-  main#browse-pads .inner .pads-container .pub-status label::after {
+  main#browse-pads .inner .pads-container .pub-status div::after {
     content: "";
     position: absolute;
     left: 100%;
     /*top: -8px;*/
-    top: 8px;
+    /*top: 8px;
     min-width: 225px;
+    height: 100%;*/
+    top: 10px;
+    min-width: 120px;
     height: 100%;
+    margin-left: 5px;
     background-color: #FFF;
     background: #FFF url("../imgs/branding/dancing_squares_dark_blue.svg") no-repeat center;
     background-size: contain;
@@ -2863,12 +2880,13 @@ main#template .inner .body .input-group.fixed label {
     clear: both;
     width: 100%;
     display: flex;
-    justify-content: center;
-    margin: -30px 0 30px 0;
+    justify-content: flex-start;
+    margin: -30px 0 15px 0;
   }
   main#browse-pads .inner .pads-container .input-group button {
     border: none;
     outline: none;
+    width: 175px;
     height: 45px;
     background-color: transparent;
     /*border-bottom-left-radius: 5px;*/
@@ -3190,22 +3208,29 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
     text-align: center;
   }
   main#browse-templates .inner .new a button {
-    width: 90px;
-    height: 90px;
+    width: 75px;
+    height: 75px;
     border: none;
     outline: none;
     background-color: #FFC10E;
     font-size: 36px;
     color: #FFF;
     cursor: pointer;
-    transform: rotate(45deg);
-    transition: background-color 0.25s;
+    transform: translateY(7px) rotate(45deg);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.25s, transform 0.25s;
   }
   main#browse-templates .inner .new a button div {
     transform: rotate(-45deg);
+    transition: color 0.5s, transform 0.5s;
   }
   main#browse-templates .inner .new a button:hover {
     background-color: #FFF32A;
+    transform: rotate(180deg);
+  }
+  main#browse-templates .inner .new a button:hover div {
+    transform: rotate(-180deg);
+    color: #000000;
   }
   main#browse-templates .inner .overview .summary-statistics {
     width: 100%;
@@ -3262,32 +3287,37 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
   main#browse-templates .inner .templates-container {
     clear: both;
     position: relative;
-    margin: 60px 0 60px 0;
-    border-top: 1px solid #0A4C73;
+    margin: 60px 0;
+    /*border-top: 1px solid $c-dark-blue;*/
   }
   main#browse-templates .inner .templates-container .pub-status {
     display: block;
-    text-align: center;
+    /*text-align: center;*/
     margin-bottom: 30px;
   }
-  main#browse-templates .inner .templates-container .pub-status label {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
+  main#browse-templates .inner .templates-container .pub-status div {
+    /*position: absolute;*/
+    /*bottom: 100%;*/
+    /*left: 0;*/
+    position: relative;
+    width: 175px;
     white-space: nowrap;
-    padding: 5px 10px;
+    padding: 5px 0;
     background-color: #0A4C73;
     font-size: 12px;
+    text-align: center;
     color: #FFF;
   }
-  main#browse-templates .inner .templates-container .pub-status label::after {
+  main#browse-templates .inner .templates-container .pub-status div::after {
     content: "";
     position: absolute;
     left: 100%;
-    /*top: -8px;*/
-    top: 8px;
-    min-width: 225px;
+    /*top: 8px;*/
+    /*min-width: 225px;*/
+    top: 10px;
+    min-width: 120px;
     height: 100%;
+    margin-left: 5px;
     background-color: #FFF;
     background: #FFF url("../imgs/branding/dancing_squares_dark_blue.svg") no-repeat center;
     background-size: contain;
@@ -3296,20 +3326,18 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
     clear: both;
     width: 100%;
     display: flex;
-    justify-content: center;
-    margin: -30px 0 30px 0;
+    justify-content: flex-start;
+    margin: -30px 0 15px 0;
   }
   main#browse-templates .inner .templates-container .input-group button {
     border: none;
     outline: none;
+    width: 175px;
     height: 45px;
     background-color: transparent;
-    /*border-bottom-left-radius: 5px;*/
-    /*border-bottom-right-radius: 5px;*/
     padding: 0 30px 0 20px;
     font-size: 12px;
     font-weight: 700;
-    /*color: $c-mid-1;*/
     cursor: pointer;
     transition: background-color 0.25s;
   }
@@ -3604,10 +3632,11 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .foot {
     align-self: center;
     flex-shrink: 0;
-    width: 75px;
+    min-width: 75px;
   }
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .foot h1 {
-    margin-top: 10px;
+    display: inline-block;
+    margin: 10px 15px 0 15px;
     text-align: center;
     line-height: 16px;
     white-space: nowrap;
@@ -6280,6 +6309,10 @@ main#template .inner .body .layout .group-container .media-group-items .meta-con
     background: linear-gradient(90deg, #FFF32A 0%, rgba(255, 255, 255, 0) 100%);
     z-index: -1;
   }
+  main#pad .inner .body .layout .group-container .media-group-items.animate-in,
+main#template .inner .body .layout .group-container .media-group-items.animate-in {
+    animation: slide-down 1s;
+  }
   main#pad .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts),
 main#pad .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 main#pad .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
@@ -6799,22 +6832,29 @@ main#template .inner .body .input-group.fixed label {
     text-align: center;
   }
   main#browse-pads .inner .new a button {
-    width: 90px;
-    height: 90px;
+    width: 75px;
+    height: 75px;
     border: none;
     outline: none;
-    background-color: #B4DC28;
+    background-color: #61B233;
     font-size: 36px;
     color: #FFF;
     cursor: pointer;
-    transform: rotate(45deg);
-    transition: background-color 0.25s;
+    transform: translateY(7px) rotate(45deg);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.25s, transform 0.25s;
   }
   main#browse-pads .inner .new a button div {
     transform: rotate(-45deg);
+    transition: color 0.5s, transform 0.5s;
   }
   main#browse-pads .inner .new a button:hover {
-    background-color: #61B233;
+    background-color: #B4DC28;
+    transform: rotate(180deg);
+  }
+  main#browse-pads .inner .new a button:hover div {
+    transform: rotate(-180deg);
+    color: #000000;
   }
   main#browse-pads .inner .overview .summary-statistics {
     width: 100%;
@@ -6890,34 +6930,40 @@ main#template .inner .body .input-group.fixed label {
   main#browse-pads .inner .pads-container {
     clear: both;
     position: relative;
-    margin: 60px 0 60px 0;
+    margin: 60px 0;
     /*border-top: 1px solid $c-mid-2;*/
-    border-top: 1px solid #0A4C73;
+    /*border-top: 1px solid $c-dark-blue;*/
   }
   main#browse-pads .inner .pads-container .pub-status {
     display: block;
-    text-align: center;
+    /*text-align: center;*/
     margin-bottom: 30px;
   }
-  main#browse-pads .inner .pads-container .pub-status label {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
+  main#browse-pads .inner .pads-container .pub-status div {
+    /*position: absolute;*/
+    /*bottom: 100%;*/
+    /*left: 0;*/
+    position: relative;
+    width: 175px;
     white-space: nowrap;
-    padding: 5px 10px;
-    /*background-color: $c-mid-2;*/
+    padding: 5px 0;
     background-color: #0A4C73;
     font-size: 12px;
+    text-align: center;
     color: #FFF;
   }
-  main#browse-pads .inner .pads-container .pub-status label::after {
+  main#browse-pads .inner .pads-container .pub-status div::after {
     content: "";
     position: absolute;
     left: 100%;
     /*top: -8px;*/
-    top: 8px;
+    /*top: 8px;
     min-width: 225px;
+    height: 100%;*/
+    top: 10px;
+    min-width: 120px;
     height: 100%;
+    margin-left: 5px;
     background-color: #FFF;
     background: #FFF url("../imgs/branding/dancing_squares_dark_blue.svg") no-repeat center;
     background-size: contain;
@@ -6926,12 +6972,13 @@ main#template .inner .body .input-group.fixed label {
     clear: both;
     width: 100%;
     display: flex;
-    justify-content: center;
-    margin: -30px 0 30px 0;
+    justify-content: flex-start;
+    margin: -30px 0 15px 0;
   }
   main#browse-pads .inner .pads-container .input-group button {
     border: none;
     outline: none;
+    width: 175px;
     height: 45px;
     background-color: transparent;
     /*border-bottom-left-radius: 5px;*/
@@ -7253,22 +7300,29 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
     text-align: center;
   }
   main#browse-templates .inner .new a button {
-    width: 90px;
-    height: 90px;
+    width: 75px;
+    height: 75px;
     border: none;
     outline: none;
     background-color: #FFC10E;
     font-size: 36px;
     color: #FFF;
     cursor: pointer;
-    transform: rotate(45deg);
-    transition: background-color 0.25s;
+    transform: translateY(7px) rotate(45deg);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.25s, transform 0.25s;
   }
   main#browse-templates .inner .new a button div {
     transform: rotate(-45deg);
+    transition: color 0.5s, transform 0.5s;
   }
   main#browse-templates .inner .new a button:hover {
     background-color: #FFF32A;
+    transform: rotate(180deg);
+  }
+  main#browse-templates .inner .new a button:hover div {
+    transform: rotate(-180deg);
+    color: #000000;
   }
   main#browse-templates .inner .overview .summary-statistics {
     width: 100%;
@@ -7325,32 +7379,37 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
   main#browse-templates .inner .templates-container {
     clear: both;
     position: relative;
-    margin: 60px 0 60px 0;
-    border-top: 1px solid #0A4C73;
+    margin: 60px 0;
+    /*border-top: 1px solid $c-dark-blue;*/
   }
   main#browse-templates .inner .templates-container .pub-status {
     display: block;
-    text-align: center;
+    /*text-align: center;*/
     margin-bottom: 30px;
   }
-  main#browse-templates .inner .templates-container .pub-status label {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
+  main#browse-templates .inner .templates-container .pub-status div {
+    /*position: absolute;*/
+    /*bottom: 100%;*/
+    /*left: 0;*/
+    position: relative;
+    width: 175px;
     white-space: nowrap;
-    padding: 5px 10px;
+    padding: 5px 0;
     background-color: #0A4C73;
     font-size: 12px;
+    text-align: center;
     color: #FFF;
   }
-  main#browse-templates .inner .templates-container .pub-status label::after {
+  main#browse-templates .inner .templates-container .pub-status div::after {
     content: "";
     position: absolute;
     left: 100%;
-    /*top: -8px;*/
-    top: 8px;
-    min-width: 225px;
+    /*top: 8px;*/
+    /*min-width: 225px;*/
+    top: 10px;
+    min-width: 120px;
     height: 100%;
+    margin-left: 5px;
     background-color: #FFF;
     background: #FFF url("../imgs/branding/dancing_squares_dark_blue.svg") no-repeat center;
     background-size: contain;
@@ -7359,20 +7418,18 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
     clear: both;
     width: 100%;
     display: flex;
-    justify-content: center;
-    margin: -30px 0 30px 0;
+    justify-content: flex-start;
+    margin: -30px 0 15px 0;
   }
   main#browse-templates .inner .templates-container .input-group button {
     border: none;
     outline: none;
+    width: 175px;
     height: 45px;
     background-color: transparent;
-    /*border-bottom-left-radius: 5px;*/
-    /*border-bottom-right-radius: 5px;*/
     padding: 0 30px 0 20px;
     font-size: 12px;
     font-weight: 700;
-    /*color: $c-mid-1;*/
     cursor: pointer;
     transition: background-color 0.25s;
   }
@@ -7667,10 +7724,11 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .foot {
     align-self: center;
     flex-shrink: 0;
-    width: 75px;
+    min-width: 75px;
   }
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .foot h1 {
-    margin-top: 10px;
+    display: inline-block;
+    margin: 10px 15px 0 15px;
     text-align: center;
     line-height: 16px;
     white-space: nowrap;

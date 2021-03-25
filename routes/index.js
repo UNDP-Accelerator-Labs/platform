@@ -221,10 +221,10 @@ function parsePadFilters (req) {
 	const 	f_mobilizations		= q_mobilizations 		? DB.pgp.as.format(`AND mob.mobilization IN ($1:csv)`, [q_mobilizations])		: ''
 	// PUBLIC/ PRIVATE FILTERS
 	let f_space = ''
-	if (space === 'private' && !sudo) 	f_space	= DB.pgp.as.format(`AND p.contributor IN (SELECT id FROM contributors WHERE uuid = $1)`, [uuid])
-	if (space === 'bookmarks') 							f_space	= DB.pgp.as.format(`AND p.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
-	if (space === 'fortomorrow')	 					f_space = DB.pgp.as.format(`AND (p.sdgs @> ANY('{$1:csv}'::jsonb[]) OR (p.id IN (SELECT DISTINCT pad FROM engagement_pads WHERE type = 'flag'))) AND p.status = 2`, [[11]])
-	if (space === 'public')	 							f_space = DB.pgp.as.format(`AND p.status = 2`)
+	if (space === 'private' && !sudo) 	f_space	= DB.pgp.as.format(`AND p.contributor IN (SELECT id FROM contributors WHERE country = (SELECT country FROM contributors WHERE uuid = $1))`, [uuid])
+	if (space === 'bookmarks') 			f_space	= DB.pgp.as.format(`AND p.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
+	if (space === 'fortomorrow')	 	f_space = DB.pgp.as.format(`AND (p.sdgs @> ANY('{$1:csv}'::jsonb[]) OR (p.id IN (SELECT DISTINCT pad FROM engagement_pads WHERE type = 'flag'))) AND p.status = 2`, [[11]])
+	if (space === 'public')	 			f_space = DB.pgp.as.format(`AND p.status = 2`)
 	// ORDER
 	let 	order 				= DB.pgp.as.format(`ORDER BY p.status ASC, p.date DESC`)
 	// INTERCEPT FOR TOMORROW 
@@ -598,13 +598,13 @@ function lazyLoadTemplates (kwargs) {
 		INNER JOIN contributors c
 			ON c.id = t.contributor
 		LEFT JOIN pads p
-			ON p.template = t.id
+			ON t.id = p.template
 		LEFT JOIN (
 			SELECT template, contributor, array_agg(DISTINCT type) AS types FROM engagement_templates
 			WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1)
 			GROUP BY (template, contributor)
 		) e
-			ON e.template = t.id
+			ON t.id = e.template
 		LEFT JOIN (
 			SELECT template, 
 				SUM (CASE WHEN type = 'bookmark' THEN 1 ELSE 0 END) AS bookmarks,
@@ -612,12 +612,12 @@ function lazyLoadTemplates (kwargs) {
 			FROM engagement_templates
 			GROUP BY template
 		) ce
-			ON ce.template = t.id
+			ON t.id = ce.template
 		LEFT JOIN mobilizations mob
-			ON mob.template = t.id
+			ON t.id = mob.template
 		WHERE TRUE 
 			$3:raw $4:raw $5:raw $6:raw
-		GROUP BY (t.id, c.name, ce.bookmarks, ce.applications, e.types, p.id)
+		GROUP BY (t.id, c.name, ce.bookmarks, ce.applications, e.types)
 		$7:raw
 		LIMIT $8 OFFSET $9
 		;`, [uuid, rights, f_search, f_contributors, f_mobilizations, f_space, order, lazyLimit, (page - 1) * lazyLimit])

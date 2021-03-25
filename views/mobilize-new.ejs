@@ -19,7 +19,7 @@
 		<div class='modal m-1'>
 			<div class='inner'>
 				<div class='body'>
-					<input id='title' type='text' name='title' onblur='fixLabel(this); enableNext(this)'>
+					<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onblur='fixLabel(this); enableNext(this)'>
 					<label class='placeholder' for='title'>Provide a title for the mobilization</label>
 				</div>
 				<div class='foot'>
@@ -118,6 +118,14 @@
 	const lang = '<%- locals.lang %>';
 	const editing = false
 	
+	function preventSubmit (node, evt) {
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			console.log('here')
+			evt.preventDefault()
+			node.blur()
+			d3.select(node).findAncestor('modal').select('.foot button').node().click()
+		}
+	}
 	function enableNext (node) {
 		const parent = d3.select(node).findAncestor('modal')
 		const button = parent.select('.foot button').node()

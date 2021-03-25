@@ -14,23 +14,31 @@ main#browse-pads {
 			text-align: center;
 			a {
 				button {
-					width: 90px;
-					height: 90px;
+					width: 75px;
+					height: 75px;
 					border: none;
 					outline: none;
-					background-color: $c-light-green;
+					background-color: $c-mid-green;
 					font-size: $t-xlarge;
 					color: #FFF;
 					cursor: pointer;
-					transform: rotate(45deg);
-					transition: background-color .25s;
+					transform: translateY(7px) rotate(45deg);
+					box-shadow: 0 0 10px rgba(0,0,0,.15);
+					transition: background-color .25s, transform .25s;
 
 					div {
 						transform: rotate(-45deg);
+						transition: color .5s, transform .5s;
 					}
 				}
 				button:hover {
-					background-color: $c-mid-green;
+					background-color: $c-light-green;
+					transform: rotate(180deg);
+
+					div {
+						transform: rotate(-180deg);
+						color: $c-dark-grey;
+					}
 				}
 			}
 		}
@@ -119,34 +127,40 @@ main#browse-pads {
 		.pads-container {
 			clear: both;
 			position: relative;
-			margin: 60px 0 60px 0;
+			margin: 60px 0;
 			/*border-top: 1px solid $c-mid-2;*/
-			border-top: 1px solid $c-dark-blue;
+			/*border-top: 1px solid $c-dark-blue;*/
 
 			.pub-status {
 				display: block;
-				text-align: center;
+				/*text-align: center;*/
 				margin-bottom: 30px;
 
-				label {
-					position: absolute;
-					bottom: 100%;
-					left: 0;
+				div {
+					/*position: absolute;*/
+					/*bottom: 100%;*/
+					/*left: 0;*/
+					position: relative;
+					width: 175px;
 					white-space: nowrap;
-					padding: 5px 10px;
-					/*background-color: $c-mid-2;*/
+					padding: 5px 0;
 					background-color: $c-dark-blue;
 					font-size: $t-small;
+					text-align: center;
 					color: #FFF;
 				}
-				label::after {
+				div::after {
 					content: '';
 					position: absolute;
 					left: 100%;
 					/*top: -8px;*/
-					top: 8px;
+					/*top: 8px;
 					min-width: 225px;
+					height: 100%;*/
+					top: 10px;
+					min-width: 120px;
 					height: 100%;
+					margin-left: 5px;
 					background-color: #FFF;
 					background: #FFF url('../imgs/branding/dancing_squares_dark_blue.svg') no-repeat center;
 					background-size: contain;
@@ -156,12 +170,13 @@ main#browse-pads {
 				clear: both;
 				width: 100%;
 				display: flex;
-				justify-content: center;
-				margin: -30px 0 30px 0;
+				justify-content: flex-start;
+				margin: -30px 0 15px 0;
 
 				button {
 					border: none;
 					outline: none;
+					width: 175px;
 					height: 45px;
 					background-color: transparent;
 					/*border-bottom-left-radius: 5px;*/
@@ -529,23 +544,31 @@ main#browse-templates {
 			text-align: center;
 			a {
 				button {
-					width: 90px;
-					height: 90px;
+					width: 75px;
+					height: 75px;
 					border: none;
 					outline: none;
 					background-color: $c-mid-yellow;
 					font-size: $t-xlarge;
 					color: #FFF;
 					cursor: pointer;
-					transform: rotate(45deg);
-					transition: background-color .25s;
+					transform: translateY(7px) rotate(45deg);
+					box-shadow: 0 0 10px rgba(0,0,0,.15);
+					transition: background-color .25s, transform .25s;
 
 					div {
 						transform: rotate(-45deg);
+						transition: color .5s, transform .5s;
 					}
 				}
 				button:hover {
 					background-color: $c-light-yellow;
+					transform: rotate(180deg);
+
+					div {
+						transform: rotate(-180deg);
+						color: $c-dark-grey;
+					}
 				}
 			}
 		}
@@ -611,32 +634,37 @@ main#browse-templates {
 		.templates-container {
 			clear: both;
 			position: relative;
-			margin: 60px 0 60px 0;
-			border-top: 1px solid $c-dark-blue;
+			margin: 60px 0;
+			/*border-top: 1px solid $c-dark-blue;*/
 
 			.pub-status {
 				display: block;
-				text-align: center;
+				/*text-align: center;*/
 				margin-bottom: 30px;
 
-				label {
-					position: absolute;
-					bottom: 100%;
-					left: 0;
+				div {
+					/*position: absolute;*/
+					/*bottom: 100%;*/
+					/*left: 0;*/
+					position: relative;
+					width: 175px;
 					white-space: nowrap;
-					padding: 5px 10px;
+					padding: 5px 0;
 					background-color: $c-dark-blue;
 					font-size: $t-small;
+					text-align: center;
 					color: #FFF;
 				}
-				label::after {
+				div::after {
 					content: '';
 					position: absolute;
 					left: 100%;
-					/*top: -8px;*/
-					top: 8px;
-					min-width: 225px;
+					/*top: 8px;*/
+					/*min-width: 225px;*/
+					top: 10px;
+					min-width: 120px;
 					height: 100%;
+					margin-left: 5px;
 					background-color: #FFF;
 					background: #FFF url('../imgs/branding/dancing_squares_dark_blue.svg') no-repeat center;
 					background-size: contain;
@@ -646,20 +674,18 @@ main#browse-templates {
 				clear: both;
 				width: 100%;
 				display: flex;
-				justify-content: center;
-				margin: -30px 0 30px 0;
+				justify-content: flex-start;
+				margin: -30px 0 15px 0;
 
 				button {
 					border: none;
 					outline: none;
+					width: 175px;
 					height: 45px;
 					background-color: transparent;
-					/*border-bottom-left-radius: 5px;*/
-					/*border-bottom-right-radius: 5px;*/
 					padding: 0 30px 0 20px;
 					font-size: $t-small;
 					font-weight: 700;
-					/*color: $c-mid-1;*/
 					cursor: pointer;
 					transition: background-color .25s;
 
@@ -975,10 +1001,11 @@ main#browse-templates {
 								.foot {
 									align-self: center;
 									flex-shrink: 0;
-									width: 75px;
+									min-width: 75px;
 
 									h1 {
-										margin-top: 10px;
+										display: inline-block;
+										margin: 10px 15px 0 15px;
 										text-align: center;
 										line-height: $t-main;
 										white-space: nowrap;

@@ -39,6 +39,7 @@ const Media = function (kwargs) {
 	this.lang = lang
 	this.constraint = datum.constraint
 
+	this.id = uuidv4()
 	this.container = (container || parent.insertElem('.repeat-container', 'div', `media-container ${type}-container`)) // MAYBE ADD ACTIVITY AS CLASS HERE
 		.classed('focus', focus)
 		.datum(datum)
@@ -202,7 +203,7 @@ const Taglist = function (kwargs) {
 					.classed('selected', d => tags.map(c => c.name.simplify()).includes(d.name.simplify()))
 				meta.tags.addElem('input')
 					.attrs({ 
-						'id': d => `${type.slice(0, -1)}-${d.name.simplify()}`, 
+						'id': d => `${meta.id}-${d.name.simplify()}`, 
 						'type': 'checkbox', 
 						'name': type.slice(0, -1), 
 						'value': d => d.name, 
@@ -252,12 +253,12 @@ const Taglist = function (kwargs) {
 				})
 
 				meta.tags.addElem('label')
-					.attrs({ 'for': d => `${type.slice(0, -1)}-${d.name.simplify()}` })
+					.attrs({ 'for': d => `${meta.id}-${d.name.simplify()}` })
 					.html(d => d.name.capitalize())
 
 				meta.filter = meta.inset.addElem('div', 'filter-or-add')
 				meta.filter.addElem('input')
-					.attrs({ 'type': 'text', 'name': type.slice(0, -1), 'id': `filter-${type}-field` })
+					.attrs({ 'type': 'text', 'name': type.slice(0, -1), 'id': `filter-${meta.id}` })
 				.on('keyup', function () {
 					const evt = d3.event
 					const sel = d3.select(this)
@@ -290,7 +291,7 @@ const Taglist = function (kwargs) {
 				}).on('blur', function () { fixLabel(this) })
 
 				meta.filter.addElem('label')
-					.attr('for', `filter-${type}-field`)
+					.attr('for', `filter-${meta.id}`)
 					.html(opencode ? vocabulary['looking for something or add'][lang] : vocabulary['looking for something'][lang])
 
 				meta.filter.addElems('button',  'add')
@@ -306,7 +307,7 @@ Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE A
 Taglist.prototype.constructor = Taglist
 Taglist.prototype.recode = function (opencode = true) {
 	const meta = this
-	const filter = meta.filter.select(`input#filter-${meta.type}-field`)
+	const filter = meta.filter.select(`input#filter-${meta.id}`)
 	const val = filter.node().value.trim().toLowerCase()
 	const prechecked = meta.inset.selectAll(`.inset-${meta.type} .tag input:checked`).data()
 
@@ -321,9 +322,9 @@ Taglist.prototype.recode = function (opencode = true) {
 			.classed('selected', !meta.constraint || prechecked.length < meta.constraint)
 		opt.addElem('input')
 		.attrs({ 
-			'id': c => `${meta.type.slice(0, -1)}-${c.name.simplify()}`, 
+			'id': c => `${meta.id}-${c.name.simplify()}`, 
 			'type': 'checkbox', 
-			'name': meta.type.slice(0, -1), 
+			'name': type.slice(0, -1), 
 			'value': c => c.name
 		}).each(function () {
 			const sel = d3.select(this)
@@ -381,7 +382,7 @@ Taglist.prototype.recode = function (opencode = true) {
 		})
 
 		opt.addElem('label')
-			.attr('for', c => `${meta.type.slice(0, -1)}-${c.name.simplify()}`)
+			.attr('for', c => `${meta.id}-${c.name.simplify()}`)
 			.html(c => c.name.capitalize())
 	} else {
 		if (!meta.constraint || prechecked.length < meta.constraint) {
@@ -549,11 +550,12 @@ function addSection (kwargs) {
 	if (!structure) structure = []
 	if (!items) items = []
 
-	if (editing && !items.length && templated) items = JSON.parse(JSON.stringify(structure)) // TO DO: THIS IS NOT OPTIMAL, BUT DEEP COPY IS NEEDED
+	if (editing && templated && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure)) // TO DO: THIS IS NOT OPTIMAL, BUT DEEP COPY IS NEEDED
+
+	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+	const section_id = uuidv4()
 
 	d3.selectAll('.media-layout').classed('focus', false)
-
-	// if (sibling) console.log(d3.select(`main#pad div.inner div.body section${sibling}`))
 
 	const section = d3.select('main#pad div.inner div.body')
 		.insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
@@ -562,12 +564,6 @@ function addSection (kwargs) {
 		.datum({ type: 'section', title: title, lead: lead, structure: structure, items: items, repeat: repeat, group: group })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
 
-	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
-	let section_id = uuidv4()
-	// let section_id = 0
-	// d3.selectAll('.media-layout').each(function (d, i) {
-	// 	if (this === section.node()) section_id = i
-	// })
 	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
 	if (
 		((editing || activity === 'preview') && section_id !== 0 && !templated)
@@ -662,11 +658,9 @@ function addSection (kwargs) {
 					kwargs.sibling = `section:nth-child(${i + 2})`
 					kwargs.focus = true
 					
+					console.log(kwargs)
 					const new_section = addSection(kwargs)
 					d3.select(new_section).classed('animate-in', true)
-					.each(function (c) {
-						c.structure.forEach(b => populateSection (b, lang, this))
-					})
 					
 					partialSave('media')
 				}
@@ -1933,7 +1927,7 @@ function addGroup (kwargs) {
 		.each(function (c) { 
 			this.innerHTML = ''
 			c.forEach(b => populateSection(b, lang, this))
-		})
+		}).classed('animate-in', true)
 		// THIS IS THE SAME AS IN MEDIA, BUT IN MEDIA WE PREVENT THESE OPTIONS WHEN TEMPLATED
 		// HERE THEY ARE MADE AVAILABLE FOR REMOVING GROUP REPETITIONS
 		const placement = groups.addElems('div', 'placement-opts')
@@ -1947,7 +1941,7 @@ function addGroup (kwargs) {
 			.addElems('i', 'material-icons')
 			.html(d => d.label)
 
-		function rmGroup (sel) {
+		function rmGroup (sel) { // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS
 			console.log(sel)
 			// FOR META INPUT
 			sel.selectAll('.media-container, .meta-container').data()

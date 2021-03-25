@@ -353,6 +353,7 @@
 		let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
 		if (tags && !tags.length) tags = null
 		let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
+		let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
 		if (datasources && !datasources.length) datasources = null
 
 		

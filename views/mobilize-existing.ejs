@@ -94,7 +94,7 @@
 		const content = mobilizations.addElems('div', 'content')
 		
 		const template_title = content.addElem('div', 'media media-txt')
-			.attr('data-placeholder', '<%- vocabulary['untitled template'][locals.lang] %>')
+			.attr('data-placeholder', '<%- vocabulary["untitled template"][locals.lang] %>')
 		template_title.addElems('i').html(d => 'This mobilization uses: ')// TO DO: TRANSLATE
 		template_title.addElems('a')
 			.attr('href', d => `../edit/template?id=${d.template_id}`)
@@ -103,13 +103,13 @@
 		const contributions = content.addElem('div', 'meta meta-stats')
 			.addElems('a')
 			.classed('disabled', d => !d.pads)
-			.attr('href', d => `../browse/pads/private?mobilizations=${d.id}`)
+			.attr('href', d => `../browse/pads/public?mobilizations=${d.id}`)
 		.addElems('h1')
 			.html(d => d.pads)
 		contributions.addElems('small')
 		contributions.addElems('br')
 		contributions.addElems('small', 'light')
-			.html(d => 'contributions') // TO DO: TRANSLATE
+			.html(d => vocabulary['pad']['<%- locals.lang %>'](d.pads !== 1))
 
 		const contributors = content.addElem('div', 'meta meta-stats')
 			.addElems('a')
@@ -118,23 +118,25 @@
 		contributors.addElems('small')
 		contributors.addElems('br')
 		contributors.addElems('small', 'light')
-			.html(d => 'invited contributors') // TO DO: TRANSLATE
+			.html(d => 'contributors') // TO DO: TRANSLATE
 
 		content.addElems('div', 'btn-group')
 		.addElems('form', 'pad-actons', function (d) {
 			const opts = []
+			console.log(d)
 			// opts.push({ node: 'button', type: 'button', label: 'Contribute' })
 			// opts.push({ action: '../browse/pads/private', method: 'GET', node: 'button', type: 'submit', label: 'Browse contributions', name: 'mobilizations', value: d.id })
 			// opts.push({ node: 'button', type: 'submit', label: 'Browse contributions', name: 'mobilizations', value: d.id })
 			// TO DO: TERMINATE DEPLOYMENT
 			// if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteMobilizations })
+			if (d.status === 1) opts.push({ action: '/demobilize', method: 'GET', node: 'button', type: 'submit', label: 'Demobilize' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
 			const sel = d3.select(this)
 			const mobilization = sel.findAncestor('mobilization')
-			// sel.addElems('input')
-				// .attrs({ 'type': 'hidden', 'name': 'id', 'value': template.datum().id })
+			sel.addElems('input')
+				.attrs({ 'type': 'hidden', 'name': 'id', 'value': mobilization.datum().id })
 			sel.addElems('a')
 				.attr('href', '#')
 			.addElems(d.node, 'btn-overlay')

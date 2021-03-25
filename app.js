@@ -74,6 +74,7 @@ app.route('/:lang/mobilize/:space')
 	.get(routes.render.login, routes.dispatch.mobilize)
 	.post(routes.dispatch.mobilize)
 app.post('/deploy', routes.process.deploy)
+app.get('/demobilize', routes.process.demobilize)
 
 app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
 

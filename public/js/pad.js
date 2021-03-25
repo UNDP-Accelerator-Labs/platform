@@ -48,7 +48,7 @@ const Media = function (kwargs) {
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) }) // TO DO: CHANGE EDITING VAR HERE > PLACE IT IN BACK END, LIKE FOR THE browse VIEW
 	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-	if (templated) this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
+	if (templated && datum.instruction) this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
 		.attr('data-placeholder', d => d.instruction)
 		.text(d => d.instruction)
 	this.media = this.container.addElems('div', 'media', d => [d], d => d.type)

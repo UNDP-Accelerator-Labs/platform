@@ -13,7 +13,7 @@
 <%- include ('partials/menu-filters.ejs') %> 
 
 <main id='browse-pads'>
-	<h1>Accelerator Lab<br>Action Central</h1>
+	<!-- <h1>Accelerator Lab <%- locals.country %><br>Action Central</h1> -->
 	<div class='inner'>
 		<% if (locals.space === 'private') { %>
 			<section class='new'>
@@ -145,14 +145,18 @@
 			} else return [null]
 		}
 		function getSDGs (d) {
-			if (d && d.meta) {
-				if (d.meta.find(c => c.type === 'sdgs')) return [d.meta.find(c => c.type === 'sdgs').sdgs]
+			if (d && d.sections) {
+				const sdgs = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b).flat())
+					.flat().find(c => c.type === 'sdgs')
+				if (sdgs) return [sdgs.sdgs]
 				else return []
 			} else return []
 		}
 		function getTags(d) {
-			if (d && d.meta) {
-				if (d.meta.find(c => c.type === 'tags')) return [d.meta.find(c => c.type === 'tags').tags.map(c => c.name)]
+			if (d && d.sections) {
+				const tags = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b).flat())
+					.flat().find(c => c.type === 'tags')
+				if (tags) return [tags.tags.map(c => c.name)]
 				else return []
 			} else return []
 		}

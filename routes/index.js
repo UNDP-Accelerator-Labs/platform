@@ -107,7 +107,7 @@ exports.process.login = (req, res, next) => { // REROUTE
 	if (!username || !password) res.redirect('/login')
 	else { 
 		DB.conn.oneOrNone(`
-			SELECT name, uuid, rights, lang FROM contributors
+			SELECT name, country, uuid, rights, lang FROM contributors
 			WHERE (name = $1 OR email = $1)
 				AND password = CRYPT($2, password)
 		;`, [username, password])
@@ -115,6 +115,7 @@ exports.process.login = (req, res, next) => { // REROUTE
 			if (result) {
 				req.session.uuid = result.uuid
 				req.session.username = result.name
+				req.session.country = result.country
 				req.session.sudo = result.name === 'sudo' // THIS SHOULD BE DEPRECATED
 				req.session.rights = result.rights
 				if (!result.lang) req.session.lang = 'en'
@@ -143,7 +144,7 @@ function navigationData (kwargs) {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	let { path, query, headers } = kwargs.req || {}
 	path = path.substring(1).split('/')
-	const { uuid, username, rights } = kwargs.req.session || {}
+	const { uuid, username, country, rights } = kwargs.req.session || {}
 	let { lang } = kwargs.req.params || kwargs.req.session || {}
 	lang = checklanguage(lang)
 
@@ -159,15 +160,19 @@ function navigationData (kwargs) {
 	}
 
 	return conn.any(`
-		SELECT mob.id, mob.title, mob.template, to_char(mob.start_date, 'DD Mon YYYY') AS start_date, c.name AS host_name FROM mobilization_contributors mc
+		SELECT mob.id, mob.title, mob.template, 
+			to_char(mob.start_date, 'DD Mon YYYY') AS start_date, 
+			c.name AS host_name 
+		FROM mobilization_contributors mc
 		INNER JOIN mobilizations mob
 			ON mc.mobilization = mob.id
 		INNER JOIN contributors c
 			ON mob.host = c.id
 		WHERE mc.contributor = (SELECT id FROM contributors WHERE uuid = $1)
+			AND mob.status = 1
 	;`, [uuid])
 	.then(results => {
-		return { path: path, uuid: uuid, originalUrl: headers.referer, username: username, rights: rights, lang: lang, query: parsedQuery, participations: results }
+		return { path: path, originalUrl: headers.referer, uuid: uuid, username: username, country: country, rights: rights, lang: lang, query: parsedQuery, participations: results }
 	}).catch(err => console.log(err))
 }
 /* =============================================================== */
@@ -190,7 +195,7 @@ exports.dispatch.browse = async (req, res) => {
 }
 /* ============================ PADS ============================= */
 function parsePadFilters (req) {
-	const { uuid, rights, restricted, restrictedTemplate } = req.session || {}
+	const { uuid, country, rights, restricted, restrictedTemplate } = req.session || {}
 	const { space } = req.params
 	let { query, sdgs, thematic_areas, mappers, templates, mobilizations, page } = req.query && Object.keys(req.query).length ? req.query : req.body && Object.keys(req.body).length ? req.body : {}
 	const sudo = rights > 2
@@ -221,7 +226,7 @@ function parsePadFilters (req) {
 	const 	f_mobilizations		= q_mobilizations 		? DB.pgp.as.format(`AND mob.mobilization IN ($1:csv)`, [q_mobilizations])		: ''
 	// PUBLIC/ PRIVATE FILTERS
 	let f_space = ''
-	if (space === 'private' && !sudo) 	f_space	= DB.pgp.as.format(`AND p.contributor IN (SELECT id FROM contributors WHERE country = (SELECT country FROM contributors WHERE uuid = $1))`, [uuid])
+	if (space === 'private' && !sudo) 	f_space	= DB.pgp.as.format(`AND p.contributor IN (SELECT id FROM contributors WHERE country = $1)`, [country])
 	if (space === 'bookmarks') 			f_space	= DB.pgp.as.format(`AND p.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
 	if (space === 'fortomorrow')	 	f_space = DB.pgp.as.format(`AND (p.sdgs @> ANY('{$1:csv}'::jsonb[]) OR (p.id IN (SELECT DISTINCT pad FROM engagement_pads WHERE type = 'flag'))) AND p.status = 2`, [[11]])
 	if (space === 'public')	 			f_space = DB.pgp.as.format(`AND p.status = 2`)
@@ -239,7 +244,7 @@ function galleryPads (req, res) {
 
 	DB.conn.tx(async t => {
 		const data = await lazyLoadPads({ connection: t, req: req })
-		const { path, uuid, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
+		const { path, uuid, username, country, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
 		
 		console.log(query)
 
@@ -333,12 +338,12 @@ function galleryPads (req, res) {
 		.then(results => {
 			// let [totalcounts, filteredcounts, locations, centerpoint, sdgs, thematic_areas, templates, contributors, mobilizations] = results
 			let [totalcounts, filteredcounts, locations, centerpoint, templates, contributors, mobilizations] = results
-			
 			return { 
 				title: 'Browse pads', 
 				
 				path: path,
 				user: username,
+				country: country,
 				centerpoint: JSON.stringify(centerpoint),
 				rights: rights,
 				participations: participations,
@@ -489,7 +494,7 @@ function galleryTemplates (req, res) {
 
 	DB.conn.tx(async t => {
 		const data = await lazyLoadTemplates({ connection: t, req: req })
-		const { path, uuid, username, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
+		const { path, uuid, username, country, rights, lang, query, participations } = await navigationData({ connection: t, req: req })
 	
 		const batch = []
 		
@@ -544,6 +549,7 @@ function galleryTemplates (req, res) {
 
 				path: path,
 				user: username,
+				country: country,
 				rights: rights,
 				participations: participations,
 				
@@ -847,6 +853,7 @@ exports.process.deploy = (req, res) => {
 	let { title, template, cohort } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]
+	
 	const { uuid } = req.session || {}
 	let { lang } = req.params || req.session || {}
 	lang = checklanguage(lang)
@@ -875,6 +882,17 @@ exports.process.deploy = (req, res) => {
 			return t.batch(batch)
 		})
 	}).then(_ => res.redirect(`/${lang}/mobilize/existing`))
+	.catch(err => console.log(err))
+}
+exports.process.demobilize = (req, res) => {
+	const { referer } = req.headers || {}
+	const { id } = req.query || {}
+
+	// EXECUTE SQL
+	DB.conn.none(`
+		UPDATE mobilizations SET status = 2 WHERE id = $1
+	;`, [id])
+	.then(_ => res.redirect(referer))
 	.catch(err => console.log(err))
 }
 /* =============================================================== */

@@ -1160,10 +1160,10 @@ main#template .inner .body .layout .meta-container .add-opt i {
     line-height: 30px;
     cursor: pointer;
   }
-  main#pad .inner .body .layout .media-container .instruction,
-main#pad .inner .body .layout .meta-container .instruction,
-main#template .inner .body .layout .media-container .instruction,
-main#template .inner .body .layout .meta-container .instruction {
+  main#pad .inner .body .layout .media-container div.instruction,
+main#pad .inner .body .layout .meta-container div.instruction,
+main#template .inner .body .layout .media-container div.instruction,
+main#template .inner .body .layout .meta-container div.instruction {
     padding: 5px 0 5px 10px;
     margin-bottom: 5px;
     border-left: 1px dotted #0468B1;
@@ -3136,6 +3136,7 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
   }
   main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .meta-tags .tag:hover {
     background-color: #0A4C73;
+    border-color: #0A4C73;
     color: #FFF;
   }
   main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .meta-contributor {
@@ -3567,6 +3568,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   }
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .head .meta-tags .tag:hover {
     background-color: #0A4C73;
+    border-color: #0A4C73;
     color: #FFF;
   }
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .head .meta-contributor {
@@ -5254,10 +5256,10 @@ main#template .inner .body .layout .meta-container .add-opt i {
     line-height: 30px;
     cursor: pointer;
   }
-  main#pad .inner .body .layout .media-container .instruction,
-main#pad .inner .body .layout .meta-container .instruction,
-main#template .inner .body .layout .media-container .instruction,
-main#template .inner .body .layout .meta-container .instruction {
+  main#pad .inner .body .layout .media-container div.instruction,
+main#pad .inner .body .layout .meta-container div.instruction,
+main#template .inner .body .layout .media-container div.instruction,
+main#template .inner .body .layout .meta-container div.instruction {
     padding: 5px 0 5px 10px;
     margin-bottom: 5px;
     border-left: 1px dotted #0468B1;
@@ -7230,6 +7232,7 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
   }
   main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .meta-tags .tag:hover {
     background-color: #0A4C73;
+    border-color: #0A4C73;
     color: #FFF;
   }
   main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .meta-contributor {
@@ -7661,6 +7664,7 @@ main#browse-templates .inner .templates-container .templates-layout .template .i
   }
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .head .meta-tags .tag:hover {
     background-color: #0A4C73;
+    border-color: #0A4C73;
     color: #FFF;
   }
   main#browse-templates .inner .templates-container .templates-layout .template .inner a .body .head .meta-contributor {

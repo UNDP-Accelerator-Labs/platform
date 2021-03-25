@@ -438,6 +438,7 @@ main#browse-pads {
 								}
 								.tag:hover {
 									background-color: $c-dark-blue;
+									border-color: $c-dark-blue;
 									color: #FFF;
 								}
 							}
@@ -928,6 +929,7 @@ main#browse-templates {
 										}
 										.tag:hover {
 											background-color: $c-dark-blue;
+											border-color: $c-dark-blue;
 											color: #FFF;
 										}
 									}

@@ -1539,18 +1539,22 @@ exports.process.save = (req, res) => { // TO DO: SAVE PAD TO MOBILIZATION IF REL
 				;`, [d.toLowerCase()]))
 			})
 		}
-
 		batch.push(t.oneOrNone(saveSQL))
 		return t.batch(batch)
 		.then(results => {
 			const newObject = results[results.length - 1]
+			const batch = []
 			if (mobilization && newObject) {
 				batch.push(t.none(`
 					INSERT INTO mobilization_contributions (pad, mobilization)
 					VALUES ($1, $2)
 				;`, [newObject.id, mobilization]))
 			}
-			return results
+			// UPDATE THE TIMESTAMP
+			batch.push(t.none(`
+				UPDATE pads SET update_at = NOW() WHERE id = $1
+			;`, [id || newObject.id]))
+			return t.batch(batch).then(_ => results)
 		})
 	}).then(results => {
 		const newObject = results[results.length - 1]

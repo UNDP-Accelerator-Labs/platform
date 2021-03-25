@@ -22,9 +22,6 @@ html, body {
 		padding: 5px 10px;
 		font-size: $t-small;
 	}
-	/*.close:hover {
-		text-decoration: underline;
-	}*/
 	.inner {
 		clear: both;
 		padding: 10px;
@@ -78,7 +75,7 @@ html, body {
 
 					.sub {
 						font-size: $t-small;
-						color: $c-light-1;
+						color: $c-light-grey;
 					}
 				}
 				button.padded {
@@ -88,7 +85,7 @@ html, body {
 					width: 100%;
 					min-height: 300px;
 					border: none;
-					border-bottom: 1px solid $c-light-1;
+					border-bottom: 1px solid $c-light-grey;
 					outline: none;
 					background-color: transparent;
 					font-size: $t-large; 
@@ -113,7 +110,7 @@ html, body {
 			}
 			li:hover {
 				button {
-					background-color: $c-dark-1;
+					background-color: $c-dark-blue;
 					color: #FFF;
 				}
 			}

@@ -79,9 +79,7 @@ input:-webkit-autofill:active {
   width: 100vw;
   height: calc(100vh - 95px);
   overflow: scroll;
-  background-color: #57648C;
-  /*background: $c-dark-1;*/
-  /*background: linear-gradient(315deg, $c-dark-1 0%, $c-mid-2 100%);*/
+  background-color: #61B233;
   animation: fade-in 0.25s;
   z-index: 9999;
 }
@@ -89,12 +87,13 @@ input:-webkit-autofill:active {
   float: right;
   border: none;
   outline: none;
-  background-color: #934A5F;
+  background-color: #0A4C73;
   color: #FFF;
   cursor: pointer;
 }
 .screen .modal .inner {
-  border-top: 3px solid #934A5F;
+  border-top: 3px solid #0A4C73;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
 .screen.bis {

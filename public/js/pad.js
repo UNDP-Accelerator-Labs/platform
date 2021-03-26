@@ -626,7 +626,7 @@ function addSection (kwargs) {
 			lang: lang
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		medialead.opts.remove()
+		if (medialead.opts) medialead.opts.remove()
 
 		medialead.media.attrs({ 
 			'data-placeholder': d => 'Lead paragraph', // TO DO: TRANSLATION
@@ -645,8 +645,8 @@ function addSection (kwargs) {
 			lang: lang
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		mediarepeat.opts.remove()
-		mediarepeat.instruction.remove()
+		if (mediarepeat.opts) mediarepeat.opts.remove()
+		if (mediarepeat.instruction) mediarepeat.instruction.remove()
 
 		mediarepeat.media.addElems('button')
 		.on('click', function () {
@@ -1942,7 +1942,6 @@ function addGroup (kwargs) {
 			.html(d => d.label)
 
 		function rmGroup (sel) { // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS
-			console.log(sel)
 			// FOR META INPUT
 			sel.selectAll('.media-container, .meta-container').data()
 			.forEach(d => {

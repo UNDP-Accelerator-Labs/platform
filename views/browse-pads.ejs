@@ -134,10 +134,11 @@
 
 	function renderVignette (section, data) {
 		function getImg (d) {
-			if (d && d.media) {
-				const img = d.media.find(c => c.type === 'img' && c.src)
-				const mosaic = d.media.find(c => c.type === 'mosaic' && c.srcs[0])
-				const embed = d.media.find(c => c.type === 'embed' && c.src)
+			if (d && d.sections) {
+				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
+				const img = media.find(c => c.type === 'img' && c.src)
+				const mosaic = media.find(c => c.type === 'mosaic' && c.srcs[0])
+				const embed = media.find(c => c.type === 'embed' && c.src)
 				if (img) return [`/${img.src.replace('uploads', 'uploads/sm')}`]
 				else if (mosaic) return [`/${mosaic.srcs[0].replace('uploads', 'uploads/sm')}`]
 				else if (embed) return [`/${embed.src.replace('uploads', 'uploads/sm')}`]
@@ -146,7 +147,7 @@
 		}
 		function getSDGs (d) {
 			if (d && d.sections) {
-				const sdgs = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b).flat())
+				const sdgs = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat())
 					.flat().find(c => c.type === 'sdgs')
 				if (sdgs) return [sdgs.sdgs]
 				else return []
@@ -154,8 +155,8 @@
 		}
 		function getTags(d) {
 			if (d && d.sections) {
-				const tags = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b).flat())
-					.flat().find(c => c.type === 'tags')
+				const tags = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat())
+					.flat().flat().find(c => c.type === 'tags')
 				if (tags) return [tags.tags.map(c => c.name)]
 				else return []
 			} else return []

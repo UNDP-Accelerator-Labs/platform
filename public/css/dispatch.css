@@ -2785,6 +2785,7 @@ main#template .inner .body .input-group.fixed label {
   }
   main#browse-pads .inner .overview .summary-statistics .statistic h1 small {
     font-size: 16px;
+    line-height: 16px;
   }
   main#browse-pads .inner .overview .summary-statistics .statistic h1:after {
     content: "";
@@ -3253,6 +3254,7 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
   }
   main#browse-templates .inner .overview .summary-statistics .statistic h1 small {
     font-size: 16px;
+    line-height: 16px;
   }
   main#browse-templates .inner .overview .summary-statistics .statistic h1:after {
     content: "";
@@ -6881,6 +6883,7 @@ main#template .inner .body .input-group.fixed label {
   }
   main#browse-pads .inner .overview .summary-statistics .statistic h1 small {
     font-size: 16px;
+    line-height: 16px;
   }
   main#browse-pads .inner .overview .summary-statistics .statistic h1:after {
     content: "";
@@ -7349,6 +7352,7 @@ main#browse-pads .inner .pads-container .pads-layout .pad .inner .body .media-im
   }
   main#browse-templates .inner .overview .summary-statistics .statistic h1 small {
     font-size: 16px;
+    line-height: 16px;
   }
   main#browse-templates .inner .overview .summary-statistics .statistic h1:after {
     content: "";

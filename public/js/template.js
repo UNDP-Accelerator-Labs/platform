@@ -232,7 +232,7 @@ const Taglist = function (kwargs) {
 				const panel = meta.inset.addElems('div', `inset-${type}`)
 					.addElems('ul', 'panel')
 				panel.addElems('li', 'instruction', [{ value: vocabulary['tags instruction'][lang] }])
-					.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
+					.html(d => `* ${d.value}`)
 				panel.addElems('li', 'opt', data)
 				.each(function (d, i) {
 					const sel = d3.select(this)
@@ -358,9 +358,9 @@ function addSection (kwargs) {
 		lang: lang
 	})
 	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-	medialead.opts.remove()
-	medialead.placement.remove()
-	medialead.response.remove()
+	if (medialead.opts) medialead.opts.remove()
+	if (medialead.placement) medialead.placement.remove()
+	if (medialead.response) medialead.response.remove()
 
 	medialead.media.attrs({ 
 		'data-placeholder': d => 'Lead paragraph', // TO DO: TRANSLATION
@@ -375,9 +375,9 @@ function addSection (kwargs) {
 			lang: lang
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		mediarepeat.opts.remove()
-		mediarepeat.placement.remove()
-		mediarepeat.response.remove()
+		if (mediarepeat.opts) mediarepeat.opts.remove()
+		if (mediarepeat.placement) mediarepeat.placement.remove()
+		if (mediarepeat.response) mediarepeat.response.remove()
 
 		mediarepeat.media.addElems('button')
 		.addElems('div').attrs({ 
@@ -409,8 +409,8 @@ function addTitle (kwargs) {
 		lang: lang
 	})
 	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-	media.placement.remove()
-	media.input.remove()
+	if (media.placement) media.placement.remove()
+	if (media.input) media.input.remove()
 
 	media.media.attrs({ 
 		'data-placeholder': d => vocabulary[`request ${type}`][lang],
@@ -426,7 +426,7 @@ function addImg (kwargs) {
 	if (!instruction) instruction = ''
 
 	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), // TO DO: ENABLE IN GROUP
+		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
 		type: type, 
 		datum: { type: type, instruction: instruction },
 		focus: focus || false,
@@ -866,7 +866,7 @@ function addSDGs (kwargs) {
 			const panel = meta.inset.addElems('div', `inset-${type}`)
 				.addElems('ul', 'panel')
 			panel.addElems('li', 'instruction', [{ value: vocabulary['sdgs instruction'][lang] }])
-				.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END
+				.html(d => `* ${d.value}`)
 			panel.addElems('li', 'opt', d => d.sdgs)
 			.each(function (d, i) {
 				const sel = d3.select(this)
@@ -990,8 +990,8 @@ function addGroup (kwargs) {
 			.html(d => d.value)
 	}
 
-	media.input.remove()
-	media.response.remove()
+	if (media.input) media.input.remove()
+	if (media.response) media.response.remove()
 
 	media.media.attrs({ 
 		'data-placeholder': d => vocabulary[`request ${type}`][lang],

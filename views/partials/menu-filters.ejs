@@ -217,10 +217,11 @@
 			d3.select('button#search').node().click()
 		} else {
 			const sel = d3.select(`input[name="${key}"][value="${d}"]`) // TO DO: FIX PB HERE SINCE THE MENUS ARE UPDATED ACCODRING TO FILTER, THERE MAY NO LONGER BE A sel TO FIND IN THE FILTER MENU
-			console.log(key, d)
-			const opt = sel.findAncestor('opt')
-			sel.attr('checked', sel.node().checked ? null : true)
-			sel.node().onchange()
+			if (sel.node()) {
+				const opt = sel.findAncestor('opt')
+				sel.attr('checked', sel.node().checked ? null : true)
+				sel.node().onchange()
+			}
 		}
 	}
 	function accordion (node) {

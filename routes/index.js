@@ -100,7 +100,7 @@ function geocode (locations, centerpoint, list = false, dir = 'forward') { // FO
 /* =============================================================== */
 exports.render.login = (req, res, next) => {
 	if (req.session.uuid) next()
-	else res.render('login', { title: 'Solutions mapping platform | Login', originalUrl: req.originalUrl })
+	else res.render('login', { title: 'AccLabs Action Central | Login', originalUrl: req.originalUrl })
 }
 exports.process.login = (req, res, next) => { // REROUTE
 	const { username, password, originalUrl } = req.body
@@ -346,7 +346,7 @@ function galleryPads (req, res) {
 			// let [totalcounts, filteredcounts, locations, centerpoint, sdgs, thematic_areas, templates, contributors, mobilizations] = results
 			let [totalcounts, filteredcounts, locations, centerpoint, templates, contributors, mobilizations, publications] = results
 			return { 
-				title: 'Browse pads', 
+				title: 'AccLabs Action Central | Browse | Pads', 
 				
 				path: path,
 				user: username,
@@ -553,7 +553,7 @@ function galleryTemplates (req, res) {
 			let [totalcounts, filteredcounts, contributors, mobilizations] = results
 
 			return {
-				title: 'Solutions mapping | Browse | Templates',
+				title: 'AccLabs Action Central | Browse | Templates',
 
 				path: path,
 				user: username,
@@ -729,7 +729,7 @@ function createMobilization (req, res) {
 		.then(results => {
 			const [cohort, templates] = results
 			return { 
-				title: 'Solutions mapping | mobilize', 
+				title: 'AccLabs Action Central | Mobilize', 
 				
 				path: path,
 				queryparams: query,
@@ -787,7 +787,7 @@ function galleryMobilizations (req, res) {
 			let [totalcounts, filteredcounts] = results
 
 			return {
-				title: 'Solutions mapping | Mobilize',
+				title: 'AccLabs Action Central | Mobilize',
 
 				path: path,
 				user: username,
@@ -1029,7 +1029,7 @@ function createPad (req, res) {
 			let [templates, display_template, centerpoint, contributor] = results
 
 			return { 
-				title: 'Pad', 
+				title: 'AccLabs Action Central | Pad', 
 
 				lang: lang,
 				path: path,
@@ -1142,7 +1142,7 @@ function editPad (req, res) {
 			const [display_template, centerpoint, engagement, messages, data] = results
 
 			return { 
-				title: 'Pad', 
+				title: 'AccLabs Action Central | Pad', 
 				
 				lang: lang,
 				path: path,
@@ -1188,7 +1188,7 @@ function createTemplate (req, res) {
 			const [cohort] = results
 			// const [cohort, themes, sdgs] = results
 			return { 
-				title: 'Template', 
+				title: 'AccLabs Action Central | Template', 
 				
 				cohort: cohort,
 
@@ -1233,7 +1233,7 @@ function editTemplate (req, res) {
 			const [cohort, data] = results
 			// const [cohort, themes, sdgs, data] = results
 			return { 
-				title: 'Template', 
+				title: 'AccLabs Action Central | Template', 
 				
 				cohort: cohort,
 
@@ -1289,7 +1289,7 @@ function createImport (req, res) {
 		.then(results => {
 			const [user, centerpoint] = results
 			return { 
-				title: 'Solutions mapping | Import', 
+				title: 'AccLabs Action Central | Import', 
 				
 				path: path,
 				user: username,

@@ -42,10 +42,10 @@ const vocabulary = {
 		"pt": plural => { return `tema${plural ? 's' : ''}` }
 	},
 	"credit": {
-		"en": (cid, name, date) => { return `Contributed by <a href='?mappers=${cid}'>${name}</a> on ${date}.` },
-		"fr": (cid, name, date) => { return `Contribué par <a href='?mappers=${cid}'>${name}</a> le ${date}.` },
-		"es": (cid, name, date) => { return `Contribuido por <a href='?mappers=${cid}'>${name}</a> el ${date}.` },
-		"pt": (cid, name, date) => { return `Contribuíram por <a href='?mappers=${cid}'>${name}</a> em ${date}.` }
+		"en": (cid, name, lab, date) => { return `Contributed by <a href='?mappers=${cid}'>${name}</a> (${lab}) on ${date}.` },
+		"fr": (cid, name, lab, date) => { return `Contribué par <a href='?mappers=${cid}'>${name}</a> (${lab}) le ${date}.` },
+		"es": (cid, name, lab, date) => { return `Contribuido por <a href='?mappers=${cid}'>${name}</a> (${lab}) el ${date}.` },
+		"pt": (cid, name, lab, date) => { return `Contribuíram por <a href='?mappers=${cid}'>${name}</a> (${lab}) em ${date}.` }
 	},
 	"untitled pad": {
 		"en": "Untitled pad",

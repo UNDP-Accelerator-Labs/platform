@@ -64,7 +64,8 @@ CREATE TABLE methods (
 CREATE TABLE datasources (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	name CITEXT UNIQUE,
-	description VARCHAR(99)
+	description VARCHAR(99),
+	contributor INT
 );
 CREATE TABLE cohorts (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

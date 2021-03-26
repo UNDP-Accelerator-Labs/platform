@@ -333,11 +333,18 @@ function galleryPads (req, res) {
 				ORDER BY mob.title
 			;`, [participations.map(d => d.id), f_search, f_sdgs, f_thematic_areas, f_contributors, f_template, f_space]))
 		} else batch.push([])
+		// CHECK NUMBER OF PUBLISHED PADS
+		batch.push(t.one(`
+			SELECT COUNT (id)::INT FROM pads
+			WHERE status = 2
+			AND contributor IN 
+				(SELECT id FROM contributors WHERE country = (SELECT country FROM contributors WHERE uuid = $1))
+		;`, [uuid]))
 
 		return t.batch(batch)
 		.then(results => {
 			// let [totalcounts, filteredcounts, locations, centerpoint, sdgs, thematic_areas, templates, contributors, mobilizations] = results
-			let [totalcounts, filteredcounts, locations, centerpoint, templates, contributors, mobilizations] = results
+			let [totalcounts, filteredcounts, locations, centerpoint, templates, contributors, mobilizations, publications] = results
 			return { 
 				title: 'Browse pads', 
 				
@@ -359,6 +366,7 @@ function galleryPads (req, res) {
 
 				pads: data.pads, // STILL NEED THIS FOR THE MAP AND PIE CHARTS. ULTIMATELY REMOVE WHEN NEW EXPLORE VIEW IS CREATED
 				sections: data.sections,
+				publications: publications.count,
 				
 				// locations: JSON.stringify(locations), 
 				// clusters: JSON.stringify(clusters),
@@ -386,7 +394,7 @@ function lazyLoadPads (kwargs) {
 	const [f_search, f_sdgs, f_thematic_areas, f_contributors, f_template, f_mobilizations, f_space, order, page] = parsePadFilters(kwargs.req)
  
 	return conn.any(`
-		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country AS lab, 
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.inspirations, 0)::INT AS inspirations, 
 			COALESCE(ce.approvals, 0)::INT AS approvals, 
@@ -1550,11 +1558,12 @@ exports.process.save = (req, res) => { // TO DO: SAVE PAD TO MOBILIZATION IF REL
 		if (datasources) {
 			JSON.parse(datasources).forEach(d => {
 				batch.push(t.none(`
-					INSERT INTO datasources (name)
-					VALUES ($1)
+					INSERT INTO datasources (name, contributor)
+					SELECT $1, id FROM contributors
+					WHERE uuid = $2
 						ON CONFLICT ON CONSTRAINT datasources_name_key
 						DO NOTHING
-				;`, [d.toLowerCase()]))
+				;`, [d.toLowerCase(), uuid]))
 			})
 		}
 		batch.push(t.oneOrNone(saveSQL))
@@ -1590,7 +1599,7 @@ exports.process.save = (req, res) => { // TO DO: SAVE PAD TO MOBILIZATION IF REL
 }
 exports.process.publish = (req, res) => {
 	const { referer } = req.headers || {}
-	const { id } = req.query || {}
+	const { id, limit } = req.query || {}
 	const { uuid, rights } = req.session || {}
 	const { lang, activity, object } = req.params || {}
 	
@@ -1606,14 +1615,19 @@ exports.process.publish = (req, res) => {
 					OR $4 > 2)
 		;`, [object, +id, uuid, rights])
 	} else { // PUBLISH ALL
+		// MAKE SURE WE ARE NOT PUBLISHING MORE THAN THE LIMIT (IF THERE IS A LIMIT)
 		saveSQL = DB.pgp.as.format(`
 			UPDATE $1:name
 			SET status = 2,
 				published = TRUE
-			WHERE status = 1
-				AND (contributor = (SELECT id FROM contributors WHERE uuid = $2)
+			WHERE id IN (
+				SELECT id FROM $1:name 
+				WHERE status = 1 
+					AND (contributor = (SELECT id FROM contributors WHERE uuid = $2)
 					OR $3 > 2)
-		;`, [object, uuid, rights])
+				LIMIT $4
+			)
+		;`, [object, uuid, rights, limit])
 	}
 	// EXECUTE SQL
 	DB.conn.none(saveSQL)
@@ -1819,7 +1833,9 @@ exports.api.methods = (req, res) => {
 }
 exports.api.datasources = (req, res) => {
 	DB.conn.any(`
-		SELECT id, name, description FROM datasources ORDER BY name
+		SELECT d.id, d.name, d.description, c.country FROM datasources d
+		LEFT JOIN contributors c
+			ON d.contributor = c.id
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }

@@ -69,6 +69,8 @@
 
 	let page = <%- locals.page %>;
 	var lazyloading = false
+
+	const publication_limit = 3
 	
 
 	function renderStats (data, counts) {
@@ -103,10 +105,13 @@
 				return vocabulary['pad publication status']['<%- locals.lang %>'](count, d.status)
 			})
 		// FOR PUBLISHABLE PADS, PUBLISH ALL
-		sections.addElems('div', 'input-group publish', d => d.status === 1 ? [d] : [])
-			.addElems('form')
+		const publishall = sections.addElems('div', 'input-group publish', d => {
+			return d.status === 1 && <%- locals.publications %> < publication_limit ? [d] : []
+		}).addElems('form')
 			.attrs({ 'action': '/publish/pads', 'method': 'GET' })
-		.addElems('button')
+		publishall.addElems('input')
+			.attrs({ 'type': 'hidden', 'name': 'limit', 'value': publication_limit - <%- locals.publications %> })
+		publishall.addElems('button')
 			.attr('type', 'submit')
 		.each(function () {
 			const sel = d3.select(this)
@@ -172,7 +177,7 @@
 		.addElems('form', 'pad-actons', function (d) {
 			const opts = []
 			// THE FIRST LINE IS IF WE SELECT MULTIPLE PADS
-			if (d.editable && d.status === 1) opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', label: 'Publish' })
+			if (d.editable && d.status === 1 && <%- locals.publications %> < publication_limit) opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', label: 'Publish' })
 			// TO DO: UNPUBLISH
 			if (d.status === 2) opts.push({ node: 'button', type: 'button', label: 'Download', fn: downloadPads })
 			if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deletePads })
@@ -275,7 +280,7 @@
 			})
 
 		pads.addElems('div', 'meta meta-contributor')
-			.html(d => vocabulary['credit']['<%- locals.lang %>'](d.contributor, d.contributorname, d.date))
+			.html(d => vocabulary['credit']['<%- locals.lang %>'](d.contributor, d.contributorname, d.lab, d.date))
 	}
 
 	window.onscroll = async function (ev) {

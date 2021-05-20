@@ -1,0 +1,1 @@
+exports.main = lang => ['en', 'fr', 'es', 'pt'].includes(lang) ? lang : 'en'

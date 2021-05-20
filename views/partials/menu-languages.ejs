@@ -1,0 +1,23 @@
+<nav id='languages'>
+	<ul>
+		<li id='lang-en'>
+			<a class='<% if (locals.metadata.page.lang === "en") { %>active<% } %>'>EN</a>
+		</li>
+		<li id='lang-fr'>
+			<a class='<% if (locals.metadata.page.lang === "fr") { %>active<% } %>'>FR</a>
+		</li>
+		<li id='lang-ar' class='disabled'>
+			<a>AR</a>
+		</li>
+		<li id='lang-es'>
+			<a class='<% if (locals.metadata.page.lang === "es") { %>active<% } %>'>ES</a>
+		</li>
+		<li id='lang-pt'>
+			<a class='<% if (locals.metadata.page.lang === "pt") { %>active<% } %>'>PT</a>
+		</li>
+
+		<li class='user-id'>
+			<span class='lg'><%- vocabulary['logged in'][locals.metadata.page.lang](locals.metadata.user.name) %>. | </span><a href='/logout' class='logout'><%- vocabulary['log out'][locals.metadata.page.lang] %></a>
+		</li>
+	</ul>
+</nav>

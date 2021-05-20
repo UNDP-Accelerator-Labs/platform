@@ -1,0 +1,104 @@
+<nav id='site-title' class='sm'>
+	<div class='inner'>
+
+		<%# if (locals.metadata.page.object === 'pads') { %>
+			<% if (locals.metadata.user.rights > 1) { %>
+				<div class='create'>
+					<button>New</button>
+					<div class='drop-down'>
+						<ul>
+							<!-- TO DO: TRANSLATE -->
+							<li>
+								<button>
+									<label><%- vocabulary['pad'][locals.metadata.page.lang](false).capitalize() %></label>
+									<span class='expandable'>></span>
+								</button>
+								<div class='drop-down'>
+									<ul>
+										<li>
+											<a href='/<%- locals.metadata.page.lang %>/contribute/pad' target='_blank'>
+	 											<button>
+													<label><%- vocabulary['free pad'][locals.metadata.page.lang] %></label>
+												</button>
+											</a>
+										</li>
+										<li>
+											<button>
+												<label>Templated pad</label>
+												<span class='expandable'>></span>
+											</button>
+										</li>
+										<li>
+											<% if (locals.metadata.user.participations.length > 0) { %>
+												<button>
+													<label>Contributive pad</label>
+													<span class='expandable'>></span>
+												</button>
+												<div class='drop-down'>
+													<ul>
+														<% locals.metadata.user.participations.forEach(p => { %>
+															<li>
+																<a href='/<%- locals.metadata.page.lang %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>' target='_blank'>
+																	<button class='wrapable'>
+																		<label><%- p.title %></label>
+																		<div class='sub'>Mobilized by <%- p.host_name %> on <%- p.start_date %></div>
+																	</button>
+																</a>
+															</li>
+														<% }) %>
+													</ul>
+												</div>
+											<% } %>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<li>
+								<button>
+									<label><%- vocabulary['template'][locals.metadata.page.lang](false, false).capitalize() %></label>
+									<span class='expandable'>></span>
+								</button>
+								<div class='drop-down'>
+									<ul>
+										<li>
+											<a href='../../contribute/template' target='_blank'>
+												<button><label>Blank template</label></button>
+											</a>
+										</li>
+										<li>
+											<button>
+												<label>Copy template</label>
+												<span class='expandable'>></span>
+											</button>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<li>
+								<a href='../../contribute/mobilization'>
+									<button><%- vocabulary['cohort'][locals.metadata.page.lang](false).capitalize() %></button>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			<% } %>
+		<%# } %>
+		<h1><%- (locals.metadata.page.title).replace(/\s+/g, '<br>') %></h1>
+		<h2><%- locals.metadata.user.country %></h2>
+		<% if (locals.metadata.page.activity === 'browse' && locals.metadata.page.object === 'pads') { %>
+			<div class='search'>
+				<button onclick='d3.select(".filter-veil").classed("hide", false)'><img src='/imgs/icons/i-search.svg'></button>
+			</div>
+		<% } %>
+	</div>
+</nav>
+
+<script type='text/javascript'>
+	// d3.selectAll('nav#site-title li').on('mouseover', function () {
+	// 	const sel = d3.select(this)
+	// 	const parent = d3.select(this.parentNode)
+	// 	parent.selectAll('li').classed('not-hovered', true)
+	// 	sel.classed('not-hovered', false).selectAll('li').classed('not-hovered', false)
+	// })
+</script>

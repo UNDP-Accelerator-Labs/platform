@@ -1,5 +1,6 @@
 /*@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');*/
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital@1&display=swap");
 /*$c-dark-1: $c-dark-blue;
 $c-mid-1: $c-dark-red;
 $c-mid-2: $c-light-green;
@@ -49,7 +50,8 @@ ul {
 }
 
 a {
-  color: #F03C8C;
+  /*color: $c-light-red;*/
+  color: #32BEE1;
   text-decoration: none;
 }
 

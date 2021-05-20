@@ -1,30 +1,13 @@
-let connection = {}
+exports.title = 'UNDP AccLabs Pads' // EDIT THIS
 
-if (!['production', 'local-production'].includes(process.env.NODE_ENV)) {
-	connection = {
-		database: process.env.database, 
-		port: process.env.port, 
-		host: process.env.host,
-		user: process.env.user,
-		password: process.env.password
-	}
-} else {
-	connection = {
-		database: process.env.DB_NAME, 
-		port: process.env.DB_PORT, 
-		host: process.env.DB_HOST,
-		user: process.env.DB_USERNAME,
-		password: process.env.DB_PASSWORD,
-		ssl: true
-	}
-}
+// DESIRED MODULES
+const modules = ['pads', 'templates', 'mobilizations'] // EDIT THIS
 
-const logSQL = true
-const initOptions = {
-	query(e) {
-		if (logSQL) console.log(e.query)
-	}
+if (modules.includes('mobilizations')) {
+	if (!modules.includes('pads')) modules.push('pads')
+	if (!modules.includes('templates')) modules.push('templates')
 }
-const pgp = require('pg-promise')(initOptions)
-exports.conn = pgp(connection)
-exports.pgp = pgp
+exports.modules = modules
+// DISPLAY VARIABLES
+exports.lazyload = true // EDIT THIS
+exports.page_content_limit = 25 // EDIT THIS

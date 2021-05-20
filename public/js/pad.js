@@ -723,11 +723,13 @@ function addImg (kwargs) {
 			media.media.addElems('img').attrs({ 'class': d => d.scale, 'src': d => this.src })
 		}
 		img.onerror = function (err) {
-			if (img.src !== src) img.src = src
-			else console.log(err)
+			if (err) console.log(err)
+			// if (img.src !== src) img.src = src
+			// else console.log(err)
 		}
 		img.src = `/${src}`
 	}
+
 
 	// WE NEED THE ICON IF
 	// THE PAD IS BASED ON A TEMPLATE: templated
@@ -849,8 +851,9 @@ function addMosaic (kwargs) {
 			}
 		}
 		img.onerror = function (err) {
-			if (img.src !== d) img.src = d
-			else console.log(err)
+			// if (img.src !== d) img.src = d
+			// else console.log(err)
+			if (err) console.log(err)
 		}
 		img.src = `/${d}`
 	})

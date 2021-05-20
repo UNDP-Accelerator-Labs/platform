@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang='<%- locals.lang %>'>
+<html lang='<%- locals.metadata.page.lang %>'>
 <head>
 
 	<%- include ('partials/head.ejs') %> 
@@ -9,12 +9,46 @@
 
 <body>
 <!-- INCLUDE MULTI-LANGUAGE VOCABULARY FOR ejs -->
-<%- include ('partials/navigate.ejs') %> 
-<%- include ('partials/menu-filters.ejs') %> 
+<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
+<%# include ('partials/menu-filters.ejs') %> 
+<%- include ('partials/menu-logo.ejs') %> 
 
-<main id='browse-templates'>
+
+<div class='browse'>
+	<%- include ('partials/navigate.ejs') %> 
+	<nav>
+		<ul>
+			<% if (locals.metadata.user.rights > 0) { %>
+				<li class='<% if (locals.metadata.page.space === "private") { %>active<% } %>'>
+					<a href='./private'>
+						<% if (locals.metadata.page.object === 'pads') { %><button><%- vocabulary['private'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.privatecount %></div></button>
+						<% } else if (locals.metadata.page.object === 'templates') { %><button><%- vocabulary['private templates'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.privatecount %></div></button><% } %>
+					</a>	
+				</li>
+			<% } %>
+			<li class='<% if (locals.metadata.page.space === "public") { %>active<% } %>'>
+				<a href='./public'>
+					<% if (locals.metadata.page.object === 'pads') { %><button><%- vocabulary['public'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.publiccount %></div></button>
+					<% } else if (locals.metadata.page.object === 'templates') { %><button><%- vocabulary['public templates'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.publiccount %></div></button><% } %>
+				</a>
+			</li>
+			<!-- <% if (locals.metadata.page.object === 'pads') { %>
+				<a href='./bookmarks'>
+					<li class='<% if (locals.metadata.page.space === "bookmarks") { %>active<% } %>'><%- vocabulary['bookmarks'][locals.metadata.page.lang] %></li>
+				</a>
+			<% } %> -->
+		</ul>
+	</nav>
+	<main>
+		<div class='inner'>
+		</div>
+	</main>
+</div>
+
+<!-- <main id='browse-templates'>
 	<div class='inner'>
-		<% if (locals.space === 'private') { %>
+		<% if (locals.metadata.page.space === 'private') { %>
 			<section class='new'>
 				<a href='../../contribute/template'><button id='add'><div>+</div></button></a>
 			</section>
@@ -22,7 +56,7 @@
 		<section class='overview'></section>
 	</div>
 	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
-</main>
+</main> -->
 
 <footer>
 </footer>
@@ -30,16 +64,17 @@
 
 
 <script type='text/javascript'>
-	const main = d3.select('main')
+	const main = d3.select('div.browse main')
+	// const main = d3.select('main')
 		// .call(multiSelection, { class: '.template.visible .inner', filter: d => d.editable })
-	const templatesLayout = main.select('.inner')
-	const overview = templatesLayout.select('.overview')
+	const layout = main.select('.inner')
+	const overview = layout.select('.overview')
 	 
-	const queryparams = <%- JSON.stringify(locals.queryparams) %>;
-	var lang = '<%- locals.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
-	const rights = <%- locals.rights %>;
+	// const queryparams = <%- JSON.stringify(locals.metadata.page.query) %>;
+	var lang = '<%- locals.metadata.page.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
+	const rights = <%- locals.metadata.user.rights %>;
 
-	let page = <%- locals.page %>;
+	let page = <%- locals.metadata.page.id %>;
 	var lazyloading = false
 
 	function renderStats (counts) {
@@ -53,154 +88,72 @@
 			.html(d => `/ ${d.total}`)
 		count.addElems('br')
 		count.addElems('small', 'light')
-			.html(d => vocabulary['template']['<%- locals.lang %>'](d.total !== 1))
+			.html(d => vocabulary['template']['<%- locals.metadata.page.lang %>'](d.total !== 1))
 		const contributors = stats.addElems('div', 'statistic contributors')
 		// .addElems('h2', 'lg', public || rights > 1 ? [meta.unique('id').length] : [])
-		.addElems('h2', 'lg', [<%- locals.mappers.unique('id').length %>])
+		.addElems('h2', 'lg', [<%- locals.stats.contributors %>])
 			.html(d => d)
 		contributors.addElems('small')
 		contributors.addElems('br')
 		contributors.addElems('small', 'light')
-			// .html(_ => vocabulary['contributor']['<%- locals.lang %>'](meta.unique('id').length !== 1))
-			.html(d => vocabulary['contributor']['<%- locals.lang %>'](d !== 1))
+			// .html(_ => vocabulary['contributor']['<%- locals.metadata.page.lang %>'](meta.unique('id').length !== 1))
+			.html(d => vocabulary['contributor']['<%- locals.metadata.page.lang %>'](d !== 1))
 	}	
 
 
 	function renderSections (data, counts) {
 		// MAKE SURE WE ONLY KEEP THE SECTIONS WHERE THERE ARE PADS
-		data = data.filter(d => counts.map(c => c.status).includes(d.status))
-		const sections = templatesLayout.addElems('section', 'templates-container', data)
-		sections.addElems('div', 'pub-status')
-			.addElems('div')
-			.html(d => {
-				const count = counts.find(c => c.status === d.status).count
-				return vocabulary['template publication status']['<%- locals.lang %>'](count, d.status)
-			})
-		sections.addElems('div', 'input-group', d => d.status === 1 ? [d] : [])
-			.addElems('form')
-			.attrs({ 'action': '/publish/templates', 'method': 'GET' })
-		.addElems('button')
-			.attr('type', 'submit')
-		.each(function () {
-			const sel = d3.select(this)
-			sel.addElems('i', 'material-icons').html('publish')
-			sel.addElems('label').html(vocabulary['publish all']['<%- locals.lang %>'])
-		})
+		// data = data.filter(d => counts.map(c => c.status).includes(d.status))
+		const sections = layout.addElems('section', 'templates-container', data)
+		// sections.addElems('div', 'pub-status')
+		// 	.addElems('div')
+		// 	.html(d => {
+		// 		const count = counts.find(c => c.status === d.status).count
+		// 		return vocabulary['template publication status']['<%- locals.metadata.page.lang %>'](count, d.status)
+		// 	})
+		// sections.addElems('div', 'input-group', d => d.status === 1 ? [d] : [])
+		// 	.addElems('form')
+		// 	.attrs({ 'action': '/publish/templates', 'method': 'GET' })
+		// .addElems('button')
+		// 	.attr('type', 'submit')
+		// .each(function () {
+		// 	const sel = d3.select(this)
+		// 	sel.addElems('i', 'material-icons').html('publish')
+		// 	sel.addElems('label').html(vocabulary['publish all']['<%- locals.metadata.page.lang %>'])
+		// })
 		sections.addElems('div', 'templates-layout')
 			.each(function (d) {
 				const section = d3.select(this)
-				section.classed(d.label, true)
+				// section.classed(d.label, true)
 				d.templates.forEach(p => section.call(renderVignette, p))
 			})
 	}
 
 	function renderVignette (section, data) {		
-		// function getTags(d) {
-		// 	if (d && d.meta) {
-		// 		if (d.meta.find(c => c.type === 'tags')) return [d.meta.find(c => c.type === 'tags').tags.map(c => c.name)]
-		// 		else return []
-		// 	} else return []
-		// }
-
 		const templates = section.addElem('div', 'template')
 			.datum(data)
-		.addElems('div', 'inner')
-			.addElems('a', 'template-link')
-			.attr('href', d => d.editable ? `../../edit/template?id=${d.id}` : `../../view/template?id=${d.id}`)
-		.addElems('div', 'body')
-
-		// const media = pads.addElems('div', 'media media-img')
-		// // WE SEPARATE BOOKMARKS FROM THE OTHER TYPES OF ENGAGEMENT
-		// media.addElems('div', 'bookmark', d => d.status === 2 ? [{ type: 'bookmark', active: d.bookmarked, pad: d.id }] : [])
-		// 	.classed('active', d => d.active)
-		// .on('click', async function (d) {
-		// 	const result = await POST('/engage', { pad: d.pad, active: !d.active, type: d.type })
-		// 	d.active = result.bool
-		// 	d3.select(this).classed('active', d.active)
-		// 		.select('div')
-		// 		.html(vocabulary['bookmark'](d.active))
-		// }).addElems('div', 'label')
-		// 	.html(d => vocabulary['bookmark']['<%- locals.lang %>'](d.active))
-		// media.addElems('a', 'pad-link')
-		// 	.attr('href', d => d.editable ? `../edit/solution?pad=${d.id}` : `../view/solution?pad=${d.id}`)
-		// .addElems('img', 'vignette', d => getImg(d))
-		// 	.attrs({ 'loading': 'lazy', 'alt': d => vocabulary['missing image']['<%- locals.lang %>'] })
-		// .each(function (d) {
-		// 	const node = this
-		// 	const img = new Image()
-		// 	img.onload = function () { node.src = this.src }
-		// 	img.src = d
-		// })
+		.each(function (d) {
+			d3.select(this).classed(`status-${d.status}`, true)
+		}).addElems('div', 'inner')
 
 		const head = templates.addElems('div', 'head')
+		const body = templates.addElems('div', 'body')
+		const foot = templates.addElems('div', 'foot')
 
-		// const metaR1 = head.addElems('div', 'meta row-1')		
-		// metaR1.addElems('div', 'meta meta-engagement')
-		// 	.addElems('button', 'engagement', d => {
-		// 		const opts = []
-		// 		// THIS IS TEMP, WILL HAVE TO CONNECT WITH DATA FROM DB
-		// 		// opts.push({ type: 'bookmark', count: d.bookmarks, active: d.bookmarked, pad: d.id }) // HAS BEEN BOOKMARKED BY n USERS AND IS ACTIVE FOR CURRENT USER
-		// 		opts.push({ type: 'inspiration', count: d.inspirations, active: d.inspired, pad: d.id }) // HAS BEEN FOUND INSPIRATIONAL BY n USERS AND IS ACTIVE FOR CURRENT USER
-		// 		opts.push({ type: 'approval', count: d.approvals, active: d.approved, pad: d.id }) // HAS BEEN APPROVED BY n USERS AND IS ACTIVE FOR CURRENT USER
-		// 		opts.push({ type: 'flag', count: d.flags, active: d.flagged, pad: d.id }) // HAS BEEN FLAGGED FOR TOMORROW BY n USERS AND IS ACTIVE FOR CURRENT USER
-		// 		return d.status === 2 ? opts : []
-		// 	}).classed('active', d => d.active)
-		// 	.attr('data-count', d => d.count)
-		// .on('click', async function (d) {
-		// 	if (d.type === 'approval') {
-		// 		if (!d.active) {
-		// 			const message = 'Describe in a few sentences how you tested and validated this solution.' // TO DO: TRANSLATE
-		// 			const form = { action: '/validate',  method: 'POST' }
-		// 			const opts = []
-		// 			opts.push({ node: 'input', type: 'hidden', name: 'pad', value: d.pad })
-		// 			opts.push({ node: 'input', type: 'hidden', name: 'active', value: !d.active })
-		// 			opts.push({ node: 'input', type: 'hidden', name: 'type', value: d.type })
-		// 			opts.push({ node: 'input', type: 'hidden', name: 'path', value: new URL(window.location) })
-		// 			opts.push({ node: 'textarea', name: 'message', placeholder: 'What did you do?' }) // TO DO: TRANSLATE
-		// 			opts.push({ node: 'button', type: 'submit', label: 'Validate solution', resolve: true }) // TO DO: TRANSLATE
-		// 			renderFormModal({ message: message, formdata: form, opts: opts })
-		// 		}
-		// 	} else {
-		// 		const result = await POST('/engage', { pad: d.pad, active: !d.active, type: d.type })
-		// 		d.active = result.bool
-		// 		d.count = d.active ? d.count + 1 : d.count - 1
-		// 		sel.classed('active', d.active)
-		// 			.attr('data-count', d.count)
-		// 	}
-		// }).addElems('i', 'material-icons-outlined')
-		// 	.html(d => {
-		// 		if (d.type === 'bookmark') return 'bookmark'
-		// 		else if (d.type === 'inspiration') return 'wb_sunny'
-		// 		else if (d.type === 'approval') return 'thumb_up'
-		// 		else if (d.type === 'flag') return '()'
-		// 	})
+		const metagroup = head.addElems('div', 'meta-group')
+		metagroup.addElems('div', 'meta meta-contributor')
+			// .html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>AccLab ${d.lab}<% } %>`)
+			.html(d => `AccLab ${d.lab}`)
 
-		// templates.addElems('div', 'meta meta-tags', d => getTags(d))
-		// 	.addElems('a', 'tag-link', d => d)
-		// 	.attr('href', d => `?thematic_areas=${d}`)
-		// .addElems('div', 'tag')
-		// 	.addElems('label')
-		// 	.attr('title', d => d.capitalize())
-		// 	.html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
-
-		head.addElems('div', 'media media-title')
-			.html(d => {
-				if (d.title === null || d.title === undefined || d.title === '') return `[${vocabulary['untitled template']['<%- locals.lang %>']}]`
-				else return d.title
-			})
-		head.addElems('div', 'meta meta-contributor')
-			.html(d => vocabulary['credit']['<%- locals.lang %>'](d.contributor, d.contributorname, d.date))
-		const content = templates.addElems('div', 'content')
-		content.addElems('div', 'media media-txt')
-			.attr('data-placeholder', '<%- vocabulary['missing template description'][locals.lang] %>')
-			.html(d => d.description)
-
-		content.addElems('div', 'btn-group')
-		.addElems('form', 'pad-actons', function (d) {
+		metagroup.addElems('div', 'btn-group')
+		.addElems('form', 'actions', function (d) {
 			const opts = []
-			if (d.editable && d.status === 1) opts.push({ action: '/publish/templates', method: 'GET', node: 'button', type: 'submit', label: 'Publish' })
+			console.log(d)
 			// TO DO: UNPUBLISH
-			if (d.editable && d.associated_pads === 0) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteTemplates })
+			if ('<%- locals.metadata.page.space %>' === 'private' && d.editable)
+
+			opts.push({ node: 'button', type: 'button', disabled: !(d.editable && d.associated_pads === 0), label: 'Delete', fn: deleteTemplates })
+			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/templates', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), label: 'Publish' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
@@ -208,30 +161,53 @@
 			const template = sel.findAncestor('template')
 			sel.addElems('input')
 				.attrs({ 'type': 'hidden', 'name': 'id', 'value': template.datum().id })
-			sel.addElems('a')
-				.attr('href', '#')
-			.addElems(d.node, 'btn-overlay')
-				.attr('type', d.type)
+			// sel.addElems('a')
+			// 	.attr('href', '#')
+			sel.addElems(d.node, 'btn-overlay')
+				.classed(d.label.toLowerCase(), true)
+				.attrs({ 'type': d.type, 'disabled': d.disabled || null })
 				.html(d => d.label)
 			.on('click', _ => {
 				if (d.fn) d.fn(template)
 			})
 		})
 
-		const statistics = templates.addElems('div', 'foot')
-			.addElems('div', 'media meta-stats')
-		const itemcount = statistics.addElems('h1', 'item-count')
+		const title = body.addElems('div', 'media media-title')
+			.addElems('a', 'template-link')
+			.attrs({ 'href': d => d.editable ? `../../edit/template?id=${d.id}` : `../../view/template?id=${d.id}`, 'target': '_blank' })
+		title.addElems('img')
+			.attrs({ 'src': '/imgs/icons/i-template.svg', 'target': '_blank' })
+		title.addElems('h1').html(d => d.title || `[${vocabulary['untitled template']['<%- locals.metadata.page.lang %>']}]`)
+		// head.addElems('div', 'meta meta-contributor')
+		// 	.html(d => vocabulary['credit']['<%- locals.metadata.page.lang %>'](d.contributor, d.contributorname, d.date))
+		
+		body.addElems('div', 'media media-txt')
+			.addElems('a', 'pad-link')
+			.attrs({ 
+				'href': d => d.editable ? `../../edit/template?id=${d.id}` : `../../view/template?id=${d.id}`, 
+				'target': '_blank',
+				'data-placeholder': '<%- vocabulary['missing template description'][locals.metadata.page.lang] %>'
+			}).html(d => d.description)
+		body.addElems('div', 'meta meta-date')
+			.html(d => d.date)
+
+
+		const stats = foot.addElem('div', 'meta meta-group')
+		const itemcount = stats.addElem('div', 'meta meta-stats')
+		 	.addElems('a', 'disabled')
+		 	.addElems('h1', 'item-count')
 			.html(d => d.sections ? d.sections.map(d => d.structure).flat().length : 0)
-		// itemcount.addElems('small')
-		itemcount.addElems('br')
 		itemcount.addElems('small', 'light')
-			.html(d => vocabulary['item']['<%- locals.lang %>'](d.sections ? d.sections.map(d => d.structure).flat().length !== 1 : true))
-		const padcount = statistics.addElems('h1', 'pads-count')
-				.html(d => d.associated_pads)
-			// padcount.addElems('small')
-			padcount.addElems('br')
-			padcount.addElems('small', 'light')
-				.html(d => vocabulary['pad']['<%- locals.lang %>'](d.associated_pads !== 1))
+			.html(d => vocabulary['item']['<%- locals.metadata.page.lang %>'](d.sections ? d.sections.map(d => d.structure).flat().length !== 1 : true))
+		
+		const padcount = stats.addElem('div', 'meta meta-stats')
+			.addElems('a')
+			.classed('disabled', d => d.associated_pads === 0)
+			.attr('href', d => `../../browse/pads/public?templates=${d.id}`)
+		.addElems('h1', 'pads-count')
+			.html(d => d.associated_pads)
+		padcount.addElems('small', 'light')
+			.html(d => vocabulary['pad']['<%- locals.metadata.page.lang %>'](d.associated_pads !== 1))
 	}
 
 	window.onscroll = async function (ev) {
@@ -261,7 +237,7 @@
 
 	async function deleteTemplates (templates) {
 		const data = templates.data()
-		const message = `Do you really want to delete the following ${data.length > 1 ? data.length : ''} template${data.length > 1 ? 's' : ''}: <strong>${data.map(d => d.title || '<%- vocabulary["untitled template"][locals.lang] %>').join('</strong>, <strong>')}</strong>? <br/><small>* This operation cannot be undone.</small>` // TO DO: TRANSLATE
+		const message = `Do you really want to delete the following ${data.length > 1 ? data.length : ''} template${data.length > 1 ? 's' : ''}: <strong>${data.map(d => d.title || '<%- vocabulary["untitled template"][locals.metadata.page.lang] %>').join('</strong>, <strong>')}</strong>? <br/><small>* This operation cannot be undone.</small>` // TO DO: TRANSLATE
 		const form = { action: '/delete/templates',  method: 'GET' }
 		const opts = [{ node: 'button', type: 'submit', label: `Delete ${data.length > 1 ? 'them' : 'it'}`, resolve: true }]
 		data.forEach(d => opts.unshift({ node: 'input', type: 'hidden', name: 'id', value: d.id }))
@@ -287,7 +263,7 @@
 
 
 	window.onload = function () {
-		renderStats(<%- JSON.stringify(locals.stats) %>)
+		// renderStats(<%- JSON.stringify(locals.stats) %>)
 		renderSections(<%- JSON.stringify(locals.sections) %>, <%- JSON.stringify(locals.stats.breakdown) %>)
 	}
 

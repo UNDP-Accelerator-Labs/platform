@@ -388,7 +388,6 @@ function addSection (kwargs) {
 	// if (focus) header.node().focus()
 	// if (editing) observer.observe(section.node(), obsvars)
 
-	// console.log(structure)
 	if (structure) section.each(function (d) {
 		d.structure.forEach(c => populateSection(c, lang, this))
 	})

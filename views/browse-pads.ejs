@@ -1,56 +1,61 @@
 <!DOCTYPE html>
-<html lang='<%- locals.lang %>'>
+<html lang='<%- locals.metadata.page.lang %>'>
 <head>
 
 <%- include ('partials/head.ejs') %> 
 
 </head>
 
-
 <body>
 <!-- INCLUDE MULTI-LANGUAGE VOCABULARY FOR ejs -->
-<%- include ('partials/navigate.ejs') %> 
+<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
 <%- include ('partials/menu-filters.ejs') %> 
 
-<main id='browse-pads'>
-	<!-- <h1>Accelerator Lab <%- locals.country %><br>Action Central</h1> -->
-	<div class='inner'>
-		<% if (locals.space === 'private') { %>
-			<section class='new'>
-			<% if (locals.participations.length > 0) { %>
-				<% 
-					const mobs = locals.participations.map(m => { 
-						console.log(m)
-						return { 
-							label: `${m.title}<div class="sub">Shared by ${m.host_name} on ${m.start_date}</div>`, 
-							class: 'padded',
-							href: `/${locals.lang}/contribute/pad?mobilization=${m.id}&template=${m.template}` 
-						}
-					})
-					if (locals.rights > 1) {
-						mobs.push({ label: vocabulary['free pad'][locals.lang], href: `/${locals.lang}/contribute/pad` })
-					}
-				%>
-				<a onclick='renderModal({ headline: "<%- vocabulary[`contribute`][locals.lang] %>", opts: <%- JSON.stringify(mobs) %>, theme: "blue", node: this.parentNode })'>
-					<button>
-						<div>+</div>
-						<!-- <div><i class='material-icons'>create</i></div> -->
-					</button>
-				</a>
-			<% } else if (locals.rights > 1) { %>
-				<a href='/<%- locals.lang %>/contribute/pad'>
-					<button id='add'>
-						<div>+</div>
-						<!-- <div><i class='material-icons'>create</i></div> -->
-					</button>
-				</a>
+<%- include ('partials/menu-logo.ejs') %> 
+<div class='browse'>
+	<%- include ('partials/navigate.ejs') %> 
+	<nav>
+		<ul>
+			<% if (locals.metadata.user.rights > 0) { %>
+				<li class='<% if (locals.metadata.page.space === "private") { %>active<% } %>'>
+					<a href='./private'>
+						<button><%- vocabulary['private'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.privatecount %></div></button>
+					</a>	
+				</li>
 			<% } %>
-			</section>
+			<li class='<% if (locals.metadata.page.space === "public") { %>active<% } %>'>
+				<a href='./public'>
+					<button><%- vocabulary['public'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.publiccount %></div></button>
+				</a>
+			</li>
+			<!-- <% if (locals.metadata.page.object === 'pads') { %>
+				<a href='./bookmarks'>
+					<li class='<% if (locals.metadata.page.space === "bookmarks") { %>active<% } %>'><%- vocabulary['bookmarks'][locals.metadata.page.lang] %></li>
+				</a>
+			<% } %> -->
+		</ul>
+		<!-- TO DO: TRANSLATE -->
+		<% if (locals.metadata.page.query) { %>
+			<p>Search yielded <strong><%- locals.stats.filtered %></strong> results</p>
 		<% } %>
+	</nav>
+	<main>
+		<div class='inner'>
+		</div>
+	</main>
+</div>
+<%- include ('partials/filters.ejs') %>
+
+
+
+
+<!-- <main id='browse-pads'>
+	<div class='inner'>
 		<section class='overview'></section>
 	</div>
 	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
-</main>
+</main> -->
 
 <footer>
 </footer>
@@ -58,19 +63,19 @@
 
 
 <script type='text/javascript'>
-	const main = d3.select('main#browse-pads')
+	const main = d3.select('div.browse main')
 		// .call(multiSelection, { class: '.pad.visible .inner', filter: d => d.editable })
 	const layout = main.select('div.inner')
 	const overview = layout.select('section.overview')
 	
 	let data = <%- JSON.stringify(locals.pads) %>;
 
-	const queryparams = <%- JSON.stringify(locals.queryparams) %>;
+	const queryparams = <%- JSON.stringify(locals.metadata.page.query) %>;
 
-	let page = <%- locals.page %>;
+	let page = <%- locals.metadata.page.id %>;
 	var lazyloading = false
 
-	const publication_limit = 3
+	const publication_limit = 5
 	
 
 	function renderStats (data, counts) {
@@ -84,57 +89,56 @@
 			.html(d => `/ ${d.total}`)
 		count.addElems('br')
 		count.addElems('small', 'light')
-			.html(d => vocabulary['pad']['<%- locals.lang %>'](d.total !== 1))
+			.html(d => vocabulary['pad']['<%- locals.metadata.page.lang %>'](d.total !== 1))
 		const contributors = stats.addElems('div', 'statistic contributors')
 		.addElems('h2', 'lg')
 			.html(d => d.contributors)
 		contributors.addElems('small')
 		contributors.addElems('br')
 		contributors.addElems('small', 'light')
-			.html(d => vocabulary['contributor']['<%- locals.lang %>'](d !== 1))
+			.html(d => vocabulary['contributor']['<%- locals.metadata.page.lang %>'](d !== 1))
 	}
 
 	function renderSections (data, counts) {
 		// MAKE SURE WE ONLY KEEP THE SECTIONS WHERE THERE ARE PADS
-		data = data.filter(d => counts.map(c => c.status).includes(d.status))
+		// data = data.filter(d => counts.map(c => c.status).includes(d.status))
 		const sections = layout.addElems('section', 'pads-container', data)
-		sections.addElems('div', 'pub-status')
-			.addElems('div')
-			.html(d => {
-				const count = counts.find(c => c.status === d.status).count
-				return vocabulary['pad publication status']['<%- locals.lang %>'](count, d.status)
-			})
-		// FOR PUBLISHABLE PADS, PUBLISH ALL
-		const publishall = sections.addElems('div', 'input-group publish', d => {
-			return d.status === 1 && <%- locals.publications %> < publication_limit ? [d] : []
-		}).addElems('form')
-			.attrs({ 'action': '/publish/pads', 'method': 'GET' })
-		publishall.addElems('input')
-			.attrs({ 'type': 'hidden', 'name': 'limit', 'value': publication_limit - <%- locals.publications %> })
-		publishall.addElems('button')
-			.attr('type', 'submit')
-		.each(function () {
-			const sel = d3.select(this)
-			sel.addElems('i', 'material-icons').html('publish')
-			sel.addElems('label').html(vocabulary['publish all']['<%- locals.lang %>'])
-		})
-		// FOR BOOKMARKED PADS, DOWNLOAD ALL
-		sections.addElems('div', 'input-group download', d => '<%- locals.space %>' === 'bookmarks' ? [d] : [])
-			.addElems('form')
-		.addElems('button')
-			.attr('type', 'button')
-		.each(function () {
-			const sel = d3.select(this)
-			sel.addElems('i', 'material-icons').html('download')
-			sel.addElems('label').html(vocabulary['download all']['<%- locals.lang %>'])
-		}).on('click', _ => downloadPads('bookmarks'))
+		// sections.addElems('div', 'pub-status')
+		// 	.addElems('div')
+		// 	.html(d => {
+		// 		const count = counts.find(c => c.status === d.status).count
+		// 		return vocabulary['pad publication status']['<%- locals.metadata.page.lang %>'](count, d.status)
+		// 	})
+		// // FOR PUBLISHABLE PADS, PUBLISH ALL
+		// const publishall = sections.addElems('div', 'input-group publish', d => {
+		// 	return d.status === 1 && <%- locals.publications %> < publication_limit ? [d] : []
+		// }).addElems('form')
+		// 	.attrs({ 'action': '/publish/pads', 'method': 'GET' })
+		// publishall.addElems('input')
+		// 	.attrs({ 'type': 'hidden', 'name': 'limit', 'value': publication_limit - <%- locals.publications %> })
+		// publishall.addElems('button')
+		// 	.attr('type', 'submit')
+		// .each(function () {
+		// 	const sel = d3.select(this)
+		// 	sel.addElems('i', 'material-icons').html('publish')
+		// 	sel.addElems('label').html(vocabulary['publish all']['<%- locals.metadata.page.lang %>'])
+		// })
+		// // FOR BOOKMARKED PADS, DOWNLOAD ALL
+		// sections.addElems('div', 'input-group download', d => '<%- locals.metadata.page.space %>' === 'bookmarks' ? [d] : [])
+		// 	.addElems('form')
+		// .addElems('button')
+		// 	.attr('type', 'button')
+		// .each(function () {
+		// 	const sel = d3.select(this)
+		// 	sel.addElems('i', 'material-icons').html('download')
+		// 	sel.addElems('label').html(vocabulary['download all']['<%- locals.metadata.page.lang %>'])
+		// }).on('click', _ => downloadPads('bookmarks'))
 
 		sections.addElems('div', 'pads-layout')
-			.each(function (d) {
-				const section = d3.select(this)
-				section.classed(d.label, true)
-				d.pads.forEach(p => section.call(renderVignette, p))
-			})
+		.each(function (d) {
+			const section = d3.select(this)
+			d.pads.forEach(p => section.call(renderVignette, p))
+		})
 	}
 
 	function renderVignette (section, data) {
@@ -147,8 +151,8 @@
 				if (img) return [`/${img.src.replace('uploads', 'uploads/sm')}`]
 				else if (mosaic) return [`/${mosaic.srcs[0].replace('uploads', 'uploads/sm')}`]
 				else if (embed) return [`/${embed.src.replace('uploads', 'uploads/sm')}`]
-				else return [null]
-			} else return [null]
+				else return []
+			} else return []
 		}
 		function getSDGs (d) {
 			if (d && d.sections) {
@@ -166,21 +170,39 @@
 				else return []
 			} else return []
 		}
+		function getTxt (d) {
+			if (d && d.sections) {
+				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
+				const txt = media.find(c => c.type === 'txt' && c.txt.length)
+				if (txt) return [txt.txt]
+				else return []
+			} else return []
+		}
+
 
 		const pads = section.addElem('div', 'pad')
 			.datum(data)
-		.addElems('div', 'inner')
-			.addElems('div', 'body')
+		.each(function (d) {
+			d3.select(this).classed(`status-${d.status}`, true)
+		}).addElems('div', 'inner')
+		
+		const head = pads.addElems('div', 'head')
+		const body = pads.addElems('div', 'body')
+		const foot = pads.addElems('div', 'foot')
 
-		const media = pads.addElems('div', 'media media-img')
-		media.addElems('div', 'btn-group')
-		.addElems('form', 'pad-actons', function (d) {
+		const metagroup = head.addElems('div', 'meta-group')
+		metagroup.addElems('div', 'meta meta-contributor')
+			// .html(d => vocabulary['credit']['<%- locals.metadata.page.lang %>'](d.contributor, d.contributorname, d.lab, d.date))
+			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>AccLab ${d.lab}<% } %>`)
+
+		metagroup.addElems('div', 'btn-group')
+		.addElems('form', 'actions', function (d) {
 			const opts = []
 			// THE FIRST LINE IS IF WE SELECT MULTIPLE PADS
-			if (d.editable && d.status === 1 && <%- locals.publications %> < publication_limit) opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', label: 'Publish' })
 			// TO DO: UNPUBLISH
-			if (d.status === 2) opts.push({ node: 'button', type: 'button', label: 'Download', fn: downloadPads })
-			if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deletePads })
+			if ('<%- locals.metadata.page.space %>' === 'private' && d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deletePads })
+			opts.push({ node: 'button', type: 'button', label: 'Download', disabled: d.status !== 2, fn: downloadPads })
+			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && <%- locals.publications %> < publication_limit), label: 'Publish' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
@@ -189,10 +211,46 @@
 			sel.addElems('input')
 				.attrs({ 'type': 'hidden', 'name': 'id', 'value': pad.datum().id })
 			sel.addElems(d.node, 'btn-overlay')
-				.attr('type', d.type)
-				.html(d => d.label)
+				.classed(d.label.toLowerCase(), true)
+				.attrs({ 'type': d.type, 'disabled': d.disabled || null })
+				.html(d.label)
 			.on('click', _ => d.fn ? d.fn(pad) : null)
 		})
+
+		const title = body.addElems('div', 'media media-title')
+			.addElems('a', 'pad-link')
+			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+		title.addElems('img')
+			.attr('src', '/imgs/icons/i-pad.svg')
+		title.addElems('h1').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
+		
+		body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, txt: c } }))
+			.addElems('a', 'pad-link')
+			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			.html(d => {
+					if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[Read more]</span>`
+					else return d.txt
+			})
+		body.addElems('div', 'meta meta-date')
+			.html(d => d.date)
+
+		const taggroup = body.addElems('div', 'tag-group')
+		taggroup.addElems('div', 'meta meta-tags', d => getTags(d))
+			.addElems('a', 'tag-link', d => d)
+			.attr('href', d => `?thematic_areas=${d}`)
+		.addElems('div', 'tag')
+			.addElems('label')
+			// .attr('title', d => d.capitalize())
+			// .html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
+			.html(d => d.capitalize())
+		const sdgs = taggroup.addElems('div', 'meta meta-sdgs', d => getSDGs(d))
+		sdgs.addElems('span')
+			.html(d => `${vocabulary['SDG']['<%- locals.metadata.page.lang %>'](d.length > 1)}:`)
+		sdgs.addElems('a', 'sdg-link', d => d)
+			.attr('href', d => `?sdgs=${d}`)
+			.html(d => d)
+
+		
 		// WE SEPARATE BOOKMARKS FROM THE OTHER TYPES OF ENGAGEMENT
 		// media.addElems('div', 'bookmark', d => d.status === 2 ? [{ type: 'bookmark', active: d.bookmarked, pad: d.id }] : [])
 		// 	.classed('active', d => d.active)
@@ -203,26 +261,19 @@
 		// 		.select('div')
 		// 		.html(vocabulary['bookmark'](d.active))
 		// }).addElems('div', 'label')
-		// 	.html(d => vocabulary['bookmark']['<%- locals.lang %>'](d.active))
+		// 	.html(d => vocabulary['bookmark']['<%- locals.metadata.page.lang %>'](d.active))
 		
-		media.addElems('a', 'pad-link')
-			.attr('href', d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`)
-		.addElems('img', 'vignette', d => getImg(d))
-			.attrs({ 'loading': 'lazy', 'alt': d => vocabulary['missing image']['<%- locals.lang %>'] })
+		foot.addElems('div', 'media media-img', d => getImg(d))
+			.addElems('a', 'pad-link')
+			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+		.addElems('img', 'vignette')
+			.attrs({ 'loading': 'lazy', 'alt': d => vocabulary['missing image']['<%- locals.metadata.page.lang %>'] })
 		.each(function (d) {
 			const node = this
 			const img = new Image()
 			img.onload = function () { node.src = this.src }
 			img.src = d
 		})
-
-		const metaR1 = pads.addElems('div', 'meta row-1')
-		const sdgs = metaR1.addElems('div', 'meta meta-sdgs', d => getSDGs(d))
-		sdgs.addElems('span')
-			.html(d => `${vocabulary['SDG']['<%- locals.lang %>'](d.length > 1)}:`)
-		sdgs.addElems('a', 'sdg-link', d => d)
-			.attr('href', d => `?sdgs=${d}`)
-			.html(d => d)
 		
 		// metaR1.addElems('div', 'meta meta-engagement')
 		// 	.addElems('button', 'engagement', d => {
@@ -263,24 +314,6 @@
 		// 		else if (d.type === 'flag') return '()'
 		// 	})
 
-		pads.addElems('div', 'meta meta-tags', d => getTags(d))
-			.addElems('a', 'tag-link', d => d)
-			.attr('href', d => `?thematic_areas=${d}`)
-		.addElems('div', 'tag')
-			.addElems('label')
-			.attr('title', d => d.capitalize())
-			.html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
-
-		pads.addElems('div', 'media media-title')
-			.addElems('a', 'pad-link')
-			.attr('href', d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`)
-			.html(d => {
-				if (d.title === null || d.title === undefined || d.title === '') return `[${vocabulary['untitled pad']['<%- locals.lang %>']}]`
-				else return d.title
-			})
-
-		pads.addElems('div', 'meta meta-contributor')
-			.html(d => vocabulary['credit']['<%- locals.lang %>'](d.contributor, d.contributorname, d.lab, d.date))
 	}
 
 	window.onscroll = async function (ev) {
@@ -310,7 +343,7 @@
 
 	async function deletePads (pads) {
 		const data = pads.data()
-		const message = `Do you really want to delete the following ${data.length > 1 ? data.length : ''} solution${data.length > 1 ? 's' : ''}: <strong>${data.map(d => d.title || '<%- vocabulary["untitled solution"][locals.lang] %>').join('</strong>, <strong>')}</strong>? <br/><small>* This operation cannot be undone.</small>` // TO DO: TRANSLATE
+		const message = `Do you really want to delete the following ${data.length > 1 ? data.length : ''} solution${data.length > 1 ? 's' : ''}: <strong>${data.map(d => d.title || '<%- vocabulary["untitled solution"][locals.metadata.page.lang] %>').join('</strong>, <strong>')}</strong>? <br/><small>* This operation cannot be undone.</small>` // TO DO: TRANSLATE
 		const form = { action: '/delete/pads',  method: 'GET' }
 		const opts = [{ node: 'button', type: 'submit', label: `Delete ${data.length > 1 ? 'them' : 'it'}` }]
 		data.forEach(d => opts.unshift({ node: 'input', type: 'hidden', name: 'id', value: d.id }))
@@ -318,24 +351,25 @@
 		renderFormModal({ message: message, formdata: form, opts: opts })
 	}
 	async function downloadPads (source) {
-		if (source !== 'bookmarks') source = source.datum().id // IF A SINGLE SOLUTION, EXTRACT id
-		const headline = source === 'bookmarks' ? vocabulary['download all']['<%- locals.lang %>'] : vocabulary['download']['<%- locals.lang %>']
-		const opts = [
-			{ node: 'button', type: 'button', label: 'raw data', resolve: 'raw' }, 
-			// { node: 'button', type: 'button', label: 'as .pdf', resolve: 'pdf' } // TO DO
-		]
-		const format = await renderPromiseModal({ headline: headline, opts: opts })
-		const res = await POST(`/download/${format}`, { source: source }, false)
+		alert('sorry this feature is not yet available')
+		// if (source !== 'bookmarks') source = source.datum().id // IF A SINGLE SOLUTION, EXTRACT id
+		// const headline = source === 'bookmarks' ? vocabulary['download all']['<%- locals.metadata.page.lang %>'] : vocabulary['download']['<%- locals.metadata.page.lang %>']
+		// const opts = [
+		// 	{ node: 'button', type: 'button', label: 'raw data', resolve: 'raw' }, 
+		// 	// { node: 'button', type: 'button', label: 'as .pdf', resolve: 'pdf' } // TO DO
+		// ]
+		// const format = await renderPromiseModal({ headline: headline, opts: opts })
+		// const res = await POST(`/download/${format}`, { source: source }, false)
 
-		const a = document.createElement('a')
-		res.blob().then(b => {
-			var url = window.URL.createObjectURL(b)
-			a.href = url
-			a.download = `solutions_${(new Date(Date.now())).display_for_query()}.zip`
-			a.click()
-			window.URL.revokeObjectURL(url)
-			a.remove()
-		})
+		// const a = document.createElement('a')
+		// res.blob().then(b => {
+		// 	var url = window.URL.createObjectURL(b)
+		// 	a.href = url
+		// 	a.download = `solutions_${(new Date(Date.now())).display_for_query()}.zip`
+		// 	a.click()
+		// 	window.URL.revokeObjectURL(url)
+		// 	a.remove()
+		// })
 	}
 
 	// THIS IS FOR PUBLISHING FROM THE PRIVATE VIEW
@@ -406,7 +440,7 @@
 	})
 
 	window.onload = function () {
-		renderStats(data, <%- JSON.stringify(locals.stats) %>)
+		// renderStats(data, <%- JSON.stringify(locals.stats) %>)
 		renderSections(<%- JSON.stringify(locals.sections) %>, <%- JSON.stringify(locals.stats.breakdown) %>)
 	}
 

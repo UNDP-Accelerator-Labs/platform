@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang='<%- locals.lang %>'>
+<html lang='<%- locals.metadata.page.lang %>'>
 <head>
 
 <%- include ('partials/head.ejs') %> 
@@ -17,8 +17,11 @@
 
 <body>
 
-<%- include ('partials/navigate.ejs') %> 
-<% if (!locals.activity) locals.activity = locals.path[1] %>
+<%# include ('partials/navigate.ejs') %> 
+
+<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
+<%- include ('partials/menu-logo.ejs') %> 
 
 <!-- NOT SURE THIS IS NECESSARY -->
 <nav>
@@ -30,37 +33,37 @@
 <main id='template' class='template'>
 	<div class='inner'>
 		<div class='head'>
-			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
-				<% if (locals.activity === 'edit') { %>
-					<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a> -->
-					<a href='<%- locals.originalUrl || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
+				<% if (locals.metadata.page.activity === 'edit') { %>
+					<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a> -->
+					<a href='<%- locals.metadata.page.referrer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
 				<% } %>
-				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.lang] %>' onblur='partialSave("title")' contenteditable></div>
+				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.lang] %>' onblur='partialSave("title")' contenteditable></div>
 			<% } else { %>
-				<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a> -->
-				<a href='<%- locals.originalUrl || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
-				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.lang] %>'></div>
-				<div class='contributor'><%- vocabulary['credit'][locals.lang](locals.data.contributor, locals.data.contributorname) %></div>
+				<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a> -->
+				<a href='<%- locals.metadata.page.referrer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
+				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.lang] %>'></div>
+				<div class='contributor'><%- vocabulary['credit'][locals.metadata.page.lang](locals.data.contributor, locals.data.contributorname) %></div>
 			<% } %>
 		</div>
 		<div class='body'>
-			<section class='description-layout layout <%- locals.activity %>'>
+			<section class='description-layout layout <%- locals.metadata.page.activity %>'>
 				<div class='input-type'>
-					<label><%- vocabulary['description'][locals.lang] %></label>
+					<label><%- vocabulary['description'][locals.metadata.page.lang] %></label>
 				</div>
 				<!-- TO DO: TRANSLATE THIS -->
 				<div class='media-container txt-container lead' onclick='d3.select(this).classed("focus", true)'>
-					<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][locals.lang] %>' onblur='partialSave("description")' contenteditable><%- locals.template_description %></div>
+					<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][locals.metadata.page.lang] %>' onblur='partialSave("description")' contenteditable><%- locals.template_description %></div>
 				</div>
 			</section>
 
-			<!-- <section class='media-layout layout <%- locals.activity %>'>
+			<!-- <section class='media-layout layout <%- locals.metadata.page.activity %>'>
 				<div class='input-type'>
-					<label><%- vocabulary['media'][locals.lang] %></label>
+					<label><%- vocabulary['media'][locals.metadata.page.lang] %></label>
 				</div>
 			</section> -->
 
-			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
 				<div class='media-input-group input-group'>
 					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
 					<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
@@ -81,12 +84,12 @@
 				</div>
 			<% } %>
 			
-			<!-- <section class='meta-layout layout <%- locals.activity %>'>
+			<!-- <section class='meta-layout layout <%- locals.metadata.page.activity %>'>
 				<div class='input-type'>
-					<label><%- vocabulary['metadata'][locals.lang] %></label>
+					<label><%- vocabulary['metadata'][locals.metadata.page.lang] %></label>
 				</div>
 			</section>
-			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
+			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
 				<div class='meta-input-group input-group'>
 					<button id='input-meta-location' title='Request a location.'><i class='material-icons'>add_location</i></button>
 					<button id='input-meta-sdgs' title='Request one or more SDG tag(s).'><i class='material-icons'>public</i></button>
@@ -122,66 +125,66 @@
 <script type='text/javascript'>
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
-	.on('click', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addSection({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addSection({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-repeat-section')
-	.on('click', _ => addSection({ data: { repeat: true }, lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addSection({ data: { repeat: true }, lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addSection({ data: { repeat: true }, lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addSection({ data: { repeat: true }, lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-meta-group')
-	.on('click', _ => addGroup({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addGroup({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addGroup({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addGroup({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 
 	d3.select('.media-input-group #input-media-img')
-	.on('click', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addImg({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addImg({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addImg({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	
 	d3.select('.media-input-group #input-media-txt')
-	.on('click', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addTxt({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addTxt({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	
 	d3.select('.media-input-group #input-media-embed')
-	.on('click', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addEmbed({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addEmbed({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	
 	d3.select('.media-input-group #input-media-checklist')
-	.on('click', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addChecklist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addChecklist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-radiolist')
-	.on('click', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addRadiolist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addRadiolist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	// d3.select('.media-input-group #input-meta-location')
-	// .on('click', _ => addMap(null, '<%- locals.lang %>', true))
-	// .on('touchend', _ => addMap(null, '<%- locals.lang %>', true))
+	// .on('click', _ => addMap(null, '<%- locals.metadata.page.lang %>', true))
+	// .on('touchend', _ => addMap(null, '<%- locals.metadata.page.lang %>', true))
 
 	// d3.select('.media-input-group #input-meta-sdgs')
-	// .on('click', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.lang %>', true))
-	// .on('touchend', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.lang %>', true))
+	// .on('click', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.metadata.page.lang %>', true))
+	// .on('touchend', _ => addSDGs({ sdgs: <%- JSON.stringify(locals.sdgs) || {} %> }, '<%- locals.metadata.page.lang %>', true))
 
 	// d3.select('.media-input-group #input-meta-tags')
-	// .on('click', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
-	// .on('touchend', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.lang %>', true))
+	// .on('click', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.metadata.page.lang %>', true))
+	// .on('touchend', _ => addTags({ themes: <%- JSON.stringify(locals.themes) || {} %> }, '<%- locals.metadata.page.lang %>', true))
 
 	d3.select('.media-input-group #input-meta-sdgs')
-	.on('click', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addSDGs({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addSDGs({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	// d3.select('.meta-input-group #input-meta-tags')
 	d3.select('.media-input-group #input-meta-tags')
-	.on('click', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addTags({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addTags({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-meta-skills')
-	.on('click', _ => addSkills({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addSkills({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addSkills({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addSkills({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-meta-datasources')
-	.on('click', _ => addDataSources({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addDataSources({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addDataSources({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addDataSources({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
@@ -199,10 +202,10 @@
 
 
 	
-	var lang = '<%- locals.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
+	var lang = '<%- locals.metadata.page.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
 	
 
-	let activity = '<%- locals.activity %>';
+	let activity = '<%- locals.metadata.page.activity %>';
 	let published = false
 	const editing = ['contribute', 'edit'].includes(activity)
 
@@ -290,7 +293,7 @@
 					d3.select('#input-media-embed').node().click()
 				}
 			} else {
-				switchButtons('<%- locals.lang %>')
+				switchButtons('<%- locals.metadata.page.lang %>')
 			}
 		}
 
@@ -524,15 +527,15 @@
 		descriptionLayout.select('.media-container .media-txt').text(data.description)
 		if (data.sections) {
 			data.sections.forEach(d => {
-				addSection({ data: d, lang: '<%- locals.lang %>' })
-				// d.structure.forEach(c => populateSection(c, '<%- locals.lang %>', section))
+				addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+				// d.structure.forEach(c => populateSection(c, '<%- locals.metadata.page.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	} else {
-		addSection({ lang: '<%- locals.lang %>' })
-		addTitle({ lang: '<%- locals.lang %>' })
+		addSection({ lang: '<%- locals.metadata.page.lang %>' })
+		addTitle({ lang: '<%- locals.metadata.page.lang %>' })
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	}

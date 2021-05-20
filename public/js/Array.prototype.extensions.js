@@ -26,6 +26,14 @@ Array.prototype.sum = function (key) {
 		})[key]
 	}
 }
+Array.prototype.max = function (key, onkey) {
+	const max = this.sort((a, b) => {
+		if (key) return b[key] - a[key]
+		else return b - a
+	})[0]
+	if (onkey) return max[key]
+	else return max
+}
 Array.prototype.mean = function (key) {
 	return this.sum(key) / this.length
 }

@@ -1,4 +1,4 @@
-const DB = require('./config.js')
+const DB = require('./db-config.js')
 const express = require('express')
 const path = require('path')
 const bodyparser = require('body-parser')
@@ -57,7 +57,7 @@ app.route('/:lang/view/:object')
 	.get(routes.render.login, routes.dispatch.view)
 	.post(routes.process.login, routes.dispatch.view)
 app.post('/:lang/preview/:object', routes.dispatch.preview)
-
+app.get('/:lang/analyse/:object', routes.dispatch.analyse)
 
 app.route('/:lang/browse/:object/:space')
 	.get(routes.render.login, routes.dispatch.browse)
@@ -68,14 +68,16 @@ app.post('/validate', routes.process.validate)
 
 app.get('/publish/:object', routes.process.publish)
 app.get('/delete/:object', routes.process.delete)
-app.post('/download/:format', routes.process.download) // THIS SHOULD BE GET
+app.post('/download/:object', routes.process.download)
 
-app.route('/:lang/mobilize/:space')
-	.get(routes.render.login, routes.dispatch.mobilize)
-	.post(routes.dispatch.mobilize)
+// app.route('/:lang/mobilize/:space') // THIS SHOULD BE DEPRECATED
+// 	.get(routes.render.login, routes.dispatch.mobilize)
+// 	.post(routes.dispatch.mobilize)
+
 app.post('/deploy', routes.process.deploy)
 app.get('/demobilize', routes.process.demobilize)
 
+// TO DO: CHECK IF THIS IS STILL RELEVANT
 app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
 
 

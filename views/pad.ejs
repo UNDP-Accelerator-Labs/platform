@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang='<%- locals.lang %>'>
+<html lang='<%- locals.metadata.page.lang %>'>
 <head>
 
 <%- include ('partials/head.ejs') %> 
@@ -16,19 +16,24 @@
 
 <body>
 
-<%- include ('partials/navigate.ejs') %> 
-<%- include ('partials/menu-templates.ejs') %>
+<%# include ('partials/navigate.ejs') %> 
+<%# include ('partials/menu-templates.ejs') %>
+
+<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
+<%- include ('partials/menu-logo.ejs') %> 
+
+
 <% 
-	if (!locals.activity) locals.activity = locals.path[1] 
 	if (!locals.templated) locals.templated = locals.display_template !== null
 %>
 
 <main id='pad' class='pad'>
 	<!-- BELOW ARE ENGAGEMENT FEATURES -->
-	<!-- <% if (['edit', 'view'].includes(locals.activity) && (locals.data && locals.data.published)) { %>
+	<!-- <% if (['edit', 'view'].includes(locals.metadata.page.activity) && (locals.data && locals.data.published)) { %>
 		<div class='engagement-input-group'>
 			<div class='engagement bookmark <% if (locals.data.bookmarked) { %>active<% } %>' data-type='bookmark' data-count='<%- locals.engagement["bookmark"] %>'>
-				<div class='label'><%- vocabulary['bookmark'][locals.lang](locals.data.bookmarked) %></div>
+				<div class='label'><%- vocabulary['bookmark'][locals.metadata.page.lang](locals.data.bookmarked) %></div>
 			</div>
 			<ul>
 				<% ['inspiration', 'approval', 'flag'].forEach(type => { 
@@ -70,16 +75,16 @@
 	<% } %> -->
 	<div class='inner'>
 		<div class='head'>
-			<% if (['contribute', 'edit'].includes(locals.activity)) { %>
-				<% if (locals.activity === 'edit') { %>
-					<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.lang] %></a> -->
-					<a href='<%- locals.originalUrl || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
+			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
+				<% if (locals.metadata.page.activity === 'edit') { %>
+					<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a> -->
+					<a href='<%- locals.metadata.page.referrer || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
 				<% } %>
-				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.lang] %>' onblur='partialSave("title")' contenteditable></div>
+				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.metadata.page.lang] %>' onblur='partialSave("title")' contenteditable></div>
 			<% } else { %>
-				<a href='<%- locals.originalUrl || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][locals.lang] %></a>
-				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.lang] %>'></div>
-				<div class='contributor'><%- vocabulary['credit'][locals.lang](locals.data.contributor, locals.data.contributorname) %></div>
+				<a href='<%- locals.metadata.page.referrer || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
+				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.metadata.page.lang] %>'></div>
+				<div class='contributor'><%- vocabulary['credit'][locals.metadata.page.lang](locals.data.contributor, locals.data.contributorname) %></div>
 			<% } %>
 		</div>
 		<div class='body'>
@@ -89,7 +94,7 @@
 					<div class='media-container txt-container'>
 						<div class='media media-txt'>
 							<i>This pad is based on: </i>
-							<a href='/<%- locals.lang %>/edit/template?id=<%- locals.display_template.id %>'>
+							<a href='/<%- locals.metadata.page.lang %>/edit/template?id=<%- locals.display_template.id %>'>
 							<%- locals.display_template.title %></a>
 						</div>
 					</div>
@@ -101,24 +106,24 @@
 				</div>
 			<% } %>
 			
-			<!-- <section class='media-layout layout <%- locals.activity %>'>
+			<!-- <section class='media-layout layout <%- locals.metadata.page.activity %>'>
 				<div class='input-type'>
-					<label><%- vocabulary['media'][locals.lang] %></label>
+					<label><%- vocabulary['media'][locals.metadata.page.lang] %></label>
 				</div>
 			</section> -->
 
-			<% if (['contribute', 'edit'].includes(locals.activity) && (!locals.templated)) { %>
+			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity) && (!locals.templated)) { %>
 				<div class='media-input-group input-group'>
 					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
 						
 					<div class='vertical-separator'></div>
 					<!-- TO DO: TRANSLATE title INFO -->
 					<form action='/upload/img' method='POST' enctype='multipart/form-data'>
-						<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' onchange='uploadImg(this.form, "<%- locals.lang %>")' multiple>
+						<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' onchange='uploadImg(this.form, "<%- locals.metadata.page.lang %>")' multiple>
 						<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></label>
 					</form>
 					<form action='/upload/video' method='POST' enctype='multipart/form-data'>
-						<input type='file' id='input-media-video' name='video' accept='video/mp4,video/x-m4v,video/webm,video/*' onchange='uploadVideo(this.form, "<%- locals.lang %>")'>
+						<input type='file' id='input-media-video' name='video' accept='video/mp4,video/x-m4v,video/webm,video/*' onchange='uploadVideo(this.form, "<%- locals.metadata.page.lang %>")'>
 						<label for='input-media-video' title='Add a video. You can also use the “v” key as a keyboard shortcut.'><i class='material-icons'>ondemand_video</i></label>
 					</form>
 
@@ -132,12 +137,12 @@
 					<button id='input-meta-tags' title='Add one or more thematic area tag(s).'><i class='material-icons'>style</i>
 				</div>
 			<% } %>
-			<!-- <section class='meta-layout layout <%- locals.activity %>'>
+			<!-- <section class='meta-layout layout <%- locals.metadata.page.activity %>'>
 				<div class='input-type'>
-					<label><%- vocabulary['metadata'][locals.lang] %></label>
+					<label><%- vocabulary['metadata'][locals.metadata.page.lang] %></label>
 				</div>
 			</section> -->
-			<!-- <% if (['contribute', 'edit'].includes(locals.activity)) { %>
+			<!-- <% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
 				<div class='meta-input-group input-group'>
 					<button id='input-meta-location' title='Add a location.'><i class='material-icons'>add_location</i></button>
 					<button id='input-meta-sdgs' title='Add one or more SDG tag(s).'><i class='material-icons'>public</i></button>
@@ -154,7 +159,7 @@
 	<div class='inner'>
 		<% locals.messages.forEach(m => { %>
 			<div class='approval-message'>
-				<small><%- vocabulary['tested and approved'][locals.lang](m.commentator, m.name) %></small>
+				<small><%- vocabulary['tested and approved'][locals.metadata.page.lang](m.commentator, m.name) %></small>
 				<p><%- m.message %></p>
 			</div>
 		<% }) %>
@@ -166,45 +171,40 @@
 <script type='text/javascript'>
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
-	.on('click', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addSection({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addSection({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addSection({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-txt')
-	.on('click', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addTxt({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addTxt({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addTxt({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-embed')
-	.on('click', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addEmbed({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addEmbed({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addEmbed({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-checklist')
-	.on('click', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addChecklist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addChecklist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addChecklist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	d3.select('.media-input-group #input-media-radiolist')
-	.on('click', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addRadiolist({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addRadiolist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addRadiolist({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
-	// const centerpoint = <% if (locals.centerpoint) { %>[<%- JSON.stringify(locals.centerpoint) %>]<% } else { %>[]<% } %>;
+	// const centerpoint = <% if (locals.metadata.user.centerpoint) { %>[<%- JSON.stringify(locals.metadata.user.centerpoint) %>]<% } else { %>[]<% } %>;
 	// d3.select('.media-input-group #input-meta-location')
-	// .on('click', _ => addMap({ centerpoints: centerpoint }, '<%- locals.lang %>', true))
-	// .on('touchend', _ => addMap({ centerpoints: centerpoint }, '<%- locals.lang %>', true))
+	// .on('click', _ => addMap({ centerpoints: centerpoint }, '<%- locals.metadata.page.lang %>', true))
+	// .on('touchend', _ => addMap({ centerpoints: centerpoint }, '<%- locals.metadata.page.lang %>', true))
 
 	// d3.select('.meta-input-group #input-meta-sdgs')
 	d3.select('.media-input-group #input-meta-sdgs')
-	.on('click', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addSDGs({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addSDGs({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addSDGs({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
 	// d3.select('.meta-input-group #input-meta-tags')
 	d3.select('.media-input-group #input-meta-tags')
-	.on('click', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
-	.on('touchend', _ => addTags({ lang: '<%- locals.lang %>', focus: true }))
+	.on('click', _ => addTags({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addTags({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
-	// const people = <% if (locals.people) { %><%- JSON.stringify(locals.people) %><% } else { %>[]<% } %>;
-	// const contributors = <% if (locals.contributors) { %><%- JSON.stringify(locals.contributors) %><% } else { %>[]<% } %>;
-	// d3.select('.meta-input-group #input-meta-personas')
-	// .on('click', _ => addPersonas({ people: people, contributors: contributors }, true))
-	// .on('touchend', _ => addPersonas({ people: people, contributors: contributors }, true))
 
 	// ADD ALL INTERACTION WITH ENGAGEMENT BUTTONS
 	// d3.selectAll('.engagement-input-group .engagement')
@@ -233,14 +233,14 @@
 	// 		count = active ? count + 1 : count - 1
 	// 		sel.classed('active', active)
 	// 			.attr('data-count', count)
-	// 		if (type === 'bookmark') sel.select('div.label').html(vocabulary['bookmark']['<%- locals.lang %>'](active))
+	// 		if (type === 'bookmark') sel.select('div.label').html(vocabulary['bookmark']['<%- locals.metadata.page.lang %>'](active))
 	// 	}
 	// })
 
 
 	const templated = <%- locals.templated %>;
 		
-	let activity = '<%- locals.activity %>';
+	let activity = '<%- locals.metadata.page.activity %>';
 	const editing = ['contribute', 'edit'].includes(activity)
 
 	let published = false
@@ -301,7 +301,47 @@
 			items.push(datum)
 		}
 	}
+	function getStatus () { // TO DO: FINISH THIS
+		const sections = []
+		main.selectAll('.layout:not(.description-layout)')
+		.each(function (d) {
+			const items = []
+			const sel = d3.select(this)
+			
+			sel.selectAll('.media-container, .meta-container')
+			.each(function (c) {
+				const sel = d3.select(this)
+				const ingroup = sel.findAncestor('group-container')	
+				// GROUPS
+				if (c.type === 'group') {
+					const groupitems = []
+					sel.selectAll('.media-group-items')
+						.each(function () { 
+							const sel = d3.select(this)
+							const subitems = []
+							sel.selectAll('.media-container, .meta-container')
+								.each(function (b) { 
+									retrieveItems(d3.select(this), b, subitems) 
+								})
+							groupitems.push(subitems)
+						})
+					c.items = groupitems
+					items.push(c)
+				} else {
+					if (!ingroup) retrieveItems(sel, c, items)
+				}
+			})
 
+			console.log(d.structure.filter(c => c.type !== 'title'))
+			console.log(items)
+
+			// d.title = sel.select('.section-header label').node().innerText
+			// d.lead = (sel.select('.media-lead').node() || {}).innerText
+			// d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
+			// d.items = items
+			// sections.push(d)
+		})
+	}
 	// TO DO: STILL A PB HERE WHEN SAVING REPEAT SECTIONS OR GROUPS
 	// THE ENTERED CONTENT GETS COPIED FOR ALL REPETITIONS
 	function compileContent (attr) {
@@ -353,8 +393,8 @@
 		let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
 		if (tags && !tags.length) tags = null
 		let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
-		let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
 		if (datasources && !datasources.length) datasources = null
+		let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
 
 		
 		// COMPILE FULL TXT FOR SEARCH
@@ -405,6 +445,7 @@
 		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
 		// ALWAYS SEND status
 		let status = 0
+		getStatus() // TO DO: THIS DOES NOTHING FOR NOW
 		if (!published) {
 			if (title && title.trim().length
 				// && location && location.centerpoints && location.centerpoints.length 
@@ -439,7 +480,7 @@
 			const header = d3.select('header ul.primary')
 			header.select('.placeholder').classed('saved', true)
 				.select('a button')
-				.html(vocabulary['changes saved']['<%- locals.lang %>'])
+				.html(vocabulary['changes saved']['<%- locals.metadata.page.lang %>'])
 			window.setTimeout(_ => {
 				header.select('.placeholder').classed('hide', true)
 				header.selectAll('li:not(.placeholder)').classed('hide', false)
@@ -548,7 +589,7 @@
 						|| d3.select(e.srcElement).findAncestor('filter-or-add') && d3.select(e.srcElement).findAncestor('filter-or-add').node()
 					)
 				)) {
-					switchButtons('<%- locals.lang %>') // THIS PICKS UP ON KEYSTROKES OUTSIDE OF INPUT FIELDS
+					switchButtons('<%- locals.metadata.page.lang %>') // THIS PICKS UP ON KEYSTROKES OUTSIDE OF INPUT FIELDS
 				}
 			}
 		}
@@ -591,10 +632,10 @@
 			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat().find(d => d.type === 'title').instruction)
 
 			data.sections.forEach(d => {
-				addSection({ data: d, lang: '<%- locals.lang %>' })
+				addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
 				// const content = d.items || d.structure
 				// d3.select(section).each(function (c) {
-				// 	c.items.forEach(b => populateSection (b, '<%- locals.lang %>', this))	
+				// 	c.items.forEach(b => populateSection (b, '<%- locals.metadata.page.lang %>', this))	
 				// })
 			})
 		}
@@ -610,13 +651,13 @@
 
 		if (data.sections) {
 			data.sections.forEach(d => {
-				addSection({ data: d, lang: '<%- locals.lang %>' })
-				// d.items.forEach(c => populateSection (c, '<%- locals.lang %>', section))
+				addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+				// d.items.forEach(c => populateSection (c, '<%- locals.metadata.page.lang %>', section))
 			})
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
-	} else addSection(null, '<%- locals.lang %>')
+	} else addSection(null, '<%- locals.metadata.page.lang %>')
 
 </script>
 </body>

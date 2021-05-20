@@ -5,4 +5,5 @@ package-lock.json
 *.sublime-project
 values.sql
 pads.env
+pads-distant.env
 public/uploads/

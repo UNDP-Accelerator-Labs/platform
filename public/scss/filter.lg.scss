@@ -1,245 +1,376 @@
-nav#filter {
+.veil {
 	position: fixed;
+	/*display: flex;*/
+	/*justify-content: center;*/
+	/*align-items: center;*/
 	top: 0;
 	left: 0;
-	width: 375px;
-	/*height: calc(100vh - 30px);*/
-	height: 100vh;
-	/*background-color: $c-mid-1;*/
-	background-color: $c-dark-green;
-	/*box-shadow: 10px 0 10px rgba(175,175,175,.15);*/
-	transform: translateX(-375px);
-	transition: transform .5s;
-	z-index: 10001;
+	width: 100vw;
+	min-height: 100vh;
+	z-index: 10000;
+	background-color: rgba(255,255,255,.9);
 
-	.handle {
-		position: absolute;
-		display: flex;
-		justify-content: center;
-		left: 100%;
-		width: 30px;
-		height: 75px;
-		/*background-color: $c-mid-1;*/
-		background-color: $c-dark-green;
-		font-size: $t-small;
-		line-height: 75px;
-		text-align: center;
-		cursor: e-resize;
+	button.close {
 
-		div {
-			color: #FFF;
-			cursor: e-resize;
-			transform: rotate(-90deg);
-		}
 	}
-	form {
-		width: 100%;
-		height: 100%;
+	nav.browse-filters {
+		position: relative;
+		/*width: 475px;*/
+		width: 400px;
+		/*width: calc(150px * 3 + 15px * 2 + 60px);*/
+		margin: 60px auto 125px auto;
+		background-color: #FFF;
+		border: 1px solid $c-dark-blue;
+		border-top-width: 5px;
+		transition: transform .5s;
 
-		.query {
-			width: 375px;
-			height: 65px;
-			background-color: $c-dark-green;
+		.handle {
+			position: absolute;
+			bottom: 100%;
+			right: -1px;
+			padding-bottom: 5px;
+			font-size: $t-small;
+			text-align: center;
+			cursor: e-resize;
 
-			input[type=text] {
-				float: left;
-				position: relative;
-				width: calc(100% - 30px - 65px);
-				height: 50px;
-				margin: 15px 0 0 30px;
-				border: none;
-				border-bottom: 1px solid #FFF;
-				outline: none;
-				background-color: transparent;
-				font-size: $t-large; 
-				color: #FFF;
-			}
-			label[for=search-field] {
-				position: absolute;
-				top: 5px;
-				left: 30px;
-				font-size: $t-main;
-				color: #FFF;
-				transform: translateY(calc(#{$t-main}));
-				transition: transform .25s, font-size .25s;
-			}
-			input[type=text]:focus + label,
-			input[type=text].has-value + label {
-				font-size: $t-small;
-				transform: translateY(0px);
-			}
-			input:-webkit-autofill,
-			input:-webkit-autofill:hover, 
-			input:-webkit-autofill:focus, 
-			input:-webkit-autofill:active  {
-				-webkit-box-shadow: 0 0 0 40px $c-dark-green inset !important;
-				-webkit-text-fill-color: #FFF !important;
-			}
-			button {
-				float: left;
-				width: 65px;
-				height: 60px;
-				margin-top: 5px;
-				background-color: transparent;
+			button.close {
+				height: 30px;
 				border: none;
 				outline: none;
+				padding: 0 15px;
+				background-color: $c-dark-blue;
 				color: #FFF;
-				cursor: pointer;
+
+				label {
+					cursor: pointer;
+					span {
+						margin-left: 15px;
+					}
+				}
 			}
 		}
-		.filters {
-			clear: both;
-			height: calc(100% - 65px - 10px * 2);
-			padding: 10px 30px;
-			overflow: scroll;
+		form {
+			.query {
+				position: relative;
+				width: 100%;
+				height: 65px;
+				border-bottom: 1px solid $c-light-blue;
 
-			.title {
-				h1 {
-					font-size: $t-main;
-					font-style: italic;
-					color: $c-light-green;
-					/*text-decoration: underline;*/
-				}
-				.active {
-					margin-bottom: 10px;
-					
-					.tag {
-						display: inline-block;
-						margin: 5px 5px 0 0;
-						text-decoration: none;
-						padding: 3px 5px;
-						background-color: transparent;
-						border: 1px solid $c-dark-1;
-						border-radius: 5px;
-						font-size: $t-small;
-						color: $c-dark-1;
-						transition: background-color .25s;
-						cursor: pointer;
-
-						label {
-							cursor: pointer;
-						}
-						i {
-							vertical-align: middle;
-							font-size: $t-main;
-							margin-left: 5px;
-						}
-						a {
-							color: $c-dark-1;
-						}
-					}
-					.tag:hover {
-						background-color: $c-dark-1;
-						color: #FFF;
-
-						a {
-							color: #FFF;
-						}
-					}
-				}
-			}
-			.filter {				
-				.accordion {
-					width: 100%;
-					padding: 10px 10px 0 0;
+				input[type=text] {
+					float: left;
+					position: relative;
+					width: calc(100% - 30px - 65px);
+					height: 50px;
+					margin: 15px 0 0 30px;
 					border: none;
+					/*border-bottom: 1px solid #FFF;*/
 					outline: none;
 					background-color: transparent;
-					text-align: left;
+					font-size: $t-large; 
+					color: $c-dark-blue;
+				}
+				label[for=search-field] {
+					position: absolute;
+					top: 5px;
+					left: 30px;
 					font-size: $t-main;
-					font-weight: 700;
-					color: #FFF;
+					color: $c-light-blue;
+					transform: translateY(calc(#{$t-main}));
+					transition: transform .25s, font-size .25s;
+				}
+				input[type=text]:focus + label,
+				input[type=text].has-value + label {
+					font-size: $t-small;
+					transform: translateY(5px);
+				}
+				input:-webkit-autofill,
+				input:-webkit-autofill:hover, 
+				input:-webkit-autofill:focus, 
+				input:-webkit-autofill:active  {
+					-webkit-box-shadow: 0 0 0 40px $c-dark-green inset !important;
+					-webkit-text-fill-color: $c-dark-blue !important;
+				}
+				button {
+					float: left;
+					width: 65px;
+					height: 60px;
+					margin-top: 5px;
+					background-color: transparent;
+					border: none;
+					outline: none;
+					color: $c-dark-blue;
 					cursor: pointer;
+				}
+			}
+			.filters {
+				p {
+					margin: 15px 30px 0px 30px;
+					font-size: $t-main;
+					font-style: italic;
+				}
+				.meta-filters,
+				.content-filters {
+					position: relative;
+					display: flex;
+					flex-wrap: wrap;
+					padding: 5px 15px;
 
-					i {
-						vertical-align: middle;
-						transition: transform .25s;
-					}
-				}
-				.accordion:hover {
-					text-decoration: underline;
-				}
-				.accordion.open {
-					i {
-						transform: rotate(90deg);
-					}
-				}
-				.panel {
-					max-height: 0;
-					overflow: hidden;
-					/*background-color: $c-light-2;*/
-					margin-left: 12px;
-					border-left: 1px solid $c-light-1;
-					transition: max-height .25s ease-out;
-					margin-bottom: 10px;
-
-					a {
-						text-decoration: none;
-					}
-					.opt {
+					.active-filters {
 						display: flex;
-						align-items: center;
-						color: $c-light-2;
-						margin: 10px 0;
+						justify-content: center;
+						flex-wrap: wrap;
+						width: calc(100% - 20px);
+						padding: 0 10px;
+						margin-bottom: 5px;
 
-						div {
-							padding: 0 5px;
-							cursor: pointer;
-							
+						.tag {
+							display: inline-block;
+							/*max-width: 50%;*/
+							border: 1px solid $c-light-grey;
+							padding: 5px 10px;
+							margin: 5px;
+							background-color: #FFF;
+							font-size: $t-small;
+							color: $c-light-grey;
+
 							label {
-								display: inline-block;
-								width: 100%;
 								cursor: pointer;
+
+								small {
+									font-size: $t-xsmall;
+								}
 							}
 						}
-						div:nth-child(2) {
-							margin-left: 5px;
+					}
+					.filter{
+						position: relative;
+						/*flex-grow: 1;*/
+						width: 100%;
+						/*width: 200px;*/
+						margin: 5px 15px;
+
+						button {
+							height: 30px;
+							width: 100%;
+							padding: 0 30px;
+							border: 1px solid $c-mid-blue;
+							outline: none;
+							background-color: transparent;
+							font-size: $t-mid-small;
+							line-height: $t-main;
+							color: $c-mid-blue;
+							cursor: pointer;
+
+							label.count {
+								position: absolute;
+								top: 5px;
+								right: 15px;
+								width: 20px;
+								height: 20px;
+								border-radius: 20px;
+								background-color: $c-mid-blue;
+								line-height: 20px;
+								font-size: $t-xsmall;
+								color: #FFF;
+							}
 						}
-						div:last-child {
-							margin-right: 5px;
-						}
-						.grow {
-							flex-grow: 1;
-						}
-						.count {
-							vertical-align: baseline;
-							color: $c-light-1;
-							font-size: $t-small;
+						.drop-down {
+							display: none;
+							position: absolute;
+							/*top: calc(100% - 1px);*/
+							top: 100%;
+							left: 0;
+							/*width: calc(415px - 2px);*/
+							width: calc(340px - 2px);
+							max-height: 300px;
+							background-color: #FFF;
+							border: 1px solid $c-light-blue;
+							border-top: none;
+							/*border-top-width: 5px;*/
+							z-index: 1000;
+							overflow: scroll;
+
+							ul {
+								width: 100%;
+								/*padding-bottom: 5px;*/
+								
+								li {
+									position: relative;
+									display: flex;
+									justify-content: space-between;
+									align-items: center;
+									padding: 5px 15px;
+									cursor: pointer;
+
+									input[type=checkbox] {
+										display: none;
+									}
+									label {
+										cursor: pointer;
+										font-size: $t-mid-small;
+										text-transform: capitalize;
+										color: $c-dark-grey;
+									}
+									label.count {
+										font-size: $t-small;
+										color: $c-mid-blue;
+									}
+								}
+								li:hover {
+									background-color: $c-light-2;
+								}
+								li.active {
+									background-color: $c-light-blue;
+									
+									label {
+										color: #FFF;
+									}
+								}
+								/*li.not-hovered > button {
+									background-color: $c-light-grey !important;
+								}
+								li.not-hovered > a {
+									button {
+										background-color: $c-light-grey !important;
+									}
+								}*/
+							}
 						}
 					}
-					.opt.checked {
+					/*.filter:nth-child(2n) {
+						margin-left: 0;
+						.drop-down {
+							left: -215px;
+						}
+					}*/
+					.filter:hover {
+						button {
+							background-color: $c-mid-blue;
+							color: #FFF;
+
+							label.count {
+								background-color: #FFF;
+								font-weight: bold;
+								color: $c-mid-blue;
+							}
+						}
+						.drop-down {
+							display: block;
+						}
+					}
+
+					
+
+
+
+
+
+
+
+
+
+					.title {
+						h1 {
+							font-size: $t-main;
+							font-style: italic;
+							color: $c-light-green;
+							/*text-decoration: underline;*/
+						}
+						.active {
+							margin-bottom: 10px;
+							
+							.tag {
+								display: inline-block;
+								margin: 5px 5px 0 0;
+								text-decoration: none;
+								padding: 3px 5px;
+								background-color: transparent;
+								border: 1px solid $c-dark-1;
+								border-radius: 5px;
+								font-size: $t-small;
+								color: $c-dark-1;
+								transition: background-color .25s;
+								cursor: pointer;
+
+								label {
+									cursor: pointer;
+								}
+								i {
+									vertical-align: middle;
+									font-size: $t-main;
+									margin-left: 5px;
+								}
+								a {
+									color: $c-dark-1;
+								}
+							}
+							.tag:hover {
+								background-color: $c-dark-1;
+								color: #FFF;
+
+								a {
+									color: #FFF;
+								}
+							}
+						}
+					}
+				}
+				.separator {
+					position: relative;
+					width: 100%;
+					text-align: center;
+
+					span {
+						position: relative;
+						padding: 0 5px;
 						background-color: #FFF;
-						color: $c-dark-1;
-
-						.count {
-							color: $c-mid-2;
-						}
+						font-size: $t-small;
+						color: $c-light-blue;
+						z-index: 100;
 					}
-					.opt:not(.checked):hover {
-						background-color: $c-light-1;
-						color: $c-dark-1;
+				}
+				.separator:before {
+					content: '';
+					position: absolute;
+					left: 0;
+					top: 50%;
+					width: 100%;
+					height: 1px;
+					background-color: $c-light-blue;
+				}
+			}
+			.submission {
+				width: calc(100% - 55px);
+				padding: 5px 25px 30px 30px;
+				text-align: right;
 
-						.count {
-							color: $c-mid-2;
-						}
-					}
+				button {
+					height: 30px;
+					padding: 0 10px;
+					border: 1px solid $c-dark-blue;
+					margin-right: 5px;
+					outline: none;
+					background-color: transparent;
+					font-size: $t-mid-small;
+					cursor: pointer;
+				}
+				button.search {
+					background-color: $c-light-blue;
+					border-color: $c-light-blue;
+					color: #FFF;
 				}
 			}
 		}
-		.filters.full-height {
-			height: calc(100% - 10px * 2);
-		}
-
 	}
-}
-nav#filter.open {
-	transform: translateX(0);
+	nav#filter.open {
+		transform: translateX(0);
 
-	.handle {
-		cursor: w-resize;
-		
-		div {
+		.handle {
 			cursor: w-resize;
+			
+			div {
+				cursor: w-resize;
+			}
 		}
 	}
 }

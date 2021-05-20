@@ -1,88 +1,33 @@
-<%- include ('./multi-language.ejs') %> 
-<% 
-	if (!locals.lang) locals.lang = locals.path[0]
-	if (!locals.activity) locals.activity = locals.path[1] || 'browse'
-	if (!locals.object) locals.object = locals.path[2]
-	if (!locals.space) locals.space = locals.path[3]
-%>
-<nav id='languages'>
-	<ul>
-		<li id='lang-en'>
-			<a class='<% if (locals.lang === "en") { %>active<% } %>'>EN</a>
-		</li>
-		<li id='lang-fr'>
-			<a class='<% if (locals.lang === "fr") { %>active<% } %>'>FR</a>
-		</li>
-		<li id='lang-ar' class='disabled'>
-			<a>AR</a>
-		</li>
-		<li id='lang-es'>
-			<a class='<% if (locals.lang === "es") { %>active<% } %>'>ES</a>
-		</li>
-		<li id='lang-pt'>
-			<a class='<% if (locals.lang === "pt") { %>active<% } %>'>PT</a>
-		</li>
-	</ul>
-</nav>
-
+<%- include ('./multi-language.ejs') %>
 <header>
-	<ul class='primary'>
-		
-		<% if (locals.rights > 0) { %>
-			<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.activity) && ['pads', 'pad'].includes(locals.object)) { %>
-				<li class='active'>
-			<% } else { %><li><% } %>
-				<a href='/<%- locals.lang %>/browse/pads/private'><button><%- vocabulary['pad'][locals.lang](true).capitalize() %></button></a>
-			</li>
-		<% } %>
-		<% if (locals.rights > 1) { %>
-			<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.activity) && ['templates', 'template'].includes(locals.object)) { %>
-				<li class='active'>
-			<% } else { %><li><% } %>
-				<a href='/<%- locals.lang %>/browse/templates/private'><button><%- vocabulary['template'][locals.lang](false, true).capitalize() %></button></a>
-			</li>
-		<% } %>
-		<% if (locals.rights > 1) { %>
-			<% if (locals.activity === "mobilize") { %><li class='active'>
-			<% } else { %><li><% } %>
-				<a href='/<%- locals.lang %>/mobilize/existing'><button><%- vocabulary['cohort'][locals.lang](true).capitalize() %></button></a>
-			</li>
-		<% } %>
+	<div class='inner'>
+		<ul class='primary'>
 			
-		<li class='placeholder hide'><a><button></button></a></li>
-
-		<li class='user-id'>
-			<span class='lg'><%- vocabulary['logged in'][locals.lang](locals.user) %>. | </span><a href='/logout' class='logout'><%- vocabulary['log out'][locals.lang] %></a>
-		</li>
-	</ul>
-
-	<% if (locals.activity === 'browse') { %>
-		<ul class='secondary'>
-			<div class='inner'>
-				<% if (locals.activity === 'browse') { %>
-					<% if (locals.rights > 0) { %>
-						<a href='./private'>
-							<li class='<% if (locals.space === "private") { %>active<% } %>'>
-								<% if (locals.object === 'pads') { %><%- vocabulary['private'][locals.lang] %>
-								<% } else if (locals.object === 'templates') { %><%- vocabulary['private templates'][locals.lang] %><% } %>
-							</li>
-						</a>
-					<% } %>
-					<!-- <% if (locals.object === 'pads') { %>
-						<a href='./bookmarks'>
-							<li class='<% if (locals.space === "bookmarks") { %>active<% } %>'><%- vocabulary['bookmarks'][locals.lang] %></li>
-						</a>
-					<% } %> -->
-					<a href='./public'>
-						<li class='<% if (locals.space === "public") { %>active<% } %>'>
-							<% if (locals.object === 'pads') { %><%- vocabulary['public'][locals.lang] %>
-							<% } else if (locals.object === 'templates') { %><%- vocabulary['public templates'][locals.lang] %><% } %>
-						</li>
-					</a>
-				<% } %>
-			</div>
+			<% if (locals.metadata.user.rights > 0) { %>
+				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['pads', 'pad'].includes(locals.metadata.page.object)) { %>
+					<li class='active'>
+				<% } else { %><li><% } %>
+					<a href='/<%- locals.metadata.page.lang %>/browse/pads/private'><button><%- vocabulary['pad'][locals.metadata.page.lang](true).capitalize() %></button></a>
+				</li>
+			<% } %>
+			<% if (locals.metadata.user.rights > 1) { %>
+				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['templates', 'template'].includes(locals.metadata.page.object)) { %>
+					<li class='active'>
+				<% } else { %><li><% } %>
+					<a href='/<%- locals.metadata.page.lang %>/browse/templates/private'><button><%- vocabulary['template'][locals.metadata.page.lang](false, true).capitalize() %></button></a>
+				</li>
+			<% } %>
+			<% if (locals.metadata.user.rights > 1) { %>
+				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['mobilizations', 'mobilization'].includes(locals.metadata.page.object)) { %>
+					<li class='active'>
+				<% } else { %><li><% } %>
+					<a href='/<%- locals.metadata.page.lang %>/browse/mobilizations/ongoing'><button><%- vocabulary['cohort'][locals.metadata.page.lang](true).capitalize() %></button></a>
+				</li>
+			<% } %>
+				
+			<li class='placeholder hide'><a><button></button></a></li>
 		</ul>
-	<% } %>
+	</li>
 </header>
 
 <div class='screen hide'>

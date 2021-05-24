@@ -41,7 +41,7 @@
 			<% } else { %>
 				<a href='<%- locals.metadata.page.referrer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
 				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.lang] %>'><%- locals.mobilization.title %></div>
-				<div class='contributor'><%- vocabulary['credit'][locals.metadata.page.lang](locals.mobilization.host, locals.mobilization.hostname) %></div>
+				<div class='contributor'><%- vocabulary['host credit'][locals.metadata.page.lang](locals.mobilization.host, locals.mobilization.hostname) %></div>
 			<% } %>
 		</div>
 		

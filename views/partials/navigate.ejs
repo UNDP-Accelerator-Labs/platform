@@ -17,7 +17,7 @@
 					<a href='/<%- locals.metadata.page.lang %>/browse/templates/private'><button><%- vocabulary['template'][locals.metadata.page.lang](false, true).capitalize() %></button></a>
 				</li>
 			<% } %>
-			<% if (locals.metadata.user.rights > 1) { %>
+			<% if (locals.metadata.user.rights > 1 || locals.metadata.user.participations.length > 0) { %>
 				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['mobilizations', 'mobilization'].includes(locals.metadata.page.object)) { %>
 					<li class='active'>
 				<% } else { %><li><% } %>

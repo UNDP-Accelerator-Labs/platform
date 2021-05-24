@@ -2,7 +2,7 @@
 	<div class='inner'>
 
 		<%# if (locals.metadata.page.object === 'pads') { %>
-			<% if (locals.metadata.user.rights > 1) { %>
+			<% if (locals.metadata.user.rights > 0) { %>
 				<div class='create'>
 					<button>New</button>
 					<div class='drop-down'>
@@ -53,32 +53,34 @@
 									</ul>
 								</div>
 							</li>
-							<li>
-								<button>
-									<label><%- vocabulary['template'][locals.metadata.page.lang](false, false).capitalize() %></label>
-									<span class='expandable'>></span>
-								</button>
-								<div class='drop-down'>
-									<ul>
-										<li>
-											<a href='../../contribute/template' target='_blank'>
-												<button><label>Blank template</label></button>
-											</a>
-										</li>
-										<li>
-											<button>
-												<label>Copy template</label>
-												<span class='expandable'>></span>
-											</button>
-										</li>
-									</ul>
-								</div>
-							</li>
-							<li>
-								<a href='../../contribute/mobilization'>
-									<button><%- vocabulary['cohort'][locals.metadata.page.lang](false).capitalize() %></button>
-								</a>
-							</li>
+							<% if (locals.metadata.user.rights > 1) { %>
+								<li>
+									<button>
+										<label><%- vocabulary['template'][locals.metadata.page.lang](false, false).capitalize() %></label>
+										<span class='expandable'>></span>
+									</button>
+									<div class='drop-down'>
+										<ul>
+											<li>
+												<a href='../../contribute/template' target='_blank'>
+													<button><label>Blank template</label></button>
+												</a>
+											</li>
+											<li>
+												<button>
+													<label>Copy template</label>
+													<span class='expandable'>></span>
+												</button>
+											</li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<a href='../../contribute/mobilization'>
+										<button><%- vocabulary['cohort'][locals.metadata.page.lang](false).capitalize() %></button>
+									</a>
+								</li>
+							<% } %>
 						</ul>
 					</div>
 				</div>

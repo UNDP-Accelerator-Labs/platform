@@ -10,7 +10,7 @@ exports.main = kwargs => {
 	const [f_search, f_contributors, f_mobilizations, f_space, order, page] = filter(kwargs.req)
 	
 	return conn.any(`
-		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country, cp.id AS country_id,
 			COUNT(p.id)::INT AS associated_pads,
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.applications, 0)::INT AS applications,
@@ -32,6 +32,8 @@ exports.main = kwargs => {
 		FROM templates t
 		INNER JOIN contributors c
 			ON c.id = t.contributor
+		INNER JOIN centerpoints cp
+			ON c.country = cp.country
 		LEFT JOIN pads p
 			ON t.id = p.template
 		LEFT JOIN (
@@ -52,7 +54,7 @@ exports.main = kwargs => {
 			ON t.id = mob.template
 		WHERE TRUE 
 			$3:raw $4:raw $5:raw $6:raw
-		GROUP BY (t.id, c.name, ce.bookmarks, ce.applications, e.types)
+		GROUP BY (t.id, c.name, c.country, cp.id, ce.bookmarks, ce.applications, e.types)
 		$7:raw
 		LIMIT $8 OFFSET $9
 		;`, [uuid, rights, f_search, f_contributors, f_mobilizations, f_space, order, page_content_limit, (page - 1) * page_content_limit])

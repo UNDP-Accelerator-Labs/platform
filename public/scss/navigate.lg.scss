@@ -272,7 +272,6 @@ nav#site-title.sm {
 nav#filters {
 	display: inline-block;
 	vertical-align: top;
-	/*margin-top: calc(30px + 75px + 60px + 45px);*/
 	margin-top: calc(30px + 75px);
 	
 	.inner {
@@ -287,14 +286,12 @@ nav#filters {
 		}
 		.active-filters {
 			width: 100%;
-			/*padding: 0 10px;*/
 			margin-bottom: 30px;
 
 			.tag {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				/*max-width: calc(75px + 105px + 30px);*/
 				border: 1px solid $c-light-grey;
 				padding: 0 0 0 10px;
 				margin: 5px;

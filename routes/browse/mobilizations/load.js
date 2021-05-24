@@ -16,7 +16,8 @@ exports.main = kwargs => {
 			to_char(mob.start_date, 'DD Mon YYYY') AS start_date, 
 			to_char(mob.end_date, 'DD Mon YYYY') AS end_date, 
 			c.name,
-			c.country AS lab, 
+			c.country, 
+			cp.id AS country_id,
 			t.id AS template_id,
 			t.title AS template_title, 
 			t.description AS template_description,
@@ -30,6 +31,8 @@ exports.main = kwargs => {
 		FROM mobilizations mob
 		INNER JOIN contributors c
 			ON mob.host = c.id
+		INNER JOIN centerpoints cp
+			ON cp.country = c.country
 		INNER JOIN templates t
 			ON mob.template = t.id
 		LEFT JOIN mobilization_contributions p
@@ -40,7 +43,7 @@ exports.main = kwargs => {
 			ON mob.id = mc.mobilization
 		WHERE c.uuid = $1
 			$3:raw
-			GROUP BY (mob.id, c.id, c.name, c.country, t.id)
+			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id)
 			ORDER BY pads DESC, start_date DESC
 		LIMIT $4 OFFSET $5
 	;`, [uuid, rights, f_space, page_content_limit, (page - 1) * page_content_limit])

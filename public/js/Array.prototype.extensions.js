@@ -120,11 +120,26 @@ Array.prototype.unique = function (key, onkey) {
 	})
 	return arr
 }
-Array.prototype.group = function () {
+Array.prototype.group = function (key, keep) {
 	const arr = []
 	this.forEach(d => {
-		if (arr.map(c => c.key).indexOf(d) === -1) arr.push({ key: d, count: 1 })
-		else arr.find(c => c.key === d).count += 1
+		if (!key) {
+			if (arr.map(c => c.key).indexOf(d) === -1) arr.push({ key: d, count: 1 })
+			else arr.find(c => c.key === d).count += 1
+		} else {
+			if (arr.map(c => c.key).indexOf(d[key]) === -1) {
+				const obj = {}
+				obj.key = d[key]
+				obj.count = 1
+				if (keep) obj[keep] = [d[keep]]
+				arr.push(obj)
+			}
+			else {
+				const obj =  arr.find(c => c.key === d[key])
+				obj.count += 1
+				if (keep) obj[keep].push(d[keep])
+			}
+		}
 	})
 	arr.forEach(d => d.p = d.count / this.length)
 	return arr

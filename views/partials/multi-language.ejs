@@ -221,10 +221,10 @@
 			"pt": plural => { return plural ? "Coorte" : "Coortes" }
 		},
 		"credit": {
-			"en": (cid, name) => { return `Contributed by <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
-			"fr": (cid, name) => { return `Contribué par <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
-			"es": (cid, name) => { return `Contribuido por <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
-			"pt": (cid, name) => { return `Contribuíram por <a href='../browse/public?mappers=${cid}'>${name}</a>.` }
+			"en": (cid, name) => { return `Contributed by <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
+			"fr": (cid, name) => { return `Contribué par <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
+			"es": (cid, name) => { return `Contribuido por <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
+			"pt": (cid, name) => { return `Contribuíram por <a href='../browse/public?contributors=${cid}'>${name}</a>.` }
 		},
 		"missing contributor": {
 
@@ -278,10 +278,10 @@
 			"pt": active => { return active ? "Favorito" : "Marcar" }
 		},
 		"tested and approved": {
-			"en": (cid, name) => { return `This solution has been tested and approved by <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
-			"fr": (cid, name) => { return `Cette solution a été testée et approuvée par <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
-			"es": (cid, name) => { return `Esta solución ha sido probada y aprobada por <a href='../browse/public?mappers=${cid}'>${name}</a>.` },
-			"pt": (cid, name) => { return `Esta solução foi testada e aprovada por <a href='../browse/public?mappers=${cid}'>${name}</a>.` }
+			"en": (cid, name) => { return `This solution has been tested and approved by <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
+			"fr": (cid, name) => { return `Cette solution a été testée et approuvée par <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
+			"es": (cid, name) => { return `Esta solución ha sido probada y aprobada por <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
+			"pt": (cid, name) => { return `Esta solução foi testada e aprovada por <a href='../browse/public?contributors=${cid}'>${name}</a>.` }
 		}
 	}
 %>

@@ -1,5 +1,6 @@
 main#pad,
-main#template {
+main#template,
+main#mobilization {
 	width: 55%;
 	min-width: 875px;
 	margin-left: 15%;
@@ -827,6 +828,27 @@ main#template {
 						color: $c-light-grey;
 						/*color: $c-mid-2;*/
 						font-size: $t-small;
+					}
+				}
+				.results-container {
+					.chart {
+						svg {
+							rect {
+								fill: $c-mid-blue;
+								cursor: pointer;
+							}
+							rect:hover {
+								fill: $c-dark-blue;
+							}
+							.x.axis {
+								text {
+									font-weight: bold;
+								}
+								path {
+									display: none;
+								}
+							}
+						}
 					}
 				}
 				.group-container {

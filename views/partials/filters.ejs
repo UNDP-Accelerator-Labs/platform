@@ -25,9 +25,9 @@
 				</div>
 			</div>
 		<% } %>
-		<% if (query.contributors || query.templates || query.mobilizations || query.methods || query.datasources || query.thematic_areas || query.sdgs) { %>
+		<% if (query.contributors || query.countries || query.templates || query.mobilizations || query.methods || query.datasources || query.thematic_areas || query.sdgs) { %>
 			<p>Filters</p>
-			<% if (query.contributors || query.templates || query.mobilizations) { %>
+			<% if (query.contributors || query.countries || query.templates || query.mobilizations) { %>
 				<div class='filters-group meta-filters'>
 					<div class='active-filters'>
 						<!-- TO DO: TRANSLATE -->
@@ -41,6 +41,21 @@
 												<%- locals.filters.contributors.find(d => +d.id === +c).name.slice(0, 25) %>…
 											<% } else { %>
 												<%- locals.filters.contributors.find(d => +d.id === +c).name %>	
+											<% } %>
+										</label>
+										<label class='close'>x</label>
+									</div>
+								<% }) 
+							} %>
+							<% if (query.countries) { 
+								query.countries.forEach(c => { %>
+									<div class='tag' data-type='Contributor' data-value='<%- c %>'>
+										<label class='type'>Contributor:</label> 
+										<label class='name'>
+											<% if (locals.filters.countries.find(d => +d.id === +c).name.length > 25) { %>
+												<%- locals.filters.countries.find(d => +d.id === +c).name.slice(0, 25) %>…
+											<% } else { %>
+												<%- locals.filters.countries.find(d => +d.id === +c).name %>	
 											<% } %>
 										</label>
 										<label class='close'>x</label>

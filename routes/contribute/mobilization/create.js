@@ -16,7 +16,7 @@ exports.main = (req, res) => {
 			ORDER BY c.country
 		;`, [uuid]))
 		batch.push(t.any(`
-			SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, 
+			SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country,
 				COALESCE(ce.applications, 0)::INT AS applications
 			FROM templates t
 			INNER JOIN contributors c

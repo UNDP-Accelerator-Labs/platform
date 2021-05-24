@@ -67,7 +67,7 @@ exports.main = kwargs => {
 	// 	LIMIT $13 OFFSET $14
 	// ;`, [uuid, rights, f_search, f_sdgs, f_thematic_areas, f_methods, f_datasources, f_contributors, f_template, f_mobilizations, f_space, order, page_content_limit, (page - 1) * page_content_limit])
 	return conn.any(`
-		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country AS lab, 
+		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country, cp.id AS country_id,
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.inspirations, 0)::INT AS inspirations, 
 			COALESCE(ce.approvals, 0)::INT AS approvals, 
@@ -100,6 +100,8 @@ exports.main = kwargs => {
 		FROM pads p
 		INNER JOIN contributors c
 			ON c.id = p.contributor
+		INNER JOIN centerpoints cp
+			ON c.country = cp.country
 		LEFT JOIN (
 			SELECT pad, contributor, array_agg(DISTINCT type) AS types FROM engagement_pads
 			WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1)

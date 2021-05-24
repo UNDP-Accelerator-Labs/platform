@@ -25,48 +25,16 @@
 				<p>Filters</p>
 
 				<div class='filters-group meta-filters'>
-					<div class='active-filters'>
-						<!-- TO DO: TRANSLATE -->
-						<% if (query) { %>
-							<% if (query.contributors) { 
-								query.contributors.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>Contributor:</small> 
-										<%- locals.filters.contributors.find(d => +d.id === +c).name %>
-										</label>
-									</div>
-								<% }) 
-							} %>
-							<% if (query.templates) { 
-								query.templates.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>Template:</small> 
-										<%- locals.filters.templates.find(d => +d.id === +c).title %>
-										</label>
-									</div>
-								<% }) 
-							} %>
-							<% if (query.mobilizations) { 
-								query.mobilizations.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>Mobilization:</small> 
-										<%- locals.filters.mobilizations.find(d => +d.id === +c).title %>
-										</label>
-									</div>
-								<% }) 
-							} %>
-						<% } %>
-					</div>
 					<div class='filter'>
 						<button type='button'>
 							<label>Contributors</label>
-							<% if (query.contributors) { %><label class='count'><%- query.contributors.length %><% } %></label>
+							<% if (query.contributors || query.countries) { %><label class='count'><%- (query.contributors || query.countries).length %><% } %></label>
 						</button>
 						<div class='drop-down'>
 							<ul>
 								<!-- TO DO: TRANSLATE -->
-								<% locals.filters.contributors.forEach((c, j) => { %>
-									<% if (locals.metadata.page.space === 'private') { %>
+								<% if (locals.metadata.page.space === 'private') { %>
+									<% locals.filters.contributors.forEach(c => { %>
 										<% if (query.contributors && query.contributors.map(q => +q).includes(+c.id)) { %>
 										<li class='entry active'>
 											<input type='checkbox' name='contributors' id='contributor-<%- c.id %>' value='<%- c.id %>' data-type='Contributor' data-value='<%- c.name %>' checked>
@@ -77,25 +45,21 @@
 											<label for='contributor-<%- c.id %>'><%- c.name %></label>
 											<label for='contributor-<%- c.id %>' class='count'><%- c.count %></label>
 										</li>
-									<% } else { %>
-										<% if (query.contributors && query.contributors.filter(q => q.values.filter(r => +r === +c.id).length).length) { %>
+									<% }) %>
+								<% } else if (locals.metadata.page.space === 'public') { %>
+									<% locals.filters.countries.forEach((c, j) => { %>
+										<% if (query.countries && query.countries.map(q => +q).includes(+c.id)) { %>
 										<li class='entry active'>
-											<% c.values.forEach(d => { %>
-												<input type='hidden' name='contributors' value='<%- d.id %>'>
-											<% }) %>	
-											<input type='checkbox' name='country' id='contributor-<%- j %>' value='<%- c.key %>' data-type='Contributor' data-value='<%- c.key %>' checked>
+											<input type='checkbox' name='countries' id='country-<%- c.id %>' value='<%- c.id %>' data-type='Contributor' data-value='<%- c.name %>' checked>
 										<% } else { %>
 										<li class='entry'>
-											<% c.values.forEach(d => { %>
-												<input type='hidden' name='contributors' value='<%- d.id %>' disabled>
-											<% }) %>
-											<input type='checkbox' name='country' id='contributor-<%- j %>' value='<%- c.key %>' data-type='Contributor' data-value='<%- c.key %>'>
+											<input type='checkbox' name='countries' id='contributor-<%- c.id %>' value='<%- c.id %>' data-type='Contributor' data-value='<%- c.name %>'>
 										<% } %>
-											<label for='contributor-<%- j %>'><%- c.key %></label>
-											<label for='contributor-<%- j %>' class='count'><%- c.count %></label>
+											<label for='contributor-<%- c.id %>'><%- c.name %></label>
+											<label for='contributor-<%- c.id %>' class='count'><%- c.count %></label>
 										</li>
-									<% } %>
-								<% }) %>
+									<% }) %>
+								<% } %>
 							</ul>
 						</div>
 					</div>
@@ -145,51 +109,51 @@
 							</ul>
 						</div>
 					</div>
-					<!-- <small>OR join</small> -->
-				</div>
-				<div class='separator'><span>AND</span></div>
-				<div class='filters-group content-filters'>
 					<div class='active-filters'>
 						<!-- TO DO: TRANSLATE -->
 						<% if (query) { %>
-							<% if (query.methods) { 
-								query.methods.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>Method:</small> 
-										<%- locals.filters.methods.find(d => +d.tag_id === +c).tag_name %>
-										</label>
+							<% if (query.contributors) { 
+								query.contributors.forEach(c => { %>
+									<div class='tag' data-type='Contributor' data-value='<%- c %>'>
+										<label class='type'>Contributor:</label> 
+										<label class='name'><%- locals.filters.contributors.find(d => +d.id === +c).name %></label>
+										<label class='close'>x</label>
 									</div>
 								<% }) 
 							} %>
-							<% if (query.datasources) { 
-								query.datasources.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>Data source:</small> 
-										<%- locals.filters.datasources.find(d => +d.tag_id === +c).tag_name %>
-										</label>
+							<% if (query.countries) { 
+								query.countries.forEach(c => { %>
+									<div class='tag' data-type='Contributor' data-value='<%- c %>'>
+										<label class='type'>Contributor:</label> 
+										<label class='name'><%- locals.filters.countries.find(d => +d.id === +c).name %></label>
+										<label class='close'>x</label>
 									</div>
 								<% }) 
 							} %>
-							<% if (query.thematic_areas) { 
-								query.thematic_areas.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>Thematic area:</small>
-										<%- locals.filters.thematic_areas.find(d => +d.tag_id === +c).tag_name %>
-										</label>
+							<% if (query.templates) { 
+								query.templates.forEach(c => { %>
+									<div class='tag' data-type='Template' data-value='<%- c %>'>
+										<label class='type'>Template:</label> 
+										<label class='name'><%- locals.filters.templates.find(d => +d.id === +c).title %></label>
+										<label class='close'>x</label>
 									</div>
 								<% }) 
 							} %>
-							<% if (query.sdgs) { 
-								query.sdgs.forEach(c => { %>
-									<div class='tag' data-value='<%- c %>'>
-										<label><small>SDG:</small> 
-										<%- locals.filters.sdgs.find(d => +d.tag_id === +c).tag_name %>
-										</label>
+							<% if (query.mobilizations) { 
+								query.mobilizations.forEach(c => { %>
+									<div class='tag' data-type='Mobilization' data-value='<%- c %>'>
+										<label class='type'>Mobilization:</label> 
+										<label class='name'><%- locals.filters.mobilizations.find(d => +d.id === +c).title %></label>
+										<label class='close'>x</label>
 									</div>
 								<% }) 
 							} %>
 						<% } %>
 					</div>
+					<!-- <small>OR join</small> -->
+				</div>
+				<div class='separator'><span>AND</span></div>
+				<div class='filters-group content-filters'>
 					<% if (locals.filters.methods) { %>
 						<div class='filter'>
 							<button type='button'>
@@ -290,6 +254,47 @@
 							</div>
 						</div>
 					<% } %>
+					<div class='active-filters'>
+						<!-- TO DO: TRANSLATE -->
+						<% if (query) { %>
+							<% if (query.methods) { 
+								query.methods.forEach(c => { %>
+									<div class='tag' data-type='Method' data-value='<%- c %>'>
+										<label class='type'>Method:</label> 
+										<label class='name'><%- locals.filters.methods.find(d => +d.tag_id === +c).tag_name %></label>
+										<label class='close'>x</label>
+									</div>
+								<% }) 
+							} %>
+							<% if (query.datasources) { 
+								query.datasources.forEach(c => { %>
+									<div class='tag' data-type='Data source' data-value='<%- c %>'>
+										<label class='type'>Data source:</label> 
+										<label class='type'><%- locals.filters.datasources.find(d => +d.tag_id === +c).tag_name %></label>
+										<label class='close'>x</label>
+									</div>
+								<% }) 
+							} %>
+							<% if (query.thematic_areas) { 
+								query.thematic_areas.forEach(c => { %>
+									<div class='tag' data-type='Thematic area' data-value='<%- c %>'>
+										<label class='type'>Thematic area:</label>
+										<label class='type'><%- locals.filters.thematic_areas.find(d => +d.tag_id === +c).tag_name %></label>
+										<label class='close'>x</label>
+									</div>
+								<% }) 
+							} %>
+							<% if (query.sdgs) { 
+								query.sdgs.forEach(c => { %>
+									<div class='tag' data-type='SDG' data-value='<%- c %>'>
+										<label class='type'>SDG:</label> 
+										<label class='type'><%- locals.filters.sdgs.find(d => +d.tag_id === +c).tag_name %></label>
+										<label class='close'>x</label>
+									</div>
+								<% }) 
+							} %>
+						<% } %>
+					</div>
 				</div>
 				<!-- <small>OR join</small> -->
 			</div>
@@ -306,6 +311,9 @@
 	d3.selectAll('nav.browse-filters input[type=checkbox]')
 	.on('change', function () {
 		const sel = d3.select(this)
+		const data_type = sel.attr('data-type')
+		const data_value = sel.attr('data-value')
+
 		const value = this.value
 		const entry = sel.findAncestor('entry')
 		const drop_down = sel.findAncestor('drop-down')
@@ -315,9 +323,11 @@
 		entry.classed('active', this.checked)
 		
 		if (this.checked) {
-			active_filters.addElem('div', 'tag')
-			.addElem('label')
-				.html(`<small>${sel.attr('data-type')}</small>: ${sel.attr('data-value')}`)
+			const tag = active_filters.addElem('div', 'tag')
+				.attrs({ 'data-type': data_type, 'data-value': data_value })
+			tag.addElem('label', 'type').html(`${data_type}:`)
+			tag.addElem('label', 'name').html(data_value)
+			tag.addElem('label', 'close').html('x')
 		} else {
 			active_filters.selectAll('.tag')
 				.filter(function () { return d3.select(this).attr('data-value') === value })
@@ -327,6 +337,29 @@
 		const active_size = drop_down.selectAll('input[type=checkbox]:checked').size()
 		if (active_size > 0) filter.select('button').addElems('label', 'count', [active_size]).html(d => d)
 		else filter.select('button').addElems('label', 'count', [])
+	})
+	d3.selectAll('nav.browse-filters div.active-filters div.tag label.close')
+	.on('click', function () {
+		const sel = d3.select(this)
+		const tag = sel.findAncestor('tag')
+		const data_type = tag.attr('data-type')
+		const data_value = tag.attr('data-value')
+
+		const filter_form = d3.select('nav.browse-filters')
+		const checkbox = filter_form.selectAll('input[type=checkbox]').filter(function () {
+			return d3.select(this).attr('data-type') === data_type && this.value === data_value
+		})
+		checkbox.node().checked = false
+		checkbox.findAncestor('entry').classed('active', false)
+
+		const drop_down = checkbox.findAncestor('drop-down')
+		const filter = checkbox.findAncestor('filter')
+		const active_size = drop_down.selectAll('input[type=checkbox]:checked').size()
+		if (active_size > 0) filter.select('button').addElems('label', 'count', [active_size]).html(d => d)
+		else filter.select('button').addElems('label', 'count', [])
+		
+		tag.remove()
+		// filter_form.select('div.submission button.search').node().click()
 	})
 	d3.selectAll('nav.browse-filters div.submission button.reset')
 	.on('click', function () {

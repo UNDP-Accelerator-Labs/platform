@@ -121,24 +121,40 @@
 						flex-wrap: wrap;
 						width: calc(100% - 20px);
 						padding: 0 10px;
-						margin-bottom: 5px;
+						/*margin-bottom: 5px;*/
 
 						.tag {
-							display: inline-block;
-							/*max-width: 50%;*/
+							display: flex;
+							justify-content: space-between;
+							align-items: center;
 							border: 1px solid $c-light-grey;
-							padding: 5px 10px;
+							padding: 0 0 0 5px;
 							margin: 5px;
 							background-color: #FFF;
-							font-size: $t-small;
+							font-size: $t-xsmall;
 							color: $c-light-grey;
 
 							label {
 								cursor: pointer;
-
-								small {
-									font-size: $t-xsmall;
-								}
+							}
+							.type {
+								flex-shrink: 0;
+								/*font-size: $t-xsmall;*/
+							}
+							.name {
+								flex-grow: 1;
+								margin: 0 10px 0 5px;
+								white-space: nowrap;
+								font-weight: bold;
+							}
+							.close {
+								flex-shrink: 0;
+								width: 30px;
+								padding: 5px 0;
+								background-color: $c-light-grey;
+								text-align: center;
+								font-size: $t-small;
+								color: #FFF;
 							}
 						}
 					}

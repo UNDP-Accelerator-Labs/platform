@@ -29,11 +29,6 @@
 					<button>Past mobilizations<div class='count'><%- locals.stats.past %></div></button>
 				</a>	
 			</li>
-			<!-- <% if (locals.metadata.page.object === 'pads') { %>
-				<a href='./bookmarks'>
-					<li class='<% if (locals.metadata.page.space === "bookmarks") { %>active<% } %>'><%- vocabulary['bookmarks'][locals.metadata.page.lang] %></li>
-				</a>
-			<% } %> -->
 		</ul>
 	</nav>
 	<main>
@@ -42,26 +37,12 @@
 	</main>
 </div>
 
-
-<!-- <main id='mobilize-existing'>
-	<div class='inner'>
-		<section class='new'>
-		<a href='../mobilize/new'><button id='add'><div>+</div></button></a>
-	</section>
-		<section class='overview'></section>
-	</div>
-	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
-</main> -->
-
 <footer>
 </footer>
 
 
 
 <script type='text/javascript'>
-	const searchForm = d3.select('#filter form')
-	const search = d3.select('#filter')
-	const filters = d3.select('.filters')
 	
 	// const main = d3.select('main')
 	// 	.call(multiSelection, { class: '.template.visible .inner', filter: d => d.editable })
@@ -116,8 +97,6 @@
 		.each(function (d) {
 			d3.select(this).classed(`status-${d.status}`, true)
 		}).addElems('div', 'inner')
-			// .addElems('a', 'mobilization-link')
-			// .attr('href', d => d.editable ? `../../edit/template?id=${d.id}` : `../../view/template?id=${d.id}`)
 		
 		const head = mobilizations.addElems('div', 'head')
 		const body = mobilizations.addElems('div', 'body')
@@ -125,8 +104,9 @@
 
 		const metagroup = head.addElems('div', 'meta-group')
 		metagroup.addElems('div', 'meta meta-contributor')
-			// .html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>AccLab ${d.lab}<% } %>`)
-			.html(d => `AccLab ${d.lab}`)
+			.addElems('a')
+			.attr('href', d => `?countries=${d.country_id}`)
+			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
 		
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
@@ -160,10 +140,11 @@
 
 		const title = body.addElems('div', 'media media-title')
 			.addElems('a', 'mobilization-link')
-			// .attr('href', d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`)
+			.attrs({ 'href': d => d.editable ? `../../edit/mobilization?id=${d.id}` : `../../view/mobilization?id=${d.id}`, 'target': 'blank' })
+			.addElems('h1')
 		title.addElems('img')
 			.attr('src', '/imgs/icons/i-mobilize.svg')
-		title.addElems('h1').html(d => d.title || `[${vocabulary['untitled template']['<%- locals.metadata.page.lang %>']}]`)
+		title.addElems('span').html(d => d.title || `[${vocabulary['untitled template']['<%- locals.metadata.page.lang %>']}]`)
 
 		const template_title = body.addElem('div', 'media media-txt')
 			.attr('data-placeholder', '<%- vocabulary["untitled template"][locals.metadata.page.lang] %>')

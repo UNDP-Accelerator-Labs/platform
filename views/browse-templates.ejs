@@ -142,8 +142,9 @@
 
 		const metagroup = head.addElems('div', 'meta-group')
 		metagroup.addElems('div', 'meta meta-contributor')
-			// .html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>AccLab ${d.lab}<% } %>`)
-			.html(d => `AccLab ${d.lab}`)
+			.addElems('a')
+			.attr('href', d => `?countries=${d.country_id}`)
+			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
 
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
@@ -175,9 +176,10 @@
 		const title = body.addElems('div', 'media media-title')
 			.addElems('a', 'template-link')
 			.attrs({ 'href': d => d.editable ? `../../edit/template?id=${d.id}` : `../../view/template?id=${d.id}`, 'target': '_blank' })
+			.addElems('h1')
 		title.addElems('img')
 			.attrs({ 'src': '/imgs/icons/i-template.svg', 'target': '_blank' })
-		title.addElems('h1').html(d => d.title || `[${vocabulary['untitled template']['<%- locals.metadata.page.lang %>']}]`)
+		title.addElems('span').html(d => d.title || `[${vocabulary['untitled template']['<%- locals.metadata.page.lang %>']}]`)
 		// head.addElems('div', 'meta meta-contributor')
 		// 	.html(d => vocabulary['credit']['<%- locals.metadata.page.lang %>'](d.contributor, d.contributorname, d.date))
 		

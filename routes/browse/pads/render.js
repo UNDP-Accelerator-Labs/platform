@@ -114,22 +114,29 @@ exports.main = (req, res) => {
 			const batch1 = []
 			// GET CONTRBIUTOR BREAKDOWN
 			// DEPENDING ON space, GET names OR COUNTRIES
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.country, c.id FROM pads p 
-				INNER JOIN contributors c 
-					ON p.contributor = c.id 
-				WHERE TRUE
-					$1:raw
-				GROUP BY c.id
-				ORDER BY c.name
-			;`, [f_space]).then(d => { 
-				if (space === 'private') return { contributors: d } 
-				else if (space === 'public') return { contributors: d.nest('country').sort((a, b) => { 
-					if(a.key < b.key) return -1
-					if(a.key > b.key) return 1
-					return 0
-				}) }
-			}))
+			if (space === 'private') {
+				batch1.push(t1.any(`
+					SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.country, c.id FROM pads p 
+					INNER JOIN contributors c 
+						ON p.contributor = c.id 
+					WHERE TRUE
+						$1:raw
+					GROUP BY c.id
+					ORDER BY c.name
+				;`, [f_space]).then(d => { return { contributors: d } }))
+			} else if (space === 'public') {
+				batch1.push(t1.any(`
+					SELECT COUNT (DISTINCT (p.id))::INT, c.country AS name, cp.id FROM pads p 
+					INNER JOIN contributors c 
+						ON p.contributor = c.id 
+					INNER JOIN centerpoints cp
+						ON c.country = cp.country
+					WHERE TRUE
+						$1:raw
+					GROUP BY (c.country, cp.id)
+					ORDER BY c.country
+				;`, [f_space]).then(d => { return { countries: d } }))
+			} else batch1.push([])
 			// GET TEMPLATE BREAKDOWN
 			batch1.push(t1.any(`
 				SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 

@@ -145,19 +145,17 @@ div.browse {
 									a {
 										color: $c-dark-blue;
 
-										img {
-											display: inline-block;
-											vertical-align: middle;
-											width: 30px;
-											height: 30px;
-											cursor: pointer;
-										}
 										h1 {
-											display: inline-block;
-											vertical-align: middle;
 											font-size: $t-large;
 											font-weight: bold;
 											cursor: pointer;
+
+											img {
+												vertical-align: top;
+												width: 30px;
+												height: 30px;
+												cursor: pointer;
+											}
 										}
 									}
 								}

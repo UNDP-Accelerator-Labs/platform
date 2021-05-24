@@ -193,7 +193,9 @@
 		const metagroup = head.addElems('div', 'meta-group')
 		metagroup.addElems('div', 'meta meta-contributor')
 			// .html(d => vocabulary['credit']['<%- locals.metadata.page.lang %>'](d.contributor, d.contributorname, d.lab, d.date))
-			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>AccLab ${d.lab}<% } %>`)
+			.addElems('a')
+			.attr('href', d => `?countries=${d.country_id}`)
+			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
 
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
@@ -220,9 +222,10 @@
 		const title = body.addElems('div', 'media media-title')
 			.addElems('a', 'pad-link')
 			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			.addElems('h1')
 		title.addElems('img')
 			.attr('src', '/imgs/icons/i-pad.svg')
-		title.addElems('h1').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
+		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
 		body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, txt: c } }))
 			.addElems('a', 'pad-link')

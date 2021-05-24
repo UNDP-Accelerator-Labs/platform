@@ -15,17 +15,20 @@ exports.main = (req, res) => {
 		const batch = []
 		// GET MOBILIZATIONS COUNT
 		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (id))::INT, status FROM mobilizations
-			WHERE host IN (SELECT id FROM contributors WHERE uuid = $1)
-			GROUP BY status
-			ORDER BY status
+			SELECT COUNT (DISTINCT (mob.id))::INT, mob.status FROM mobilizations mob
+			WHERE mob.host IN (SELECT id FROM contributors WHERE uuid = $1)
+				OR $1 IN (SELECT c.uuid FROM contributors c INNER JOIN mobilization_contributors mc ON mc.contributor = c.id WHERE mc.mobilization = mob.id)
+			GROUP BY mob.status
+			ORDER BY mob.status
 		;`, [uuid]))
 		// GET MOBILIZATIONS COUNT, ACCORDING TO FILTERS
+		// TO DO
 		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (id))::INT, status FROM mobilizations
-			WHERE host IN (SELECT id FROM contributors WHERE uuid = $1) 
-			GROUP BY status
-			ORDER BY status
+			SELECT COUNT (DISTINCT (mob.id))::INT, mob.status FROM mobilizations mob
+			WHERE mob.host IN (SELECT id FROM contributors WHERE uuid = $1)
+				OR $1 IN (SELECT c.uuid FROM contributors c INNER JOIN mobilization_contributors mc ON mc.contributor = c.id WHERE mc.mobilization = mob.id)
+			GROUP BY mob.status
+			ORDER BY mob.status
 		;`, [uuid])) // TO DO: UPDATE FILTER
 		// ;`, [f_search, f_contributors, f_space])) // TO DO: UPDATE FILTER
 		// GET CONTRBIUTOR BREAKDOWN

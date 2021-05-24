@@ -15,7 +15,7 @@ exports.main = kwargs => {
 			mob.status, 
 			to_char(mob.start_date, 'DD Mon YYYY') AS start_date, 
 			to_char(mob.end_date, 'DD Mon YYYY') AS end_date, 
-			c.name,
+			c.name AS hostname,
 			c.country, 
 			cp.id AS country_id,
 			t.id AS template_id,
@@ -42,6 +42,7 @@ exports.main = kwargs => {
 		LEFT JOIN mobilization_contributors mc
 			ON mob.id = mc.mobilization
 		WHERE c.uuid = $1
+			OR $1 IN (SELECT c1.uuid FROM contributors c1 INNER JOIN mobilization_contributors mc1 ON mc1.contributor = c1.id WHERE mc1.mobilization = mob.id)
 			$3:raw
 			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id)
 			ORDER BY pads DESC, start_date DESC

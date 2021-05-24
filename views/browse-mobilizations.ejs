@@ -106,7 +106,8 @@
 		metagroup.addElems('div', 'meta meta-contributor')
 			.addElems('a')
 			.attr('href', d => `?countries=${d.country_id}`)
-			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
+			// .html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
+			.html(d => d.hostname)
 		
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {

@@ -15,21 +15,23 @@
 								</button>
 								<div class='drop-down'>
 									<ul>
-										<li>
-											<a href='/<%- locals.metadata.page.lang %>/contribute/pad' target='_blank'>
-	 											<button>
-													<label><%- vocabulary['free pad'][locals.metadata.page.lang] %></label>
+										<% if (locals.metadata.user.rights > 1) { %>
+											<li>
+												<a href='/<%- locals.metadata.page.lang %>/contribute/pad' target='_blank'>
+		 											<button>
+														<label><%- vocabulary['free pad'][locals.metadata.page.lang] %></label>
+													</button>
+												</a>
+											</li>
+											<li>
+												<button>
+													<label>Templated pad</label>
+													<span class='expandable'>></span>
 												</button>
-											</a>
-										</li>
-										<li>
-											<button>
-												<label>Templated pad</label>
-												<span class='expandable'>></span>
-											</button>
-										</li>
-										<li>
-											<% if (locals.metadata.user.participations.length > 0) { %>
+											</li>
+										<% } %>
+										<% if (locals.metadata.user.participations.length > 0) { %>
+											<li>
 												<button>
 													<label>Contributive pad</label>
 													<span class='expandable'>></span>
@@ -48,8 +50,8 @@
 														<% }) %>
 													</ul>
 												</div>
-											<% } %>
-										</li>
+											</li>
+										<% } %>
 									</ul>
 								</div>
 							</li>

@@ -166,7 +166,7 @@
 			if (d && d.sections) {
 				const tags = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat())
 					.flat().flat().find(c => c.type === 'tags')
-				if (tags) return [tags.tags.map(c => c.name)]
+				if (tags) return [tags.tags.filter(c => c.name && c.name !== '').map(c => c.name)]
 				else return []
 			} else return []
 		}
@@ -252,7 +252,6 @@
 		sdgs.addElems('a', 'sdg-link', d => d)
 			.attr('href', d => `?sdgs=${d}`)
 			.html(d => d)
-
 		
 		// WE SEPARATE BOOKMARKS FROM THE OTHER TYPES OF ENGAGEMENT
 		// media.addElems('div', 'bookmark', d => d.status === 2 ? [{ type: 'bookmark', active: d.bookmarked, pad: d.id }] : [])

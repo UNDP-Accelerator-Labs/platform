@@ -298,7 +298,7 @@ const Taglist = function (kwargs) {
 					.on('click', _ => meta.recode(opencode))
 				.addElems('i', 'material-icons')
 					.html('add_circle_outline')
-			})
+			}).catch(err => console.log(err))
 		} 
 		resolve(meta)
 	})

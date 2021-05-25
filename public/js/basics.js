@@ -3,7 +3,6 @@ function GET (_uri, _expectJSON = true) {
 	return new Promise(resolve => 
 		fetch(_uri, { method: 'GET', headers: jsonQueryHeader })
 			.then(response => {
-				console.log(response)
 				if (_expectJSON) return response.json()
 				else return response
 			})

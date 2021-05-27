@@ -363,6 +363,7 @@ main#mobilization {
 						position: relative;
 						/*border-top: 1px solid transparent;*/
 						outline: none;
+						color: $c-dark-grey;
 					}
 					.media-title {
 						font-size: $t-large;
@@ -554,26 +555,32 @@ main#mobilization {
 						text-align: center;
 
 						.tag {
-							display: inline-block;
+							/*display: inline-block;
 							margin: 5px 5px 0 0;
 							padding: 5px 10px;
-							/*border: 1px solid $c-light-blue;*/
 							background-color: $c-light-blue;
 							border-radius: 5px;
-							/*color: $c-light-green;*/
 							color: #FFF;
 							font-size: $t-small;
 							transition: background-color .25s;
-							cursor: pointer;
+							cursor: pointer;*/
+							display: inline-block;
+							color: $c-mid-blue;
+							border: 1px solid $c-mid-blue;
+							padding: 5px 10px;
+							margin: 5px;
+							font-size: $t-small;
 
 							input {
 								display: none;
 							}
 							label {
-								padding: 3px 5px;
+								/*padding: 3px 5px;*/
 								cursor: pointer;
 							}
 						}
+
+
 						.tag:hover,
 						.tag.selected {
 							background-color: $c-dark-blue;

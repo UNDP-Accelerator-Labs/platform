@@ -50,6 +50,8 @@ exports.main = (req, res) => {
 					batch.push(t.none(`
 						INSERT INTO tagging (pad, tag_id, tag_name, type)
 						VALUES ($1, $2, $3, $4)
+						ON CONFLICT ON CONSTRAINT unique_pad_tag_type
+							DO NOTHING
 					;`, [newID || id, d.tag_id, d.tag_name, d.type]))
 				})
 			}

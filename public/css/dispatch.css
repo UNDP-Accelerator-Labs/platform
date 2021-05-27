@@ -586,7 +586,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
   }
   nav#filters .inner .active-filters .tag .type {
     flex-shrink: 0;
-    font-size: 9px;
+    font-size: 10px;
   }
   nav#filters .inner .active-filters .tag .name {
     flex-grow: 1;
@@ -791,7 +791,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
 .veil nav.browse-filters form .query input:-webkit-autofill:hover,
 .veil nav.browse-filters form .query input:-webkit-autofill:focus,
 .veil nav.browse-filters form .query input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 40px #418246 inset !important;
+    -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
     -webkit-text-fill-color: #0A4C73 !important;
   }
   .veil nav.browse-filters form .query button {
@@ -841,7 +841,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     padding: 0 0 0 5px;
     margin: 5px;
     background-color: #FFF;
-    font-size: 9px;
+    font-size: 10px;
     color: #969696;
   }
   .veil nav.browse-filters form .filters .meta-filters .active-filters .tag label,
@@ -901,7 +901,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     border-radius: 20px;
     background-color: #0468B1;
     line-height: 20px;
-    font-size: 9px;
+    font-size: 10px;
     color: #FFF;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .drop-down,
@@ -1300,7 +1300,7 @@ main#mobilization .engagement-input-group ul li button::after {
     top: calc(100% - 10px);
     width: 45px;
     text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     pointer-events: none;
     transition: opacity 0.25s, transform 0.5s;
@@ -1544,7 +1544,7 @@ main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt .re
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     /*color: $c-mid-1;*/
     color: #A51E41;
   }
@@ -1655,6 +1655,7 @@ main#mobilization .inner .body .layout .meta-container .meta {
     position: relative;
     /*border-top: 1px solid transparent;*/
     outline: none;
+    color: #000000;
   }
   main#pad .inner .body .layout .media-container .media-title,
 main#pad .inner .body .layout .meta-container .media-title,
@@ -2192,17 +2193,21 @@ main#mobilization .inner .body .layout .media-container .meta-datasources .tag,
 main#mobilization .inner .body .layout .meta-container .meta-tags .tag,
 main#mobilization .inner .body .layout .meta-container .meta-skills .tag,
 main#mobilization .inner .body .layout .meta-container .meta-datasources .tag {
-    display: inline-block;
+    /*display: inline-block;
     margin: 5px 5px 0 0;
     padding: 5px 10px;
-    /*border: 1px solid $c-light-blue;*/
-    background-color: #32BEE1;
+    background-color: $c-light-blue;
     border-radius: 5px;
-    /*color: $c-light-green;*/
     color: #FFF;
+    font-size: $t-small;
+    transition: background-color .25s;
+    cursor: pointer;*/
+    display: inline-block;
+    color: #0468B1;
+    border: 1px solid #0468B1;
+    padding: 5px 10px;
+    margin: 5px;
     font-size: 12px;
-    transition: background-color 0.25s;
-    cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag input,
 main#pad .inner .body .layout .media-container .meta-skills .tag input,
@@ -2242,7 +2247,7 @@ main#mobilization .inner .body .layout .media-container .meta-datasources .tag l
 main#mobilization .inner .body .layout .meta-container .meta-tags .tag label,
 main#mobilization .inner .body .layout .meta-container .meta-skills .tag label,
 main#mobilization .inner .body .layout .meta-container .meta-datasources .tag label {
-    padding: 3px 5px;
+    /*padding: 3px 5px;*/
     cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag:hover,
@@ -3676,7 +3681,7 @@ main#mobilization .inner .body .input-group.fixed label {
     border-radius: 30px;
     margin: -1px 0 0 10px;
     line-height: 30px;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: bold;
     color: #FFF;
   }
@@ -5406,7 +5411,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
   }
   nav#filters .inner .active-filters .tag .type {
     flex-shrink: 0;
-    font-size: 9px;
+    font-size: 10px;
   }
   nav#filters .inner .active-filters .tag .name {
     flex-grow: 1;
@@ -5611,7 +5616,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
 .veil nav.browse-filters form .query input:-webkit-autofill:hover,
 .veil nav.browse-filters form .query input:-webkit-autofill:focus,
 .veil nav.browse-filters form .query input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 40px #418246 inset !important;
+    -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
     -webkit-text-fill-color: #0A4C73 !important;
   }
   .veil nav.browse-filters form .query button {
@@ -5661,7 +5666,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     padding: 0 0 0 5px;
     margin: 5px;
     background-color: #FFF;
-    font-size: 9px;
+    font-size: 10px;
     color: #969696;
   }
   .veil nav.browse-filters form .filters .meta-filters .active-filters .tag label,
@@ -5721,7 +5726,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     border-radius: 20px;
     background-color: #0468B1;
     line-height: 20px;
-    font-size: 9px;
+    font-size: 10px;
     color: #FFF;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .drop-down,
@@ -6120,7 +6125,7 @@ main#mobilization .engagement-input-group ul li button::after {
     top: calc(100% - 10px);
     width: 45px;
     text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     pointer-events: none;
     transition: opacity 0.25s, transform 0.5s;
@@ -6364,7 +6369,7 @@ main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt .re
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     /*color: $c-mid-1;*/
     color: #A51E41;
   }
@@ -6475,6 +6480,7 @@ main#mobilization .inner .body .layout .meta-container .meta {
     position: relative;
     /*border-top: 1px solid transparent;*/
     outline: none;
+    color: #000000;
   }
   main#pad .inner .body .layout .media-container .media-title,
 main#pad .inner .body .layout .meta-container .media-title,
@@ -7012,17 +7018,21 @@ main#mobilization .inner .body .layout .media-container .meta-datasources .tag,
 main#mobilization .inner .body .layout .meta-container .meta-tags .tag,
 main#mobilization .inner .body .layout .meta-container .meta-skills .tag,
 main#mobilization .inner .body .layout .meta-container .meta-datasources .tag {
-    display: inline-block;
+    /*display: inline-block;
     margin: 5px 5px 0 0;
     padding: 5px 10px;
-    /*border: 1px solid $c-light-blue;*/
-    background-color: #32BEE1;
+    background-color: $c-light-blue;
     border-radius: 5px;
-    /*color: $c-light-green;*/
     color: #FFF;
+    font-size: $t-small;
+    transition: background-color .25s;
+    cursor: pointer;*/
+    display: inline-block;
+    color: #0468B1;
+    border: 1px solid #0468B1;
+    padding: 5px 10px;
+    margin: 5px;
     font-size: 12px;
-    transition: background-color 0.25s;
-    cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag input,
 main#pad .inner .body .layout .media-container .meta-skills .tag input,
@@ -7062,7 +7072,7 @@ main#mobilization .inner .body .layout .media-container .meta-datasources .tag l
 main#mobilization .inner .body .layout .meta-container .meta-tags .tag label,
 main#mobilization .inner .body .layout .meta-container .meta-skills .tag label,
 main#mobilization .inner .body .layout .meta-container .meta-datasources .tag label {
-    padding: 3px 5px;
+    /*padding: 3px 5px;*/
     cursor: pointer;
   }
   main#pad .inner .body .layout .media-container .meta-tags .tag:hover,
@@ -8496,7 +8506,7 @@ main#mobilization .inner .body .input-group.fixed label {
     border-radius: 30px;
     margin: -1px 0 0 10px;
     line-height: 30px;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: bold;
     color: #FFF;
   }

@@ -8,3 +8,6 @@ pads.env
 pads-distant.env
 public/uploads/
 dep.*
+*.env
+tmp/
+routes/scripts/

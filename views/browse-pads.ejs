@@ -250,8 +250,8 @@
 		sdgs.addElems('span')
 			.html(d => `${vocabulary['SDG']['<%- locals.metadata.page.lang %>'](d.length > 1)}:`)
 		sdgs.addElems('a', 'sdg-link', d => d)
-			.attr('href', d => `?sdgs=${d}`)
-			.html(d => d)
+			.attr('href', d => `?sdgs=${d.key || d}`)
+			.html(d => d.key || d)
 		
 		// WE SEPARATE BOOKMARKS FROM THE OTHER TYPES OF ENGAGEMENT
 		// media.addElems('div', 'bookmark', d => d.status === 2 ? [{ type: 'bookmark', active: d.bookmarked, pad: d.id }] : [])

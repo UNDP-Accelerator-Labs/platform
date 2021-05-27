@@ -190,9 +190,9 @@ const Taglist = function (kwargs) {
 	const meta = this
 
 	meta.media.attr('data-placeholder', vocabulary['missing tag'][lang])
-	.addElems('div', 'tag', c => c.tags, c => c)
+	.addElems('div', 'tag', d => d.tags, d => d.name)
 	.addElems('label')
-		.html(c => c.name ? c.name.capitalize() : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
+		.html(d => d.name ? d.name.capitalize() : '') // KEPT THIS, BUT IT SHOULD NOT HAPPEN
 	// POPULATE THE INSET
 	return new Promise(resolve => {
 		if (meta.inset) {
@@ -271,7 +271,7 @@ const Taglist = function (kwargs) {
 								d3.select(this.parentNode).classed('hide', true)
 							}
 						})
-						if (evt.code === 'Enter' || evt.keyCode === 13) meta.recode(opencode)
+						if (evt.code === 'Enter' || evt.keyCode === 13) meta.recode(opencode, url)
 					}
 				}).on('input', function () {
 					const evt = d3.event
@@ -295,7 +295,7 @@ const Taglist = function (kwargs) {
 					.html(opencode ? vocabulary['looking for something or add'][lang] : vocabulary['looking for something'][lang])
 
 				meta.filter.addElems('button',  'add')
-					.on('click', _ => meta.recode(opencode))
+					.on('click', _ => meta.recode(opencode, url))
 				.addElems('i', 'material-icons')
 					.html('add_circle_outline')
 			}).catch(err => console.log(err))
@@ -305,7 +305,7 @@ const Taglist = function (kwargs) {
 }
 Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
 Taglist.prototype.constructor = Taglist
-Taglist.prototype.recode = function (opencode = true) {
+Taglist.prototype.recode = async function (opencode = true, url = null) {
 	const meta = this
 	const filter = meta.filter.select(`input#filter-${meta.id}`)
 	const val = filter.node().value.trim().toLowerCase()
@@ -316,74 +316,82 @@ Taglist.prototype.recode = function (opencode = true) {
 		existingTags.push(this.value.toLowerCase())
 	})
 
-	if (!existingTags.includes(val) && opencode) { 
-		const opt = meta.inset.select(`.inset-${meta.type}`).insertElem('input[type=text]', 'div', 'tag')
-			.datum({ name: val })
-			.classed('selected', !meta.constraint || prechecked.length < meta.constraint)
-		opt.addElem('input')
-		.attrs({ 
-			'id': c => `${meta.id}-${c.name.simplify()}`, 
-			'type': 'checkbox', 
-			'name': meta.type.slice(0, -1), 
-			'value': c => c.name
-		}).each(function () {
-			const sel = d3.select(this)
-			if (meta.constraint && prechecked.length >= meta.constraint) {
-				meta.inset.selectAll(`.inset-${meta.type} .tag input:not(:checked)`)
-				.each(function () { 
-					this.disabled = true 
-					d3.select(this.parentNode).classed('disabled', true)
-				})
-			} else {
-				sel.attr('checked', true)
-				meta.inset.selectAll(`.inset-${meta.type} .tag input`)
-				.each(function () { 
-					this.disabled = false 
-					d3.select(this.parentNode).classed('disabled', false)
-				})
-			}
-		}).on('change', function () { 
-			const checked = meta.inset.selectAll(`.inset-${meta.type} .tag input:checked`).data()
-
-			if (meta.constraint && checked.length >= meta.constraint) {
-				meta.inset.selectAll(`.inset-${meta.type} .tag input:not(:checked)`)
-				.each(function () { 
-					this.disabled = true 
-					d3.select(this.parentNode).classed('disabled', true)
-				})
-			} else {
-				meta.inset.selectAll(`.inset-${meta.type} .tag input`)
-				.each(function () { 
-					this.disabled = false 
-					d3.select(this.parentNode).classed('disabled', false)
-				})
-			}
-			if (!meta.constraint || checked.length <= meta.constraint) {
-				toggleClass(this.parentNode, 'selected')
+	if (!existingTags.includes(val) && opencode) { // ADD THE NEW TAG
+		// SEND THE TAG TO THE DB AND GET BACK THE id, name
+		if (!url) {
+			alert('Something is wrong: you cannot add a new tag')
+			return
+		} else {
+			const datum = await POST(url, { tag: val })
+			
+			const opt = meta.inset.select(`.inset-${meta.type}`).insertElem('input[type=text]', 'div', 'tag')
+				.datum(datum)
+				.classed('selected', !meta.constraint || prechecked.length < meta.constraint)
+			opt.addElem('input')
+			.attrs({ 
+				'id': c => `${meta.id}-${c.name.simplify()}`, 
+				'type': 'checkbox', 
+				'name': meta.type.slice(0, -1), 
+				'value': c => c.name
+			}).each(function () {
 				const sel = d3.select(this)
-
-				meta.container.each(c => c.tags = checked)
-					.select(`.meta-${meta.type}`)
-					.addElems('div', 'tag', c => c.tags, c => c)
-				.addElems('label')
-					.html(c => c.name.capitalize())
-				
-				meta.inset.selectAll(`.inset-${meta.type} .tag`).classed('hide', false)
-				meta.inset.select('input[type=text]').node().value = ''
-
-				if (meta.opts && meta.constraint) {
-					meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
-						return d.value - checked.length
+				if (meta.constraint && prechecked.length >= meta.constraint) {
+					meta.inset.selectAll(`.inset-${meta.type} .tag input:not(:checked)`)
+					.each(function () { 
+						this.disabled = true 
+						d3.select(this.parentNode).classed('disabled', true)
+					})
+				} else {
+					sel.attr('checked', true)
+					meta.inset.selectAll(`.inset-${meta.type} .tag input`)
+					.each(function () { 
+						this.disabled = false 
+						d3.select(this.parentNode).classed('disabled', false)
 					})
 				}
-				
-				if (editing) switchButtons(meta.lang)
-			}
-		})
+			}).on('change', function () { 
+				const checked = meta.inset.selectAll(`.inset-${meta.type} .tag input:checked`).data()
 
-		opt.addElem('label')
-			.attr('for', c => `${meta.id}-${c.name.simplify()}`)
-			.html(c => c.name.capitalize())
+				if (meta.constraint && checked.length >= meta.constraint) {
+					meta.inset.selectAll(`.inset-${meta.type} .tag input:not(:checked)`)
+					.each(function () { 
+						this.disabled = true 
+						d3.select(this.parentNode).classed('disabled', true)
+					})
+				} else {
+					meta.inset.selectAll(`.inset-${meta.type} .tag input`)
+					.each(function () { 
+						this.disabled = false 
+						d3.select(this.parentNode).classed('disabled', false)
+					})
+				}
+				if (!meta.constraint || checked.length <= meta.constraint) {
+					toggleClass(this.parentNode, 'selected')
+					const sel = d3.select(this)
+
+					meta.container.each(c => c.tags = checked)
+						.select(`.meta-${meta.type}`)
+						.addElems('div', 'tag', c => c.tags, c => c)
+					.addElems('label')
+						.html(c => c.name.capitalize())
+					
+					meta.inset.selectAll(`.inset-${meta.type} .tag`).classed('hide', false)
+					meta.inset.select('input[type=text]').node().value = ''
+
+					if (meta.opts && meta.constraint) {
+						meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
+							return d.value - checked.length
+						})
+					}
+					
+					if (editing) switchButtons(meta.lang)
+				}
+			})
+
+			opt.addElem('label')
+				.attr('for', c => `${meta.id}-${c.name.simplify()}`)
+				.html(c => c.name.capitalize())
+		}
 	} else {
 		if (!meta.constraint || prechecked.length < meta.constraint) {
 			meta.inset.selectAll(`.inset-${meta.type} .tag input[type=checkbox]`)
@@ -1707,76 +1715,82 @@ function addSDGs (kwargs) {
 
 	// meta.media.attr('data-placeholder', d => d.instruction || vocabulary['missing SDG'][lang])
 	meta.media.attr('data-placeholder', vocabulary['missing SDG'][lang])
-	.addElems('img', 'icon', c => c.sdgs, c => c)
+	.addElems('img', 'icon', c => c.sdgs, c => c.key || c) // THE || c IS LEGACY FOR THE ACTION PLANNING PLATFORM
 	.each(function (c) {
 		const sel = d3.select(this)
 		const img = new Image()
 		img.onload = function () { 
 			sel.attr('src', this.src)
 		}
-		img.src = `/imgs/sdgs/${lang}/G${c}-c.svg`
+		img.src = `/imgs/sdgs/${lang}/G${c.key || c}-c.svg`
 	})
 
+
 	if (meta.inset) {
-		const opts = meta.inset.addElem('div', 'inset-sdgs')
-			.addElems('div', 'sdg', d3.range(17).map(d => d + 1))
-			.classed('selected', d => sdgs.includes(d))
-		opts.addElem('input')
-			.attrs({ 'id': d => `sdg-${d}`, 'type': 'checkbox', 'name': 'sdg', 'value': d => d })
-		.each(function (d) { if (sdgs.includes(d)) this.checked = true })
-		.on('change', function (d) { 
-			const checked = meta.container.selectAll('.sdgs-inset-container .inset-sdgs .sdg input:checked').data()
+		// GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
+		GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+		.then(response => {
+			const opts = meta.inset.addElem('div', `inset-${type}`)
+				.addElems('div', 'sdg', response)
+				// .addElems('div', 'sdg', d3.range(17).map(d => d + 1))
+				.classed('selected', d => sdgs.map(c => c.key || c).includes(d.key || c))
+			opts.addElem('input')
+				.attrs({ 'id': d => `sdg-${d.key || d}`, 'type': 'checkbox', 'name': 'sdg', 'value': d => d.key || d})
+			.each(function (d) { if (sdgs.map(c => c.key || c).includes(d.key || d)) this.checked = true })
+			.on('change', function (d) { 
+				const checked = meta.container.selectAll('.sdgs-inset-container .inset-sdgs .sdg input:checked').data()
 
-			if (constraint && checked.length >= constraint) {
-				meta.container.selectAll('.sdgs-inset-container .inset-sdgs .sdg input:not(:checked)')
-				.each(function () { 
-					this.disabled = true 
-					d3.select(this.parentNode).classed('disabled', true)
-				})
-			} else {
-				meta.container.selectAll('.sdgs-inset-container .inset-sdgs .sdg input')
-				.each(function () { 
-					this.disabled = false 
-					d3.select(this.parentNode).classed('disabled', false)
-				})
-			}
-			if (!constraint || checked.length <= constraint) {
-				toggleClass(this.parentNode, 'selected')
-				const sel = d3.select(this)
-
-				meta.container
-					.each(c => c.sdgs = checked)
-					.select('.meta-sdgs')
-				.addElems('img', 'icon', c => c.sdgs, c => c)
-				.each(function (c) {
-					const sel = d3.select(this)
-					const img = new Image()
-					img.onload = function () { 
-						sel.attr('src', this.src)
-					}
-					img.src = `/imgs/sdgs/${lang}/G${c}-c.svg`
-				})
-
-				if (meta.opts) {
-					meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
-						return d.value - checked.length
+				if (constraint && checked.length >= constraint) {
+					meta.container.selectAll('.sdgs-inset-container .inset-sdgs .sdg input:not(:checked)')
+					.each(function () { 
+						this.disabled = true 
+						d3.select(this.parentNode).classed('disabled', true)
+					})
+				} else {
+					meta.container.selectAll('.sdgs-inset-container .inset-sdgs .sdg input')
+					.each(function () { 
+						this.disabled = false 
+						d3.select(this.parentNode).classed('disabled', false)
 					})
 				}
+				if (!constraint || checked.length <= constraint) {
+					toggleClass(this.parentNode, 'selected')
+					const sel = d3.select(this)
 
-				if (editing) switchButtons(lang)
-			}
-		})
-		opts.addElem('label')
-			.attrs({ 'for': d => `sdg-${d}` })
-		.addElem('img')
-		.each(function (d) {
-			const sel = d3.select(this)
-			const img = new Image()
-			img.onload = function () { 
-				sel.attr('src', this.src)
-			}
-			img.src = `/imgs/sdgs/${lang}/G${d}.svg`
-		})
+					meta.container
+						.each(c => c.sdgs = checked)
+						.select('.meta-sdgs')
+					.addElems('img', 'icon', c => c.sdgs, c => c.key || c)
+					.each(function (c) {
+						const sel = d3.select(this)
+						const img = new Image()
+						img.onload = function () { 
+							sel.attr('src', this.src)
+						}
+						img.src = `/imgs/sdgs/${lang}/G${c.key || c}-c.svg`
+					})
+
+					if (meta.opts) {
+						meta.opts.selectAll('.opt-group .opt .constraint').html(d => {
+							return d.value - checked.length
+						})
+					}
+
+					if (editing) switchButtons(lang)
+				}
+			})
+			opts.addElem('label')
+				.attrs({ 'for': d => `sdg-${d.key || d}` })
+			.addElem('img')
+			.each(function (d) {
+				const sel = d3.select(this)
+				const img = new Image()
+				img.onload = function () { 
+					sel.attr('src', this.src)
+				}
+				img.src = `/imgs/sdgs/${lang}/G${d.key || d}.svg`
+			})
+		}).catch(err => console.log(err))
 	}
 }
 async function addTags (kwargs) {

@@ -247,8 +247,6 @@
 	const main = d3.select('#pad')
 	const head = main.select('.head')
 	const body = main.select('.body')
-	// const mediaLayout = body.select('.media-layout')
-	// const metaLayout = body.select('.meta-layout')
 	const foot = main.select('.foot')
 	const footer = d3.select('footer')
 
@@ -331,9 +329,6 @@
 				}
 			})
 
-			console.log(d.structure.filter(c => c.type !== 'title'))
-			console.log(items)
-
 			// d.title = sel.select('.section-header label').node().innerText
 			// d.lead = (sel.select('.media-lead').node() || {}).innerText
 			// d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
@@ -341,8 +336,6 @@
 			// sections.push(d)
 		})
 	}
-	// TO DO: STILL A PB HERE WHEN SAVING REPEAT SECTIONS OR GROUPS
-	// THE ENTERED CONTENT GETS COPIED FOR ALL REPETITIONS
 	function compileContent (attr) {
 		const content = {}
 		// COLLECT TITLE
@@ -387,13 +380,36 @@
 		})
 		
 		const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
-		let sdgs = main.select('.sdgs-container').node() ? main.select('.sdgs-container').datum().sdgs : null
-		if (sdgs && !sdgs.length) sdgs = null
-		let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
-		if (tags && !tags.length) tags = null
-		let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
-		if (datasources && !datasources.length) datasources = null
-		let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
+		// let sdgs = main.select('.sdgs-container').node() ? main.select('.sdgs-container').datum().sdgs.map(d => d.key || d) : null
+		// if (sdgs && !sdgs.length) sdgs = null
+		// let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
+		// if (tags && !tags.length) tags = null
+		// let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
+		// if (datasources && !datasources.length) datasources = null
+		// let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
+
+		// THIS SHOULD REPLAE WHAT IS ABOVE
+		let allTags = []
+		if (main.select('.sdgs-container').node()) {
+			main.selectAll('.sdgs-container').each(d => {
+				d.sdgs.forEach(c => {
+					// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY sdgs WERE ONLY THE keys, NOT THE { key: INT, name: STR } OBJECT
+					if (Object.keys(c).includes('key') && Object.keys(c).includes('name')) {
+						allTags.push({ tag_id: c.key, tag_name: c.name, type: d.type })
+					}
+				})
+			})
+		}
+		main.selectAll('.tags-container, .datasources-container, .skills-container')
+		.each(d => {
+			// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY tags WERE ONLY THE names, NOT THE { key: INT, name: STR } OBJECT
+			d.tags.forEach(c => {
+				if (Object.keys(c).includes('id') && Object.keys(c).includes('name')) {
+					allTags.push({ tag_id: c.id, tag_name: c.name, type: d.type })
+				}
+			})
+		})
+		content.tagging = allTags
 
 		
 		// COMPILE FULL TXT FOR SEARCH
@@ -426,7 +442,6 @@
 		// COMPILE THE CONTENT
 		if (!attr || attr === 'title') {
 			content.title = title
-			// THIS IS IN CASE THE PAD IS BASED ON A TEMPLATE .. TO DO: SEE IF THIS LOGIC CAN BE IMPROVED
 			// content.media = JSON.stringify(media)
 			// content.meta = JSON.stringify(meta)
 			content.sections = JSON.stringify(sections)
@@ -436,15 +451,18 @@
 		}
 		// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
 		if (!attr || attr === 'location') content.location = JSON.stringify(location)
-		if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
-		if (!attr || attr === 'tags') content.tags = JSON.stringify(tags)
-		if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
+		// if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
+		// if (!attr || attr === 'tags') content.tags = JSON.stringify(tags)
+		// if (!attr || attr === 'skills') content.skills = JSON.stringify(skills)
+		// if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
+		
+		// FULL TEXT
 		if (!attr || ['title', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr)) content.full_text = fullTxt
 
 		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
 		// ALWAYS SEND status
 		let status = 0
-		getStatus() // TO DO: THIS DOES NOTHING FOR NOW
+		// getStatus() // TO DO: THIS DOES NOTHING FOR NOW
 		if (!published) {
 			if (title && title.trim().length
 				// && location && location.centerpoints && location.centerpoints.length 
@@ -502,9 +520,10 @@
 			}
 		}).catch(err => { throw err })
 		// POST NEW TAGS (THIS USED TO BE IN THE BACKEND, BUT MOVED IT HERE)
-		if (content.tags) {
-			POST('https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas', { tags: content.tags }).then(res => console.log(res))
-		}
+		// MOVE THIS BACK TO THE PADS
+		// if (content.tags) {
+		// 	POST('https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas', { tags: content.tags }).then(res => console.log(res))
+		// }
 	}
 
 

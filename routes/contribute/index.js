@@ -9,5 +9,6 @@ const template = require('./template/')
 exports.contribute = require('./contribute').main
 exports.edit = require('./edit').main
 exports.view = require('./view').main
+exports.save = require('./save').main
 exports.publish = require('./publish').main
 exports.delete = require('./delete').main

@@ -644,76 +644,80 @@ exports.process.screenshot = (req, res) => {
 
 
 // THIS IS THE NEW SAVING MECHANISM
-exports.process.save = (req, res) => {
-	// CHECK THE PAD EXISTS
-	const { uuid } = req.session || {}
-	const { object } = req.params || {}
-	const { datasources, deletion, id, mobilization } = req.body || {}
-	let saveSQL
+// exports.process.save = (req, res) => {
+// 	// CHECK THE PAD EXISTS
+// 	const { uuid } = req.session || {}
+// 	const { object } = req.params || {}
+// 	const { datasources, deletion, id, mobilization } = req.body || {}
+// 	let saveSQL
 
-	if (!id) { // INSERT OBJECT
-		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
-		const insert = Object.keys(req.body)
-			.filter(key => !['id', 'deletion', 'mobilization', 'datasources'].includes(key))
-			.reduce((obj, key) => {
-				obj[key] = req.body[key]
-				return obj
-			}, {})
-		saveSQL = DB.pgp.as.format(`
-			INSERT INTO $1:name ($2:name, contributor) 
-			SELECT $2:csv, c.id FROM contributors c
-			WHERE c.uuid = $3
-			RETURNING $1:name.id
-		;`, [`${object}s`, insert, uuid])
-	} else { // UPDATE OBJECT
-		const condition = DB.pgp.as.format(` WHERE id = $1;`, [id])
-		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'datasources'].includes(d)), `${object}s`) + condition
-	}	
+// 	if (!id) { // INSERT OBJECT
+// 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
+// 		const insert = Object.keys(req.body)
+// 			.filter(key => !['id', 'deletion', 'mobilization', 'datasources'].includes(key))
+// 			.reduce((obj, key) => {
+// 				obj[key] = req.body[key]
+// 				return obj
+// 			}, {})
+// 		saveSQL = DB.pgp.as.format(`
+// 			INSERT INTO $1:name ($2:name, contributor) 
+// 			SELECT $2:csv, c.id FROM contributors c
+// 			WHERE c.uuid = $3
+// 			RETURNING $1:name.id
+// 		;`, [`${object}s`, insert, uuid])
+// 	} else { // UPDATE OBJECT
+// 		// TO DO: URGENT INSERT TAGS DIRECTLY IN tagging FOR PADS
+// 		// THIS WILL REQUIRE DELETING ALL TAGS FOR A PAD EVERYTIME AND REPOPULATING
+// 		const condition = DB.pgp.as.format(` WHERE id = $1;`, [id])
+// 		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'datasources'].includes(d)), `${object}s`) + condition
+// 	}	
 
-	DB.conn.tx(t => { 
-		const batch = []
-		if (datasources) {
-			JSON.parse(datasources).forEach(d => {
-				batch.push(t.none(`
-					INSERT INTO datasources (name, contributor)
-					SELECT $1, id FROM contributors
-					WHERE uuid = $2
-						ON CONFLICT ON CONSTRAINT datasources_name_key
-						DO NOTHING
-				;`, [d.toLowerCase(), uuid]))
-			})
-		}
-		batch.push(t.oneOrNone(saveSQL))
-		return t.batch(batch)
-		.then(results => {
-			const newObject = results[results.length - 1]
-			const batch = []
-			if (mobilization && newObject) {
-				batch.push(t.none(`
-					INSERT INTO mobilization_contributions (pad, mobilization)
-					VALUES ($1, $2)
-				;`, [newObject.id, mobilization]))
-			}
-			// UPDATE THE TIMESTAMP
-			batch.push(t.none(`
-				UPDATE pads SET update_at = NOW() WHERE id = $1
-			;`, [id || newObject.id]))
-			return t.batch(batch).then(_ => results)
-		})
-	}).then(results => {
-		const newObject = results[results.length - 1]
-		if (deletion) {
-			const promises = deletion.map(f => {
-				if (fs.existsSync(path.join(__dirname, `../public/${f}`))) {
-					return new Promise(resolve => {
-						resolve(fs.unlinkSync(path.join(__dirname, `../public/${f}`)))
-					})
-				}
-			})
-			Promise.all(promises).then(_ => res.json({ status: 200, message: 'Successfully saved.', object: newObject ? newObject.id : null }))
-		} else res.json({ status: 200, message: 'Successfully saved.', object: newObject ? newObject.id : null })
-	}).catch(err => console.log(err))
-}
+// 	DB.conn.tx(t => { 
+// 		const batch = []
+// 		if (datasources) {
+// 			JSON.parse(datasources).forEach(d => {
+// 				batch.push(t.none(`
+// 					INSERT INTO datasources (name, contributor)
+// 					SELECT $1, id FROM contributors
+// 					WHERE uuid = $2
+// 						ON CONFLICT ON CONSTRAINT datasources_name_key
+// 						DO NOTHING
+// 				;`, [d.toLowerCase(), uuid]))
+// 			})
+// 		}
+// 		batch.push(t.oneOrNone(saveSQL))
+// 		return t.batch(batch)
+// 		.then(results => {
+// 			const newObject = results[results.length - 1]
+// 			const batch = []
+// 			if (mobilization && newObject) {
+// 				batch.push(t.none(`
+// 					INSERT INTO mobilization_contributions (pad, mobilization)
+// 					VALUES ($1, $2)
+// 				;`, [newObject.id, mobilization]))
+// 			}
+// 			// UPDATE THE TIMESTAMP
+// 			batch.push(t.none(`
+// 				UPDATE pads SET update_at = NOW() WHERE id = $1
+// 			;`, [id || newObject.id]))
+// 			return t.batch(batch).then(_ => results)
+// 		})
+// 	}).then(results => {
+// 		const newObject = results[results.length - 1]
+// 		if (deletion) {
+// 			const promises = deletion.map(f => {
+// 				if (fs.existsSync(path.join(__dirname, `../public/${f}`))) {
+// 					return new Promise(resolve => {
+// 						resolve(fs.unlinkSync(path.join(__dirname, `../public/${f}`)))
+// 					})
+// 				}
+// 			})
+// 			Promise.all(promises).then(_ => res.json({ status: 200, message: 'Successfully saved.', object: newObject ? newObject.id : null }))
+// 		} else res.json({ status: 200, message: 'Successfully saved.', object: newObject ? newObject.id : null })
+// 	}).catch(err => console.log(err))
+// }
+exports.process.save = require('./contribute/').save
+
 exports.process.publish = require('./contribute/').publish
 // (req, res) => {
 // 	const { referer } = req.headers || {}
@@ -1168,12 +1172,28 @@ exports.api.methods = (req, res) => {
 	.catch(err => res.status(500).send(err))
 }
 exports.api.datasources = (req, res) => {
-	DB.conn.any(`
-		SELECT d.id, d.name, d.description, c.country FROM datasources d
-		LEFT JOIN contributors c
-			ON d.contributor = c.id
-	;`).then(results => res.status(200).json(results))
-	.catch(err => res.status(500).send(err))
+	if (req.method === 'GET') {
+		DB.conn.any(`
+			SELECT d.id, d.name, d.description, c.country FROM datasources d
+			LEFT JOIN contributors c
+				ON d.contributor = c.id
+		;`).then(results => res.status(200).json(results))
+		.catch(err => res.status(500).send(err))
+	} else if (req.method === 'POST') {
+		const { uuid } = req.session || {}
+		const { tag } = req.body || {}
+
+		DB.conn.one(`
+			INSERT INTO datasources (name, contributor)
+			SELECT $1, id FROM contributors
+			WHERE uuid = $2
+				ON CONFLICT ON CONSTRAINT datasources_name_key
+				DO NOTHING
+			RETURNING id, name
+		;`, [tag.toLowerCase(), uuid || null])
+		.then(result => res.status(200).json(result))
+		.catch(err => res.status(500).send(err))
+	}
 }
 
 

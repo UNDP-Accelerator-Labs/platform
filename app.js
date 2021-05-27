@@ -94,7 +94,9 @@ app.post('/forwardGeocoding', routes.forwardGeocoding) // TO DO: SET THIS UP IN 
 // API
 app.get('/api/skills', routes.api.skills)
 app.get('/api/methods', routes.api.methods)
-app.get('/api/datasources', routes.api.datasources)
+app.route('/api/datasources')
+	.get(routes.api.datasources)
+	.post(routes.api.datasources)
 
 
 

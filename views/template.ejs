@@ -20,8 +20,10 @@
 <%# include ('partials/navigate.ejs') %> 
 
 <%- include ('partials/multi-language.ejs') %> 
+
 <%- include ('partials/menu-languages.ejs') %> 
 <%- include ('partials/menu-logo.ejs') %> 
+<%- include ('partials/modals.ejs') %> 
 
 <!-- NOT SURE THIS IS NECESSARY -->
 <nav>
@@ -302,7 +304,7 @@
 	window.addEventListener('mouseup', function (e) {
 		e = e || event
 		if (editing) {
-			console.log(e.target)
+			// console.log(e.target)
 			const target = d3.select(e.target)
 			const media = target.findAncestor('media')
 			const meta = target.findAncestor('meta')

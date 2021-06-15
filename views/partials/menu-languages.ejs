@@ -21,3 +21,13 @@
 		</li>
 	</ul>
 </nav>
+
+<script type='text/javascript'>
+	// SET PATHS
+	const url = new URL(window.location)
+	const pathname = `${url.pathname.split('/').slice(2).join('/')}${url.search}`
+	d3.select('#lang-en a').attr('href', `/en/${pathname}`)
+	d3.select('#lang-fr a').attr('href', `/fr/${pathname}`)
+	d3.select('#lang-es a').attr('href', `/es/${pathname}`)
+	d3.select('#lang-pt a').attr('href', `/pt/${pathname}`)
+</script>

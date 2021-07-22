@@ -23,15 +23,31 @@
 													</button>
 												</a>
 											</li>
-											<li>
-												<button>
-													<label>Templated pad</label>
-													<span class='expandable'>></span>
-												</button>
-												<!-- TO DO: ADD DROPDOWN: NEED TO GET TEMPLATES IN BACKEND -->
-											</li>
+											<% if (locals.metadata.menu.templates.length > 0) { %>
+												<li>
+													<button>
+														<label>Templated pad</label>
+														<span class='expandable'>></span>
+													</button>
+													<div class='drop-down'>
+														<ul>
+															<% locals.metadata.menu.templates.forEach(t => { %>
+																<li>
+																	<a href='/<%- locals.metadata.page.lang %>/contribute/pad?template=<%- t.id %>' target='_blank'>
+																		<% if (t.title) { %>
+																			<button><label><%- t.title %></label></button>
+																		<% } else { %>
+																			<button><label>[<%- vocabulary['untitled template'][locals.metadata.page.lang] %>]</label></button>
+																		<% } %>
+																	</a>
+																</li>
+															<% }) %>
+														</ul>
+													</div>
+												</li>
+											<% } %>
 										<% } %>
-										<% if (locals.metadata.user.participations.length > 0) { %>
+										<% if (locals.metadata.menu.participations.length > 0) { %>
 											<li>
 												<button>
 													<label>Contributive pad</label>
@@ -39,7 +55,7 @@
 												</button>
 												<div class='drop-down'>
 													<ul>
-														<% locals.metadata.user.participations.forEach(p => { %>
+														<% locals.metadata.menu.participations.forEach(p => { %>
 															<li>
 																<a href='/<%- locals.metadata.page.lang %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>' target='_blank'>
 																	<button class='wrapable'>
@@ -69,12 +85,29 @@
 													<button><label>Blank template</label></button>
 												</a>
 											</li>
-											<li>
-												<button>
-													<label>Copy template</label>
-													<span class='expandable'>></span>
-												</button>
-											</li>
+											<% if (locals.metadata.menu.templates.length > 0) { %>
+												<li>
+													<button>
+														<label>Copy template</label>
+														<span class='expandable'>></span>
+													</button>
+													<div class='drop-down'>
+														<ul>
+															<% locals.metadata.menu.templates.forEach(t => { %>
+																<li>
+																	<a href='/<%- locals.metadata.page.lang %>/contribute/template?source=<%- t.id %>' target='_blank'>
+																		<% if (t.title) { %>
+																			<button><label><%- t.title %></label></button>
+																		<% } else { %>
+																			<button><label>[<%- vocabulary['untitled template'][locals.metadata.page.lang] %>]</label></button>
+																		<% } %>
+																	</a>
+																</li>
+															<% }) %>
+														</ul>
+													</div>
+												</li>
+											<% } %>
 										</ul>
 									</div>
 								</li>

@@ -131,7 +131,8 @@
 			})
 	}
 
-	function renderVignette (section, data) {		
+	function renderVignette (section, data) {	
+		console.log(data)	
 		const templates = section.addElem('div', 'template')
 			.datum(data)
 		.each(function (d) {
@@ -151,7 +152,6 @@
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
 			const opts = []
-			console.log(d)
 			// TO DO: UNPUBLISH
 			if ('<%- locals.metadata.page.space %>' === 'private' && d.editable)
 

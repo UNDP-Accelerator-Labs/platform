@@ -6,7 +6,7 @@ exports.main = (req, res) => {
 	const { template } = req.query || {}
 
 	DB.conn.tx(async t => {
-		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, participations } = await header_data({ connection: t, req: req })
+		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
 		// FILTERS
 		// INTERCEPT FOR EXERCISE
 		let template_filter
@@ -68,12 +68,15 @@ exports.main = (req, res) => {
 						// space: space,
 						query: query
 					},
+					menu: {
+						templates: templates,
+						participations: participations
+					},
 					user: {
 						name: username,
 						country: country,
 						centerpoint: centerpoint,
-						rights: rights,
-						participations: participations
+						rights: rights
 					}
 				},
 

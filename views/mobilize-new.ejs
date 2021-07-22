@@ -11,7 +11,6 @@
 <body>
 
 <%- include ('partials/navigate.ejs') %>
-<% if (!locals.activity) locals.activity = locals.path[1] %>
 
 <main id='mobilize-new'>
 	<!-- FIRST MODAL: TITLE -->
@@ -114,8 +113,8 @@
 </footer>
 
 <script type='text/javascript'>
-	const activity = '<%- locals.activity %>';
-	const lang = '<%- locals.lang %>';
+	const activity = '<%- locals.metadata.page.activity %>';
+	const lang = '<%- locals.metadata.page.lang %>';
 	const editing = false
 	
 	function preventSubmit (node, evt) {

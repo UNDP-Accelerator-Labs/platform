@@ -534,8 +534,9 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
   }
   nav#site-title.sm .inner h2 {
     margin: 5px 0;
-    font-family: "Noto Serif", serif;
-    color: #F03C8C;
+    /*font-family: 'Noto Serif', serif;*/
+    font-weight: 300;
+    color: #B4DC28;
   }
   nav#site-title.sm .inner .search {
     margin-top: 15px;
@@ -5359,8 +5360,9 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
   }
   nav#site-title.sm .inner h2 {
     margin: 5px 0;
-    font-family: "Noto Serif", serif;
-    color: #F03C8C;
+    /*font-family: 'Noto Serif', serif;*/
+    font-weight: 300;
+    color: #B4DC28;
   }
   nav#site-title.sm .inner .search {
     margin-top: 15px;

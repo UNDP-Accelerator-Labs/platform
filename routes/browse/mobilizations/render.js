@@ -10,7 +10,7 @@ exports.main = (req, res) => {
 
 	DB.conn.tx(async t => {
 		const data = await load({ connection: t, req: req })
-		const { pagetitle, path, uuid, username, country, rights, lang, query, participations } = await header_data({ connection: t, req: req })
+		const { pagetitle, path, uuid, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
 	
 		const batch = []
 		// GET MOBILIZATIONS COUNT
@@ -58,15 +58,17 @@ exports.main = (req, res) => {
 						space: space,
 						query: query
 					},
+					menu : {
+						templates: templates,
+						participations: participations
+					},
 					user: {
 						name: username,
 						country: country,
 						// centerpoint: JSON.stringify(centerpoint),
-						rights: rights,
-						participations: participations
+						rights: rights
 					}
 				},
-
 				stats: { 
 					total: totalcounts.sum('count'), 
 					filtered: filteredcounts.sum('count'),

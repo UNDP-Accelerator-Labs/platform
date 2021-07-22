@@ -31,7 +31,8 @@ CREATE TABLE templates (
 	"date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	"update_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	published BOOLEAN DEFAULT FALSE
+	published BOOLEAN DEFAULT FALSE,
+	source INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE TABLE pads (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
@@ -98,7 +99,7 @@ CREATE TABLE tagging (
 	tag_name TEXT NOT NULL,
 	type VARCHAR(19)
 );
-ALTER TABLE tagging ADD CONSTRAINT unique_pad_tag_type UNIQUE (pad, tag_id, type)
+ALTER TABLE tagging ADD CONSTRAINT unique_pad_tag_type UNIQUE (pad, tag_id, type);
 -- TO DO
 CREATE TABLE engagement_pads (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

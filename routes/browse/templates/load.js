@@ -10,8 +10,9 @@ exports.main = kwargs => {
 	const [f_search, f_contributors, f_mobilizations, f_space, order, page] = filter(kwargs.req)
 	
 	return conn.any(`
-		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country, cp.id AS country_id,
-			COUNT(p.id)::INT AS associated_pads,
+		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, 
+			c.name AS contributorname, c.country, cp.id AS country_id, st.title AS source,
+			COALESCE(p.count, 0)::INT AS associated_pads, 
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.applications, 0)::INT AS applications,
 			CASE WHEN t.contributor = (SELECT id FROM contributors WHERE uuid = $1)
@@ -34,8 +35,15 @@ exports.main = kwargs => {
 			ON c.id = t.contributor
 		INNER JOIN centerpoints cp
 			ON c.country = cp.country
-		LEFT JOIN pads p
+		LEFT JOIN (
+			SELECT template, 
+				SUM (CASE WHEN status = 2 THEN 1 ELSE 0 END) AS count
+			FROM pads
+			GROUP BY (template)
+		) p
 			ON t.id = p.template
+		LEFT JOIN templates st
+			ON t.source = st.id
 		LEFT JOIN (
 			SELECT template, contributor, array_agg(DISTINCT type) AS types FROM engagement_templates
 			WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1)
@@ -54,7 +62,7 @@ exports.main = kwargs => {
 			ON t.id = mob.template
 		WHERE TRUE 
 			$3:raw $4:raw $5:raw $6:raw
-		GROUP BY (t.id, c.name, c.country, cp.id, ce.bookmarks, ce.applications, e.types)
+		GROUP BY (t.id, c.name, c.country, cp.id, ce.bookmarks, ce.applications, e.types, p.count, st.title)
 		$7:raw
 		LIMIT $8 OFFSET $9
 		;`, [uuid, rights, f_search, f_contributors, f_mobilizations, f_space, order, page_content_limit, (page - 1) * page_content_limit])

@@ -442,13 +442,12 @@
 		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
 		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
 		// COMPILE THE CONTENT
-		if (!attr || attr === 'title') {
-			content.title = title
-			// content.media = JSON.stringify(media)
-			// content.meta = JSON.stringify(meta)
-			content.sections = JSON.stringify(sections)
-		}
-		if (!attr || ['lead', 'media', 'meta', 'group'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
+		// if (!attr || attr === 'title') {
+			// content.title = title
+			// content.sections = JSON.stringify(sections)
+		// }
+		content.title = title // ALWAYS SAVE THE TITLE
+		if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
 			content.sections = JSON.stringify(sections)
 		}
 		// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
@@ -459,7 +458,9 @@
 		// if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
 		
 		// FULL TEXT
-		if (!attr || ['title', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr)) content.full_text = fullTxt
+		// if (!attr || ['title', 'lead', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr)) 
+		// ALWAYS SEND fullTxt
+		content.full_text = fullTxt
 
 		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
 		// ALWAYS SEND status

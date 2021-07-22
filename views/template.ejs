@@ -100,6 +100,7 @@
 			<% } %> -->
 
 			<div class='foot'>
+				<!--
 				<% if (locals.data && locals.data.status > 0) { %>
 					<div class='deploy <% if (!locals.template) { %>hide<% }%>'>
 						
@@ -113,6 +114,7 @@
 						</ul>
 					</div>
 				<% } %>
+				-->
 			</div>
 		</div>
 		
@@ -461,7 +463,8 @@
 			// TO DO: REPLICATE ABOVE FOR GROUPS
 		
 		// COMPILE THE CONTENT
-		if (!attr || attr === 'title') content.title = title
+		// if (!attr || attr === 'title') content.title = title
+		content.title = title // ALWAYS SAVE THE TITLE
 		if (!attr || attr === 'description') content.description = description
 		if (!attr || ['lead', 'media', 'meta'].includes(attr) || sections.map(d => d.structure).flat().unique('type', true).includes(attr)) { content.sections = JSON.stringify(sections)
 		}
@@ -481,14 +484,22 @@
 
 	function partialSave (attr) {
 		console.log('saving')
-		// FIRST CHECK IF THIS IS A NEW PAD
-		const content = compileContent(attr)
-		console.log(content)
+		// FIRST CHECK IF THIS IS A NEW TEMPLATE
 		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
 		const url = new URL(window.location)
 		const queryparams = new URLSearchParams(url.search)
 		const id = queryparams.get('id')
-		if (id) content.id = +id
+		const source = queryparams.get('source')
+		// IF IT HAS, THEN FOR THE FIRST SAVE, COMPILE EVERYTHING IN CASE IT IS A COPY OF A TEMPLATE
+		let content
+		if (id) {
+			content = compileContent(attr)
+			content.id = +id
+		}
+		else {
+			content = compileContent()
+			if (source) content.source = +source
+		}
 
 		POST('/save/template', content)
 		.then(res => {
@@ -519,9 +530,10 @@
 	}
 
 	// POPULATE THE PAGE
-	if (['edit', 'view'].includes(activity)) {
+	// if (['edit', 'view'].includes(activity)) {
+	<% if (locals.data) { %>
 		const data = <%- JSON.stringify(locals.data || {}) %>;
-		console.log(data)
+		if (activity === 'contribute') data.title = `[Copy] ${data.title}` // THIS IS A COPIED TEMPLATE
 
 		published = data.published
 
@@ -535,12 +547,12 @@
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
-	} else {
+	<% } else { %>
 		addSection({ lang: '<%- locals.metadata.page.lang %>' })
 		addTitle({ lang: '<%- locals.metadata.page.lang %>' })
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
-	}
+	<% } %>
 
 </script>
 </body>

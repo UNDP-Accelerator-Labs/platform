@@ -249,8 +249,9 @@ nav#site-title.sm {
 		}
 		h2 {
 			margin: 5px 0;
-			font-family: 'Noto Serif', serif;
-			color: $c-light-red;
+			/*font-family: 'Noto Serif', serif;*/
+			font-weight: 300;
+			color: $c-light-green;
 		}
 		.search {
 			margin-top: 15px;

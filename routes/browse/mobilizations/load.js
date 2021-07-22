@@ -8,7 +8,8 @@ exports.main = kwargs => {
 
 	// GET FILTERS
 	const [f_space, order, page] = filter(kwargs.req)
-	
+	console.log('space')
+	console.log(f_space)
 	return conn.any(`
 		SELECT mob.id,
 			mob.title, 
@@ -41,8 +42,8 @@ exports.main = kwargs => {
 			ON p.pad = pads.id AND pads.status = 2
 		LEFT JOIN mobilization_contributors mc
 			ON mob.id = mc.mobilization
-		WHERE c.uuid = $1
-			OR $1 IN (SELECT c1.uuid FROM contributors c1 INNER JOIN mobilization_contributors mc1 ON mc1.contributor = c1.id WHERE mc1.mobilization = mob.id)
+		WHERE (c.uuid = $1
+			OR $1 IN (SELECT c1.uuid FROM contributors c1 INNER JOIN mobilization_contributors mc1 ON mc1.contributor = c1.id WHERE mc1.mobilization = mob.id))
 			$3:raw
 			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id)
 			ORDER BY pads DESC, start_date DESC

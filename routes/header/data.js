@@ -21,19 +21,41 @@ exports.main = (kwargs) => {
 		}
 	}
 
-	return conn.any(`
-		SELECT mob.id, mob.title, mob.template, 
-			to_char(mob.start_date, 'DD Mon YYYY') AS start_date, 
-			c.name AS host_name 
-		FROM mobilization_contributors mc
-		INNER JOIN mobilizations mob
-			ON mc.mobilization = mob.id
-		INNER JOIN contributors c
-			ON mob.host = c.id
-		WHERE mc.contributor = (SELECT id FROM contributors WHERE uuid = $1)
-			AND mob.status = 1
-	;`, [uuid])
-	.then(results => {
-		return { pagetitle: config.title, path: path, originalUrl: headers.referer, uuid: uuid, username: username, country: country, rights: rights, lang: lang, query: parsedQuery, participations: results }
+	// ADD A CALL FOR ALL TEMPLATES (NAME + ID)
+	return conn.tx(t => {
+		const batch = []
+		batch.push(t.any(`
+			SELECT t.id, t.title FROM templates t
+			WHERE t.status = 2
+				OR (t.status = 1 AND t.contributor = (SELECT id FROM contributors WHERE uuid = $1))
+		;`, [uuid]))
+		batch.push(t.any(`
+			SELECT mob.id, mob.title, mob.template, 
+				to_char(mob.start_date, 'DD Mon YYYY') AS start_date, 
+				c.name AS host_name 
+			FROM mobilization_contributors mc
+			INNER JOIN mobilizations mob
+				ON mc.mobilization = mob.id
+			INNER JOIN contributors c
+				ON mob.host = c.id
+			WHERE mc.contributor = (SELECT id FROM contributors WHERE uuid = $1)
+				AND mob.status = 1
+		;`, [uuid]))
+		return t.batch(batch)
+	}).then(results => {
+		const [templates, participations] = results
+		return { 
+			pagetitle: config.title, 
+			path: path, 
+			originalUrl: headers.referer, 
+			uuid: uuid, 
+			username: username, 
+			country: country, 
+			rights: rights, 
+			lang: lang, 
+			query: parsedQuery, 
+			templates: templates,
+			participations: participations
+		}
 	}).catch(err => console.log(err))
 }

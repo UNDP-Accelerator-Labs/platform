@@ -2,11 +2,11 @@ const DB = require('../../../db-config.js')
 const header_data = require('../../header/').data
 
 exports.main = (req, res) => {
+	const { object } = req.params || {}
 	const { id } = req.query || {}
 
 	DB.conn.tx(async t => {
-		const { pagetitle, path, uuid, username, country, rights, lang, query, participations } = await header_data({ connection: t, req: req })
-
+		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
 		const batch = []
 		batch.push(t.any(`
 			SELECT co.target AS id, c.name, c.country, c.position FROM cohorts co
@@ -35,18 +35,32 @@ exports.main = (req, res) => {
 		.then(results => {
 			const [cohort, templates] = results
 			return { 
-				title: pagetitle, 
-				
-				path: path,
-				queryparams: query,
-				user: username,
-				rights: rights,
-				participations: participations,
-				
-				cohort: cohort,
-				templates: templates, 
+				metadata : {
+					page: {
+						title: pagetitle, 
+						path: path,
+						referrer: originalUrl,
+						// id: page,
+						lang: lang,
+						activity: path[1],
+						object: object,
+						// space: space,
+						query: query
+					},
+					menu: {
+						templates: templates,
+						participations: participations
+					},
+					user: {
+						name: username,
+						country: country,
+						// centerpoint: centerpoint,
+						rights: rights
+					}
+				},
 
-				lang: lang
+				cohort: cohort,
+				templates: templates
 			}
 		})
 	}).then(data => res.status(200).render('mobilize-new', data))

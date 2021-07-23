@@ -66,8 +66,13 @@ exports.main = kwargs => {
 	// 	$12:raw
 	// 	LIMIT $13 OFFSET $14
 	// ;`, [uuid, rights, f_search, f_sdgs, f_thematic_areas, f_methods, f_datasources, f_contributors, f_template, f_mobilizations, f_space, order, page_content_limit, (page - 1) * page_content_limit])
+	
+
+	// TO DO: CHECK IF PAD IS PART OF A MOBILIZATION THAT HAS A FOLLOW UP
+	// IF SO, THEN IN THE FRONT END ADD A BUTTON TO FOLLOW UP
 	return conn.any(`
-		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country, cp.id AS country_id,
+		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, 
+			c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization,
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.inspirations, 0)::INT AS inspirations, 
 			COALESCE(ce.approvals, 0)::INT AS approvals, 

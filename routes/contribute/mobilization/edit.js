@@ -11,7 +11,7 @@ exports.main = (req, res) => {
 		const batch = []
 		// THE MOBILIZATION INFORMATION
 		batch.push(t.one(`
-			SELECT m.title, m.status, m.start_date, m.end_date, m.host, c.name AS hostname, t.title FROM mobilizations m
+			SELECT m.title, m.status, m.start_date, m.end_date, m.host, c.name AS hostname, t.title AS template FROM mobilizations m
 			INNER JOIN contributors c
 				ON c.id = m.host
 			INNER JOIN templates t

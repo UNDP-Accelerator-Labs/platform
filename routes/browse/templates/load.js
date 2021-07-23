@@ -11,7 +11,7 @@ exports.main = kwargs => {
 	
 	return conn.any(`
 		SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, 
-			c.name AS contributorname, c.country, cp.id AS country_id, st.title AS source,
+			c.name AS contributorname, c.country, cp.id AS country_id, st.title AS source, st.id AS source_id,
 			COALESCE(p.count, 0)::INT AS associated_pads, 
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.applications, 0)::INT AS applications,
@@ -62,7 +62,7 @@ exports.main = kwargs => {
 			ON t.id = mob.template
 		WHERE TRUE 
 			$3:raw $4:raw $5:raw $6:raw
-		GROUP BY (t.id, c.name, c.country, cp.id, ce.bookmarks, ce.applications, e.types, p.count, st.title)
+		GROUP BY (t.id, c.name, c.country, cp.id, ce.bookmarks, ce.applications, e.types, p.count, st.title, st.id)
 		$7:raw
 		LIMIT $8 OFFSET $9
 		;`, [uuid, rights, f_search, f_contributors, f_mobilizations, f_space, order, page_content_limit, (page - 1) * page_content_limit])

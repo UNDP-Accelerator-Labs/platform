@@ -8,8 +8,7 @@ exports.main = kwargs => {
 
 	// GET FILTERS
 	const [f_space, order, page] = filter(kwargs.req)
-	console.log('space')
-	console.log(f_space)
+
 	return conn.any(`
 		SELECT mob.id,
 			mob.title, 
@@ -22,6 +21,8 @@ exports.main = kwargs => {
 			t.id AS template_id,
 			t.title AS template_title, 
 			t.description AS template_description,
+			smob.title AS source, 
+			smob.id AS source_id,
 			COUNT (DISTINCT(pads.id))::INT AS pads,
 			COUNT (DISTINCT(mc.contributor))::INT AS contributors,
 			CASE WHEN c.id = (SELECT id FROM contributors WHERE uuid = $1)
@@ -42,10 +43,12 @@ exports.main = kwargs => {
 			ON p.pad = pads.id AND pads.status = 2
 		LEFT JOIN mobilization_contributors mc
 			ON mob.id = mc.mobilization
+		LEFT JOIN mobilizations smob
+			ON mob.source = smob.id
 		WHERE (c.uuid = $1
 			OR $1 IN (SELECT c1.uuid FROM contributors c1 INNER JOIN mobilization_contributors mc1 ON mc1.contributor = c1.id WHERE mc1.mobilization = mob.id))
 			$3:raw
-			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id)
+			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id, smob.title, smob.id)
 			ORDER BY pads DESC, start_date DESC
 		LIMIT $4 OFFSET $5
 	;`, [uuid, rights, f_space, page_content_limit, (page - 1) * page_content_limit])

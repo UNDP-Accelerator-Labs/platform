@@ -80,7 +80,8 @@ CREATE TABLE mobilizations (
 	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	status INT DEFAULT 1, 
 	start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	end_date TIMESTAMPTZ
+	end_date TIMESTAMPTZ,
+	source INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE TABLE mobilization_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

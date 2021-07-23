@@ -132,7 +132,7 @@
 	}
 
 	function renderVignette (section, data) {	
-		console.log(data)	
+		// console.log(data)	
 		const templates = section.addElem('div', 'template')
 			.datum(data)
 		.each(function (d) {
@@ -192,9 +192,19 @@
 				'target': '_blank',
 				'data-placeholder': '<%- vocabulary['missing template description'][locals.metadata.page.lang] %>'
 			}).html(d => d.description)
+	
+		
+		if (data.source) {
+			const source = body.addElem('div', 'media media-txt')
+				// .attr('data-placeholder', '<%- vocabulary["untitled template"][locals.metadata.page.lang] %>')
+			source.addElems('i').html(d => 'This template is based on: ')// TO DO: TRANSLATE
+			source.addElems('a')
+				.attrs({ 'href': d => `../../edit/template?id=${d.source_id}`, 'target': '_blank' })
+				.html(d => d.source)
+		}
+
 		body.addElems('div', 'meta meta-date')
 			.html(d => d.date)
-
 
 		const stats = foot.addElem('div', 'meta meta-group')
 		const itemcount = stats.addElem('div', 'meta meta-stats')

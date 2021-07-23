@@ -3,7 +3,8 @@ const header_data = require('../../header/').data
 
 exports.main = (req, res) => {
 	const { object } = req.params || {}
-	const { id } = req.query || {}
+
+	// TO DO: IF THIS IS A FOLLOW-UP, GET ALL THE PARTICIPANTS IN THE PREVIOUS COHORT AND DISPLAY THEM ALL SELECTED BY DEFAULT IN THE FRONT END
 
 	DB.conn.tx(async t => {
 		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
@@ -15,8 +16,10 @@ exports.main = (req, res) => {
 			WHERE co.source IN (SELECT id FROM contributors WHERE uuid = $1)
 			ORDER BY c.country
 		;`, [uuid]))
+		// THIS CAN BE ULTRA SIMPLIFIED BY SIMPLY LINKING THE TEMPLATE TO A BLANK TARGET IN THE FRONT END
 		batch.push(t.any(`
-			SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, c.name AS contributorname, c.country,
+			SELECT t.id, t.title, t.description, t.sections, t.status, to_char(t.date, 'DD Mon YYYY') AS date, 
+				c.name AS contributorname, c.country,
 				COALESCE(ce.applications, 0)::INT AS applications
 			FROM templates t
 			INNER JOIN contributors c
@@ -63,6 +66,6 @@ exports.main = (req, res) => {
 				templates: templates
 			}
 		})
-	}).then(data => res.status(200).render('mobilize-new', data))
+	}).then(data => res.status(200).render('mobilization-new', data)) // CHANGE THE NAME TO MOBILIZATION
 	.catch(err => console.log(err))
 }

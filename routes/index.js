@@ -190,7 +190,7 @@ exports.dispatch.browse = require('./browse/')
 
 
 exports.process.deploy = (req, res) => { // THIS IS EQUIVALENT TO PUBLISH
-	let { title, template, cohort } = req.body || {}
+	let { title, template, cohort, source } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]
 	
@@ -199,12 +199,27 @@ exports.process.deploy = (req, res) => { // THIS IS EQUIVALENT TO PUBLISH
 	lang = checklanguage(lang)
 
 	DB.conn.tx(t => { // INSERT THE NEW MOBILIZATION
-		return t.one(`
-			INSERT INTO mobilizations (title, host, template)
-			SELECT $1, c.id, $2 FROM contributors c
-				WHERE c.uuid = $3
-			RETURNING id
-		;`, [title, +template, uuid])
+		// return t.one(`
+		// 	INSERT INTO mobilizations (title, host, template)
+		// 	SELECT $1, c.id, $2 FROM contributors c
+		// 		WHERE c.uuid = $3
+		// 	RETURNING id
+		// ;`, [title, +template, uuid])
+		
+		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
+		const insert = Object.keys(req.body)
+			.filter(key => !['cohort'].includes(key))
+			.reduce((obj, key) => {
+				obj[key] = req.body[key]
+				return obj
+			}, {})
+		saveSQL = DB.pgp.as.format(`
+			INSERT INTO $1:name ($2:name, host) 
+			SELECT $2:csv, c.id FROM contributors c
+			WHERE c.uuid = $3
+			RETURNING $1:name.id
+		;`, ['mobilizations', insert, uuid])
+		return t.one(saveSQL)
 		.then(result => { // INSERT THE COHORT FOR THE MOBILIZATION
 			const { id } = result
 			const batch = cohort.map(d => {
@@ -221,7 +236,7 @@ exports.process.deploy = (req, res) => { // THIS IS EQUIVALENT TO PUBLISH
 			;`, [id, uuid]))
 			return t.batch(batch)
 		})
-	}).then(_ => res.redirect(`/${lang}/browse/mobilization/ongoing`))
+	}).then(_ => res.redirect(`/${lang}/browse/mobilizations/ongoing`))
 	.catch(err => console.log(err))
 }
 exports.process.demobilize = (req, res) => {

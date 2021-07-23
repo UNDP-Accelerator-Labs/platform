@@ -144,6 +144,8 @@
 	}
 
 	function renderVignette (section, data) {
+		if (data.mobilization) console.log(data)
+
 		function getImg (d) {
 			if (d && d.sections) {
 				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()

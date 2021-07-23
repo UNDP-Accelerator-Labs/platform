@@ -126,6 +126,7 @@
 			// opts.push({ action: '../../analyse/mobilization', method: 'GET', node: 'button', type: 'submit', disabled: d.pads === 0, label: 'View' })
 			opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, label: 'Download', fn: download })
 			if (d.status === 1) opts.push({ action: '/demobilize', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), label: 'Demobilize' })
+			if (d.status === 2) opts.push({ action: `../../contribute/mobilization`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0), label: 'Follow up' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
@@ -149,6 +150,15 @@
 		title.addElems('img')
 			.attr('src', '/imgs/icons/i-mobilize.svg')
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled template']['<%- locals.metadata.page.lang %>']}]`)
+
+		if (data.source) {
+			const source = body.addElem('div', 'media media-txt')
+				// .attr('data-placeholder', '<%- vocabulary["untitled template"][locals.metadata.page.lang] %>')
+			source.addElems('i').html(d => 'This is a follow-up to: ')// TO DO: TRANSLATE
+			source.addElems('a')
+				.attrs({ 'href': d => `../../edit/mobilization?id=${d.source_id}`, 'target': '_blank' })
+				.html(d => d.source)
+		}
 
 		const template_title = body.addElem('div', 'media media-txt')
 			.attr('data-placeholder', '<%- vocabulary["untitled template"][locals.metadata.page.lang] %>')

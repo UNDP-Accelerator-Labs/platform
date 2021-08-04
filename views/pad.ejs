@@ -33,8 +33,12 @@
 		}
 
 		function extractTarget (node, source, target) {
-			const doc = node.contentDocument || node.contentWindow.document
-			d3.select(target).html(d3.select(doc).select(source).attr('id', 'reference').classed('split-screen', true).node().outerHTML)
+			const doc = d3.select(node.contentDocument || node.contentWindow.document)
+				.select(source)
+				.attr('id', 'reference')
+				.classed('split-screen', true)
+			doc.selectAll('.focus').classed('focus', false)
+			d3.select(target).html(doc.node().outerHTML)
 			d3.select(node).remove()
 		}
 		document.body.appendChild(iframe)
@@ -478,6 +482,7 @@
 		
 		// IF THIS IS A NEW PAD, CHECK WHETHER IT HAS A SOURCE
 		if (activity === 'contribute') content.source = <%- locals.source %>
+		console.log(content.source)
 		// ALWAYS SAVE THE TITLE
 		content.title = title 
 		if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
@@ -681,7 +686,7 @@
 	// POPULATE THE PAGE
 	if (activity === 'contribute' && templated) {
 		const data = <%- JSON.stringify(locals.display_template || {}) %>;
-		console.log(data)
+
 		if (data.sections) {
 			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat().find(d => d.type === 'title').instruction)
 

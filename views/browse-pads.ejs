@@ -248,7 +248,7 @@
 				.addElems('ul')
 			.addElems('li', null, d => d.followups)
 			.addElems('a')
-				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}`, 'target': '_blank' })
+				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}&template=${d.template}`, 'target': '_blank' })
 				.addElems('button')
 			.html(d => d.title)
 

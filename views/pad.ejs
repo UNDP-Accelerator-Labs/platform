@@ -12,6 +12,35 @@
 	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
 	crossorigin=''></script>
 
+
+<script type="text/javascript">
+	// THE FOLLOWING IS INSPIRED BY: 
+	// https://www.programmersought.com/article/5248306768/
+	// https://stackoverflow.com/questions/926916/how-to-get-the-bodys-content-of-an-iframe-in-javascript
+	function loadHTML(url, source, target) {
+		const iframe = document.createElement('iframe')
+		iframe.style.display = 'none'
+		iframe.src = url
+
+		if (iframe.attachEvent){
+			iframe.attachEvent('onload', function () {
+				extractTarget(this, source, target)
+			})
+		} else {
+			iframe.onload = function () {
+				extractTarget(this, source, target)
+			}
+		}
+
+		function extractTarget (node, source, target) {
+			const doc = node.contentDocument || node.contentWindow.document
+			d3.select(target).html(d3.select(doc).select(source).attr('id', 'reference').classed('split-screen', true).node().outerHTML)
+			d3.select(node).remove()
+		}
+		document.body.appendChild(iframe)
+	}
+</script>
+
 </head>
 
 <body>
@@ -22,7 +51,10 @@
 <%- include ('partials/multi-language.ejs') %> 
 
 <%- include ('partials/menu-languages.ejs') %> 
-<%- include ('partials/menu-logo.ejs') %> 
+
+<!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
+<% if (!locals.source) { %><%- include ('partials/menu-logo.ejs') %><% } %>
+
 <%- include ('partials/modals.ejs') %> 
 
 
@@ -30,7 +62,15 @@
 	if (!locals.templated) locals.templated = locals.display_template !== null
 %>
 
-<main id='pad' class='pad'>
+
+<% if (locals.source) { %>
+	<div id='source'></div>
+	<script type='text/javascript'>
+		loadHTML('../edit/pad?id=<%- locals.source %>', '#pad', '#source')
+	</script>
+<% } %>
+
+<main id='pad' class='pad <% if (locals.source) { %>split-screen<% } %>'>
 	<!-- BELOW ARE ENGAGEMENT FEATURES -->
 	<!-- <% if (['edit', 'view'].includes(locals.metadata.page.activity) && (locals.data && locals.data.published)) { %>
 		<div class='engagement-input-group'>
@@ -382,12 +422,6 @@
 		})
 		
 		const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
-		// let sdgs = main.select('.sdgs-container').node() ? main.select('.sdgs-container').datum().sdgs.map(d => d.key || d) : null
-		// if (sdgs && !sdgs.length) sdgs = null
-		// let tags = main.select('.tags-container').node() ? main.select('.tags-container').datum().tags.map(d => d.name) : null
-		// if (tags && !tags.length) tags = null
-		// let datasources = main.select('.datasources-container').node() ? main.select('.datasources-container').datum().tags.map(d => d.name) : null
-		// if (datasources && !datasources.length) datasources = null
 		// let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
 
 		// THIS SHOULD REPLAE WHAT IS ABOVE
@@ -441,12 +475,11 @@
 
 		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
 		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
-		// COMPILE THE CONTENT
-		// if (!attr || attr === 'title') {
-			// content.title = title
-			// content.sections = JSON.stringify(sections)
-		// }
-		content.title = title // ALWAYS SAVE THE TITLE
+		
+		// IF THIS IS A NEW PAD, CHECK WHETHER IT HAS A SOURCE
+		if (activity === 'contribute') content.source = <%- locals.source %>
+		// ALWAYS SAVE THE TITLE
+		content.title = title 
 		if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
 			content.sections = JSON.stringify(sections)
 		}

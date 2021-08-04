@@ -196,7 +196,6 @@
 
 		const metagroup = head.addElems('div', 'meta-group')
 		metagroup.addElems('div', 'meta meta-contributor')
-			// .html(d => vocabulary['credit']['<%- locals.metadata.page.lang %>'](d.contributor, d.contributorname, d.lab, d.date))
 			.addElems('a')
 			.attr('href', d => `?countries=${d.country_id}`)
 			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
@@ -225,15 +224,52 @@
 
 		const title = body.addElems('div', 'media media-title')
 			.addElems('a', 'pad-link')
-			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			.attrs({ 
+				'href': d => {
+					if (d.editable) {
+						if (d.source) return `../../edit/pad?id=${d.id}&source=${d.source}`
+						else return `../../edit/pad?id=${d.id}`
+					} else {
+						if (d.source) return `../../view/pad?id=${d.id}&source=${d.source}`
+						else return `../../view/pad?id=${d.id}`
+					}
+				}, 'target': '_blank'
+			})
 			.addElems('h1')
 		title.addElems('img')
 			.attr('src', '/imgs/icons/i-pad.svg')
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
+		if (data.followups) {
+			const dropdown = body.addElems('div', 'create')
+			dropdown.addElems('button')
+				.html('Follow-up') // TO DO: TRANSLATE
+			dropdown.addElems('div', 'drop-down')
+				.addElems('ul')
+			.addElems('li', null, d => d.followups)
+			.addElems('a')
+				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}`, 'target': '_blank' })
+				.addElems('button')
+			.html(d => d.title)
+
+			// TO DO: THIS NEEDS TO KEEP REFERENCE TO THE PAD BEING FOLLOWED UP AND THE NEW TEMPLATED PAD TO BE FILLED IN
+		}
+
+
 		body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, txt: c } }))
 			.addElems('a', 'pad-link')
-			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			// .attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			.attrs({ 
+				'href': d => {
+					if (d.editable) {
+						if (d.source) return `../../edit/pad?id=${d.id}&source=${d.source}`
+						else return `../../edit/pad?id=${d.id}`
+					} else {
+						if (d.source) return `../../view/pad?id=${d.id}&source=${d.source}`
+						else return `../../view/pad?id=${d.id}`
+					}
+				}, 'target': '_blank'
+			})
 			.html(d => {
 					if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[Read more]</span>`
 					else return d.txt
@@ -271,7 +307,18 @@
 		
 		foot.addElems('div', 'media media-img', d => getImg(d))
 			.addElems('a', 'pad-link')
-			.attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			// .attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
+			.attrs({ 
+				'href': d => {
+					if (d.editable) {
+						if (d.source) return `../../edit/pad?id=${d.id}&source=${d.source}`
+						else return `../../edit/pad?id=${d.id}`
+					} else {
+						if (d.source) return `../../view/pad?id=${d.id}&source=${d.source}`
+						else return `../../view/pad?id=${d.id}`
+					}
+				}, 'target': '_blank'
+			})
 		.addElems('img', 'vignette')
 			.attrs({ 'loading': 'lazy', 'alt': d => vocabulary['missing image']['<%- locals.metadata.page.lang %>'] })
 		.each(function (d) {

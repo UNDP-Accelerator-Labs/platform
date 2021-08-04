@@ -56,6 +56,7 @@ app.route('/:lang/edit/:object')
 app.route('/:lang/view/:object')
 	.get(routes.render.login, routes.dispatch.view)
 	.post(routes.process.login, routes.dispatch.view)
+
 app.post('/:lang/preview/:object', routes.dispatch.preview)
 app.get('/:lang/analyse/:object', routes.dispatch.analyse)
 

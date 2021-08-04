@@ -217,6 +217,117 @@ div.browse {
 										margin: 0 5px;
 									}
 								}
+								.create {
+									position: relative;
+									margin: 0 0 15px 0;
+
+									button {
+										height: 30px;
+										padding: 0 15px;
+										border: 1px solid $c-light-blue;
+										outline: none;
+										background-color: $c-light-blue;
+										font-size: $t-main;
+										color:  #FFF;
+										cursor: pointer;
+									}
+									.drop-down {
+										display: none;
+										position: absolute;
+										top: 100%;
+										left: 0;
+										background-color: #FFF;
+
+										ul {
+											/*width: 100%;*/
+											margin-top: -1px;
+											border:  1px solid $c-light-blue;
+											
+											li {
+												position: relative;
+
+												button {
+													display: flex;
+													flex-direction: row;
+													justify-content: space-between;
+													align-items: center;
+													width: 100%;
+													margin: 0;
+													background-color: transparent;
+													border: none;
+													text-align: left;
+													white-space: nowrap;
+													color: $c-dark-grey;
+													cursor: pointer;
+
+													label {
+														cursor: pointer;
+													}
+													.expandable {
+														margin-left: 30px;
+														cursor: pointer;
+													}
+												}
+												button:hover {
+													background-color: $c-light-2;
+												}
+												button.wrapable {
+													flex-direction: column;
+													justify-content: center;
+													align-items: flex-start;
+													height: 60px;
+
+													.sub {
+														font-size: $t-small;
+													}
+												}
+												a:hover {
+													text-decoration: none;
+												}
+												.drop-down {
+													display: none;
+
+													ul {
+														li {
+															button {
+																background-color: $c-mid-blue-semi;
+															}
+															.drop-down {
+																display: none;
+															}
+														}
+														li:hover {
+															.drop-down {
+																display: block;
+															}
+														}
+													}
+												}
+											}
+											li:hover {
+												.drop-down {
+													display: block;
+												}
+											}
+											li:hover > button {
+												background-color: $c-light-2;
+											}
+											/*li.not-hovered > button {
+												background-color: $c-light-grey !important;
+											}
+											li.not-hovered > a {
+												button {
+													background-color: $c-light-grey !important;
+												}
+											}*/
+										}
+									}
+								}
+								.create:hover {
+									.drop-down {
+										display: block;
+									}
+								}
 							}
 							.foot {
 								align-self: top;

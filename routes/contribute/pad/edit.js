@@ -3,7 +3,7 @@ const header_data = require('../../header/').data
 
 exports.main = (req, res) => {
 	const { object } = req.params || {}
-	const { id } = req.query || {}
+	const { id, source } = req.query || {}
 
 	DB.conn.tx(async t => {
 		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
@@ -120,7 +120,8 @@ exports.main = (req, res) => {
 				engagement: engagement || {},
 				messages: messages,
 
-				display_template: display_template
+				display_template: display_template,
+				source: source
 			}
 		})
 	}).then(data => res.status(200).render('pad', data))

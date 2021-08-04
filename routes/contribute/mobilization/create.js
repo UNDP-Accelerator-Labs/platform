@@ -5,6 +5,7 @@ exports.main = (req, res) => {
 	const { object } = req.params || {}
 
 	// TO DO: IF THIS IS A FOLLOW-UP, GET ALL THE PARTICIPANTS IN THE PREVIOUS COHORT AND DISPLAY THEM ALL SELECTED BY DEFAULT IN THE FRONT END
+	// ALSO MAKE SURE ONLY ONE FOLLOW UP AT A TIME: IF THE MOBILIZATION HAS AN ACTIVE FOLLOW UP (status = 1) THEN PREVENT NEW FOLLOW UPS
 
 	DB.conn.tx(async t => {
 		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })

@@ -1,3 +1,4 @@
+// BROWSE > PADS > LOAD
 const DB = require('../../../db-config.js')
 const { page_content_limit } = require('../../../config.js')
 const filter = require('./filter').main
@@ -68,11 +69,19 @@ exports.main = kwargs => {
 	// ;`, [uuid, rights, f_search, f_sdgs, f_thematic_areas, f_methods, f_datasources, f_contributors, f_template, f_mobilizations, f_space, order, page_content_limit, (page - 1) * page_content_limit])
 	
 
-	// TO DO: CHECK IF PAD IS PART OF A MOBILIZATION THAT HAS A FOLLOW UP
-	// IF SO, THEN IN THE FRONT END ADD A BUTTON TO FOLLOW UP
+	// FOLLOW UP json_agg INSPIRED BY:
+	// https://stackoverflow.com/questions/54637699/how-to-group-multiple-columns-into-a-single-array-or-similar/54638050
+	// https://stackoverflow.com/questions/24155190/postgresql-left-join-json-agg-ignore-remove-null
+	
+	// TO DO: MAKE SURE THE FOLLOW UP IS ASSIGNED TO THIS USER
+	// ALSO MAKE SURE THE FOLOW UP IS NOT ACCESSIBLE THROUGH THE MAIN MENU: A FOLLOW UP MUST BE ASSOCIATED WITH AN EXISTING, PUBLISHED TAG
 	return conn.any(`
-		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, 
-			c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization,
+		SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, p.source,
+			c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization, 
+
+			COALESCE(json_agg(json_build_object('id', fmob.id, 'title', fmob.title, 'source', p.id, 'template', fmob.template)) 
+				FILTER (WHERE fmob.id IS NOT NULL AND p.status = 2), NULL) AS followups,
+
 			COALESCE(ce.bookmarks, 0)::INT AS bookmarks, 
 			COALESCE(ce.inspirations, 0)::INT AS inspirations, 
 			COALESCE(ce.approvals, 0)::INT AS approvals, 
@@ -125,8 +134,14 @@ exports.main = kwargs => {
 			ON ce.pad = p.id
 		LEFT JOIN mobilization_contributions mob
 			ON mob.pad = p.id
+		LEFT JOIN (
+			SELECT id, title, source, template FROM mobilizations
+			WHERE status = 1	
+		) fmob
+			ON fmob.source = mob.mobilization
 		WHERE TRUE 
 			$3:raw $4:raw
+		GROUP BY (p.id, c.name, c.country, cp.id, mob.mobilization, ce.bookmarks, ce.inspirations, ce.approvals, ce.flags, e.types)
 		$5:raw
 		LIMIT $6 OFFSET $7
 	;`, [uuid, rights, full_filters, f_space, order, page_content_limit, (page - 1) * page_content_limit])

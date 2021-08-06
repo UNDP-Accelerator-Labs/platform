@@ -3779,7 +3779,7 @@ main#mobilization .inner .body .input-group.fixed label {
   }
 
   div#source {
-    float: left;
+    position: fixed;
     width: 50%;
     height: 100vh;
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(150, 150, 150, 0.1) 10px, rgba(150, 150, 150, 0.1) 20px);
@@ -3793,10 +3793,9 @@ main#mobilization .inner .body .input-group.fixed label {
   }
 
   main#pad.split-screen {
-    float: left;
     width: 50%;
     min-width: 0;
-    margin-left: 0;
+    margin-left: 50%;
   }
 
   nav#import {
@@ -9203,7 +9202,7 @@ main#mobilization .inner .body .input-group.fixed label {
   }
 
   div#source {
-    float: left;
+    position: fixed;
     width: 50%;
     height: 100vh;
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(150, 150, 150, 0.1) 10px, rgba(150, 150, 150, 0.1) 20px);
@@ -9217,10 +9216,9 @@ main#mobilization .inner .body .input-group.fixed label {
   }
 
   main#pad.split-screen {
-    float: left;
     width: 50%;
     min-width: 0;
-    margin-left: 0;
+    margin-left: 50%;
   }
 
   nav#import {

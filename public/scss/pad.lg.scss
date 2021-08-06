@@ -1135,7 +1135,7 @@ footer#pad {
 	}
 }
 div#source {
-	float: left;
+	position: fixed;
 	width: 50%;
 	height: 100vh;
 	background: repeating-linear-gradient(
@@ -1155,8 +1155,7 @@ div#source {
 	}
 }
 main#pad.split-screen {
-	float: left;
 	width: 50%;
 	min-width: 0;
-	margin-left: 0;
+	margin-left: 50%;
 }

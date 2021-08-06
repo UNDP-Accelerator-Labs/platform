@@ -688,7 +688,8 @@
 		const data = <%- JSON.stringify(locals.display_template || {}) %>;
 
 		if (data.sections) {
-			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat().find(d => d.type === 'title').instruction)
+			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat()
+				.find(d => d.type === 'title')?.instruction)
 
 			data.sections.forEach(d => {
 				addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })

@@ -115,25 +115,18 @@
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
 			const opts = []
-			console.log(d)
-			// opts.push({ node: 'button', type: 'button', label: 'Contribute' })
-			// opts.push({ action: '../browse/pads/private', method: 'GET', node: 'button', type: 'submit', label: 'Browse contributions', name: 'mobilizations', value: d.id })
-			// opts.push({ node: 'button', type: 'submit', label: 'Browse contributions', name: 'mobilizations', value: d.id })
-			// TO DO: TERMINATE DEPLOYMENT
-			// if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteMobilizations })
-			// if (d.status === 1) 
-			
 			// opts.push({ action: '../../analyse/mobilization', method: 'GET', node: 'button', type: 'submit', disabled: d.pads === 0, label: 'View' })
 			opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, label: 'Download', fn: download })
-			if (d.status === 1) opts.push({ action: '/demobilize', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), label: 'Demobilize' })
-			if (d.status === 2) opts.push({ action: `../../contribute/mobilization`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0), label: 'Follow up' })
+			if (d.status === 1) opts.push({ action: '/demobilize', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), label: 'Demobilize', inputs: [{ name: 'id', value: d.id }] })
+			if (d.status === 2) opts.push({ action: `../../contribute/mobilization`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), label: 'Follow up', inputs: [{ name: 'id', value: d.id }] })
+			if (d.status === 2) opts.push({ action: `../../contribute/mobilization`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), label: 'Copy', inputs: [{ name: 'id', value: d.id }, { name: 'copy', value: true }] })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
 			const sel = d3.select(this)
 			const mobilization = sel.findAncestor('mobilization')
-			sel.addElems('input')
-				.attrs({ 'type': 'hidden', 'name': 'id', 'value': mobilization.datum().id })
+			sel.addElems('input', 'get-value', d.inputs)
+				.attrs({ 'type': 'hidden', 'name': c => c.name, 'value': c => c.value })
 			sel.addElems(d.node, 'btn-overlay')
 				.classed(d.label.toLowerCase(), true)
 				// .attrs({ 'type': d.type, 'name': d.name, 'value': d.value })

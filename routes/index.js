@@ -190,7 +190,7 @@ exports.dispatch.browse = require('./browse/')
 
 
 exports.process.deploy = (req, res) => { // THIS IS EQUIVALENT TO PUBLISH
-	let { title, template, cohort, source } = req.body || {}
+	let { title, template, cohort, pad_limit, source, copy } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]
 	
@@ -734,6 +734,7 @@ exports.process.screenshot = (req, res) => {
 exports.process.save = require('./contribute/').save
 
 exports.process.publish = require('./contribute/').publish
+exports.process.forward = require('./contribute/').forward
 // (req, res) => {
 // 	const { referer } = req.headers || {}
 // 	const { id, limit } = req.query || {}

@@ -219,7 +219,8 @@ div.browse {
 								}
 								.create {
 									position: relative;
-									margin: 0 0 15px 0;
+									display: inline-block;
+									margin: 0 10px 15px 0;
 
 									button {
 										height: 30px;
@@ -498,18 +499,26 @@ div.browse {
 	}
 }
 
-
-
-
-
-
-
-
 footer {
 	position: fixed;
-	bottom: 0;
-	width: 100%;
-	z-index: -1;
+	bottom: 60px;
+	width: 15%;
+	/*z-index: -1;*/
+
+	.inner {
+		ul.pagination {
+			text-align: center;
+			li {
+				display: inline-block;
+				margin: 0 5px;
+
+				a.page-link.active {
+					font-weight: 700;
+					text-decoration: underline;
+				}
+			}
+		}
+	}
 
 	img {
 		width: 180px;

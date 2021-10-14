@@ -68,6 +68,9 @@ const Media = function (kwargs) {
 			.addElems('i', 'material-icons')
 			.html(d => d.label)
 	}
+	// this.required = this.container.addElems('div', 'required', d => [d], d => d.type)
+	// 	.addElems('h1')
+	// 	.html('*')
 	// THE FOLLOWING IS DIFFERENT FROM THE Media CONSTRUCTOR IN pads.js
 	this.response = this.container.addElems('div', 'response template', [type])
 		.html(d => vocabulary[`expect ${d}`][lang])

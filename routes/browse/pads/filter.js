@@ -51,11 +51,15 @@ exports.main = req => {
 	if (space === 'bookmarks') 			f_space	= DB.pgp.as.format(`AND p.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
 	if (space === 'public')	 			f_space = DB.pgp.as.format(`AND p.status = 2`)
 	// ORDER
-	// let 	order 				= DB.pgp.as.format(`ORDER BY p.status ASC, p.date DESC`)
-	let 	order 				= DB.pgp.as.format(`ORDER BY p.date DESC`)
+	// let 	order = DB.pgp.as.format(`ORDER BY p.status ASC, p.date DESC`)
+	let order = DB.pgp.as.format(`ORDER BY p.date DESC`)
+
+	// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
+	const f_sources = DB.pgp.as.format(`AND p.source IS NULL`)
 
 	const platform_filters = [f_contributors, f_countries, f_templates, f_mobilizations].filter(d => d).join(' OR ')
 	const content_filters = [f_methods, f_datasources, f_thematic_areas, f_sdgs].filter(d => d).join(' OR ')
+	const display_filters = []
 
 	let filters = ''
 	if (f_pads) {

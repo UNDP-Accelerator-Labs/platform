@@ -4426,7 +4426,8 @@ div.browse main .inner section .mobilizations-layout .pad .inner .body .create,
 div.browse main .inner section .mobilizations-layout .template .inner .body .create,
 div.browse main .inner section .mobilizations-layout .mobilization .inner .body .create {
     position: relative;
-    margin: 0 0 15px 0;
+    display: inline-block;
+    margin: 0 10px 15px 0;
   }
   div.browse main .inner section .pads-layout .pad .inner .body .create button,
 div.browse main .inner section .pads-layout .template .inner .body .create button,
@@ -5014,9 +5015,20 @@ div.browse main .inner section .mobilizations-layout .template.status-1 {
 
   footer {
     position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: -1;
+    bottom: 60px;
+    width: 15%;
+    /*z-index: -1;*/
+  }
+  footer .inner ul.pagination {
+    text-align: center;
+  }
+  footer .inner ul.pagination li {
+    display: inline-block;
+    margin: 0 5px;
+  }
+  footer .inner ul.pagination li a.page-link.active {
+    font-weight: 700;
+    text-decoration: underline;
   }
   footer img {
     width: 180px;
@@ -9849,7 +9861,8 @@ div.browse main .inner section .mobilizations-layout .pad .inner .body .create,
 div.browse main .inner section .mobilizations-layout .template .inner .body .create,
 div.browse main .inner section .mobilizations-layout .mobilization .inner .body .create {
     position: relative;
-    margin: 0 0 15px 0;
+    display: inline-block;
+    margin: 0 10px 15px 0;
   }
   div.browse main .inner section .pads-layout .pad .inner .body .create button,
 div.browse main .inner section .pads-layout .template .inner .body .create button,
@@ -10437,9 +10450,20 @@ div.browse main .inner section .mobilizations-layout .template.status-1 {
 
   footer {
     position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: -1;
+    bottom: 60px;
+    width: 15%;
+    /*z-index: -1;*/
+  }
+  footer .inner ul.pagination {
+    text-align: center;
+  }
+  footer .inner ul.pagination li {
+    display: inline-block;
+    margin: 0 5px;
+  }
+  footer .inner ul.pagination li a.page-link.active {
+    font-weight: 700;
+    text-decoration: underline;
   }
   footer img {
     width: 180px;

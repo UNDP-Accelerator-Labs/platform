@@ -22,7 +22,7 @@
 					<label class='placeholder' for='title'>Provide a title for the mobilization</label>
 				</div>
 				<div class='foot'>
-					<button type='button' disabled onclick='advanceTo(2)'>
+					<button type='button' disabled onclick='<% if (locals.metadata.page?.query?.copy?.[0] === "true") { %>advanceTo(3)<% } else { %>advanceTo(2)<% } %>'>
 						<label>Next</label>
 						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
 					</button>
@@ -30,47 +30,54 @@
 			</div>
 		</div>
 		<!-- SECOND MODAL: TEMPLATE -->
-		<div class='modal m-2 hide'>
-			<button type='button' class='back' onclick='advanceTo(1)'>
-				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
-				<label>Back</label>
-			</button>
-			<div class='inner'>
-				<div class='head'>
-					<div class='title'>
-						<i class='material-icons'>keyboard_arrow_right</i>
-						Templates <!-- TO DO: TRANSLATION -->
+		<% if (locals.metadata.page?.query?.copy?.[0] === "true") { %>
+		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
+		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
+			<input type='hidden' name='template' value='<%- locals.templates.id %>'>
+			<input type='hidden' name='copy' value='true'>
+		<% } else { %>
+			<div class='modal m-2 hide'>
+				<button type='button' class='back' onclick='advanceTo(1)'>
+					<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
+					<label>Back</label>
+				</button>
+				<div class='inner'>
+					<div class='head'>
+						<div class='title'>
+							<i class='material-icons'>keyboard_arrow_right</i>
+							Templates <!-- TO DO: TRANSLATION -->
+						</div>
+					</div>
+					<div class='body'>
+						<ul class='opts'>
+							<% locals.templates.forEach(t => { %>
+								<li class='opt'>
+									<div class='hide'>
+										<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>' onchange='toggleChecked(this); enableNext(this)'>
+									</div>
+									<div class='preview' onclick='previewTemplate(<%- t.id %>)' title='Preview template.'>
+										<i class='material-icons'>visibility</i>
+									</div>
+									<div class='grow'>
+										<label for='t-<%- t.id %>'><%- t.title %></label>
+									</div>
+									<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
+								</li>
+							<% }) %>
+						</ul>
+					</div>
+					<div class='foot'>
+						<button type='button' disabled onclick='advanceTo(3)'>
+							<label>Next</label>
+							<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
+						</button>
 					</div>
 				</div>
-				<div class='body'>
-					<ul class='opts'>
-						<% locals.templates.forEach(t => { %>
-							<li class='opt'>
-								<div class='hide'>
-									<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>' onchange='toggleChecked(this); enableNext(this)'>
-								</div>
-								<div class='preview' onclick='previewTemplate(<%- t.id %>)' title='Preview template.'>
-									<i class='material-icons'>visibility</i>
-								</div>
-								<div class='grow'>
-									<label for='t-<%- t.id %>'><%- t.title %></label>
-								</div>
-								<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
-							</li>
-						<% }) %>
-					</ul>
-				</div>
-				<div class='foot'>
-					<button type='button' disabled onclick='advanceTo(3)'>
-						<label>Next</label>
-						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
-					</button>
-				</div>
 			</div>
-		</div>
+		<% } %>
 		<!-- THIRD MODAL: COHORT -->
 		<div class='modal m-3 hide'>
-			<button type='button' class='back' onclick='advanceTo(2)'>
+			<button type='button' class='back' onclick='<% if (locals.metadata.page?.query?.copy?.[0] === "true") { %>advanceTo(1)<% } else { %>advanceTo(2)<% } %>'>
 				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
 				<label>Back</label>
 			</button>
@@ -101,7 +108,35 @@
 					</ul>
 				</div>
 				<div class='foot'>
-					<button type='submit' disabled>Deploy</button>
+					<!-- <button type='submit' disabled>Deploy</button> -->
+					<button type='button' disabled onclick='advanceTo(4)'>
+						<label>Next</label>
+						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class='modal m-4 hide'>
+			<button type='button' class='back' onclick='advanceTo(3)'>
+				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
+				<label>Back</label>
+			</button>
+			<div class='inner'>
+				<div class='head'>
+					<div class='title'>
+						Submissions limit <!-- TO DO: TRANSLATION -->
+					</div>
+					<!-- <div class='contributor-count'>0 invited contributors</div>
+					<div class='global-opt'>
+						<input type='checkbox' id='select-all' onchange='selectAllOpts(this); enableNext(this)'>
+						<label for='select-all'>Select all</label>
+					</div> -->
+				</div>
+				<div class='body'>
+					<input type='number' name='pad_limit' value=3 min=1 placeholder='Number of pads.'>
+				</div>
+				<div class='foot'>
+					<button type='submit'>Deploy</button>
 				</div>
 			</div>
 		</div>

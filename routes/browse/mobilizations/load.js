@@ -9,6 +9,9 @@ exports.main = kwargs => {
 	// GET FILTERS
 	const [f_space, order, page] = filter(kwargs.req)
 
+	// THE tmob PART ENSURES ONLY ONE FOLLOW UP AT A TIME: 
+	// IF THE MOBILIZATION HAS AN ACTIVE FOLLOW UP (status = 1) THEN THE USER CANNOT ADD ANOTHER FOLLOW UP
+	// TO DO: THE SAME FOR COPIES
 	return conn.any(`
 		SELECT mob.id,
 			mob.title, 
@@ -21,8 +24,13 @@ exports.main = kwargs => {
 			t.id AS template_id,
 			t.title AS template_title, 
 			t.description AS template_description,
-			smob.title AS source, 
-			smob.id AS source_id,
+			
+			COALESCE((SELECT smob.title FROM mobilizations smob WHERE smob.id = mob.source LIMIT 1), NULL) AS source,
+			COALESCE((SELECT smob.id FROM mobilizations smob WHERE smob.id = mob.source LIMIT 1), NULL) AS source_id, 
+			
+			COALESCE((SELECT tmob.title FROM mobilizations tmob WHERE tmob.source = mob.id LIMIT 1), NULL) AS target, 
+			COALESCE((SELECT tmob.id FROM mobilizations tmob WHERE tmob.source = mob.id LIMIT 1), NULL) AS target_id, 
+			
 			COUNT (DISTINCT(pads.id))::INT AS pads,
 			COUNT (DISTINCT(mc.contributor))::INT AS contributors,
 			CASE WHEN c.id = (SELECT id FROM contributors WHERE uuid = $1)
@@ -43,12 +51,11 @@ exports.main = kwargs => {
 			ON p.pad = pads.id AND pads.status = 2
 		LEFT JOIN mobilization_contributors mc
 			ON mob.id = mc.mobilization
-		LEFT JOIN mobilizations smob
-			ON mob.source = smob.id
+		
 		WHERE (c.uuid = $1
 			OR $1 IN (SELECT c1.uuid FROM contributors c1 INNER JOIN mobilization_contributors mc1 ON mc1.contributor = c1.id WHERE mc1.mobilization = mob.id))
 			$3:raw
-			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id, smob.title, smob.id)
+			GROUP BY (mob.id, c.id, c.name, c.country, cp.id, t.id)
 			ORDER BY pads DESC, start_date DESC
 		LIMIT $4 OFFSET $5
 	;`, [uuid, rights, f_space, page_content_limit, (page - 1) * page_content_limit])

@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(session({ 
 	name: 'uid',
-	secret: 'solmappass',
+	secret: 'acclabspadspass',
 	store: new pgSession({ pgPromise: DB.conn }),
 	resave: false,
 	saveUninitialized: false,
@@ -68,6 +68,7 @@ app.post('/engage', routes.process.engage)
 app.post('/validate', routes.process.validate)
 
 app.get('/publish/:object', routes.process.publish)
+app.get('/forward/:object', routes.process.forward)
 app.get('/delete/:object', routes.process.delete)
 app.post('/download/:object', routes.process.download)
 

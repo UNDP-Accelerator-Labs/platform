@@ -45,21 +45,57 @@
 	<main>
 		<div class='inner'>
 		</div>
+		<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 	</main>
 </div>
 <%- include ('partials/filters.ejs') %>
 
-
-
-
-<!-- <main id='browse-pads'>
-	<div class='inner'>
-		<section class='overview'></section>
-	</div>
-	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
-</main> -->
-
 <footer>
+	<div class='inner'>
+		<!-- IF PAGE IS BELOW 5, SHOW FIRST 10 -->
+		<!-- IF IT IS ABOVE 5, CENTER WINDOW OF 10 AROUND PAGE -->
+		<% if (!locals.metadata.page.lazyload) { %>
+			<ul class='pagination'>
+			<% if (locals.metadata.page.id <= 2) { %>
+				<% for (let i = 1; i < Math.min(4, locals.metadata.page.count + 1); i++) { %>
+					<li>
+						<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+					</li>
+				<% } %>
+				<% if (locals.metadata.page.count > 3) { %>
+					<li>…</li>
+					<li>
+						<a class='page-link' data-page='<%- locals.metadata.page.count %>'><%- locals.metadata.page.count %></a>
+					</li>
+				<% } %>
+			<% } else if (locals.metadata.page.id > 2 && locals.metadata.page.id <= (locals.metadata.page.count + 1) - 3) { %>
+				<li>
+					<a class='page-link' data-page='<%- 1 %>'>1</a>
+				</li>
+				<li>…</li>
+				<% for (let i = locals.metadata.page.id - 1; i < locals.metadata.page.id + 2; i++) { %>
+					<li>
+						<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+					</li>
+				<% } %>
+				<li>…</li>
+				<li>
+					<a class='page-link' data-page='<%- locals.metadata.page.count %>'><%- locals.metadata.page.count %></a>
+				</li>
+			<% } else { %>
+				<li>
+					<a class='page-link' data-page='<%- 1 %>'>1</a>
+				</li>
+				<li>…</li>
+				<% for (let i = locals.metadata.page.count - 2; i < locals.metadata.page.count + 1; i++) { %>
+					<li>
+						<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+					</li>
+				<% } %>
+			<% } %>
+			</ul>
+		<% } %>
+	</div>
 </footer>
 
 
@@ -139,13 +175,14 @@
 		sections.addElems('div', 'pads-layout')
 		.each(function (d) {
 			const section = d3.select(this)
+			console.log(d.pads)
+			console.log(d.pads.nest('source_id'))
 			d.pads.forEach(p => section.call(renderVignette, p))
 		})
 	}
 
 	function renderVignette (section, data) {
-		if (data.mobilization) console.log(data)
-
+		// console.log(data)
 		function getImg (d) {
 			if (d && d.sections) {
 				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
@@ -202,12 +239,15 @@
 
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
+			console.log(d)
 			const opts = []
 			// THE FIRST LINE IS IF WE SELECT MULTIPLE PADS
 			// TO DO: UNPUBLISH
 			if ('<%- locals.metadata.page.space %>' === 'private' && d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deletePads })
 			opts.push({ node: 'button', type: 'button', label: 'Download', disabled: d.status !== 2, fn: downloadPads })
-			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && <%- locals.publications %> < publication_limit), label: 'Publish' })
+			// if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && <%- locals.publications %> < publication_limit), label: 'Publish' })
+			// CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
+			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && d.available_publications > 0), label: 'Publish' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
@@ -241,18 +281,32 @@
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
 		if (data.followups) {
-			const dropdown = body.addElems('div', 'create')
+			console.log(data.followups)
+			const dropdown = body.addElems('div', 'create follow-up')
 			dropdown.addElems('button')
 				.html('Follow-up') // TO DO: TRANSLATE
 			dropdown.addElems('div', 'drop-down')
 				.addElems('ul')
 			.addElems('li', null, d => d.followups)
 			.addElems('a')
-				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}&template=${d.template}`, 'target': '_blank' })
+				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}&template=${d.template}&mobilization=${d.id}`, 'target': '_blank' })
 				.addElems('button')
 			.html(d => d.title)
 
 			// TO DO: THIS NEEDS TO KEEP REFERENCE TO THE PAD BEING FOLLOWED UP AND THE NEW TEMPLATED PAD TO BE FILLED IN
+		}
+
+		if (data.forwards) {
+			const dropdown = body.addElems('div', 'create forward')
+				dropdown.addElems('button')
+					.html('Forward to') // TO DO: TRANSLATE
+				dropdown.addElems('div', 'drop-down')
+					.addElems('ul')
+				.addElems('li', null, d => d.forwards)
+				.addElems('a')
+					.attrs({ 'href': d => `/forward/pad?id=${d.source}&mobilization=${d.id}` }) // TO DO: CHECK THIS WORKS
+					.addElems('button')
+				.html(d => d.title)
 		}
 
 
@@ -369,29 +423,40 @@
 
 	}
 
-	window.onscroll = async function (ev) {
-		if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && !lazyloading) {
-			console.log('hit the bottom')
-			main.select('.lds-ellipsis').classed('hide', false)
-			
-			page ++
-			lazyloading = true
-			
+	// THIS IS THE LAZY LOADING MECHANISM
+	if (<%- JSON.parse(locals.metadata.page.lazyload) %>) {
+		window.onscroll = async function (ev) {
+			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && !lazyloading) {
+				console.log('hit the bottom')
+				main.select('.lds-ellipsis').classed('hide', false)
+				
+				page ++
+				lazyloading = true
+				
+				const url = new URL(window.location)
+				const queryparams = new URLSearchParams(url.search)
+				queryparams.set('page', page)
+
+				const response = await GET(`?${queryparams.toString()}`) // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
+
+				d3.selectAll('section.pads-container div.pads-layout')
+				.each(function (d) {
+					const section = d3.select(this)
+					response.sections.find(s => s.status === d.status).pads.forEach(p => section.call(renderVignette, p))
+				})
+
+				if (response.count < <%- locals.stats.filtered %>) lazyloading = false
+				else main.select('.lds-ellipsis').classed('hide', true)
+			}
+		}
+	} else { // PAGINATION MECHANISM
+		d3.selectAll('.pagination a.page-link').each(function () {
+			const sel = d3.select(this)
 			const url = new URL(window.location)
 			const queryparams = new URLSearchParams(url.search)
-			queryparams.set('page', page)
-
-			const response = await GET(`?${queryparams.toString()}`) // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
-
-			d3.selectAll('section.pads-container div.pads-layout')
-			.each(function (d) {
-				const section = d3.select(this)
-				response.sections.find(s => s.status === d.status).pads.forEach(p => section.call(renderVignette, p))
-			})
-
-			if (response.count < <%- locals.stats.filtered %>) lazyloading = false
-			else main.select('.lds-ellipsis').classed('hide', true)
-		}
+			queryparams.set('page', +sel.attr('data-page'))
+			sel.attr('href', `?${queryparams.toString()}`)
+		})
 	}
 
 	async function deletePads (pads) {

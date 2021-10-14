@@ -9,5 +9,5 @@ if (modules.includes('mobilizations')) {
 }
 exports.modules = modules
 // DISPLAY VARIABLES
-exports.lazyload = true // EDIT THIS
+exports.lazyload = false // EDIT THIS
 exports.page_content_limit = 25 // EDIT THIS

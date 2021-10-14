@@ -1,6 +1,7 @@
 const DB = require('../../../db-config.js')
 const header_data = require('../../header/').data
 const load = require('./load').main
+const { page_content_limit, lazyload } = require('../../../config.js')
 const filter = require('./filter').main
 
 exports.main = (req, res) => { 
@@ -13,7 +14,6 @@ exports.main = (req, res) => {
 		const { pagetitle, path, uuid, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
 		
 		const batch = []
-		
 		
 		// SUMMARY STATISTICS
 		batch.push(t.task(t1 => {
@@ -211,7 +211,7 @@ exports.main = (req, res) => {
 				contributors, 
 				mobilizations, 
 				filters,
-				publications] = results
+				publications ] = results
 			
 			return { 
 				metadata : {
@@ -219,6 +219,9 @@ exports.main = (req, res) => {
 						title: pagetitle, 
 						path: path,
 						id: page,
+						count: Math.ceil((statistics.filteredcounts.sum('count') || 0) / page_content_limit),
+						// count: Math.ceil((statistics.filteredcounts.find(d => d.status === pubstatus)?.count || 0) / lazyLimit),
+						lazyload: lazyload,
 						lang: lang,
 						activity: path[1],
 						object: object,

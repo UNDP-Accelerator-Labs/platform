@@ -533,6 +533,7 @@
 	// if (['edit', 'view'].includes(activity)) {
 	<% if (locals.data) { %>
 		const data = <%- JSON.stringify(locals.data || {}) %>;
+		console.log(data)
 		if (activity === 'contribute') data.title = `[Copy] ${data.title}` // THIS IS A COPIED TEMPLATE
 
 		published = data.published

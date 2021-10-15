@@ -88,7 +88,7 @@ exports.main = (req, res) => {
 
 				templates: templates,
 				display_template: display_template,
-				source: source
+				source: source || null
 			}
 		})
 	}).then(data => res.render('pad', data))

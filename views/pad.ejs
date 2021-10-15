@@ -66,7 +66,6 @@
 	if (!locals.templated) locals.templated = locals.display_template !== null
 %>
 
-
 <% if (locals.source) { %>
 	<div id='source'></div>
 	<script type='text/javascript'>
@@ -126,7 +125,7 @@
 					<!-- <a href='javascript:history.back()' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a> -->
 					<a href='<%- locals.metadata.page.referrer || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
 				<% } %>
-				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.metadata.page.lang] %>' onblur='partialSave("title")' contenteditable></div>
+				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.metadata.page.lang] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
 			<% } else { %>
 				<a href='<%- locals.metadata.page.referrer || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
 				<div class='title' data-placeholder='<%- vocabulary["untitled pad"][locals.metadata.page.lang] %>'></div>
@@ -309,18 +308,24 @@
 	function retrieveItems (sel, datum, items) {
 		// MEDIA
 		if (['img', 'mosaic', 'video'].includes(datum.type)) {
+			if (datum.type === 'mosaic') datum.has_content = datum?.srcs?.filter(b => b)?.length > 0
+			else datum.has_content = datum.src !== null && datum.src !== undefined
 			items.push(datum)
+			// datum.has_content = TO DO
 		}
 		else if (datum.type === 'txt') {
 			datum.txt = sel.select('.media-txt').node().innerText
+			datum.has_content = datum.txt?.trim()?.length > 0
 			items.push(datum)
 		}
 		else if (datum.type === 'embed') {
 			datum.html = sel.select('.media-embed').node().innerHTML
+			datum.has_content = datum.html?.trim()?.length > 0
 			items.push(datum)
 		}
 		else if (['checklist', 'radiolist'].includes(datum.type)) {
 			datum.options = datum.options.filter(b => b.name && b.name.length)
+			datum.has_content = datum.options.filter(b => b.checked).length > 0
 			items.push(datum)
 		}
 		// META
@@ -329,23 +334,36 @@
 		// }
 		else if (datum.type === 'sdgs') {
 			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			datum.has_content = datum?.sdgs?.length > 0
 			items.push(datum)
 		}
 		else if (datum.type === 'tags') {
 			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			datum.has_content = datum?.tags?.length > 0
 			items.push(datum)
 		}
 		else if (datum.type === 'skills') {
 			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			datum.has_content = datum?.tags?.length > 0
 			items.push(datum)
 		}
 		else if (datum.type === 'datasources') {
 			// d.options = d.options.filter(c => datum.name && datum.name.length)
+			datum.has_content = datum?.tags?.length > 0
 			items.push(datum)
 		}
 	}
-	function getStatus () { // TO DO: FINISH THIS
-		const sections = []
+	function getStatus () {
+		const completion = []
+		const title = head.select('.title').node().innerText
+		completion.push(title?.trim()?.length > 0)
+
+		function checkCompletion (d) {
+			if (d.required === null || d.required === undefined) throw 'there is not requirement: this should not happen'
+			if (d.required === false) return true
+			else return d.has_content === true
+		}
+
 		main.selectAll('.layout:not(.description-layout)')
 		.each(function (d) {
 			const items = []
@@ -357,7 +375,7 @@
 				const ingroup = sel.findAncestor('group-container')	
 				// GROUPS
 				if (c.type === 'group') {
-					const groupitems = []
+					// const groupitems = []
 					sel.selectAll('.media-group-items')
 						.each(function () { 
 							const sel = d3.select(this)
@@ -366,21 +384,16 @@
 								.each(function (b) { 
 									retrieveItems(d3.select(this), b, subitems) 
 								})
-							groupitems.push(subitems)
+							completion.push(!subitems.map(checkCompletion).unique().includes(false))
 						})
-					c.items = groupitems
-					items.push(c)
 				} else {
 					if (!ingroup) retrieveItems(sel, c, items)
+					completion.push(!items.map(checkCompletion).unique().includes(false))
 				}
 			})
-
-			// d.title = sel.select('.section-header label').node().innerText
-			// d.lead = (sel.select('.media-lead').node() || {}).innerText
-			// d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
-			// d.items = items
-			// sections.push(d)
 		})
+
+		return !completion.unique().includes(false)
 	}
 	function compileContent (attr) {
 		const content = {}
@@ -450,7 +463,6 @@
 			})
 		})
 		content.tagging = allTags
-
 		
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
@@ -479,10 +491,9 @@
 
 		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
 		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
-		
+	
 		// IF THIS IS A NEW PAD, CHECK WHETHER IT HAS A SOURCE
-		if (activity === 'contribute') content.source = <%- locals.source %>
-		console.log(content.source)
+		if (activity === 'contribute') content.source = <%- locals.source || JSON.stringify(locals.source) %>;
 		// ALWAYS SAVE THE TITLE
 		content.title = title 
 		if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr) || sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
@@ -500,17 +511,16 @@
 		// ALWAYS SEND fullTxt
 		content.full_text = fullTxt
 
-		// TO DO: SEE IF THERE IS A BETTER WAY TO DO THIS
 		// ALWAYS SEND status
 		let status = 0
-		// getStatus() // TO DO: THIS DOES NOTHING FOR NOW
+		const completion = getStatus()
+
 		if (!published) {
-			if (title && title.trim().length
-				// && location && location.centerpoints && location.centerpoints.length 
-				// && sdgs && sdgs.length && sdgs.length <= 5
-				// && tags && tags.length && tags.length <= 5
-			) status = 1
-		} else status = 2
+			if (completion) status = 1
+		} else {
+			if (completion) status = 2
+			else status = 0
+		}
 		content.status = status
 		// ALWAYS SEND deletion IF THERE IS SOMETHING TO DELET
 		if (deletion.length) content.deletion = deletion
@@ -521,7 +531,7 @@
 		console.log('saving')
 		// FIRST CHECK IF THIS IS A NEW PAD
 		const content = compileContent(attr)
-		console.log(content)
+		console.log(content.title)
 		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
 		const url = new URL(window.location)
 		const queryparams = new URLSearchParams(url.search)
@@ -658,6 +668,7 @@
 	window.addEventListener('mouseup', function (e) {
 		e = e || event
 		if (editing) {
+			const focused_node = d3.select('.focus')
 			const target = d3.select(e.target)
 			const media = target.findAncestor('media')
 			const meta = target.findAncestor('meta')
@@ -679,7 +690,22 @@
 				.selectAll('.inset')
 				.style('max-height', null)
 			main.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
-			autofillTitle()
+			
+			// console.log(document.activeElement)
+			// console.log(document.activeElement.classList)
+			// console.log(document.activeElement.classList.contains('title'))
+
+			if (focused_node.node() && focused_node.classed('title')) {
+				console.log('in')
+				if (!document.activeElement.classList.contains('title')) {
+					focused_node.classed('focus', false)
+					console.log('in to out')
+				}
+			}
+			else {
+				autofillTitle()
+				console.log('oout')
+			}
 		}
 	})
 
@@ -707,7 +733,7 @@
 		console.log(data)
 
 		if (data.title) head.select('.title').html(data.title)
-		published = data.published
+		published = data.status === 2
 
 		if (data.sections) {
 			data.sections.forEach(d => {

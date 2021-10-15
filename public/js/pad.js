@@ -67,6 +67,15 @@ const Media = function (kwargs) {
 		.addElems('i', 'material-icons')
 		.html(d => d.label)
 
+	if (editing) {
+		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
+		// this.required.addElems('input')
+		// 	.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
+		this.required.addElems('label')
+			.each(function (d) { d3.select(this).classed('active', d.required) })
+			.html('*')
+	}
+
 	if (editing) observer.observe(this.container.node(), obsvars)
 }
 Media.prototype.rmMedia = function () {
@@ -687,17 +696,18 @@ function addSection (kwargs) {
 
 function addImg (kwargs) { 
 	const { data, lang, section, container, focus } = kwargs || {}
-	let { type, src, textalign, scale, instruction } = data
+	let { type, src, textalign, scale, instruction, required } = data || {}
 	if (!type) type = 'img'
 	if (!src) src = null
 	if (!textalign) textalign = 'left'
 	if (!scale) scale = 'original'
+	required = required ?? false
 	
 	const media = new Media({ 
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
-		datum: { type: type, textalign: textalign, scale: scale, src: src, instruction: instruction },
+		datum: { type: type, textalign: textalign, scale: scale, src: src, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -780,16 +790,17 @@ function addImg (kwargs) {
 }
 function addMosaic (kwargs) {
 	const { data, lang, section, container, focus } = kwargs || {}
-	let { type, srcs, verticalalign, instruction } = data
+	let { type, srcs, verticalalign, instruction, required } = data || {}
 	if (!type) type = 'mosaic'
 	if (!srcs) srcs = []
 	if (!verticalalign) verticalalign = 'center'
+	required = required ?? false
 
 	const media = new Media({ 
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
-		datum: { type: type, verticalalign: verticalalign, srcs: srcs, instruction: instruction },
+		datum: { type: type, verticalalign: verticalalign, srcs: srcs, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -868,16 +879,17 @@ function addMosaic (kwargs) {
 }
 function addVideo (kwargs) { 
 	const { data, lang, section, container, focus } = kwargs || {}
-	let { type, src, textalign, instruction } = data
+	let { type, src, textalign, instruction, required } = data || {}
 	if (!type) type = 'video'
 	if (!src) src = null
 	if (!textalign) textalign = 'left'
+	required = required ?? false
 	
 	const media = new Media({ 
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		container: container,
 		type: type, 
-		datum: { type: type, textalign: textalign, src: src, instruction: instruction },
+		datum: { type: type, textalign: textalign, src: src, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -946,18 +958,19 @@ function addVideo (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint } = data || {}
+	let { type, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required } = data || {}
 	if (!type) type = 'txt'
 	if (!fontsize) fontsize = 1
 	if (!fontweight) fontweight = 'normal'
 	if (!fontstyle) fontstyle = 'normal'
 	if (!textalign) textalign = 'left'
 	if (!txt) txt = ''
+	required = required ?? false
 
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, textalign: textalign, txt: txt, instruction: instruction, constraint: constraint },
+		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, textalign: textalign, txt: txt, instruction: instruction, constraint: constraint, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -1038,16 +1051,17 @@ function addTxt (kwargs) {
 }
 function addEmbed (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, textalign, html, src, instruction } = data || {}
+	let { type, textalign, html, src, instruction, required } = data || {}
 	if (!type) type = 'embed'
 	if (!textalign) textalign = 'left'
 	if (!html) html = ''
 	if (!src) src = null
+	required = required ?? false
 
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, src: src, textalign: textalign, html: html, instruction: instruction },
+		datum: { type: type, src: src, textalign: textalign, html: html, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -1138,7 +1152,7 @@ function addEmbed (kwargs) {
 }
 function addChecklist (kwargs) { 
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, fontsize, fontweight, fontstyle, options, instruction } = data || {}
+	let { type, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!type) type = 'checklist'
 	if (!fontsize) fontsize = 1
 	if (!fontweight) fontweight = 'normal'
@@ -1154,6 +1168,7 @@ function addChecklist (kwargs) {
 			else return a.id < b.id ? -1 : 1
 		})
 	}
+	required = required ?? false
 
 	if (editing && !options.find(d => !d.name) && !templated) options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -1161,7 +1176,7 @@ function addChecklist (kwargs) {
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction },
+		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -1310,7 +1325,7 @@ function addChecklist (kwargs) {
 }
 function addRadiolist (kwargs) { 
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, fontsize, fontweight, fontstyle, options, instruction } = data || {}
+	let { type, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!type) type = 'radiolist'
 	if (!fontsize) fontsize = 1
 	if (!fontweight) fontweight = 'normal'
@@ -1326,6 +1341,7 @@ function addRadiolist (kwargs) {
 			else return a.id < b.id ? -1 : 1
 		})
 	}
+	required = required ?? false
 
 	if (editing && !options.find(d => !d.name) && !templated) options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -1333,7 +1349,7 @@ function addRadiolist (kwargs) {
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction },
+		datum: { type: type, fontsize: fontsize, fontweight: fontweight, fontstyle: fontstyle, options: options, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -1479,9 +1495,10 @@ function addRadiolist (kwargs) {
 }
 // META ELEMENTS
 function addMap (data, lang = 'en', focus = false) { // TO DO
-	let { type, instruction, centerpoints, caption } = data || {}
+	let { type, instruction, centerpoints, caption, required } = data || {}
 	if (!type) type = 'location'
 	let dragging = false
+	required = required ?? false
 
 	// const input = d3.select('.meta-input-group #input-meta-location').node()
 	const input = d3.select('.media-input-group #input-meta-location').node()
@@ -1491,7 +1508,7 @@ function addMap (data, lang = 'en', focus = false) { // TO DO
 		// parent: d3.select('.meta-layout'), 
 		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, centerpoints: centerpoints, caption: caption, instruction: instruction },
+		datum: { type: type, centerpoints: centerpoints, caption: caption, instruction: instruction, required: required },
 		focus: focus,
 		maxheight: 300,
 		lang: lang
@@ -1680,9 +1697,10 @@ function addMap (data, lang = 'en', focus = false) { // TO DO
 }
 function addSDGs (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, sdgs, constraint } = data || {}
+	let { type, instruction, sdgs, constraint, required } = data || {}
 	if (!type) type = 'sdgs'
 	if (!sdgs) sdgs = []
+	required = required ?? false
 
 	// const input = d3.select('.meta-input-group #input-meta-sdgs').node()
 	const input = d3.select('.media-input-group #input-meta-sdgs').node()
@@ -1691,7 +1709,7 @@ function addSDGs (kwargs) {
 	const meta = new Meta({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, sdgs: sdgs, instruction: instruction, constraint: constraint },
+		datum: { type: type, sdgs: sdgs, instruction: instruction, constraint: constraint, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -1795,9 +1813,10 @@ function addSDGs (kwargs) {
 }
 async function addTags (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, tags, themes, constraint } = data || {}
+	let { type, instruction, tags, themes, constraint, required } = data || {}
 	if (!type) type = 'tags'
 	if (!tags) tags = []
+	required = required ?? false
 
 	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
@@ -1805,7 +1824,7 @@ async function addTags (kwargs) {
 	const list = await new Taglist({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint },
+		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint, required: required },
 		opencode: true,
 		focus: focus || false,
 		lang: lang,
@@ -1832,9 +1851,10 @@ async function addTags (kwargs) {
 }
 async function addSkills (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, tags, skills, constraint } = data || {}
+	let { type, instruction, tags, skills, constraint, required } = data || {}
 	if (!type) type = 'skills'
 	if (!tags) tags = []
+	required = required ?? false
 
 	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
@@ -1842,7 +1862,7 @@ async function addSkills (kwargs) {
 	const list = await new Taglist({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint },
+		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint, required: required },
 		opencode: false,
 		focus: focus || false,
 		lang: lang,
@@ -1868,9 +1888,10 @@ async function addSkills (kwargs) {
 }
 async function addDataSources (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, tags, datasources, constraint } = data || {}
+	let { type, instruction, tags, datasources, constraint, required } = data || {}
 	if (!type) type = 'datasources'
 	if (!tags) tags = []
+	required = required ?? false
 
 	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
@@ -1878,7 +1899,7 @@ async function addDataSources (kwargs) {
 	const list = await new Taglist({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint },
+		datum: { type: type, tags: tags, instruction: instruction, constraint: constraint, required: required },
 		opencode: true,
 		focus: focus || false,
 		lang: lang,

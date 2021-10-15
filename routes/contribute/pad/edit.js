@@ -51,7 +51,7 @@ exports.main = (req, res) => {
 			AND e.message IS NOT NULL
 		;`, [+id]))
 		batch.push(t.oneOrNone(`
-			SELECT p.title, p.sections, p.location, p.template, p.published, p.contributor, c.name AS contributorname,
+			SELECT p.title, p.sections, p.location, p.template, p.status, p.contributor, c.name AS contributorname,
 				CASE WHEN p.status = 2 
 					AND 'bookmark' = ANY(e.types)
 						THEN TRUE 
@@ -87,7 +87,6 @@ exports.main = (req, res) => {
 		.then(results => {
 			// const [template, themes, sdgs, centerpoint, engagement, messages, data] = results
 			const [display_template, centerpoint, engagement, messages, data] = results
-
 			return { 
 				metadata : {
 					page: {
@@ -121,7 +120,7 @@ exports.main = (req, res) => {
 				messages: messages,
 
 				display_template: display_template,
-				source: source
+				source: source || null
 			}
 		})
 	}).then(data => res.status(200).render('pad', data))

@@ -1460,6 +1460,37 @@ main#mobilization .inner .body .layout .placement-opts .opt i {
     font-size: 24px;
     line-height: 30px;
   }
+  main#pad .inner .body .layout .required, main#reference .inner .body .layout .required,
+main#template .inner .body .layout .required,
+main#mobilization .inner .body .layout .required {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 30px;
+    text-align: center;
+    line-height: 33px;
+  }
+  main#pad .inner .body .layout .required input, main#reference .inner .body .layout .required input,
+main#template .inner .body .layout .required input,
+main#mobilization .inner .body .layout .required input {
+    display: none;
+  }
+  main#pad .inner .body .layout .required label, main#reference .inner .body .layout .required label,
+main#template .inner .body .layout .required label,
+main#mobilization .inner .body .layout .required label {
+    font-size: 20px;
+    color: #969696;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .required input:checked + label,
+main#pad .inner .body .layout .required label.active, main#reference .inner .body .layout .required input:checked + label,
+main#reference .inner .body .layout .required label.active,
+main#template .inner .body .layout .required input:checked + label,
+main#template .inner .body .layout .required label.active,
+main#mobilization .inner .body .layout .required input:checked + label,
+main#mobilization .inner .body .layout .required label.active {
+    color: #FA1C26;
+  }
   main#pad .inner .body .layout .section-header, main#reference .inner .body .layout .section-header,
 main#template .inner .body .layout .section-header,
 main#mobilization .inner .body .layout .section-header {
@@ -6894,6 +6925,37 @@ main#template .inner .body .layout .placement-opts .opt i,
 main#mobilization .inner .body .layout .placement-opts .opt i {
     font-size: 24px;
     line-height: 30px;
+  }
+  main#pad .inner .body .layout .required, main#reference .inner .body .layout .required,
+main#template .inner .body .layout .required,
+main#mobilization .inner .body .layout .required {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 30px;
+    text-align: center;
+    line-height: 33px;
+  }
+  main#pad .inner .body .layout .required input, main#reference .inner .body .layout .required input,
+main#template .inner .body .layout .required input,
+main#mobilization .inner .body .layout .required input {
+    display: none;
+  }
+  main#pad .inner .body .layout .required label, main#reference .inner .body .layout .required label,
+main#template .inner .body .layout .required label,
+main#mobilization .inner .body .layout .required label {
+    font-size: 20px;
+    color: #969696;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .required input:checked + label,
+main#pad .inner .body .layout .required label.active, main#reference .inner .body .layout .required input:checked + label,
+main#reference .inner .body .layout .required label.active,
+main#template .inner .body .layout .required input:checked + label,
+main#template .inner .body .layout .required label.active,
+main#mobilization .inner .body .layout .required input:checked + label,
+main#mobilization .inner .body .layout .required label.active {
+    color: #FA1C26;
   }
   main#pad .inner .body .layout .section-header, main#reference .inner .body .layout .section-header,
 main#template .inner .body .layout .section-header,

@@ -243,6 +243,27 @@ main#mobilization {
 						}
 					}
 				}
+				.required {
+					position: absolute;
+					left: 100%;
+					top: 0;
+					width: 30px;
+					text-align: center;
+					line-height: 33px;
+
+					input {
+						display: none;
+					}
+					label {
+						font-size: $t-mid;
+						color: $c-light-grey;
+						cursor: pointer;
+					}
+					input:checked + label,
+					label.active {
+						color:  $c-mid-red;
+					}
+				}
 				.section-header {
 					display: block;
 					text-align: center;

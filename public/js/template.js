@@ -68,9 +68,19 @@ const Media = function (kwargs) {
 			.addElems('i', 'material-icons')
 			.html(d => d.label)
 	}
-	// this.required = this.container.addElems('div', 'required', d => [d], d => d.type)
-	// 	.addElems('h1')
-	// 	.html('*')
+	if (editing) {
+		const requirement_id = uuidv4()
+		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
+		this.required.addElems('input')
+			.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
+		.on('change', function (d) { 
+			d.required = this.checked
+			partialSave(d.level)
+		})
+		this.required.addElems('label')
+			.attr('for', requirement_id)
+			.html('*')
+	}
 	// THE FOLLOWING IS DIFFERENT FROM THE Media CONSTRUCTOR IN pads.js
 	this.response = this.container.addElems('div', 'response template', [type])
 		.html(d => vocabulary[`expect ${d}`][lang])
@@ -399,14 +409,15 @@ function addSection (kwargs) {
 }
 function addTitle (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction } = data || {}
+	let { type, instruction, required } = data || {}
 	if (!type) type = 'title'
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const media = new Media({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction },
+		datum: { type: type, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -423,14 +434,15 @@ function addTitle (kwargs) {
 }
 function addImg (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction } = data || {}
+	let { type, instruction, required } = data || {}
 	if (!type) type = 'img'
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
 		type: type, 
-		datum: { type: type, instruction: instruction },
+		datum: { type: type, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -444,14 +456,15 @@ function addImg (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, constraint } = data || {}
+	let { type, instruction, constraint, required } = data || {}
 	if (!type) type = 'txt'
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction, constraint: constraint },
+		datum: { type: type, instruction: instruction, constraint: constraint, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -501,14 +514,15 @@ function addTxt (kwargs) {
 }
 function addEmbed (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction } = data || {}
+	let { type, instruction, required } = data || {}
 	if (!type) type = 'embed'
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction },
+		datum: { type: type, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -523,7 +537,7 @@ function addEmbed (kwargs) {
 }
 function addChecklist (kwargs) { 
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, options, instruction } = data || {}
+	let { type, options, instruction, required } = data || {}
 	if (!type) type = 'checklist'
 	if (!options) options = []
 	else {
@@ -536,6 +550,7 @@ function addChecklist (kwargs) {
 		})
 	}
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	if (editing && !options.find(d => !d.name)) options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -543,7 +558,7 @@ function addChecklist (kwargs) {
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, options: options, instruction: instruction },
+		datum: { type: type, options: options, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -648,7 +663,7 @@ function addChecklist (kwargs) {
 }
 function addRadiolist (kwargs) { 
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, options, instruction } = data || {}
+	let { type, options, instruction, required } = data || {}
 	if (!type) type = 'radiolist'
 	if (!options) options = []
 	else {
@@ -661,6 +676,7 @@ function addRadiolist (kwargs) {
 		})
 	}
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	if (editing && !options.find(d => !d.name)) options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -668,7 +684,7 @@ function addRadiolist (kwargs) {
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, options: options, instruction: instruction },
+		datum: { type: type, options: options, instruction: instruction, required: required },
 		focus: focus || false,
 		lang: lang
 	})
@@ -773,9 +789,10 @@ function addRadiolist (kwargs) {
 }
 // META ELEMENTS
 function addMap (data, lang = 'en', focus = false) { // TO DO
-	let { type, instruction } = data || {}
+	let { type, instruction, required } = data || {}
 	if (!type) type = 'location'
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	// const input = d3.select('.meta-input-group #input-meta-location').node()
 	const input = d3.select('.media-input-group #input-meta-location').node()
@@ -785,7 +802,7 @@ function addMap (data, lang = 'en', focus = false) { // TO DO
 		// parent: d3.select('.meta-layout'), 
 		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction },
+		datum: { type: type, instruction: instruction, required: required },
 		focus: focus,
 		lang: lang
 	})
@@ -804,9 +821,10 @@ function addMap (data, lang = 'en', focus = false) { // TO DO
 }
 function addSDGs (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, instruction, constraint } = data || {}
+	let { type, instruction, constraint, required } = data || {}
 	if (!type) type = 'sdgs'
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	// GET(`http://localhost:3000/api/sdgs?lang=${lang}`)
 	GET(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
@@ -818,7 +836,7 @@ function addSDGs (kwargs) {
 		const meta = new Meta({ 
 			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 			type: type, 
-			datum: { type: type, sdgs: sdgs, instruction: instruction, constraint: constraint },
+			datum: { type: type, sdgs: sdgs, instruction: instruction, constraint: constraint, required: required },
 			focus: focus || false,
 			lang: lang
 		})
@@ -884,10 +902,11 @@ function addSDGs (kwargs) {
 }
 async function addTags (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, themes, instruction, constraint } = data || {}
+	let { type, themes, instruction, constraint, required } = data || {}
 	if (!type) type = 'tags'
 	if (!themes) themes = []
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
@@ -895,7 +914,7 @@ async function addTags (kwargs) {
 	await new Taglist({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction, constraint: constraint },
+		datum: { type: type, instruction: instruction, constraint: constraint, required: required },
 		focus: focus || false,
 		lang: lang,
 		url: 'https://undphqexoacclabsapp01.azurewebsites.net/api/thematic_areas'
@@ -904,10 +923,11 @@ async function addTags (kwargs) {
 }
 async function addSkills (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, skills, instruction, constraint } = data || {}
+	let { type, skills, instruction, constraint, required } = data || {}
 	if (!type) type = 'skills'
 	if (!skills) skills = []
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
@@ -915,7 +935,7 @@ async function addSkills (kwargs) {
 	await new Taglist({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction, constraint: constraint },
+		datum: { type: type, instruction: instruction, constraint: constraint, required: required },
 		focus: focus || false,
 		lang: lang,
 		url: '/api/methods'
@@ -923,10 +943,11 @@ async function addSkills (kwargs) {
 }
 async function addDataSources (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, datasources, instruction, constraint } = data || {}
+	let { type, datasources, instruction, constraint, required } = data || {}
 	if (!type) type = 'datasources'
 	if (!datasources) datasources = []
 	if (!instruction) instruction = ''
+	required = required ?? true
 
 	const input = d3.select(`.media-input-group #input-meta-${type}`).node()
 	if (input) input.disabled = true
@@ -934,7 +955,7 @@ async function addDataSources (kwargs) {
 	await new Taglist({ 
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		type: type, 
-		datum: { type: type, instruction: instruction, constraint: constraint },
+		datum: { type: type, instruction: instruction, constraint: constraint, required: required },
 		focus: focus || false,
 		lang: lang,
 		url: '/api/datasources'

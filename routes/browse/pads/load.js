@@ -112,7 +112,7 @@ exports.main = kwargs => {
 							WHERE pp.contributor IN (SELECT id FROM contributors WHERE country = c.country)
 							AND pp.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization = mob.mobilization)
 							AND pp.status = 2  
-						), 0)::INT AS available_publications,
+						), 1)::INT AS available_publications,
 
 					COALESCE(p.source, p.id) AS group_id,
 

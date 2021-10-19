@@ -55,7 +55,7 @@
 												</button>
 												<div class='drop-down'>
 													<ul>
-														<% locals.metadata.menu.participations.filter(p => !(p.source && !p.copy)).forEach(p => { %>
+														<% locals.metadata.menu.participations.filter(p => !(p.source && !p.copy) && (p.status === 1)).forEach(p => { %>
 															<li>
 																<a href='/<%- locals.metadata.page.lang %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>' target='_blank'>
 																	<button class='wrapable'>

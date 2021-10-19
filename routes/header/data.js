@@ -30,7 +30,7 @@ exports.main = (kwargs) => {
 				OR (t.status = 1 AND t.contributor = (SELECT id FROM contributors WHERE uuid = $1))
 		;`, [uuid]))
 		batch.push(t.any(`
-			SELECT mob.id, mob.title, mob.template, mob.source, mob.copy,
+			SELECT mob.id, mob.title, mob.template, mob.source, mob.copy, mob.status,
 				to_char(mob.start_date, 'DD Mon YYYY') AS start_date, 
 				c.name AS host_name 
 			FROM mobilization_contributors mc
@@ -39,7 +39,6 @@ exports.main = (kwargs) => {
 			INNER JOIN contributors c
 				ON mob.host = c.id
 			WHERE mc.contributor = (SELECT id FROM contributors WHERE uuid = $1)
-				AND mob.status = 1
 		;`, [uuid]))
 		return t.batch(batch)
 	}).then(results => {

@@ -104,7 +104,7 @@ exports.process.intercept = (req, res) => {
 			console.log(response.json())
 			if (expectJSON) return response.json()
 			else return response
-		}).then(result => res.send(result))
+		}).then(result => res.json(result))
 		.catch(err => console.log(err))
 }
 

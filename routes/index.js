@@ -98,7 +98,11 @@ exports.process.intercept = (req, res) => {
 	const { uri, method, headers, key } = req.body || req.query || {}
 	headers['x-access-token'] = process.env[key]
 	fetch(uri, { method: method, headers: headers })
-		.then(result => res.send(result))
+		.then(response => {
+			console.log(response)
+			console.log(response.json())
+			res.send(response)
+		})
 		.catch(err => console.log(err))
 }
 

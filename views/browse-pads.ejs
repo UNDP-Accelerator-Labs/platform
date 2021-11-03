@@ -140,7 +140,9 @@
 	function renderSections (data, counts) {
 		// MAKE SURE WE ONLY KEEP THE SECTIONS WHERE THERE ARE PADS
 		// data = data.filter(d => counts.map(c => c.status).includes(d.status))
+		
 		const sections = layout.addElems('section', 'pads-container', data)
+		
 		// sections.addElems('div', 'pub-status')
 		// 	.addElems('div')
 		// 	.html(d => {
@@ -175,6 +177,7 @@
 		sections.addElems('div', 'pads-layout')
 		.each(function (d) {
 			const section = d3.select(this)
+			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
 			console.log(d.pads)
 			console.log(d.pads.nest('source_id'))
 			d.pads.forEach(p => section.call(renderVignette, p))
@@ -182,7 +185,6 @@
 	}
 
 	function renderVignette (section, data) {
-		// console.log(data)
 		function getImg (d) {
 			if (d && d.sections) {
 				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()

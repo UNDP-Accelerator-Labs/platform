@@ -95,14 +95,16 @@ function geocode (locations, centerpoint, list = false, dir = 'forward') { // FO
 
 
 exports.process.intercept = (req, res) => {
-	const { uri, method, headers, key } = req.body || req.query || {}
+	const { uri, method, headers, key, expectJSON } = req.body || req.query || {}
 	headers['x-access-token'] = process.env[key]
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
+			console.log('check response')
 			console.log(response)
 			console.log(response.json())
-			res.send(response)
-		})
+			if (expectJSON) return response.json()
+			else return response
+		}).then(result => res.send(result))
 		.catch(err => console.log(err))
 }
 

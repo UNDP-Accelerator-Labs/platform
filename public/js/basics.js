@@ -2,7 +2,7 @@ const jsonQueryHeader = { 'Accept': 'application/json', 'Content-Type': 'applica
 function GET (_uri, _expectJSON = true, _tokenkey = null) {
 	return new Promise(async resolve => {
 		if (_tokenkey) {
-			const result = await POST('/intercept/GET', { uri: _uri, method: 'GET', headers: jsonQueryHeader, key: _tokenkey }, _expectJSON)
+			const result = await POST('/intercept/GET', { uri: _uri, method: 'GET', headers: jsonQueryHeader, key: _tokenkey, expectJSON: _expectJSON }, _expectJSON)
 			resolve(result)
 		} else {
 			fetch(_uri, { method: 'GET', headers: jsonQueryHeader })

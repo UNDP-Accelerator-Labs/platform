@@ -99,12 +99,9 @@ exports.process.intercept = (req, res) => {
 	headers['x-access-token'] = process.env[key]
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
-			console.log('check response')
-			console.log(response)
-			console.log(response.json())
 			if (expectJSON) return response.json()
 			else return response
-		}).then(result => res.json(result))
+		}).then(results => res.json(results))
 		.catch(err => console.log(err))
 }
 

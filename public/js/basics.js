@@ -1,4 +1,4 @@
-const jsonQueryHeader = { 'Accept': 'application/json, image/*, text/*', 'Content-Type': 'application/json, image/*, text/*', 'X-Requested-With': 'XMLHttpRequest' }
+const jsonQueryHeader = { 'Accept': 'application/json, image/*, text/*', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
 function GET (_uri, _expectJSON = true, _tokenkey = null) {
 	return new Promise(async resolve => {
 		if (_tokenkey) {

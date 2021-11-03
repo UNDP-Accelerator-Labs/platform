@@ -94,7 +94,13 @@ function geocode (locations, centerpoint, list = false, dir = 'forward') { // FO
 
 
 
-
+exports.process.intercept = (req, res) => {
+	const { uri, method, headers, key } = req.body || req.query || {}
+	headers['x-access-token'] = process.env[key]
+	fetch(uri, { method: method, headers: headers })
+		.then(result => res.send(result))
+		.catch(err => console.log(err))
+}
 
 /* =============================================================== */
 /* =========================== LOGIN ============================= */

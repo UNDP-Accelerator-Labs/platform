@@ -79,16 +79,18 @@ app.post('/download/:object', routes.process.download)
 app.post('/deploy', routes.process.deploy)
 app.get('/demobilize', routes.process.demobilize)
 
+app.post('/intercept/:method', routes.process.intercept)
+
 // TO DO: CHECK IF THIS IS STILL RELEVANT
 app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
 
 
-
-// THIS IS DEPRECATED
 app.post('/upload/img', upload.array('img'), routes.process.upload)
 app.post('/upload/video', upload.array('video'), routes.process.upload)
 app.post('/screenshot', routes.process.screenshot)
 
+
+// THIS IS DEPRECATED
 app.post('/storeImport', routes.render.login, routes.storeImport)
 app.post('/forwardGeocoding', routes.forwardGeocoding) // TO DO: SET THIS UP IN PAD
 

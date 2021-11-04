@@ -123,11 +123,12 @@ exports.process.callapi = (req, res) => {
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
 			if (expect === 'json') return response.json()
-			else if (expect === 'blob') return response.blob()
+			else if (['blob', 'image', 'file']) return response.blob()
 			else return response
 		}).then(result => {
 			if (expect === 'json') res.json(result)
 			else if (expect === 'blob') return res.send(result)
+			else if (['image', 'file']) return res.sendFile(new File([result], 'test'))
 			else res.send(result)
 		}).catch(err => console.log(err))
 }

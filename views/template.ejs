@@ -368,25 +368,25 @@
 			datum.instruction = sel.select('.meta-sdgs').node().innerText
 			// datum.options = sel.selectAll('.inset-sdgs .panel .opt').data()
 			// WE DO NOT KEEP A COPY HERE OF ALL sdgs
-			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
 		else if (datum.type === 'tags') {
 			datum.instruction = sel.select('.meta-tags').node().innerText
 			// datum.options = sel.selectAll('.inset-tags .panel .opt').data()
 			// WE DO NOT KEEP A COPY HERE OF ALL tags
-			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
 		else if (datum.type === 'skills') {
 			datum.instruction = sel.select('.meta-skills').node().innerText
 			// datum.options = sel.selectAll('.inset-tags .panel .opt').data()
 			// WE DO NOT KEEP A COPY HERE OF ALL tags
-			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
 		else if (datum.type === 'datasources') {
 			datum.instruction = sel.select('.meta-datasources').node().innerText
 			// datum.options = sel.selectAll('.inset-tags .panel .opt').data()
 			// WE DO NOT KEEP A COPY HERE OF ALL tags
-			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint })
+			items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
 	}
 

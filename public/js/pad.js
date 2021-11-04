@@ -71,18 +71,20 @@ const Media = function (kwargs) {
 		const requirement_id = uuidv4()
 
 		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
-		// TO DO: COMMENT THE INPUT
+		// ENABLE CHANGE REQUIREMENTS ONLY IF THE USER IS SUDO 
 		if (rights > 2) {
 			this.required.addElems('input')
 				.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
 				.on('change', function (d) { 
 					d.required = this.checked
+					d3.select(this.parentNode).select('label').classed('active', d.required)
 					partialSave(d.level)
 				})
 		}
 		this.required.addElems('label')
-			.each(function (d) { d3.select(this).classed('active', d.required) })
 			.attr('for', requirement_id)
+			// .each(function (d) { d3.select(this).classed('active', d.required) })
+			.classed('active', d => d.required)
 			.html('*')
 	}
 

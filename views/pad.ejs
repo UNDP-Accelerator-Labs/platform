@@ -359,6 +359,9 @@
 		completion.push(title?.trim()?.length > 0)
 
 		function checkCompletion (d) {
+			console.log('check requirement')
+			console.log(d)
+			console.log(d.required)
 			if (d.required === null || d.required === undefined) throw 'there is not requirement: this should not happen'
 			if (d.required === false) return true
 			else return d.has_content === true

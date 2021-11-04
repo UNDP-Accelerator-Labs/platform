@@ -128,7 +128,7 @@ exports.process.callapi = (req, res) => {
 		}).then(result => {
 			if (expect === 'json') res.json(result)
 			else if (expect === 'blob') return res.send(result)
-			else if (['image', 'file']) return res.sendFile(new File([result], 'test'))
+			else if (['image', 'file']) return res.sendFile(result)
 			else res.send(result)
 		}).catch(err => console.log(err))
 }

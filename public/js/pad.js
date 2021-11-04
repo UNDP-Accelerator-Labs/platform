@@ -68,14 +68,24 @@ const Media = function (kwargs) {
 		.html(d => d.label)
 
 	if (editing) {
+		const requirement_id = uuidv4()
+
 		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
 		// TO DO: COMMENT THE INPUT
-		this.required.addElems('input')
-			.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
+		if (rights > 2) {
+			this.required.addElems('input')
+				.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
+				.on('change', function (d) { 
+					d.required = this.checked
+					partialSave(d.level)
+				})
+		}
 		this.required.addElems('label')
 			.each(function (d) { d3.select(this).classed('active', d.required) })
+			.attr('for', requirement_id)
 			.html('*')
 	}
+
 
 	if (editing) observer.observe(this.container.node(), obsvars)
 }

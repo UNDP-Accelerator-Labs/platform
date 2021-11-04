@@ -79,7 +79,8 @@ app.post('/download/:object', routes.process.download)
 app.post('/deploy', routes.process.deploy)
 app.get('/demobilize', routes.process.demobilize)
 
-app.post('/intercept/:method', routes.process.intercept)
+// app.post('/intercept/:method', routes.process.intercept)
+app.post('/call/api', routes.process.callapi)
 
 // TO DO: CHECK IF THIS IS STILL RELEVANT
 app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX

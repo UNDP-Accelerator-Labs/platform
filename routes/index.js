@@ -94,16 +94,41 @@ function geocode (locations, centerpoint, list = false, dir = 'forward') { // FO
 
 
 
-exports.process.intercept = (req, res) => {
-	const { uri, method, headers, key, expectJSON } = req.body || req.query || {}
-	headers['x-access-token'] = process.env[key]
+// exports.process.intercept = (req, res) => {
+// 	const { uri, method, headers, key, expectJSON } = req.body || req.query || {}
+// 	headers['x-access-token'] = process.env[key]
+// 	fetch(uri, { method: method, headers: headers })
+// 		.then(response => {
+// 			if (expectJSON) return response.json()
+// 			else return response
+// 		}).then(results => {
+// 			if (expectJSON) res.json(results)
+// 			else res.send(results)
+// 		}).catch(err => console.log(err))
+// }
+exports.process.callapi = (req, res) => {
+	const { uri, method, key, expect } = req.body || {}
+	const headers = { 
+		'Accept': 'application/*', 
+		'Content-Type': 'application/*', 
+		'X-Requested-With': 'XMLHttpRequest',
+		'x-access-token': process.env[key]
+	}
+	
+	console.log('look here')
+	console.log(uri)
+	console.log(method)
+	console.log(key)
+
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
-			if (expectJSON) return response.json()
+			if (expect === 'json') return response.json()
+			else if (expect === 'blob') return response.blob()
 			else return response
-		}).then(results => {
-			if (expectJSON) res.json(results)
-			else res.send(results)
+		}).then(result => {
+			if (expect === 'json') res.json(result)
+			else if (expect === 'blob') return res.sendFile(result)
+			else res.send(result)
 		}).catch(err => console.log(err))
 }
 

@@ -1,18 +1,13 @@
-const jsonQueryHeader = { 'Accept': 'application/json, image/*, text/*', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-function GET (_uri, _expectJSON = true, _tokenkey = null) {
+const jsonQueryHeader = { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+function GET (_uri, _expectJSON = true) {
 	return new Promise(async resolve => {
-		if (_tokenkey) {
-			const result = await POST('/intercept/GET', { uri: _uri, method: 'GET', headers: jsonQueryHeader, key: _tokenkey, expectJSON: _expectJSON }, _expectJSON)
-			resolve(result)
-		} else {
-			fetch(_uri, { method: 'GET', headers: jsonQueryHeader })
-				.then(response => {
-					if (_expectJSON) return response.json()
-					else return response
-				})
-				.then(results => resolve(results))
-				.catch(err => { if (err) throw (err) })
-		}
+		fetch(_uri, { method: 'GET', headers: jsonQueryHeader })
+			.then(response => {
+				if (_expectJSON) return response.json()
+				else return response
+			})
+			.then(results => resolve(results))
+			.catch(err => { if (err) throw (err) })
 	})
 }
 function POST (_uri, _q, _expectJSON = true) {

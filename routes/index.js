@@ -115,11 +115,6 @@ exports.process.callapi = (req, res) => {
 		'x-access-token': process.env[key]
 	}
 	
-	console.log('look here')
-	console.log(uri)
-	console.log(method)
-	console.log(key)
-
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
 			if (expect === 'json') return response.json()

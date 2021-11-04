@@ -123,12 +123,17 @@ exports.process.callapi = (req, res) => {
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
 			if (expect === 'json') return response.json()
-			else if (['blob', 'image', 'file']) return response.blob()
+			else if (['blob', 'image', 'file'].includes(expect)) return response.blob()
 			else return response
 		}).then(result => {
 			if (expect === 'json') res.json(result)
-			else if (expect === 'blob') return res.send(result)
-			else if (['image', 'file']) return res.send(URL.createObjectURL(result))
+			else if (['blob', 'image', 'file'].includes(expect)) {
+				// BASED ON https://stackoverflow.com/questions/52665103/using-express-how-to-send-blob-object-as-response
+				res.type(result.type)
+				result.arrayBuffer().then(buf => {
+					res.send(Buffer.from(buf))
+				})
+			}
 			else res.send(result)
 		}).catch(err => console.log(err))
 }

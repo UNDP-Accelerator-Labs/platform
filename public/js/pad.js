@@ -69,8 +69,9 @@ const Media = function (kwargs) {
 
 	if (editing) {
 		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
-		// this.required.addElems('input')
-		// 	.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
+		// TO DO: COMMENT THE INPUT
+		this.required.addElems('input')
+			.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
 		this.required.addElems('label')
 			.each(function (d) { d3.select(this).classed('active', d.required) })
 			.html('*')

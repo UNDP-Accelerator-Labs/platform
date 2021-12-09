@@ -71,12 +71,21 @@
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	var lang = '<%- locals.metadata.page.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
 	
-	console.log(<%- JSON.stringify(locals.mobilization) %>)
-	console.log(<%- JSON.stringify(locals.data) %>)
-
 	let activity = '<%- locals.metadata.page.activity %>';
 	const editing = ['contribute', 'edit'].includes(activity)
+
+	const contributing_countries = (<%- JSON.stringify(locals.cohort) %>).nest('country')
+	contributing_countries.forEach(d => {
+		d.contributions = (<%- JSON.stringify(locals.contributors) %>).nest('country')?.find(c => c.key === d.key)?.count || 0
+	})
 	
+	const overview = d3.select('main#mobilization div.inner div.body')
+		.addElems('table')
+	const rows = overview.addElems('tr', 'row', contributing_countries.sort((a, b) => b.contributions - a.contributions))
+	rows.addElems('td', 'cell name')
+			.html(d => d.key)
+	rows.addElems('td', 'cell count')
+			.html(d => d.contributions)
 
 	const sections = d3.select('main#mobilization div.inner div.body')
 		.addElems('section', `chart-layout layout ${activity}`, <%- JSON.stringify(locals.data) %>)

@@ -2,9 +2,9 @@ const { modules } = require('../../config.js')
 const { language } = require('../header/')
 const DB = require('../../db-config.js')
 
-const pad = require('./pad/')
-const template = require('./template/')
-const mobilization = require('./mobilization/')
+const pad = require('./pad')
+const template = require('./template')
+const mobilization = require('./mobilization')
 
 exports.main = (req, res) => {
 	const { rights } = req.session || {}

@@ -1,9 +1,9 @@
 const { modules } = require('../../config.js')
-const { language } = require('../header/')
-const DB = require('../../db-config.js')
+// const { language } = require('../header/')
+// const DB = require('../../db-config.js')
 
-const pad = require('./pad/')
-const template = require('./template/')
+// const pad = require('./pad/')
+// const template = require('./template/')
 // const mobilizations = require('./mobilizations/') // TO DO
 
 exports.contribute = require('./contribute').main

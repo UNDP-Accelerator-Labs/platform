@@ -136,47 +136,51 @@ exports.process.callapi = (req, res) => {
 /* =============================================================== */
 /* =========================== LOGIN ============================= */
 /* =============================================================== */
-exports.render.login = (req, res, next) => {
-	if (req.session.uuid) next()
-	else res.render('login', { title: `${config.title} | Login`, originalUrl: req.originalUrl })
-}
-exports.process.login = (req, res, next) => { // REROUTE
-	const { username, password, originalUrl } = req.body
-	if (!username || !password) res.redirect('/login')
-	else { 
-		DB.conn.oneOrNone(`
-			SELECT name, country, uuid, rights, lang FROM contributors
-			WHERE (name = $1 OR email = $1)
-				AND password = CRYPT($2, password)
-		;`, [username, password])
-		.then(result => {
-			if (result) {
-				req.session.uuid = result.uuid
-				req.session.username = result.name
-				req.session.country = result.country
-				req.session.sudo = result.name === 'sudo' // THIS SHOULD BE DEPRECATED
-				req.session.rights = result.rights
-				if (!result.lang) req.session.lang = 'en'
-				else req.session.lang = checklanguage(result.lang)
+exports.render.login = require('./login').render
+// exports.render.login = (req, res, next) => {
+// 	if (req.session.uuid) next()
+// 	else res.render('login', { title: `${config.title} | Login`, originalUrl: req.originalUrl })
+// }
+exports.process.login = require('./login').process
+// exports.process.login = (req, res, next) => { // REROUTE
+// 	const { username, password, originalUrl } = req.body
+// 	if (!username || !password) res.redirect('/login')
+// 	else { 
+// 		DB.conn.oneOrNone(`
+// 			SELECT name, country, uuid, rights, lang FROM contributors
+// 			WHERE (name = $1 OR email = $1)
+// 				AND password = CRYPT($2, password)
+// 		;`, [username, password])
+// 		.then(result => {
+// 			if (result) {
+// 				req.session.uuid = result.uuid
+// 				req.session.username = result.name
+// 				req.session.country = result.country
+// 				req.session.sudo = result.name === 'sudo' // THIS SHOULD BE DEPRECATED
+// 				req.session.rights = result.rights
+// 				if (!result.lang) req.session.lang = 'en'
+// 				else req.session.lang = checklanguage(result.lang)
 
-				res.redirect(originalUrl)
+// 				res.redirect(originalUrl)
 
-			} else res.redirect('/login')
-		})
-		.catch(err => console.log(err))
-	}
-}
-exports.process.logout = (req, res) => {
-	req.session.destroy()
-	res.redirect('/')
-}
-exports.redirect.home = (req, res, next) => {
-	const lang = checklanguage(req.params && req.params.lang ? req.params.lang : req.session.lang)
-	if (req.session.uuid) {
-		if (req.session.rights > 0) res.redirect(`/${lang}/browse/pads/private`)
-		else res.redirect(`/${lang}/browse/pads/public`)
-	} else next()
-}
+// 			} else res.redirect('/login')
+// 		})
+// 		.catch(err => console.log(err))
+// 	}
+// }
+exports.process.logout = require('./login').logout
+// exports.process.logout = (req, res) => {
+// 	req.session.destroy()
+// 	res.redirect('/')
+// }
+exports.redirect.home = require('./login').redirect
+// exports.redirect.home = (req, res, next) => {
+// 	const lang = checklanguage(req.params && req.params.lang ? req.params.lang : req.session.lang)
+// 	if (req.session.uuid) {
+// 		if (req.session.rights > 0) res.redirect(`/${lang}/browse/pads/private`)
+// 		else res.redirect(`/${lang}/browse/pads/public`)
+// 	} else next()
+// }
 
 
 // TO DO: REMOVE THIS - IT IS NOW IN header > data.js

@@ -78,7 +78,7 @@
 	contributing_countries.forEach(d => {
 		d.contributions = (<%- JSON.stringify(locals.contributors) %>).nest('country')?.find(c => c.key === d.key)?.count || 0
 	})
-	
+	// TO DO: PRETIFY THE TABLE
 	const overview = d3.select('main#mobilization div.inner div.body')
 		.addElems('table')
 	const rows = overview.addElems('tr', 'row', contributing_countries.sort((a, b) => b.contributions - a.contributions))

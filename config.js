@@ -1,4 +1,5 @@
 exports.title = 'UNDP AccLabs Pads' // EDIT THIS
+exports.title_short = 'pads'
 
 // DESIRED MODULES
 const modules = ['pads', 'templates', 'mobilizations'] // EDIT THIS

@@ -1543,6 +1543,9 @@ main#template .inner .body .layout .meta-container .opts .opt-group,
 main#mobilization .inner .body .layout .media-container .opts .opt-group,
 main#mobilization .inner .body .layout .meta-container .opts .opt-group {
     display: none;
+    /*.opt.brush-size:hover {
+    	opacity: 1;
+    }*/
   }
   main#pad .inner .body .layout .media-container .opts .opt-group .opt,
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt, main#reference .inner .body .layout .media-container .opts .opt-group .opt,
@@ -1593,6 +1596,88 @@ main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt .re
     /*color: $c-mid-1;*/
     color: #A51E41;
   }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size {
+    display: inline-block;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border: 1px solid #0A4C73;
+    outline: none;
+    transform: translateY(5px);
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #0A4C73;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #0A4C73;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label {
+    display: none;
+    z-index: 1000;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span {
+    font-weight: bold;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label {
+    display: inline-block;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.color, main#reference .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.color,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.color,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.color {
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
+    border-radius: 15px;
+    transform: translateY(-3px);
+  }
   main#pad .inner .body .layout .media-container .opts .opt-group .opt:last-child,
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt:last-child, main#reference .inner .body .layout .media-container .opts .opt-group .opt:last-child,
 main#reference .inner .body .layout .meta-container .opts .opt-group .opt:last-child,
@@ -1609,8 +1694,23 @@ main#template .inner .body .layout .media-container .opts .opt-group .opt.active
 main#template .inner .body .layout .meta-container .opts .opt-group .opt.active,
 main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.active,
 main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    /*background-color: $c-light-2;*/
     background-color: #FFF32A;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after, main#reference .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 21px;
+    height: 21px;
+    border-radius: 21px;
+    outline: 1px solid #969696;
   }
   main#pad .inner .body .layout .media-container .opts .opt-group label,
 main#pad .inner .body .layout .meta-container .opts .opt-group label, main#reference .inner .body .layout .media-container .opts .opt-group label,
@@ -1888,6 +1988,27 @@ main#template .inner .body .layout .meta-container .media-mosaic.x2,
 main#mobilization .inner .body .layout .media-container .media-mosaic.x2,
 main#mobilization .inner .body .layout .meta-container .media-mosaic.x2 {
     grid-template-columns: repeat(2, 1fr);
+  }
+  main#pad .inner .body .layout .media-container .media-drawing,
+main#pad .inner .body .layout .meta-container .media-drawing, main#reference .inner .body .layout .media-container .media-drawing,
+main#reference .inner .body .layout .meta-container .media-drawing,
+main#template .inner .body .layout .media-container .media-drawing,
+main#template .inner .body .layout .meta-container .media-drawing,
+main#mobilization .inner .body .layout .media-container .media-drawing,
+main#mobilization .inner .body .layout .meta-container .media-drawing {
+    text-align: center;
+  }
+  main#pad .inner .body .layout .media-container .media-drawing canvas,
+main#pad .inner .body .layout .meta-container .media-drawing canvas, main#reference .inner .body .layout .media-container .media-drawing canvas,
+main#reference .inner .body .layout .meta-container .media-drawing canvas,
+main#template .inner .body .layout .media-container .media-drawing canvas,
+main#template .inner .body .layout .meta-container .media-drawing canvas,
+main#mobilization .inner .body .layout .media-container .media-drawing canvas,
+main#mobilization .inner .body .layout .meta-container .media-drawing canvas {
+    margin: 10px auto;
+    background-color: #FFF;
+    border: 1px solid #969696;
+    cursor: crosshair;
   }
   main#pad .inner .body .layout .media-container .media-embed,
 main#pad .inner .body .layout .media-container .media-embed:empty:not(:focus):before,
@@ -7009,6 +7130,9 @@ main#template .inner .body .layout .meta-container .opts .opt-group,
 main#mobilization .inner .body .layout .media-container .opts .opt-group,
 main#mobilization .inner .body .layout .meta-container .opts .opt-group {
     display: none;
+    /*.opt.brush-size:hover {
+    	opacity: 1;
+    }*/
   }
   main#pad .inner .body .layout .media-container .opts .opt-group .opt,
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt, main#reference .inner .body .layout .media-container .opts .opt-group .opt,
@@ -7059,6 +7183,88 @@ main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt .re
     /*color: $c-mid-1;*/
     color: #A51E41;
   }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size {
+    display: inline-block;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border: 1px solid #0A4C73;
+    outline: none;
+    transform: translateY(5px);
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #0A4C73;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #0A4C73;
+    cursor: pointer;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label {
+    display: none;
+    z-index: 1000;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label span,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size + label span {
+    font-weight: bold;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label, main#reference .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.brush-size:hover + label,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size:hover + label {
+    display: inline-block;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.color, main#reference .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.color,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.color,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.color,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.color {
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
+    border-radius: 15px;
+    transform: translateY(-3px);
+  }
   main#pad .inner .body .layout .media-container .opts .opt-group .opt:last-child,
 main#pad .inner .body .layout .meta-container .opts .opt-group .opt:last-child, main#reference .inner .body .layout .media-container .opts .opt-group .opt:last-child,
 main#reference .inner .body .layout .meta-container .opts .opt-group .opt:last-child,
@@ -7075,8 +7281,23 @@ main#template .inner .body .layout .media-container .opts .opt-group .opt.active
 main#template .inner .body .layout .meta-container .opts .opt-group .opt.active,
 main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.active,
 main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    /*background-color: $c-light-2;*/
     background-color: #FFF32A;
+  }
+  main#pad .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#pad .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after, main#reference .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#reference .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after,
+main#template .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#template .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after,
+main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
+main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 21px;
+    height: 21px;
+    border-radius: 21px;
+    outline: 1px solid #969696;
   }
   main#pad .inner .body .layout .media-container .opts .opt-group label,
 main#pad .inner .body .layout .meta-container .opts .opt-group label, main#reference .inner .body .layout .media-container .opts .opt-group label,
@@ -7354,6 +7575,27 @@ main#template .inner .body .layout .meta-container .media-mosaic.x2,
 main#mobilization .inner .body .layout .media-container .media-mosaic.x2,
 main#mobilization .inner .body .layout .meta-container .media-mosaic.x2 {
     grid-template-columns: repeat(2, 1fr);
+  }
+  main#pad .inner .body .layout .media-container .media-drawing,
+main#pad .inner .body .layout .meta-container .media-drawing, main#reference .inner .body .layout .media-container .media-drawing,
+main#reference .inner .body .layout .meta-container .media-drawing,
+main#template .inner .body .layout .media-container .media-drawing,
+main#template .inner .body .layout .meta-container .media-drawing,
+main#mobilization .inner .body .layout .media-container .media-drawing,
+main#mobilization .inner .body .layout .meta-container .media-drawing {
+    text-align: center;
+  }
+  main#pad .inner .body .layout .media-container .media-drawing canvas,
+main#pad .inner .body .layout .meta-container .media-drawing canvas, main#reference .inner .body .layout .media-container .media-drawing canvas,
+main#reference .inner .body .layout .meta-container .media-drawing canvas,
+main#template .inner .body .layout .media-container .media-drawing canvas,
+main#template .inner .body .layout .meta-container .media-drawing canvas,
+main#mobilization .inner .body .layout .media-container .media-drawing canvas,
+main#mobilization .inner .body .layout .meta-container .media-drawing canvas {
+    margin: 10px auto;
+    background-color: #FFF;
+    border: 1px solid #969696;
+    cursor: crosshair;
   }
   main#pad .inner .body .layout .media-container .media-embed,
 main#pad .inner .body .layout .media-container .media-embed:empty:not(:focus):before,

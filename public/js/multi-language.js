@@ -253,6 +253,20 @@ const vocabulary = {
 		"es": "<i class='material-icons'>photo</i><br><strong>Imagen(es)</strong> esperada(s).",
 		"pt": "<i class='material-icons'>photo</i><br><strong>Image.m.ns</strong> esperada.s."
 	},
+	"request drawing": {
+		"en": "request a drawing",
+		"fr": "demander un dessin",
+		"es": "solicitar un dibujo",
+		"pt": "solicitar um desenho"
+	},
+	"expect drawing": {
+		"en": "<strong>Drawing</strong> expected.",
+		"fr": "<strong>Dessin</strong> attendu.",
+		"es": "<strong>Dibujo</strong> esperado.",
+		"pt": "<strong>Desenho</strong> esperado."
+	},
+
+
 	"request txt": {
 		"en": "request a description",
 		"fr": "demander une description",

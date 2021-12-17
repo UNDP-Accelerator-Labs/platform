@@ -261,7 +261,7 @@ main#mobilization {
 					}
 					input:checked + label,
 					label.active {
-						color:  $c-mid-red;
+						color:	$c-mid-red;
 					}
 				}
 				.section-header {
@@ -322,12 +322,67 @@ main#mobilization {
 									color: $c-dark-red;
 								}
 							}
+
+							.opt.brush-size {
+								display: inline-block;
+								-webkit-appearance: none;
+								width: 100%;
+								height: 15px;
+								border: 1px solid $c-dark-blue;
+								outline: none;
+								transform: translateY(5px);
+							}
+							/*.opt.brush-size:hover {
+								opacity: 1;
+							}*/
+							.opt.brush-size::-webkit-slider-thumb {
+								-webkit-appearance: none;
+								appearance: none;
+								width: 15px;
+								height: 15px;
+								background: $c-dark-blue;
+								cursor: pointer;
+							}
+
+							.opt.brush-size::-moz-range-thumb {
+								width: 15px;
+								height: 15px;
+								background: $c-dark-blue;
+								cursor: pointer;
+							}
+							.opt.brush-size + label {
+								display: none;
+								z-index: 1000;
+
+								span {
+									font-weight: bold;
+								}
+							}
+							.opt.brush-size:hover + label {
+								display: inline-block;
+							}
+							.opt.color {
+								width: 15px;
+								height: 15px;
+								margin: 0 5px;
+								border-radius: 15px;
+								transform: translateY(-3px);
+							}
 							.opt:last-child {
 								margin-right: 0;
 							}
 							.opt.active {
-								/*background-color: $c-light-2;*/
 								background-color: $c-light-yellow;
+							}
+							.opt.color.active::after {
+								content: '';
+								position: absolute;
+								top: -3px;
+								left: -3px;
+								width: 21px;
+								height: 21px;
+								border-radius: 21px;
+								outline: 1px solid $c-light-grey;
 							}
 							label {
 								position: absolute;
@@ -471,6 +526,16 @@ main#mobilization {
 					}
 					.media-mosaic.x2 {
 						grid-template-columns: repeat(2, 1fr);
+					}
+					.media-drawing {
+						text-align: center;
+
+						canvas {
+							margin: 10px auto;
+							background-color: #FFF;
+							border: 1px solid $c-light-grey;
+							cursor: crosshair;
+						}
 					}
 					.media-embed,
 					.media-embed:empty:not(:focus):before {
@@ -686,7 +751,7 @@ main#mobilization {
 							input[type=text]:-webkit-autofill,
 							input[type=text]:-webkit-autofill:hover, 
 							input[type=text]:-webkit-autofill:focus, 
-							input[type=text]:-webkit-autofill:active  {
+							input[type=text]:-webkit-autofill:active	{
 								-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;
 								-webkit-text-fill-color: $c-dark-1 !important;
 							}
@@ -795,7 +860,7 @@ main#mobilization {
 							}
 						}
 					}
-					.inset.template {  /* THIS IS FOR TEMPLATES */
+					.inset.template {	/* THIS IS FOR TEMPLATES */
 						div {
 							padding: 0 0 10px 10px;
 							overflow: scroll;

@@ -268,6 +268,7 @@ function populateSection (data, lang = 'en', section) {
 	// MEDIA
 	if (data.type === 'title') addTitle({ data: data, lang: lang, section: section })
 	if (data.type === 'img') addImg({ data: data, lang: lang, section: section })
+	if (data.type === 'drawing') addDrawing({ data: data, lang: lang, section: section })
 	if (data.type === 'txt') addTxt({ data: data, lang: lang, section: section })
 	if (data.type === 'embed') addEmbed({ data: data, lang: lang, section: section })
 	if (data.type === 'checklist') addChecklist({ data: data, lang: lang, section: section })
@@ -447,6 +448,28 @@ function addImg (kwargs) {
 		lang: lang
 	})
 	
+	media.media.attrs({ 
+		'data-placeholder': d => vocabulary[`request ${type}`][lang],
+		'contenteditable': editing ? true : null 
+	}).html(d => d.instruction)
+
+	if (focus) media.media.node().focus()
+}
+function addDrawing (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
+	let { type, instruction, required } = data || {}
+	if (!type) type = 'drawing'
+	if (!instruction) instruction = ''
+	required = required ?? true
+
+	const media = new Media({
+		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		type: type, 
+		datum: { type: type, instruction: instruction, required: required },
+		focus: focus || false,
+		lang: lang
+	})
+
 	media.media.attrs({ 
 		'data-placeholder': d => vocabulary[`request ${type}`][lang],
 		'contenteditable': editing ? true : null 

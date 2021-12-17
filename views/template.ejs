@@ -76,6 +76,7 @@
 					<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
 					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
 					<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>insert_photo</i></button>
+					<button id='input-media-drawing' title='Request a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
 					<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
 						
 					<div class='vertical-separator'></div>
@@ -140,11 +141,14 @@
 	.on('click', _ => addGroup({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	.on('touchend', _ => addGroup({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 
-
 	d3.select('.media-input-group #input-media-img')
 	.on('click', _ => addImg({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	.on('touchend', _ => addImg({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	
+	d3.select('.media-input-group #input-media-drawing')
+	.on('click', _ => addDrawing({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+	.on('touchend', _ => addDrawing({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
+
 	d3.select('.media-input-group #input-media-txt')
 	.on('click', _ => addTxt({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
 	.on('touchend', _ => addTxt({ lang: '<%- locals.metadata.page.lang %>', focus: true }))
@@ -258,6 +262,7 @@
 				&& !d3.select('.modal').node()
 			) {
 				if (e.key === 'i' || e.keyCode === 73) main.select('.media-input-group label[for=input-media-img]').classed('highlight', true)
+				if (e.key === 'd' || e.keyCode === 68) main.select('.media-input-group label[for=input-media-drawing]').classed('highlight', true)
 				if (e.key === 't' || e.keyCode === 84) main.select('.media-input-group label[for=input-media-txt]').classed('highlight', true)
 				if (e.key === 'l' || e.keyCode === 76) main.select('.media-input-group label[for=input-media-checklist]').classed('highlight', true)
 				if (e.key === 'r' || e.keyCode === 82) main.select('.media-input-group label[for=input-media-radiolist]').classed('highlight', true)
@@ -279,6 +284,10 @@
 				if (e.key === 'i' || e.keyCode === 73) {
 					main.select('label[for=input-media-img]').classed('highlight', false)
 					d3.select('#input-media-img').node().click()
+				}
+				if (e.key === 'd' || e.keyCode === 68) {
+					main.select('label[for=input-media-drawing]').classed('highlight', false)
+					d3.select('#input-media-drawing').node().click()
 				}
 				if (e.key === 't' || e.keyCode === 84) {
 					main.select('label[for=input-media-txt]').classed('highlight', false)
@@ -339,6 +348,10 @@
 		}
 		else if (datum.type === 'img') {
 			datum.instruction = sel.select('.media-img').node().innerText
+			items.push(datum)
+		}
+		else if (datum.type === 'drawing') {
+			datum.instruction = sel.select('.media-drawing').node().innerText
 			items.push(datum)
 		}
 		else if (datum.type === 'txt') {

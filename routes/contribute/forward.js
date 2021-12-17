@@ -5,7 +5,7 @@ exports.main = (req, res) => {
 	const { object } = req.params || {}
 	const { id, mobilization } = req.query || {}
 	if (object === 'pad') {
-		//  THIS SOLUTION IS TAKEN FROM https://dba.stackexchange.com/questions/122120/duplicate-row-with-primary-key-in-postgresql
+		// THIS SOLUTION IS TAKEN FROM https://dba.stackexchange.com/questions/122120/duplicate-row-with-primary-key-in-postgresql
 		console.log(`forwarding ${id}`)
 		DB.conn.tx(t => {
 			return t.one(`

@@ -460,6 +460,7 @@ function populateSection (data, lang = 'en', section) {
 	if (data.type === 'img') addImg({ data: data, lang: lang, section: section })
 	if (data.type === 'mosaic') addMosaic({ data: data, lang: lang, section: section })
 	if (data.type === 'video') addVideo({ data: data, lang: lang, section: section })
+	if (data.type === 'drawing') addDrawing({ data: data, lang: lang, section: section })
 	if (data.type === 'txt') addTxt({ data: data, lang: lang, section: section })
 	if (data.type === 'embed') addEmbed({ data: data, lang: lang, section: section })
 	if (data.type === 'checklist') addChecklist({ data: data, lang: lang, section: section })
@@ -968,6 +969,153 @@ function addVideo (kwargs) {
 				.html('ondemand_video')
 		}
 	}
+}
+function addDrawing (kwargs) {
+	const { data, lang, section, focus } = kwargs || {}
+	let { type, shapes, size, instruction, required } = data || {}
+	if (!type) type = 'drawing'
+	if (!shapes) shapes = []
+	if (!size) size = []
+	required = required ?? false
+
+	const media = new Media({
+		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+		type: type, 
+		datum: { type: type, shapes: shapes, size: size, instruction: instruction, required: required },
+		focus: focus || false,
+		lang: lang
+	})
+
+	if (media.opts) {
+
+		const opt_groups = media.opts.addElems('div', 'opt-group', _ => {
+			const brush_size = [ { element: 'input', type: 'range', key: 'brush-size', min: 1, max: 10, value: 2 } ]
+			const colors = ['#000000','#646464','#969696','#0A4C73','#0468B1','#32BEE1','#A51E41','#FA1C26','#F03C8C','#418246','#61B233','#B4DC28','#FA7814','#FFC10E','#FFF32A']
+				.map(d => { return { element: 'button', type: 'button', key: 'color', label: d, value: d } }) 
+			const clear = [ { element: 'button', type: 'button', key: 'clear', label: 'close', value: null } ]
+			// if (constraint) para_styles.push({ element: 'button', type: 'button', key: 'constraint', label: 'block', value: constraint })
+			return [brush_size, colors, clear]
+		}).each(function (d) {
+			const group = d3.select(this)
+
+			d.forEach(c => {
+				const opt = group.addElem(c.element, 'opt')
+					.datum(c)
+					.classed('active', (b, i) => {
+						if (b.key === 'color') return b.value === '#000000'
+						else return false
+					}).attrs({
+						'type': b => b.type,
+						'min': b => b.type === 'range' ? b.min : null,
+						'max': b => b.type === 'range' ? b.max : null,
+						'value': b => b.value
+					}).style('background-color', b => b.key === 'color' ? b.value : null)
+				opt.each(function (b) { d3.select(this).classed(b.key, true) })
+				.on('click', function (b) {
+					const sel = d3.select(this)
+					if (b.element === 'button') {
+						if (b.key === 'clear') {
+							const canvas = media.media.select('canvas')
+							const ctx = canvas.node().getContext('2d')
+							ctx.clearRect(0, 0, canvas.node().width, canvas.node().height)
+							media.media.datum().shapes = []
+						} else if (b.key === 'color') {
+							group.selectAll('.opt').classed('active', false)
+							sel.classed('active', true)
+						}
+					} else return false
+					if (editing) switchButtons(lang)
+				}).on('input', function (b) {
+					if (c.key === 'brush-size') {
+						group.select('label span').html(`${this.value}px`)
+					}
+				})
+				if (c.key === 'brush-size') {
+					group.addElem('label', c.key).html('Brush size: ')
+					.addElems('span', 'size').html(`${opt.node().value}px`)
+				}
+				opt.addElems('i', 'material-icons', b => b.element === 'button' && b.key !== 'color' ? [b] : []).html(b => b.label)
+				// opt.addElems('span', 'constraint', b => b.key === 'constraint' ? [b] : [])
+					// .html(b => b.value - txt.length)
+			})
+		})
+	}
+	
+	const canvas = media.media.addElems('canvas')
+		.attrs({ 
+			'width': d => d.size[0] = d.size [0] ?? (media.container.node().clientWidth || media.container.node().offsetWidth) - 2, // THE -2 IS FOR THE BORDER
+			'height': d => d.size[1] = d.size[1] ?? ((media.container.node().clientWidth || media.container.node().offsetWidth) / 2) - 2
+		})
+
+	canvas.node()['__drawing__'] = false
+	const ctx = canvas.node().getContext('2d')
+
+	function onCanvas () { return this.target === canvas.node() }
+
+	function draw () {
+		let isDrawing = canvas.node()['__drawing__']
+		if (isDrawing) render()
+		window.requestAnimationFrame(draw)
+	}
+	function render () {
+		ctx.clearRect(0, 0, canvas.node().width, canvas.node().height)
+		
+		if (canvas.datum().shapes.length) {
+			canvas.datum().shapes.forEach(d => {
+				ctx.save()
+				if (d.type === 'line') {
+					ctx.lineWidth = d.lineWidth
+					ctx.strokeStyle = d.color
+					ctx.lineCap = 'round'
+					ctx.lineJoin = 'round'
+
+					ctx.beginPath()
+					d.points.forEach((p, i) => {
+						if (i === 0) ctx.moveTo(p[0], p[1])
+						else ctx.lineTo(p[0], p[1])
+					})
+					ctx.stroke()
+				}
+				ctx.restore()
+			})
+		} else {
+			ctx.save()
+			ctx.translate(canvas.node().width / 2, canvas.node().height / 2)
+			ctx.textAlign = 'center'
+			ctx.font = '18px Noto Sans, Helvetica, Arial, sans-serif'
+			ctx.fillStyle = '#969696'
+			ctx.fillText('Draw here', 0, 0)
+			ctx.restore()
+		}
+	}
+
+	['mousedown', 'ontouchstart'].forEach(evt_handler => {
+		window.addEventListener(evt_handler, evt => {
+			canvas.node()['__drawing__'] = onCanvas.call(evt)
+			canvas.datum().shapes.push({ 
+				type: 'line', 
+				points: [], 
+				lineWidth: media.opts.select('input.brush-size').node().value,
+				color: media.opts.select('button.color.active').node().value 
+			})
+		})
+	});
+	['mousemove', 'ontouchmove'].forEach(evt_handler => {
+		canvas.node().addEventListener(evt_handler, function (evt) {
+			const currentShape = this['__data__'].shapes.last()
+			if (this['__drawing__']) currentShape.points.push([evt.offsetX, evt.offsetY])
+		})
+	});
+	['mouseup', 'ontouchend'].forEach(evt_handler => {
+		window.addEventListener(evt_handler, evt => {
+			canvas.node()['__drawing__'] = false
+		})
+	});
+
+	window.requestAnimationFrame(draw)
+	render()
+
+	if (focus) media.media.node().focus()
 }
 function addTxt (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}

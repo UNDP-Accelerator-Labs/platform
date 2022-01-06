@@ -4063,6 +4063,35 @@ main#mobilization .inner .body .input-group.fixed label {
     margin-left: 50%;
   }
 
+  div.display-option {
+    position: absolute;
+    top: 30px;
+    width: 100%;
+    z-index: 1000;
+  }
+  div.display-option a button {
+    width: 100%;
+    height: 20px;
+    outline: none;
+    border: none;
+    padding: 0 10px;
+    background-color: #969696;
+    color: #FFF;
+    text-align: center;
+    font-size: 12px;
+    line-height: 20px;
+    cursor: pointer;
+    vertical-align: top;
+    transition: background-color 0.25s;
+  }
+  div.display-option a button:hover {
+    background-color: #646464;
+  }
+
+  div.display-option.split-screen a button {
+    width: 50%;
+  }
+
   nav#import {
     position: fixed;
     top: 95px;
@@ -9761,6 +9790,35 @@ main#mobilization .inner .body .input-group.fixed label {
     width: 50%;
     min-width: 0;
     margin-left: 50%;
+  }
+
+  div.display-option {
+    position: absolute;
+    top: 30px;
+    width: 100%;
+    z-index: 1000;
+  }
+  div.display-option a button {
+    width: 100%;
+    height: 20px;
+    outline: none;
+    border: none;
+    padding: 0 10px;
+    background-color: #969696;
+    color: #FFF;
+    text-align: center;
+    font-size: 12px;
+    line-height: 20px;
+    cursor: pointer;
+    vertical-align: top;
+    transition: background-color 0.25s;
+  }
+  div.display-option a button:hover {
+    background-color: #646464;
+  }
+
+  div.display-option.split-screen a button {
+    width: 50%;
   }
 
   nav#import {

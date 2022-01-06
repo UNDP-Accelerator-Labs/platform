@@ -57,7 +57,7 @@
 <%- include ('partials/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
-<% if (!locals.source) { %><%- include ('partials/menu-logo.ejs') %><% } %>
+<% if (!(locals.source && locals.metadata.page.query?.display?.includes('adjacent'))) { %><%- include ('partials/menu-logo.ejs') %><% } %>
 
 <%- include ('partials/modals.ejs') %> 
 
@@ -67,14 +67,30 @@
 %>
 
 <% if (locals.source) { %>
-<!-- HAVE A display HTTPQUERY WITH VALUE adjacent TO DISPLAY THIS WAY -->
-	<div id='source'></div>
-	<script type='text/javascript'>
-		loadHTML('../edit/pad?id=<%- locals.source %>', '#pad', '#source')
-	</script>
+	<% if (locals.metadata.page.query?.display?.includes('adjacent')) { %>
+		<div class='display-option split-screen'><a><button>Hide source</button></a></div> <!-- TO DO: TRANSLATE -->
+		<div id='source'></div>
+		<script type='text/javascript'>
+			loadHTML('../edit/pad?id=<%- locals.source %>', '#pad', '#source')
+			
+			// const url = new URL(window.location) // url IS ALREADY DEFINED SOMEWHERE ELSE
+			const queryparams = new URLSearchParams(url.search)
+			queryparams.delete('display')
+
+			d3.select('div.display-option a').attr('href', `?${queryparams.toString()}`)
+		</script>
+	<% } else { %>
+		<div class='display-option'><a><button>Display source</button></a></div> <!-- TO DO: TRANSLATE -->
+		<script type='text/javascript'>
+			const queryparams = new URLSearchParams(url.search)
+			queryparams.append('display', 'adjacent')
+
+			d3.select('div.display-option a').attr('href', `?${queryparams.toString()}`)
+		</script>
+	<% } %>
 <% } %>
 
-<main id='pad' class='pad <% if (locals.source) { %>split-screen<% } %>'>
+<main id='pad' class='pad <% if (locals.source && locals.metadata.page.query?.display?.includes("adjacent")) { %>split-screen<% } %>'>
 	<!-- BELOW ARE ENGAGEMENT FEATURES -->
 	<!-- <% if (['edit', 'view'].includes(locals.metadata.page.activity) && (locals.data && locals.data.published)) { %>
 		<div class='engagement-input-group'>

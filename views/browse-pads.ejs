@@ -268,11 +268,15 @@
 			.attrs({ 
 				'href': d => {
 					if (d.editable) {
-						if (d.source) return `../../edit/pad?id=${d.id}&source=${d.source}`
-						else return `../../edit/pad?id=${d.id}`
+						if (d.source) {
+							if (d.is_followup) return `../../edit/pad?id=${d.id}&source=${d.source}&display=adjacent`
+							else return `../../edit/pad?id=${d.id}&source=${d.source}`
+						} else return `../../edit/pad?id=${d.id}`
 					} else {
-						if (d.source) return `../../view/pad?id=${d.id}&source=${d.source}`
-						else return `../../view/pad?id=${d.id}`
+						if (d.source) {
+							if (d.is_followup) return `../../view/pad?id=${d.id}&source=${d.source}&display=adjacent`
+							else return `../../view/pad?id=${d.id}&source=${d.source}`
+						} else return `../../view/pad?id=${d.id}`
 					}
 				}, 'target': '_blank'
 			})
@@ -321,11 +325,15 @@
 			.attrs({ 
 				'href': d => {
 					if (d.editable) {
-						if (d.source) return `../../edit/pad?id=${d.id}&source=${d.source}`
-						else return `../../edit/pad?id=${d.id}`
+						if (d.source) {
+							if (d.is_followup) return `../../edit/pad?id=${d.id}&source=${d.source}&display=adjacent`
+							else return `../../edit/pad?id=${d.id}&source=${d.source}`
+						} else return `../../edit/pad?id=${d.id}`
 					} else {
-						if (d.source) return `../../view/pad?id=${d.id}&source=${d.source}`
-						else return `../../view/pad?id=${d.id}`
+						if (d.source) {
+							if (d.is_followup) return `../../view/pad?id=${d.id}&source=${d.source}&display=adjacent`
+							else return `../../view/pad?id=${d.id}&source=${d.source}`
+						} else return `../../view/pad?id=${d.id}`
 					}
 				}, 'target': '_blank'
 			})
@@ -370,11 +378,15 @@
 			.attrs({ 
 				'href': d => {
 					if (d.editable) {
-						if (d.source) return `../../edit/pad?id=${d.id}&source=${d.source}`
-						else return `../../edit/pad?id=${d.id}`
+						if (d.source) {
+							if (d.is_followup) return `../../edit/pad?id=${d.id}&source=${d.source}&display=adjacent`
+							else return `../../edit/pad?id=${d.id}&source=${d.source}`
+						} else return `../../edit/pad?id=${d.id}`
 					} else {
-						if (d.source) return `../../view/pad?id=${d.id}&source=${d.source}`
-						else return `../../view/pad?id=${d.id}`
+						if (d.source) {
+							if (d.is_followup) return `../../view/pad?id=${d.id}&source=${d.source}&display=adjacent`
+							else return `../../view/pad?id=${d.id}&source=${d.source}`
+						} else return `../../view/pad?id=${d.id}`
 					}
 				}, 'target': '_blank'
 			})

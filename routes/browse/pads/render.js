@@ -232,9 +232,9 @@ exports.main = (req, res) => {
 						console.log('this is what is retrieved')
 						console.log(sdgs)
 						filters.sdgs.forEach(d => {
-							d.tag_name = sdgs.find(s => s.key === d.tag_id)
+							d.tag_name = sdgs.find(s => s.key === d.tag_id)?.name
 						})
-					})
+					}).catch(err => console.log(err))
 			}
 			
 			return { 

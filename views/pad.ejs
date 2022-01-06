@@ -67,6 +67,7 @@
 %>
 
 <% if (locals.source) { %>
+<!-- HAVE A display HTTPQUERY WITH VALUE adjacent TO DISPLAY THIS WAY -->
 	<div id='source'></div>
 	<script type='text/javascript'>
 		loadHTML('../edit/pad?id=<%- locals.source %>', '#pad', '#source')
@@ -288,10 +289,11 @@
 
 
 	const templated = <%- locals.templated %>;
+	const httpquery = <%- JSON.stringify(locals.metadata.page.query) %>;
 		
 	let activity = '<%- locals.metadata.page.activity %>';
 	const editing = ['contribute', 'edit'].includes(activity)
-	const rights = <%- locals.metadata.user.rights %>
+	const rights = <%- locals.metadata.user.rights %>;
 
 	let published = false
 
@@ -722,7 +724,7 @@
 			}
 			else {
 				autofillTitle()
-				console.log('oout')
+				console.log('out')
 			}
 		}
 	})
@@ -735,12 +737,10 @@
 			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat()
 				.find(d => d.type === 'title')?.instruction)
 
-			data.sections.forEach(d => {
-				addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
-				// const content = d.items || d.structure
-				// d3.select(section).each(function (c) {
-				// 	c.items.forEach(b => populateSection (b, '<%- locals.metadata.page.lang %>', this))	
-				// })
+			data.sections.forEach(async d => {
+				if (httpquery?.display?.includes('slideshow')) {
+					await addSlides({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+				} else addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
 			})
 		}
 		// CLEAR CHANGES
@@ -748,20 +748,192 @@
 	}
 	else if (['edit', 'view'].includes(activity)) {
 		const data = <%- JSON.stringify(locals.data || {}) %>;
-		console.log(data)
 
 		if (data.title) head.select('.title').html(data.title)
 		published = data.status === 2
 
 		if (data.sections) {
-			data.sections.forEach(d => {
-				addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
-				// d.items.forEach(c => populateSection (c, '<%- locals.metadata.page.lang %>', section))
+			data.sections.forEach(async d => {
+				if (httpquery?.display?.includes('slideshow')) {
+					await addSlides({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+				} else addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
 			})
 		}
+
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	} else addSection(null, '<%- locals.metadata.page.lang %>')
+
+	function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
+		const { data, lang, sibling, focus } = kwargs || {}
+		let { title, lead, structure, items, repeat, group, instruction } = data || {}
+		if (!title) title = ''
+		if (!lead) lead = ''
+		if (!structure) structure = []
+		if (!items) items = []
+
+		if (editing && templated && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure)) // TO DO: THIS IS NOT OPTIMAL, BUT DEEP COPY IS NEEDED
+
+		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+		const section_id = uuidv4()
+
+		return new Promise(resolve => {
+			d3.selectAll('.media-layout').classed('focus', false)
+
+			const section = d3.select('main#pad div.inner div.body')
+				// .insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
+				.insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
+				.classed('repeat', repeat || false)
+				// .classed('focus', focus && !templated)
+				.datum({ type: 'section', title: title, lead: lead, structure: structure, items: items, repeat: repeat, group: group })
+			// .on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
+			
+			// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
+			if (title || lead) {
+				const titleslide = section.addElems('div', 'title-slide')
+
+				if (title) {
+					titleslide.addElems('div', 'section-header')
+						.addElems('label')
+						.html(d => d.title)
+				}
+				
+				if (lead) {
+					const medialead = new Media({
+						parent: titleslide.node(), 
+						type: 'lead', 
+						datum: { type: 'lead', lead: lead },
+						lang: lang
+					})
+					// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+					if (medialead.opts) medialead.opts.remove()
+
+					medialead.media.html(d => d.lead)
+				}
+			}
+			// END SLIDE
+
+			if (repeat) {
+				// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
+				d3.selectAll('.layout.repeat').filter(d => d.group === group)
+					.select('.repeat-container').classed('hide', true)
+
+				const mediarepeat = new Media({
+					parent: section.node(), 
+					type: 'repeat', 
+					datum: { type: 'repeat', instruction: instruction },
+					lang: lang
+				})
+				// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+				if (mediarepeat.opts) mediarepeat.opts.remove()
+				if (mediarepeat.instruction) mediarepeat.instruction.remove()
+
+				mediarepeat.media.addElems('button')
+				.on('click', function () {
+					const sel = d3.select(this)
+					
+					section.findAncestor('pad').selectAll('.body>*')
+					.each(async function (d, i) {
+						if (this === section.node()) {
+							kwargs.sibling = `section:nth-child(${i + 2})`
+							kwargs.focus = true
+							
+							const new_section = await addSlides(kwargs) // THIS TOO IS DIFFERENT TO addSection
+							
+							partialSave('media')
+							initslideshow()
+						}
+					})
+				}).addElems('div').attrs({ 
+					'data-placeholder': d => 'Repeat section' // TO DO: TRANSLATION
+				}).html(d => d.instruction)
+			}
+
+			const displaypromises = []
+			if (items.length) {
+				section.each(function (d) {
+					d.items.forEach(c => displaypromises.push(new Promise(resolvedisplay => {
+						populateSection(c, lang, this)
+						resolvedisplay()
+					})))
+				})
+			}
+			Promise.all(displaypromises).then(_ => resolve(section))
+
+		}).then(section => {
+			initslideshow()
+			return section.node()
+		})
+	}
+	function initslideshow () {
+		// TRANSFORM THE MAIN #pad INTO A SLIDESHOW
+		d3.select('#pad').classed('slideshow', true)
+		// TRANSFORM ALL .media-container TO .slide
+		if (d3.selectAll('.slide').size() === 0) d3.select('#pad .inner .head').classed('slide slide-in-view', true)
+
+		d3.selectAll('.title-slide, .description-layout:not(.hide), .media-layout > .media-container:not(.lead-container):not(.hide), .media-layout > .meta-container:not(.hide)')
+			.classed('slide slide-next hide', true)
+		// PREVENT GROUPS FROM ANIMATING IN
+		d3.selectAll('.media-group-items').classed('animate-in', false)
+		// SET THE FOCUS ON THE TITLE SLIDE
+		const slides = d3.selectAll('.slide')
+		
+		// TO DO: IF VIEW === SLIDESHOW
+		// 1) CREATE INDEXING OF SECTIONS
+		// 2) CREATE NAVIGATION BETWEEN SECTIONS
+
+		// ADD BUTTONS TO NAVIGATE
+		d3.select('main#pad.slideshow div.inner')
+			.addElems('button', 'slide-nav', [{ label: '&lsaquo;', class: 'prev' }, { label: '&rsaquo;', class: 'next' }])
+		.each(function (d) { d3.select(this).classed(d.class, true) })
+			.classed('hide', d => {
+				const sel = d3.select(this)
+				let focus_id = 0
+				d3.selectAll('.slide').each(function (c, i) {
+					if (d3.select(this).classed('slide-in-view')) focus_id = i
+				})
+				return (d.class === 'prev' && focus_id === 0) || (d.class === 'next' && focus_id === d3.sels)
+			}).html(d => d.label)
+		.on('click', d => {
+			let focus_id = 0
+			d3.selectAll('.slide').each(function (c, i) {
+				if (d3.select(this).classed('slide-in-view')) focus_id = i
+			})
+
+			if (d.class === 'prev') switchslide(focus_id, focus_id - 1)
+			else if (d.class === 'next') switchslide(focus_id, focus_id + 1)
+		}).on('mouseup', _ => d3.event.stopPropagation())
+
+		function switchslide (prev, focus) {
+			const slides = d3.selectAll('.slide').classed('hide', (d, i) => ![prev, focus].includes(i))
+			window.setTimeout(_ => {
+				slides.classed('slide-in-view', (d, i) => i === focus)
+					.classed('slide-prev', (d, i) => i < focus)
+					.classed('slide-next', (d, i) => i > focus)
+				// .filter((d, i) => i === prev)
+					.on('transitionend', function (d, i) {
+						d3.select(this).classed('hide', i !== focus)
+					})
+			}, 1)
+			d3.select('button.slide-nav.prev').classed('hide', focus === 0)
+			d3.select('button.slide-nav.next').classed('hide', focus === slides.size() - 1)
+		}
+		// IF THE SLIDE IN VIEW IS HIDDEN (e.g. AFTER CLICKING ON A REPEAT SECTION BUTTON), THEN AUTO MOVE TO THE NEXT SLIDE
+		const slideinview = d3.select('.slide.slide-in-view')
+		if (slideinview.classed('hide')) {
+			let focus_id = 0
+			slides.each(function (c, i) {
+				if (d3.select(this).classed('slide-in-view')) focus_id = i
+			})
+			if (focus_id < slides.size() - 1) switchslide(focus_id - 1, focus_id + 1)
+			else switchslide(focus_id + 1, focus_id - 1)
+			console.log(slideinview)
+			slideinview.classed('slide slide-next slide-prev slide-in-view', false)
+		}
+
+		// ADD BUTTON TO SAVE AND GENERATE PDF: TO DO IN consent FORM APP (THIS DOES NOT NEED TO BE IN THE MAIN pads APP)
+
+	}
 
 </script>
 </body>

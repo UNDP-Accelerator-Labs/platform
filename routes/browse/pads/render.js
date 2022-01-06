@@ -1,3 +1,4 @@
+const fetch = require('node-fetch')
 const DB = require('../../../db-config.js')
 const header_data = require('../../header/').data
 const load = require('./load').main
@@ -170,10 +171,18 @@ exports.main = (req, res) => {
 				ORDER BY tag_name
 			;`).then(d => { return { thematic_areas: d } }))
 			// GET THE SDGs BREAKDOWN
+			// batch1.push(t1.any(`
+			// 	SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
+			// 	WHERE type = 'sdgs'
+			// 	GROUP BY (tag_name, tag_id)
+			// 	ORDER BY tag_id
+			// ;`).then(d => { return { sdgs: d } }))
+			// THE LOGIC FOR SDGs SHOULD BE SLIGHTLY DIFFERENT: WE ONLY WANT THE SDG KEY, AS THERE MAY BE NAMES STORED IN MULTIPLE LANGUAGES
+			// NAMES WILL BE RETRIEVED ON THE FRONT END FROM THE SOLUTIONS MAPPING PLATFORM (OR MAYBE DOWN THE ROAD FROM THE GLOBAL LOGIN PLATFORM)
 			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
+				SELECT COUNT (DISTINCT (pad))::INT, tag_id FROM tagging
 				WHERE type = 'sdgs'
-				GROUP BY (tag_name, tag_id)
+				GROUP BY tag_id
 				ORDER BY tag_id
 			;`).then(d => { return { sdgs: d } }))
 			// GET THE METHODS (SKILLS) BREAKDOWN
@@ -212,6 +221,17 @@ exports.main = (req, res) => {
 				mobilizations, 
 				filters,
 				publications ] = results
+
+			// IF SDG TAGS ARE USED, GO FETCH THE NAME AND DETAILS FROM THE SOlUTIONS MAPPING PLATFORM
+			if (filters.sdgs.length) {
+				fetch(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+					.then(response => response.json())
+					.then(sdgs => {
+						filters.sdgs.forEach(d => {
+							d.tag_name = sdgs.find(s => s.key === d.tag_id)
+						})
+					})
+			}
 			
 			return { 
 				metadata : {

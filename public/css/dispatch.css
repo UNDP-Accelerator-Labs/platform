@@ -537,6 +537,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     /*font-family: 'Noto Serif', serif;*/
     font-weight: 300;
     color: #B4DC28;
+    font-size: 16px;
   }
   nav#site-title.sm .inner .search {
     margin-top: 15px;
@@ -1414,6 +1415,21 @@ main#mobilization .inner .body .layout {
     /*border-top: 1px solid $c-mid-2;*/
     border-top: 1px solid #0A4C73;
     transition: background-color 0.25s;
+    /*.media-container.slide {
+    	position: absolute;
+    	min-height: 100vh;
+    	transform: translateX(0);
+    	opacity: 1;
+    	transition: transform 1s, opacity 1s;
+    }
+    .media-container.slide-next {
+    	transform: translateX(100%);
+    	opacity: 0;
+    }
+    .media-container.slide-prev {
+    	transform: translateX(-100%);
+    	opacity: 0;
+    }*/
   }
   main#pad .inner .body .layout .input-type, main#reference .inner .body .layout .input-type,
 main#template .inner .body .layout .input-type,
@@ -3515,7 +3531,8 @@ main#mobilization .inner .body .layout .group-container .media-group-items .meta
   main#pad .inner .body .layout .group-container .media-group-items.animate-in, main#reference .inner .body .layout .group-container .media-group-items.animate-in,
 main#template .inner .body .layout .group-container .media-group-items.animate-in,
 main#mobilization .inner .body .layout .group-container .media-group-items.animate-in {
-    animation: slide-down 1s;
+    opacity: 0;
+    animation: slide-down 1s forwards;
   }
   main#pad .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts),
 main#pad .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
@@ -3928,6 +3945,96 @@ main#mobilization .inner .body .input-group.fixed label {
     font-size: 36px;
     color: #C2B4D6;
     text-align: center;
+  }
+
+  main#pad.slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*margin: 0;*/
+    /*width: 100%;*/
+    background-color: #FFF;
+    /*text-align: center;*/
+  }
+  main#pad.slideshow .inner {
+    /*width: 100%;*/
+  }
+  main#pad.slideshow .inner button.slide-nav {
+    position: fixed;
+    top: 0;
+    width: 60px;
+    height: 100vh;
+    background-color: #969696;
+    border: none;
+    outline: none;
+    color: #FFF;
+    font-size: 60px;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  main#pad.slideshow .inner button.slide-nav.prev {
+    left: 0;
+  }
+  main#pad.slideshow .inner button.slide-nav.next {
+    right: 0;
+  }
+  main#pad.slideshow .inner button.slide-nav:hover {
+    background-color: #646464;
+  }
+  main#pad.slideshow .inner .slide {
+    position: absolute !important;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    top: 30px;
+    left: 0;
+    min-height: calc(100vh - 30px);
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 1s, opacity 1s;
+    background-color: #FFF;
+  }
+  main#pad.slideshow .inner .slide .required {
+    position: absolute;
+    left: 100%;
+    top: calc(50% - 33px / 2);
+    width: 30px;
+    text-align: center;
+    line-height: 33px;
+  }
+  main#pad.slideshow .inner .slide.slide-next {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  main#pad.slideshow .inner .slide.slide-prev {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  main#pad.slideshow .inner .slide.title-slide {
+    width: 100%;
+  }
+  main#pad.slideshow .inner .slide.title-slide .section-header {
+    text-align: left;
+  }
+  main#pad.slideshow .inner .slide.title-slide .section-header label {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    font-size: 36px;
+    color: #0A4C73;
+  }
+  main#pad.slideshow .inner .body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*width: 100%;*/
+  }
+  main#pad.slideshow .inner .body .layout {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: none;
   }
 
   div#source {
@@ -6124,6 +6231,7 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     /*font-family: 'Noto Serif', serif;*/
     font-weight: 300;
     color: #B4DC28;
+    font-size: 16px;
   }
   nav#site-title.sm .inner .search {
     margin-top: 15px;
@@ -7001,6 +7109,21 @@ main#mobilization .inner .body .layout {
     /*border-top: 1px solid $c-mid-2;*/
     border-top: 1px solid #0A4C73;
     transition: background-color 0.25s;
+    /*.media-container.slide {
+    	position: absolute;
+    	min-height: 100vh;
+    	transform: translateX(0);
+    	opacity: 1;
+    	transition: transform 1s, opacity 1s;
+    }
+    .media-container.slide-next {
+    	transform: translateX(100%);
+    	opacity: 0;
+    }
+    .media-container.slide-prev {
+    	transform: translateX(-100%);
+    	opacity: 0;
+    }*/
   }
   main#pad .inner .body .layout .input-type, main#reference .inner .body .layout .input-type,
 main#template .inner .body .layout .input-type,
@@ -9102,7 +9225,8 @@ main#mobilization .inner .body .layout .group-container .media-group-items .meta
   main#pad .inner .body .layout .group-container .media-group-items.animate-in, main#reference .inner .body .layout .group-container .media-group-items.animate-in,
 main#template .inner .body .layout .group-container .media-group-items.animate-in,
 main#mobilization .inner .body .layout .group-container .media-group-items.animate-in {
-    animation: slide-down 1s;
+    opacity: 0;
+    animation: slide-down 1s forwards;
   }
   main#pad .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts),
 main#pad .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
@@ -9515,6 +9639,96 @@ main#mobilization .inner .body .input-group.fixed label {
     font-size: 36px;
     color: #C2B4D6;
     text-align: center;
+  }
+
+  main#pad.slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*margin: 0;*/
+    /*width: 100%;*/
+    background-color: #FFF;
+    /*text-align: center;*/
+  }
+  main#pad.slideshow .inner {
+    /*width: 100%;*/
+  }
+  main#pad.slideshow .inner button.slide-nav {
+    position: fixed;
+    top: 0;
+    width: 60px;
+    height: 100vh;
+    background-color: #969696;
+    border: none;
+    outline: none;
+    color: #FFF;
+    font-size: 60px;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  main#pad.slideshow .inner button.slide-nav.prev {
+    left: 0;
+  }
+  main#pad.slideshow .inner button.slide-nav.next {
+    right: 0;
+  }
+  main#pad.slideshow .inner button.slide-nav:hover {
+    background-color: #646464;
+  }
+  main#pad.slideshow .inner .slide {
+    position: absolute !important;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    top: 30px;
+    left: 0;
+    min-height: calc(100vh - 30px);
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 1s, opacity 1s;
+    background-color: #FFF;
+  }
+  main#pad.slideshow .inner .slide .required {
+    position: absolute;
+    left: 100%;
+    top: calc(50% - 33px / 2);
+    width: 30px;
+    text-align: center;
+    line-height: 33px;
+  }
+  main#pad.slideshow .inner .slide.slide-next {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  main#pad.slideshow .inner .slide.slide-prev {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  main#pad.slideshow .inner .slide.title-slide {
+    width: 100%;
+  }
+  main#pad.slideshow .inner .slide.title-slide .section-header {
+    text-align: left;
+  }
+  main#pad.slideshow .inner .slide.title-slide .section-header label {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    font-size: 36px;
+    color: #0A4C73;
+  }
+  main#pad.slideshow .inner .body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*width: 100%;*/
+  }
+  main#pad.slideshow .inner .body .layout {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: none;
   }
 
   div#source {

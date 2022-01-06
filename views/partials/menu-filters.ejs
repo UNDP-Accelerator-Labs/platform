@@ -238,6 +238,9 @@
 							<div class='drop-down'>
 								<ul>
 									<!-- TO DO: TRANSLATE -->
+									<!-- AS MENTIONED IN routes/browse/pads/render THE LOGIC FOR SDGs IS SLIGHTLY DIFFERENT -->
+									<!-- WE ONLY TAKE THE ids AND WE QUERY THE NAMES FROM THE SOLUTIONS MAPPING PLATFROM -->
+									<!-- TO AVOID DUPLICATES BECAUSE OF DIFFERENT LANGUAGES BEING STORED -->
 									<% locals.filters.sdgs.forEach(s => { %>
 										<% if (query.sdgs && query.sdgs.map(q => +q).includes(s.tag_id)) { %>
 										<li class='entry active'>

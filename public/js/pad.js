@@ -68,10 +68,12 @@ const Media = function (kwargs) {
 		.html(d => d.label)
 
 	if (editing) {
+		// NOTE REQUIREMENTS CAN ONLY COME FROM A TEMPLATE
 		const requirement_id = uuidv4()
 
 		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
 		// ENABLE CHANGE REQUIREMENTS ONLY IF THE USER IS SUDO 
+		// THIS IS MAINLY FOR DEBUGGING IF THE REQUIREMENT WAS NOT PROPERLY SET IN THE TEMPLATE
 		if (rights > 2) {
 			this.required.addElems('input')
 				.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
@@ -83,8 +85,8 @@ const Media = function (kwargs) {
 		}
 		this.required.addElems('label')
 			.attr('for', requirement_id)
-			// .each(function (d) { d3.select(this).classed('active', d.required) })
 			.classed('active', d => d.required)
+			.classed('hide', d => !d.required)// && rights < 3)
 			.html('*')
 	}
 
@@ -121,6 +123,7 @@ Media.prototype.move = function (dir) {
 	let sourceMargin = parseInt(getComputedStyle(this.container.node()).marginBottom)
 	const level = this.container.datum().level
 
+	// .meta-layout IS PROBABLY OBSOLETE
 	const metaLayout = d3.select('.meta-layout')
 	const openInset = metaLayout.selectAll('.inset').filter(function () { return this.style.maxHeight.length })
 	// CHECK WHETHER AN INSET IS OPEN
@@ -664,7 +667,7 @@ function addSection (kwargs) {
 			'contenteditable': editing && !templated ? true : null 
 		}).html(d => d.lead)
 	}
-	if (templated && repeat) {
+	if (templated && repeat) { 
 		// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
 		d3.selectAll('.layout.repeat').filter(d => d.group === group)
 			.select('.repeat-container').classed('hide', true)
@@ -689,7 +692,6 @@ function addSection (kwargs) {
 					kwargs.sibling = `section:nth-child(${i + 2})`
 					kwargs.focus = true
 					
-					console.log(kwargs)
 					const new_section = addSection(kwargs)
 					d3.select(new_section).classed('animate-in', true)
 					
@@ -987,7 +989,6 @@ function addDrawing (kwargs) {
 	})
 
 	if (media.opts) {
-
 		const opt_groups = media.opts.addElems('div', 'opt-group', _ => {
 			const brush_size = [ { element: 'input', type: 'range', key: 'brush-size', min: 1, max: 10, value: 2 } ]
 			const colors = ['#000000','#646464','#969696','#0A4C73','#0468B1','#32BEE1','#A51E41','#FA1C26','#F03C8C','#418246','#61B233','#B4DC28','#FA7814','#FFC10E','#FFF32A']
@@ -1089,28 +1090,32 @@ function addDrawing (kwargs) {
 		}
 	}
 
-	['mousedown', 'ontouchstart'].forEach(evt_handler => {
-		window.addEventListener(evt_handler, evt => {
-			canvas.node()['__drawing__'] = onCanvas.call(evt)
-			canvas.datum().shapes.push({ 
-				type: 'line', 
-				points: [], 
-				lineWidth: media.opts.select('input.brush-size').node().value,
-				color: media.opts.select('button.color.active').node().value 
+	if (editing) {
+		['mousedown', 'ontouchstart'].forEach(evt_handler => {
+			window.addEventListener(evt_handler, evt => {
+				canvas.node()['__drawing__'] = onCanvas.call(evt)
+				canvas.datum().shapes.push({ 
+					type: 'line', 
+					points: [], 
+					lineWidth: media.opts.select('input.brush-size').node().value,
+					color: media.opts.select('button.color.active').node().value 
+				})
 			})
-		})
-	});
-	['mousemove', 'ontouchmove'].forEach(evt_handler => {
-		canvas.node().addEventListener(evt_handler, function (evt) {
-			const currentShape = this['__data__'].shapes.last()
-			if (this['__drawing__']) currentShape.points.push([evt.offsetX, evt.offsetY])
-		})
-	});
-	['mouseup', 'ontouchend'].forEach(evt_handler => {
-		window.addEventListener(evt_handler, evt => {
-			canvas.node()['__drawing__'] = false
-		})
-	});
+		});
+		['mousemove', 'ontouchmove'].forEach(evt_handler => {
+			canvas.node().addEventListener(evt_handler, function (evt) {
+				const currentShape = this['__data__'].shapes.last()
+				if (this['__drawing__']) currentShape.points.push([evt.offsetX, evt.offsetY])
+			})
+		});
+		['mouseup', 'ontouchend'].forEach(evt_handler => {
+			window.addEventListener(evt_handler, evt => {
+				canvas.node()['__drawing__'] = false
+				partialSave('media')
+				// switchButtons(lang)
+			})
+		});
+	}
 
 	window.requestAnimationFrame(draw)
 	render()
@@ -2126,7 +2131,8 @@ function addGroup (kwargs) {
 		.each(function (c) { 
 			this.innerHTML = ''
 			c.forEach(b => populateSection(b, lang, this))
-		}).classed('animate-in', true)
+		})
+		groups.classed('animate-in', (d, i) => i === groups.size() - 1)
 		// THIS IS THE SAME AS IN MEDIA, BUT IN MEDIA WE PREVENT THESE OPTIONS WHEN TEMPLATED
 		// HERE THEY ARE MADE AVAILABLE FOR REMOVING GROUP REPETITIONS
 		const placement = groups.addElems('div', 'placement-opts')

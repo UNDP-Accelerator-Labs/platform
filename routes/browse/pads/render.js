@@ -211,7 +211,7 @@ exports.main = (req, res) => {
 		;`, [uuid]))
 
 		return t.batch(batch)
-		.then(results => {
+		.then(async results => {
 			// let [totalcounts, filteredcounts, locations, centerpoint, sdgs, thematic_areas, templates, contributors, mobilizations] = results
 			let [ statistics, 
 				locations, 
@@ -225,19 +225,22 @@ exports.main = (req, res) => {
 			// IF SDG TAGS ARE USED, GO FETCH THE NAME AND DETAILS FROM THE SOlUTIONS MAPPING PLATFORM
 			console.log('look for sdgs')
 			console.log(filters.sdgs)
-			if (filters.sdgs.length) {
-				fetch(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
-					.then(response => response.json())
-					.then(sdgs => {
-						console.log('this is what is retrieved')
-						console.log(sdgs)
-						filters.sdgs.forEach(d => {
-							d.tag_name = sdgs.find(s => +s.key === +d.tag_id)?.name
-						})
-					}).catch(err => console.log(err))
+			await new Promise(resolve => {
+				if (filters.sdgs.length) {
+					fetch(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
+						.then(response => response.json())
+						.then(sdgs => {
+							console.log('this is what is retrieved')
+							console.log(sdgs)
+							filters.sdgs.forEach(d => {
+								d.tag_name = sdgs.find(s => +s.key === +d.tag_id)?.name
+							})
+							resolve()
+						}).catch(err => console.log(err))					
+				} else resolve()
+			})
 
-				console.log(filters.sdgs)
-			}
+			console.log(filters.sdgs)
 			
 			return { 
 				metadata : {

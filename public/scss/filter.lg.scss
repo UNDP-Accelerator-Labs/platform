@@ -259,7 +259,14 @@
 							left: -215px;
 						}
 					}*/
-					.filter:hover {
+					.filter:not(.expand):hover {
+						button {
+							background-color: $c-light-blue;
+							border: 1px solid $c-light-blue;
+							color: #FFF;
+						}
+					}
+					.filter.expand {
 						button {
 							background-color: $c-mid-blue;
 							color: #FFF;

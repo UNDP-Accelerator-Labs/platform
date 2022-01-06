@@ -237,10 +237,6 @@
 							</button>
 							<div class='drop-down'>
 								<ul>
-									<!-- TO DO: TRANSLATE -->
-									<!-- AS MENTIONED IN routes/browse/pads/render THE LOGIC FOR SDGs IS SLIGHTLY DIFFERENT -->
-									<!-- WE ONLY TAKE THE ids AND WE QUERY THE NAMES FROM THE SOLUTIONS MAPPING PLATFROM -->
-									<!-- TO AVOID DUPLICATES BECAUSE OF DIFFERENT LANGUAGES BEING STORED -->
 									<% locals.filters.sdgs.forEach(s => { %>
 										<% if (query.sdgs && query.sdgs.map(q => +q).includes(s.tag_id)) { %>
 										<li class='entry active'>
@@ -312,6 +308,15 @@
 
 
 <script type='text/javascript'>
+	d3.select('div.filter-veil').on('click', _ => d3.selectAll('nav.browse-filters div.filter').classed('expand', false))
+
+	d3.selectAll('nav.browse-filters div.filter')
+	.on('click', function () {
+		d3.event.stopPropagation()
+		d3.selectAll('nav.browse-filters div.filter').classed('expand', false)
+		d3.select(this).classed('expand', true)
+	})
+
 	d3.selectAll('nav.browse-filters input[type=checkbox]')
 	.on('change', function () {
 		const sel = d3.select(this)

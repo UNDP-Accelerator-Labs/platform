@@ -973,19 +973,25 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
 .veil nav.browse-filters form .filters .content-filters .filter .drop-down ul li.active label {
     color: #FFF;
   }
-  .veil nav.browse-filters form .filters .meta-filters .filter:hover button,
-.veil nav.browse-filters form .filters .content-filters .filter:hover button {
+  .veil nav.browse-filters form .filters .meta-filters .filter:not(.expand):hover button,
+.veil nav.browse-filters form .filters .content-filters .filter:not(.expand):hover button {
+    background-color: #32BEE1;
+    border: 1px solid #32BEE1;
+    color: #FFF;
+  }
+  .veil nav.browse-filters form .filters .meta-filters .filter.expand button,
+.veil nav.browse-filters form .filters .content-filters .filter.expand button {
     background-color: #0468B1;
     color: #FFF;
   }
-  .veil nav.browse-filters form .filters .meta-filters .filter:hover button label.count,
-.veil nav.browse-filters form .filters .content-filters .filter:hover button label.count {
+  .veil nav.browse-filters form .filters .meta-filters .filter.expand button label.count,
+.veil nav.browse-filters form .filters .content-filters .filter.expand button label.count {
     background-color: #FFF;
     font-weight: bold;
     color: #0468B1;
   }
-  .veil nav.browse-filters form .filters .meta-filters .filter:hover .drop-down,
-.veil nav.browse-filters form .filters .content-filters .filter:hover .drop-down {
+  .veil nav.browse-filters form .filters .meta-filters .filter.expand .drop-down,
+.veil nav.browse-filters form .filters .content-filters .filter.expand .drop-down {
     display: block;
   }
   .veil nav.browse-filters form .filters .meta-filters .title h1,
@@ -6667,19 +6673,25 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
 .veil nav.browse-filters form .filters .content-filters .filter .drop-down ul li.active label {
     color: #FFF;
   }
-  .veil nav.browse-filters form .filters .meta-filters .filter:hover button,
-.veil nav.browse-filters form .filters .content-filters .filter:hover button {
+  .veil nav.browse-filters form .filters .meta-filters .filter:not(.expand):hover button,
+.veil nav.browse-filters form .filters .content-filters .filter:not(.expand):hover button {
+    background-color: #32BEE1;
+    border: 1px solid #32BEE1;
+    color: #FFF;
+  }
+  .veil nav.browse-filters form .filters .meta-filters .filter.expand button,
+.veil nav.browse-filters form .filters .content-filters .filter.expand button {
     background-color: #0468B1;
     color: #FFF;
   }
-  .veil nav.browse-filters form .filters .meta-filters .filter:hover button label.count,
-.veil nav.browse-filters form .filters .content-filters .filter:hover button label.count {
+  .veil nav.browse-filters form .filters .meta-filters .filter.expand button label.count,
+.veil nav.browse-filters form .filters .content-filters .filter.expand button label.count {
     background-color: #FFF;
     font-weight: bold;
     color: #0468B1;
   }
-  .veil nav.browse-filters form .filters .meta-filters .filter:hover .drop-down,
-.veil nav.browse-filters form .filters .content-filters .filter:hover .drop-down {
+  .veil nav.browse-filters form .filters .meta-filters .filter.expand .drop-down,
+.veil nav.browse-filters form .filters .content-filters .filter.expand .drop-down {
     display: block;
   }
   .veil nav.browse-filters form .filters .meta-filters .title h1,

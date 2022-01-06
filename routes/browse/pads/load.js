@@ -101,6 +101,20 @@ exports.main = kwargs => {
 				SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, p.source,
 					c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization, m.pad_limit,
 
+					CASE WHEN p.source IS NOT NULL
+						AND mob.mobilization IS NOT NULL
+						AND (SELECT copy FROM mobilizations WHERE id = mob.mobilization) = FALSE
+							THEN TRUE
+							ELSE FALSE
+						END AS is_followup,
+
+					CASE WHEN p.source IS NOT NULL
+						AND mob.mobilization IS NOT NULL
+						AND (SELECT copy FROM mobilizations WHERE id = mob.mobilization) = TRUE
+							THEN TRUE
+							ELSE FALSE
+						END AS is_forward,
+
 					COALESCE(json_agg(json_build_object('id', fmob.id, 'title', fmob.title, 'source', p.id, 'template', fmob.template)) 
 						FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = FALSE AND p.status = 2), NULL) AS followups,
 

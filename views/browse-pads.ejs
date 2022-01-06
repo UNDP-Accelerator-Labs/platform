@@ -222,7 +222,6 @@
 			} else return []
 		}
 
-
 		const pads = section.addElem('div', 'pad')
 			.datum(data)
 		.each(function (d) {
@@ -279,7 +278,11 @@
 			})
 			.addElems('h1')
 		title.addElems('img')
-			.attr('src', '/imgs/icons/i-pad.svg')
+			.attr('src', d => {
+				if (d.is_followup) return '/imgs/icons/i-followup-pad.svg'
+				else if (d.is_forward) return '/imgs/icons/i-forward-pad.svg'
+				else return '/imgs/icons/i-pad.svg'
+			})
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
 		if (data.followups) {

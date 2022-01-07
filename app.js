@@ -64,6 +64,7 @@ app.route('/:lang/browse/:object/:space')
 	.get(routes.render.login, routes.dispatch.browse)
 
 app.post('/save/:object', routes.process.save)
+app.post('/generate/:format', routes.process.generate)
 app.post('/engage', routes.process.engage)
 app.post('/validate', routes.process.validate)
 

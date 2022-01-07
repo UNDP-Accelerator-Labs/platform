@@ -773,6 +773,7 @@ exports.process.screenshot = (req, res) => {
 // 	}).catch(err => console.log(err))
 // }
 exports.process.save = require('./contribute/').save
+exports.process.generate = require('./contribute/').generate
 
 exports.process.publish = require('./contribute/').publish
 exports.process.forward = require('./contribute/').forward

@@ -297,7 +297,7 @@
 			})
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
-		if (data.followups && !data.followed_up) {
+		if (data.followups && !data.followed_up) { // THE !data.followed_up LIMITS THE NUMBER OF POSSIBLE FOLLOW UPS TO ONE FOR A GIVEN MOBILIZATION
 			console.log(data.followups)
 			const dropdown = body.addElems('div', 'create follow-up')
 			dropdown.addElems('button')

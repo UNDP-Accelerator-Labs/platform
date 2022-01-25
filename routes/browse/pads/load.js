@@ -96,7 +96,7 @@ exports.main = kwargs => {
 			// https://stackoverflow.com/questions/24155190/postgresql-left-join-json-agg-ignore-remove-null
 			
 			// TO DO: MAKE SURE THE FOLLOW UP IS ASSIGNED TO THIS USER
-			// MAKE SURE THE FOLOW UP IS NOT ACCESSIBLE THROUGH THE MAIN MENU: A FOLLOW UP MUST BE ASSOCIATED WITH AN EXISTING, PUBLISHED PAD
+			// MAKE SURE THE FOLLOW UP IS NOT ACCESSIBLE THROUGH THE MAIN MENU: A FOLLOW UP MUST BE ASSOCIATED WITH AN EXISTING, PUBLISHED PAD
 			return t.any(`
 				SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, p.source,
 					c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization, m.pad_limit,
@@ -107,6 +107,19 @@ exports.main = kwargs => {
 							THEN TRUE
 							ELSE FALSE
 						END AS is_followup,
+
+					CASE WHEN (
+							SELECT p2.id FROM pads p2 
+							INNER JOIN mobilization_contributions mc2 
+								ON p2.id = mc2.pad 
+							INNER JOIN mobilizations m2 
+								ON mc2.mobilization = m2.id 
+							WHERE p2.source = p.id 
+							AND m2.status = 1
+						) IS NOT NULL
+						THEN TRUE 
+						ELSE FALSE 
+					END AS followed_up,
 
 					CASE WHEN p.source IS NOT NULL
 						AND mob.mobilization IS NOT NULL

@@ -297,7 +297,7 @@
 			})
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
-		if (data.followups) {
+		if (data.followups && !data.followed_up) {
 			console.log(data.followups)
 			const dropdown = body.addElems('div', 'create follow-up')
 			dropdown.addElems('button')
@@ -313,7 +313,7 @@
 			// TO DO: THIS NEEDS TO KEEP REFERENCE TO THE PAD BEING FOLLOWED UP AND THE NEW TEMPLATED PAD TO BE FILLED IN
 		}
 
-		if (data.forwards) {
+		if (data.forwards && !data.followed_up) {
 			const dropdown = body.addElems('div', 'create forward')
 				dropdown.addElems('button')
 					.html('Forward to') // TO DO: TRANSLATE

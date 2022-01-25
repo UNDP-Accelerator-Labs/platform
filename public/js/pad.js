@@ -2092,7 +2092,7 @@ async function addDataSources (kwargs) {
 // GROUPS
 function addGroup (kwargs) {
 	const { data, lang, section, focus } = kwargs || {}
-	let { type, structure, items, values, instruction, repeat } = data || {}
+	let { type, structure, items, values, instruction, repeat } = data || {} // NOT SURE WHY values IS USED HERE, IT IS NOT USED ANYWHERE ELSE
 	if (!type) type = 'group'
 	if (!structure) structure = []
 	if (!items) items = []

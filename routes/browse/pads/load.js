@@ -134,26 +134,31 @@ exports.main = kwargs => {
 					COALESCE(ce.inspirations, 0)::INT AS inspirations, 
 					COALESCE(ce.approvals, 0)::INT AS approvals, 
 					COALESCE(ce.flags, 0)::INT AS flags,
+					
 					CASE WHEN p.contributor = (SELECT id FROM contributors WHERE uuid = $1)
 						OR $2 > 2
 							THEN TRUE
 							ELSE FALSE
 						END AS editable,
+					
 					CASE WHEN p.status = 2 
 						AND 'bookmark' = ANY(e.types)
 							THEN TRUE 
 							ELSE FALSE 
 						END AS bookmarked,
+					
 					CASE WHEN p.status = 2 
 						AND 'inspiration' = ANY(e.types)
 							THEN TRUE 
 							ELSE FALSE 
 						END AS inspired,
+					
 					CASE WHEN p.status = 2 
 						AND 'approval' = ANY(e.types)
 							THEN TRUE 
 							ELSE FALSE 
 						END AS approved,
+					
 					CASE WHEN p.status = 2 
 						AND 'flag' = ANY(e.types)
 							THEN TRUE 
@@ -190,7 +195,9 @@ exports.main = kwargs => {
 				) fmob
 					ON fmob.source = mob.mobilization
 				WHERE TRUE 
-					$3:raw $4:raw
+					$3:raw 
+					$4:raw
+					AND mob.mobilization = (SELECT MAX(mc2.mobilization) FROM mobilization_contributions mc2 WHERE mc2.pad = p.id)
 				GROUP BY (p.id, c.name, c.country, cp.id, mob.mobilization, ce.bookmarks, ce.inspirations, ce.approvals, ce.flags, e.types, m.pad_limit)
 				$5:raw
 				LIMIT $6 OFFSET $7

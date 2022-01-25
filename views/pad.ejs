@@ -213,6 +213,12 @@
 				</div>
 			<% } %> -->
 		</div>
+		<div class='generate-pdf'>
+			<form method='POST' action='/generate/pdf'>
+				<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
+				<button type='submit'>Generate PDF</button>
+			</form>
+		</div>
 	</div>
 </main>
 
@@ -329,6 +335,7 @@
 		}
 	})
 
+	// THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
 	function retrieveItems (sel, datum, items) {
 		// MEDIA
 		if (['img', 'mosaic', 'video'].includes(datum.type)) {

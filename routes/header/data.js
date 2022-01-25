@@ -13,7 +13,7 @@ exports.main = (kwargs) => {
 	// THIS IS PARSING THE QUERY TO SEND IT BACK TO THE CLIENT FOR PROPER DISPLAY IN FILTER MENU
 	const parsedQuery = {}
 	for (let key in query) {
-		if (key === 'query') {
+		if (key === 'search') { 
 			if (query[key].trim().length) parsedQuery[key] = query[key].trim().toLowerCase().split(' or ').map(d => d.split(' ')).flat() // TO DO: CHECK THIS
 		} else {
 			if (!Array.isArray(query[key])) parsedQuery[key] = [query[key]]

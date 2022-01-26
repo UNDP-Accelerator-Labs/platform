@@ -226,10 +226,13 @@
 										font-size: $t-mid-small;
 										text-transform: capitalize;
 										color: $c-dark-grey;
+										width: 90%;
 									}
 									label.count {
 										font-size: $t-small;
 										color: $c-mid-blue;
+										width: 10%;
+										text-align: right;
 									}
 								}
 								li:hover {

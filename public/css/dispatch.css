@@ -955,11 +955,14 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     font-size: 14px;
     text-transform: capitalize;
     color: #000000;
+    width: 90%;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .drop-down ul li label.count,
 .veil nav.browse-filters form .filters .content-filters .filter .drop-down ul li label.count {
     font-size: 12px;
     color: #0468B1;
+    width: 10%;
+    text-align: right;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .drop-down ul li:hover,
 .veil nav.browse-filters form .filters .content-filters .filter .drop-down ul li:hover {
@@ -4340,7 +4343,7 @@ main#mobilization .inner .body .input-group.fixed label {
     color: #0468B1;
   }
   div.browse nav p {
-    margin-top: 15px;
+    margin: 15px 0 0 15px;
     font-size: 12px;
     color: #969696;
   }
@@ -6684,11 +6687,14 @@ nav#site-title.sm .inner .create .drop-down ul li a button:hover {
     font-size: 14px;
     text-transform: capitalize;
     color: #000000;
+    width: 90%;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .drop-down ul li label.count,
 .veil nav.browse-filters form .filters .content-filters .filter .drop-down ul li label.count {
     font-size: 12px;
     color: #0468B1;
+    width: 10%;
+    text-align: right;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .drop-down ul li:hover,
 .veil nav.browse-filters form .filters .content-filters .filter .drop-down ul li:hover {
@@ -10069,7 +10075,7 @@ main#mobilization .inner .body .input-group.fixed label {
     color: #0468B1;
   }
   div.browse nav p {
-    margin-top: 15px;
+    margin: 15px 0 0 15px;
     font-size: 12px;
     color: #969696;
   }

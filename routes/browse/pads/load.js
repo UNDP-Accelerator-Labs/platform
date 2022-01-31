@@ -116,6 +116,7 @@ exports.main = kwargs => {
 								ON mc2.mobilization = m2.id 
 							WHERE p2.source = p.id 
 							AND m2.status = 1
+							LIMIT 1
 						) IS NOT NULL
 						THEN TRUE 
 						ELSE FALSE 

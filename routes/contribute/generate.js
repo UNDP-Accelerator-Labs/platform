@@ -32,6 +32,7 @@ exports.main = (req, res) => {
 		dark_yellow: '#FA7814',
 		mid_yellow: '#FFC10E',
 		light_yellow: '#FFF32A',
+		light_yellow_alpha: a => `rgba(255,243,42,${a})`,
 
 		dark_grey: '#000000',
 		mid_grey: '#646464',
@@ -84,7 +85,7 @@ exports.main = (req, res) => {
 		if (lead) {
 			doc.save()
 			doc.fontSize(rem_size * 1.25)
-			doc.text(lead)
+			doc.text(lead, { paragraphGap: 10 })
 			doc.fontSize(rem_size)
 			doc.restore()
 		}
@@ -106,35 +107,48 @@ exports.main = (req, res) => {
 		items.forEach(d => {
 			populateSection(d, lang, doc)
 		})
+		doc.moveDown()
 	}
 
-	function populateSection (data, lang = 'en', doc) {
+	function populateSection (data, lang = 'en', doc, is_in_group = false) {
 		if (data.instruction) {
 			doc.save()
+			
+			if (is_in_group) doc.translate(20, 0)
 			doc.fillColor(colors.mid_blue)
-			doc.strokeColor(colors.mid_blue)
-			doc.moveTo(doc.page.margins.left, doc.y - 1)
-				.lineTo(doc.page.margins.left, doc.y - 1 + doc.heightOfString(data.instruction))
-				.dash(1, { space: 2 })
-				.stroke()
-			doc.text(data.instruction, { indent: 10 })
+			doc.text(data.instruction, { indent: 10, paragraphGap: 10 })
+
+			const start = doc.y - doc.heightOfString(data.instruction) - 10
+			const end = doc.y
+			doc.save()
+			const processed	= processDrawing(start, end, doc)
+			processed.forEach(d => {
+				doc.strokeColor(colors.mid_blue)
+				doc.moveTo(doc.page.margins.left, d.start)
+					.lineTo(doc.page.margins.left, d.end - 10)
+					.dash(1, { space: 2 })
+					.stroke()
+				doc.restore()
+			})
+			doc.restore()
+
+			if (is_in_group) drawGroupBox(start, end, doc)
 		
 			// RESET THE FONT OF THE DOC
 			// doc.fillColor('#000')
 
 			// heightOfString(text, options)
-			doc.restore()
 		}
 		
 		// MEDIA
-		if (data.type === 'img') addImg({ data: data, lang: lang, doc: doc })
+		if (data.type === 'img') addImg({ data, lang, doc, is_in_group })
 		// if (data.type === 'mosaic') addMosaic({ data: data, lang: lang, doc: doc })
 		// // if (data.type === 'video') addVideo({ data: data, lang: lang, doc: doc }) // CANNOT ADD VIDEO TO PDF
 		// if (data.type === 'drawing') addDrawing({ data: data, lang: lang, doc: doc })
-		if (data.type === 'txt') addTxt({ data: data, lang: lang, doc: doc })
-		if (data.type === 'embed') addEmbed({ data: data, lang: lang, doc: doc })
-		if (data.type === 'checklist') addChecklist({ data: data, lang: lang, doc: doc })
-		// if (data.type === 'radiolist') addRadiolist({ data: data, lang: lang, doc: doc })
+		if (data.type === 'txt') addTxt({ data, lang, doc, is_in_group })
+		if (data.type === 'embed') addEmbed({ data, lang, doc, is_in_group })
+		if (data.type === 'checklist') addChecklist({ data, lang, doc, is_in_group })
+		if (data.type === 'radiolist') addRadiolist({ data, lang, doc, is_in_group })
 		
 		// // META
 		// // if (data.type === 'location') {
@@ -155,7 +169,6 @@ exports.main = (req, res) => {
 		// // GROUP
 		if (data.type === 'group') addGroup({ data: data, lang: lang, doc: doc })
 		// MOVE DOWN THE DOC
-		doc.moveDown()
 		// RESET THE FONT OF THE DOC
 		// doc.font('Helvetica')
 		// doc.fillColor('#000')
@@ -168,7 +181,7 @@ exports.main = (req, res) => {
 
 
 	function addImg (kwargs) { 
-		const { data, lang, doc } = kwargs || {}
+		const { data, lang, doc, is_in_group } = kwargs || {}
 		let { type, src, textalign, scale } = data || {}
 		if (!type) type = 'img'
 		if (!src) src = null
@@ -176,34 +189,23 @@ exports.main = (req, res) => {
 		if (!scale) scale = 'original'
 		
 		console.log('looking for image')
+		doc.save()
+		const start = doc.y
+		if (is_in_group) doc.translate(20, 0)
 		if (src) {
 			const img = doc.openImage(path.join(__dirname, `../../public/${src}`))
 			doc.image(img, { width: Math.min(doc.page.width - doc.x - doc.page.margins.right, img.width) })
 		}
-		// const media = new Media({ 
-		// 	parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		// 	container: container,
-		// 	type: type, 
-		// 	datum: { type: type, textalign: textalign, scale: scale, src: src, instruction: instruction, required: required },
-		// 	focus: focus || false,
-		// 	lang: lang
-		// })
-				
-		// if (src) {
-		// 	const img = new Image()
-		// 	img.onload = function () { 
-		// 		media.media.addElems('img').attrs({ 'class': d => d.scale, 'src': d => this.src })
-		// 	}
-		// 	img.onerror = function (err) {
-		// 		if (err) console.log(err)
-		// 		// if (img.src !== src) img.src = src
-		// 		// else console.log(err)
-		// 	}
-		// 	img.src = `/${src}`
-		// }
+		doc.moveDown()
+		const end = doc.y
+		doc.restore()
+		
+		if (is_in_group) drawGroupBox(start, end, doc)
+
+		return null
 	}
 	function addTxt (kwargs) {
-		const { data, lang, doc } = kwargs || {}
+		const { data, lang, doc, is_in_group } = kwargs || {}
 		let { fontsize, fontweight, fontstyle, textalign, txt, instruction } = data || {}
 		if (!fontsize) fontsize = 1
 		if (!fontweight) fontweight = 'normal'
@@ -212,33 +214,47 @@ exports.main = (req, res) => {
 		if (!txt) txt = ''
 
 		doc.save()
+		if (is_in_group) doc.translate(20, 0)
 		doc.fontSize(rem_size / fontsize)
 		if (fontweight === 'bold' && fontstyle === 'italic') doc.font('Helvetica-BoldOblique')
 		else if (fontweight === 'bold' && fontstyle !== 'italic') doc.font('Helvetica-Bold')
 		else if (fontweight !== 'bold' && fontstyle === 'italic') doc.font('Helvetica-Oblique')
+		const start = doc.y
 		doc.text(txt, {
 			align: textalign
 		})
 		doc.fontSize(rem_size)
+		doc.moveDown()
+		const end = doc.y
 		doc.restore()
+
+		if (is_in_group) drawGroupBox(start, end, doc)
+
 		return null
 	}
 	function addEmbed (kwargs) {
-		const { data, lang, doc } = kwargs || {}
+		const { data, lang, doc, is_in_group } = kwargs || {}
 		let { fontsize, fontweight, fontstyle, textalign, html, instruction } = data || {}
 		if (!textalign) textalign = 'left'
 		if (!html) html = ''
 
 		doc.save()
+		if (is_in_group) doc.translate(20, 0)
 		doc.font('Courier')
+		const start = doc.y
 		doc.text(html, {
 			align: textalign
 		})
+		doc.moveDown()
+		const end = doc.y
 		doc.restore()
+
+		if (is_in_group) drawGroupBox(start, end, doc)
+
 		return null
 	}
 	function addChecklist (kwargs) { 
-		const { data, lang, doc } = kwargs || {}
+		const { data, lang, doc, is_in_group } = kwargs || {}
 		let { fontsize, fontweight, fontstyle, options, instruction } = data || {}
 		if (!fontsize) fontsize = 1
 		if (!fontweight) fontweight = 'normal'
@@ -256,17 +272,64 @@ exports.main = (req, res) => {
 		options = options.filter(d => d.name)
 
 		doc.save()
+		if (is_in_group) doc.translate(20, 0)
 		doc.fontSize(rem_size / fontsize)
 		if (fontweight === 'bold' && fontstyle === 'italic') doc.font('Helvetica-BoldOblique')
 		else if (fontweight === 'bold' && fontstyle !== 'italic') doc.font('Helvetica-Bold')
 		else if (fontweight !== 'bold' && fontstyle === 'italic') doc.font('Helvetica-Oblique')
+		const start = doc.y
 		options.forEach(d => {
 			console.log(d)
 			if (!d.checked) doc.fillColor('#999')
 			else doc.fillColor('#000')
 			doc.list([d.name])
 		})
+		doc.moveDown()
+		const end = doc.y
 		doc.restore()
+
+		if (is_in_group) drawGroupBox(start, end, doc)
+
+		return null
+	}
+	function addRadiolist (kwargs) { 
+		const { data, lang, doc, is_in_group } = kwargs || {}
+		let { fontsize, fontweight, fontstyle, options, instruction } = data || {}
+		if (!fontsize) fontsize = 1
+		if (!fontweight) fontweight = 'normal'
+		if (!fontstyle) fontstyle = 'normal'
+		if (!options) options = []
+		else {
+			// THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
+			options.sort((a, b) => {
+				if (a.name === b.name) return 0
+				else if (!a.name || !a.name.trim().length) return 1
+				else if (!b.name || !b.name.trim().length) return -1
+				else return a.id < b.id ? -1 : 1
+			})
+		}
+		options = options.filter(d => d.name)
+
+		doc.save()
+		if (is_in_group) doc.translate(20, 0)
+		doc.fontSize(rem_size / fontsize)
+		if (fontweight === 'bold' && fontstyle === 'italic') doc.font('Helvetica-BoldOblique')
+		else if (fontweight === 'bold' && fontstyle !== 'italic') doc.font('Helvetica-Bold')
+		else if (fontweight !== 'bold' && fontstyle === 'italic') doc.font('Helvetica-Oblique')
+		const start = doc.y
+		options.forEach(d => {
+			console.log(d)
+			if (!d.checked) doc.fillColor('#999')
+			else doc.fillColor('#000')
+			doc.list([d.name])
+		})
+		doc.moveDown()
+		const end = doc.y
+		doc.restore()
+
+		if (is_in_group) drawGroupBox(start, end, doc)
+
+		return null
 	}
 
 	function addGroup (kwargs) {
@@ -276,15 +339,48 @@ exports.main = (req, res) => {
 		if (!type) type = 'group'
 		if (!structure) structure = []
 		if (!items) items = []
-
-		doc.moveDown()
-		doc.save()
-		doc.translate(20, 0)
+	
 		for (let i = 0; i < items.length; i ++) {
-			items[i].forEach(d => populateSection(d, lang, doc))
+			doc.save()
+			items[i].forEach(d => populateSection(d, lang, doc, true))
 			doc.moveDown()
+			doc.restore()
 		}
-		doc.restore()
+		doc.moveDown()
+
+		return null
+	}
+	function drawGroupBox (start, end, doc) {
+		const processed = processDrawing(start, end, doc)
+		
+		doc.save()
+		
+		processed.forEach(d => {
+			const grad = doc.linearGradient(doc.x, d.start, doc.x + 30, d.start)
+			grad.stop(0, colors.light_yellow)
+				.stop(1, [255,255,255] ,0)
+
+			doc.rect(doc.x, d.start, 30, d.end - d.start)
+			doc.fill(grad)
+
+			doc.strokeColor(colors.dark_yellow)
+			doc.moveTo(doc.x, d.start)
+				.lineTo(doc.x, d.end)
+				.stroke()
+			doc.restore()
+		})
+	}
+	function processDrawing (start, end, doc) {
+		const { height, margins } = doc.page
+		let { bottom, top } = margins
+		bottom = height - bottom
+		if (start >= bottom) { // DRAW ON NEXT PAGE
+			return [{ start: top, end: end }]
+		} else if (start < bottom && end > bottom) { // DRAW ON THIS PAGE AND THE NEXT
+			return [{ start: start, end: bottom }, { start: top, end: end }]
+		} else { // JUST DRAW ON THIS PAGE
+			return [{ start: start, end: end }]
+		}
 	}
 }
 

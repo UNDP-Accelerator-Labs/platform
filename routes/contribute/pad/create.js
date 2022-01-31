@@ -5,6 +5,9 @@ exports.main = (req, res) => {
 	const { object } = req.params || {}
 	const { template, source } = req.query || {}
 
+
+	// TO DO: INTERCEPT IF THERE IS ALREADY A FOLLOW UP
+	// WE ONLY WANT ONE PER PAD
 	DB.conn.tx(async t => {
 		const { pagetitle, path, uuid, originalUrl, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
 		// FILTERS

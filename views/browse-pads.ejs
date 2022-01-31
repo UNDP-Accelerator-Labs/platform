@@ -327,7 +327,7 @@
 		}
 
 
-		body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, txt: c } }))
+		body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, source: d.source, is_followup: d.is_followup, txt: c } }))
 			.addElems('a', 'pad-link')
 			// .attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
 			.attrs({ 

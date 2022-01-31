@@ -8,6 +8,8 @@ exports.main = (req, res) => {
 		// THIS SOLUTION IS TAKEN FROM https://dba.stackexchange.com/questions/122120/duplicate-row-with-primary-key-in-postgresql
 		console.log(`forwarding ${id}`)
 		DB.conn.tx(t => {
+			// TO DO: INTERCEPT IF THERE IS ALREADY A FOLLOW UP
+			// WE ONLY WANT ONE PER PAD
 			return t.one(`
 				INSERT INTO pads
 				SELECT (p1).* FROM (

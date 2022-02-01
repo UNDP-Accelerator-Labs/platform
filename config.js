@@ -12,3 +12,4 @@ exports.modules = modules
 // DISPLAY VARIABLES
 exports.lazyload = false // EDIT THIS
 exports.page_content_limit = 25 // EDIT THIS
+exports.followup_count = 1

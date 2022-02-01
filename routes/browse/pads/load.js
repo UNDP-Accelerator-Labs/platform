@@ -1,6 +1,6 @@
 // BROWSE > PADS > LOAD
 const DB = require('../../../db-config.js')
-const { page_content_limit } = require('../../../config.js')
+const { page_content_limit, followup_count } = require('../../../config.js')
 const filter = require('./filter').main
 
 exports.main = kwargs => {
@@ -108,20 +108,6 @@ exports.main = kwargs => {
 							ELSE FALSE
 						END AS is_followup,
 
-					CASE WHEN (
-							SELECT p2.id FROM pads p2 
-							INNER JOIN mobilization_contributions mc2 
-								ON p2.id = mc2.pad 
-							INNER JOIN mobilizations m2 
-								ON mc2.mobilization = m2.id 
-							WHERE p2.source = p.id 
-							AND m2.status = 1
-							LIMIT 1
-						) IS NOT NULL
-						THEN TRUE 
-						ELSE FALSE 
-					END AS followed_up,
-
 					CASE WHEN p.source IS NOT NULL
 						AND mob.mobilization IS NOT NULL
 						AND (SELECT copy FROM mobilizations WHERE id = mob.mobilization) = TRUE
@@ -129,11 +115,33 @@ exports.main = kwargs => {
 							ELSE FALSE
 						END AS is_forward,
 
-					COALESCE(json_agg(json_build_object('id', fmob.id, 'title', fmob.title, 'source', p.id, 'template', fmob.template)) 
-						FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = FALSE AND p.status = 2), NULL) AS followups,
+					COALESCE(json_agg(json_build_object(
+						'id', fmob.id, 
+						'title', fmob.title, 
+						'source', p.id, 
+						'template', fmob.template,
+						'count', (SELECT COUNT(p2.id) FROM pads p2 
+							INNER JOIN mobilization_contributions mc2 
+								ON p2.id = mc2.pad 
+							WHERE p2.source = p.id 
+							AND mc2.mobilization = fmob.id),
+						'max', $8::INT
+					)) FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = FALSE AND p.status = 2), '[]') 
+					AS followups,
 
-					COALESCE(json_agg(json_build_object('id', fmob.id, 'title', fmob.title, 'source', p.id, 'template', fmob.template)) 
-						FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = TRUE AND p.status = 2), NULL) AS forwards,
+					COALESCE(json_agg(json_build_object(
+						'id', fmob.id, 
+						'title', fmob.title, 
+						'source', p.id, 
+						'template', fmob.template,
+						'count', (SELECT COUNT(p2.id) FROM pads p2 
+							INNER JOIN mobilization_contributions mc2 
+								ON p2.id = mc2.pad 
+							WHERE p2.source = p.id 
+							AND mc2.mobilization = fmob.id),
+						'max', $8::INT
+					)) FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = TRUE AND p.status = 2), '[]') 
+					AS forwards,
 
 					COALESCE(
 						(SELECT m.pad_limit - COUNT (id) FROM pads pp 
@@ -211,15 +219,23 @@ exports.main = kwargs => {
 				WHERE TRUE 
 					$3:raw 
 					$4:raw
-					AND mob.mobilization = (SELECT MAX(mc2.mobilization) FROM mobilization_contributions mc2 WHERE mc2.pad = p.id)
+					AND (mob.mobilization = (SELECT MAX(mc2.mobilization) FROM mobilization_contributions mc2 WHERE mc2.pad = p.id)
+						OR mob.mobilization IS NULL)
 				GROUP BY (p.id, c.name, c.country, cp.id, mob.mobilization, ce.bookmarks, ce.inspirations, ce.approvals, ce.flags, e.types, m.pad_limit)
 				$5:raw
 				LIMIT $6 OFFSET $7
-			;`, [uuid, rights, full_filters, f_space, order, page_content_limit, (page - 1) * page_content_limit])
+			;`, [uuid, rights, full_filters, f_space, order, page_content_limit, (page - 1) * page_content_limit, followup_count])
 			.then(results => {
+				// REMOVE THE follow_ups AND forwards FOR PADS THAT HAVE ALREADY BEEN FOLLOWED UP FOR A GIVEN MOBILIZATION
+				results.forEach(d => {
+					console.log(d)
+					d.followups = d.followups?.filter(c => c.count < followup_count)
+					d.forwards = d.forwards?.filter(c => c.count < followup_count)
+				})
+
 				// IF ALL PADS ARE ALREADY RETRIEVED, THEN GROUP THEM
 				// IF A FOLLOW UP IS RETRIEVED BUT NOT THE SOURCE, LOOK FOR THE SOURCES AND RETRIEVE THEM
-				console.log(results.map(d => d.id))
+				// console.log(results.map(d => d.id))
 				results.forEach(d => {
 					if (d.source) {
 						const group = groups.find(c => c.includes(d.id))

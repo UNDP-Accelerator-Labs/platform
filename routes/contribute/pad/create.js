@@ -1,9 +1,10 @@
 const DB = require('../../../db-config.js')
+const { followup_count } = require('../../../config.js')
 const header_data = require('../../header/').data
 
 exports.main = (req, res) => {	
 	const { object } = req.params || {}
-	const { template, source } = req.query || {}
+	const { template, source, mobilization } = req.query || {}
 
 
 	// TO DO: INTERCEPT IF THERE IS ALREADY A FOLLOW UP
@@ -27,6 +28,18 @@ exports.main = (req, res) => {
 		}
 
 		const batch = []
+		// FIRST, CHECK IF THIS THERE IS A SOURCE AND THIS IS IN A MOBILIZATION 
+		// AND WHETHER THE PAD HAS ALREADY BEEN FOLLOWED UP IN THIS MOBILIZATION
+		if (mobilization && source) {
+			batch.push(t.one(`
+				SELECT COUNT(p.id) FROM mobilization_contributions mc
+				INNER JOIN pads p
+					ON p.id = mc.pad
+				WHERE mc.mobilization = $1
+				AND p.source = $2
+			`, [mobilization, source], d => d.count))
+		} else batch.push(0)
+
 		// THIS IS FOR THE TEMPLATE MENU
 		batch.push(t.any(`
 			SELECT id, title FROM templates
@@ -56,9 +69,13 @@ exports.main = (req, res) => {
 		return t.batch(batch)
 		.then(results => {
 			// let [templates, themes, sdgs, centerpoint, people, contributor] = results
-			let [templates, display_template, centerpoint, contributor] = results
+			let [ duplicates, templates, display_template, centerpoint, contributor ] = results
 
-			return { 
+			console.log('check duplicates')
+			console.log(duplicates)
+
+			if (duplicates >= followup_count) return res.redirect(`/${lang}/browse/pads/private`)
+			else return { 
 				metadata : {
 					page: {
 						title: pagetitle, 

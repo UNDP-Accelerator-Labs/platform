@@ -297,33 +297,47 @@
 			})
 		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 		
-		if (data.editable && data.followups && !data.followed_up) { // THE !data.followed_up LIMITS THE NUMBER OF POSSIBLE FOLLOW UPS TO ONE FOR A GIVEN MOBILIZATION
+		if (data.editable && data.followups.length) {
 			console.log(data.followups)
 			const dropdown = body.addElems('div', 'create follow-up')
 			dropdown.addElems('button')
 				.html('Follow-up') // TO DO: TRANSLATE
 			dropdown.addElems('div', 'drop-down')
 				.addElems('ul')
-			.addElems('li', null, d => d.followups)
+			.addElems('li', 'follow-up-option', d => d.followups)
 			.addElems('a')
-				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}&template=${d.template}&mobilization=${d.id}`, 'target': '_blank' })
+				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}&template=${d.template}&mobilization=${d.id}&display=adjacent`, 'target': '_blank' })
 				.addElems('button')
 			.html(d => d.title)
+			.on('click', function (d) {
+				const sel = d3.select(this)
+				const li = sel.findAncestor('follow-up-option')
+				const button = li.findAncestor('follow-up')
+				if (d.count + 1 >= d.max) li.remove()
+				if (button.selectAll('li').size() === 0) button.remove()
+			})
 
 			// TO DO: THIS NEEDS TO KEEP REFERENCE TO THE PAD BEING FOLLOWED UP AND THE NEW TEMPLATED PAD TO BE FILLED IN
 		}
 
-		if (data.editable && data.forwards && !data.followed_up) {
+		if (data.editable && data.forwards.length) {
 			const dropdown = body.addElems('div', 'create forward')
 				dropdown.addElems('button')
 					.html('Forward to') // TO DO: TRANSLATE
 				dropdown.addElems('div', 'drop-down')
 					.addElems('ul')
-				.addElems('li', null, d => d.forwards)
+				.addElems('li', 'forward-option', d => d.forwards)
 				.addElems('a')
 					.attrs({ 'href': d => `/forward/pad?id=${d.source}&mobilization=${d.id}` }) // TO DO: CHECK THIS WORKS
 					.addElems('button')
 				.html(d => d.title)
+				.on('click', function (d) {
+					const sel = d3.select(this)
+					const li = sel.findAncestor('forward-option')
+					const button = li.findAncestor('forward')
+					if (d.count + 1 >= d.max) li.remove()
+					if (button.selectAll('li').size() === 0) button.remove()
+				})
 		}
 
 

@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 const DB = require('../../../db-config.js')
 const header_data = require('../../header/').data
 const load = require('./load').main
-const { page_content_limit, lazyload } = require('../../../config.js')
+const { page_content_limit, lazyload, followup_count } = require('../../../config.js')
 const filter = require('./filter').main
 
 exports.main = (req, res) => { 
@@ -11,7 +11,7 @@ exports.main = (req, res) => {
 	const [f_space, order, page, full_filters] = filter(req)
 
 	DB.conn.tx(async t => {
-		const data = await load({ connection: t, req: req })
+		const data = await load({ connection: t, req })
 		const { pagetitle, path, uuid, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
 		
 		const batch = []
@@ -203,6 +203,7 @@ exports.main = (req, res) => {
 		}).then(d => d.flatObj()))
 		// CHECK NUMBER OF PUBLISHED PADS
 		// THIS IS TO LIMIT THE NUMBER THAT CAN BE PUBLISHED
+		// THIS IS ALSO PROBABLY DEPRECATED NOW
 		batch.push(t.one(`
 			SELECT COUNT (id)::INT FROM pads
 			WHERE status = 2

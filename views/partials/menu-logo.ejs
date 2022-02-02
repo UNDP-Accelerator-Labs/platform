@@ -1,6 +1,5 @@
 <nav id='site-title' class='sm'>
 	<div class='inner'>
-
 		<%# if (locals.metadata.page.object === 'pads') { %>
 			<% if (locals.metadata.user.rights > 0) { %>
 				<div class='create'>
@@ -127,6 +126,12 @@
 		<% if (locals.metadata.page.activity === 'browse' && locals.metadata.page.object === 'pads') { %>
 			<div class='search'>
 				<button onclick='d3.select(".filter-veil").classed("hide", false)'><img src='/imgs/icons/i-search.svg'></button>
+			</div>
+		<% } %>
+		
+		<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
+			<div class='save hide'>
+				<button><%- vocabulary['save'][locals.metadata.page.lang] %></button>
 			</div>
 		<% } %>
 	</div>

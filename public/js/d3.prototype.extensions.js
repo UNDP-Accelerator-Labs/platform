@@ -26,7 +26,7 @@ d3.selection.prototype.addElems = function (_element, _class, _data, _key) {
 	return new dynamicElement(this, 'append', _element.trim(), _class ? _class.trim() : null, _data, _key)
 }
 d3.selection.prototype.findAncestor = function (_class) {
-	if (!this.node().classList) return false
+	if (!this.node().classList) return null
 	if (this.classed(_class)) return this
 	return d3.select(this.node().parentNode) && d3.select(this.node().parentNode).findAncestor(_class);
 }

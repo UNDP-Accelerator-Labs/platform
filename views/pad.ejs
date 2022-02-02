@@ -582,15 +582,18 @@
 
 		POST('/save/pad', content)
 		.then(res => {
+			
 			// ADD THE NOTIFICATION
-			const header = d3.select('header ul.primary')
-			header.select('.placeholder').classed('saved', true)
-				.select('a button')
+			window.sessionStorage.removeItem('changed-content')
+			const menu_logo = d3.select('nav#site-title .inner')
+			menu_logo.select('.save').classed('saved', true)
+				.select('button')
 				.html(vocabulary['changes saved']['<%- locals.metadata.page.lang %>'])
 			window.setTimeout(_ => {
-				header.select('.placeholder').classed('hide', true)
-				header.selectAll('li:not(.placeholder)').classed('hide', false)
+				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
+				menu_logo.selectAll('div.save').classed('hide', true)
 			}, 1000)
+			
 			// REMOVE ITEMS TO DELETE
 			window.sessionStorage.removeItem('deleted')
 			// CHANGE THE URL TO INCLUDE THE PAD ID
@@ -694,14 +697,19 @@
 					}
 				}
 			} else {
-				if (!(
+				if ((d3.select(e.srcElement).classed('media')
+						|| d3.select(e.srcElement).classed('meta')
+						|| d3.select(e.srcElement).classed('title')
+					) && !(
 					[e.srcElement.nodeName, e.srcElement.tagName].map(d => d.toLowerCase()).includes('input') 
 					&& (
-						d3.select(e.srcElement).findAncestor('search') && d3.select(e.srcElement).findAncestor('search').node() 
-						|| d3.select(e.srcElement).findAncestor('filter-or-add') && d3.select(e.srcElement).findAncestor('filter-or-add').node()
+						d3.select(e.srcElement).findAncestor('search')?.node() 
+						|| d3.select(e.srcElement).findAncestor('filter-or-add')?.node()
+						)
 					)
-				)) {
-					switchButtons('<%- locals.metadata.page.lang %>') // THIS PICKS UP ON KEYSTROKES OUTSIDE OF INPUT FIELDS
+				) {
+					switchButtons('<%- locals.metadata.page.lang %>') 
+					// THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS 
 				}
 			}
 		}

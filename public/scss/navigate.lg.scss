@@ -121,7 +121,8 @@ nav#site-title.sm {
 		width: 15%;
 		z-index: 1000;
 
-		.create {
+		.create, 
+		.save {
 			position: relative;
 			margin-top: 31px;
 
@@ -267,6 +268,21 @@ nav#site-title.sm {
 					height: 60px;
 					cursor: pointer;
 				}
+			}
+		}
+		.save {
+			button {
+				background-color: $c-light-blue;
+				padding:  0 15px;
+				border-color: $c-light-blue;
+				color: #FFF;
+			}
+		}
+		.save.saved {
+			button {
+				background-color: $c-mid-blue;
+				border-color: $c-mid-blue;
+				color: #FFF;
 			}
 		}
 	}

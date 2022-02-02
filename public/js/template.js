@@ -18,7 +18,6 @@ const observer = new MutationObserver(evt => {
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
 			if (changedContent) {
-				window.sessionStorage.removeItem('changed-content')
 				// SAVE
 				let item = evt.find(d => d.oldValue.includes('focus'))
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
@@ -1059,12 +1058,12 @@ function addGroup (kwargs) {
 }
 
 function switchButtons (lang = 'en') {
-	const header = d3.select('header ul.primary') 
+	const menu_logo = d3.select('nav#site-title .inner')
 	window.sessionStorage.setItem('changed-content', true)
 	// PROVIDE FEEDBACK: UNSAVED CHANGES
-	header.selectAll('li:not(.placeholder)').classed('hide', true)
-	header.select('.placeholder').classed('hide', false)
-		.select('a button')
+	menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
+	menu_logo.selectAll('div.save').classed('hide saved', false)
+		.select('button')
 	.on('click', _ => partialSave())
 		.html(vocabulary['save changes'][lang])
 }

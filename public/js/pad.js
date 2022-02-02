@@ -18,7 +18,6 @@ const observer = new MutationObserver(evt => {
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
 			if (changedContent) {
-				window.sessionStorage.removeItem('changed-content')
 				// SAVE
 				let item = evt.find(d => d.oldValue.includes('focus'))
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
@@ -1111,8 +1110,8 @@ function addDrawing (kwargs) {
 		['mouseup', 'ontouchend'].forEach(evt_handler => {
 			window.addEventListener(evt_handler, evt => {
 				canvas.node()['__drawing__'] = false
+				switchButtons(lang)
 				partialSave('media')
-				// switchButtons(lang)
 			})
 		});
 	}
@@ -1439,8 +1438,10 @@ function addChecklist (kwargs) {
 			sel.findAncestor('opt').select('.checkbox label i')
 				.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
 
-			// if (editing) switchButtons(lang)
-			if (editing) partialSave('media')
+			if (editing) {
+				switchButtons(lang)
+				partialSave('media')
+			}
 		})
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
@@ -1609,8 +1610,10 @@ function addRadiolist (kwargs) {
 		.on('change', _ => {
 			opts.selectAll('input[type=radio]').each(function (d) { d.checked = this.checked })
 			opts.selectAll('label i').html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
-			// if (editing) switchButtons(lang)
-			if (editing) partialSave('media')
+			if (editing) {
+				switchButtons(lang)
+				partialSave('media')
+			}
 		})
 		opts.addElems('div', 'radio')
 			.addElems('label')
@@ -2165,12 +2168,12 @@ function addGroup (kwargs) {
 
 // SAVING BUTTON
 function switchButtons (lang = 'en') {
-	const header = d3.select('header ul.primary') 
+	const menu_logo = d3.select('nav#site-title .inner')
 	window.sessionStorage.setItem('changed-content', true)
 	// PROVIDE FEEDBACK: UNSAVED CHANGES
-	header.selectAll('li:not(.placeholder)').classed('hide', true)
-	header.select('.placeholder').classed('hide', false)
-		.select('a button')
+	menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
+	menu_logo.selectAll('div.save').classed('hide saved', false)
+		.select('button')
 	.on('click', _ => partialSave())
 		.html(vocabulary['save changes'][lang])
 }

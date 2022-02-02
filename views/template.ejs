@@ -516,15 +516,18 @@
 
 		POST('/save/template', content)
 		.then(res => {
+			
 			// ADD THE NOTIFICATION
-			const header = d3.select('header ul.primary')
-			header.select('.placeholder').classed('saved', true)
-				.select('a button')
-				.html(vocabulary['changes saved'][lang])
+			window.sessionStorage.removeItem('changed-content')
+			const menu_logo = d3.select('nav#site-title .inner')
+			menu_logo.select('.save').classed('saved', true)
+				.select('button')
+				.html(vocabulary['changes saved']['<%- locals.metadata.page.lang %>'])
 			window.setTimeout(_ => {
-				header.select('.placeholder').classed('hide', true)
-				header.selectAll('li:not(.placeholder)').classed('hide', false)
+				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
+				menu_logo.selectAll('div.save').classed('hide', true)
 			}, 1000)
+			
 			// CHANGE THE URL TO INCLUDE THE PAD ID
 			if (!id) { // INSERT
 				queryparams.append('id', res.object)

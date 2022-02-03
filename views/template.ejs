@@ -407,6 +407,8 @@
 		const content = {}
 		// COLLECT TITLE
 		const title = head.select('.title').node().innerText
+		if (title.length > 99) title = `${title.slice(0, 98)}…`
+			
 		const description = descriptionLayout.select('.media-container .media-txt').node().innerText
 		// MAYBE INCLUDE ALERT IF title IS EMPTY
 		// COLLECT ALL MEDIA

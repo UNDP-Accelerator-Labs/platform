@@ -13,15 +13,15 @@ const observer = new MutationObserver(evt => {
 	setTimeout(_ => {
 		if (evt.unique('type', true).includes('attributes') 
 			&& evt.unique('attributeName', true).includes('class') 
-			&& (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus'))
-			&& !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
+			&& evt.map(d => d.oldValue).join(' ').includes('focus')
+			// && (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus'))
+			// && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
 			if (changedContent) {
 				// SAVE
 				let item = evt.find(d => d.oldValue.includes('focus'))
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
-				console.log(item)
 				partialSave(item)
 			}
 		}

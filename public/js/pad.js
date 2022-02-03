@@ -14,10 +14,8 @@ const observer = new MutationObserver(evt => {
 		if (evt.unique('type', true).includes('attributes') 
 			&& evt.unique('attributeName', true).includes('class') 
 			&& evt.map(d => d.oldValue).join(' ').includes('focus')
-			// && (
-			// 	evt.map(d => d.oldValue).join(' ').includes('focus') 
-			// 	&& !evt.map(d => d.target.className).join(' ').includes('focus')
-			// ) && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
+			// && (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus')) 
+			// && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
 			if (changedContent) {
@@ -584,6 +582,8 @@ function addSection (kwargs) {
 	if (!lead) lead = ''
 	if (!structure) structure = []
 	if (!items) items = []
+
+	console.log(structure)
 
 	if (editing && templated && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure)) // TO DO: THIS IS NOT OPTIMAL, BUT DEEP COPY IS NEEDED
 

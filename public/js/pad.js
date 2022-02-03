@@ -24,7 +24,6 @@ const observer = new MutationObserver(evt => {
 				// SAVE
 				let item = evt.find(d => d.oldValue.includes('focus'))
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
-				// console.log(item)
 				partialSave(item)
 			}
 		}

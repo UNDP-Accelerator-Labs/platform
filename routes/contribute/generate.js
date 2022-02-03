@@ -3,6 +3,8 @@ const DB = require('../../db-config.js')
 const path = require('path')
 const fs = require('fs')
 const PDFDocument = require('pdfkit')
+const { vocabulary } = require('../header/language.js')
+
 // DOCUMENTATION HERE: https://pdfkit.org/docs/getting_started.html
 const { v4: uuidv4 } = require('uuid')
 
@@ -10,12 +12,25 @@ exports.main = (req, res) => {
 	// CHECK THE PAD EXISTS
 	const { uuid } = req.session || {}
 	const { format } = req.params || {}
-	const { id } = req.body || {}
+	const { id, lang } = req.body || {}
 
 	if (!format) format = 'pdf'
 	if (!id) res.send('No id submitted')
-	
-	const rem_size = 12 // THIS IS THE BASIC FONT SIZE FOR THE PDF DOCUMENT
+	if (!lang) lang = 'en'
+		
+	const fontsizes = {
+		xsmall: 10,
+		small: 12,
+		mid_small: 14,
+		main: 16,
+		mid: 20,
+		large: 24,
+		xlarge: 36,
+		xxlarge: 60,
+		xxxlarge: 90
+	}
+	for (key in fontsizes) fontsizes[key] = fontsizes[key] * .75
+
 	const colors = {
 		dark_blue: '#0A4C73',
 		mid_blue: '#0468B1',
@@ -39,6 +54,8 @@ exports.main = (req, res) => {
 		light_grey: '#969696'
 	}
 
+	let page = 0
+
 	DB.conn.one(`
 		SELECT * FROM pads WHERE id = $1
 	;`, [+id]).then(result => {
@@ -57,14 +74,28 @@ exports.main = (req, res) => {
 				'Subject': 'This document was created using PDFKit: https://pdfkit.org/docs/getting_started.html',
 				'ModDate': Date.now()
 			},
-			size: 'A4'
+			size: 'A4',
+			bufferPages: true
 		})
 		// CREATE THE WRITE STREAM
 		doc.pipe(fs.createWriteStream(target))
 		doc.pipe(res)
 
+		doc.on('pageAdded', _ => page ++)
+
+		// ADD THE TITLE
+		doc.fontSize(fontsizes.xlarge)
+		.fillColor(colors.dark_blue)
+		.font('Helvetica-Bold')
+		.text(result.title)
+		.moveDown()
+		
+		resetEnvironment(doc)
+
+		// doc.moveDown()
+		// ADD THE SECTIONS
 		result.sections.forEach(d => {
-			addSection({ data: d, lang: 'en', doc: doc }) // CHANGE en TO CURRENT LANGUAGE // ALTHOUGH THIS SHOULD NOT BE NEEDED HERE
+			addSection({ data: d, lang, doc }) // CHANGE en TO CURRENT LANGUAGE // ALTHOUGH THIS SHOULD NOT BE NEEDED HERE
 		})
 
 		doc.end() // FINALIZE THE STREAM FOR THE PDF FILE
@@ -79,30 +110,43 @@ exports.main = (req, res) => {
 		if (!structure) structure = []
 		if (!items) items = []
 
+		let { x, y } = doc
+		const { width, margins } = doc.page
+		let { right } = margins
+		right = width - right
+
+
 		if (title) {
-			doc.text(title)
+			const w = doc.widthOfString(title)
+			const h = doc.heightOfString(title)
+			doc.fillColor(colors.dark_blue)
+			.rect(x, y - 5, w + 20, h + 5)
+			.fill()
+
+			doc.fillColor(colors.light_grey)
+			doc.text(title, x + 10, y)
+			
+			resetEnvironment(doc)
 		}
+
+		y = doc.y
+		doc.save()
+		doc.strokeColor(colors.dark_blue)
+		doc.moveTo(x, y)
+		.lineTo(right, y)
+		.stroke()
+		.moveDown()
+		doc.restore()
+
 		if (lead) {
 			doc.save()
-			doc.fontSize(rem_size * 1.25)
-			doc.text(lead, { paragraphGap: 10 })
-			doc.fontSize(rem_size)
+			doc.fontSize(fontsizes.large)
+				.fillColor(colors.dark_grey)
+				.text(lead)
+				.moveDown()
+				.fontSize(fontsizes.main)
 			doc.restore()
 		}
-		// const header = section.addElems('div', 'section-header')
-		// 	.addElems('label')
-		// 	.attrs({ 
-		// 		'data-placeholder': d => 'Section header', // TO DO: TRANSLATION
-		// 		'contenteditable': editing && !templated ? true : null 
-		// 	}).html(d => d.title)
-
-		// if (templated && lead) {
-		// 	const medialead = new Media({
-		// 		parent: section.node(), 
-		// 		type: 'lead', 
-		// 		datum: { type: 'lead', lead: lead },
-		// 		lang: lang
-		// 	})
 		
 		items.forEach(d => {
 			populateSection(d, lang, doc)
@@ -112,39 +156,32 @@ exports.main = (req, res) => {
 
 	function populateSection (data, lang = 'en', doc, is_in_group = false) {
 		if (data.instruction) {
-			doc.save()
-			
-			if (is_in_group) doc.translate(20, 0)
 			doc.fillColor(colors.mid_blue)
-			doc.text(data.instruction, { indent: 10, paragraphGap: 10 })
+			.text(data.instruction, doc.x + (is_in_group ? 20 : 0), doc.y, { indent: 10, paragraphGap: fontsizes.main })
+			resetEnvironment(doc)
 
-			const start = doc.y - doc.heightOfString(data.instruction) - 10
-			const end = doc.y
-			doc.save()
+			const start = { x: doc.x, y: doc.y - doc.heightOfString(data.instruction) - fontsizes.main, page }
+			const end = { x: doc.x, y: doc.y, page }
 			const processed	= processDrawing(start, end, doc)
 			processed.forEach(d => {
+				doc.save()
+				if (is_in_group) doc.translate(20, 0)
 				doc.strokeColor(colors.mid_blue)
-				doc.moveTo(doc.page.margins.left, d.start)
-					.lineTo(doc.page.margins.left, d.end - 10)
-					.dash(1, { space: 2 })
-					.stroke()
+				.moveTo(doc.page.margins.left, d.y1)
+				.lineTo(doc.page.margins.left, d.y2 - fontsizes.main)
+				.dash(1, { space: 2 })
+				.stroke()
 				doc.restore()
 			})
-			doc.restore()
 
 			if (is_in_group) drawGroupBox(start, end, doc)
-		
-			// RESET THE FONT OF THE DOC
-			// doc.fillColor('#000')
-
-			// heightOfString(text, options)
 		}
 		
 		// MEDIA
 		if (data.type === 'img') addImg({ data, lang, doc, is_in_group })
 		// if (data.type === 'mosaic') addMosaic({ data: data, lang: lang, doc: doc })
 		// // if (data.type === 'video') addVideo({ data: data, lang: lang, doc: doc }) // CANNOT ADD VIDEO TO PDF
-		// if (data.type === 'drawing') addDrawing({ data: data, lang: lang, doc: doc })
+		if (data.type === 'drawing') addDrawing({ data, lang, doc, is_in_group })
 		if (data.type === 'txt') addTxt({ data, lang, doc, is_in_group })
 		if (data.type === 'embed') addEmbed({ data, lang, doc, is_in_group })
 		if (data.type === 'checklist') addChecklist({ data, lang, doc, is_in_group })
@@ -168,10 +205,6 @@ exports.main = (req, res) => {
 		// if (data.type === 'datasources') addDataSources({ data: data, lang: lang, doc: doc })
 		// // GROUP
 		if (data.type === 'group') addGroup({ data: data, lang: lang, doc: doc })
-		// MOVE DOWN THE DOC
-		// RESET THE FONT OF THE DOC
-		// doc.font('Helvetica')
-		// doc.fillColor('#000')
 	}
 
 
@@ -182,27 +215,104 @@ exports.main = (req, res) => {
 
 	function addImg (kwargs) { 
 		const { data, lang, doc, is_in_group } = kwargs || {}
-		let { type, src, textalign, scale } = data || {}
-		if (!type) type = 'img'
+		let { src, textalign, scale } = data || {}
 		if (!src) src = null
 		if (!textalign) textalign = 'left'
 		if (!scale) scale = 'original'
+
+		const { width, height, margins } = doc.page
+		const { right, bottom, top } = margins
 		
 		console.log('looking for image')
-		doc.save()
-		const start = doc.y
-		if (is_in_group) doc.translate(20, 0)
+		let start = { x: doc.x, y: doc.y, page }
 		if (src) {
 			const img = doc.openImage(path.join(__dirname, `../../public/${src}`))
-			doc.image(img, { width: Math.min(doc.page.width - doc.x - doc.page.margins.right, img.width) })
+			const { width: w, height: h } = img
+			const scaledwidth = Math.min(width - doc.x - right, w)
+			const scaledheight = scaledwidth * h / w
+			if (doc.y + scaledheight > height - bottom) {
+				doc.addPage()
+				start = { x: doc.x, y: top, page }
+			}
+			doc.save()
+			if (is_in_group) doc.translate(20, 0)
+			doc.image(img, { width: scaledwidth, height: scaledheight })
+			doc.restore()
+		} else {
+			doc.fillColor(colors.light_grey)
+			.text(vocabulary['missing image'][lang], doc.x + (is_in_group ? 20 : 0), doc.y)
+			resetEnvironment(doc)
 		}
 		doc.moveDown()
-		const end = doc.y
-		doc.restore()
+		const end = { x: doc.x, y: doc.y, page }
 		
 		if (is_in_group) drawGroupBox(start, end, doc)
 
 		return null
+	}
+	function addDrawing (kwargs) {
+		const { data, lang, doc, is_in_group } = kwargs || {}
+		let { shapes, size, instruction } = data || {}
+		const scale = size[1] / size[0]
+		if (!shapes) shapes = []
+		shapes = shapes.filter(d => d.points.length)
+		if (!size) size = []
+
+		const { width, height, margins } = doc.page
+		const { left, right, bottom, top } = margins
+
+		console.log('looking for drawing')
+		let start = { x: doc.x, y: doc.y, page }
+		if (doc.y + size[1] * scale > height - bottom) {
+			doc.addPage()
+			doc.y = top
+			start = { x: doc.x, y: doc.y, page }
+		}
+
+		doc.save()
+		doc.translate(doc.x + (width - left - right - size[0] * scale) / 2, doc.y)
+		.scale(scale)
+		if (is_in_group) doc.translate(20, 0)
+		
+		doc.rect(0, 0, size[0], size[1])
+		.fillAndStroke('#FFF', colors.light_grey)
+
+		if (shapes.length) {
+			shapes.forEach(d => {
+				doc.save()
+				if (d.type === 'line') {
+					doc.lineWidth(d.lineWidth)
+					.strokeColor(d.color)
+					.lineCap('round')
+					.lineJoin('round')
+
+					d.points.forEach((p, i) => {
+						if (i === 0) doc.moveTo(p[0], p[1])
+						else doc.lineTo(p[0], p[1])
+					})
+					doc.stroke()
+				}
+				doc.restore()
+			})
+		} else {
+			doc.save()
+			.fillColor(colors.light_grey)
+			.fontSize(fontsizes.main / scale)
+			.translate(0, size[1] * scale / 2)
+			.text('Missing drawing.', { width: size[0], align: 'center' }) // TO DO: TRANSLATION
+			.restore()
+		}
+		resetEnvironment(doc)
+		doc.y += size[1] * scale
+		doc.moveDown()
+		.restore()
+
+		const end = { x: doc.x, y: doc.y, page }
+
+		if (is_in_group) drawGroupBox(start, end, doc)
+
+		return null
+
 	}
 	function addTxt (kwargs) {
 		const { data, lang, doc, is_in_group } = kwargs || {}
@@ -214,18 +324,16 @@ exports.main = (req, res) => {
 		if (!txt) txt = ''
 
 		doc.save()
-		if (is_in_group) doc.translate(20, 0)
-		doc.fontSize(rem_size / fontsize)
+		doc.fontSize(fontsizes.main / fontsize)
 		if (fontweight === 'bold' && fontstyle === 'italic') doc.font('Helvetica-BoldOblique')
 		else if (fontweight === 'bold' && fontstyle !== 'italic') doc.font('Helvetica-Bold')
 		else if (fontweight !== 'bold' && fontstyle === 'italic') doc.font('Helvetica-Oblique')
-		const start = doc.y
-		doc.text(txt, {
+		const start = { x: doc.x, y: doc.y, page }
+		doc.text(txt, doc.x + (is_in_group ? 20 : 0), doc.y, {
 			align: textalign
-		})
-		doc.fontSize(rem_size)
-		doc.moveDown()
-		const end = doc.y
+		}).moveDown()
+		resetEnvironment(doc)
+		const end = { x: doc.x, y: doc.y, page }
 		doc.restore()
 
 		if (is_in_group) drawGroupBox(start, end, doc)
@@ -245,11 +353,12 @@ exports.main = (req, res) => {
 		doc.text(html, {
 			align: textalign
 		})
-		doc.moveDown()
+		.font('Helvetica')
+		.moveDown()
 		const end = doc.y
 		doc.restore()
 
-		if (is_in_group) drawGroupBox(start, end, doc)
+		// if (is_in_group) drawGroupBox(start, end, doc)
 
 		return null
 	}
@@ -272,20 +381,37 @@ exports.main = (req, res) => {
 		options = options.filter(d => d.name)
 
 		doc.save()
-		if (is_in_group) doc.translate(20, 0)
-		doc.fontSize(rem_size / fontsize)
+		doc.fontSize(fontsizes.main / fontsize)
 		if (fontweight === 'bold' && fontstyle === 'italic') doc.font('Helvetica-BoldOblique')
 		else if (fontweight === 'bold' && fontstyle !== 'italic') doc.font('Helvetica-Bold')
 		else if (fontweight !== 'bold' && fontstyle === 'italic') doc.font('Helvetica-Oblique')
-		const start = doc.y
+		const start = { x: doc.x, y: doc.y, page }
+		
 		options.forEach(d => {
-			console.log(d)
-			if (!d.checked) doc.fillColor('#999')
-			else doc.fillColor('#000')
-			doc.list([d.name])
+			let { x, y } = doc
+			doc.text(d.name, x + (is_in_group ? 50 : 30), y, { 
+				paragraphGap: fontsizes.main / 2
+			})
+
+			if (y + doc.heightOfString('dummy') > doc.page.height - doc.page.margins.bottom) y = doc.page.margins.top
+			doc.save()
+			doc.translate(is_in_group ? 30 : 10, -1)
+			.lineWidth(1.5)
+			.lineJoin('round')
+			.rect(x, y, 12, 12)
+			if (!d.checked) doc.fillAndStroke('#FFF', colors.dark_blue)
+			else {
+				doc.fillAndStroke(colors.dark_blue, colors.dark_blue)
+				.strokeColor('#FFF')
+				.path(`M ${x + 2},${y + 12 / 2} L ${x + (12 - 2) / 2},${y + 12 - 3} L ${x + 12 - 2},${y + 2}`)
+				.stroke()
+			}
+			doc.restore()
+
+			resetEnvironment(doc)
 		})
 		doc.moveDown()
-		const end = doc.y
+		const end = { x: doc.x, y: doc.y, page }
 		doc.restore()
 
 		if (is_in_group) drawGroupBox(start, end, doc)
@@ -311,20 +437,35 @@ exports.main = (req, res) => {
 		options = options.filter(d => d.name)
 
 		doc.save()
-		if (is_in_group) doc.translate(20, 0)
-		doc.fontSize(rem_size / fontsize)
+		doc.fontSize(fontsizes.main / fontsize)
 		if (fontweight === 'bold' && fontstyle === 'italic') doc.font('Helvetica-BoldOblique')
 		else if (fontweight === 'bold' && fontstyle !== 'italic') doc.font('Helvetica-Bold')
 		else if (fontweight !== 'bold' && fontstyle === 'italic') doc.font('Helvetica-Oblique')
-		const start = doc.y
+		const start = { x: doc.x, y: doc.y, page }
+
 		options.forEach(d => {
-			console.log(d)
-			if (!d.checked) doc.fillColor('#999')
-			else doc.fillColor('#000')
-			doc.list([d.name])
+			let { x, y } = doc
+			doc.text(d.name, x + (is_in_group ? 50 : 30), y, { 
+				paragraphGap: fontsizes.main / 2
+			})
+
+			if (y + doc.heightOfString('dummy') > doc.page.height - doc.page.margins.bottom) y = doc.page.margins.top
+			doc.save()
+			doc.translate(is_in_group ? 30 : 10, 0)
+			.lineWidth(1.5)
+			.circle(x + 5, y + 5, 6.5)
+			.fillAndStroke('#FFF', colors.dark_blue)
+			if (d.checked) {
+				doc.fillColor(colors.dark_blue)
+				.circle(x + 5, y + 5, 3.5)
+				.fill()
+			}
+			doc.restore()
+
+			resetEnvironment(doc)
 		})
 		doc.moveDown()
-		const end = doc.y
+		const end = { x: doc.x, y: doc.y, page }
 		doc.restore()
 
 		if (is_in_group) drawGroupBox(start, end, doc)
@@ -353,34 +494,50 @@ exports.main = (req, res) => {
 	function drawGroupBox (start, end, doc) {
 		const processed = processDrawing(start, end, doc)
 		
-		doc.save()
-		
 		processed.forEach(d => {
-			const grad = doc.linearGradient(doc.x, d.start, doc.x + 30, d.start)
+			doc.switchToPage(Math.min(d.page, doc.bufferedPageRange().count))
+			doc.save()
+			const grad = doc.linearGradient(start.x, d.y1, start.x + 30, d.y1)
 			grad.stop(0, colors.light_yellow)
 				.stop(1, [255,255,255] ,0)
 
-			doc.rect(doc.x, d.start, 30, d.end - d.start)
+			doc.rect(start.x, d.y1, 30, d.y2 - d.y1)
 			doc.fill(grad)
 
 			doc.strokeColor(colors.dark_yellow)
-			doc.moveTo(doc.x, d.start)
-				.lineTo(doc.x, d.end)
-				.stroke()
+			doc.moveTo(start.x, d.y1)
+			.lineTo(end.x, d.y2)
+			.stroke()
 			doc.restore()
+
+			resetEnvironment(doc)
 		})
 	}
 	function processDrawing (start, end, doc) {
 		const { height, margins } = doc.page
 		let { bottom, top } = margins
 		bottom = height - bottom
-		if (start >= bottom) { // DRAW ON NEXT PAGE
-			return [{ start: top, end: end }]
-		} else if (start < bottom && end > bottom) { // DRAW ON THIS PAGE AND THE NEXT
-			return [{ start: start, end: bottom }, { start: top, end: end }]
-		} else { // JUST DRAW ON THIS PAGE
-			return [{ start: start, end: end }]
+		const pagespan = end.page - start.page
+
+		if (pagespan === 0) {
+			if (start >= bottom) { // DRAW ON NEXT PAGE
+				return [{ y1: top, y2: end.y, page: start.page }]
+			} else { // JUST DRAW ON THIS PAGE
+				return [{ y1: start.y, y2: end.y, page: start.page }]
+			}
+		} else {
+			return new Array(pagespan + 1).fill(0).map((d, i) => {
+				if (i === 0) return { y1: start.y, y2: bottom, page: start.page + i }
+				else if (i === pagespan) return { y1: top, y2: end.y, page: start.page + i }
+				else return { y1: top, y2: bottom, page: start.page + i }
+			})
 		}
+	}
+	function resetEnvironment (doc) {
+		doc.fontSize(fontsizes.main)
+		.font('Helvetica')
+		.fillColor(colors.dark_grey)
+		doc.x = doc.page.margins.left
 	}
 }
 

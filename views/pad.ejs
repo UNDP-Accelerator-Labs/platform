@@ -216,6 +216,7 @@
 		<div class='generate-pdf'>
 			<form method='POST' action='/generate/pdf'>
 				<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
+				<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
 				<button type='submit'>Generate PDF</button>
 			</form>
 		</div>
@@ -582,7 +583,6 @@
 
 		POST('/save/pad', content)
 		.then(res => {
-			
 			// ADD THE NOTIFICATION
 			window.sessionStorage.removeItem('changed-content')
 			const menu_logo = d3.select('nav#site-title .inner')
@@ -752,8 +752,7 @@
 					focused_node.classed('focus', false)
 					console.log('in to out')
 				}
-			}
-			else {
+			} else {
 				autofillTitle()
 				console.log('out')
 			}

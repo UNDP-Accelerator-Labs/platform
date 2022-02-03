@@ -13,8 +13,11 @@ const observer = new MutationObserver(evt => {
 	setTimeout(_ => {
 		if (evt.unique('type', true).includes('attributes') 
 			&& evt.unique('attributeName', true).includes('class') 
-			&& (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus'))
-			&& !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
+			&& evt.map(d => d.oldValue).join(' ').includes('focus')
+			// && (
+			// 	evt.map(d => d.oldValue).join(' ').includes('focus') 
+			// 	&& !evt.map(d => d.target.className).join(' ').includes('focus')
+			// ) && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
 			if (changedContent) {
@@ -976,6 +979,7 @@ function addDrawing (kwargs) {
 	let { type, shapes, size, instruction, required } = data || {}
 	if (!type) type = 'drawing'
 	if (!shapes) shapes = []
+	shapes = shapes.filter(d => d.points.length)
 	if (!size) size = []
 	required = required ?? false
 

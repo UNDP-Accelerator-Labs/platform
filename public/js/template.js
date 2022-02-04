@@ -16,6 +16,7 @@ const observer = new MutationObserver(evt => {
 			&& evt.map(d => d.oldValue).join(' ').includes('focus')
 			// && (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus'))
 			// && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
+			&& evt.find(d => d.oldValue.includes('focus')) !== evt.find(d => d.target.className.includes('focus'))
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
 			if (changedContent) {
@@ -605,7 +606,7 @@ function addChecklist (kwargs) {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
-					d.options = d.options.filter(c => c.name && c.name.length)
+					d.options = d.options.filter(c => c.name?.length)
 					d.options.push({ checked: false })
 				})
 				list.call(addItem)
@@ -616,7 +617,7 @@ function addChecklist (kwargs) {
 
 	function addItem (sel) {
 		const opts = sel.addElems('li', 'opt', d => d.options)
-			.classed('valid', d => d.name && d.name.length)
+			.classed('valid', d => d.name?.length)
 			.each((d, i) => d.id = i)
 		opts.addElems('div', 'hide')
 			.addElems('input')
@@ -655,14 +656,14 @@ function addChecklist (kwargs) {
 				this.blur()
 				
 				media.container.each(d => {
-					d.options = d.options.filter(c => c.name && c.name.length)
+					d.options = d.options.filter(c => c.name?.length)
 					d.options.push({ checked: false })
 				})
 				list.call(addItem)
 			}
 		}).on('blur', function (d) {
 			d.name = this.innerText.trim()
-			d3.select(this).findAncestor('opt').classed('valid', d => d.name && d.name.length)
+			d3.select(this).findAncestor('opt').classed('valid', d => d.name?.length)
 
 			if (editing) switchButtons(lang)
 		}).html(d => d.name)
@@ -731,7 +732,7 @@ function addRadiolist (kwargs) {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
-					d.options = d.options.filter(c => c.name && c.name.length)
+					d.options = d.options.filter(c => c.name?.length)
 					d.options.push({ checked: false })
 				})
 				list.call(addItem)
@@ -741,8 +742,9 @@ function addRadiolist (kwargs) {
 	}
 
 	function addItem (sel) {
+		sel.each(d => console.log(d))
 		const opts = sel.addElems('li', 'opt', d => d.options)
-			.classed('valid', d => d.name && d.name.length)
+			.classed('valid', d => d.name?.length)
 			.each((d, i) => d.id = i)
 		opts.addElems('div', 'hide')
 			.addElems('input')
@@ -774,21 +776,22 @@ function addRadiolist (kwargs) {
 				'data-placeholder': vocabulary['new checklist item'][lang],
 				'contenteditable': activity !== 'view' ? true : null
 			})
-		.on('keydown', function () {
+		.on('keydown', function (d) {
 			const evt = d3.event
+			d.name = this.innerText.trim()
 			if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
 				evt.preventDefault()
 				this.blur()
 				
 				media.container.each(d => {
-					d.options = d.options.filter(c => c.name && c.name.length)
+					d.options = d.options.filter(c => c.name?.length)
 					d.options.push({ checked: false })
 				})
 				list.call(addItem)
 			}
 		}).on('blur', function (d) {
 			d.name = this.innerText.trim()
-			d3.select(this).findAncestor('opt').classed('valid', d => d.name && d.name.length)
+			d3.select(this).findAncestor('opt').classed('valid', d => d.name?.length)
 
 			if (editing) switchButtons(lang)
 		}).html(d => d.name)

@@ -765,8 +765,8 @@
 		const data = <%- JSON.stringify(locals.display_template || {}) %>;
 
 		if (data.sections) {
-			head.select('.title').attr('data-placeholder', data.sections.map(d => d.items || d.structure).flat()
-				.find(d => d.type === 'title')?.instruction)
+			const title_instruction = data.sections.map(d => d.items || d.structure).flat().find(d => d.type === 'title')?.instruction
+			if (title_instruction) head.select('.title').attr('data-placeholder', title_instruction)
 
 			data.sections.forEach(async d => {
 				if (httpquery?.display?.includes('slideshow')) {

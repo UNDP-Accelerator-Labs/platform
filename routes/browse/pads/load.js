@@ -95,11 +95,15 @@ exports.main = kwargs => {
 			// https://stackoverflow.com/questions/54637699/how-to-group-multiple-columns-into-a-single-array-or-similar/54638050
 			// https://stackoverflow.com/questions/24155190/postgresql-left-join-json-agg-ignore-remove-null
 			
-			// TO DO: MAKE SURE THE FOLLOW UP IS ASSIGNED TO THIS USER
-			// MAKE SURE THE FOLLOW UP IS NOT ACCESSIBLE THROUGH THE MAIN MENU: A FOLLOW UP MUST BE ASSOCIATED WITH AN EXISTING, PUBLISHED PAD
 			return t.any(`
 				SELECT p.id, p.sections, p.title, p.status, to_char(p.date, 'DD Mon YYYY') AS date, p.source,
-					c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization, m.pad_limit,
+					c.name AS contributorname, c.country, cp.id AS country_id, mob.mobilization, 
+					m.title AS mobilization_title, m.pad_limit, p.template, t.title AS template_title,
+
+					CASE WHEN p.source IS NOT NULL
+						THEN (SELECT p2.title FROM pads p2 WHERE p2.id = p.source) 
+						ELSE NULL
+					END AS source_title,
 
 					CASE WHEN p.source IS NOT NULL
 						AND mob.mobilization IS NOT NULL
@@ -191,6 +195,8 @@ exports.main = kwargs => {
 					ON c.id = p.contributor
 				INNER JOIN centerpoints cp
 					ON c.country = cp.country
+				LEFT JOIN templates t
+					ON t.id = p.template
 				LEFT JOIN (
 					SELECT pad, contributor, array_agg(DISTINCT type) AS types FROM engagement_pads
 					WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1)
@@ -221,7 +227,21 @@ exports.main = kwargs => {
 					$4:raw
 					AND (mob.mobilization = (SELECT MAX(mc2.mobilization) FROM mobilization_contributions mc2 WHERE mc2.pad = p.id)
 						OR mob.mobilization IS NULL)
-				GROUP BY (p.id, c.name, c.country, cp.id, mob.mobilization, ce.bookmarks, ce.inspirations, ce.approvals, ce.flags, e.types, m.pad_limit)
+				GROUP BY (
+					p.id, 
+					c.name, 
+					c.country, 
+					cp.id, 
+					mob.mobilization, 
+					ce.bookmarks, 
+					ce.inspirations, 
+					ce.approvals, 
+					ce.flags, 
+					e.types, 
+					m.title, 
+					m.pad_limit,
+					t.title
+				)
 				$5:raw
 				LIMIT $6 OFFSET $7
 			;`, [uuid, rights, full_filters, f_space, order, page_content_limit, (page - 1) * page_content_limit, followup_count])

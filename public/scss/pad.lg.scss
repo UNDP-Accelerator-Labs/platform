@@ -191,6 +191,10 @@ main#mobilization {
 					.media,
 					.media.focus {
 						border-top: none;
+
+						i {
+							color: $c-mid-grey;
+						}
 					}
 				}
 			}
@@ -1334,7 +1338,7 @@ main#pad.slideshow {
 }
 div#source {
 	position: fixed;
-	width: 50%;
+	width: calc(50% - 30px); /* THE 30px ARE FOR THE REQUIRED ASTERISK TO BE VISIBLE */
 	height: 100vh;
 	background: repeating-linear-gradient(
 		-45deg,
@@ -1355,10 +1359,10 @@ div#source {
 main#pad.split-screen {
 	width: 50%;
 	min-width: 0;
-	margin-left: 50%;
+	margin-left: calc(50% - 30px);
 }
 div.display-option {
-	position: absolute;
+	position: fixed;
 	top: 30px;
 	width: 100%;
 	z-index: 1000;
@@ -1387,7 +1391,7 @@ div.display-option {
 div.display-option.split-screen {
 	a {
 		button {
-			width: 50%;
+			width: calc(50% - 30px);
 		}
 	}
 }

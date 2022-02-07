@@ -182,6 +182,22 @@ div.browse {
 									font-size: $t-small;
 									color: $c-mid-blue;
 								}
+								.meta-mobilization,
+								.meta-template {
+									font-size: $t-small;
+									display: inline-block;
+								}
+								.meta-mobilization,
+								.meta-template,
+								.meta-followup,
+								.meta-forward {
+									color: $c-mid-grey;
+								}
+								.meta-mobilization {
+									padding-right: 10px;
+									margin-right: 10px;
+									border-right: 1px solid $c-mid-blue;
+								}
 								.tag-group {
 									.meta-tags {
 										margin-left: -5px;

@@ -1443,6 +1443,15 @@ main#mobilization .inner .body .layout.description-layout .media-container .medi
 main#mobilization .inner .body .layout.description-layout .media-container .media.focus {
     border-top: none;
   }
+  main#pad .inner .body .layout.description-layout .media-container .media i,
+main#pad .inner .body .layout.description-layout .media-container .media.focus i, main#reference .inner .body .layout.description-layout .media-container .media i,
+main#reference .inner .body .layout.description-layout .media-container .media.focus i,
+main#template .inner .body .layout.description-layout .media-container .media i,
+main#template .inner .body .layout.description-layout .media-container .media.focus i,
+main#mobilization .inner .body .layout.description-layout .media-container .media i,
+main#mobilization .inner .body .layout.description-layout .media-container .media.focus i {
+    color: #646464;
+  }
   main#pad .inner .body .layout, main#reference .inner .body .layout,
 main#template .inner .body .layout,
 main#mobilization .inner .body .layout {
@@ -4079,7 +4088,8 @@ main#mobilization .inner .body .input-group.fixed label {
 
   div#source {
     position: fixed;
-    width: 50%;
+    width: calc(50% - 30px);
+    /* THE 30px ARE FOR THE REQUIRED ASTERISK TO BE VISIBLE */
     height: 100vh;
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(150, 150, 150, 0.1) 10px, rgba(150, 150, 150, 0.1) 20px);
     overflow: auto;
@@ -4094,11 +4104,11 @@ main#mobilization .inner .body .input-group.fixed label {
   main#pad.split-screen {
     width: 50%;
     min-width: 0;
-    margin-left: 50%;
+    margin-left: calc(50% - 30px);
   }
 
   div.display-option {
-    position: absolute;
+    position: fixed;
     top: 30px;
     width: 100%;
     z-index: 1000;
@@ -4123,7 +4133,7 @@ main#mobilization .inner .body .input-group.fixed label {
   }
 
   div.display-option.split-screen a button {
-    width: 50%;
+    width: calc(50% - 30px);
   }
 
   nav#import {
@@ -4659,6 +4669,78 @@ div.browse main .inner section .mobilizations-layout .template .inner .body .met
 div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-date {
     font-size: 12px;
     color: #0468B1;
+  }
+  div.browse main .inner section .pads-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-template,
+div.browse main .inner section .pads-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .template .inner .body .meta-template,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-template,
+div.browse main .inner section .templates-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .template .inner .body .meta-template,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-template {
+    font-size: 12px;
+    display: inline-block;
+  }
+  div.browse main .inner section .pads-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-template,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-followup,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-forward,
+div.browse main .inner section .pads-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .template .inner .body .meta-template,
+div.browse main .inner section .pads-layout .template .inner .body .meta-followup,
+div.browse main .inner section .pads-layout .template .inner .body .meta-forward,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-followup,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-forward,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-template,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-followup,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-forward,
+div.browse main .inner section .templates-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .template .inner .body .meta-template,
+div.browse main .inner section .templates-layout .template .inner .body .meta-followup,
+div.browse main .inner section .templates-layout .template .inner .body .meta-forward,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-followup,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-forward,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-followup,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-forward,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-followup,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-forward,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-followup,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-forward {
+    color: #646464;
+  }
+  div.browse main .inner section .pads-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-mobilization {
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #0468B1;
   }
   div.browse main .inner section .pads-layout .pad .inner .body .tag-group .meta-tags,
 div.browse main .inner section .pads-layout .template .inner .body .tag-group .meta-tags,
@@ -7206,6 +7288,15 @@ main#mobilization .inner .body .layout.description-layout .media-container .medi
 main#mobilization .inner .body .layout.description-layout .media-container .media.focus {
     border-top: none;
   }
+  main#pad .inner .body .layout.description-layout .media-container .media i,
+main#pad .inner .body .layout.description-layout .media-container .media.focus i, main#reference .inner .body .layout.description-layout .media-container .media i,
+main#reference .inner .body .layout.description-layout .media-container .media.focus i,
+main#template .inner .body .layout.description-layout .media-container .media i,
+main#template .inner .body .layout.description-layout .media-container .media.focus i,
+main#mobilization .inner .body .layout.description-layout .media-container .media i,
+main#mobilization .inner .body .layout.description-layout .media-container .media.focus i {
+    color: #646464;
+  }
   main#pad .inner .body .layout, main#reference .inner .body .layout,
 main#template .inner .body .layout,
 main#mobilization .inner .body .layout {
@@ -9842,7 +9933,8 @@ main#mobilization .inner .body .input-group.fixed label {
 
   div#source {
     position: fixed;
-    width: 50%;
+    width: calc(50% - 30px);
+    /* THE 30px ARE FOR THE REQUIRED ASTERISK TO BE VISIBLE */
     height: 100vh;
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(150, 150, 150, 0.1) 10px, rgba(150, 150, 150, 0.1) 20px);
     overflow: auto;
@@ -9857,11 +9949,11 @@ main#mobilization .inner .body .input-group.fixed label {
   main#pad.split-screen {
     width: 50%;
     min-width: 0;
-    margin-left: 50%;
+    margin-left: calc(50% - 30px);
   }
 
   div.display-option {
-    position: absolute;
+    position: fixed;
     top: 30px;
     width: 100%;
     z-index: 1000;
@@ -9886,7 +9978,7 @@ main#mobilization .inner .body .input-group.fixed label {
   }
 
   div.display-option.split-screen a button {
-    width: 50%;
+    width: calc(50% - 30px);
   }
 
   nav#import {
@@ -10422,6 +10514,78 @@ div.browse main .inner section .mobilizations-layout .template .inner .body .met
 div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-date {
     font-size: 12px;
     color: #0468B1;
+  }
+  div.browse main .inner section .pads-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-template,
+div.browse main .inner section .pads-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .template .inner .body .meta-template,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-template,
+div.browse main .inner section .templates-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .template .inner .body .meta-template,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-template {
+    font-size: 12px;
+    display: inline-block;
+  }
+  div.browse main .inner section .pads-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-template,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-followup,
+div.browse main .inner section .pads-layout .pad .inner .body .meta-forward,
+div.browse main .inner section .pads-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .template .inner .body .meta-template,
+div.browse main .inner section .pads-layout .template .inner .body .meta-followup,
+div.browse main .inner section .pads-layout .template .inner .body .meta-forward,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-followup,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-forward,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-template,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-followup,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-forward,
+div.browse main .inner section .templates-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .template .inner .body .meta-template,
+div.browse main .inner section .templates-layout .template .inner .body .meta-followup,
+div.browse main .inner section .templates-layout .template .inner .body .meta-forward,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-followup,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-forward,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-followup,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-forward,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-followup,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-forward,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-template,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-followup,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-forward {
+    color: #646464;
+  }
+  div.browse main .inner section .pads-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .pads-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .templates-layout .mobilization .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .pad .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .template .inner .body .meta-mobilization,
+div.browse main .inner section .mobilizations-layout .mobilization .inner .body .meta-mobilization {
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #0468B1;
   }
   div.browse main .inner section .pads-layout .pad .inner .body .tag-group .meta-tags,
 div.browse main .inner section .pads-layout .template .inner .body .tag-group .meta-tags,

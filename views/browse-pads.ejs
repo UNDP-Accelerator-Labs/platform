@@ -241,9 +241,9 @@
 		const foot = pads.addElems('div', 'foot')
 
 		const metagroup = head.addElems('div', 'meta-group')
-		metagroup.addElems('div', 'meta meta-contributor')
-			.addElems('a')
-			.attr('href', d => `?countries=${d.country_id}`)
+		const metainfo = metagroup.addElems('div', 'meta meta-contributor')
+		metainfo.addElems('a', 'contributor-name')
+			.attr('href', d => `?countries=${d.country_id}`) // TO DO: FIX ISSUE HERE FOR VIEW WITH CONTRIBUTOR NAMES
 			.html(d => `<% if (locals.metadata.page.space === 'private') { %>${d.contributorname}<% } else { %>${d.country}<% } %>`)
 
 		metagroup.addElems('div', 'btn-group')
@@ -272,7 +272,8 @@
 		})
 
 		const title = body.addElems('div', 'media media-title')
-			.addElems('a', 'pad-link')
+			
+		const title_link = title.addElems('a', 'pad-link')
 			.attrs({ 
 				'href': d => {
 					if (d.editable) {
@@ -289,13 +290,48 @@
 				}, 'target': '_blank'
 			})
 			.addElems('h1')
-		title.addElems('img')
+		title_link.addElems('img')
 			.attr('src', d => {
 				if (d.is_followup) return '/imgs/icons/i-followup-pad.svg'
 				else if (d.is_forward) return '/imgs/icons/i-forward-pad.svg'
 				else return '/imgs/icons/i-pad.svg'
 			})
-		title.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
+		title_link.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
+
+		body.addElems('div', 'meta meta-followup', d => d.source && d.is_followup ? [d] : [])
+			.attr('title', d => d.source_title)
+			.html('<i>This pad follows up on:</i> ')
+		.addElems('a')
+			.attrs({
+				'href': d => {
+					if (d.editable) return `../../edit/pad?id=${d.source}`
+					else return `../../view/pad?id=${d.source}`
+				}, 'target': '_blank'
+			}).html(d => d.source_title.length > 25 ? `${d.source_title.slice(0, 25)}…` : d.source_title)
+
+		body.addElems('div', 'meta meta-forward', d => d.source && d.is_forward ? [d] : [])
+			.attr('title', d => d.source_title)
+			.html('<i>This pad was forwared from:</i> ')
+		.addElems('a')
+			.attrs({
+				'href': d => {
+					if (d.editable) return `../../edit/pad?id=${d.source}`
+					else return `../../view/pad?id=${d.source}`
+				}, 'target': '_blank'
+			}).html(d => d.source_title.length > 25 ? `${d.source_title.slice(0, 25)}…` : d.source_title)
+
+		body.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
+			.attr('title', d => d.mobilization_title)
+			.html('<i>Submitted to:</i> ')
+		.addElems('a')
+			.attr('href', d => `?mobilizations=${d.mobilization}`)
+			.html(d => d.mobilization_title.length > 25 ? `${d.mobilization_title.slice(0, 25)}…` : d.mobilization_title)
+		body.addElems('div', 'meta meta-template', d => d.template ? [d] : [])
+			.attr('title', d => d.template_title)
+			.html('<i>Based on:</i> ')
+		.addElems('a')
+			.attr('href', d => `?templates=${d.mobilization}`)
+			.html(d => d.template_title.length > 25 ? `${d.template_title.slice(0, 25)}…` : d.template_title)
 		
 		if (data.editable && data.followups.length) {
 			console.log(data.followups)

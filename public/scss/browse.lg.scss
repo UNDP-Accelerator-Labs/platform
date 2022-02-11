@@ -2,7 +2,7 @@ div.browse {
 	display: inline-block;
 	width: 55%;
 	min-width: 875px;
-	/*margin-left: 15%;*/
+	margin-left: 15%;
 	padding-top: 120px;
 
 	nav {
@@ -235,8 +235,8 @@ div.browse {
 								}
 								.create {
 									position: relative;
-									display: inline-block;
-									margin: 0 10px 15px 0;
+									display: block;
+									margin: 5px 10px 10px 0;
 
 									button {
 										height: 30px;

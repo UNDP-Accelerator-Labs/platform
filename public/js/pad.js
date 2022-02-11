@@ -531,8 +531,22 @@ function deleteImg (sel, lang = 'en') {
 }
 function addImgs (array, lang = 'en', container = null, focus = false) {
 	const fls = array.filter(d => d.status === 200)
-	if (fls.length === 1) fls.forEach(f => addImg({ data: { src: f.src }, lang: lang, container: container, focus: focus })) // ONLY ONE IMAGE SO NO MOSAIC
-	else addMosaic({ data: { srcs: fls.map(f => f.src) }, lang: lang, container: container, focus: focus })
+	// THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
+	if (fls.length === 1) {
+		fls.forEach(f => {
+			let data = {}
+			if (container) data = container.datum()
+			if (data.type !== 'img') data = { instruction: data.instruction }
+			data['src'] = f.src
+			addImg({ data, lang, container, focus })
+		}) // ONLY ONE IMAGE SO NO MOSAIC
+	} else {
+		let data = {}
+		if (container) data = container.datum()
+		if (data.type !== 'mosaic') data = { instruction: data.instruction }
+		data['srcs'] = fls.map(f => f.src)
+		addMosaic({ data, lang, container, focus })
+	}
 }
 function uploadVideo (form, lang = 'en', container = null, focus = true) {
 	const ellipsis = d3.select('.media-layout').addElems('div', 'lds-ellipsis')
@@ -553,9 +567,15 @@ function uploadVideo (form, lang = 'en', container = null, focus = true) {
 		setTimeout(_ => notification.remove(), 4000)
 		switchButtons(lang)
 		return json
-	}).then(data => {
-		const fls = data.filter(d => d.status === 200)
-		if (fls.length === 1) fls.forEach(f => addVideo({ data: { src: f.src }, lang: lang, container: container, focus: focus }))
+	}).then(videos => {
+		const fls = videos.filter(d => d.status === 200)
+		// SAME AS FOR IMAGES: THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
+		if (fls.length === 1) {
+			let data = {}
+			if (container) data = container.datum()
+			data['src'] = f.src
+			fls.forEach(f => addVideo({ data, lang, container, focus }))
+		}
 	})
 	.catch(err => { if (err) throw err })
 }
@@ -768,13 +788,9 @@ function addImg (kwargs) {
 	// WE NEED THE ICON IF
 	// THE PAD IS BASED ON A TEMPLATE: templated
 	// THE PAD IS IN create, preview MODE
-	// THERE IS NOT IMAGE YET
+	// THERE IS NO IMAGE YET
 	if (templated && (activity !== 'view' || (activity === 'preview' && !src))) { 		
 		let form_id = uuidv4()
-		// let form_id = 0
-		// d3.selectAll('.media-container.img-container').each(function (d, i) {
-		// 	if (this === media.container.node()) form_id = i
-		// })
 		
 		if (media.input) {
 			const form = media.input.addElems('form')
@@ -1095,12 +1111,14 @@ function addDrawing (kwargs) {
 		['mousedown', 'ontouchstart'].forEach(evt_handler => {
 			window.addEventListener(evt_handler, evt => {
 				canvas.node()['__drawing__'] = onCanvas.call(evt)
-				canvas.datum().shapes.push({ 
-					type: 'line', 
-					points: [], 
-					lineWidth: media.opts.select('input.brush-size').node().value,
-					color: media.opts.select('button.color.active').node().value 
-				})
+				if (canvas.node()['__drawing__']) {
+					canvas.datum().shapes.push({ 
+						type: 'line', 
+						points: [], 
+						lineWidth: media.opts.select('input.brush-size').node().value,
+						color: media.opts.select('button.color.active').node().value 
+					})
+				}
 			})
 		});
 		['mousemove', 'ontouchmove'].forEach(evt_handler => {
@@ -1111,9 +1129,11 @@ function addDrawing (kwargs) {
 		});
 		['mouseup', 'ontouchend'].forEach(evt_handler => {
 			window.addEventListener(evt_handler, evt => {
-				canvas.node()['__drawing__'] = false
-				switchButtons(lang)
-				partialSave('media')
+				if (canvas.node()['__drawing__']) {
+					canvas.node()['__drawing__'] = false
+					switchButtons(lang)
+					partialSave('media')
+				}
 			})
 		});
 	}

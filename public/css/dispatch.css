@@ -411,7 +411,7 @@ header .inner ul li.active::after {
   }
 
   nav#site-title.sm {
-    display: inline-block;
+    display: block;
     width: 15%;
   }
   nav#site-title.sm .inner {
@@ -1191,7 +1191,9 @@ main#mobilization {
     width: 55%;
     min-width: 875px;
     margin-left: 15%;
-    padding-top: 63px;
+    /*padding-top: 63px;*/
+    padding-top: 30px;
+    /*padding-bottom: 75px;*/
     /*margin: 95px auto 0 auto;*/
     /*padding: 60px 0;*/
   }
@@ -1377,6 +1379,65 @@ main#mobilization .engagement-input-group ul li button:hover::after {
 main#template .inner,
 main#mobilization .inner {
     padding: 10px;
+    padding-top: 0;
+  }
+  main#pad .inner .meta-status, main#reference .inner .meta-status,
+main#template .inner .meta-status,
+main#mobilization .inner .meta-status {
+    width: 100%;
+  }
+  main#pad .inner .meta-status .btn-group, main#reference .inner .meta-status .btn-group,
+main#template .inner .meta-status .btn-group,
+main#mobilization .inner .meta-status .btn-group {
+    width: 300px;
+    height: 30px;
+    margin-left: auto;
+    padding: 15px 0;
+    margin-bottom: 15px;
+    z-index: 100;
+  }
+  main#pad .inner .meta-status .btn-group form, main#reference .inner .meta-status .btn-group form,
+main#template .inner .meta-status .btn-group form,
+main#mobilization .inner .meta-status .btn-group form {
+    display: inline-block;
+    margin: 0 5px 0 5px;
+  }
+  main#pad .inner .meta-status .btn-group form button, main#reference .inner .meta-status .btn-group form button,
+main#template .inner .meta-status .btn-group form button,
+main#mobilization .inner .meta-status .btn-group form button {
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid #0A4C73;
+    outline: none;
+    background-color: transparent;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  main#pad .inner .meta-status .btn-group form button.publish, main#reference .inner .meta-status .btn-group form button.publish,
+main#template .inner .meta-status .btn-group form button.publish,
+main#mobilization .inner .meta-status .btn-group form button.publish {
+    background-color: #32BEE1;
+    border-color: #32BEE1;
+    color: #FFF;
+  }
+  main#pad .inner .meta-status .btn-group form button:disabled, main#reference .inner .meta-status .btn-group form button:disabled,
+main#template .inner .meta-status .btn-group form button:disabled,
+main#mobilization .inner .meta-status .btn-group form button:disabled {
+    background-color: transparent;
+    border: 1px solid #E5E5E5;
+    color: #E5E5E5;
+    pointer-events: none;
+    cursor: default;
+  }
+  main#pad .inner .meta-status.status-0, main#reference .inner .meta-status.status-0,
+main#template .inner .meta-status.status-0,
+main#mobilization .inner .meta-status.status-0 {
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 193, 14, 0.1) 10px, rgba(255, 193, 14, 0.1) 20px);
+  }
+  main#pad .inner .meta-status.status-1, main#reference .inner .meta-status.status-1,
+main#template .inner .meta-status.status-1,
+main#mobilization .inner .meta-status.status-1 {
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(50, 190, 225, 0.1) 10px, rgba(50, 190, 225, 0.1) 20px);
   }
   main#pad .inner .head, main#reference .inner .head,
 main#template .inner .head,
@@ -1421,6 +1482,7 @@ main#mobilization .inner .head .dropdown {
 main#template .inner .body,
 main#mobilization .inner .body {
     width: 100%;
+    padding-bottom: 60px;
   }
   main#pad .inner .body .layout.description-layout, main#reference .inner .body .layout.description-layout,
 main#template .inner .body .layout.description-layout,
@@ -3937,14 +3999,19 @@ main#template .inner .body .input-group.fixed label,
 main#mobilization .inner .body .input-group.fixed label {
     pointer-events: all;
   }
-
   main#reference {
     pointer-events: none;
   }
 
   footer#pad {
-    padding: 65px 0;
-    background-color: #F0F0F0;
+    /*	position: static;
+    	width: 100%;
+    	min-height: 60px;
+    	background-color: $c-light-blue;
+    */
+  }
+  footer#pad .inner {
+    /* BELOW IS FOR THE COMMENTS MODULE */
   }
   footer#pad .inner button {
     height: 45px;
@@ -4339,7 +4406,7 @@ main#mobilization .inner .body .input-group.fixed label {
     display: inline-block;
     width: 55%;
     min-width: 875px;
-    /*margin-left: 15%;*/
+    margin-left: 15%;
     padding-top: 120px;
   }
   div.browse nav {
@@ -4836,8 +4903,8 @@ div.browse main .inner section .mobilizations-layout .pad .inner .body .create,
 div.browse main .inner section .mobilizations-layout .template .inner .body .create,
 div.browse main .inner section .mobilizations-layout .mobilization .inner .body .create {
     position: relative;
-    display: inline-block;
-    margin: 0 10px 15px 0;
+    display: block;
+    margin: 5px 10px 10px 0;
   }
   div.browse main .inner section .pads-layout .pad .inner .body .create button,
 div.browse main .inner section .pads-layout .template .inner .body .create button,
@@ -6256,7 +6323,7 @@ header .inner ul li.active::after {
   }
 
   nav#site-title.sm {
-    display: inline-block;
+    display: block;
     width: 15%;
   }
   nav#site-title.sm .inner {
@@ -7036,7 +7103,9 @@ main#mobilization {
     width: 55%;
     min-width: 875px;
     margin-left: 15%;
-    padding-top: 63px;
+    /*padding-top: 63px;*/
+    padding-top: 30px;
+    /*padding-bottom: 75px;*/
     /*margin: 95px auto 0 auto;*/
     /*padding: 60px 0;*/
   }
@@ -7222,6 +7291,65 @@ main#mobilization .engagement-input-group ul li button:hover::after {
 main#template .inner,
 main#mobilization .inner {
     padding: 10px;
+    padding-top: 0;
+  }
+  main#pad .inner .meta-status, main#reference .inner .meta-status,
+main#template .inner .meta-status,
+main#mobilization .inner .meta-status {
+    width: 100%;
+  }
+  main#pad .inner .meta-status .btn-group, main#reference .inner .meta-status .btn-group,
+main#template .inner .meta-status .btn-group,
+main#mobilization .inner .meta-status .btn-group {
+    width: 300px;
+    height: 30px;
+    margin-left: auto;
+    padding: 15px 0;
+    margin-bottom: 15px;
+    z-index: 100;
+  }
+  main#pad .inner .meta-status .btn-group form, main#reference .inner .meta-status .btn-group form,
+main#template .inner .meta-status .btn-group form,
+main#mobilization .inner .meta-status .btn-group form {
+    display: inline-block;
+    margin: 0 5px 0 5px;
+  }
+  main#pad .inner .meta-status .btn-group form button, main#reference .inner .meta-status .btn-group form button,
+main#template .inner .meta-status .btn-group form button,
+main#mobilization .inner .meta-status .btn-group form button {
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid #0A4C73;
+    outline: none;
+    background-color: transparent;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  main#pad .inner .meta-status .btn-group form button.publish, main#reference .inner .meta-status .btn-group form button.publish,
+main#template .inner .meta-status .btn-group form button.publish,
+main#mobilization .inner .meta-status .btn-group form button.publish {
+    background-color: #32BEE1;
+    border-color: #32BEE1;
+    color: #FFF;
+  }
+  main#pad .inner .meta-status .btn-group form button:disabled, main#reference .inner .meta-status .btn-group form button:disabled,
+main#template .inner .meta-status .btn-group form button:disabled,
+main#mobilization .inner .meta-status .btn-group form button:disabled {
+    background-color: transparent;
+    border: 1px solid #E5E5E5;
+    color: #E5E5E5;
+    pointer-events: none;
+    cursor: default;
+  }
+  main#pad .inner .meta-status.status-0, main#reference .inner .meta-status.status-0,
+main#template .inner .meta-status.status-0,
+main#mobilization .inner .meta-status.status-0 {
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 193, 14, 0.1) 10px, rgba(255, 193, 14, 0.1) 20px);
+  }
+  main#pad .inner .meta-status.status-1, main#reference .inner .meta-status.status-1,
+main#template .inner .meta-status.status-1,
+main#mobilization .inner .meta-status.status-1 {
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(50, 190, 225, 0.1) 10px, rgba(50, 190, 225, 0.1) 20px);
   }
   main#pad .inner .head, main#reference .inner .head,
 main#template .inner .head,
@@ -7266,6 +7394,7 @@ main#mobilization .inner .head .dropdown {
 main#template .inner .body,
 main#mobilization .inner .body {
     width: 100%;
+    padding-bottom: 60px;
   }
   main#pad .inner .body .layout.description-layout, main#reference .inner .body .layout.description-layout,
 main#template .inner .body .layout.description-layout,
@@ -9782,14 +9911,19 @@ main#template .inner .body .input-group.fixed label,
 main#mobilization .inner .body .input-group.fixed label {
     pointer-events: all;
   }
-
   main#reference {
     pointer-events: none;
   }
 
   footer#pad {
-    padding: 65px 0;
-    background-color: #F0F0F0;
+    /*	position: static;
+    	width: 100%;
+    	min-height: 60px;
+    	background-color: $c-light-blue;
+    */
+  }
+  footer#pad .inner {
+    /* BELOW IS FOR THE COMMENTS MODULE */
   }
   footer#pad .inner button {
     height: 45px;
@@ -10184,7 +10318,7 @@ main#mobilization .inner .body .input-group.fixed label {
     display: inline-block;
     width: 55%;
     min-width: 875px;
-    /*margin-left: 15%;*/
+    margin-left: 15%;
     padding-top: 120px;
   }
   div.browse nav {
@@ -10681,8 +10815,8 @@ div.browse main .inner section .mobilizations-layout .pad .inner .body .create,
 div.browse main .inner section .mobilizations-layout .template .inner .body .create,
 div.browse main .inner section .mobilizations-layout .mobilization .inner .body .create {
     position: relative;
-    display: inline-block;
-    margin: 0 10px 15px 0;
+    display: block;
+    margin: 5px 10px 10px 0;
   }
   div.browse main .inner section .pads-layout .pad .inner .body .create button,
 div.browse main .inner section .pads-layout .template .inner .body .create button,

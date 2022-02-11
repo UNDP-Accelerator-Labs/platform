@@ -4,7 +4,9 @@ main#mobilization {
 	width: 55%;
 	min-width: 875px;
 	margin-left: 15%;
-	padding-top: 63px;	
+	/*padding-top: 63px;*/
+	padding-top: 30px;
+	/*padding-bottom: 75px;*/
 	/*margin: 95px auto 0 auto;*/
 	/*padding: 60px 0;*/
 
@@ -148,6 +150,65 @@ main#mobilization {
 	}
 	.inner {
 		padding: 10px;
+		padding-top: 0;
+
+		.meta-status {
+			width: 100%;
+
+			.btn-group {
+				width: 300px;
+				height: 30px;
+				margin-left: auto;
+				padding: 15px 0;
+				margin-bottom: 15px;
+				z-index: 100;
+
+				form {
+					display: inline-block;
+					margin: 0 5px 0 5px;
+					
+					button {
+						height: 30px;
+						padding: 0 10px;
+						border: 1px solid $c-dark-blue;
+						outline: none;
+						background-color: transparent;
+						font-size: $t-mid-small;
+						cursor: pointer;
+					}
+					button.publish {
+						background-color: $c-light-blue;
+						border-color: $c-light-blue;
+						color: #FFF;
+					}
+					button:disabled {
+						background-color: transparent;
+						border: 1px solid $c-light-2;
+						color: $c-light-2;
+						pointer-events: none;
+						cursor: default;
+					}
+				}
+			}
+		}
+		.meta-status.status-0 {
+			background: repeating-linear-gradient(
+				-45deg,
+				transparent,
+				transparent 10px,
+				rgba(255, 193, 14, .1) 10px,
+				rgba(255, 193, 14, .1) 20px
+			);
+		}
+		.meta-status.status-1 {
+			background: repeating-linear-gradient(
+				-45deg,
+				transparent,
+				transparent 10px,
+				rgba(50, 190, 225, .1) 10px,
+				rgba(50, 190, 225, .1) 20px
+			);
+		}
 
 		.head {
 			position: relative;
@@ -179,6 +240,7 @@ main#mobilization {
 		}
 		.body {
 			width: 100%;
+			padding-bottom: 60px;
 
 			.layout.description-layout {
 				clear: both;
@@ -1175,17 +1237,22 @@ main#mobilization {
 				}
 			}
 		}
+		.foot {
+		}
 	}
 }
 main#reference {
 	pointer-events: none;
 }
 footer#pad {
-	padding: 65px 0;
-	background-color: $c-light-3;
-
+/*	position: static;
+	width: 100%;
+	min-height: 60px;
+	background-color: $c-light-blue;
+*/
 	.inner {
 
+		/* BELOW IS FOR THE COMMENTS MODULE */
 		button {
 			height: 45px;
 			background-color: $c-dark-1;

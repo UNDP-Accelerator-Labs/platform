@@ -136,6 +136,29 @@
 		</div>
 	<% } %> -->
 	<div class='inner'>
+		<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
+			<div class='meta-status status-<%- locals.data?.status || 0 %>'>
+				<div class='btn-group'>
+					<form method='GET' action='/publish/pads'>
+						<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
+						<% if (locals.data?.status !== 1) { %><button type='submit' class='publish' disabled>Publish</button>
+						<% } else if (locals.data?.status === 1) { %><button type='submit' class='publish'>Publish</button>
+						<% } %>
+					</form>
+					<form method='POST' action='/generate/pdf'>
+						<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
+						<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
+						<!-- TO DO: THIS DOES NOT WORK WHEN THE PAD HAS JUST BEEN CREATED -->
+						<!-- AND MAKE SURE ALL FIELDS ARE CLEARED BEFORE SHOWING THIS -->
+						<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
+						<% if (locals.data?.status === 0 || !locals.data?.status) { %><button type='submit' class='generate-pdf' disabled>Generate PDF</button>
+						<% } else if (locals.data?.status > 0) { %><button type='submit' class='generate-pdf'>Generate PDF</button>
+						<% } %>
+					</form>
+				</div>
+			</div>
+		<% } %>
+
 		<div class='head'>
 			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
 				<% if (locals.metadata.page.activity === 'edit') { %>
@@ -213,16 +236,10 @@
 				</div>
 			<% } %> -->
 		</div>
-		<div class='generate-pdf'>
-			<form method='POST' action='/generate/pdf'>
-				<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
-				<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
-				<button type='submit'>Generate PDF</button>
-			</form>
-		</div>
 	</div>
 </main>
 
+<!-- THIS IS THE INITIAL SETTING FOR A COMMENTS MODULE: THIS IS NOT USED -->
 <% if (locals.messages && locals.messages.length) { %>
 <footer id='pad'>
 	<div class='inner'>
@@ -343,7 +360,6 @@
 			if (datum.type === 'mosaic') datum.has_content = datum?.srcs?.filter(b => b)?.length > 0
 			else datum.has_content = datum.src !== null && datum.src !== undefined
 			items.push(datum)
-			// datum.has_content = TO DO
 		}
 		else if (datum.type === 'drawing') {
 			datum.has_content = datum.shapes?.length > 0
@@ -390,15 +406,13 @@
 		}
 	}
 	function getStatus () {
+		console.log('getting status')
 		const completion = []
 		const title = head.select('.title').node().innerText
 		completion.push(title?.trim()?.length > 0)
 
 		function checkCompletion (d) {
-			console.log('check requirement')
-			console.log(d)
-			console.log(d.required)
-			if (d.required === null || d.required === undefined) throw 'there is not requirement: this should not happen'
+			if (d.required === null || d.required === undefined) throw 'there is no requirement: this should not happen'
 			if (d.required === false) return true
 			else return d.has_content === true
 		}
@@ -571,7 +585,6 @@
 		console.log('saving')
 		// FIRST CHECK IF THIS IS A NEW PAD
 		const content = compileContent(attr)
-		console.log(content.title)
 		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
 		const url = new URL(window.location)
 		const queryparams = new URLSearchParams(url.search)
@@ -610,6 +623,12 @@
 				window.history.pushState(nextState, nextTitle, nextURL)
 				// REMOVE THE templates MENU
 				d3.select('nav#filter').remove()
+
+				// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
+				d3.selectAll('div.meta-status form input[name="id"]').attr('value', res.object)
+				d3.select('div.meta-status form input[name="id"] button.publish').attr('disabled', content.status === 1)
+				d3.select('div.meta-status form input[name="id"] button.generate-pdf').attr('disabled', content.status > 0)
+				// d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
 			}
 		}).catch(err => { throw err })
 		// POST NEW TAGS (THIS USED TO BE IN THE BACKEND, BUT MOVED IT HERE)
@@ -772,6 +791,7 @@
 			data.sections.forEach(async d => {
 				if (httpquery?.display?.includes('slideshow')) {
 					await addSlides({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+					// TO DO: ADD END SLIDE FOR PUBLICATION AND PDF EXPORT
 				} else addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
 			})
 		}
@@ -788,6 +808,7 @@
 			data.sections.forEach(async d => {
 				if (httpquery?.display?.includes('slideshow')) {
 					await addSlides({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+					// TO DO: ADD END SLIDE FOR PUBLICATION AND PDF EXPORT
 				} else addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
 			})
 		}
@@ -813,11 +834,10 @@
 			d3.selectAll('.media-layout').classed('focus', false)
 
 			const section = d3.select('main#pad div.inner div.body')
-				// .insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
 				.insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
 				.classed('repeat', repeat || false)
 				// .classed('focus', focus && !templated)
-				.datum({ type: 'section', title: title, lead: lead, structure: structure, items: items, repeat: repeat, group: group })
+				.datum({ type: 'section', title, lead, structure, items, repeat, group })
 			// .on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
 			
 			// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES

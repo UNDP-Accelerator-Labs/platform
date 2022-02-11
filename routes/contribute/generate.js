@@ -6,7 +6,51 @@ const PDFDocument = require('pdfkit')
 const { vocabulary } = require('../header/language.js')
 
 // DOCUMENTATION HERE: https://pdfkit.org/docs/getting_started.html
-const { v4: uuidv4 } = require('uuid')
+
+const sdgobj = {
+    "sdgs": [
+        {
+            "key": 1,
+            "name": "Affordable and clean energy",
+            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+        },
+        {
+            "key": 2,
+            "name": "Affordable and clean energy",
+            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+        },
+        {
+            "key": 4,
+            "name": "Affordable and clean energy",
+            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+        },
+        {
+            "key": 6,
+            "name": "Affordable and clean energy",
+            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+        },
+        {
+            "key": 7,
+            "name": "Affordable and clean energy",
+            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+        },
+        {
+            "key": 9,
+            "name": "Industry, innovation and infrastructure",
+            "description": "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation."
+        },
+        {
+            "key": 13,
+            "name": "Climate action",
+            "description": "Take urgent action to combat climate change and its impacts."
+        }
+    ],
+    "type": "sdgs",
+    "level": "meta",
+    "required": true,
+    "has_content": true,
+    "instruction": "SDGs: What SDGs is your challenge related to? (please choose the top 3)"
+}
 
 exports.main = (req, res) => {
 	// CHECK THE PAD EXISTS
@@ -104,17 +148,16 @@ exports.main = (req, res) => {
 
 	function addSection (kwargs) {
 		const { data, lang, doc } = kwargs || {}
-		let { title, lead, structure, items, group, instruction } = data || {}
+		let { title, lead, structure, items, group } = data || {}
 		if (!title) title = ''
 		if (!lead) lead = ''
-		if (!structure) structure = []
+		if (!structure) structure = [] // WE DO NOT USE STRUCTURE HERE
 		if (!items) items = []
 
 		let { x, y } = doc
 		const { width, margins } = doc.page
 		let { right } = margins
 		right = width - right
-
 
 		if (title) {
 			const w = doc.widthOfString(title)
@@ -148,6 +191,9 @@ exports.main = (req, res) => {
 			doc.restore()
 		}
 		
+
+		items.unshift(sdgobj)
+
 		items.forEach(d => {
 			populateSection(d, lang, doc)
 		})
@@ -155,12 +201,13 @@ exports.main = (req, res) => {
 	}
 
 	function populateSection (data, lang = 'en', doc, is_in_group = false) {
-		if (data.instruction) {
+		const { instruction } = data
+		if (instruction) {
 			doc.fillColor(colors.mid_blue)
-			.text(data.instruction, doc.x + (is_in_group ? 20 : 0), doc.y, { indent: 10, paragraphGap: fontsizes.main })
+			.text(instruction, doc.x + (is_in_group ? 20 : 0), doc.y, { indent: 10, paragraphGap: fontsizes.main })
 			resetEnvironment(doc)
 
-			const start = { x: doc.x, y: doc.y - doc.heightOfString(data.instruction) - fontsizes.main, page }
+			const start = { x: doc.x, y: doc.y - doc.heightOfString(instruction) - fontsizes.main, page }
 			const end = { x: doc.x, y: doc.y, page }
 			const processed	= processDrawing(start, end, doc)
 			processed.forEach(d => {
@@ -179,7 +226,7 @@ exports.main = (req, res) => {
 		
 		// MEDIA
 		if (data.type === 'img') addImg({ data, lang, doc, is_in_group })
-		// if (data.type === 'mosaic') addMosaic({ data: data, lang: lang, doc: doc })
+		if (data.type === 'mosaic') addMosaic({ data, lang, doc, is_in_group })
 		// // if (data.type === 'video') addVideo({ data: data, lang: lang, doc: doc }) // CANNOT ADD VIDEO TO PDF
 		if (data.type === 'drawing') addDrawing({ data, lang, doc, is_in_group })
 		if (data.type === 'txt') addTxt({ data, lang, doc, is_in_group })
@@ -199,11 +246,11 @@ exports.main = (req, res) => {
 		// // 	addMap({ data: data, lang: lang, doc: doc })
 		// // }
 		
-		// if (data.type === 'sdgs') addSDGs({ data: data, lang: lang, doc: doc })
-		// if (data.type === 'tags') addTags({ data: data, lang: lang, doc: doc })
-		// if (data.type === 'skills') addSkills({ data: data, lang: lang, doc: doc })
-		// if (data.type === 'datasources') addDataSources({ data: data, lang: lang, doc: doc })
-		// // GROUP
+		if (data.type === 'sdgs') addSDGs({ data, lang, doc, is_in_group }) // TECHNICALLY THIS CANNOT BE IN A GROUP
+		if (data.type === 'tags') addTags({ data, lang, doc, is_in_group }) // TECHNICALLY THIS CANNOT BE IN A GROUP
+		if (data.type === 'skills') addTags({ data, lang, doc, is_in_group }) // TECHNICALLY THIS CANNOT BE IN A GROUP
+		if (data.type === 'datasources') addTags({ data, lang, doc, is_in_group }) // TECHNICALLY THIS CANNOT BE IN A GROUP
+		// GROUP
 		if (data.type === 'group') addGroup({ data: data, lang: lang, doc: doc })
 	}
 
@@ -250,9 +297,86 @@ exports.main = (req, res) => {
 
 		return null
 	}
+	function addMosaic (kwargs) { 
+		// IF ONLY 2 IMAGES: 2 COLS
+		// IF 3 OR MORE: 3 COLS
+		const { data, lang, doc, is_in_group } = kwargs || {}
+		let { srcs, verticalalign } = data || {}
+		if (!srcs) srcs = []
+		if (!verticalalign) verticalalign = 'center'
+
+		const { width, height, margins } = doc.page
+		const { left, right, bottom, top } = margins
+		
+		console.log('looking for mosaic')
+		let start = { x: doc.x, y: doc.y, page }
+		if (srcs.length) {
+			if (srcs.length === 2) {
+				doc.save()
+				if (is_in_group) doc.translate(20, 0)
+				let { x, y } = doc
+				const layout = srcs.map(d => {
+					const img = doc.openImage(path.join(__dirname, `../../public/${d}`))
+					const { width: w, height: h } = img
+					const scaledwidth = (width - x - right - (is_in_group ? 20 : 0)) / 2 - 10 / 2
+					const scaledheight = scaledwidth * h / w
+					return { img: img, width: scaledwidth, height: scaledheight }
+				})
+				const maxheight = layout.sort((a, b) => b.height - a.height)[0].height
+				layout.forEach((d, i) => {
+					if (y + d.height > height - bottom) {
+						doc.addPage()
+						start = { x: x, y: top, page }
+						y = top
+					}
+					doc.image(d.img, x + (i === 1 ? 10 : 0), y, { fit: [d.width, maxheight], valign: verticalalign })
+					x += d.width
+				})
+				doc.restore()
+			} else {
+				doc.save()
+				if (is_in_group) doc.translate(20, 0)
+				let { x, y } = doc
+				let line = 0
+				const layout = srcs.map((d, i) => {
+					if (i !== 0 && !(i % 3)) line ++
+					const img = doc.openImage(path.join(__dirname, `../../public/${d}`))
+					const { width: w, height: h } = img
+					const scaledwidth = (width - x - right - (is_in_group ? 20 : 0)) / 3 - 10 * 2 / 3
+					const scaledheight = scaledwidth * h / w
+					return { img: img, width: scaledwidth, height: scaledheight, line }
+				})
+				layout.forEach((d, i) => {
+					const maxheight = layout.filter(c => c.line === d.line).sort((a, b) => b.height - a.height)[0].height
+
+					if (i !== 0 && !(i % 3)) {
+						const prevheight = layout.filter(c => c.line === d.line - 1).sort((a, b) => b.height - a.height)[0].height
+						doc.y += maxheight + 10
+						y += prevheight + 10
+						x = left
+					}
+
+					if (y + d.height > height - bottom) {
+						doc.addPage()
+						start = { x: x, y: top, page }
+						y = top
+					}
+					doc.image(d.img, x + ((i % 3) !== 0 ? 10 : 0), y, { fit: [d.width, maxheight], valign: verticalalign })
+					x += d.width + ((i % 3) !== 0 ? 10 : 0)
+				})
+				doc.restore()
+			}	
+		}
+		doc.moveDown()
+		const end = { x: doc.x, y: doc.y, page }
+		
+		if (is_in_group) drawGroupBox(start, end, doc)
+
+		return null
+	}
 	function addDrawing (kwargs) {
 		const { data, lang, doc, is_in_group } = kwargs || {}
-		let { shapes, size, instruction } = data || {}
+		let { shapes, size } = data || {}
 		const scale = size[1] / size[0]
 		if (!shapes) shapes = []
 		shapes = shapes.filter(d => d.points.length)
@@ -262,12 +386,11 @@ exports.main = (req, res) => {
 		const { left, right, bottom, top } = margins
 
 		console.log('looking for drawing')
-		let start = { x: doc.x, y: doc.y, page }
 		if (doc.y + size[1] * scale > height - bottom) {
 			doc.addPage()
 			doc.y = top
-			start = { x: doc.x, y: doc.y, page }
 		}
+		let start = { x: doc.x, y: doc.y, page }
 
 		doc.save()
 		doc.translate(doc.x + (width - left - right - size[0] * scale) / 2, doc.y)
@@ -294,13 +417,23 @@ exports.main = (req, res) => {
 				}
 				doc.restore()
 			})
-		} else {
+		} else {			
 			doc.save()
-			.fillColor(colors.light_grey)
-			.fontSize(fontsizes.main / scale)
-			.translate(0, size[1] * scale / 2)
-			.text('Missing drawing.', { width: size[0], align: 'center' }) // TO DO: TRANSLATION
-			.restore()
+			.lineWidth(1)
+			.strokeColor(colors.light_grey)
+			.lineCap('round')
+			.lineJoin('round')
+
+			const lines = [[[0, 0], [size[0], size[1]]], [[size[0], 0], [0, size[1]]]]
+			lines.forEach(l => {
+				l.forEach((p, i) => {
+					console.log(p)
+					if (i === 0) doc.moveTo(p[0], p[1])
+					else doc.lineTo(p[0], p[1])
+				})
+				doc.stroke()
+			})
+			doc.restore()
 		}
 		resetEnvironment(doc)
 		doc.y += size[1] * scale
@@ -312,11 +445,10 @@ exports.main = (req, res) => {
 		if (is_in_group) drawGroupBox(start, end, doc)
 
 		return null
-
 	}
 	function addTxt (kwargs) {
 		const { data, lang, doc, is_in_group } = kwargs || {}
-		let { fontsize, fontweight, fontstyle, textalign, txt, instruction } = data || {}
+		let { fontsize, fontweight, fontstyle, textalign, txt } = data || {}
 		if (!fontsize) fontsize = 1
 		if (!fontweight) fontweight = 'normal'
 		if (!fontstyle) fontstyle = 'normal'
@@ -340,31 +472,29 @@ exports.main = (req, res) => {
 
 		return null
 	}
-	function addEmbed (kwargs) {
+	function addEmbed (kwargs) { //. TO DO: FINISH FOR GROUPING
 		const { data, lang, doc, is_in_group } = kwargs || {}
-		let { fontsize, fontweight, fontstyle, textalign, html, instruction } = data || {}
+		let { fontsize, fontweight, fontstyle, textalign, html } = data || {}
 		if (!textalign) textalign = 'left'
 		if (!html) html = ''
 
 		doc.save()
-		if (is_in_group) doc.translate(20, 0)
 		doc.font('Courier')
-		const start = doc.y
-		doc.text(html, {
+		const start = { x: doc.x, y: doc.y, page }
+		doc.text(html, doc.x + (is_in_group ? 20 : 0), doc.y, {
 			align: textalign
-		})
-		.font('Helvetica')
-		.moveDown()
-		const end = doc.y
+		}).moveDown()
+		resetEnvironment(doc)
+		const end = { x: doc.x, y: doc.y, page }
 		doc.restore()
 
-		// if (is_in_group) drawGroupBox(start, end, doc)
+		if (is_in_group) drawGroupBox(start, end, doc)
 
 		return null
 	}
 	function addChecklist (kwargs) { 
 		const { data, lang, doc, is_in_group } = kwargs || {}
-		let { fontsize, fontweight, fontstyle, options, instruction } = data || {}
+		let { fontsize, fontweight, fontstyle, options } = data || {}
 		if (!fontsize) fontsize = 1
 		if (!fontweight) fontweight = 'normal'
 		if (!fontstyle) fontstyle = 'normal'
@@ -420,7 +550,7 @@ exports.main = (req, res) => {
 	}
 	function addRadiolist (kwargs) { 
 		const { data, lang, doc, is_in_group } = kwargs || {}
-		let { fontsize, fontweight, fontstyle, options, instruction } = data || {}
+		let { fontsize, fontweight, fontstyle, options } = data || {}
 		if (!fontsize) fontsize = 1
 		if (!fontweight) fontweight = 'normal'
 		if (!fontstyle) fontstyle = 'normal'
@@ -473,12 +603,152 @@ exports.main = (req, res) => {
 		return null
 	}
 
+	function addTags (kwargs) {
+		const { data, lang, doc, is_in_group } = kwargs || {}
+		let { tags } = data || {}
+		if (!tags?.length) return null
+
+		const start = { x: doc.x, y: doc.y, page }
+		const padding = 10
+		const lines = []
+		let { width, height, margins } = doc.page
+		let { left, right, top, bottom } = margins
+		width = width - left - right
+		bottom = height - bottom
+		// PRECALCULATE WIDTHS
+		let line = 0
+		let x = start.x
+		let y = start.y + padding
+		let cumul = 0
+		
+		tags.forEach((d, i) => {
+			doc.fontSize(fontsizes.small)
+			const w = doc.widthOfString(d.name) + padding * 2
+			const h = doc.heightOfString(d.name) + padding
+			let addpage = false
+			if (i === 0 && y + h > bottom) {
+				y = top
+				addpage = true
+			}
+			else if (cumul + w >= width) {
+				line ++
+				x = start.x
+				y += lines.find(c => c.line === line - 1).height + padding
+				if (y + h > bottom) {
+					y = top
+					addpage = true
+				}
+				cumul = 0
+			} else {
+				if (lines.length > 0) x += lines[i - 1].width + padding
+			}
+			cumul += w + padding
+			lines.push({ name: d.name, line, width: w, height: h, x, y, addpage })
+		})
+		new Array(line + 1).fill(0).forEach((d, i) => {
+			const currentlines = lines.filter(c => c.line === i)
+			const linewidth = currentlines.reduce((prev, val) => { return { width: prev.width + val.width } }).width
+			const offset = (width - linewidth) / 2
+			currentlines.forEach(c => c.x += offset)
+		})
+
+		doc.save()
+		lines.forEach((d, i) => {
+			if (d.addpage) doc.addPage()
+			doc.save()
+			.strokeColor(colors.mid_blue)
+			.rect(d.x - padding, d.y - padding * .6, d.width, d.height)
+			.stroke()
+			.restore()
+			.fillColor(colors.mid_blue)
+			.fontSize(fontsizes.small)
+			.text(d.name, d.x, d.y)
+			doc.x = left
+			if (i === lines.length - 1) doc.y = d.y + d.height + padding
+		})
+		doc.moveDown()
+
+		resetEnvironment(doc)
+		const end = { x: doc.x, y: doc.y, page }
+		doc.restore()
+
+		if (is_in_group) drawGroupBox(start, end, doc)		
+
+		return null
+	}
+	function addSDGs (kwargs) {
+		const { data, lang, doc, is_in_group } = kwargs || {}
+		let { sdgs } = data || {}
+		if (!sdgs?.length) return null
+
+		const start = { x: doc.x, y: doc.y, page }
+		const padding = 10
+		const lines = []
+		let { width, height, margins } = doc.page
+		let { left, right, top, bottom } = margins
+		width = width - left - right
+		bottom = height - bottom
+		// PRECALCULATE WIDTHS
+		let line = 0
+		let x = start.x
+		let y = start.y
+		let w = h = 100
+		let cumul = 0
+		
+		sdgs.forEach((d, i) => {
+			let addpage = false
+			if (i === 0 && y + h > bottom) {
+				y = top
+				addpage = true
+			}
+			else if (cumul + w >= width) {
+				line ++
+				x = start.x
+				y += lines.find(c => c.line === line - 1).height + padding
+				if (y + h > bottom) {
+					y = top
+					addpage = true
+				}
+				cumul = 0
+			} else {
+				if (lines.length > 0) x += lines[i - 1].width + padding
+			}
+			cumul += w + padding
+			lines.push({ key: d.key, line, width: w, height: h, x, y, addpage })
+		})
+		new Array(line + 1).fill(0).forEach((d, i) => {
+			const currentlines = lines.filter(c => c.line === i)
+			const linewidth = currentlines.reduce((prev, val) => { return { width: prev.width + val.width } }).width
+			const offset = (width - linewidth) / 2
+			currentlines.forEach(c => c.x += offset)
+		})
+
+
+		doc.save()
+		lines.forEach((d, i) => {
+			if (d.addpage) doc.addPage()
+			const img = doc.openImage(path.join(__dirname, `../../public/imgs/sdgs/${lang}/G${d.key || d}-c.png`))
+			doc.image(img, d.x, d.y, { width: d.width, height: d.height })
+
+			doc.x = left
+			if (i === lines.length - 1) doc.y = d.y + d.height + padding
+		})
+		doc.moveDown()
+		resetEnvironment(doc)
+		const end = { x: doc.x, y: doc.y, page }
+		doc.restore()
+
+		if (is_in_group) drawGroupBox(start, end, doc)		
+
+		return null
+	}
+
 	function addGroup (kwargs) {
 		console.log('found a group')
 		const { data, lang, doc } = kwargs || {}
-		let { type, structure, items, instruction, repeat } = data || {}
+		let { type, structure, items, repeat } = data || {}
 		if (!type) type = 'group'
-		if (!structure) structure = []
+		if (!structure) structure = [] // WE DO NOT USE STRUCTURE HERE
 		if (!items) items = []
 	
 		for (let i = 0; i < items.length; i ++) {

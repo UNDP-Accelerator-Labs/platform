@@ -7,50 +7,51 @@ const { vocabulary } = require('../header/language.js')
 
 // DOCUMENTATION HERE: https://pdfkit.org/docs/getting_started.html
 
-const sdgobj = {
-    "sdgs": [
-        {
-            "key": 1,
-            "name": "Affordable and clean energy",
-            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
-        },
-        {
-            "key": 2,
-            "name": "Affordable and clean energy",
-            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
-        },
-        {
-            "key": 4,
-            "name": "Affordable and clean energy",
-            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
-        },
-        {
-            "key": 6,
-            "name": "Affordable and clean energy",
-            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
-        },
-        {
-            "key": 7,
-            "name": "Affordable and clean energy",
-            "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
-        },
-        {
-            "key": 9,
-            "name": "Industry, innovation and infrastructure",
-            "description": "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation."
-        },
-        {
-            "key": 13,
-            "name": "Climate action",
-            "description": "Take urgent action to combat climate change and its impacts."
-        }
-    ],
-    "type": "sdgs",
-    "level": "meta",
-    "required": true,
-    "has_content": true,
-    "instruction": "SDGs: What SDGs is your challenge related to? (please choose the top 3)"
-}
+// THIS WAS FOR TESTING
+// const sdgobj = {
+//	 "sdgs": [
+//		 {
+//			 "key": 1,
+//			 "name": "Affordable and clean energy",
+//			 "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+//		 },
+//		 {
+//			 "key": 2,
+//			 "name": "Affordable and clean energy",
+//			 "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+//		 },
+//		 {
+//			 "key": 4,
+//			 "name": "Affordable and clean energy",
+//			 "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+//		 },
+//		 {
+//			 "key": 6,
+//			 "name": "Affordable and clean energy",
+//			 "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+//		 },
+//		 {
+//			 "key": 7,
+//			 "name": "Affordable and clean energy",
+//			 "description": "Ensure access to affordable, reliable, sustainable and modern energy for all."
+//		 },
+//		 {
+//			 "key": 9,
+//			 "name": "Industry, innovation and infrastructure",
+//			 "description": "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation."
+//		 },
+//		 {
+//			 "key": 13,
+//			 "name": "Climate action",
+//			 "description": "Take urgent action to combat climate change and its impacts."
+//		 }
+//	 ],
+//	 "type": "sdgs",
+//	 "level": "meta",
+//	 "required": true,
+//	 "has_content": true,
+//	 "instruction": "SDGs: What SDGs is your challenge related to? (please choose the top 3)"
+// }
 
 exports.main = (req, res) => {
 	// CHECK THE PAD EXISTS
@@ -192,7 +193,7 @@ exports.main = (req, res) => {
 		}
 		
 
-		items.unshift(sdgobj)
+		// items.unshift(sdgobj)
 
 		items.forEach(d => {
 			populateSection(d, lang, doc)

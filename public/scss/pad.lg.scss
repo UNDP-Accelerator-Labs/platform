@@ -158,9 +158,9 @@ main#mobilization {
 			.btn-group {
 				width: 300px;
 				height: 30px;
-				margin-left: auto;
 				padding: 15px 0;
-				margin-bottom: 15px;
+				margin: 0 10px 15px auto;
+				text-align: right;
 				z-index: 100;
 
 				form {
@@ -1384,6 +1384,20 @@ main#pad.slideshow {
 					background-color: transparent;
 					font-size: $t-xlarge;
 					color: $c-dark-blue;
+				}
+			}
+		}
+		.slide.meta-status {
+			.btn-group {
+				width: 100%;
+				text-align: center;
+				height: 45px;
+
+				form {
+					button {
+						height: 45px;
+						padding: 0 30px;
+					}
 				}
 			}
 		}

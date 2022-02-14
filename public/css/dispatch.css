@@ -1391,9 +1391,9 @@ main#template .inner .meta-status .btn-group,
 main#mobilization .inner .meta-status .btn-group {
     width: 300px;
     height: 30px;
-    margin-left: auto;
     padding: 15px 0;
-    margin-bottom: 15px;
+    margin: 0 10px 15px auto;
+    text-align: right;
     z-index: 100;
   }
   main#pad .inner .meta-status .btn-group form, main#reference .inner .meta-status .btn-group form,
@@ -4139,6 +4139,15 @@ main#mobilization .inner .body .input-group.fixed label {
     background-color: transparent;
     font-size: 36px;
     color: #0A4C73;
+  }
+  main#pad.slideshow .inner .slide.meta-status .btn-group {
+    width: 100%;
+    text-align: center;
+    height: 45px;
+  }
+  main#pad.slideshow .inner .slide.meta-status .btn-group form button {
+    height: 45px;
+    padding: 0 30px;
   }
   main#pad.slideshow .inner .body {
     position: absolute;
@@ -7303,9 +7312,9 @@ main#template .inner .meta-status .btn-group,
 main#mobilization .inner .meta-status .btn-group {
     width: 300px;
     height: 30px;
-    margin-left: auto;
     padding: 15px 0;
-    margin-bottom: 15px;
+    margin: 0 10px 15px auto;
+    text-align: right;
     z-index: 100;
   }
   main#pad .inner .meta-status .btn-group form, main#reference .inner .meta-status .btn-group form,
@@ -10051,6 +10060,15 @@ main#mobilization .inner .body .input-group.fixed label {
     background-color: transparent;
     font-size: 36px;
     color: #0A4C73;
+  }
+  main#pad.slideshow .inner .slide.meta-status .btn-group {
+    width: 100%;
+    text-align: center;
+    height: 45px;
+  }
+  main#pad.slideshow .inner .slide.meta-status .btn-group form button {
+    height: 45px;
+    padding: 0 30px;
   }
   main#pad.slideshow .inner .body {
     position: absolute;

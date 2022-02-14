@@ -922,6 +922,14 @@
 		d3.select('#pad').classed('slideshow', true)
 		// TRANSFORM ALL .media-container TO .slide
 		if (d3.selectAll('.slide').size() === 0) d3.select('#pad .inner .head').classed('slide slide-in-view', true)
+		// ADD BUTTON TO SAVE AND GENERATE PDF AT THE END
+		const status_slide = d3.select('.meta-status')
+		if (status_slide.node()) {
+			status_slide.classed('slide slide-next hide', true) 
+			const last_slide = d3.selectAll('.slide').last().node()
+			last_slide.parentNode.append(status_slide.node())
+			console.log(last_slide.parentNode)
+		}
 
 		d3.selectAll('.title-slide, .description-layout:not(.hide), .media-layout > .media-container:not(.lead-container):not(.hide), .media-layout > .meta-container:not(.hide)')
 			.classed('slide slide-next hide', true)
@@ -982,9 +990,6 @@
 			console.log(slideinview)
 			slideinview.classed('slide slide-next slide-prev slide-in-view', false)
 		}
-
-		// ADD BUTTON TO SAVE AND GENERATE PDF: TO DO IN consent FORM APP (THIS DOES NOT NEED TO BE IN THE MAIN pads APP)
-
 	}
 
 </script>

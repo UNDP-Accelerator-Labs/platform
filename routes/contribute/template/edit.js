@@ -1,4 +1,5 @@
 const DB = require('../../../db-config.js')
+const { modules } = require('../../../config.js')
 const header_data = require('../../header/').data
 
 exports.main = (req, res) => {
@@ -28,6 +29,9 @@ exports.main = (req, res) => {
 			// const [cohort, themes, sdgs, data] = results
 			return { 
 				metadata : {
+					site: {
+						modules: modules
+					},
 					page: {
 						title: pagetitle, 
 						path: path,

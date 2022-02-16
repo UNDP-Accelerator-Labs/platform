@@ -89,6 +89,8 @@ app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOU
 
 app.post('/upload/img', upload.array('img'), routes.process.upload)
 app.post('/upload/video', upload.array('video'), routes.process.upload)
+app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
+
 app.post('/screenshot', routes.process.screenshot)
 
 

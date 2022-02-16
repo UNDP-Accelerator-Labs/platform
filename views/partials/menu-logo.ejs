@@ -7,99 +7,61 @@
 					<div class='drop-down'>
 						<ul>
 							<!-- TO DO: TRANSLATE -->
-							<li>
-								<button>
-									<label><%- vocabulary['pad'][locals.metadata.page.lang](false).capitalize() %></label>
-									<span class='expandable'>></span>
-								</button>
-								<div class='drop-down'>
-									<ul>
-										<% if (locals.metadata.user.rights > 1) { %>
-											<li>
-												<a href='/<%- locals.metadata.page.lang %>/contribute/pad' target='_blank'>
-		 											<button>
-														<label><%- vocabulary['free pad'][locals.metadata.page.lang] %></label>
-													</button>
-												</a>
-											</li>
-											<% if (locals.metadata.menu.templates.length > 0) { %>
-												<li>
-													<button>
-														<label>Templated pad</label>
-														<span class='expandable'>></span>
-													</button>
-													<div class='drop-down'>
-														<ul>
-															<% locals.metadata.menu.templates.forEach(t => { %>
-																<li>
-																	<a href='/<%- locals.metadata.page.lang %>/contribute/pad?template=<%- t.id %>' target='_blank'>
-																		<% if (t.title) { %>
-																			<button><label><%- t.title %></label></button>
-																		<% } else { %>
-																			<button><label>[<%- vocabulary['untitled template'][locals.metadata.page.lang] %>]</label></button>
-																		<% } %>
-																	</a>
-																</li>
-															<% }) %>
-														</ul>
-													</div>
-												</li>
-											<% } %>
-										<% } %>
-										<% if (locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %>
-											<li>
-												<button>
-													<label>Contributive pad</label>
-													<span class='expandable'>></span>
-												</button>
-												<div class='drop-down'>
-													<ul>
-														<% locals.metadata.menu.participations.filter(p => !(p.source && !p.copy) && (p.status === 1)).forEach(p => { %>
-															<li>
-																<a href='/<%- locals.metadata.page.lang %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>' target='_blank'>
-																	<button class='wrapable'>
-																		<label><%- p.title %></label>
-																		<div class='sub'>Mobilized by <%- p.host_name %> on <%- p.start_date %></div>
-																	</button>
-																</a>
-															</li>
-														<% }) %>
-													</ul>
-												</div>
-											</li>
-										<% } %>
-									</ul>
-								</div>
-							</li>
-							<% if (locals.metadata.user.rights > 1) { %>
+							<% if (locals.metadata?.site?.modules?.includes('pads')) { %>
 								<li>
 									<button>
-										<label><%- vocabulary['template'][locals.metadata.page.lang](false, false).capitalize() %></label>
+										<label><%- vocabulary['pad'][locals.metadata.page.lang](false).capitalize() %></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='drop-down'>
 										<ul>
-											<li>
-												<a href='/<%- locals.metadata.page.lang %>/contribute/template' target='_blank'>
-													<button><label>Blank template</label></button>
-												</a>
-											</li>
-											<% if (locals.metadata.menu.templates.length > 0) { %>
+											<% if (locals.metadata.user.rights > 1) { %>
+												<li>
+													<a href='/<%- locals.metadata.page.lang %>/contribute/pad' target='_blank'>
+			 											<button>
+															<label><%- vocabulary['free pad'][locals.metadata.page.lang] %></label>
+														</button>
+													</a>
+												</li>
+												<% if (locals.metadata.menu.templates.length > 0) { %>
+													<li>
+														<button>
+															<label>Templated pad</label>
+															<span class='expandable'>></span>
+														</button>
+														<div class='drop-down'>
+															<ul>
+																<% locals.metadata.menu.templates.forEach(t => { %>
+																	<li>
+																		<a href='/<%- locals.metadata.page.lang %>/contribute/pad?template=<%- t.id %>' target='_blank'>
+																			<% if (t.title) { %>
+																				<button><label><%- t.title %></label></button>
+																			<% } else { %>
+																				<button><label>[<%- vocabulary['untitled template'][locals.metadata.page.lang] %>]</label></button>
+																			<% } %>
+																		</a>
+																	</li>
+																<% }) %>
+															</ul>
+														</div>
+													</li>
+												<% } %>
+											<% } %>
+											<% if (locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %>
 												<li>
 													<button>
-														<label>Copy template</label>
+														<label>Contributive pad</label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='drop-down'>
 														<ul>
-															<% locals.metadata.menu.templates.forEach(t => { %>
+															<% locals.metadata.menu.participations.filter(p => !(p.source && !p.copy) && (p.status === 1)).forEach(p => { %>
 																<li>
-																	<a href='/<%- locals.metadata.page.lang %>/contribute/template?source=<%- t.id %>' target='_blank'>
-																		<% if (t.title) { %>
-																			<button><label><%- t.title %></label></button>
-																		<% } else { %>
-																			<button><label>[<%- vocabulary['untitled template'][locals.metadata.page.lang] %>]</label></button>
-																		<% } %>
+																	<a href='/<%- locals.metadata.page.lang %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>' target='_blank'>
+																		<button class='wrapable'>
+																			<label><%- p.title %></label>
+																			<div class='sub'>Mobilized by <%- p.host_name %> on <%- p.start_date %></div>
+																		</button>
 																	</a>
 																</li>
 															<% }) %>
@@ -110,10 +72,66 @@
 										</ul>
 									</div>
 								</li>
+							<% } %>
+							<% if (locals.metadata.user.rights > 1) { console.log(locals.metadata?.site?.modules)%>
+								<% if (locals.metadata?.site?.modules?.includes('templates')) { %>
+									<li>
+										<button>
+											<label><%- vocabulary['template'][locals.metadata.page.lang](false, false).capitalize() %></label>
+											<span class='expandable'>></span>
+										</button>
+										<div class='drop-down'>
+											<ul>
+												<li>
+													<a href='/<%- locals.metadata.page.lang %>/contribute/template' target='_blank'>
+														<button><label>Blank template</label></button>
+													</a>
+												</li>
+												<% if (locals.metadata.menu.templates.length > 0) { %>
+													<li>
+														<button>
+															<label>Copy template</label>
+															<span class='expandable'>></span>
+														</button>
+														<div class='drop-down'>
+															<ul>
+																<% locals.metadata.menu.templates.forEach(t => { %>
+																	<li>
+																		<a href='/<%- locals.metadata.page.lang %>/contribute/template?source=<%- t.id %>' target='_blank'>
+																			<% if (t.title) { %>
+																				<button><label><%- t.title %></label></button>
+																			<% } else { %>
+																				<button><label>[<%- vocabulary['untitled template'][locals.metadata.page.lang] %>]</label></button>
+																			<% } %>
+																		</a>
+																	</li>
+																<% }) %>
+															</ul>
+														</div>
+													</li>
+												<% } %>
+											</ul>
+										</div>
+									</li>
+								<% } %>
+								<% if (locals.metadata?.site?.modules?.includes('mobilizations')) { %>
+									<li>
+										<a href='/<%- locals.metadata.page.lang %>/contribute/mobilization'>
+											<button><%- vocabulary['cohort'][locals.metadata.page.lang](false).capitalize() %></button>
+										</a>
+									</li>
+								<% } %>
+							<% } %>
+							<!-- TO DO: CREATE CONDITION FOR UPLOAD -->
+							<% if (locals.metadata?.site?.modules?.includes('files')) { %>
 								<li>
-									<a href='/<%- locals.metadata.page.lang %>/contribute/mobilization'>
-										<button><%- vocabulary['cohort'][locals.metadata.page.lang](false).capitalize() %></button>
-									</a>
+									<form action='/upload/pdf' method='POST' enctype='multipart/form-data'>
+										<input type='file' id='input-file-pdf' name='pdf' accept='application/pdf' onchange='uploadPDF(this.form, "<%- locals.metadata.page.lang %>")' multiple>
+										<label for='input-file-pdf' title='Upload a pdf.'>
+											<!-- <i class='material-icons'>add_photo_alternate</i> -->
+											Upload
+										</label>
+									</form>
 								</li>
 							<% } %>
 						</ul>
@@ -137,6 +155,7 @@
 	</div>
 </nav>
 
+<script type='text/javascript' src='/js/upload.js'></script>
 <script type='text/javascript'>
 	// d3.selectAll('nav#site-title li').on('mouseover', function () {
 	// 	const sel = d3.select(this)

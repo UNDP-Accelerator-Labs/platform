@@ -1,5 +1,5 @@
 const DB = require('../../../db-config.js')
-const { followup_count } = require('../../../config.js')
+const { followup_count, modules } = require('../../../config.js')
 const header_data = require('../../header/').data
 
 exports.main = (req, res) => {	
@@ -77,6 +77,9 @@ exports.main = (req, res) => {
 			if (duplicates >= followup_count) return res.redirect(`/${lang}/browse/pads/private`)
 			else return { 
 				metadata : {
+					site: {
+						modules: modules
+					},
 					page: {
 						title: pagetitle, 
 						path: path,

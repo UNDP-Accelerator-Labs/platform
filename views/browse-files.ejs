@@ -31,7 +31,7 @@
 					<button><%- vocabulary['public'][locals.metadata.page.lang] %><div class='count'><%- locals.stats.publiccount %></div></button>
 				</a>
 			</li>
-			<!-- <% if (locals.metadata.page.object === 'pads') { %>
+			<!-- <% if (locals.metadata.page.object === 'files') { %>
 				<a href='./bookmarks'>
 					<li class='<% if (locals.metadata.page.space === "bookmarks") { %>active<% } %>'><%- vocabulary['bookmarks'][locals.metadata.page.lang] %></li>
 				</a>
@@ -110,11 +110,10 @@
 
 <script type='text/javascript'>
 	const main = d3.select('div.browse main')
-		// .call(multiSelection, { class: '.pad.visible .inner', filter: d => d.editable })
 	const layout = main.select('div.inner')
 	const overview = layout.select('section.overview')
 	
-	let data = <%- JSON.stringify(locals.pads) %>;
+	let data = <%- JSON.stringify(locals.files) %>;
 
 	const queryparams = <%- JSON.stringify(locals.metadata.page.query) %>;
 
@@ -135,7 +134,7 @@
 			.html(d => `/ ${d.total}`)
 		count.addElems('br')
 		count.addElems('small', 'light')
-			.html(d => vocabulary['pad']['<%- locals.metadata.page.lang %>'](d.total !== 1))
+			.html(d => vocabulary['file']['<%- locals.metadata.page.lang %>'](d.total !== 1))
 		const contributors = stats.addElems('div', 'statistic contributors')
 		.addElems('h2', 'lg')
 			.html(d => d.contributors)
@@ -149,7 +148,7 @@
 		// MAKE SURE WE ONLY KEEP THE SECTIONS WHERE THERE ARE PADS
 		// data = data.filter(d => counts.map(c => c.status).includes(d.status))
 		
-		const sections = layout.addElems('section', 'pads-container', data)
+		const sections = layout.addElems('section', 'files-container', data)
 		
 		// sections.addElems('div', 'pub-status')
 		// 	.addElems('div')
@@ -182,63 +181,23 @@
 		// 	sel.addElems('label').html(vocabulary['download all']['<%- locals.metadata.page.lang %>'])
 		// }).on('click', _ => downloadPads('bookmarks'))
 
-		sections.addElems('div', 'pads-layout')
+		sections.addElems('div', 'files-layout')
 		.each(function (d) {
 			const section = d3.select(this)
-			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
-			console.log(d.pads)
-			console.log(d.pads.nest('source_id'))
-			d.pads.forEach(p => section.call(renderVignette, p))
+			d.files.forEach(p => section.call(renderVignette, p))
 		})
 	}
 
 	function renderVignette (section, data) {
-		function getImg (d) {
-			if (d && d.sections) {
-				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
-				const img = media.find(c => c.type === 'img' && c.src)
-				const mosaic = media.find(c => c.type === 'mosaic' && c.srcs[0])
-				const embed = media.find(c => c.type === 'embed' && c.src)
-				if (img) return [`/${img.src.replace('uploads', 'uploads/sm')}`]
-				else if (mosaic) return [`/${mosaic.srcs[0].replace('uploads', 'uploads/sm')}`]
-				else if (embed) return [`/${embed.src.replace('uploads', 'uploads/sm')}`]
-				else return []
-			} else return []
-		}
-		function getSDGs (d) {
-			if (d && d.sections) {
-				const sdgs = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat())
-					.flat().find(c => c.type === 'sdgs')
-				if (sdgs) return [sdgs.sdgs]
-				else return []
-			} else return []
-		}
-		function getTags(d) {
-			if (d && d.sections) {
-				const tags = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat())
-					.flat().flat().find(c => c.type === 'tags')
-				if (tags) return [tags.tags.filter(c => c.name && c.name !== '').map(c => c.name)]
-				else return []
-			} else return []
-		}
-		function getTxt (d) {
-			if (d && d.sections) {
-				const media = d.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
-				const txt = media.find(c => c.type === 'txt' && c.txt.length)
-				if (txt) return [txt.txt]
-				else return []
-			} else return []
-		}
-
-		const pads = section.addElem('div', 'pad')
+		const files = section.addElem('div', 'file')
 			.datum(data)
 		.each(function (d) {
 			d3.select(this).classed(`status-${d.status}`, true)
 		}).addElems('div', 'inner')
 		
-		const head = pads.addElems('div', 'head')
-		const body = pads.addElems('div', 'body')
-		const foot = pads.addElems('div', 'foot')
+		const head = files.addElems('div', 'head')
+		const body = files.addElems('div', 'body')
+		const foot = files.addElems('div', 'foot')
 
 		const metagroup = head.addElems('div', 'meta-group')
 		const metainfo = metagroup.addElems('div', 'meta meta-contributor')
@@ -248,77 +207,54 @@
 
 		metagroup.addElems('div', 'btn-group')
 		.addElems('form', 'actions', function (d) {
-			// console.log(d)
 			const opts = []
 			// THE FIRST LINE IS IF WE SELECT MULTIPLE PADS
-			// TO DO: UNPUBLISH
-			if ('<%- locals.metadata.page.space %>' === 'private' && d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deletePads })
-			opts.push({ node: 'button', type: 'button', label: 'Download', disabled: d.status !== 2, fn: downloadPads })
-			// if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && <%- locals.publications %> < publication_limit), label: 'Publish' })
-			// CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
-			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/pads', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && d.available_publications > 0), label: 'Publish' })
+			// TO DO: DELETE AND UNPUBLISH
+			// DELETE IS LIKELY COMPLICATED, ESPECIALLY IF FILES ARE SHARED ACROSS PLATFORMS
+			// if ('<%- locals.metadata.page.space %>' === 'private' && d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteFiles })
+			if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Edit name', fn: editFile })
+			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/files', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && d.available_publications > 0), label: 'Publish' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
 			const sel = d3.select(this)
-			const pad = sel.findAncestor('pad')
+			const file = sel.findAncestor('file')
 			sel.addElems('input')
-				.attrs({ 'type': 'hidden', 'name': 'id', 'value': pad.datum().id })
+				.attrs({ 'type': 'hidden', 'name': 'id', 'value': file.datum().id })
 			sel.addElems(d.node, 'btn-overlay')
 				.classed(d.label.toLowerCase(), true)
 				.attrs({ 'type': d.type, 'disabled': d.disabled || null })
 				.html(d.label)
-			.on('click', _ => d.fn ? d.fn(pad) : null)
+			.on('click', _ => d.fn ? d.fn(file) : null)
 		})
 
 		const title = body.addElems('div', 'media media-title')
 			
-		const title_link = title.addElems('a', 'pad-link')
+		const title_link = title.addElems('a', 'file-link')
 			.attrs({ 
-				'href': d => {
-					if (d.editable) {
-						if (d.source) {
-							if (d.is_followup) return `../../edit/pad?id=${d.id}&source=${d.source}&display=adjacent`
-							else return `../../edit/pad?id=${d.id}&source=${d.source}`
-						} else return `../../edit/pad?id=${d.id}`
-					} else {
-						if (d.source) {
-							if (d.is_followup) return `../../view/pad?id=${d.id}&source=${d.source}&display=adjacent`
-							else return `../../view/pad?id=${d.id}&source=${d.source}`
-						} else return `../../view/pad?id=${d.id}`
-					}
-				}, 'target': '_blank'
-			})
-			.addElems('h1')
+				'href': d => d.path,
+				'target': '_blank'
+			}).addElems('h1')
 		title_link.addElems('img')
 			.attr('src', d => {
-				if (d.is_followup) return '/imgs/icons/i-followup-pad.svg'
-				else if (d.is_forward) return '/imgs/icons/i-forward-pad.svg'
-				else return '/imgs/icons/i-pad.svg'
+				// if (d.is_followup) return '/imgs/icons/i-followup-pad.svg'
+				// else if (d.is_forward) return '/imgs/icons/i-forward-pad.svg'
+				// else 
+				return '/imgs/icons/i-pad.svg'
 			})
-		title_link.addElems('span').html(d => d.title || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
-
-		body.addElems('div', 'meta meta-followup', d => d.source && d.is_followup ? [d] : [])
-			.attr('title', d => d.source_title)
-			.html('<i>This pad follows up on:</i> ')
-		.addElems('a')
-			.attrs({
-				'href': d => {
-					if (d.editable) return `../../edit/pad?id=${d.source}`
-					else return `../../view/pad?id=${d.source}`
-				}, 'target': '_blank'
-			}).html(d => d.source_title.length > 25 ? `${d.source_title.slice(0, 25)}…` : d.source_title)
+		title_link.addElems('span').html(d => d.name || `[${vocabulary['untitled pad']['<%- locals.metadata.page.lang %>']}]`)
 
 		body.addElems('div', 'meta meta-forward', d => d.source && d.is_forward ? [d] : [])
 			.attr('title', d => d.source_title)
-			.html('<i>This pad was forwared from:</i> ')
+			.html('<i>This file was forwared from:</i> ')
 		.addElems('a')
-			.attrs({
-				'href': d => {
-					if (d.editable) return `../../edit/pad?id=${d.source}`
-					else return `../../view/pad?id=${d.source}`
-				}, 'target': '_blank'
-			}).html(d => d.source_title.length > 25 ? `${d.source_title.slice(0, 25)}…` : d.source_title)
+			// .attrs({
+			// 	'href': d => {
+			// 		if (d.editable) return `../../edit/pad?id=${d.source}`
+			// 		else return `../../view/pad?id=${d.source}`
+			// 	}, 'target': '_blank'
+			// })
+			.html(d => d.source_title.length > 25 ? `${d.source_title.slice(0, 25)}…` : d.source_title)
 
 		body.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
 			.attr('title', d => d.mobilization_title)
@@ -326,6 +262,14 @@
 		.addElems('a')
 			.attr('href', d => `?mobilizations=${d.mobilization}`)
 			.html(d => d.mobilization_title?.length > 25 ? `${d.mobilization_title.slice(0, 25)}…` : d.mobilization_title)
+
+		body.addElems('div', 'meta meta-mobilization', d => d.source ? [d] : [])
+			.attr('title', d => d.mobilization_title)
+			.html('<i>Generated from:</i> ')
+		.addElems('a')
+			// .attr('href', d => `?pads=${d.source}`)
+			.html(d => d.pad_title?.length > 25 ? `${d.pad_title.slice(0, 25)}…` : d.pad_title)
+
 		body.addElems('div', 'meta meta-template', d => d.template ? [d] : [])
 			.attr('title', d => d.template_title)
 			.html('<i>Based on:</i> ')
@@ -333,28 +277,6 @@
 			.attr('href', d => `?templates=${d.template}`)
 			.html(d => d.template_title?.length > 25 ? `${d.template_title.slice(0, 25)}…` : d.template_title)
 		
-		if (data.editable && data.followups.length) {
-			console.log(data.followups)
-			const dropdown = body.addElems('div', 'create follow-up')
-			dropdown.addElems('button')
-				.html('Follow-up') // TO DO: TRANSLATE
-			dropdown.addElems('div', 'drop-down')
-				.addElems('ul')
-			.addElems('li', 'follow-up-option', d => d.followups)
-			.addElems('a')
-				.attrs({ 'href': d => `../../contribute/pad?source=${d.source}&template=${d.template}&mobilization=${d.id}&display=adjacent`, 'target': '_blank' })
-				.addElems('button')
-			.html(d => d.title)
-			.on('click', function (d) {
-				const sel = d3.select(this)
-				const li = sel.findAncestor('follow-up-option')
-				const button = li.findAncestor('follow-up')
-				if (d.count + 1 >= d.max) li.remove()
-				if (button.selectAll('li').size() === 0) button.remove()
-			})
-
-			// TO DO: THIS NEEDS TO KEEP REFERENCE TO THE PAD BEING FOLLOWED UP AND THE NEW TEMPLATED PAD TO BE FILLED IN
-		}
 
 		if (data.editable && data.forwards.length) {
 			const dropdown = body.addElems('div', 'create forward')
@@ -364,7 +286,7 @@
 					.addElems('ul')
 				.addElems('li', 'forward-option', d => d.forwards)
 				.addElems('a')
-					.attrs({ 'href': d => `/forward/pad?id=${d.source}&mobilization=${d.id}` }) // TO DO: CHECK THIS WORKS
+					.attrs({ 'href': d => `/forward/file?id=${d.source}&mobilization=${d.id}` }) // TO DO: CHECK THIS WORKS
 					.addElems('button')
 				.html(d => d.title)
 				.on('click', function (d) {
@@ -377,52 +299,41 @@
 		}
 
 
-		body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, source: d.source, is_followup: d.is_followup, txt: c } }))
-			.addElems('a', 'pad-link')
-			// .attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
-			.attrs({ 
-				'href': d => {
-					if (d.editable) {
-						if (d.source) {
-							if (d.is_followup) return `../../edit/pad?id=${d.id}&source=${d.source}&display=adjacent`
-							else return `../../edit/pad?id=${d.id}&source=${d.source}`
-						} else return `../../edit/pad?id=${d.id}`
-					} else {
-						if (d.source) {
-							if (d.is_followup) return `../../view/pad?id=${d.id}&source=${d.source}&display=adjacent`
-							else return `../../view/pad?id=${d.id}&source=${d.source}`
-						} else return `../../view/pad?id=${d.id}`
-					}
-				}, 'target': '_blank'
-			})
-			.html(d => {
-					if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[Read more]</span>`
-					else return d.txt
-			})
+		// body.addElems('div', 'media media-txt', d => getTxt(d).map(c => { return { id: d.id, editable: d.editable, source: d.source, is_followup: d.is_followup, txt: c } }))
+		// 	.addElems('a', 'file-link')
+		// 	.attrs({ 
+		// 		'href': d => d.path,
+		// 		'target': '_blank'
+		// 	})
+		// 	.html(d => {
+		// 			if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[Read more]</span>`
+		// 			else return d.txt
+		// 	})
 		body.addElems('div', 'meta meta-date')
 			.html(d => d.date)
 
-		const taggroup = body.addElems('div', 'tag-group')
-		taggroup.addElems('div', 'meta meta-tags', d => getTags(d))
-			.addElems('a', 'tag-link', d => d)
-			.attr('href', d => `?thematic_areas=${d}`)
-		.addElems('div', 'tag')
-			.addElems('label')
-			// .attr('title', d => d.capitalize())
-			// .html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
-			.html(d => d.capitalize())
-		const sdgs = taggroup.addElems('div', 'meta meta-sdgs', d => getSDGs(d))
-		sdgs.addElems('span')
-			.html(d => `${vocabulary['SDG']['<%- locals.metadata.page.lang %>'](d.length > 1)}:`)
-		sdgs.addElems('a', 'sdg-link', d => d)
-			.attr('href', d => `?sdgs=${d.key || d}`)
-			.html(d => d.key || d)
+		// REINSERT THIS WHEN WE HAVE TAGGING MECHANISM
+		// const taggroup = body.addElems('div', 'tag-group')
+		// taggroup.addElems('div', 'meta meta-tags', d => getTags(d))
+		// 	.addElems('a', 'tag-link', d => d)
+		// 	.attr('href', d => `?thematic_areas=${d}`)
+		// .addElems('div', 'tag')
+		// 	.addElems('label')
+		// 	// .attr('title', d => d.capitalize())
+		// 	// .html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
+		// 	.html(d => d.capitalize())
+		// const sdgs = taggroup.addElems('div', 'meta meta-sdgs', d => getSDGs(d))
+		// sdgs.addElems('span')
+		// 	.html(d => `${vocabulary['SDG']['<%- locals.metadata.page.lang %>'](d.length > 1)}:`)
+		// sdgs.addElems('a', 'sdg-link', d => d)
+		// 	.attr('href', d => `?sdgs=${d.key || d}`)
+		// 	.html(d => d.key || d)
 		
 		// WE SEPARATE BOOKMARKS FROM THE OTHER TYPES OF ENGAGEMENT
-		// media.addElems('div', 'bookmark', d => d.status === 2 ? [{ type: 'bookmark', active: d.bookmarked, pad: d.id }] : [])
+		// media.addElems('div', 'bookmark', d => d.status === 2 ? [{ type: 'bookmark', active: d.bookmarked, file: d.id }] : [])
 		// 	.classed('active', d => d.active)
 		// .on('click', async function (d) {
-		// 	const result = await POST('/engage', { pad: d.pad, active: !d.active, type: d.type })
+		// 	const result = await POST('/engage', { file: d.file, active: !d.active, type: d.type })
 		// 	d.active = result.bool
 		// 	d3.select(this).classed('active', d.active)
 		// 		.select('div')
@@ -430,39 +341,27 @@
 		// }).addElems('div', 'label')
 		// 	.html(d => vocabulary['bookmark']['<%- locals.metadata.page.lang %>'](d.active))
 		
-		foot.addElems('div', 'media media-img', d => getImg(d))
-			.addElems('a', 'pad-link')
-			// .attrs({ 'href': d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`, 'target': '_blank' })
-			.attrs({ 
-				'href': d => {
-					if (d.editable) {
-						if (d.source) {
-							if (d.is_followup) return `../../edit/pad?id=${d.id}&source=${d.source}&display=adjacent`
-							else return `../../edit/pad?id=${d.id}&source=${d.source}`
-						} else return `../../edit/pad?id=${d.id}`
-					} else {
-						if (d.source) {
-							if (d.is_followup) return `../../view/pad?id=${d.id}&source=${d.source}&display=adjacent`
-							else return `../../view/pad?id=${d.id}&source=${d.source}`
-						} else return `../../view/pad?id=${d.id}`
-					}
-				}, 'target': '_blank'
-			})
-		.addElems('img', 'vignette')
-			.attrs({ 'loading': 'lazy', 'alt': d => vocabulary['missing image']['<%- locals.metadata.page.lang %>'] })
-		.each(function (d) {
-			const node = this
-			const img = new Image()
-			img.onload = function () { node.src = this.src }
-			img.src = d
-		})
+		// foot.addElems('div', 'media media-img', d => getImg(d))
+		// 	.addElems('a', 'file-link')
+		// 	.attrs({ 
+		// 		'href': d => d.path, 
+		// 		'target': '_blank'
+		// 	})
+		// .addElems('img', 'vignette')
+		// 	.attrs({ 'loading': 'lazy', 'alt': d => vocabulary['missing image']['<%- locals.metadata.page.lang %>'] })
+		// .each(function (d) {
+		// 	const node = this
+		// 	const img = new Image()
+		// 	img.onload = function () { node.src = this.src }
+		// 	img.src = d
+		// })
 		
 		// metaR1.addElems('div', 'meta meta-engagement')
 		// 	.addElems('button', 'engagement', d => {
 		// 		const opts = []
-		// 		opts.push({ type: 'inspiration', count: d.inspirations, active: d.inspired, pad: d.id }) // HAS BEEN FOUND INSPIRATIONAL BY n USERS AND IS ACTIVE FOR CURRENT USER
-		// 		opts.push({ type: 'approval', count: d.approvals, active: d.approved, pad: d.id }) // HAS BEEN APPROVED BY n USERS AND IS ACTIVE FOR CURRENT USER
-		// 		opts.push({ type: 'flag', count: d.flags, active: d.flagged, pad: d.id }) // HAS BEEN FLAGGED FOR TOMORROW BY n USERS AND IS ACTIVE FOR CURRENT USER
+		// 		opts.push({ type: 'inspiration', count: d.inspirations, active: d.inspired, file: d.id }) // HAS BEEN FOUND INSPIRATIONAL BY n USERS AND IS ACTIVE FOR CURRENT USER
+		// 		opts.push({ type: 'approval', count: d.approvals, active: d.approved, file: d.id }) // HAS BEEN APPROVED BY n USERS AND IS ACTIVE FOR CURRENT USER
+		// 		opts.push({ type: 'flag', count: d.flags, active: d.flagged, file: d.id }) // HAS BEEN FLAGGED FOR TOMORROW BY n USERS AND IS ACTIVE FOR CURRENT USER
 		// 		return d.status === 2 ? opts : []
 		// 	}).classed('active', d => d.active)
 		// 	.attr('data-count', d => d.count)
@@ -473,7 +372,7 @@
 		// 			const message = 'Describe in a few sentences how you tested and validated this solution.' // TO DO: TRANSLATE
 		// 			const form = { action: '/validate',  method: 'POST' }
 		// 			const opts = []
-		// 			opts.push({ node: 'input', type: 'hidden', name: 'pad', value: d.pad })
+		// 			opts.push({ node: 'input', type: 'hidden', name: 'file', value: d.file })
 		// 			opts.push({ node: 'input', type: 'hidden', name: 'active', value: !d.active })
 		// 			opts.push({ node: 'input', type: 'hidden', name: 'type', value: d.type })
 		// 			opts.push({ node: 'input', type: 'hidden', name: 'path', value: new URL(window.location) })
@@ -482,7 +381,7 @@
 		// 			renderFormModal({ message: message, formdata: form, opts: opts, foot: foot })
 		// 		}
 		// 	} else {
-		// 		const result = await POST('/engage', { pad: d.pad, active: !d.active, type: d.type })
+		// 		const result = await POST('/engage', { file: d.file, active: !d.active, type: d.type })
 		// 		d.active = result.bool
 		// 		d.count = d.active ? d.count + 1 : d.count - 1
 		// 		sel.classed('active', d.active)
@@ -514,10 +413,10 @@
 
 				const response = await GET(`?${queryparams.toString()}`) // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
 
-				d3.selectAll('section.pads-container div.pads-layout')
+				d3.selectAll('section.files-container div.files-layout')
 				.each(function (d) {
 					const section = d3.select(this)
-					response.sections.find(s => s.status === d.status).pads.forEach(p => section.call(renderVignette, p))
+					response.sections.find(s => s.status === d.status).files.forEach(p => section.call(renderVignette, p))
 				})
 
 				if (response.count < <%- locals.stats.filtered %>) lazyloading = false
@@ -534,42 +433,62 @@
 		})
 	}
 
-	async function deletePads (pads) {
-		const data = pads.data()
+	function editFile (file) {
+		file.select('.meta-group .btn-group .actions button.edit')
+			.classed('active', true)
+			.html('<%- vocabulary['save'][locals.metadata.page.lang] %>')
+		.on('click', function (d) {
+			updateName(file, d.id)
+		})
+		file.select('a.file-link')
+		.on('click', function () { d3.event.preventDefault() })
+			.select('span')
+		.attr('contenteditable', true)
+			.on('keydown', function (d) {
+				const evt = d3.event
+				if (evt.code === 'Enter' || evt.keyCode === 13) {
+					evt.preventDefault()
+					this.blur()
+				}
+			}).on('blur', function (d) {
+				updateName(file, d.id)
+			}).node().focus()
+
+		function updateName (file, id) {
+			const link = file.select('a.file-link')
+			const content = link.select('span')
+			let name = content.node().innerText
+			name = name.length > 99 ? `${name.slice(0, 96)}…` : name
+			const button = file.select('.meta-group .btn-group .actions button.edit')
+			// DO THE SAVE
+			POST('/save/file', { name, id })
+			.then(res => {
+				if (res.status === 200) {
+					link.on('click', null)
+					content.attr('contenteditable', null)
+					button.on('click', d => d.fn(file))
+						.classed('active', false)
+						.html(function (d) { return this.parentNode['__data__'].label })
+				}
+			})
+		}
+	}
+
+	async function deleteFiles (files) {
+		const data = files.data()
 		const message = `Do you really want to delete the following ${data.length > 1 ? data.length : ''} solution${data.length > 1 ? 's' : ''}: <strong>${data.map(d => d.title || '<%- vocabulary["untitled solution"][locals.metadata.page.lang] %>').join('</strong>, <strong>')}</strong>? <br/><small>* This operation cannot be undone.</small>` // TO DO: TRANSLATE
-		const form = { action: '/delete/pads',  method: 'GET' }
+		const form = { action: '/delete/files',  method: 'GET' }
 		const opts = [{ node: 'button', type: 'submit', label: `Delete ${data.length > 1 ? 'them' : 'it'}` }]
 		data.forEach(d => opts.unshift({ node: 'input', type: 'hidden', name: 'id', value: d.id }))
 
 		renderFormModal({ message: message, formdata: form, opts: opts })
-	}
-	async function downloadPads (source) {
-		alert('sorry this feature is not yet available')
-		// if (source !== 'bookmarks') source = source.datum().id // IF A SINGLE SOLUTION, EXTRACT id
-		// const headline = source === 'bookmarks' ? vocabulary['download all']['<%- locals.metadata.page.lang %>'] : vocabulary['download']['<%- locals.metadata.page.lang %>']
-		// const opts = [
-		// 	{ node: 'button', type: 'button', label: 'raw data', resolve: 'raw' }, 
-		// 	// { node: 'button', type: 'button', label: 'as .pdf', resolve: 'pdf' } // TO DO
-		// ]
-		// const format = await renderPromiseModal({ headline: headline, opts: opts })
-		// const res = await POST(`/download/${format}`, { source: source }, false)
-
-		// const a = document.createElement('a')
-		// res.blob().then(b => {
-		// 	var url = window.URL.createObjectURL(b)
-		// 	a.href = url
-		// 	a.download = `solutions_${(new Date(Date.now())).display_for_query()}.zip`
-		// 	a.click()
-		// 	window.URL.revokeObjectURL(url)
-		// 	a.remove()
-		// })
 	}
 
 	// THIS IS FOR PUBLISHING FROM THE PRIVATE VIEW
 
 	async function unpublish (ids) {
 		if (!ids) ids = data.filter(d => d.status === 2).map(d => d.id)
-		return await PUT('/unpublish', { type: 'pads', ids: ids })
+		return await PUT('/unpublish', { type: 'files', ids: ids })
 	}
 	// async function createXLS () {
 	// 	const pads = d3.selectAll('.pad.flagged')

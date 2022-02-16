@@ -1,6 +1,8 @@
 const DB = require('../../../db-config.js')
 const header_data = require('../../header/').data
 const load = require('./load').main
+const { page_content_limit, modules, lazyload, followup_count } = require('../../../config.js')
+// TO DO: INTEGRATE OPTIONS FROM config.js
 const filter = require('./filter').main
 
 exports.main = (req, res) => {
@@ -80,6 +82,9 @@ exports.main = (req, res) => {
 
 			return {
 				metadata : {
+					site: {
+						modules: modules
+					},
 					page: {
 						title: pagetitle, 
 						path: path,

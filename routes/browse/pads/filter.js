@@ -77,5 +77,5 @@ exports.main = req => {
 	if (content_filters !== '') filters += `(${content_filters})`
 	if (filters.length) filters = `AND ${filters}`
 
-	return [f_space, order, page, filters]
+	return [ f_space, order, page, filters ]
 }

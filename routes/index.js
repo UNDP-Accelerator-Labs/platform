@@ -584,20 +584,20 @@ exports.storeImport = (req, res) => {
 /* ====================== SAVING MECHANISMS ====================== */
 /* =============================================================== */
 exports.process.upload = (req, res) => {
+	const { uuid } = req.session || {}
+	
 	const fls = req.files
 	const promises = fls.map(f => {
-		console.log('hello')
-		console.log(f)
 		return new Promise(resolve => {
 			if (['image/png', 'image/jpg', 'image/jpeg', 'image/jfif', 'image/gif', 'application/octet-stream'].includes(f.mimetype)) { // octet-streram IS FOR IMAGE URLs
 				const basedir = path.join(__dirname, `../public/uploads/`)
 				if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
 
-				const dir = path.join(basedir, req.session.uuid)
+				const dir = path.join(basedir, uuid)
 				if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 				const smdir = path.join(basedir, 'sm/')
 				if (!fs.existsSync(smdir)) fs.mkdirSync(smdir)
-				const targetdir = path.join(smdir, req.session.uuid)
+				const targetdir = path.join(smdir, uuid)
 				if (!fs.existsSync(targetdir)) fs.mkdirSync(targetdir)
 
 				const source = path.join(__dirname, `../${f.path}`)
@@ -636,7 +636,7 @@ exports.process.upload = (req, res) => {
 				const basedir = path.join(__dirname, `../public/uploads/`)
 				if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
 
-				const dir = path.join(basedir, req.session.uuid)
+				const dir = path.join(basedir, uuid)
 				if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 
 				const source = path.join(__dirname, `../${f.path}`)
@@ -657,6 +657,27 @@ exports.process.upload = (req, res) => {
 					fs.unlinkSync(source)
 					resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
 				})
+			} else if (f.mimetype.includes('application/pdf')) {
+				const basedir = path.join(__dirname, `../public/uploads/`)
+				if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
+
+				const dir = path.join(basedir, uuid)
+				if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+
+				const source = path.join(__dirname, `../${f.path}`)
+				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+
+				DB.conn.one(`
+					INSERT INTO files (name, path, contributor) 
+					SELECT $1, $2, id FROM contributors WHERE uuid = $3
+					RETURNING id
+				;`, [f.originalname, `/${target.split('public/')[1]}`, uuid])
+				.then(result => {
+					if (result) {
+						fs.renameSync(source, target)
+						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
+					} else resolve({ status: 403, message: 'file was not properly stored' })
+				}).catch(err => console.log(err))
 			} else {
 				fs.unlinkSync(source)
 				resolve({ status: 403, message: 'wrong file format' })

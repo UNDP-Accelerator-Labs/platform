@@ -11,3 +11,4 @@ dep.*
 *.env
 tmp/
 routes/scripts/
+public/generated/

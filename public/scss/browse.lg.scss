@@ -68,9 +68,11 @@ div.browse {
 		.inner {
 			section {
 				.pads-layout,
+				.files-layout,
 				.templates-layout,
 				.mobilizations-layout {
 					.pad,
+					.file,
 					.template,
 					.mobilization {
 						margin: 30px 0;
@@ -110,7 +112,8 @@ div.browse {
 												font-size: $t-mid-small;
 												cursor: pointer;
 											}
-											button.publish {
+											button.publish,
+											button.active {
 												background-color: $c-light-blue;
 												border-color: $c-light-blue;
 												color: #FFF;
@@ -490,7 +493,8 @@ div.browse {
 						}
 					}
 					.pad.status-0,
-					.template.status-0 {
+					.template.status-0,
+					.file.status-0 {
 						background: repeating-linear-gradient(
 							-45deg,
 							transparent,
@@ -500,7 +504,8 @@ div.browse {
 						);
 					}
 					.pad.status-1,
-					.template.status-1 {
+					.template.status-1,
+					.file.status-1 {
 						background: repeating-linear-gradient(
 							-45deg,
 							transparent,

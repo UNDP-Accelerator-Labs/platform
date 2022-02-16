@@ -2,7 +2,7 @@ exports.title = 'UNDP AccLabs Pads' // EDIT THIS
 exports.title_short = 'pads'
 
 // DESIRED MODULES
-const modules = ['pads', 'templates', 'mobilizations'] // EDIT THIS
+const modules = ['pads', 'templates', 'mobilizations', 'files'] // EDIT THIS
 
 if (modules.includes('mobilizations')) {
 	if (!modules.includes('pads')) modules.push('pads')

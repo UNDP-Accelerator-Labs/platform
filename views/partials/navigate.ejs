@@ -3,26 +3,46 @@
 	<div class='inner'>
 		<ul class='primary'>
 			
-			<% if (locals.metadata.user.rights > 0) { %>
-				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['pads', 'pad'].includes(locals.metadata.page.object)) { %>
-					<li class='active'>
-				<% } else { %><li><% } %>
-					<a href='/<%- locals.metadata.page.lang %>/browse/pads/private'><button><%- vocabulary['pad'][locals.metadata.page.lang](true).capitalize() %></button></a>
-				</li>
+			<% if (locals.metadata?.site?.modules?.includes('pads')) { %>
+				<% if (locals.metadata.user.rights > 0) { %>
+					<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['pads', 'pad'].includes(locals.metadata.page.object)) { %>
+						<li class='active'>
+					<% } else { %><li><% } %>
+						<a href='/<%- locals.metadata.page.lang %>/browse/pads/private'><button><%- vocabulary['pad'][locals.metadata.page.lang](true).capitalize() %></button></a>
+					</li>
+				<% } %>
 			<% } %>
-			<% if (locals.metadata.user.rights > 1) { %>
-				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['templates', 'template'].includes(locals.metadata.page.object)) { %>
-					<li class='active'>
-				<% } else { %><li><% } %>
-					<a href='/<%- locals.metadata.page.lang %>/browse/templates/private'><button><%- vocabulary['template'][locals.metadata.page.lang](false, true).capitalize() %></button></a>
-				</li>
+
+
+			<% if (locals.metadata?.site?.modules?.includes('files')) { %>
+				<% if (locals.metadata.user.rights > 0) { %>
+					<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['files', 'file'].includes(locals.metadata.page.object)) { %>
+						<li class='active'>
+					<% } else { %><li><% } %>
+						<a href='/<%- locals.metadata.page.lang %>/browse/files/private'><button><%- vocabulary['file'][locals.metadata.page.lang](true).capitalize() %></button></a>
+					</li>
+				<% } %>
 			<% } %>
-			<% if (locals.metadata.user.rights > 1 || (locals.metadata.user.participations && locals.metadata.user.participations.length > 0)) { %>
-				<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['mobilizations', 'mobilization'].includes(locals.metadata.page.object)) { %>
-					<li class='active'>
-				<% } else { %><li><% } %>
-					<a href='/<%- locals.metadata.page.lang %>/browse/mobilizations/ongoing'><button><%- vocabulary['cohort'][locals.metadata.page.lang](true).capitalize() %></button></a>
-				</li>
+
+
+			<% if (locals.metadata?.site?.modules?.includes('templates')) { %>
+				<% if (locals.metadata.user.rights > 1) { %>
+					<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['templates', 'template'].includes(locals.metadata.page.object)) { %>
+						<li class='active'>
+					<% } else { %><li><% } %>
+						<a href='/<%- locals.metadata.page.lang %>/browse/templates/private'><button><%- vocabulary['template'][locals.metadata.page.lang](false, true).capitalize() %></button></a>
+					</li>
+				<% } %>
+			<% } %> 
+
+			<% if (locals.metadata?.site?.modules?.includes('mobilizations')) { %>
+				<% if (locals.metadata.user.rights > 1 || locals.metadata.user?.participations?.length > 0) { %>
+					<% if (['browse', 'view', 'contribute', 'edit'].includes(locals.metadata.page.activity) && ['mobilizations', 'mobilization'].includes(locals.metadata.page.object)) { %>
+						<li class='active'>
+					<% } else { %><li><% } %>
+						<a href='/<%- locals.metadata.page.lang %>/browse/mobilizations/ongoing'><button><%- vocabulary['cohort'][locals.metadata.page.lang](true).capitalize() %></button></a>
+					</li>
+				<% } %>
 			<% } %>
 				
 			<li class='placeholder hide'><a><button></button></a></li>

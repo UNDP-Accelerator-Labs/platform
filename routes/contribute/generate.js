@@ -101,49 +101,60 @@ exports.main = (req, res) => {
 
 	let page = 0
 
-	DB.conn.one(`
-		SELECT * FROM pads WHERE id = $1
-	;`, [+id]).then(result => {
-		console.log('data to generate pdf with')
-		// console.log(result)
-		
-		const dir = path.join(__dirname, `../../public/generated/`)
-		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+	DB.conn.tx(t => {
+		return t.one(`
+			SELECT * FROM pads WHERE id = $1
+		;`, [+id]).then(result => {
+			console.log('data to generate pdf with')
+			
+			const dir = path.join(__dirname, `../../public/generated/`)
+			if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 
-		const target = path.join(dir, `p-${id}.${format}`)
-		const doc = new PDFDocument({ 
-			// font: 'Noto Sans', 
-			info: { 
-				'Title': result.title || 'Unnamed pad',
-				'Author': `${ 'author' } name via ${config.title}`,
-				'Subject': 'This document was created using PDFKit: https://pdfkit.org/docs/getting_started.html',
-				'ModDate': Date.now()
-			},
-			size: 'A4',
-			bufferPages: true
+			const docname = `p-${id}.${format}`
+			const target = path.join(dir, docname)
+			const doc = new PDFDocument({ 
+				// font: 'Noto Sans', 
+				info: { 
+					'Title': result.title || 'Unnamed pad',
+					'Author': `${ 'author' } name via ${config.title}`,
+					'Subject': 'This document was created using PDFKit: https://pdfkit.org/docs/getting_started.html',
+					'ModDate': Date.now()
+				},
+				size: 'A4',
+				bufferPages: true
+			})
+			// CREATE THE WRITE STREAM
+			doc.pipe(fs.createWriteStream(target))
+			doc.pipe(res)
+
+			doc.on('pageAdded', _ => page ++)
+
+			// ADD THE TITLE
+			doc.fontSize(fontsizes.xlarge)
+			.fillColor(colors.dark_blue)
+			.font('Helvetica-Bold')
+			.text(result.title)
+			.moveDown()
+			
+			resetEnvironment(doc)
+
+			// ADD THE SECTIONS
+			result.sections.forEach(d => {
+				addSection({ data: d, lang, doc }) // CHANGE en TO CURRENT LANGUAGE // ALTHOUGH THIS SHOULD NOT BE NEEDED HERE
+			})
+
+			doc.end() // FINALIZE THE STREAM FOR THE PDF FILE
+			return { 
+				name: result.title, 
+				path: `/generated/${docname}`, 
+				full_text: result.full_text, 
+				contributor: result.contributor, 
+				source: id 
+			}
+		}).then(result => {
+			const { name, path, full_text, contributor, source } = result
+			return t.none(`INSERT INTO files (name, path, full_text, contributor, source, status) VALUES ($1, $2, $3, $4, $5, $6)`, [name, path, full_text, contributor, source, 1])
 		})
-		// CREATE THE WRITE STREAM
-		doc.pipe(fs.createWriteStream(target))
-		doc.pipe(res)
-
-		doc.on('pageAdded', _ => page ++)
-
-		// ADD THE TITLE
-		doc.fontSize(fontsizes.xlarge)
-		.fillColor(colors.dark_blue)
-		.font('Helvetica-Bold')
-		.text(result.title)
-		.moveDown()
-		
-		resetEnvironment(doc)
-
-		// doc.moveDown()
-		// ADD THE SECTIONS
-		result.sections.forEach(d => {
-			addSection({ data: d, lang, doc }) // CHANGE en TO CURRENT LANGUAGE // ALTHOUGH THIS SHOULD NOT BE NEEDED HERE
-		})
-
-		doc.end() // FINALIZE THE STREAM FOR THE PDF FILE
 	}).catch(err => console.log(err))
 
 

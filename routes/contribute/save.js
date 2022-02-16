@@ -63,10 +63,12 @@ exports.main = (req, res) => {
 				;`, [newID, mobilization]))
 			}
 			// UPDATE THE TIMESTAMP
-			batch.push(t.none(`
-				UPDATE pads SET update_at = NOW() WHERE id = $1
-			;`, [newID || id]))
-			return t.batch(batch).then(_ => newID)
+			if (['pad', 'template'].includes(object)) {
+				batch.push(t.none(`
+					UPDATE $1:name SET update_at = NOW() WHERE id = $2
+				;`, [`${object}s`, newID || id]))
+				return t.batch(batch).then(_ => newID)
+			}
 		})
 	}).then(newID => {
 		// const newObject = results[results.length - 1]

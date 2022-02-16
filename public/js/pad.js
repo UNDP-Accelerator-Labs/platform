@@ -486,6 +486,7 @@ function populateSection (data, lang = 'en', section) {
 	// GROUP
 	if (data.type === 'group') addGroup({ data: data, lang: lang, section: section })
 }
+// THIS CAN PROBABLY BE MOVED TO upload.js
 function uploadImg (form, lang = 'en', container = null, focus = true) {
 	fetch(form.action, {
 		method: form.method,

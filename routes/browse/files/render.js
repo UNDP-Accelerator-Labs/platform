@@ -8,7 +8,7 @@ const filter = require('./filter').main
 exports.main = (req, res) => { 
 	const { object, space } = req.params || {}
 	// GET FILTERS
-	const [f_space, order, page, full_filters] = filter(req)
+	const [ f_space, order, page, full_filters ] = filter(req)
 
 	DB.conn.tx(async t => {
 		const data = await load({ connection: t, req })
@@ -19,34 +19,42 @@ exports.main = (req, res) => {
 		// SUMMARY STATISTICS
 		batch.push(t.task(t1 => {
 			const batch1 = []
-			// GET PADS COUNT BY STATUS
+			// GET FILES COUNT BY STATUS
 			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, p.status FROM pads p
+				SELECT COUNT (DISTINCT (f.id))::INT, f.status FROM files f
 				WHERE TRUE
 					$1:raw
-				GROUP BY p.status
-				ORDER BY p.status
+				GROUP BY f.status
+				ORDER BY f.status
 			;`, [f_space]).then(d => { return { totalcounts: d } }))
-			// GET PADS COUNT, ACCORDING TO FILTERS
+			// GET FILES COUNT, ACCORDING TO FILTERS
+			
+
+
+// EVERYWHERE THERE IS A LEFT JOIN mobilization_contributions NEED TO CHANGE
+// BUT FIRST, ADD COLUMN TO mobilization_contributions TO INCLUDE files
+
 			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, p.status FROM pads p
+				SELECT COUNT (DISTINCT (f.id))::INT, f.status FROM files f
+				LEFT JOIN pads p
+					ON f.source = p.id
 				LEFT JOIN mobilization_contributions mob
 					ON p.id = mob.pad
 				WHERE TRUE 
 					$1:raw $2:raw
-				GROUP BY p.status
-				ORDER BY p.status
+				GROUP BY f.status
+				ORDER BY f.status
 			;`, [full_filters, f_space]).then(d => { return { filteredcounts: d } }))
-			// GET PRIVATE PADS COUNT
+			// GET PRIVATE FILES COUNT
 			batch1.push(t1.one(`
-				SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-				WHERE p.contributor IN (SELECT id FROM contributors WHERE country = $1)
+				SELECT COUNT (DISTINCT (f.id))::INT FROM files f
+				WHERE f.contributor IN (SELECT id FROM contributors WHERE country = $1)
 				OR $2 > 2
 			;`, [country, rights], d => d.count).then(d => { return { privatecount: d } }))
-			// GET PUBLIC PADS COUNT
+			// GET PUBLIC FILES COUNT
 			batch1.push(t1.one(`
-				SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-				WHERE p.status = 2
+				SELECT COUNT (DISTINCT (f.id))::INT FROM files f
+				WHERE f.status = 2
 			;`, [], d => d.count).then(d => { return { publiccount: d } }))
 			return t1.batch(batch1)
 		}).then(d => d.flatObj()))
@@ -54,13 +62,16 @@ exports.main = (req, res) => {
 		// GET LOCATIONS, ACCORDING TO FILTERS
 		// THIS IS CURRENTLY NOT USED
 		batch.push(t.any(`
-			SELECT p.location, p.status FROM pads p
+			SELECT f.location, f.status FROM files f
+			LEFT JOIN pads p
+				ON f.source = p.id
 			LEFT JOIN mobilization_contributions mob
 				ON p.id = mob.pad
 			WHERE TRUE
 				$1:raw $2:raw
 		;`, [full_filters, f_space]))
-		// GET THE CENTERPOINT FOR THE MAPPER, IN CASE THERE ARE NO SOLUTIONS (THE MAPS AUTO-CENTERS ON THE LOCATION OF THE CONTRIBUTOR)
+		// GET THE CENTERPOINT FOR THE MAPPER, IN CASE THERE ARE NO SOLUTIONS 
+		// (THE MAPS AUTO-CENTERS ON THE LOCATION OF THE CONTRIBUTOR)
 		// THIS IS CURRENTLY NOT USED
 		batch.push(t.one(`
 			SELECT cp.lat, cp.lng FROM centerpoints cp
@@ -72,7 +83,9 @@ exports.main = (req, res) => {
 		// THE FOLLOWING IS MAINLY FOR THE "NEW" MENU
 		// GET TEMPLATE BREAKDOWN
 		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
+			SELECT COUNT (DISTINCT (f.id))::INT, t.id, t.title FROM files f
+			INNER JOIN pads p
+				ON f.source = p.id
 			INNER JOIN templates t 
 				ON p.template = t.id
 			WHERE TRUE 
@@ -82,9 +95,11 @@ exports.main = (req, res) => {
 		// GET CONTRBIUTOR BREAKDOWN
 		// DEPENDING ON space, GET names OR COUNTRIES
 		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.id FROM pads p 
+			SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.id FROM files f
 			INNER JOIN contributors c 
-				ON p.contributor = c.id 
+				ON f.contributor = c.id 
+			LEFT JOIN pads p
+				ON f.source = p.id
 			LEFT JOIN mobilization_contributions mob
 				ON p.id = mob.pad
 			WHERE TRUE
@@ -92,24 +107,7 @@ exports.main = (req, res) => {
 			GROUP BY c.id
 			ORDER BY c.name
 		;`, [full_filters]))
-		// GET MOBILIZATIONS BREAKDOWN
-		// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
-		// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
-		if (participations.length) { // TO DO: PB HERE
-			// mob SHUOLD BE ON TABLE mobilization_contributions, NOT mobilizations IF FILTERING OR MOBILIZATION
-			batch.push(t.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, m.id, m.title FROM pads p 
-				INNER JOIN mobilization_contributions mob 
-					ON mob.pad = p.id
-				INNER JOIN mobilizations m
-					ON m.id = mob.mobilization
-				WHERE m.id IN ($1:csv)
-					$2:raw $3:raw
-				GROUP BY m.id
-				ORDER BY m.title
-			;`, [participations.map(d => d.id), full_filters, f_space]))
-		} else batch.push([])
-
+		
 		// GET THE FILTERS
 		batch.push(t.task(t1 => {
 			const batch1 = []
@@ -117,9 +115,9 @@ exports.main = (req, res) => {
 			// DEPENDING ON space, GET names OR COUNTRIES
 			if (space === 'private') {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.country, c.id FROM pads p 
+					SELECT COUNT (DISTINCT (f.id))::INT, c.name, c.country, c.id FROM files f
 					INNER JOIN contributors c 
-						ON p.contributor = c.id 
+						ON f.contributor = c.id 
 					WHERE TRUE
 						$1:raw
 					GROUP BY c.id
@@ -127,9 +125,9 @@ exports.main = (req, res) => {
 				;`, [f_space]).then(d => { return { contributors: d } }))
 			} else if (space === 'public') {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, c.country AS name, cp.id FROM pads p 
+					SELECT COUNT (DISTINCT (f.id))::INT, c.country AS name, cp.id FROM files f
 					INNER JOIN contributors c 
-						ON p.contributor = c.id 
+						ON f.contributor = c.id 
 					INNER JOIN centerpoints cp
 						ON c.country = cp.country
 					WHERE TRUE
@@ -140,7 +138,9 @@ exports.main = (req, res) => {
 			} else batch1.push([])
 			// GET TEMPLATE BREAKDOWN
 			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
+				SELECT COUNT (DISTINCT (f.id))::INT, t.id, t.title FROM files f
+				INNER JOIN pads p
+					ON f.source = p.id
 				INNER JOIN templates t 
 					ON p.template = t.id
 				WHERE TRUE 
@@ -152,7 +152,9 @@ exports.main = (req, res) => {
 			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
 			if (participations.length) {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, mob.id, mob.title FROM pads p 
+					SELECT COUNT (DISTINCT (f.id))::INT, mob.id, mob.title FROM files f
+					LEFT JOIN pads p
+						ON f.source = p.id
 					INNER JOIN mobilization_contributions mc 
 						ON mc.pad = p.id
 					INNER JOIN mobilizations mob
@@ -171,12 +173,6 @@ exports.main = (req, res) => {
 				ORDER BY tag_name
 			;`).then(d => { return { thematic_areas: d } }))
 			// GET THE SDGs BREAKDOWN
-			// batch1.push(t1.any(`
-			// 	SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
-			// 	WHERE type = 'sdgs'
-			// 	GROUP BY (tag_name, tag_id)
-			// 	ORDER BY tag_id
-			// ;`).then(d => { return { sdgs: d } }))
 			// THE LOGIC FOR SDGs SHOULD BE SLIGHTLY DIFFERENT: WE ONLY WANT THE SDG KEY, AS THERE MAY BE NAMES STORED IN MULTIPLE LANGUAGES
 			// NAMES WILL BE RETRIEVED ON THE FRONT END FROM THE SOLUTIONS MAPPING PLATFORM (OR MAYBE DOWN THE ROAD FROM THE GLOBAL LOGIN PLATFORM)
 			batch1.push(t1.any(`
@@ -201,11 +197,11 @@ exports.main = (req, res) => {
 			;`).then(d => { return { datasources: d } }))
 			return t1.batch(batch1)
 		}).then(d => d.flatObj()))
-		// CHECK NUMBER OF PUBLISHED PADS
+		// CHECK NUMBER OF PUBLISHED FILES
 		// THIS IS TO LIMIT THE NUMBER THAT CAN BE PUBLISHED
 		// THIS IS ALSO PROBABLY DEPRECATED NOW
 		batch.push(t.one(`
-			SELECT COUNT (id)::INT FROM pads
+			SELECT COUNT (id)::INT FROM files
 			WHERE status = 2
 			AND contributor IN 
 				(SELECT id FROM contributors WHERE country = (SELECT country FROM contributors WHERE uuid = $1))
@@ -213,13 +209,11 @@ exports.main = (req, res) => {
 
 		return t.batch(batch)
 		.then(async results => {
-			// let [totalcounts, filteredcounts, locations, centerpoint, sdgs, thematic_areas, templates, contributors, mobilizations] = results
 			let [ statistics, 
 				locations, 
 				centerpoint, 
-				templates, 
-				contributors, 
-				mobilizations, 
+				templates, // THIS CAN PROBABLY BE REMOVED
+				contributors, // THIS CAN PROBABLY BE SIMPLIFIED TO A COUNT
 				filters,
 				publications ] = results
 
@@ -247,7 +241,6 @@ exports.main = (req, res) => {
 						path: path,
 						id: page,
 						count: Math.ceil((statistics.filteredcounts.sum('count') || 0) / page_content_limit),
-						// count: Math.ceil((statistics.filteredcounts.find(d => d.status === pubstatus)?.count || 0) / lazyLimit),
 						lazyload: lazyload,
 						lang: lang,
 						activity: path[1],
@@ -281,15 +274,15 @@ exports.main = (req, res) => {
 				},
 				filters: filters,
 
-				pads: data.pads, // STILL NEED THIS FOR THE MAP AND PIE CHARTS. ULTIMATELY REMOVE WHEN NEW EXPLORE VIEW IS CREATED
+				files: data.files, // STILL NEED THIS FOR THE MAP AND PIE CHARTS. ULTIMATELY REMOVE WHEN NEW EXPLORE VIEW IS CREATED
 				sections: data.sections,
 				publications: publications.count
 				
 				// locations: JSON.stringify(locations), 
-				// clusters: JSON.stringify(clusters),
+				// clusters: JSON.stringify(clusters)
 			}
 		})
-	}).then(data => res.render('browse-pads', data))
+	}).then(data => res.render('browse-files', data))
 	.catch(err => console.log(err))
 }
 

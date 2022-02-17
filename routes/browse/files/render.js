@@ -61,15 +61,16 @@ exports.main = (req, res) => {
 
 		// GET LOCATIONS, ACCORDING TO FILTERS
 		// THIS IS CURRENTLY NOT USED
-		batch.push(t.any(`
-			SELECT f.location, f.status FROM files f
-			LEFT JOIN pads p
-				ON f.source = p.id
-			LEFT JOIN mobilization_contributions mob
-				ON p.id = mob.pad
-			WHERE TRUE
-				$1:raw $2:raw
-		;`, [full_filters, f_space]))
+		// batch.push(t.any(`
+		// 	SELECT f.location, f.status FROM files f
+		// 	LEFT JOIN pads p
+		// 		ON f.source = p.id
+		// 	LEFT JOIN mobilization_contributions mob
+		// 		ON p.id = mob.pad
+		// 	WHERE TRUE
+		// 		$1:raw $2:raw
+		// ;`, [full_filters, f_space]))
+		
 		// GET THE CENTERPOINT FOR THE MAPPER, IN CASE THERE ARE NO SOLUTIONS 
 		// (THE MAPS AUTO-CENTERS ON THE LOCATION OF THE CONTRIBUTOR)
 		// THIS IS CURRENTLY NOT USED
@@ -95,7 +96,7 @@ exports.main = (req, res) => {
 		// GET CONTRBIUTOR BREAKDOWN
 		// DEPENDING ON space, GET names OR COUNTRIES
 		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.id FROM files f
+			SELECT COUNT (DISTINCT (f.id))::INT, c.name, c.id FROM files f
 			INNER JOIN contributors c 
 				ON f.contributor = c.id 
 			LEFT JOIN pads p
@@ -210,7 +211,7 @@ exports.main = (req, res) => {
 		return t.batch(batch)
 		.then(async results => {
 			let [ statistics, 
-				locations, 
+				// locations, 
 				centerpoint, 
 				templates, // THIS CAN PROBABLY BE REMOVED
 				contributors, // THIS CAN PROBABLY BE SIMPLIFIED TO A COUNT

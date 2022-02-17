@@ -152,150 +152,152 @@
 					</div>
 					<!-- <small>OR join</small> -->
 				</div>
-				<div class='separator'><span>AND</span></div>
-				<div class='filters-group content-filters'>
-					<% if (locals.filters.methods) { %>
-						<div class='filter'>
-							<button type='button'>
-								<label>Methods</label>
-								<% if (query.methods) { %><label class='count'><%- query.methods.length %><% } %></label>
-							</button>
-							<div class='drop-down'>
-								<ul>
-									<!-- TO DO: TRANSLATE -->
-									<% locals.filters.methods.forEach(m => { %>
-										<% if (query.methods && query.methods.map(q => +q).includes(m.tag_id)) { %>
-										<li class='entry active'>
-											<input type='checkbox' name='methods' id='method-<%- m.tag_id %>' value='<%- m.tag_id %>' data-type='Method' data-value='<%- m.tag_name %>' checked>
-										<% } else { %>
-										<li class='entry'>
-											<input type='checkbox' name='methods' id='method-<%- m.tag_id %>' value='<%- m.tag_id %>' data-type='Method' data-value='<%- m.tag_name %>'>
-										<% } %>
-											<label for='method-<%- m.tag_id %>'><%- m.tag_name %></label>
-											<label for='method-<%- m.tag_id %>' class='count'><%- m.count %></label>
-										</li>
-									<% }) %>
-								</ul>
+				<% if (['pads'].includes(locals.metadata.page.object)) { %>
+					<div class='separator'><span>AND</span></div>
+					<div class='filters-group content-filters'>
+						<% if (locals.filters.methods) { %>
+							<div class='filter'>
+								<button type='button'>
+									<label>Methods</label>
+									<% if (query.methods) { %><label class='count'><%- query.methods.length %><% } %></label>
+								</button>
+								<div class='drop-down'>
+									<ul>
+										<!-- TO DO: TRANSLATE -->
+										<% locals.filters.methods.forEach(m => { %>
+											<% if (query.methods && query.methods.map(q => +q).includes(m.tag_id)) { %>
+											<li class='entry active'>
+												<input type='checkbox' name='methods' id='method-<%- m.tag_id %>' value='<%- m.tag_id %>' data-type='Method' data-value='<%- m.tag_name %>' checked>
+											<% } else { %>
+											<li class='entry'>
+												<input type='checkbox' name='methods' id='method-<%- m.tag_id %>' value='<%- m.tag_id %>' data-type='Method' data-value='<%- m.tag_name %>'>
+											<% } %>
+												<label for='method-<%- m.tag_id %>'><%- m.tag_name %></label>
+												<label for='method-<%- m.tag_id %>' class='count'><%- m.count %></label>
+											</li>
+										<% }) %>
+									</ul>
+								</div>
 							</div>
-						</div>
-					<% } %>
-					<% if (locals.filters.datasources) { %>
-						<div class='filter'>
-							<button type='button'>
-								<label>Data sources</label>
-								<% if (query.datasources) { %><label class='count'><%- query.datasources.length %><% } %></label>
-							</button>
-							<div class='drop-down'>
-								<ul>
-									<!-- TO DO: TRANSLATE -->
-									<% locals.filters.datasources.forEach(d => { %>
-										<% if (query.datasources && query.datasources.map(q => +q).includes(d.tag_id)) { %>
-										<li class='entry active'>
-											<input type='checkbox' name='datasources' id='datasource-<%- d.tag_id %>' value='<%- d.tag_id %>' data-type='Data source' data-value='<%- d.tag_name %>' checked>
-										<% } else { %>
-										<li class='entry'>
-											<input type='checkbox' name='datasources' id='datasource-<%- d.tag_id %>' value='<%- d.tag_id %>' data-type='Data source' data-value='<%- d.tag_name %>'>
-										<% } %>
-											<label for='datasource-<%- d.tag_id %>'><%- d.tag_name %></label>
-											<label for='datasource-<%- d.tag_id %>' class='count'><%- d.count %></label>
-										</li>
-									<% }) %>
-								</ul>
-							</div>
-						</div>
-					<% } %>
-					<% if (locals.filters.thematic_areas) { %>
-						<div class='filter'>
-							<button type='button'>
-								<label>Thematic areas</label>
-								<% if (query.thematic_areas) { %><label class='count'><%- query.thematic_areas.length %><% } %></label>
-							</button>
-							<div class='drop-down'>
-								<ul>
-									<!-- TO DO: TRANSLATE -->
-									<% locals.filters.thematic_areas.forEach(t => { %>
-										<% if (query.thematic_areas && query.thematic_areas.map(q => +q).includes(t.tag_id)) { %>
-										<li class='entry active'>
-											<input type= 'checkbox' name='thematic_areas' id='theme-<%- t.tag_id %>' value='<%- t.tag_id %>' data-type='Thematic area' data-value='<%- t.tag_name %>' checked>
-										<% } else { %>
-										<li class='entry'>
-											<input type='checkbox' name='thematic_areas' id='theme-<%- t.tag_id %>' value='<%- t.tag_id %>' data-type='Thematic area' data-value='<%- t.tag_name %>'>
-										<% } %>
-											<label for='theme-<%- t.tag_id %>'><%- t.tag_name %></label>
-											<label for='theme-<%- t.tag_id %>' class='count'><%- t.count %></label>
-										</li>
-									<% }) %>
-								</ul>
-							</div>
-						</div>
-					<% } %>
-					<% if (locals.filters.sdgs) { %>
-						<div class='filter'>
-							<button type='button'>
-								<label>SDGs</label>
-								<% if (query.sdgs) { %><label class='count'><%- query.sdgs.length %><% } %></label>
-							</button>
-							<div class='drop-down'>
-								<ul>
-									<% locals.filters.sdgs.forEach(s => { %>
-										<% if (query.sdgs && query.sdgs.map(q => +q).includes(s.tag_id)) { %>
-										<li class='entry active'>
-											<input type='checkbox' name='sdgs' id='sdg-<%- s.tag_id %>' value='<%- s.tag_id %>' data-type='SDG' data-value='<%- s.tag_name %>' checked>
-										<% } else { %>
-										<li class='entry'>
-											<input type='checkbox' name='sdgs' id='sdg-<%- s.tag_id %>' value='<%- s.tag_id %>' data-type='SDG' data-value='<%- s.tag_name %>'>
-										<% } %>
-											<label for='sdg-<%- s.tag_id %>'><%- s.tag_id %> – <%- s.tag_name %></label>
-											<label for='sdg-<%- s.tag_id %>' class='count'><%- s.count %></label>
-										</li>
-									<% }) %>
-								</ul>
-							</div>
-						</div>
-					<% } %>
-					<div class='active-filters'>
-						<!-- TO DO: TRANSLATE -->
-						<% if (query) { %>
-							<% if (query.methods) { 
-								query.methods.forEach(c => { %>
-									<div class='tag' data-type='Method' data-value='<%- c %>'>
-										<label class='type'>Method:</label> 
-										<label class='name'><%- locals.filters.methods.find(d => +d.tag_id === +c).tag_name %></label>
-										<label class='close'>x</label>
-									</div>
-								<% }) 
-							} %>
-							<% if (query.datasources) { 
-								query.datasources.forEach(c => { %>
-									<div class='tag' data-type='Data source' data-value='<%- c %>'>
-										<label class='type'>Data source:</label> 
-										<label class='type'><%- locals.filters.datasources.find(d => +d.tag_id === +c).tag_name %></label>
-										<label class='close'>x</label>
-									</div>
-								<% }) 
-							} %>
-							<% if (query.thematic_areas) { 
-								query.thematic_areas.forEach(c => { %>
-									<div class='tag' data-type='Thematic area' data-value='<%- c %>'>
-										<label class='type'>Thematic area:</label>
-										<label class='type'><%- locals.filters.thematic_areas.find(d => +d.tag_id === +c).tag_name %></label>
-										<label class='close'>x</label>
-									</div>
-								<% }) 
-							} %>
-							<!-- TO DO: SOLVE PROBLEMS HERE -->
-							<% if (query.sdgs) { 
-								query.sdgs.forEach(c => { %>
-									<div class='tag' data-type='SDG' data-value='<%- c %>'>
-										<label class='type'>SDG:</label> 
-										<label class='type'><%- locals.filters.sdgs.find(d => +d.tag_id === +c).tag_name %></label>
-										<label class='close'>x</label>
-									</div>
-								<% }) 
-							} %>
 						<% } %>
+						<% if (locals.filters.datasources) { %>
+							<div class='filter'>
+								<button type='button'>
+									<label>Data sources</label>
+									<% if (query.datasources) { %><label class='count'><%- query.datasources.length %><% } %></label>
+								</button>
+								<div class='drop-down'>
+									<ul>
+										<!-- TO DO: TRANSLATE -->
+										<% locals.filters.datasources.forEach(d => { %>
+											<% if (query.datasources && query.datasources.map(q => +q).includes(d.tag_id)) { %>
+											<li class='entry active'>
+												<input type='checkbox' name='datasources' id='datasource-<%- d.tag_id %>' value='<%- d.tag_id %>' data-type='Data source' data-value='<%- d.tag_name %>' checked>
+											<% } else { %>
+											<li class='entry'>
+												<input type='checkbox' name='datasources' id='datasource-<%- d.tag_id %>' value='<%- d.tag_id %>' data-type='Data source' data-value='<%- d.tag_name %>'>
+											<% } %>
+												<label for='datasource-<%- d.tag_id %>'><%- d.tag_name %></label>
+												<label for='datasource-<%- d.tag_id %>' class='count'><%- d.count %></label>
+											</li>
+										<% }) %>
+									</ul>
+								</div>
+							</div>
+						<% } %>
+						<% if (locals.filters.thematic_areas) { %>
+							<div class='filter'>
+								<button type='button'>
+									<label>Thematic areas</label>
+									<% if (query.thematic_areas) { %><label class='count'><%- query.thematic_areas.length %><% } %></label>
+								</button>
+								<div class='drop-down'>
+									<ul>
+										<!-- TO DO: TRANSLATE -->
+										<% locals.filters.thematic_areas.forEach(t => { %>
+											<% if (query.thematic_areas && query.thematic_areas.map(q => +q).includes(t.tag_id)) { %>
+											<li class='entry active'>
+												<input type= 'checkbox' name='thematic_areas' id='theme-<%- t.tag_id %>' value='<%- t.tag_id %>' data-type='Thematic area' data-value='<%- t.tag_name %>' checked>
+											<% } else { %>
+											<li class='entry'>
+												<input type='checkbox' name='thematic_areas' id='theme-<%- t.tag_id %>' value='<%- t.tag_id %>' data-type='Thematic area' data-value='<%- t.tag_name %>'>
+											<% } %>
+												<label for='theme-<%- t.tag_id %>'><%- t.tag_name %></label>
+												<label for='theme-<%- t.tag_id %>' class='count'><%- t.count %></label>
+											</li>
+										<% }) %>
+									</ul>
+								</div>
+							</div>
+						<% } %>
+						<% if (locals.filters.sdgs) { %>
+							<div class='filter'>
+								<button type='button'>
+									<label>SDGs</label>
+									<% if (query.sdgs) { %><label class='count'><%- query.sdgs.length %><% } %></label>
+								</button>
+								<div class='drop-down'>
+									<ul>
+										<% locals.filters.sdgs.forEach(s => { %>
+											<% if (query.sdgs && query.sdgs.map(q => +q).includes(s.tag_id)) { %>
+											<li class='entry active'>
+												<input type='checkbox' name='sdgs' id='sdg-<%- s.tag_id %>' value='<%- s.tag_id %>' data-type='SDG' data-value='<%- s.tag_name %>' checked>
+											<% } else { %>
+											<li class='entry'>
+												<input type='checkbox' name='sdgs' id='sdg-<%- s.tag_id %>' value='<%- s.tag_id %>' data-type='SDG' data-value='<%- s.tag_name %>'>
+											<% } %>
+												<label for='sdg-<%- s.tag_id %>'><%- s.tag_id %> – <%- s.tag_name %></label>
+												<label for='sdg-<%- s.tag_id %>' class='count'><%- s.count %></label>
+											</li>
+										<% }) %>
+									</ul>
+								</div>
+							</div>
+						<% } %>
+						<div class='active-filters'>
+							<!-- TO DO: TRANSLATE -->
+							<% if (query) { %>
+								<% if (query.methods) { 
+									query.methods.forEach(c => { %>
+										<div class='tag' data-type='Method' data-value='<%- c %>'>
+											<label class='type'>Method:</label> 
+											<label class='name'><%- locals.filters.methods.find(d => +d.tag_id === +c).tag_name %></label>
+											<label class='close'>x</label>
+										</div>
+									<% }) 
+								} %>
+								<% if (query.datasources) { 
+									query.datasources.forEach(c => { %>
+										<div class='tag' data-type='Data source' data-value='<%- c %>'>
+											<label class='type'>Data source:</label> 
+											<label class='type'><%- locals.filters.datasources.find(d => +d.tag_id === +c).tag_name %></label>
+											<label class='close'>x</label>
+										</div>
+									<% }) 
+								} %>
+								<% if (query.thematic_areas) { 
+									query.thematic_areas.forEach(c => { %>
+										<div class='tag' data-type='Thematic area' data-value='<%- c %>'>
+											<label class='type'>Thematic area:</label>
+											<label class='type'><%- locals.filters.thematic_areas.find(d => +d.tag_id === +c).tag_name %></label>
+											<label class='close'>x</label>
+										</div>
+									<% }) 
+								} %>
+								<!-- TO DO: SOLVE PROBLEMS HERE -->
+								<% if (query.sdgs) { 
+									query.sdgs.forEach(c => { %>
+										<div class='tag' data-type='SDG' data-value='<%- c %>'>
+											<label class='type'>SDG:</label> 
+											<label class='type'><%- locals.filters.sdgs.find(d => +d.tag_id === +c).tag_name %></label>
+											<label class='close'>x</label>
+										</div>
+									<% }) 
+								} %>
+							<% } %>
+						</div>
 					</div>
-				</div>
+				<% } %>
 				<!-- <small>OR join</small> -->
 			</div>
 			<div class='submission'>

@@ -57,6 +57,7 @@ CREATE TABLE files (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	name VARCHAR(99),
 	path TEXT,
+	vignette TEXT,
 	full_text TEXT,
 	-- location JSONB,
 	sdgs JSONB,

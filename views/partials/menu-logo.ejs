@@ -73,6 +73,17 @@
 									</div>
 								</li>
 							<% } %>
+							<% if (locals.metadata?.site?.modules?.includes('files')) { %>
+								<li>
+									<form action='/upload/pdf' method='POST' enctype='multipart/form-data'>
+										<input type='file' id='input-file-pdf' name='pdf' accept='application/pdf' onchange='uploadPDF(this.form, "<%- locals.metadata.page.lang %>")' multiple>
+										<label for='input-file-pdf' title='Upload a pdf.'>
+											<!-- <i class='material-icons'>add_photo_alternate</i> -->
+											Upload
+										</label>
+									</form>
+								</li>
+							<% } %>
 							<% if (locals.metadata.user.rights > 1) { console.log(locals.metadata?.site?.modules)%>
 								<% if (locals.metadata?.site?.modules?.includes('templates')) { %>
 									<li>
@@ -122,18 +133,6 @@
 									</li>
 								<% } %>
 							<% } %>
-							<!-- TO DO: CREATE CONDITION FOR UPLOAD -->
-							<% if (locals.metadata?.site?.modules?.includes('files')) { %>
-								<li>
-									<form action='/upload/pdf' method='POST' enctype='multipart/form-data'>
-										<input type='file' id='input-file-pdf' name='pdf' accept='application/pdf' onchange='uploadPDF(this.form, "<%- locals.metadata.page.lang %>")' multiple>
-										<label for='input-file-pdf' title='Upload a pdf.'>
-											<!-- <i class='material-icons'>add_photo_alternate</i> -->
-											Upload
-										</label>
-									</form>
-								</li>
-							<% } %>
 						</ul>
 					</div>
 				</div>
@@ -141,7 +140,7 @@
 		<%# } %>
 		<h1><%- (locals.metadata.page.title).replace(/\s+/g, '<br>') %></h1>
 		<h2><%- locals.metadata.user.country %></h2>
-		<% if (locals.metadata.page.activity === 'browse' && locals.metadata.page.object === 'pads') { %>
+		<% if (locals.metadata.page.activity === 'browse' && ['pads', 'files'].includes(locals.metadata.page.object)) { %>
 			<div class='search'>
 				<button onclick='d3.select(".filter-veil").classed("hide", false)'><img src='/imgs/icons/i-search.svg'></button>
 			</div>

@@ -12,11 +12,13 @@ exports.main = req => {
 	else page = +page
 	
 	// FILTERS
+	
+	// TO DO: CHANGE pads TO files, ALSO IN THE req.query
 	const f_pads = pads ? DB.pgp.as.format(`f.id IN ($1:csv)`, [pads]) : null
 
 	// SEARCH IS ONLY AVAILABLE FOR PAD-BASED FILES (pdf) IN files BECAUSE THERE IS NO full_text REPRESENTATION
 	// THIS WOULD REQUIRE PARSING THE pdf IN A PYTHON CHILD PROCESS UPON UPLOAD
-	const f_search = search ? DB.pgp.as.format(`(f.full_text ~* $1)`, [format.regexQuery(search.trim().toLowerCase().split(' or ').map(d => d.split(' ')))]) : null
+	const f_search = search ? DB.pgp.as.format(`(f.full_text ~* $1 OR f.name ~* $1)`, [format.regexQuery(search.trim().toLowerCase().split(' or ').map(d => d.split(' ')))]) : null
 	
 	const f_contributors = contributors ? DB.pgp.as.format(`f.contributor IN ($1:csv)`, [contributors]) : null
 	const f_countries = countries ? DB.pgp.as.format(`f.contributor IN (SELECT c.id FROM contributors c INNER JOIN centerpoints cp ON c.country = cp.country WHERE cp.id IN ($1:csv))`, [countries]) : null
@@ -33,7 +35,7 @@ exports.main = req => {
 	// PUBLIC/ PRIVATE FILTERS
 	let f_space = ''
 	if (space === 'private' && !sudo) 	f_space	= DB.pgp.as.format(`AND f.contributor IN (SELECT id FROM contributors WHERE country = $1)`, [country])
-	if (space === 'bookmarks') 			f_space	= DB.pgp.as.format(`AND f.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
+	if (space === 'bookmarks') 			f_space	= DB.pgp.as.format(`AND f.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid]) // TO DO: UPDATE THIS IS STILL RELIANT ON pads
 	if (space === 'public')	 			f_space = DB.pgp.as.format(`AND f.status = 2`)
 	// ORDER
 	// let 	order = DB.pgp.as.format(`ORDER BY p.status ASC, p.date DESC`)

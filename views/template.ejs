@@ -196,17 +196,17 @@
 
 
 	// ADD INTERACTIONS WITH DEPLOYMENT OPTIONS
-	d3.select('.foot .deploy ul li a#template-deploy')
-	.on('click', _ => {
-		const message = 'Mobilize:' // TO DO: TRANSLATE
-		const form = { action: '#', method: 'GET' }
-		const opts = (<%- JSON.stringify(locals.cohort) %>).map(c => {
-			return { node: 'input', type: 'checkbox', name: 'cohort', label: c.name, value: c.id }
-		})
-		const foot = { node: 'button', type: 'submit', label: 'Deploy' }
+	// d3.select('.foot .deploy ul li a#template-deploy')
+	// .on('click', _ => {
+	// 	const message = 'Mobilize:' // TO DO: TRANSLATE
+	// 	const form = { action: '#', method: 'GET' }
+	// 	const opts = (<%- JSON.stringify(locals.cohort) %>).map(c => {
+	// 		return { node: 'input', type: 'checkbox', name: 'cohort', label: c.name, value: c.id }
+	// 	})
+	// 	const foot = { node: 'button', type: 'submit', label: 'Deploy' }
 
-		renderContactList({ message: message, formdata: form, opts: opts, foot: foot })
-	})
+	// 	renderContactList({ message: message, formdata: form, opts: opts, foot: foot })
+	// })
 
 
 	
@@ -364,13 +364,15 @@
 		}
 		else if (datum.type === 'checklist') {
 			datum.instruction = sel.select('.media-checklist .instruction').node().innerText
-			datum.options = datum.options.filter(b => b.name && b.name.length)
-			items.push(datum)
+			const clone = JSON.parse(JSON.stringify(datum))
+			clone.options = clone.options.filter(b => b.name?.length)
+			items.push(clone)
 		}
 		else if (datum.type === 'radiolist') {
 			datum.instruction = sel.select('.media-radiolist .instruction').node().innerText
-			datum.options = datum.options.filter(b => b.name && b.name.length)
-			items.push(datum)
+			const clone = JSON.parse(JSON.stringify(datum))
+			clone.options = clone.options.filter(b => b.name?.length)
+			items.push(clone)
 		}
 		// META
 		// else if (datum.type === 'location') {

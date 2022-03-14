@@ -516,6 +516,31 @@ nav#site-title.sm .inner .save .drop-down ul li a button:hover {
 nav#site-title.sm .inner .save .drop-down ul li a:hover {
     text-decoration: none;
   }
+  nav#site-title.sm .inner .create .drop-down ul li form,
+nav#site-title.sm .inner .save .drop-down ul li form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 45px);
+    height: 45px;
+    line-height: 45px;
+    margin: 0;
+    padding: 0 15px 0 30px;
+    background-color: #0468B1;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  nav#site-title.sm .inner .create .drop-down ul li form input[type=file],
+nav#site-title.sm .inner .save .drop-down ul li form input[type=file] {
+    display: none;
+  }
+  nav#site-title.sm .inner .create .drop-down ul li form input[type=file] + label,
+nav#site-title.sm .inner .save .drop-down ul li form input[type=file] + label {
+    color: #FFF;
+    cursor: inherit;
+  }
   nav#site-title.sm .inner .create .drop-down ul li .drop-down,
 nav#site-title.sm .inner .save .drop-down ul li .drop-down {
     display: none;
@@ -537,7 +562,9 @@ nav#site-title.sm .inner .save .drop-down ul li:hover .drop-down {
     display: block;
   }
   nav#site-title.sm .inner .create .drop-down ul li:hover > button,
-nav#site-title.sm .inner .save .drop-down ul li:hover > button {
+nav#site-title.sm .inner .create .drop-down ul li:hover > form,
+nav#site-title.sm .inner .save .drop-down ul li:hover > button,
+nav#site-title.sm .inner .save .drop-down ul li:hover > form {
     background-color: #0A4C73 !important;
     color: #FFF !important;
   }
@@ -2423,6 +2450,7 @@ main#mobilization .inner .body .layout .media-container .media-checklist ol .opt
 main#mobilization .inner .body .layout .media-container .media-radiolist ol .opt .grow .list-item,
 main#mobilization .inner .body .layout .meta-container .media-checklist ol .opt .grow .list-item,
 main#mobilization .inner .body .layout .meta-container .media-radiolist ol .opt .grow .list-item {
+    display: block;
     width: 100%;
     outline: none;
   }
@@ -7039,6 +7067,31 @@ nav#site-title.sm .inner .save .drop-down ul li a button:hover {
 nav#site-title.sm .inner .save .drop-down ul li a:hover {
     text-decoration: none;
   }
+  nav#site-title.sm .inner .create .drop-down ul li form,
+nav#site-title.sm .inner .save .drop-down ul li form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 45px);
+    height: 45px;
+    line-height: 45px;
+    margin: 0;
+    padding: 0 15px 0 30px;
+    background-color: #0468B1;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  nav#site-title.sm .inner .create .drop-down ul li form input[type=file],
+nav#site-title.sm .inner .save .drop-down ul li form input[type=file] {
+    display: none;
+  }
+  nav#site-title.sm .inner .create .drop-down ul li form input[type=file] + label,
+nav#site-title.sm .inner .save .drop-down ul li form input[type=file] + label {
+    color: #FFF;
+    cursor: inherit;
+  }
   nav#site-title.sm .inner .create .drop-down ul li .drop-down,
 nav#site-title.sm .inner .save .drop-down ul li .drop-down {
     display: none;
@@ -7060,7 +7113,9 @@ nav#site-title.sm .inner .save .drop-down ul li:hover .drop-down {
     display: block;
   }
   nav#site-title.sm .inner .create .drop-down ul li:hover > button,
-nav#site-title.sm .inner .save .drop-down ul li:hover > button {
+nav#site-title.sm .inner .create .drop-down ul li:hover > form,
+nav#site-title.sm .inner .save .drop-down ul li:hover > button,
+nav#site-title.sm .inner .save .drop-down ul li:hover > form {
     background-color: #0A4C73 !important;
     color: #FFF !important;
   }
@@ -8946,6 +9001,7 @@ main#mobilization .inner .body .layout .media-container .media-checklist ol .opt
 main#mobilization .inner .body .layout .media-container .media-radiolist ol .opt .grow .list-item,
 main#mobilization .inner .body .layout .meta-container .media-checklist ol .opt .grow .list-item,
 main#mobilization .inner .body .layout .meta-container .media-radiolist ol .opt .grow .list-item {
+    display: block;
     width: 100%;
     outline: none;
   }

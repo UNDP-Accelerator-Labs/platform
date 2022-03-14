@@ -213,7 +213,7 @@
 			// DELETE IS LIKELY COMPLICATED, ESPECIALLY IF FILES ARE SHARED ACROSS PLATFORMS
 			// if ('<%- locals.metadata.page.space %>' === 'private' && d.editable) opts.push({ node: 'button', type: 'button', label: 'Delete', fn: deleteFiles })
 			if (d.editable) opts.push({ node: 'button', type: 'button', label: 'Edit name', fn: editFile })
-			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/files', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && d.available_publications > 0), label: 'Publish' })
+			if ('<%- locals.metadata.page.space %>' === 'private') opts.push({ action: '/publish/files', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1 && (d?.available_publications ?? Infinity) > 0), label: 'Publish' })
 			return opts
 		}).attrs({ 'action': d => d.action, 'method': d => d.method })
 		.each(function (d) {
@@ -278,7 +278,7 @@
 			.html(d => d.template_title?.length > 25 ? `${d.template_title.slice(0, 25)}…` : d.template_title)
 		
 
-		if (data.editable && data.forwards.length) {
+		if (data.editable && data.forwards?.length) {
 			const dropdown = body.addElems('div', 'create forward')
 				dropdown.addElems('button')
 					.html('Forward to') // TO DO: TRANSLATE

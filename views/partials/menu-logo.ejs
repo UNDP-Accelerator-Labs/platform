@@ -73,13 +73,14 @@
 									</div>
 								</li>
 							<% } %>
+							<!-- TO DO: STYLE THIS -->
 							<% if (locals.metadata?.site?.modules?.includes('files')) { %>
 								<li>
 									<form action='/upload/pdf' method='POST' enctype='multipart/form-data'>
 										<input type='file' id='input-file-pdf' name='pdf' accept='application/pdf' onchange='uploadPDF(this.form, "<%- locals.metadata.page.lang %>")' multiple>
 										<label for='input-file-pdf' title='Upload a pdf.'>
 											<!-- <i class='material-icons'>add_photo_alternate</i> -->
-											Upload
+											File
 										</label>
 									</form>
 								</li>
@@ -154,7 +155,6 @@
 	</div>
 </nav>
 
-<script type='text/javascript' src='/js/upload.js'></script>
 <script type='text/javascript'>
 	// d3.selectAll('nav#site-title li').on('mouseover', function () {
 	// 	const sel = d3.select(this)

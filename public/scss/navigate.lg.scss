@@ -195,6 +195,29 @@ nav#site-title.sm {
 						a:hover {
 							text-decoration: none;
 						}
+						form {
+							display: flex;
+							flex-direction: row;
+							justify-content: space-between;
+							align-items: center;
+							width: calc(100% - 45px);
+							height: 45px;
+							line-height: 45px;
+							margin: 0;
+							padding: 0 15px 0 30px;
+							background-color: $c-mid-blue;
+							text-align: left;
+							white-space: nowrap;
+							cursor: pointer;
+
+							input[type=file] {
+								display: none;
+							}
+							input[type=file] + label {
+								color: #FFF;
+								cursor: inherit;
+							}
+						}
 						.drop-down {
 							display: none;
 
@@ -220,7 +243,8 @@ nav#site-title.sm {
 							display: block;
 						}
 					}
-					li:hover > button {
+					li:hover > button,
+					li:hover > form {
 						background-color: $c-dark-blue !important;
 						color: #FFF !important;
 					}

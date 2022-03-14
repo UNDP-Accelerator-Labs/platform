@@ -588,10 +588,6 @@ function addChecklist (kwargs) {
 	
 	// DETERMINE ID FOR THE INPUT NAME
 	let checklist_id = uuidv4()
-	// let checklist_id = 0
-	// d3.selectAll('.media-container.checklist-container').each(function (d, i) {
-	// 	if (this === media.container.node()) checklist_id = i
-	// })
 
 	media.media.addElem('div', 'instruction')
 		.attrs({ 
@@ -615,7 +611,7 @@ function addChecklist (kwargs) {
 			.html('add_circle')
 	}
 
-	function addItem (sel) {
+	function addItem (sel, focus) {
 		const opts = sel.addElems('li', 'opt', d => d.options)
 			.classed('valid', d => d.name?.length)
 			.each((d, i) => d.id = i)
@@ -649,17 +645,17 @@ function addChecklist (kwargs) {
 				'data-placeholder': vocabulary['new checklist item'][lang],
 				'contenteditable': activity !== 'view' ? true : null
 			})
-		.on('keydown', function () {
+		.on('keydown', function (d) {
 			const evt = d3.event
 			if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
 				evt.preventDefault()
 				this.blur()
 				
-				media.container.each(d => {
-					d.options = d.options.filter(c => c.name?.length)
-					d.options.push({ checked: false })
+				media.container.each(c => {
+					c.options = c.options.filter(b => b.name?.length)
+					c.options.push({ checked: false })
 				})
-				list.call(addItem)
+				list.call(addItem, true)
 			}
 		}).on('blur', function (d) {
 			d.name = this.innerText.trim()
@@ -683,6 +679,8 @@ function addChecklist (kwargs) {
 		const emptyOpts = opts.filter(d => !d.name)
 		if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
 	}
+
+	if (focus) media.media.select('.instruction').node().focus()
 }
 function addRadiolist (kwargs) { 
 	const { data, lang, section, focus } = kwargs || {}
@@ -714,10 +712,6 @@ function addRadiolist (kwargs) {
 	
 	// DETERMINE ID FOR THE INPUT NAME
 	let radiolist_id = uuidv4()
-	// let radiolist_id = 0
-	// d3.selectAll('.media-container.radiolist-container').each(function (d, i) {
-	// 	if (this === media.container.node()) radiolist_id = i
-	// })
 
 	media.media.addElem('div', 'instruction')
 		.attrs({ 
@@ -808,9 +802,11 @@ function addRadiolist (kwargs) {
 			})
 		}
 
-		const emptyOpts = opts.filter(d => !d.name)
-		if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
+		// const emptyOpts = opts.filter(d => !d.name)
+		// if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
 	}
+
+	if (focus) media.media.select('.instruction').node().focus()
 }
 // META ELEMENTS
 function addMap (data, lang = 'en', focus = false) { // TO DO

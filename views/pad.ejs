@@ -376,9 +376,13 @@
 			items.push(datum)
 		}
 		else if (['checklist', 'radiolist'].includes(datum.type)) {
-			datum.options = datum.options.filter(b => b.name && b.name.length)
-			datum.has_content = datum.options.filter(b => b.checked).length > 0
-			items.push(datum)
+			datum.has_content = datum.options.filter(b => b.name?.length && b.checked).length > 0
+			const clone = JSON.parse(JSON.stringify(datum))
+			clone.options = clone.options.filter(b => b.name?.length)
+			items.push(clone)
+
+			// datum.options = datum.options.filter(b => b.name && b.name.length)
+			// items.push(datum)
 		}
 		// META
 		// else if (datum.type === 'location') {
@@ -626,10 +630,16 @@
 
 				// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
 				d3.selectAll('div.meta-status form input[name="id"]').attr('value', res.object)
-				d3.select('div.meta-status form input[name="id"] button.publish').attr('disabled', content.status === 1)
-				d3.select('div.meta-status form input[name="id"] button.generate-pdf').attr('disabled', content.status > 0)
 				// d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
 			}
+			// ACTIVATE THE PUBLISHING OPTIONS AT THE END
+			const metastatus = d3.select('div.meta-status')
+				.classed('status-0 status-1', false)
+				.classed(`status-${content.status}`, true)
+			metastatus.select('div.btn-group form button.publish')
+				.attr('disabled', content.status === 1 ? null : true)
+			metastatus.select('div.btn-group form button.generate-pdf')
+				.attr('disabled', content.status > 0 ? null : true)
 		}).catch(err => { throw err })
 		// POST NEW TAGS (THIS USED TO BE IN THE BACKEND, BUT MOVED IT HERE)
 		// MOVE THIS BACK TO THE PADS

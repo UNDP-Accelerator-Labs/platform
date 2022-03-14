@@ -83,16 +83,16 @@ exports.main = (req, res) => {
 		
 		// THE FOLLOWING IS MAINLY FOR THE "NEW" MENU
 		// GET TEMPLATE BREAKDOWN
-		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (f.id))::INT, t.id, t.title FROM files f
-			INNER JOIN pads p
-				ON f.source = p.id
-			INNER JOIN templates t 
-				ON p.template = t.id
-			WHERE TRUE 
-				$1:raw
-			GROUP BY t.id
-		;`, [f_space]))
+		// batch.push(t.any(`
+		// 	SELECT COUNT (DISTINCT (f.id))::INT, t.id, t.title FROM files f
+		// 	INNER JOIN pads p
+		// 		ON f.source = p.id
+		// 	INNER JOIN templates t 
+		// 		ON p.template = t.id
+		// 	WHERE TRUE 
+		// 		$1:raw
+		// 	GROUP BY t.id
+		// ;`, [f_space]))
 		// GET CONTRBIUTOR BREAKDOWN
 		// DEPENDING ON space, GET names OR COUNTRIES
 		batch.push(t.any(`
@@ -213,7 +213,7 @@ exports.main = (req, res) => {
 			let [ statistics, 
 				// locations, 
 				centerpoint, 
-				templates, // THIS CAN PROBABLY BE REMOVED
+				// templates, // THIS CAN PROBABLY BE REMOVED
 				contributors, // THIS CAN PROBABLY BE SIMPLIFIED TO A COUNT
 				filters,
 				publications ] = results

@@ -78,7 +78,7 @@ exports.main = (req, res) => {
 
 		return t.batch(batch)
 		.then(results => {
-			let [statistics, contributors, mobilizations] = results
+			let [ statistics, contributors, mobilizations ] = results
 
 			return {
 				metadata : {

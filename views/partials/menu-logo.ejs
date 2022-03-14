@@ -107,7 +107,7 @@
 														</button>
 														<div class='drop-down'>
 															<ul>
-																<% locals.metadata.menu.templates.forEach(t => { %>
+																<% locals.metadata.menu.templates.forEach(t => { console.log(t) %>
 																	<li>
 																		<a href='/<%- locals.metadata.page.lang %>/contribute/template?source=<%- t.id %>' target='_blank'>
 																			<% if (t.title) { %>

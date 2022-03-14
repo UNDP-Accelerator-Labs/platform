@@ -71,14 +71,14 @@ exports.main = (req, res) => {
 		
 		// THE FOLLOWING IS MAINLY FOR THE "NEW" MENU
 		// GET TEMPLATE BREAKDOWN
-		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
-			INNER JOIN templates t 
-				ON p.template = t.id
-			WHERE TRUE 
-				$1:raw
-			GROUP BY t.id
-		;`, [f_space]))
+		// batch.push(t.any(`
+		// 	SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
+		// 	INNER JOIN templates t 
+		// 		ON p.template = t.id
+		// 	WHERE (t.contributor = (SELECT id FROM contributors WHERE uuid = $1) AND t.status >= 1)
+		// 		OR t.status = 2
+		// 	GROUP BY t.id
+		// ;`, [uuid]))
 		// GET CONTRBIUTOR BREAKDOWN
 		// DEPENDING ON space, GET names OR COUNTRIES
 		batch.push(t.any(`
@@ -217,7 +217,7 @@ exports.main = (req, res) => {
 			let [ statistics, 
 				locations, 
 				centerpoint, 
-				templates, 
+				// templates, 
 				contributors, 
 				mobilizations, 
 				filters,

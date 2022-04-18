@@ -24,6 +24,15 @@ nav#languages {
 				text-decoration: underline;
 			}
 		}
+		li.home-btn {
+			float: left;
+			white-space: nowrap;
+			text-align: left;
+
+			a {
+				color: $c-light-green;
+			}
+		}
 		li.disabled {
 			a {
 				color: $c-mid-grey;

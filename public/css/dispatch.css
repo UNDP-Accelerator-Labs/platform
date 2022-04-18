@@ -342,6 +342,14 @@ input:-webkit-autofill:active {
     color: #B4DC28;
     text-decoration: underline;
   }
+  nav#languages ul li.home-btn {
+    float: left;
+    white-space: nowrap;
+    text-align: left;
+  }
+  nav#languages ul li.home-btn a {
+    color: #B4DC28;
+  }
   nav#languages ul li.disabled a {
     color: #646464;
     cursor: default;
@@ -6892,6 +6900,14 @@ main#mobilize-new .modal .inner .body input:-webkit-autofill:active {
   nav#languages ul li a.active {
     color: #B4DC28;
     text-decoration: underline;
+  }
+  nav#languages ul li.home-btn {
+    float: left;
+    white-space: nowrap;
+    text-align: left;
+  }
+  nav#languages ul li.home-btn a {
+    color: #B4DC28;
   }
   nav#languages ul li.disabled a {
     color: #646464;

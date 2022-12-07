@@ -43,7 +43,7 @@ String.prototype.isURL = function () {
 	// 	'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
 	// 	'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
 	// 	'(\\#[-a-z\\d_]*)?$', 'i') // extension
-	const url = new RegExp(`(${b}(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`, 'ig')
+	const url = new RegExp(`(?<!:)(${b}(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`, 'ig')
 	return !!url.test(encodeURI(this.valueOf().trim()))
 }
 RegExp.escape = function(string) {

@@ -1,3 +1,11 @@
+function getMediaSize () {
+	// https://www.w3schools.com/howto/howto_js_media_queries.asp
+	return [{ label: 'xs', size: 480 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }]
+	.find(d => {
+		if (d.label !== 'lg') return window.matchMedia(`(max-width: ${d.size}px)`).matches
+		else return window.matchMedia(`(min-width: ${d.size}px)`).matches
+	})?.label
+}
 const jsonQueryHeader = { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
 function GET (_uri, _expectJSON = true) {
 	return new Promise(async resolve => {
@@ -47,7 +55,7 @@ function toggleClass (node, classname) {
 	d3.select(node).classed(classname, function () { return !d3.select(this).classed(classname) })
 }
 function fixLabel (node) {
-	d3.select(node).classed('has-value', node.value && node.value.trim().length)
+	d3.select(node).classed('has-value', node.value?.trim().length)
 }
 function multiSelection (sel, targets) {
 	const body = d3.select('body')

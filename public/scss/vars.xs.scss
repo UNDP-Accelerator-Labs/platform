@@ -15,11 +15,8 @@ html, body {
 	font-size: $t-main;
 	line-height: 1.5em;
 }
-.xs {
-	display: none;
-}
-.no-bg {
-	background-color: transparent !important;
+.lg {
+	display: none !important;
 }
 
 .modal {
@@ -71,7 +68,7 @@ html, body {
 
 				button {
 					width: 100%;
-					min-height: 30px;
+					min-height: 45px;
 					border: 1px solid $c-dark-blue;
 					outline: none;
 					background-color: transparent;
@@ -104,132 +101,22 @@ html, body {
 					top: -15px;
 					left: 0;
 					font-size: $t-main;
-					color: $c-light-grey;
+					color: $c-mid-yellow;
 					transform: translateY(calc(#{$t-main}));
 					transition: transform .25s, font-size .25s;
 					cursor: pointer;
 				}
-				input:focus + label,
-				input.has-value + label,
 				textarea:focus + label,
 				textarea.has-value + label {
 					font-size: $t-small;
-					transform: translateY(-5px);
-				}
-				input.full-width {
-					width: 100%;
-					margin: 5px 0 15px 0;
-					padding: 15px 0 15px 0;
-					border: none;
-					border-bottom: 1px solid $c-dark-blue;
-					outline: none;
-					font-size: $t-main;
-				}
-				input + label {
-					top: 1px;
-				}
-				input:focus {
-					border-color: $c-light-yellow;
-				}
-				/*button.dropbtn {
-					border: none;
-					border-bottom: 1px solid $c-light-grey;
-					color: $c-light-grey;
-					font-size: $t-mid-small;
-				}*/
-				.filter {
-					input[type=text] {
-						width: calc(100% - 30px);
-						height: 45px;
-						margin-left: 0;
-						padding: 0 15px;
-						border: none;
-						outline: none;
-						border-bottom: 1px solid $c-light-grey;
-						font-size: $t-main;
-						line-height: 1.5em;
-					}
-					input[type=text] + label {
-						left: 15px;
-						font-size: $t-mid-small;
-						line-height: 1.5em;
-						transform: translateY($t-small);
-					}
-					input[type=text]:focus + label,
-					input[type=text].has-value + label {
-						font-size: $t-small;
-						line-height: 1.5em;
-						transform: translateY(-10px);
-					}
-					.dropdown {
-						position: absolute;
-						width: 100%;
-						max-height: 0;
-						left: 0;
-						top: 100%;
-						background-color: #FFF;
-						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-						overflow: scroll;
-						z-index: 10;
-						transition: max-height 0.25s ease-out;
-
-						menu {
-							width: 100%;
-							
-							li {
-								display: inline-block;
-								width: 100%;
-								margin: 0;
-								padding: 5px 15px 5px 15px;
-								list-style: none;
-								box-sizing: border-box;
-
-								input[type=checkbox],
-								input[type=radio] {
-									display: none;
-								}
-								label {
-									display: block;
-									position: static;
-									cursor: pointer;
-									font-size: $t-mid-small;
-									line-height: 1.5em;
-									color: $c-dark-grey;
-									transform: none;
-									pointer-events: all;
-									cursor: pointer;
-									
-									.count {
-										float: right;
-										color: $c-light-grey;
-									}
-								}
-								label.secondary {
-									padding: 0;
-									font-size: $t-small;
-									color: $c-light-grey;
-									font-style: italic;
-								}
-								input:disabled + label {
-									color: $c-light-grey;
-								}
-
-								&:hover {
-									background-color: $c-light-3;
-								}
-							}
-							li.active {
-								background-color: $c-light-blue;
-							}
-						}
-					}
+					transform: translateY(0px);
 				}
 			}
 			li:hover {
-				/*button {
+				button {
 					background-color: $c-dark-blue;
 					color: #FFF;
-				}*/
+				}
 			}
 		}
 		.foot {

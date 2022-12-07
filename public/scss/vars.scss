@@ -41,7 +41,7 @@ $c-mid-2-light: rgba(87,100,140,.25);
 $c-mid-3: #F4ED6E;
 $c-light-1: #C2B4D6;
 $c-light-2: #E5E5E5;
-$c-light-3: #F0F0F0;
+$c-light-3: #F3F3F3;
 
 @keyframes fade-in {
 	from { opacity: 0 }
@@ -59,6 +59,9 @@ $c-light-3: #F0F0F0;
 * {
 	margin: 0;
 	padding: 0;
+}
+body {
+	/*background-color: #F3F3F3;*/
 }
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
 	font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
@@ -90,12 +93,19 @@ input:-webkit-autofill:active  {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	top: 95px;
+	top: 30px;
 	left: 0;
 	width: 100vw;
-	height: calc(100vh - 95px);
+	height: calc(100vh - 30px);
 	overflow: scroll;
-	background-color: $c-mid-green;
+	/*background-color: rgba(255,255,255,.75);*/
+	background: repeating-linear-gradient(
+		-45deg,
+		rgba(255,255,255,.75),
+		rgba(255,255,255,.75) 3px,
+		rgba(229,229,229,.75) 3px,
+		rgba(229,229,229,.75) 6px
+	);
 
 	animation: fade-in .25s;
 	z-index: 9999;
@@ -111,22 +121,21 @@ input:-webkit-autofill:active  {
 			cursor: pointer;
 		}
 		.inner {
-			border-top: 3px solid $c-dark-blue;
-			box-shadow: 0 0 10px rgba(0,0,0,.15);
+			border-top: 2px solid $c-dark-blue;
+			box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
 		}
 	}
 }
 .screen.bis {
-	background-color: $c-mid-1;
-	/*background: $c-mid-1;*/
-	/*background: linear-gradient(315deg, $c-light-1 0%, $c-mid-1 100%);*/
+	/*background-color: $c-mid-1;*/
 
 	.modal {
+
 		.close {
-			background-color: $c-mid-2;
+			/*background-color: $c-mid-2;*/
 		}
 		.inner {
-			border-top: 3px solid $c-mid-2;
+			/*border-top: 3px solid $c-mid-2;*/
 		}
 	}
 }
@@ -150,6 +159,96 @@ input:-webkit-autofill:active  {
 	color: $c-light-grey;
 	pointer-events: none;
 }
+input.toggle {
+	display: none;
+}
+input.toggle + label {
+	display: block;
+	position: relative;
+	width: 40px;
+	height: 20px;
+	border-radius: 20px;
+	border: 1px solid $c-light-grey;
+	margin: 15px auto 0px auto;
+	background-color: $c-light-grey;
+	cursor: pointer;
+	transition: background-color .25s, border-color .25s;
+}
+input.toggle:checked + label {
+	/*border-color: $c-dark-blue;*/
+	background-color: transparent;
+}
+input.toggle:checked + label[for='status--1'] {
+	/*border-color: $c-mid-yellow;*/
+	background: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 3px,
+		rgba(150, 150, 150, .1) 3px,
+		rgba(150, 150, 150, .1) 6px
+	);
+}
+input.toggle:checked + label[for='status-0'] {
+	/*border-color: $c-mid-yellow;*/
+	background: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 3px,
+		rgba(255, 193, 14, .25) 3px,
+		rgba(255, 193, 14, .25) 6px
+	);
+}
+input.toggle:checked + label[for='status-1'] {
+	/*border-color: $c-light-blue;*/
+	background: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 3px,
+		rgba(50, 190, 225, .25) 3px,
+		rgba(50, 190, 225, .25) 6px
+	);
+}
+input.toggle + label::after {
+	content: attr(data-content);
+	position: absolute;
+	display: block;
+	width: 20px;
+	height: 20px;
+	margin: -1px 0 0 -1px;
+	background-color: #FFF;
+	border: 1px solid $c-light-grey;
+	border-radius: 20px;
+	font-size: 8px;
+	line-height: 1.5em;
+	font-weight: bold;
+	text-align: center;
+	line-height: 20px;
+	color: $c-light-grey;
+	transition: transform .25s;
+}
+input.toggle:checked + label[for='status-0']::after {
+	/*background-color: $c-mid-yellow;*/
+	/*border-color: $c-mid-yellow;*/
+}
+input.toggle:checked + label[for='status-1']::after {
+	/*background-color: $c-light-blue;*/
+	/*border-color: $c-light-blue;*/
+}
+input.toggle:checked + label::after {
+	transform: translate(20px, 0);
+	background-color: $c-dark-blue;
+	border-color: $c-dark-blue;
+	color: #FFF;
+}
+input.toggle:disabled + label {
+	background-color: $c-light-2;
+	border-color: $c-light-2;
+}
+input.toggle:disabled + label::after {
+	color: $c-light-2;
+	background-color: #FFF;
+	border-color: $c-light-2;
+}
 /* https://loading.io/css/ */
 .lds-ellipsis {
 	display: block;
@@ -166,7 +265,7 @@ input:-webkit-autofill:active  {
 	height: 13px;
 	border-radius: 50%;
 	/*background: $c-mid-2;*/
-	background: $c-light-green;
+	background: $c-light-grey;
 	animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 .lds-ellipsis div:nth-child(1) {
@@ -209,3 +308,4 @@ input:-webkit-autofill:active  {
 		transform: translate(24px, 0);
 	}
 }
+

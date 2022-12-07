@@ -1,6 +1,10 @@
 Array.prototype.flat = function () {
 	return [].concat.apply([], this)
 }
+Array.prototype.flatObj = function () {
+	// FLATTEN OBJECT: https://stackoverflow.com/questions/31136422/flatten-array-with-objects-into-1-object
+	return Object.assign.apply(Object, this)
+}
 Array.prototype.fillNaN = function (key, value) {
 	if (!value) value = 0
 	if (!key) {
@@ -58,7 +62,7 @@ Array.prototype.nest = function (key, keep) { // THIS IS NOT QUITE THE SAME FUNC
 				obj.values = [d]
 				obj.count = 1
 				if (Array.isArray(keep)) keep.forEach(k => obj[k] = d[k])
-				else obj[keep] = d[k]
+				else obj[keep] = d[keep]
 				arr.push(obj)
 			} else arr.push({ key: groupby, values: [d], count: 1 })
 		} else { 

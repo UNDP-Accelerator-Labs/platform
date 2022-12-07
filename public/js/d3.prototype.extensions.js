@@ -25,17 +25,30 @@ d3.selection.prototype.addElem = function (_element, _class) {
 d3.selection.prototype.addElems = function (_element, _class, _data, _key) {
 	return new dynamicElement(this, 'append', _element.trim(), _class ? _class.trim() : null, _data, _key)
 }
-d3.selection.prototype.findAncestor = function (_class) {
-	if (!this.node().classList) return null
-	if (this.classed(_class)) return this
-	return d3.select(this.node().parentNode) && d3.select(this.node().parentNode).findAncestor(_class);
+d3.selection.prototype.findAncestor = function (_target) {
+	if (!this.node().classList || this.node().nodeName === 'BODY') return null
+	if (this.classed(_target) || this.node().nodeName === _target.toUpperCase()) return this
+	return d3.select(this.node().parentNode)?.findAncestor(_target);
+}
+d3.selection.prototype.hasAncestor = function (_target) {
+	if (this.node().nodeName === 'BODY') return false
+	if (this.classed(_target) || this.node().nodeName === _target.toUpperCase()) return true
+	return d3.select(this.node().parentNode)?.hasAncestor(_target);
 }
 d3.selection.prototype.moveToFront = function() {
 	return this.each(function(){
 		this.parentNode.appendChild(this)
 	})
 }
-
+d3.selection.prototype.moveToBack = function() { 
+	// CREDIT: https://stackoverflow.com/questions/14167863/how-can-i-bring-a-circle-to-the-front-with-d3
+	return this.each(function() {
+		const firstChild = this.parentNode.firstChild
+		if (firstChild) {
+			this.parentNode.insertBefore(this, firstChild)
+		}
+	})
+}
 d3.selection.prototype.toggleClass = function (_class) {
 	return this.classed(_class, !this.classed(_class))
 }

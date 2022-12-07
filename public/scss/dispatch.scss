@@ -1,23 +1,25 @@
+/* https://www.freecodecamp.org/news/css-media-queries-breakpoints-media-types-standard-resolutions-and-more/ */
+
 @import 'vars';
 
-/* Small devices (landscape phones, 576px and up) */
-@media (min-width: 576px) {
-	@import 'vars.lg';
-	@import 'navigate.lg';
+/* Small devices (landscape phones, 480px and up) */
+@media (max-width: 480px) {
+	@import 'vars.xs';
+	@import 'navigate.xs';
 	@import 'filter.lg';
 	@import 'map.lg';
 	
-	@import 'pad.lg';
-	@import 'import.lg';
-	@import 'browse.lg';
+	@import 'pad.xs';
+	@import 'profile.xs';
+	@import 'browse.xs';
 	@import 'mobilize.lg';
 }
 /* Medium devices (tablets, 768px and up) */
-@media (min-width: 768px) {
+@media (max-width: 768px) {
 
 }
-/* Large devices (desktops, 992px and up) */
-@media (min-width: 992px) {
+/* Large devices (desktops, 1024px and up) */
+@media (max-width: 1024px) {
 
 }
 /* Extra large devices (large desktops, 1200px and up) */
@@ -28,6 +30,7 @@
 	@import 'map.lg';
 	
 	@import 'pad.lg';
+	@import 'profile.lg';
 	@import 'import.lg';
 	@import 'browse.lg';
 	@import 'mobilize.lg';

@@ -40,6 +40,10 @@ $c-light-3: #F0F0F0;*/
   padding: 0;
 }
 
+body {
+  /*background-color: #F3F3F3;*/
+}
+
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
   font-family: "Noto Sans", Helvetica, Arial, sans-serif;
   color: #0A4C73;
@@ -76,12 +80,13 @@ input:-webkit-autofill:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  top: 95px;
+  top: 30px;
   left: 0;
   width: 100vw;
-  height: calc(100vh - 95px);
+  height: calc(100vh - 30px);
   overflow: scroll;
-  background-color: #61B233;
+  /*background-color: rgba(255,255,255,.75);*/
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75) 3px, rgba(229, 229, 229, 0.75) 3px, rgba(229, 229, 229, 0.75) 6px);
   animation: fade-in 0.25s;
   z-index: 9999;
 }
@@ -94,24 +99,22 @@ input:-webkit-autofill:active {
   cursor: pointer;
 }
 .screen .modal .inner {
-  border-top: 3px solid #0A4C73;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  border-top: 2px solid #0A4C73;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .screen.bis {
-  background-color: #934A5F;
-  /*background: $c-mid-1;*/
-  /*background: linear-gradient(315deg, $c-light-1 0%, $c-mid-1 100%);*/
+  /*background-color: $c-mid-1;*/
 }
 .screen.bis .modal .close {
-  background-color: #57648C;
+  /*background-color: $c-mid-2;*/
 }
 .screen.bis .modal .inner {
-  border-top: 3px solid #57648C;
+  /*border-top: 3px solid $c-mid-2;*/
 }
 
 .screen.ter {
-  background-color: #F0F0F0;
+  background-color: #F3F3F3;
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -127,6 +130,90 @@ input:-webkit-autofill:active {
   /*color: $c-light-1;*/
   color: #969696;
   pointer-events: none;
+}
+
+input.toggle {
+  display: none;
+}
+
+input.toggle + label {
+  display: block;
+  position: relative;
+  width: 40px;
+  height: 20px;
+  border-radius: 20px;
+  border: 1px solid #969696;
+  margin: 15px auto 0px auto;
+  background-color: #969696;
+  cursor: pointer;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+
+input.toggle:checked + label {
+  /*border-color: $c-dark-blue;*/
+  background-color: transparent;
+}
+
+input.toggle:checked + label[for=status--1] {
+  /*border-color: $c-mid-yellow;*/
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
+}
+
+input.toggle:checked + label[for=status-0] {
+  /*border-color: $c-mid-yellow;*/
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255, 193, 14, 0.25) 3px, rgba(255, 193, 14, 0.25) 6px);
+}
+
+input.toggle:checked + label[for=status-1] {
+  /*border-color: $c-light-blue;*/
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(50, 190, 225, 0.25) 3px, rgba(50, 190, 225, 0.25) 6px);
+}
+
+input.toggle + label::after {
+  content: attr(data-content);
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: -1px 0 0 -1px;
+  background-color: #FFF;
+  border: 1px solid #969696;
+  border-radius: 20px;
+  font-size: 8px;
+  line-height: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  line-height: 20px;
+  color: #969696;
+  transition: transform 0.25s;
+}
+
+input.toggle:checked + label[for=status-0]::after {
+  /*background-color: $c-mid-yellow;*/
+  /*border-color: $c-mid-yellow;*/
+}
+
+input.toggle:checked + label[for=status-1]::after {
+  /*background-color: $c-light-blue;*/
+  /*border-color: $c-light-blue;*/
+}
+
+input.toggle:checked + label::after {
+  transform: translate(20px, 0);
+  background-color: #0A4C73;
+  border-color: #0A4C73;
+  color: #FFF;
+}
+
+input.toggle:disabled + label {
+  background-color: #E5E5E5;
+  border-color: #E5E5E5;
+}
+
+input.toggle:disabled + label::after {
+  color: #E5E5E5;
+  background-color: #FFF;
+  border-color: #E5E5E5;
 }
 
 /* https://loading.io/css/ */
@@ -146,7 +233,7 @@ input:-webkit-autofill:active {
   height: 13px;
   border-radius: 50%;
   /*background: $c-mid-2;*/
-  background: #B4DC28;
+  background: #969696;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 

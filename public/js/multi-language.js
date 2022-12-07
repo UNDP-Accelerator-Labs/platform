@@ -23,13 +23,19 @@ const vocabulary = {
 		"es": plural => { return plural ? "Cohorte" : "Cohortes" },
 		"pt": plural => { return plural ? "Coorte" : "Coortes" }
 	},
+	"mobilization": {
+		"en": plural => { return plural ? "Mobilizations" : "Mobilization" },
+		"fr": plural => { return plural ? "Mobilisations" : "Mobilisation" },
+		"es": plural => { return plural ? "Movilizaciones" : "Movilización" },
+		"pt": plural => { return plural ? "Mobilizações" : "Mobilização" }
+	},
 	"contributor": {
 		"en": plural => { return `contributor${plural ? 's' : ''}` },
 		"fr": plural => { return `contributeur${plural ? 's' : ''}` },
 		"es": plural => { return `contribuyente${plural ? 's' : ''}` },
 		"pt": plural => { return `contribuidor${plural ? 'es' : ''}` }
 	},
-	"SDG": {
+	"sdg": {
 		"en": plural => { return plural ? "SDGs": "SDG" },
 		"fr": plural => { return plural ? "ODD": "ODD" },
 		"es": plural => { return plural ? "ODS": "ODS" },
@@ -41,11 +47,11 @@ const vocabulary = {
 		"es": plural => { return `tema${plural ? 's' : ''}` },
 		"pt": plural => { return `tema${plural ? 's' : ''}` }
 	},
-	"credit": {
-		"en": (cid, name, lab, date) => { return `Contributed by <a href='?mappers=${cid}'>${name}</a> (${lab}) on ${date}.` },
-		"fr": (cid, name, lab, date) => { return `Contribué par <a href='?mappers=${cid}'>${name}</a> (${lab}) le ${date}.` },
-		"es": (cid, name, lab, date) => { return `Contribuido por <a href='?mappers=${cid}'>${name}</a> (${lab}) el ${date}.` },
-		"pt": (cid, name, lab, date) => { return `Contribuíram por <a href='?mappers=${cid}'>${name}</a> (${lab}) em ${date}.` }
+	"credit": { // THIS DIFFERS SLIGHTLY FROM multi-language.ejs
+		"en": (cid, name, lab, date) => { return `Contributed by <a href='?mappers=${cid}'>${name}</a> (${lab}) on ${this.date(date, 'en')}.` },
+		"fr": (cid, name, lab, date) => { return `Contribué par <a href='?mappers=${cid}'>${name}</a> (${lab}) le ${this.date(date, 'fr')}.` },
+		"es": (cid, name, lab, date) => { return `Contribuido por <a href='?mappers=${cid}'>${name}</a> (${lab}) el ${this.date(date, 'es')}.` },
+		"pt": (cid, name, lab, date) => { return `Contribuíram por <a href='?mappers=${cid}'>${name}</a> (${lab}) em ${this.date(date, 'pt')}.` }
 	},
 	"untitled pad": {
 		"en": "Untitled pad",
@@ -211,6 +217,12 @@ const vocabulary = {
 		"es": "etiqueta(s) faltante(s)",
 		"pt": "etiqueta(s) faltando"
 	},
+	"missing external_resource": {
+		"en": "missing resource(s)",
+		"fr": "ressource.s manquante.s",
+		"es": "rescurso(s) faltante(s)",
+		"pt": "recurso(s) ausente(s)"
+	},
 	"request group": {
 		"en": "describe group",
 		"fr": "décrire le groupe",
@@ -265,8 +277,6 @@ const vocabulary = {
 		"es": "<strong>Dibujo</strong> esperado.",
 		"pt": "<strong>Desenho</strong> esperado."
 	},
-
-
 	"request txt": {
 		"en": "request a description",
 		"fr": "demander une description",
@@ -299,7 +309,7 @@ const vocabulary = {
 	},
 	"expect checklist": {
 		"en": "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected.",
-		"fr": "<strong>Entrée directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
+		"fr": "<strong>Saisie directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
 		"es": "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados.",
 		"pt": "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
 	},
@@ -311,7 +321,7 @@ const vocabulary = {
 	},
 	"expect radiolist": {
 		"en": "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected.",
-		"fr": "<strong>Entrée directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
+		"fr": "<strong>Saisie directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
 		"es": "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados.",
 		"pt": "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
 	},
@@ -323,7 +333,7 @@ const vocabulary = {
 	},
 	"expect location": {
 		"en": "<strong>Direct input</strong> or <strong>text</strong> expected.",
-		"fr": "<strong>Entrée directe</strong> ou <strong>texte</strong> attendu.",
+		"fr": "<strong>Saisie directe</strong> ou <strong>texte</strong> attendu.",
 		"es": "<strong>Entrada directa</strong> o <strong>texto</strong> esperado.",
 		"pt": "<strong>Entrada direta</strong> ou <strong>texto</strong> esperado."
 	},
@@ -333,81 +343,119 @@ const vocabulary = {
 		"es": "Escriba un pueblo/ ciudad, distrito/ región y nombre de país (en este orden).",
 		"pt": "Digite uma vila/ cidade, distrito/ região e nome do país (nesta ordem)."
 	},
-	"request sdgs": {
-		"en": "request one or more SDG tag(s)",
-		"fr": "demander une ou des étiquette.s ODD.s",
-		"es": "solicitar una o más etiqueta(s) de ODS",
-		"pt": "solicitar um ou mais etiqueta(s) de ODS"
+	"request index": {
+		"en": "request one or more SDG tags",
+		"fr": "demander une ou plusieurs étiquettes ODDs",
+		"es": "solicitar una o más etiquetas de ODS",
+		"pt": "solicitar um ou mais etiquetas de ODS"
 	},
-	"expect sdgs": {
+	"expect index": {
 		"en": "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected.",
-		"fr": "<strong>Entrée directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
+		"fr": "<strong>Saisie directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue.",
 		"es": "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados.",
 		"pt": "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
 	},
-	"sdgs instruction": {
+	"index instruction": {
 		"en": "List of possible responses:",
 		"fr": "Liste de réponses possibles:",
 		"es": "Lista de posibles respuestas:",
 		"pt": "Lista de respostas possíveis:"
 	},
-	"request tags": {
-		"en": "request one or more thematic area tag(s)",
-		"fr": "demander une ou des étiquette.s thématique.s",
-		"es": "solicitar una o más etiqueta(s) de área temática",
-		"pt": "solicitar uma ou mais etiqueta(s) de área temática"
+	"request tag": {
+		"en": "request one or more thematic area tags",
+		"fr": "demander une ou plusieurs étiquettes thématiques",
+		"es": "solicitar una o más etiquetas de área temática",
+		"pt": "solicitar uma ou mais etiquetas de área temática"
 	},
-	"expect tags": {
+	"expect tag": {
 		"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
-		"fr": "<strong>Entrée directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, oru <strong>texte</strong> attendu.",
+		"fr": "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu.",
 		"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
 		"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
 	},
-	"tags instruction": {
+	"tag instruction": {
 		"en": "List of possible responses:",
 		"fr": "Liste de réponses possibles:",
 		"es": "Lista de posibles respuestas:",
 		"pt": "Lista de respostas possíveis:"
 	},
-	"request skills": {
-		"en": "request one or more skill tag(s)",
-		"fr": "demander une ou des étiquette.s de compétence.s",
-		"es": "solicitar una o más etiqueta(s) de habilidades",
-		"pt": "solicitar uma ou mais etiqueta(s) de habilidades"
+
+	"request external_resource": {
+		"en": "request one or more external resources",
+		"fr": "demander une ou plusieurs ressources externes",
+		"es": "solicitar una o más recursos",
+		"pt": "solicitar uma ou mais recursos"
 	},
-	"expect skills": {
-		"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
-		"fr": "<strong>Entrée directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, oru <strong>texte</strong> attendu.",
-		"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
-		"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+	"expect external_resource": {
+		"en": "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Direct input</strong> or <strong>text</strong> expected.",
+		"fr": "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Saisie directe</strong> ou <strong>texte</strong> attendu.",
+		"es": "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada directa</strong> o <strong>texto</strong> esperados.",
+		"pt": "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada direta</strong> ou <strong>texto</strong> esperados."
 	},
-	"skills instruction": {
-		"en": "List of possible responses:",
-		"fr": "Liste de réponses possibles:",
-		"es": "Lista de posibles respuestas:",
-		"pt": "Lista de respostas possíveis:"
-	},
-	"request datasources": {
-		"en": "request one or more data source(s)",
-		"fr": "demander une ou des source.s de données",
-		"es": "solicitar una o más fuente(s) de datos",
-		"pt": "solicitar uma ou mais fonte(s) de dados"
-	},
-	"expect datasources": {
-		"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
-		"fr": "<strong>Entrée directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, oru <strong>texte</strong> attendu.",
-		"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
-		"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
-	},
-	"datasources instruction": { // TO DO: HOMOGENIZE THIS AS IT IS THE SAME FOR ALL META LISTS
-		"en": "List of possible responses:",
-		"fr": "Liste de réponses possibles:",
-		"es": "Lista de posibles respuestas:",
-		"pt": "Lista de respostas possíveis:"
-	},
+	// "external_resource instruction": {
+	// 	"en": "List of possible responses:",
+	// 	"fr": "Liste de réponses possibles:",
+	// 	"es": "Lista de posibles respuestas:",
+	// 	"pt": "Lista de respostas possíveis:"
+	// },
+
+	// "request skills": {
+	// 	"en": "request one or more skill tag(s)",
+	// 	"fr": "demander une ou des étiquette.s de compétence.s",
+	// 	"es": "solicitar una o más etiqueta(s) de habilidades",
+	// 	"pt": "solicitar uma ou mais etiqueta(s) de habilidades"
+	// },
+	// "expect skills": {
+	// 	"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
+	// 	"fr": "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu.",
+	// 	"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
+	// 	"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+	// },
+	// "skills instruction": {
+	// 	"en": "List of possible responses:",
+	// 	"fr": "Liste de réponses possibles:",
+	// 	"es": "Lista de posibles respuestas:",
+	// 	"pt": "Lista de respostas possíveis:"
+	// },
+	// "request methods": {
+	// 	"en": "request one or more method tag(s)",
+	// 	"fr": "demander une ou des étiquette.s méthodologique.s",
+	// 	"es": "solicitar una o más etiqueta(s) de método",
+	// 	"pt": "solicitar uma ou mais etiqueta(s) de método"
+	// },
+	// "expect methods": {
+	// 	"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
+	// 	"fr": "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu.",
+	// 	"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
+	// 	"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+	// },
+	// "methods instruction": {
+	// 	"en": "List of possible responses:",
+	// 	"fr": "Liste de réponses possibles:",
+	// 	"es": "Lista de posibles respuestas:",
+	// 	"pt": "Lista de respostas possíveis:"
+	// },
+	// "request datasources": {
+	// 	"en": "request one or more data source(s)",
+	// 	"fr": "demander une ou des source.s de données",
+	// 	"es": "solicitar una o más fuente(s) de datos",
+	// 	"pt": "solicitar uma ou mais fonte(s) de dados"
+	// },
+	// "expect datasources": {
+	// 	"en": "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected.",
+	// 	"fr": "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu.",
+	// 	"es": "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados.",
+	// 	"pt": "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+	// },
+	// "datasources instruction": { // TO DO: HOMOGENIZE THIS AS IT IS THE SAME FOR ALL META LISTS
+	// 	"en": "List of possible responses:",
+	// 	"fr": "Liste de réponses possibles:",
+	// 	"es": "Lista de posibles respuestas:",
+	// 	"pt": "Lista de respostas possíveis:"
+	// },
 	"expect repeat": {
 		"en": "<strong>Direct input</strong> expected.",
-		"fr": "<strong>Entrée directe</strong> attendu.",
+		"fr": "<strong>Saisie directe</strong> attendu.",
 		"es": "<strong>Entrada directa</strong> esperada.",
 		"pt": "<strong>Entrada direta</strong> esperada."
 	},
@@ -423,7 +471,7 @@ const vocabulary = {
 		"es": "Eliminar ubicación",
 		"pt": "Deletar localização"
 	},
-	"click to search or add location": {
+	"click to search or add locations": {
 		"en": "Click to search and add locations",
 		"fr": "Cliquer pour chercher et ajouter des emplacements",
 		"es": "Haga clic para buscar y agregar ubicaciones",
@@ -441,13 +489,13 @@ const vocabulary = {
 		"es": "Escribe una instrucción",
 		"pt": "Escreva uma instrução"
 	},
-	"looking for something": {
+	"looking for something": { // THIS IS search IN multi-language.ejs
 		"en": "Looking for something?",
 		"fr": "À la recherche de quleque chose ?",
 		"es": "¿Busca algo?",
 		"pt": "Procurando por algo?"
 	},
-	"looking for something or add": {
+	"looking for something or add": { // ADD THIS IN AN ADAPTED VERSION OF search IN multi-language.ejs
 		"en": "Looking for something or want to add it?",
 		"fr": "À la recherche de quleque chose ou besoin de l’ajouter ?",
 		"es": "¿Busca algo o necesita agregarlo?",
@@ -483,10 +531,129 @@ const vocabulary = {
 		"es": active => { return active ? "Favorito" : "Marcador" },
 		"pt": active => { return active ? "Favorito" : "Marcar" }
 	},
-	"item": {
-		"en": plural => { return `item${plural ? 's' : ''}` },
-		"fr": plural => { return `élément${plural ? 's' : ''}` },
-		"es": plural => { return `elemento${plural ? 's' : ''}` },
-		"pt": plural => { return `elemento${plural ? 's' : ''}` }
-	}
+	"item": { // THIS IS NOT QUITE THE SAME AS IN multi-language.ejs
+		"en": plural => { return `Item${plural ? 's' : ''}` },
+		"fr": plural => { return `Élément${plural ? 's' : ''}` },
+		"es": plural => { return `Elemento${plural ? 's' : ''}` },
+		"pt": plural => { return `Elemento${plural ? 's' : ''}` }
+	},
+	"status": {
+		"en": (object, status, count) => {
+			// const plural = count !== 1
+			// if (object === 'pads') {
+			//	if (status === 0) return `Unfinished ${plural ? 'pads' : 'pad'}`
+			//	if (status === 1) return `Publishable ${plural ? 'pads' : 'pad'}`
+			//	if (status === 2) return `Shared ${plural ? 'pads' : 'pad'}`
+			//	if (status === 2) return `Published ${plural ? 'pads' : 'pad'}`
+			// }
+			if (status === 0) return `Unfinished`
+			if (status === 1) return `Publishable`
+			if (status === 2) return `Published`
+		},
+		"fr": (object, status, count) => {
+			// const plural = count !== 1
+			// if (object === 'pads') {
+			// 	if (status === 0) return `${plural ? 'Bloc-notes non finis' : 'Bloc-note non fini'}`
+			// 	if (status === 1) return `${plural ? 'Bloc-notes publiables' : 'Bloc-note publiable'}`
+			// 	if (status === 2) return `${plural ? 'Bloc-notes partagés' : 'Bloc-note partagé'}`
+			// 	if (status === 2) return `${plural ? 'Bloc-notes publiés' : 'Bloc-note publié'}`
+			// }
+			if (status === 0) return 'Non finis'
+			if (status === 1) return 'Publiables'
+			if (status === 2) return 'Publiés'
+		},
+		"es": (object, status, count) => {
+			// const plural = count !== 1
+			// if (object === 'pads') {
+			// 	if (status === 0) return `${plural ? 'Libretas sin terminar' : 'Libreta sin terminar'}`
+			// 	if (status === 1) return `${plural ? 'Libretas publicables' : 'Libreta publicable'}`
+			// 	// if (status === 2) return `${plural ? 'Libretas compartidas' : 'Libreta compartida'}`
+			// 	if (status === 2) return `${plural ? 'Libretas publicadas' : 'Libreta publicada'}`
+			// }
+			if (status === 0) return 'Sin terminar'
+			if (status === 1) return 'Publicables'
+			if (status === 2) return 'Publicadas'
+		},
+		"pt": (object, status, count) => {
+			// const plural = count !== 1
+			// if (object === 'pads') {
+			// 	if (status === 0) return `${plural ? 'Blocos de notas inacabados' : 'Bloco de notas inacabado'}`
+			// 	if (status === 1) return `${plural ? 'Blocos de notas publicáveis' : 'Bloco de notas publicável'}`
+			// 	if (status === 2) return `${plural ? 'Blocos de notas compartilhados' : 'Bloco de notas compartilhado'}`
+			// 	if (status === 2) return `${plural ? 'Blocos de notas publicados' : 'Bloco de notas publicados'}`
+			// }
+			if (status === 0) return 'Inacabados'
+			if (status === 1) return 'Publicáveis'
+			if (status === 2) return 'Publicados'
+		}
+	},
+	"date": function (date, language) {
+		// USEFUL TABLE: https://web.library.yale.edu/cataloging/months
+		const matches = date.match(/\d+/g)
+		if (language === 'en') {
+			if (matches.length === 1) {
+				const num = parseInt(matches[0])
+				if (date.includes('minutes ago')) return `${num} minute${num === 1 ? '' : 's'} ago`
+				if (date.includes('hours ago')) return `${num} hour${num === 1 ? '' : 's'} ago`
+				if (date.includes('days ago')) return `${num} day${num === 1 ? '' : 's'} ago`
+			} else return date
+		}
+		if (language === 'fr') {
+			if (matches.length === 1) {
+				const num = parseInt(matches[0])
+				if (date.includes('minutes ago')) return `il y a ${num} minute${num === 1 ? '' : 's'}`
+				if (date.includes('hours ago')) return `il y a ${num} heure${num === 1 ? '' : 's'}`
+				if (date.includes('days ago')) return `il y a ${num} jour${num === 1 ? '' : 's'}`
+			} else return date.replace(/Jan/i, 'janv.')
+				.replace(/Feb/i, 'févr.')
+				.replace(/Mar/i, 'mars')
+				.replace(/Apr/i, 'avr.')
+				.replace(/May/i, 'mai')
+				.replace(/Jun/i, 'juin')
+				.replace(/Jul/i, 'juill.')
+				.replace(/Aug/i, 'août')
+				.replace(/Sep/i, 'sept.')
+				.replace(/Oct/i, 'oct.')
+				.replace(/Nov/i, 'nov.')
+				.replace(/Dec/i, 'déc.')
+		}
+		if (language === 'es') {
+			if (matches.length === 1) {
+				const num = parseInt(matches[0])
+				if (date.includes('minutes ago')) return `hace ${num} minuto${num === 1 ? '' : 's'}`
+				if (date.includes('hours ago')) return `hace ${num} hora${num === 1 ? '' : 's'}`
+				if (date.includes('days ago')) return `hace ${num} día${num === 1 ? '' : 's'}`
+			} else return date.replace(/Jan/i, 'enero')
+				.replace(/Feb/i, 'feb')
+				.replace(/Mar/i, 'mar')
+				.replace(/Apr/i, 'abr')
+				.replace(/May/i, 'mayo')
+				.replace(/Jun/i, 'jun')
+				.replace(/Jul/i, 'jul')
+				.replace(/Aug/i, 'agosto')
+				.replace(/Sep/i, 'sept')
+				.replace(/Oct/i, 'oct')
+				.replace(/Nov/i, 'nov')
+				.replace(/Dec/i, 'dic')
+		}
+		if (language === 'pt') {
+			if (matches.length === 1) {
+				const num = parseInt(matches[0])
+				if (date.includes('minutes ago')) return `${num} minuto${num === 1 ? '' : 's'} atrás`
+				if (date.includes('hours ago')) return `${num} hora${num === 1 ? '' : 's'} atrás`
+				if (date.includes('days ago')) return `${num} dia${num === 1 ? '' : 's'} atrás`
+			} else return date.replace(/Jan/i, 'jan.')
+				.replace(/Feb/i, 'fev.')
+				.replace(/Mar/i, 'março')
+				.replace(/Apr/i, 'abril')
+				.replace(/May/i, 'maio')
+				.replace(/Jun/i, 'junho')
+				.replace(/Jul/i, 'julho')
+				.replace(/Aug/i, 'agosto')
+				.replace(/Sep/i, 'set.')
+				.replace(/Oct/i, 'out.')
+				.replace(/Nov/i, 'nov.')
+				.replace(/Dec/i, 'dez.')
+		}
+	}  
 }

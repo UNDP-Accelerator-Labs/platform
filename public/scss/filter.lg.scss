@@ -190,7 +190,7 @@
 								color: #FFF;
 							}
 						}
-						.drop-down {
+						.dropdown {
 							display: none;
 							position: absolute;
 							/*top: calc(100% - 1px);*/
@@ -258,7 +258,7 @@
 					}
 					/*.filter:nth-child(2n) {
 						margin-left: 0;
-						.drop-down {
+						.dropdown {
 							left: -215px;
 						}
 					}*/
@@ -280,7 +280,7 @@
 								color: $c-mid-blue;
 							}
 						}
-						.drop-down {
+						.dropdown {
 							display: block;
 						}
 					}

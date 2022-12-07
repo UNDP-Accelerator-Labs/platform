@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang='<%- locals.lang %>'>
+<%
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+%>
+<html lang='<%- locals.metadata.page.language %>'>
 <head>
 
 <%- include ('partials/head.ejs') %> 
 
-<script type='text/javascript' src='../../scripts/xlsx/dist/xlsx.full.min.js'></script>
+<script type='text/javascript' src='/scripts/xlsx/dist/xlsx.full.min.js'></script>
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
 	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
@@ -13,56 +17,121 @@
 	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
 	crossorigin=''></script>
 
-<script type='text/javascript' src='/js/pad.js'></script>
-
+<%- include ('contribute/pad/render.ejs') %> 
 
 </head>
 
 <body>
 
-<%- include ('partials/navigate.ejs') %> 
+<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
 
-<nav id='import'>
-	<div class='input-group'>
-		<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
-			<i class='material-icons'>layers</i>
-		</button>
-		<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
-			<i class='material-icons'>delete_forever</i>
-		</button>
-			
-			<!-- <button type='button' class='dropdown' title='Preview all.' onclick='compileTemplates()' ontouchend='compileTemplates()'>
-				<i class='material-icons'>preview</i>
-			</button> -->
-		<form>
-			<button title='Publish pads.' type='submit'><i class='material-icons'>publish</i></button>
-		</form>
-	</div>
-</nav>
 
-<main id='import' class='import'>
+<header>
 	<div class='inner'>
-		<div class='input-group'>
-			<input type='file' id='upload' onchange='parseXLSX(event, this)' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
-			<!-- <label class='new-import' for='upload'><i class='material-icons'>cloud_upload</i></label> -->
-			<button><label class='new-import' for='upload'>Upload .xlsx</label></button>
-		</div>
-		<table border=0 cellpadding=0 cellspacing=0>
-			<thead>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
+		<%- include ('partials/menu-logo.ejs') %> 
 	</div>
-</main>
+</header>
+
+<%- include ('partials/modals.ejs') %>
+
+<div class='table'>
+	<main id='import-module' class='import-module'>
+		<div class='inner'>
+			<div class='head meta-status status-0'>
+				<div class='btn-group'>
+					<form id='contribute'>
+						<button title='<%- vocabulary["import pads"][language] %>' type='submit' disabled><%- vocabulary['import pads'][language] %></button>
+					</form>
+				</div>
+			</div>
+			<div class='body'>
+				<div class='btn-group hide'>
+					<form>
+						<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
+							<i class='material-icons'>layers</i>
+						</button>
+					</form>
+					<form>
+						<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
+							<i class='material-icons'>delete_forever</i>
+						</button>
+					</form>
+				</div>
+
+
+				<!-- INSPIRED BY https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
+				<div class='input-group' ondrop='dropHandler(event, this)' ondragover='event.preventDefault(); this.classList.toggle("accept")' ondragleave='this.classList.toggle("accept")'>
+					
+					<div class='drop-zone'>
+						<!-- <p>Drag one or more files to this <i>drop zone</i>.</p> -->
+						<input type='file' id='upload' onchange='parseXLSX(event.target.files[0], this)' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
+						<button>
+							<label for='upload'><%- vocabulary['upload source file'][language] %></label>
+						</button>
+					</div>
+				</div>
+
+				<script type='text/javascript'>
+					function dropHandler(evt, node) { 
+						evt.preventDefault()
+						const sel = d3.select(node)
+						const label = sel.select('.drop-zone button label')
+
+						if (evt.dataTransfer.items) {
+							// DataTransferItemList INTERFACE TO ACCES THE FILE
+							const items = evt.dataTransfer.items
+							if (items.length > 1) {
+								sel.classed('accept', false).classed('reject', true)
+								label.html('<%- vocabulary["chose only one file"][language]("xlsx") %>')
+							} else {
+								const item = items[0]
+								if (item.kind === 'file') {
+									const file = item.getAsFile();
+									if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
+										parseXLSX(file, d3.select(node).select('input[type=file]').node())
+									} else {
+										sel.classed('accept', false).classed('reject', true)
+										label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
+									}
+								} else {
+									sel.classed('accept', false).classed('reject', true)
+									label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
+								}
+							}
+						} else {
+							// DataTransfer INTERFAE TO ACCESS THE FILE
+							const items = evt.dataTransfer.files
+							if (items.length > 1) {
+								sel.classed('accept', false).classed('reject', true)
+								label.html('<%- vocabulary["chose only one file"][language]("xlsx") %>')
+							} else {
+								const file = evt.dataTransfer.files[0]
+								if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
+									parseXLSX(file, d3.select(node).select('input[type=file]').node())
+								} else {
+									sel.classed('accept', false).classed('reject', true)
+									label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
+								}
+							}
+
+						}
+					}
+				</script>
+			</div>
+			<div class='foot'></div>
+		</div>
+	</main>
+</div>
 
 <script type='text/javascript'>
 	const pagebody = d3.select('body')
-	const searchForm = pagebody.select('nav#import form')
-	const main = pagebody.select('main')
-	const tableModule = pagebody.select('table')
-	const moduleHead = tableModule.select('thead')
-	const moduleBody = tableModule.select('tbody')
+	const searchForm = pagebody.select('form#contribute')
+	const main = d3.select('div.table main')
+	const layout = main.select('div.inner')
+	const head = layout.select('div.head')
+	const body = layout.select('div.body')
+	const foot = layout.select('div.foot')
 
 	// THE FOLLOWING VARIABLES ARE FOR THE pad PREVIEW
 	let activity = 'preview'
@@ -70,52 +139,34 @@
 	// let previewing = false
 	const editing = false
 
-	var lang = '<%- locals.lang %>'
+	const metafields = <%- JSON.stringify(locals.metadata?.site?.metafields || {}) %>
+	const taglists = <%- JSON.stringify(locals.tags || {}) %>
 
 	const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg']
 
-	function parseXLSX (e, node) {
-		const files = e.target.files
-		const f = files[0]
+	function parseXLSX (file, node) {
 		const reader = new FileReader()
 
-		d3.select(node).attr('data-fname', f.name)
+		d3.select(node).attr('data-fname', file.name)
 
 		reader.onload = function (e) {
 			var data = new Uint8Array(e.target.result)
 			var workbook = XLSX.read(data, { type: 'array', bookFiles: true })
-			console.log(workbook)
 
 			let images = []
 			if (workbook.keys) {
 				const media = workbook.keys.filter(k => k.includes('media/image'))
-				console.log(media.sort())
+
 				images = media.map((m, i) => {
 					const name = workbook.files[m].name.split('media/')[1]
 					const buffer = workbook.files[m]._data.getContent()
-					// const loc = path.join(__dirname, `../tmp/${name}`)
-					// console.log(buffer)
-					// const buffer = new Uint8ClampedArray(40000);
-
-					// for (let i = 0; i < buffer.length; i += 4) {
-					// 	buffer[i + 0] = 0;    // R value
-					// 	buffer[i + 1] = 190;  // G value
-					// 	buffer[i + 2] = 0;    // B value
-					// 	buffer[i + 3] = 255;  // A value
-					// }
-					// // Initialize a new ImageData object
-					// let imageData = new ImageData(buffer, 200)
+					
 					const blob = new Blob([buffer], {'type': 'image/png'})
 					const urlCreator = window.URL || window.webkitURL
 					const imageUrl = urlCreator.createObjectURL(blob)
 					return { id: name.extractDigits(), type: 'img', src: imageUrl }	
-					// const img = document.querySelector( "#photo" );
-					// img.src = imageUrl
-					// fs.writeFile(loc, buffer, 'binary', function () { console.log('file written') })
 				})
 			}
-			console.log(images)
-			// TO DO: SELECT SHEET MENU
 			workbook.SheetNames.forEach((s, i) => {
 				const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], { defval: null })
 
@@ -127,112 +178,116 @@
 					const cols = keys.map(d => {
 						const obj = {}
 						obj.key = d
-						obj.values = json.map(c => c[d]).filter(c => c)
+						obj.values = json.map(c => c[d]).filter(c => c) // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
 						return obj
 					})
-					const imageCol = cols.find(d => !d.values.length) ? cols.find(d => !d.values.length).key : null
+					const imageCol = cols.find(d => !d.values.length)?.key || null
 					if (imageCol) {
-						json.forEach((d, i) => {
+						json.forEach((d, i) => { // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
 							d[imageCol] = images.find(c => c.id === i + 1)
 						})
 					}
 				}
-				// const isEmpty = keys.filter(k => k.includes('__EMPTY'))
-				// if (isEmpty.length) {
-				// 	json.forEach(d => {
-				// 		isEmpty.forEach(c => {
-				// 			delete d[c]
-				// 		})
-				// 	})
-				// 	keys = keys.filter(k => !k.includes('__EMPTY'))
-				// }
-				if (i === 0) parseColumns(json, keys) // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+				if (i === 0) {  // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+					const cols = parseColumns(json, keys)
+					renderTable(cols)
+				}
 			})
 			// HIDE THE LOADING BUTTON
 			main.select('.input-group').classed('hide', true)
+			head.classed('status-0', false)
+				.classed('status-1', true)
+				.select('button[type=submit]')
+				.attr('disabled', null)
 		}
-		reader.readAsArrayBuffer(f)
+		reader.readAsArrayBuffer(file)
 	}
-
-	function parseColumns (dict, keys) {
-		const cols = keys.map(d => {
+	function parseColumns (json, keys) {
+		return keys.map(d => {
 			const obj = {}
 			obj.key = d
-			obj.entries = dict.map(c => {
+			obj.entries = json.map(c => { // ENTRIES, UNLIKE VALUES, IS EXHAUSTIVE (IT ALSO INCLUDES NULL/ MISSING VALUES)
 				// CHECK IF DATE
 				const testdate = ExcelDateToJSDate(c[d])
 				if (isValidDate(testdate) && testdate.getFullYear() >= 2019) {
 					return testdate.toISOString()
-				}
-				else {
+				} else {
 					const e = c[d]
-					if (e !== null && e !== undefined && !isNaN(e)) return +e // VERIFY IF e IS A NUMBER
+					if (![null, undefined].includes(e) && !isNaN(e)) return +e // IF e IS A NUMBER, FORCE TYPE
 					else return e
 				}
 			})
-			let ref = obj.entries.filter(c => c).map(c => typeof c === 'string' ? c.trim().toLowerCase() : c)
+			let ref = obj.entries.filter(c => ![null, undefined].includes(c))
+				.map(c => typeof c === 'string' ? c.trim().toLowerCase() : c)
 			obj.values = ref.unique()
 			obj.types = ref.map(c => typeof c).unique()
-			
+
 			if (obj.types.length > 1 && obj.types.includes('string')) {
+				// IF THERE ARE MULTIPLE TYPES AND AT LEAST ONE OF THEM IS STRING, CONVERT ALL NOT NULL ENTRIES TO STRINGS
 				obj.entries = obj.entries.map(c => {
-					if (c === undefined || c === null) return c
-					else return String(c).trim().toLowerCase()
+					if ([null, undefined].includes(c)) return c
+					else return String(c).trim()//.toLowerCase()
 				})
-				ref = obj.entries.filter(c => c)
+				ref = obj.entries.filter(c => ![null, undefined].includes(c)).map(c => c.toLowerCase())
 				obj.values = ref.unique()
-				obj.types = ['string']
-			}
-			else if (obj.types.length === 0) {
-				if (obj.entries.filter(c => c !== null && c !== undefined).unique()[0] === 0) {
+				// obj.types = ['string']
+				obj.types = ref.map(c => typeof c).unique() // THIS SHOULD BE ['string']
+			} else if (obj.types.length === 0) {
+				// IF THERE ARE NO TYPES
+				// if (obj.entries.filter(c => ![null, undefined].includes(c)).unique()[0] === 0) {
+				if (ref.unique().every(c => c === 0)) {
 					obj.entries = obj.entries.map(c => 0)
 					ref = obj.entries.filter(c => c === 0)
 					obj.values = ref.unique()
-					obj.types = ['number']
+					// obj.types = ['number']
+					obj.types = ref.map(c => typeof c).unique() // THIS SHOULD BE ['number']
 				} else {
 					obj.types = [typeof null]
 				}
 			}
+
 			// CHECK IF THERE ARE ARRAYS/ LISTS
 			obj.types.forEach(c => {
 				if (Array.isArray(c)) {
 					const listcontent = c.map(b => typeof b).unique()
-					return `list of ${listcontent}s`
+					return `list of ${listcontent}s` // TO DO: TRANSLATE
 				} else return c
 			})
 
-
-
 			// CHECK IF BOOLEAN COLUMN
-			if (obj.values.length === 1 && ref.length !== dict.map(c => c[d]).length) obj.bool = true
+			// if (obj.values.length === 1 && ref.length !== json.map(c => c[d]).length) obj.bool = true
+			if (obj.types.length === 1 && obj.values.length <= 2) obj.bool = true
 			else obj.bool = false
 			// INFER TYPE
-			if (obj.entries.map(c => c ? typeof c === 'object' ? c.type === 'img' ? c.type : null : null : null).filter(c => c).unique().length 
-				|| !obj.entries.filter(c => c !== null && c !== undefined).length // THERE IS ANY ENTRY THAT HAS A VALUE (CASE FOR ENTIRELY EMPTY COLUMN)
+			if (obj.entries.map(c => c ? typeof c === 'object' ? c.type === 'img' ? c.type : null : null : null)
+					.filter(c => c).unique().length // c.type === 'img' IS SET IN parseXLSX AT THE VERY BEGINNING
+				// || !obj.entries.filter(c => ![null, undefined].includes(c)).length 
+				|| ref.length === 0
+				// THERE ISN'T ANY ENTRY THAT HAS A VALUE (CASE FOR ENTIRELY EMPTY COLUMN)
 			) {
-				obj.inferredtype = 'img'
-				console.log(obj)
-			}
-			else if (ref.length - obj.values.length > parseInt(ref.length * .25)) obj.inferredtype = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
-			else obj.inferredtype = 'txt'
-
-			console.log(obj)
+				obj.type = 'img'
+				// obj.inferredtype = 'img'
+			} else if (ref.length - obj.values.length > parseInt(ref.length * .25)) {
+				// obj.inferredtype = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
+				obj.type = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
+			} else obj.type = 'txt'
+			// } else obj.inferredtype = 'txt'
 
 			return obj
 		})
-		return renderTable(cols)
 	}
-	function parseGroups (dict, keys) {
+	function parseGroups (json, keys) {
+		// json HERE HAS ALREADY BEEN PROCESSED (IN parseColumns)
 		const cols = keys.map(d => {
 			return new Promise(async resolve => {
-				// CHECK IF KEY IS UNIQUE, OR GROUPED
-				// TO DO: INPUT NAME OF GROUP
-				if (typeof d === 'object') {
+				// CHECK IF KEY IS UNIQUE OR GROUPED
+				if (Array.isArray(d)) {
 					const obj = {}
+					console.log(d)
 					obj.key = `Group [${d.join(', ')}]`
 					const prefix = seekPrefix(d)
 
-					const cols = dict.filter(c => d.includes(c.key))
+					const cols = json.filter(c => d.includes(c.key))
 					const zip = []
 
 					let rmprefix = false
@@ -240,14 +295,15 @@
 					const types = cols.map(c => c.types).flat().unique()
 					
 					if (cols.map(c => c.bool).unique().includes(true)) {
+						// IF THE VALUES ARE BOLEAN, PIVOT: PUT THE key/ HEADERS INTO THE values/ CELLS
+						// AND CHECK WHETHER THE keys HAVE PREFIXES
 						const message = `The prefix <em>${prefix}</em> was detected. Should it be removed from cell values?`
 						const opts = [
 							{ node: 'button', type: 'button', label: 'Keep it', resolve: false }, 
 							{ node: 'button', type: 'button', label: 'Drop it', resolve: true }
 						]
 						rmprefix = await renderPromiseModal({ message: message, opts: opts })
-					}
-					else if (types.length === 1 && types[0] === 'string') {
+					} else if (types.length === 1 && types[0] === 'string') {
 						const message = `Merge columns into a list, or keep a single ${types[0]} with all the values?`
 						const opts = [
 							{ node: 'button', type: 'button', label: 'Make a list', resolve: true }, 
@@ -260,12 +316,7 @@
 						// IF THE VALUES ARE BOLEAN, PIVOT
 						if (c.bool) {
 							c.entries = c.entries.map(b => {
-								if (b) {
-									// if (typeof b !== 'string')
-									// else if (typeof b === 'string' && b.toLowerCase() !== 'no') return c.key
-									// else return null
-									return rmprefix ? c.key.replace(prefix, '') : c.key
-								}
+								if (b) return rmprefix ? c.key.replace(prefix, '') : c.key
 								else return null
 							})
 						}
@@ -279,7 +330,10 @@
 						}
 					})
 					obj.entries = mklist ? zip : zip.map(c => c.join(', '))
-					obj.values = cols.map(c => c.entries.map(b => typeof b === 'string' ? b.trim().toLowerCase() : b)).flat().unique().sort()
+					
+					obj.values = cols.map(c => c.entries.map(b => typeof b === 'string' ? b.trim().toLowerCase() : b))
+						.flat().filter(c => ![null, undefined].includes(c)).unique().sort()
+	
 					obj.types = obj.entries.map(c => {
 						if (Array.isArray(c)) {
 							const listcontent = c.map(b => typeof b).unique()
@@ -287,30 +341,70 @@
 						} else return typeof c
 					}).unique() 
 					obj.bool = false
-					obj.inferredtype = 'checklist'
+					// obj.inferredtype = 'checklist'
+					obj.type = 'checklist'
 					resolve(obj)
 				}
-				else resolve(dict.find(c => c.key === d))
+				else resolve(json.find(c => c.key === d))
 			})
 		})
 		Promise.all(cols).then(data => renderTable(data))
 	}
 	function renderTable (cols) {
-		moduleHead.html('').datum(cols)
-		const selectCols = moduleHead.addElem('tr', 'column-selection')
+		body.select('.btn-group').classed('hide', false)
+		const table = body.addElems('table', 'xls-preview', [cols])
+			.attrs({ 
+				'border': 0,
+				'cellpadding': 0,
+				'cellspacing': 0
+			})
+		// RENDER THE TABLE HEAD
+		const moduleHead = table.addElems('thead')
+		
+		const selectCols = moduleHead.addElems('tr', 'column-selection')
 		selectCols.addElems('th', 'selection', d => d)
+			.classed('selected left right top bottom disabled', false)
 			.attr('title', 'Select column.')
-		.on('click', function (d) {
+		.on('click', function (d, i) {
 			const evt = d3.event
 			const node = this
 			const sel = d3.select(this)
 
 			if ((evt.shiftKey || evt.metaKey || evt.ctrlKey) && sel.classed('disabled')) return null
-			if (!evt.shiftKey && !evt.metaKey && !evt.ctrlKey) moduleHead.selectAll('.selected').classed('selected', false)
+			if (!evt.shiftKey && !evt.metaKey && !evt.ctrlKey) d3.selectAll('tr th, tr td').classed('selected top bottom left right', false)
 
 			toggleClass(this, 'selected')
+			const trs = table.selectAll('tr')
+			trs.each(function (c, j) {
+				let caps = ''
+				if (j === 0) caps = 'top'
+				else if (j === trs.size() - 1) caps = 'bottom'
 
-			moduleHead.selectAll('th')
+				d3.select(this).selectAll('th, td')
+				.each(function (b, k) {
+					if (k === i) {
+						const next = this.nextSibling
+						const previous = this.previousSibling
+						const sides = []
+						
+						if (!previous?.classList.contains('selected')) sides.push('left')
+						else {
+							if (sel.classed('selected')) previous?.classList.remove('right')
+							else previous?.classList.add('right')
+						}
+						
+						if (!next?.classList.contains('selected')) sides.push('right')
+						else {
+							if (sel.classed('selected')) next?.classList.remove('left')
+							else next?.classList.add('left')
+						}
+
+						d3.select(this).classed(`selected ${caps} ${sides.join(' ')}`, sel.classed('selected'))
+					}
+				})
+			})
+
+			moduleHead.selectAll('.column-selection th')
 			.classed('disabled', function (c) { 
 				if (this === node) return false
 				if (c.types) {
@@ -327,46 +421,71 @@
 			})
 
 			// THIS IS FOR RANGE SELECTIONS
-			let idxs = []
-			let currentidx = 0
 			if (sel.classed('selected') && evt.shiftKey) {
-				moduleHead.selectAll('th').each(function (c, j) {
-					if (d3.select(this).classed('selected')) idxs.push(j)
+				let bounds = []
+				let currentidx = 0
+				const range = []
+
+				moduleHead.selectAll('.column-selection th').each(function (c, j) {
+					if (d3.select(this).classed('selected')) bounds.push(j)
 					if (this === node) currentidx = j
 				})
 
-				idxs.sort((a, b) => a - b)
-				let location = idxs.indexOf(currentidx)
+				bounds.sort((a, b) => a - b)
+				let location = bounds.indexOf(currentidx)
 				if (location === -1) {
-					idxs.push(currentidx)
-					idxs.sort((a, b) => a - b)
-					location = idxs.indexOf(currentidx)
+					bounds.push(currentidx)
+					bounds.sort((a, b) => a - b)
+					location = bounds.indexOf(currentidx)
 				}
 
-				if (location !== 0) idxs = idxs.slice(0, location + 1)
-					
-				moduleHead.selectAll('th').classed('selected', function (c, j) { return j >= d3.min(idxs) && j <= d3.max(idxs) && !d3.select(this).classed('disabled') })
+				if (location !== 0) bounds = bounds.slice(0, location + 1)
+
+				// SET RANGE OF SELECTED COLUMNS
+				moduleHead.selectAll('.column-selection th').each(function (c, j) {
+					if (!d3.select(this).classed('disabled') && j >= Math.min(...bounds) && j <= Math.max(...bounds)) {
+						range.push(j)
+					}
+				})
+
+				const trs = table.selectAll('tr')
+				trs.each(function (c, j) {
+					let caps = ''
+					if (j === 0) caps = 'top'
+					else if (j === trs.size() - 1) caps = 'bottom'
+
+					d3.select(this).selectAll('th, td')
+					.classed('top bottom left right', false)
+					.each(function (b, k) {
+						let sides = []
+						if (!range.includes(k - 1)) sides.push('left')
+						if (!range.includes(k + 1)) sides.push('right')
+						if (range.includes(k)) {
+							d3.select(this).classed(`selected ${caps} ${sides.join(' ')}`, sel.classed('selected'))
+						}
+					})	
+				})
 			}
 		}).addElems('i', 'material-icons')
 			.html('tab_unselected')
 		
-		selectCols.insertElem(':first-child', 'th', 'preview')
-			.attr('rowspan', 4)
-
-		const columnheaders = moduleHead.addElem('tr', 'column-names')
+		const columnheaders = moduleHead.addElems('tr', 'column-names')
 		columnheaders.addElems('th', 'name', d => d)
-			.attrs({ 'title': d => d.key, 'contenteditable': true })
-			.html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
+			.classed('selected left right top bottom', false)
+			.attrs({ 
+				'title': d => d.key, 
+				'contenteditable': true 
+			}).html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
 		.on('focus', function (d) {
 			d3.select(this).html(d.key)
-		})
-		.on('blur', function (d) {
+		}).on('blur', function (d) {
 			d.key = this.innerText
 			d3.select(this).html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
 		})
 
-		const datatypes = moduleHead.addElem('tr', 'data-types')
+		const datatypes = moduleHead.addElems('tr', 'data-types')
 			.addElems('th', 'data', d => d)
+			.classed('selected left right top bottom', false)
 		datatypes.addElems('label').html(d => d.types)
 		datatypes.addElems('button', 'parse', d => d.types.includes('string') ? [d] : [])
 			.addElems('i', 'material-icons')
@@ -378,149 +497,140 @@
 			splitValues(d.key, separator)
 		})
 
-		// columnheaders.insertElem(':first-child', 'th', 'preview')
-			// .attr('rowspan', 3)
-
-		const columntypes = moduleHead.addElem('tr', 'media-types')
+		const columntypes = moduleHead.addElems('tr', 'media-types')
 			.addElems('th', 'type', d => d)
+			.classed('selected left right top bottom', false)
 		.addElems('select')
 		.on('change', function (d) {
 			const selection = this.options[this.selectedIndex].value
+			
 			if (columntypes.selectAll('option[value="title"]:checked').size()) {
 				columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', true)
 			} else columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', c => c.disabled)
-			if (columntypes.selectAll('option[value="location"]:checked').size()) {
-				columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', c => c.disabled)
-			if (columntypes.selectAll('option[value="sdgs"]:checked').size()) {
-				columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', c => c.disabled)
-			if (columntypes.selectAll('option[value="tags"]:checked').size()) {
-				columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', c => c.disabled)
-			// console.log(d)
-			// console.log(d.types)
-			// if (selection === 'sdgs' && (d.types.includes('string') || d.types.includes('list of strings'))) {
-			// 	const message = `The current data type of your column is <em>${d.types[0]}</em>. To submit <em>${selection === 'sdgs' ? 'SDGs' : selection}</em> you need a <em>list</em> data type. Make sure the entries in this column are ${selection === 'sdgs' ? 'numbers (the SDG id) ' : ''}separated by e.g., a comma, a semi column, or simply a space.`
-			// 	if (d.types[0] === 'string') message += ' If this is the case, you can parse the data by clicking below.'
-			// 	const opts = [{ label: 'Parse data' }]
-			// 	modal(message, opts)
-			// }
-			d.inferredtype = selection
+			
+			if (metafields.some(c => c.type === 'location')) {
+				if (columntypes.selectAll('option[value="location-txt"]:checked, option[value="location-lat-lng"]:checked, option[value="location-lng-lat"]:checked').size()) {
+					columntypes.selectAll('option[value="location-txt"]:not(:checked)').attr('disabled', true)
+					columntypes.selectAll('option[value="location-lat-lng"]:not(:checked)').attr('disabled', true)
+					columntypes.selectAll('option[value="location-lng-lat"]:not(:checked)').attr('disabled', true)
+				} else {
+					columntypes.selectAll('option[value="location-txt"]:not(:checked)').attr('disabled', c => c.disabled)
+					columntypes.selectAll('option[value="location-lat-lng"]:not(:checked)').attr('disabled', c => c.disabled)
+					columntypes.selectAll('option[value="location-lng-lat"]:not(:checked)').attr('disabled', c => c.disabled)
+				}
+			}
+
+			metafields.filter(c => c.type !== 'location').forEach(c => {
+				if (columntypes.selectAll(`option[value="${c.label}"]:checked`).size()) {
+					columntypes.selectAll(`option[value="${c.label}"]:not(:checked)`).attr('disabled', true)
+				} else columntypes.selectAll(`option[value="${c.label}"]:not(:checked)`).attr('disabled', c => c.disabled)
+			})
+
+			d.type = selection
 		})
 		columntypes.addElems('optgroup', 'group-media')
-			.attr('label', 'media')
+			.attr('label', 'media') // TO DO: TRANSLATE ALL MEDIA values BELOW
 		.addElems('option', 'opt', d => {
-				const obj = []
+			const containsURLs = d.entries.flat().filter(c => ![null, undefined].includes(c)).every(c => typeof c === 'string' && c.isURL())
+			const obj = []
 
-				if (d.types.includes('string') || d.types.includes('number')) {
-					obj.push({ label: 'title', value: 'title', disabled: null })
-					obj.push({ label: 'text', value: 'txt', disabled: null })
-					obj.push({ label: 'embedding', value: 'embed', disabled: null })
-				} else if (d.types.includes('list of strings') || d.types.includes('list of numbers')) {
-					obj.push({ label: 'title', value: 'title', disabled: true })
-					obj.push({ label: 'text', value: 'txt', disabled: null })
-					obj.push({ label: 'embedding', value: 'embed', disabled: true })
-				} else {
-					obj.push({ label: 'title', value: 'title', disabled: true })
-					obj.push({ label: 'text', value: 'txt', disabled: true })
-					obj.push({ label: 'embedding', value: 'embed', disabled: true })
-				}
-				// else obj.push({ label: 'text (there is no text in this column)', value: 'txt', disabled: true })
-				
-				if (d.types.includes('object') && ['img', 'video'].includes(d.inferredtype)) {
-					obj.push({ label: 'image', value: 'img', disabled: null })
-					obj.push({ label: 'video', value: 'video', disabled: null })
-					obj.push({ label: 'checklist', value: 'checklist', disabled: true })
-				} else if (d.types.includes('string') || d.types.includes('list of strings')) {
-					// IF URL MAYBE IMAGE OR LIST OF URLS
-					const containsURLs = d.entries.flat().filter(c => c).map(c => c.isURL()).unique()
-					console.log('look here')
-					console.log(d.entries.flat())
-					console.log(d.entries.flat().filter(c => c).map(c => { return { original: c, url: c.isURL() } }).filter(c => !c.url))
-					console.log(containsURLs)
-					obj.push({ label: 'image', value: 'img', disabled: containsURLs.length === 1 && containsURLs.includes(true) ? null : true })
-					obj.push({ label: 'video', value: 'video', disabled: containsURLs.length === 1 && containsURLs.includes(true) ? null : true })
-					obj.push({ label: 'checklist', value: 'checklist', disabled: null })
-				} else {
-					obj.push({ label: 'image', value: 'img', disabled: true })
-					obj.push({ label: 'video', value: 'video', disabled: true })
-					obj.push({ label: 'checklist', value: 'checklist', disabled: null })
-				}
-				// else obj.push({ label: 'image (there are other media in this column)', value: 'img', disabled: true })
-				return obj
-			}).attrs({ 
-				'value': d => d.value,
-				'selected': function (d) {
-					const inferredtype = d3.select(this).findAncestor('type').datum().inferredtype
-					if (inferredtype === d.value) return true
-					else return null
-				}, 'disabled': d => d.disabled
-			}).html(d => d.label)
+			obj.push({ label: 'title', value: 'title', disabled: d.types.some(c => ['string', 'number'].includes(c)) ? null : true })
+			obj.push({ label: 'text', value: 'txt', disabled: d.types.some(c => ['string', 'number', 'list of strings', 'list of numbers'].includes(c)) ? null : true })
+			obj.push({ label: 'embedding', value: 'embed', disabled: d.types.some(c => ['string', 'number'].includes(c)) ? null : true })
+			
+			obj.push({ label: 'image', value: 'img', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
+			// obj.push({ label: 'video', value: 'video', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
+			
+			obj.push({ label: 'checklist', value: 'checklist', disabled: !d.types.includes('object') ? null : true })
+			obj.push({ label: 'radiolist', value: 'radiolist', disabled: !d.types.includes('object') ? null : true })
+
+			return obj
+		}).attrs({ 
+			'value': d => d.value,
+			'selected': function (d) {
+				const type = d3.select(this).findAncestor('type').datum().type
+				if (type === d.value) return true
+				else return null
+			}, 'disabled': d => d.disabled
+		}).html(d => d.label)
+
 		const metaOpts = columntypes.addElems('optgroup', 'group-meta')
 			.attr('label', 'meta')
 		.addElems('option', 'opt', d => {
-				const obj = []
-				// CHECK FOR LOCATIONS
-				if (d.types.includes('string') || d.types.includes('list of strings')) { 
-					obj.push({ label: 'location', value: 'location', disabled: null })
-				} else obj.push({ label: 'location', value: 'location', disabled: true })
-				// CHECK FOR SDG
-				if (d.types.includes('number')) {
-					if (!d.values.filter(c => c !== null && c !== undefined).map(c => +c > 0 && +c <= 17).includes(false)) {
-						obj.push({ label: 'SDGs', value: 'sdgs', disabled: null })
-					} else obj.push({ label: 'SDGs', value: 'sdgs', disabled: true })
-				} else if (d.types.includes('list of numbers')) {
-					if (!d.values.flat().filter(c => c !== null && c !== undefined).map(c => +c > 0 && +c <= 17).includes(false)) {
-						obj.push({ label: 'SDGs', value: 'sdgs', disabled: null })
-					} else obj.push({ label: 'SDGs', value: 'sdgs', disabled: true })
-				} else obj.push({ label: 'SDGs', value: 'sdgs', disabled: true })
-				// CHECK FOR THEMATIC AREA
-				if (d.types.includes('string') || d.types.includes('list of strings')) { 
-					obj.push({ label: 'thematic area(s)', value: 'tags', disabled: null })
-				} else obj.push({ label: 'thematic area(s)', value: 'tags', disabled: true })
-				return obj
-			}).attrs({
-				'value': d => d.value,
-				'selected': function (d) {
-					const inferredtype = d3.select(this).findAncestor('type').datum().inferredtype
-					if (inferredtype === d.value) return true
-					else return null
-				}, 'disabled': d => d.disabled
-			}).html(d => d.label)
+			const containsURLs = d.entries.flat().filter(c => ![null, undefined].includes(c)).every(c => typeof c === 'string' && c.isURL())
+			const obj = []
+			// CHECK FOR LOCATIONS
+			if (metafields.some(c => c.type === 'location')) {
 
-		columntypes.each(function (d) {
-			const selection = this.options[this.selectedIndex].value
-			if (columntypes.selectAll('option[value="title"]:checked').size()) {
-				columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', c => c.disabled)
-			if (columntypes.selectAll('option[value="location"]:checked').size()) {
-				columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="location"]:not(:checked)').attr('disabled', c => c.disabled)
-			if (columntypes.selectAll('option[value="sdgs"]:checked').size()) {
-				columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="sdgs"]:not(:checked)').attr('disabled', c => c.disabled)
-			if (columntypes.selectAll('option[value="tags"]:checked').size()) {
-				columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', true)
-			} else columntypes.selectAll('option[value="tags"]:not(:checked)').attr('disabled', c => c.disabled)
-		})
+				obj.push({ label: 'location', value: 'location-txt', disabled: d.types.some(c => ['string', 'list of strings'].includes(c)) ? null : true })
+				obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
+				obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
 
-		const show = 5
-		moduleBody.html('').datum(cols)
+				// CHECK FOR TEXT LOCATIONS
+				// if (d.types.includes('string') || d.types.includes('list of strings')) { 
+				// 	obj.push({ label: 'location', value: 'location-txt', disabled: null })
+
+				// } else obj.push({ label: 'location', value: 'location-txt', disabled: true })
+
+				// CHECK FOR LAT/ LNG
+				// if (d.types.includes('list of numbers') 
+				// && !d.entries.filter(c => ![null, undefined].includes(c)).map(c => c?.length === 2).includes(false)) {
+				// 	obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', disabled: null })
+				// 	obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', disabled: null })
+				// } else {
+				// 	obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', disabled: true })
+				// 	obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', disabled: true })
+				// }
+			}
+			
+			metafields.filter(c => c.type !== 'location')
+			.forEach(c => {
+				let disabled = true
+				if (c.type === 'tag' && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b))) disabled = null
+				if (c.type === 'index' && d.types.some(b => ['number', 'list of numbers'].includes(b))) disabled = null
+				if (['txt', 'embed'].includes(c.type) && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b))) disabled = null
+				if (c.type === 'img' && d.types.some(b => (b === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(b) && containsURLs))) disabled = null
+				// if (c.type === 'video') // TO DO: COMPLETE FOR VIDEO
+				if (['checklist', 'radiolist'].includes(c.type) && !d.type.includes('object')) disabled = null
+
+				obj.push({ label: c.name, value: c.label, disabled }) // TO DO: TRANSLATE c.name
+			})
+
+			return obj
+		}).attrs({
+			'value': d => d.value,
+			'selected': function (d) {
+				const type = d3.select(this).findAncestor('type').datum().type
+				if (type === d.value) return true
+				else return null
+			}, 'disabled': d => d.disabled
+		}).html(d => d.label)
+
+		// IMMEDIATELY DISABLE OPTIONS ACCORDING TO INFERRED TYPES
+		columntypes.each(function (d) { this.dispatchEvent(new Event('change')) }) 
+
+		// RENDER THE TABLE BODY
+		const show = 5 // THIS IS TO LIMIT THE NUMBER OF ROWS DISPLAYED
+		const moduleBody = table.addElems('tbody', null, [cols])
 		
 		const bodyRows = moduleBody.addElems('tr', 'column-values', d => {
 			const slices = d.map(c => { return { key: c.key, entries: c.entries.slice(0, show) } })
-			const zip = []
+			const row = []
 			slices.forEach(c => {
 				for (let i = 0; i < c.entries.length; i ++) {
-					if (!zip[i]) zip[i] = [{ key: c.key, cell: c.entries[i] }]
-					else zip[i].push({ key: c.key, cell: c.entries[i] })
+					if (!row[i]) row[i] = [{ key: c.key, cell: c.entries[i] }]
+					else row[i].push({ key: c.key, cell: c.entries[i] })
 				}
 			})
-			return zip
+			return row
+		}).on('mouseover', function () {
+			d3.select(this).select('.preview').classed('hide', false)
+		}).on('mouseout', function () {
+			d3.select(this).select('.preview').classed('hide', true)
 		})
-		bodyRows.addElems('td', 'value',  d => d)
-			.style('word-break', d => typeof d.cell === 'string' && d.cell.split(' ').length === 1 ? 'break-all' : null)
+		bodyRows.addElems('td', 'value', d => d)
+			.classed('selected left right top bottom', false)
+			.style('word-break', d => typeof d.cell === 'string' && (d.cell.split(' ').length === 1 || d.cell.includes('http')) ? 'break-all' : null)
 			.html(d => {
 				if (d.cell && typeof d.cell === 'string' && d.cell.length > 100) return `${d.cell.slice(0, 100)}…` 
 				else if (d.cell && typeof d.cell === 'object') {
@@ -529,29 +639,40 @@
 					} else if (Object.keys(d.cell).includes('src')) { // LIKELY AN IMAGE
 						return `<img src='${d.cell.src}'>`
 					}
-				}
-				else return d.cell
+				} else return d.cell
 			})
-		bodyRows.insertElem(':first-child', 'td', 'preview')
-			.attr('title', 'Preview pad.')
-		.on('click', function () {
-			// if (!previewing) {
-				const sel = d3.select(this)
-				const node = sel.findAncestor('column-values').node()
-				
-				let currentidx = 0
-				d3.select(node.parentNode).selectAll('tr').each(function (c, j) { if (this === node) currentidx = j })
-				
-				previewPad(currentidx)
-			// }
-		}).addElems('i', 'material-icons')
-			.html('visibility')
+		bodyRows.addElems('div', 'preview hide')
+		.on('dblclick', function () {
+			const sel = d3.select(this)
+			const node = sel.findAncestor('column-values').node()
+			let idx = 0
+			d3.select(node.parentNode).selectAll('tr').each(function (c, j) { if (this === node) idx = j })
+			
+			previewPad(idx)
+		}).addElems('span')
+			.html('<%- vocabulary["dblclick to preview"][language]("pad") %>')
+		
+		foot.addElems('p', 'summary')
+			.html(_ => {
+				const rowcount = Math.max(...cols.map(c => c.entries.length))
+				const colcount = cols.length
+				return Function('"use strict";return (<%- vocabulary["import table description"][language] %>)')()(rowcount, colcount, Math.min(show, rowcount))
 
-		main.select('.inner').addElems('p', 'summary')
-			.html(`${d3.max(cols, c => c.entries.length)} entries and ${cols.length} columns (${d3.max(cols, c => c.entries.length)} x ${cols.length} table) were detected. ${d3.min([show, d3.max(cols, c => c.entries.length)])} entries are shown.`)
+			})
+
+		// PUSH BROWSER HISTORY STATE
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		queryparams.set('file', encodeURI(d3.select('input#upload').attr('data-fname')))
+		url.search = queryparams.toString()
+		const nextURL = url.toString()
+		const nextTitle = 'Processing table'
+		const nextState = { additionalInformation: 'Updated the URL with JS' }
+		window.history.pushState(nextState, nextTitle, nextURL)
 	}
-	// THE FOLLOWING FUNCTION IS INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
+
 	function seekPrefix (arr) {
+		// INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
 		const A = arr.filter(d => d).concat().sort()
 		const a1 = A[0]
 		const a2 = A[A.length-1]
@@ -560,42 +681,9 @@
 		while (i < L && a1.charAt(i) === a2.charAt(i)) i++
 		return a1.substring(0, i)
 	}
-	// function modal (message, opts) {
-	// 	return new Promise (resolve => {
-	// 		const overlay = pagebody.addElems('div', 'modal')
-	// 		overlay.addElem('div', 'veil')
-			
-	// 		const menu = overlay.addElem('div', 'menu')
-	// 		menu.addElem('div', 'exit')
-	// 			.on('click', _ => d3.selectAll('.modal').remove())
-	// 		.addElem('i', 'material-icons')
-	// 			.html('clear')
-
-	// 		menu.addElems('div', 'modal-instruction')
-	// 			.html(message)
-
-	// 		const form = menu.addElem('form')
-	// 			// .attrs({ 'action': '/delete', 'method': 'DELETE' })
-	// 		menu.addElems('button', 'save', opts)
-	// 			.addElem('div')
-	// 			.html(d => d.label)
-	// 		.on('click', d => {
-	// 			if (typeof d.resolve === 'function') {
-	// 				const resolved = d.resolve()
-	// 				d3.selectAll('.modal').remove()
-	// 				resolve(resolved)
-
-	// 			}
-	// 			else {
-	// 				d3.selectAll('.modal').remove()
-	// 				resolve(d.resolve)
-	// 			}
-	// 		})
-	// 	})
-	// }
 
 	function splitValues (col, separator) {
-		const cols = moduleHead.datum()
+		const cols = d3.select('table.xls-preview').datum()
 		cols.forEach(d => {
 			if (d.key === col) {
 				// CHECK IF THE SPARATOR WAS INPUT TWICE (OR MORE)
@@ -620,342 +708,554 @@
 						return `list of ${listcontent}s`
 					} else return typeof c
 				}).unique()
-				d.inferredtype = 'checklist'
+				d.type = 'checklist'
 			}
 		})
 		renderTable(cols)
 	}
 	function groupColumns () {
-		const cols = moduleHead.datum()
-		const selected = moduleHead.selectAll('.selected')
+		const cols = d3.select('table.xls-preview').datum()
+		const selected = d3.selectAll('table.xls-preview thead .column-selection .selected')
 
 		if (selected.size() > 1) {
 			const groupedkeys = selected.data().map(d => d.key)
-			const keys = cols.map(d => d.key).diff(groupedkeys)
+			const keys = cols.map(d => d.key).diff(groupedkeys) // NOT SURE WHAT THIS DOES
 			keys.push(groupedkeys)
 			parseGroups(cols, keys)
 		}
 	}
 	function dropColumns () {
-		let cols = moduleHead.datum()
-		const dropkeys = moduleHead.selectAll('.selected').data().map(d => d.key)
+		let cols = d3.select('table.xls-preview').datum()
+		const dropkeys = d3.select('table.xls-preview thead').selectAll('.selected').data().map(d => d.key)
 		renderTable(cols.filter(d => !dropkeys.includes(d.key)))
 	}
-	function compilePads (idx) {
-		const cols = moduleHead.datum()
-		let extractLocations = false
-		if (idx !== null && idx !== undefined) extractLocations = true
-		// 1 - PREPARE DATA FOR THE TEMPLATE
-		// 2 - PREPARE DATA FOR THE PAD
-		const entriesLength = cols[0].entries.length
-		const pads = d3.range(entriesLength)
+	function compileLocations (idx) {
+		return new Promise(async resolve => {
+			const cols = d3.select('table.xls-preview').datum()
+			let locations = cols.find(d => d.type === 'location-txt')?.entries
+			if (!locations?.length) resolve(null)
+			else {
+				if (![null, undefined].includes(idx)) {
+					if (Array.isArray(locations[idx])) locations = locations[idx]
+					else locations = [locations[idx]]
+				} else locations = locations.flat().unique()
+				locations = locations.filter(d => d) // REMOVE ANY null VALUES
+
+				const results = await POST('/forwardGeocoding', { locations: locations })
+				resolve(results)
+			}
+		})		
+	}
+	async function compilePads (idx, structureOnly = false) {
+		const cols = d3.select('table.xls-preview').datum()
+		// FORWARD GEOCODE THE TEXT LOCATIONS
+		const compiledLocations = await compileLocations(idx)
+
+		const entriesLength = Math.max(...cols.map(d => d.entries.length))
+		const pads = new Array(entriesLength).fill(0).map((d, i) => i)
 		.filter(i => {
-			if (idx !== null && idx !== undefined) return i === idx
-			else return true
+			if (![null, undefined].includes(idx)) return i === idx
+			else return true // COMPILE ALL PADS
 		}).map(i => {
 			return new Promise(async resolve0 => {
-				// TO DO: PROBLEM WITH TITLE
-				// IT SHOULD BE THE FIRST ITEM IN THE PAD
 				const items = cols.map(c => {
 					return new Promise(async resolve1 => {
 						const item = {}
-						const type = moduleHead.selectAll('.type').filter(d => d.key === c.key).select('select option:checked').node().value
-						if (['txt', 'title'].includes(type)) {
-							if (Array.isArray(c.entries[i])) item.txt = c.entries[i].sort((a, b) => {
-									if (typeof a === 'string' && typeof b === 'string') {
-										if (a < b) return -1
-										else if (a > b) return 1
-										else return 0
-									} else {
-										return a - b
-									}
-								}).join(', ')
-							else item.txt = c.entries[i]
-							item.type = type
-						}
-						if (type === 'embed') {
-							item.html = c.entries[i]
-							item.type = type
-						}
-						if (type === 'img') {
-							item.type = type // THIS COMES FIRST HERE AS WE UPDATE IT IN THE CASE OF A mosaic
-							if (c.entries[i] && c.entries[i].src) item.src = c.entries[i].src
-							else {
-								if (Array.isArray(c.entries[i])) { 
-									const containsURLs = c.entries[i].map(b => b.isURL()).unique()
-									if (containsURLs.length === 1 && containsURLs.includes(true)) { // A MOSAIC OF URLS
-										item.srcs = c.entries[i].map(b => b.trim())
-										item.type = 'mosaic'
-									} else item.src = null
-								} else if (c.entries[i] && c.entries[i].isURL()) item.src = c.entries[i].trim()
-								else item.src = null
+						
+						if (['txt', 'title'].includes(c.type) 
+							|| ['txt', 'title'].includes(metafields.find(b => b.label === c.type)?.type)
+						) {
+							if (!structureOnly) {
+								if (Array.isArray(c.entries[i])) {
+									item.txt = c.entries[i].sort((a, b) => {
+										if (typeof a === 'string' && typeof b === 'string') return a?.localeCompare(b)
+										else return a - b
+									}).join(', ')
+								} else item.txt = c.entries[i]
+								item.has_content = item.txt?.trim()?.length > 0
 							}
+							// item.type = c.type
+							item.type = metafields.find(b => b.label === c.type)?.type || c.type
+							item.name = metafields.find(b => b.label === c.type)?.label || null
+							// item.level = 'media'
+							item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
 						}
-						if (type === 'video') { // THERE CAN BE NO VIDEO UPLOAD FROM EXCEL: THIS IS ONLY A PLACEHOLDER IN THE TABLE/ PAD
-							item.src = null
-							item.type = type
+						if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('embed')) {
+							if (!structureOnly) {
+								item.html = c.entries[i]
+								item.has_content = item.html?.trim()?.length > 0
+							}
+							// item.type = c.type
+							item.type = metafields.find(b => b.label === c.type)?.type || c.type
+							item.name = metafields.find(b => b.label === c.type)?.label || null
+							// item.level = 'media'
+							item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
 						}
-						if (type === 'checklist') {
-							item.options = c.values.filter(d => d !== null && d !== undefined).unique()
+						if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('img')) {
+							// item.type = c.type // THIS COMES FIRST HERE AS WE UPDATE IT IN THE CASE OF A mosaic
+							item.type = metafields.find(b => b.label === c.type)?.type || c.type
+							
+							if (!structureOnly) {
+								if (c.entries[i]?.src) item.src = c.entries[i].src
+								else {
+									if (Array.isArray(c.entries[i])) { 
+										const containsURLs = c.entries[i].map(b => b.isURL()).unique()
+										if (containsURLs.length === 1 && containsURLs.includes(true)) { // A MOSAIC OF URLS
+											item.srcs = c.entries[i].map(b => encodeURI(b.trim()))
+											item.type = 'mosaic'
+											// item.type = 'mosaic'
+										} else item.src = null
+									} else if (c.entries[i]?.isURL()) item.src = encodeURI(c.entries[i].trim())
+									else item.src = null
+								}
+								if (item.type === 'mosaic') item.has_content = item?.srcs?.filter(b => b)?.length > 0
+								else item.has_content = ![null, undefined].includes(item.src)
+							}
+							// item.level = 'media'
+							item.name = metafields.find(b => b.label === c.type)?.label || null
+							item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
+						}
+						if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('video')) { // THERE CAN BE NO VIDEO UPLOAD FROM EXCEL: THIS IS ONLY A PLACEHOLDER IN THE TABLE/ PAD
+							if (!structureOnly) {
+								item.src = null
+								item.has_content = ![null, undefined].includes(item.src)
+							}
+							// item.type = c.type
+							item.type = metafields.find(b => b.label === c.type)?.type || c.type
+							item.name = metafields.find(b => b.label === c.type)?.label || null
+							// item.level = 'media'
+							item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
+						}
+						if (['checklist', 'radiolist'].includes(c.type) 
+							|| ['checklist', 'radiolist'].includes(metafields.find(b => b.label === c.type)?.type)
+						) {
+							item.options = c.values //.filter(d => ![null, undefined].includes(d)).unique() // VALUES SHOUlD BE COMOPLETE (NO null OR undefined) AND SHOULD NOT BE unique
 								.sort((a, b) => {
-									if (typeof a === 'string' && typeof b === 'string') {
-										if (a < b) return -1
-										else if (a > b) return 1
-										else return 0
-									} else {
-										return a - b
-									}
-								}).map(d => { 
+									if (typeof a === 'string' && typeof b === 'string') return a?.localeCompare(b)
+									else return a - b
+								}).map((d, i) => { 
 									const obj = {}
-									obj.name = d.toString()
-									if (c.entries[i]) {
-										if (typeof c.entries[i] !== 'object') {
-											obj.checked = typeof c.entries[i] === 'string' ? c.entries[i].toLowerCase().trim() === d ? true : null : c.entries[i] === d ? true : null
-										} else obj.checked = c.entries[i].map(b => typeof b === 'string' ? b.toLowerCase().trim() : b).includes(d) ? true : null
+									obj.id = i
+									obj.name = d?.toString()
+									obj.checked = false
+									
+									if (!structureOnly) {
+										if (c.entries[i]) {
+											if (typeof c.entries[i] !== 'object') { // THIS COULD PROBABLY BE CHANGED TO Array.isArray()
+												if (typeof c.entries[i] === 'string' && c.entries[i].toLowerCase().trim() === d) {
+													obj.checked = true
+												} else if (c.entries[i] === d) obj.checked = true
+											} else {
+												if (c.entries[i].map(b => typeof b === 'string' ? b.toLowerCase().trim() : b).includes(d)) obj.checked = true
+											}
+										}
 									}
 									return obj
 								})
-							item.type = type
-						}
-						if (type === 'location') {
-							let locations = []
-							if (Array.isArray(c.entries[i])) locations = c.entries[i]
-							else locations = [c.entries[i]]
-							locations = locations.filter(d => d)
 
-							if (extractLocations && locations.length) {
-								const results = await POST('/forwardGeocoding', { locations: locations })
-					 			item.centerpoints = results.map(c => c.centerpoint)
-					 			item.caption = `Originally input location${locations.length > 1 ? 's' : ''}: <strong>${locations.map(l => l.trim().capitalize()).join('</strong>, <strong>')}</strong>.<br/>`
-					 			if (results.filter(c => c.found).length > 1) item.caption += `Multiple locations found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`
-					 			else if ((results.filter(c => c.found).length === 1)) item.caption += results.find(c => c.found).caption
-					 			if (results.filter(c => !c.found).length) {
-					 				item.caption += results.filter(c => !c.found).map(c => c.caption).join(' ')
-					 				item.caption += '<br/>Defaulted to UNDP <% if (locals.country) { %><%= country %> <% } else { %><% } %>Country Office location.'
-					 			}
-					 		} else item.locations = locations
-					 		item.type = type
+							if (!structureOnly) item.has_content = item.options?.filter(b => b.name?.length && b.checked)?.length > 0
+							// item.type = c.type
+							item.type = metafields.find(b => b.label === c.type)?.type || c.type
+							item.name = metafields.find(b => b.label === c.type)?.label || null
+							item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
 						}
-						if (type === 'sdgs') {
-							if (Array.isArray(c.entries[i])) item.sdgs = c.entries[i]
-							else item.sdgs = [c.entries[i]]
-							item.sdgs = item.sdgs.filter(d => d)
-							item.type = type
+
+						// META FIELDS
+						// NOTE: THIS IMPLIES THERE CAN ONLY BE ONE LOCATION IN THE METADATA
+						if (metafields.some(b => b.type === 'location')) {
+							if (c.type === 'location-txt') {
+								if (!structureOnly) {
+									let locations = []
+									if (Array.isArray(c.entries[i])) locations = c.entries[i]
+									else locations = [c.entries[i]]
+									locations = locations.filter(d => d)
+
+									if (locations?.length) {
+										// const results = await POST('/forwardGeocoding', { locations: locations })
+										const geocoded = compiledLocations.filter(d => locations.includes(d.input))
+										item.centerpoints = geocoded.map(c => c.centerpoint)
+										item.caption = `Originally input location${locations.length > 1 ? 's' : ''}: <strong>${locations.map(l => l.trim().capitalize()).join('</strong>, <strong>')}</strong>.<br/>`
+										if (geocoded.filter(c => c.found).length > 1) item.caption += `Multiple locations found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`
+										else if (geocoded.filter(c => c.found).length === 1) {
+											item.caption += geocoded.find(c => c.found).caption
+										}
+										if (geocoded.filter(c => !c.found).length) {
+											item.caption += geocoded.filter(c => !c.found).map(c => c.caption).join(' ')
+											item.caption += '<br/>Defaulted to UNDP <% if (locals.country) { %><%- country %> <% } else { %><% } %>Country Office location.'
+										}
+									}
+									// } else item.locations = locations // THIS IS FOR FINDING ALL LOCATIONS AT ONCE WHEN UPLOADING
+									item.has_content = item?.centerpoints?.length > 0
+								}
+						 		item.type = 'location'
+						 		item.name = metafields.find(b => b.type === 'location')?.label
+						 		item.level = 'meta'
+							} else if (c.type === 'location-lat-lng') {
+								if (!structureOnly) {
+									let locations = []
+									if (Array.isArray(c.entries[i])) locations = c.entries[i]
+									else locations = [c.entries[i]]
+									locations = locations.filter(d => d)
+
+									if (locations.length) item.centerpoints = [{ lat: locations[0], lng: locations[1] }]
+
+									item.has_content = item?.centerpoints?.length > 0
+								}
+								item.type = 'location'
+								item.name = metafields.find(b => b.type === 'location')?.label
+								item.level = 'meta'
+							} else if (c.type === 'location-lng-lat') {
+								if (!structureOnly) {
+									let locations = []
+									if (Array.isArray(c.entries[i])) locations = c.entries[i]
+									else locations = [c.entries[i]]
+									locations = locations.filter(d => d)
+
+									if (locations.length) item.centerpoints = [{ lat: locations[1], lng: locations[0] }]
+
+									item.has_content = item?.centerpoints?.length > 0
+								}
+								item.type = 'location'
+								item.name = metafields.find(b => b.type === 'location')?.label
+								item.level = 'meta'
+							}
 						}
-						if (type === 'tags') {
-							if (Array.isArray(c.entries[i])) item.tags = c.entries[i].map(b => { return { name: b } })
-							else item.tags = [{ name: c.entries[i] }]
-							item.tags = item.tags.filter(d => d.name)
-							item.type = type
+
+						// ALL TAGs ARE LOOPED BELOW BASED ON AVAILABLE metafields
+						if (metafields.some(b => b.type !== 'location' && b.label === c.type)) {
+							if (['tag', 'index'].includes(metafields.find(b => b.label === c.type)?.type)) {
+								if (!structureOnly) {
+									if (Array.isArray(c.entries[i])) {
+										item.tags = c.entries[i].filter(b => ![null, undefined].includes(b))
+											.map(b => { 
+												const obj = {}
+												obj.id = undefined
+												if (metafields.find(b => b.label === c.type)?.type === 'index') {
+													obj.key = +b
+													obj.name = taglists[c.type].find(a => a.key === +b)?.name
+												} else {
+													obj.key = null
+													obj.name = b
+												}
+												obj.type = c.type//.slice(0, -1) 
+												return obj
+											})
+									} else {
+										const obj = {}
+										obj.id = undefined
+										if (metafields.find(b => b.label === c.type)?.type === 'index') {
+											obj.key = +c.entries[i]
+											obj.name = taglists[c.type].find(b => b.key === +c.entries[i])?.name
+										} else {
+											obj.key = null
+											obj.name = c.entries[i]
+										}
+										obj.type = c.type//.slice(0, -1) 
+										item.tags = [obj]
+									}
+									item.has_content = item?.tags?.length > 0
+								}
+								item.type = metafields.find(b => b.label === c.type)?.type
+								item.name = metafields.find(b => b.label === c.type)?.label
+								item.level = 'meta'
+							}
 						}
+						
 						item.instruction = c.key
 						resolve1(item)
 					})
 				})
 				const results = await Promise.all(items)
 
+				const title = results.find(d => d.type === 'title')?.txt?.slice(0, 99) || null
+
+				let structure = results
+				if (!structureOnly) {
+					structure = results.map(d => {
+						const { txt, html, srcs, src, centerpoints, tags, ...structure } = d
+						if (structure.options) {
+							structure.options = structure.options.map(c => {
+								const { checked, ...opts } = c
+								opts.checked = false
+								return opts
+							})
+						}
+						return structure
+					})
+				}
+				structure.forEach(d => {
+					d.required = false
+					// THE FOLLOWING LIKELY REDUNDANT
+					if (metafields.some(c => c.label === d.name)) d.level = 'meta'
+					else d.level = 'media'
+				})
+
+				const full_text = `${title}\n\n
+					${results.filter(d => d.type === 'txt')
+						.map(d => d.txt).join('\n\n').trim()}\n\n
+					${results.filter(d => d.type === 'embed')
+						.map(d => d.html).join('\n\n').trim()}\n\n
+					${results.filter(d => d.type === 'checklist')
+						.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+					${results.filter(d => d.type === 'radiolist')
+						.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+					
+					${results.filter(d => d.type === 'group').map(d => results)
+						.filter(d => d.type === 'txt')
+						.map(d => d.txt).join('\n\n').trim()}\n\n
+					${results.filter(d => d.type === 'group').map(d => results)
+						.filter(d => d.type === 'embed')
+						.map(d => d.html).join('\n\n').trim()}\n\n
+					${results.filter(d => d.type === 'group').map(d => results)
+						.filter(d => d.type === 'checklist')
+						.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+					${results.filter(d => d.type === 'group').map(d => results)
+						.filter(d => d.type === 'radiolist')
+						.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+
+				// NEED TO CHECK THERE ARE ALL THE metafields AND THAT THEY HAVE CONTENT
+				const completion = []
+				completion.push(results.find(d => d.type === 'title')?.has_content || false)
+				metafields.filter(d => d.required).forEach(d => {
+					completion.push(results.find(c => c.name === d.label)?.has_content || false)
+				})
+				let status = 0
+				if (completion.every(d => d === true)) status = 1
+
 				resolve0({ 
-					title: results.find(c => c.type === 'title') ? results.find(c => c.type === 'title').txt : null, 
-					media: results.filter(c => ['img', 'mosaic', 'video', 'checklist', 'txt', 'title', 'embed'].includes(c.type)), 
-					meta: results.filter(c => ['location', 'sdgs', 'tags'].includes(c.type)) 
+					title, 
+					sections: [
+						{
+							type: 'section',
+							title: null,
+							lead: null,
+							structure,
+							items: !structureOnly ? results	: null
+						}
+					],
+					full_text,
+					status,
+					compileddata: results,
+					imgs: results.filter(d => ['img', 'mosaic'].includes(d.type)).map(d => d.src || d.srcs).flat(),
+
+					tags: results.filter(d => metafields.some(c => ['tag', 'index'].includes(c.type) && c.label === d.name)).map(d => d.tags).flat(),
+					locations: results.filter(d => d.type === 'location').map(d => d.centerpoints).flat()
 				})
 			})
 		})
 		return Promise.all(pads)
 	}
-	function compileTemplates () {
-		const cols = moduleHead.datum()
+
+	async function compileTemplate () {
+		const cols = d3.select('table.xls-preview').datum()
 
 		const template = {}
 
-		// COPY THIS FROM template.ejs
+		// THIS IS COPIED FROM template.ejs
 		const title = d3.select('input#upload').attr('data-fname').slice(0, 99) // THIS IS NECESSARY BECAUSE THE DB IS ONLY SET TO STORE 99 VARCHAR
-		const description = `Template generated from the columns in the “${title.trim()}” file.`
-		const items = cols.map(d => {
-			const item = {}
-			if (['location', 'sdgs', 'tags'].includes(d.inferredtype)) item.level = 'meta'
-			else item.level = 'media'
-			item.instruction = d.key
-			item.type = d.inferredtype
-			if (['checklist', 'tags'].includes(d.inferredtype)) item.options = d.entries.unique().map(c => { return { name: c } })
-			if (d.inferredtype === 'sdgs') {} // TO DO: GET SDGs DETAILS FROM BACKEND
-			
-			return item
+		const description = Function('"use strict";return (<%- vocabulary["generated template"][language] %>)')()(title.trim())
+
+		const data = await compilePads(0, true)
+		const sections = data[0].sections.map(d => {
+			const { items, ...section } = d
+			return section
 		})
 
-		let fullTxt = `${title}\n\n${description}`
-		items.forEach(d => {
-			fullTxt += `\n\n${d.instruction.trim()}`
-			if (d.options) fullTxt += `\n\n${d.options.map(c => c.name).flat().map(c => typeof c === 'string' ? c.trim() : c).join('\n\n').trim()}`
-		})
-		fullTxt = fullTxt.trim()
+		// COMPILE FULL TXT FOR SEARCH
+		// TECHNICALLY THE group PART IS NOT NEEDED HERE AS THERE CAN BE NO GROUPS ON IMPORT
+		// BUT WE KEEP IT FOR CONSISTENCY WITH template.ejs
+		const full_text = `${title}\n\n
+			${description}\n\n
+			${sections.map(d => d.title).join('\n\n').trim()}\n\n
+			${sections.map(d => d.lead).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'title')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'txt')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'embed')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'checklist')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'checklist')
+				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
+				.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
 
-		let tags = cols.find(d => d.inferredtype === 'tags') ? cols.find(d => d.inferredtype === 'tags').entries.flat().unique().filter(d => d) : null
-		if (tags && !tags.length) tags = null
-
-		const medium = 'xlsx'
-
-		template.title = title
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'txt')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'embed')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'checklist')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'checklist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'radiolist')
+				.map(d => d.instruction).join('\n\n').trim()}\n\n
+			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
+				.filter(d => d.type === 'radiolist')
+				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+		
+		template.title = title.slice(0, 99)
 		template.description = description
-		template.items = items
-		template.fullTxt = fullTxt
-		template.tags = tags
-		template.medium = medium
+		template.sections = JSON.stringify(sections)
+		template.full_text = full_text
+		template.medium = 'xlsx'
 
-		console.log(template)
+		const completion = []
+		metafields.filter(d => d.required).forEach(d => {
+			completion.push(sections.map(c => c.structure)?.flat().some(c => c.name === d.label))
+		})
+		template.status = 0
+		if (completion.every(d => d === true)) template.status = 1
+ 
 		return template
 	}
 
 	async function previewPad (idx) {
-		// previewing = true
-		const cols = moduleHead.datum()
-		const pads = await compilePads(idx)
-		const pad = pads[0]
+		const cols = d3.select('table.xls-preview').datum()
+		const data = await compilePads(idx)
+		const datum = data[0]
+		console.log(data)
 
-		const screen = d3.select('div.screen.ter').classed('hide', false)
+		const screen = d3.select('div.screen').classed('hide', false)
 		const modal = screen.addElems('div', 'modal pad-preview')
 		modal.addElems('button', 'close')
-		.on('click', function () {
-			let orderedCols = []
-			if (pad.media.find(d => d.type === 'title')) orderedCols.push(pad.media.find(d => d.type === 'title').instruction)
-			
-			d3.selectAll('div.media-layout div.media-container').data().forEach(d => orderedCols.push(d.instruction))
-			d3.selectAll('div.meta-layout div.meta-container').data().forEach(d => orderedCols.push(d.instruction))
+		.on('click', _ => window.history.back())
+		.html('Close')
 
-			orderedCols = orderedCols.map(d => {
-				return cols.find(c => c.key === d)
-			})
+		window.onpopstate = _ => closeModal()
 
-			renderTable(orderedCols)
+		function closeModal () {
+			// REORDER THE TABLE WHEN CLOSING PREVIEW
+			let neworder = []
+
+			if (datum.compileddata.find(d => d.type === 'title')) { // IF THERE IS A TITLE, ALWAYS PUSH IT TO THE FIRST COLUMN
+				neworder.push(datum.compileddata.find(d => d.type === 'title').instruction)
+			}
+			d3.selectAll('div.media-container, div.meta-container').each(d => neworder.push(d.instruction))
+
+			neworder = neworder.map(d => cols.find(c => c.key === d))
+			renderTable(neworder)
 
 			modal.remove()
 			screen.classed('hide', true)
-		}).html('Close')
+		}
 
-		const main = modal.addElems('main', 'pad')
+		const main = modal.addElems('div', 'document')
+			.addElems('main', 'pad')
 			.attr('id', 'pad')
 		const inner = main.addElems('div', 'inner')
 		
-		if (pad) {
-			console.log(pad)
-
+		if (datum) {
 			const head = inner.addElems('div', 'head')
-			head.addElems('div', 'title')
-				.attr('data-placeholder', vocabulary['untitled pad'][lang])
-			.html(pad.title)
-
 			const body = inner.addElems('div', 'body')
-			const mediaLayout = body.addElems('div', `media-layout layout ${activity}`, pad.media.length ? [true] : [])
-			mediaLayout.addElems('div', 'input-type')
-				.addElems('label').html(vocabulary['media'][lang])
-			// body.addElems('div', 'page-separator')
-			// body.addElems('div', 'page-label').addElems('span').html('Meta data')
-			const metaLayout = body.addElems('div', `meta-layout layout ${activity}`, pad.meta.length ? [true] : [])
-			metaLayout.addElems('div', 'input-type')
-				.addElems('label').html(vocabulary['metadata'][lang])
+			
+			if (datum.title) head.addElems('div', 'title').html(datum.title)
+			if (datum.sections) {
+				datum.sections.forEach(d => {
+					addSection({ data: d, lang: '<%- locals.metadata.page.language %>' })
+				})
+			}
 
-			pad.media.forEach(d => {
-				if (d.type === 'img') addImg(d)
-				if (d.type === 'mosaic') addMosaic(d)
-				if (d.type === 'video') addVideo(d)
-				// if (['txt', 'title'].includes(d.type)) addTxt(d)
-				if (d.type === 'txt') addTxt(d)
-				if (d.type === 'embed') addEmbed(d)
-				if (d.type === 'checklist') addChecklist(d)
-			})
-			pad.meta.forEach(d => {
-				if (d.type === 'location') {
-					// THIS COMPLEX STATEMENT IS LEGACY (ORIGINALLY ONLY ONE centerpoint COULD BE PLACED)
-					if ((!d.centerpoint && !d.centerpoints) || (d.centerpoint && (!d.centerpoint.lat || !d.centerpoint.lng))) {
-						d.centerpoints = [<%- centerpoint %>]
-					} else if (d.centerpoint && !d.centerpoints) d.centerpoints = [d.centerpoint]
-					addMap(d)
-				}
-				if (d.type === 'sdgs') addSDGs(d, false)
-				if (d.type === 'tags') {
-					addTags(d, false)
-				}
-			})
+			// REMOVE THE SECTION HEADER (WHICH IS ALWAYS EMPTY HERE)
+			body.select('div.section-header').remove()
 		}
+
+		// UPDATE THE WINDOW HISTORY SO THAT USERS CAN CLICK ON "back" IN BROWSER
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		queryparams.set('preview', idx)
+		url.search = queryparams.toString()
+		const nextURL = url.toString()
+		const nextTitle = 'Preview pad'
+		const nextState = { additionalInformation: 'Updated the URL with JS' }
+		window.history.pushState(nextState, nextTitle, nextURL)
 	}
 
 	// CATCH THE SEARCH PARAMS
 	// INSPIRED BY https://stackoverflow.com/questions/5384712/intercept-a-form-submit-in-javascript-and-prevent-normal-submission
 	async function catchSubmit (evt) {
 		if (evt.preventDefault) evt.preventDefault()
-		const cols = moduleHead.datum()
-		let fls = null
 		
-		if (cols.find(d => d.inferredtype === 'img')) {
-			const imgs = cols.find(d => d.inferredtype === 'img').entries
-			console.log(imgs)
-			const title = d3.select('input#upload').attr('data-fname').slice(0, 20).simplify()
-			const fd = new FormData()
-			const promises = []
-			imgs.filter(d => d && d.src).forEach(d => {
-				// TO DO: FOR MOSAIC, NEED TO ITERATE OVER ARRAYS OF IMAGES WITHOUT src KEY AND SEND THOSE TO BE COLLECTED IN THE BACKEND
-				// ++ STICTH TOGETHER BELOW
-				promises.push(new Promise(async resolve => {
-					const blob = await fetch(d.src).then(res => res.blob())
-					const ts = new Date().getTime()
-					const originalname = d.src //`xlsx-${title}-${d.id}-${ts}.png`
-					resolve({ blob: blob, originalname: originalname })
-				}))
-			})
-			imgs.filter(d => Array.isArray(d) && d.map(c => c.isURL()).unique().length === 1 && d.map(c => c.isURL()).unique().includes(true))
-			.flat().forEach((d, i) => {
+		// 1) SELECT MOBILIZATION TO CONTRIBUTE TO
+		// TO DO: IMPROVE THIS
+		const target_opts = <%- JSON.stringify(locals.metadata.menu.participations.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1)) %>.map(d => { return { label: d.title, value: d.id, type: 'radio' } })
+		target_opts.unshift({ label: '<%- vocabulary["space"][language]("pads", "private") %>', value: 0, type: 'radio' })
+
+		const message = '<%- vocabulary["import to workspace or mobilization"][language] %>'
+		const opts = [
+			{ node: 'select', name: 'mobilization', label: '<%- vocabulary["select destination"][language] %>', options: target_opts },
+			{ node: 'button', type: 'button', label: '<%- vocabulary["import"][language] %>', resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value }
+		]
+		const mobilization = await renderPromiseModal({ message, opts })
+
+		// COMPILE PADS AND TEMPLATE
+		const pads = await compilePads()
+		const template = await compileTemplate()
+
+		// 2) SAVE IMAGES
+		const fd = new FormData()
+		const promises = []
+		const imgs = pads.map(d => d.imgs).flat().unique().filter(d => !d.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
+
+		if (imgs.length) {
+			imgs.forEach(d => {
 				promises.push(new Promise(async resolve => {
 					const blob = await fetch(d).then(res => res.blob())
+					const ts = new Date().getTime()
 					const originalname = d
-					resolve({ blob: blob, originalname: d })
+					resolve({ blob: blob, originalname: originalname })
 				}))
 			})
 			const blobs = await Promise.all(promises)
 			blobs.forEach(b => {
-				// console.log(`xlsx-${title}-${b.id}-${ts}.png`)
 				fd.append('img', b.blob, b.originalname)
 			})
 
-			fls = await fetch('/upload/img', { method: 'POST', body: fd })
+			// THIS IS SIMILAR TO THE uploadImg FUNCTION IN pad.js
+			// WE NEED TO USE THE fetch API, AND NOT THE POST HELPER FUNCTION FOR SOME REASON
+			const files = await fetch('/upload/img', { method: 'POST', body: fd })
 			.then(response => response.json())
 			.then(results => {
 				const notification = d3.select('body').addElem('div', 'notification')
 					.addElem('div')
-					.html('Image successfully uploaded.<i class="material-icons">done</i>') // TO DO: TRANSLATE
+					.html('<%- vocabulary["image upload success"][language] %>')
 				setTimeout(_ => notification.remove(), 4000)
 				return results
 			}).catch(err => { if (err) throw (err) })
-		}
-		const pads = await compilePads()
-		if (fls) {
-			pads.forEach((d, i) => {
-				// EDIT IMG src
-				d.media.filter(c => c.type === 'img').forEach(c => {
-					c.src = fls.find(b => c.src.includes(b.originalname)).src
+
+			if (files?.length) {
+				pads.forEach(d => {
+					d.sections.forEach(c => {
+						c.items.forEach(b => {
+							if (b.type === 'img') b.src = files.find(a => b.src.includes(a.originalname))?.src
+							if (b.type === 'mosaic') {
+								b.srcs = b.srcs.map(a => {
+									return files.find(z => a.includes(z.originalname))?.src
+								})
+							}
+						})
+					})
 				})
-				// EDIT MOSAIC srcs
-				d.media.filter(c => c.type === 'mosaic').forEach(c => {
-					c.srcs = c.srcs.map(b => fls.find(a => b.includes(a.originalname)).src)
-				})
-			})
-		}
-		const template = compileTemplates()
-		const results = await POST('/storeImport', { pads: pads, template: template })
-		window.location.href = `/${lang}/browse/private`
+			}
+		} else console.log('no images to upload')
+
+		// 3) SAVE PADS
+		pads.forEach(d => d.sections = JSON.stringify(d.sections))
+		const results = await POST('/storeImport', { pads, template, mobilization })
+		window.location.href = `/<%- locals.metadata.page.language %>/browse/pads/private`
+
 		return false
 	}
 	if (searchForm.node().attachEvent) searchForm.node().attachEvent('submit', catchSubmit)
 	else searchForm.node().addEventListener('submit', catchSubmit)
-
-	// window.addEventListener('keyup', function (e) {
-	// 	e = e || event
-	// 	if (e.key === 'Escape' || e.keyCode === 27) {
-	// 		if (d3.selectAll('.modal').size()) {
-	// 			// d3.selectAll('.modal').remove()
-	// 			// previewing = false
-	// 		}
-	// 	}
-	// })
 </script>
 </body>
 </html>

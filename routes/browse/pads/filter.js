@@ -1,81 +1,144 @@
-const DB = require('../../../db-config.js')
-const format = require('../../formatting.js')
+const { DB, engagementtypes, metafields } = include('config')
+const { checklanguage, datastructures, parsers } = include('routes/helpers')
 
-exports.main = req => {
-	const { uuid, country, rights } = req.session || {}
-	const { space } = req.params || {}
-	let { pads, search, contributors, countries, templates, mobilizations, methods, datasources, sdgs, thematic_areas, page } = req.query || {} //&& Object.keys(req.query).length ? req.query : req.body && Object.keys(req.body).length ? req.body : {}
-	const sudo = rights > 2
-	
+exports.main = async (req, res) => {
+	if (req.session.uuid) { // USER IS LOGGED IN
+		var { uuid, country, rights, collaborators } = req.session || {}
+	} else { // PUBLIC/ NO SESSION
+		var { uuid, country, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
+	}
+
+	let { space, instance } = req.params || {}
+	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	const language = checklanguage(req.params?.language || req.session.language)
+
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
 	else page = +page
 
-
-	// search 
-	// AND
-	// contributors OR templates OR mobilizations
-	// AND
-	// methods OR data sources OR thematic areas OR sdgs
-
-	// const q_search = search ? search.trim().toLowerCase().split(' or ').map(d => d.split(' ')) : null
+	let collaborators_ids = collaborators.filter(d => d.rights > 0).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
 	
-	// const q_contributors = contributors ? contributors.map(d => +d) : null
-	// const q_templates = templates ? templates.map(d => +d) : null
-	// const q_mobilizations = mobilizations ? mobilizations.map(d => +d) : null
+	if (instance) {
+		const { instance_vars } = res.locals
+		if (!instance_vars) {
+			const vars = await DB.general.tx(t => {
+				return t.oneOrNone(`
+					SELECT iso3, name FROM country_names
+					WHERE (iso3 = $1
+						OR LOWER(name) = LOWER($1))
+						AND language = $2
+					LIMIT 1
+				;`, [ decodeURI(instance), language ]) // CHECK WHETHER THE instance IS A COUNTRY
+				.then(result => {
+					if (!result) {
+						return t.oneOrNone(`
+							SELECT id, name FROM teams
+							WHERE LOWER(name) = LOWER($1)
+							LIMIT 1
+						;`, [ decodeURI(instance) ]) // CHECK WHETHER THE instance IS A TEAM: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
+						.then(result => {
+							if (!result) {
+								return DB.conn.oneOrNone(`
+									SELECT id, title FROM pinboards
+									WHERE LOWER(title) = LOWER($1)
+										AND status >= 2
+									LIMIT 1
+								;`, [ decodeURI(instance) ])  // CHECK WHETHER THE instance IS A PINBOARD: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
+								.then(result => {
+									if (result) return { object: 'pads', space: 'pinned', pinboard: result?.id, title: result?.title }
+									else return res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
+								}).catch(err => console.log(err))
+							} else return { object: 'pads', space: 'public', teams: [result?.id], title: result?.name }
+						}).catch(err => console.log(err))
+					} else return { object: 'pads', space: 'public', countries: [result?.iso3], title: result?.name }
+				}).catch(err => console.log(err))
+			}).catch(err => console.log(err))
 
-	// const q_sdgs = sdgs ? sdgs.map(d => +d) : null
-	// const q_thematic_areas = thematic_areas ? thematic_areas.map(d => +d) : null
-	// const q_methods = methods ? methods.map(d => +d) : null
-	// const q_datasources = datasources ? datasources.map(d => +d) : null
-	
+			space = vars.space
+			pinboard = vars.pinboard
+			teams = vars.teams
+			countries = vars.countries
+			// MAKE SURE THE object AND space ARE SET
+			res.locals.instance_vars = vars
+		} else {
+			space = instance_vars.space
+			pinboard = instance_vars.pinboard
+			teams = instance_vars.teams
+			countries = instance_vars.countries
+		}
+	}
+
 
 	// FILTERS
-	const f_pads = pads ? DB.pgp.as.format(`p.id IN ($1:csv)`, [pads]) : null
+	return new Promise(async resolve => {
+		// BASE FILTERS
+		const base_filters = []
+		if (search) base_filters.push(DB.pgp.as.format(`AND p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
+		if (status) base_filters.push(DB.pgp.as.format(`AND p.status IN ($1:csv)`, [ status ]))
 
-	const f_search = search ? DB.pgp.as.format(`(p.full_text ~* $1)`, [format.regexQuery(search.trim().toLowerCase().split(' or ').map(d => d.split(' ')))]) : null
-	
-	const f_contributors = contributors ? DB.pgp.as.format(`p.contributor IN ($1:csv)`, [contributors]) : null
-	const f_countries = countries ? DB.pgp.as.format(`p.contributor IN (SELECT c.id FROM contributors c INNER JOIN centerpoints cp ON c.country = cp.country WHERE cp.id IN ($1:csv))`, [countries]) : null
-	const f_templates = templates ? DB.pgp.as.format(`p.template IN ($1:csv)`, [templates]) : null
-	const f_mobilizations = mobilizations ? DB.pgp.as.format(`mob.mobilization IN ($1:csv)`, [mobilizations]) : null
+		let f_space = null
+		if (space === 'private') f_space = DB.pgp.as.format(`AND p.owner IN ($1:csv)`, [ collaborators_ids ])
+		engagementtypes.forEach(e => {
+			if (space === `${e}s`) f_space = DB.pgp.as.format(`AND p.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'pad' AND type = $2)`, [ uuid, e ])
+		})
+		if (space === 'curated') f_space = DB.pgp.as.format(`AND (p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
+		if (space === 'shared') f_space = DB.pgp.as.format(`AND p.status = 2`)
+		if (space === 'reviewing') f_space = DB.pgp.as.format(`
+			AND ((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) 
+				OR (p.owner IN ($1:csv)))
+			AND p.id IN (SELECT pad FROM review_requests)
+		`, [ collaborators_ids, rights ])
+		if (space === 'public' || !uuid) f_space = DB.pgp.as.format(`AND p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		if (space === 'pinned') {
+			if (uuid) f_space = DB.pgp.as.format(`AND (p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
+			else f_space = DB.pgp.as.format(`AND (p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
+		}
+		base_filters.push(f_space)
 
-	const f_methods = methods ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'skills' AND tag_id IN ($1:csv))`, [methods]) : null
-	const f_datasources = datasources ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'datasources' AND tag_id IN ($1:csv))`, [datasources]) : null
-	const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'tags' AND tag_id IN ($1:csv))`, [thematic_areas]) : null
-	const f_sdgs = sdgs ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND tag_id IN ($1:csv))`, [sdgs]) : null
-	
-	// PUBLIC/ PRIVATE FILTERS
-	let f_space = ''
-	if (space === 'private' && !sudo) 	f_space	= DB.pgp.as.format(`AND p.contributor IN (SELECT id FROM contributors WHERE country = $1)`, [country])
-	if (space === 'bookmarks') 			f_space	= DB.pgp.as.format(`AND p.id IN (SELECT pad FROM engagement_pads WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
-	if (space === 'public')	 			f_space = DB.pgp.as.format(`AND p.status = 2`)
-	// ORDER
-	// let 	order = DB.pgp.as.format(`ORDER BY p.status ASC, p.date DESC`)
-	let order = DB.pgp.as.format(`ORDER BY p.date DESC`)
+		// PLATFORM FILTERS
+		const platform_filters = []
+		if (pads) platform_filters.push(DB.pgp.as.format(`p.id IN ($1:csv)`, [ pads ]))
+		if (contributors) platform_filters.push(DB.pgp.as.format(`p.owner IN ($1:csv)`, [ contributors ]))
+		if (countries) {
+			platform_filters.push(await DB.general.any(`
+				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
+			;`, [ countries ])
+			.then(results =>  DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.catch(err => console.log(err)))
+			// platform_filters.push(f_countries)
+		}
+		if (teams) {
+			platform_filters.push(await DB.general.any(`
+				SELECT member FROM team_members WHERE team IN ($1:csv)
+			;`, [ teams ])
+			.then(results =>  DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.catch(err => console.log(err)))
+		}
+		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
+		if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
+		if (pinboard) platform_filters.push(DB.pgp.as.format(`
+				(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
+				OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
+			`, [ pinboard ]))
+		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
+		// if (sources) platform_filters.push(DB.pgp.as.format(`AND p.source IS NULL`))
 
-	// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
-	const f_sources = DB.pgp.as.format(`AND p.source IS NULL`)
+		// CONTENT FILTERS
+		const content_filters = []
+		metafields.forEach(d => {
+			if (Object.keys(req.query).includes(d.label)) {
+				if (['tag', 'index'].includes(d.type)) {
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, req.query[d.label] ]))
+				}
+			}
+		})
 
-	const platform_filters = [f_contributors, f_countries, f_templates, f_mobilizations].filter(d => d).join(' OR ')
-	const content_filters = [f_methods, f_datasources, f_thematic_areas, f_sdgs].filter(d => d).join(' OR ')
-	const display_filters = []
+		// ORDER
+		const order = DB.pgp.as.format(`ORDER BY p.date DESC`)
 
-	let filters = ''
-	if (f_pads) {
-		filters += f_pads
-		if (f_search || platform_filters !== '' || (platform_filters === '' && content_filters !== '')) filters += ' AND '
-	}
-	if (f_search) {
-		filters += f_search
-		if (platform_filters !== '' || (platform_filters === '' && content_filters !== '')) filters += ' AND '
-	}
-	if (platform_filters !== '') {
-		filters += `(${platform_filters})`
-		if (content_filters !== '') filters += ' AND '
-	}
-	if (content_filters !== '') filters += `(${content_filters})`
-	if (filters.length) filters = `AND ${filters}`
-
-	return [ f_space, order, page, filters ]
+		let filters = [ base_filters.filter(d => d).join(' '), platform_filters.filter(d => d).join(' OR '), content_filters.filter(d => d).join(' OR ') ].filter(d => d).join(' AND ').trim()
+		if (filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
+		resolve([ f_space, order, page, filters ])
+	})
 }

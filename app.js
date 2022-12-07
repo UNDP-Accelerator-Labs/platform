@@ -1,4 +1,7 @@
-const DB = require('./db-config.js')
+// INSPIRED BY https://coderwall.com/p/th6ssq/absolute-paths-require
+global.include = path => require(`${__dirname}/${path}`)
+
+const { app_title_short, app_suite, DB } = include('config')
 const express = require('express')
 const path = require('path')
 const bodyparser = require('body-parser')
@@ -19,15 +22,14 @@ app.use('/scripts', express.static(path.join(__dirname, './node_modules')))
 app.use(bodyparser.json({ limit: '50mb' }))
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 
-
-
 if (process.env.NODE_ENV === 'production') {
 	app.set('trust proxy', 1) // trust first proxy
 }
 
 app.use(session({ 
-	name: 'uid',
-	secret: 'acclabspadspass',
+	name: `${app_title_short}-session`,
+	// secret: 'acclabspadspass',
+	secret: `${app_suite}-${app_title_short}-pass`,
 	store: new pgSession({ pgPromise: DB.conn }),
 	resave: false,
 	saveUninitialized: false,
@@ -41,50 +43,66 @@ app.use(session({
 
 const routes = require('./routes')
 
-app.get('/', routes.redirect.home, routes.render.login)
+// app.get('/', routes.redirect.home, routes.render.login)
+
+app.get('/', routes.redirect.home, routes.redirect.public)
+
+// PUBLIC VIEWS
+app.get('/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
+app.get('/:language/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
+
 app.route('/login')
 	.get(routes.redirect.home, routes.render.login)
 	.post(routes.process.login)
 app.get('/logout', routes.process.logout)
 
-app.route('/:lang/contribute/:object')
+app.route('/:language/contribute/:object')
 	.get(routes.render.login, routes.dispatch.contribute)
-	.post(routes.process.login, routes.dispatch.contribute)
-app.route('/:lang/edit/:object')
+app.route('/:language/edit/:object')
 	.get(routes.render.login, routes.dispatch.edit)
-	.post(routes.process.login, routes.dispatch.edit)
-app.route('/:lang/view/:object')
+app.route('/:language/view/:object')
 	.get(routes.render.login, routes.dispatch.view)
-	.post(routes.process.login, routes.dispatch.view)
+app.route('/:language/import/:object')
+	.get(routes.render.login, routes.dispatch.import)
+app.route('/:language/mobilize/:object')
+	.get(routes.render.login, routes.dispatch.mobilize)
 
-app.post('/:lang/preview/:object', routes.dispatch.preview)
-app.get('/:lang/analyse/:object', routes.dispatch.analyse)
-
-app.route('/:lang/browse/:object/:space')
+app.route('/:language/browse/:object/:space')
 	.get(routes.render.login, routes.dispatch.browse)
+	.post(routes.render.login, routes.dispatch.browse)
+
+app.get('/:language/analyse/:object', routes.dispatch.analyse)
+
+app.post('/check/:object', routes.process.check)
 
 app.post('/save/:object', routes.process.save)
 app.post('/generate/:format', routes.process.generate)
+app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
+app.post('/comment', routes.process.comment)
 app.post('/validate', routes.process.validate)
 
-app.get('/publish/:object', routes.process.publish)
+app.route('/publish/:object')
+	.get(routes.process.publish)
+	.post(routes.process.publish)
+app.get('/unpublish/:object', routes.process.unpublish)
 app.get('/forward/:object', routes.process.forward)
 app.get('/delete/:object', routes.process.delete)
 app.post('/download/:object', routes.process.download)
+app.route('/request/:object')
+	.get(routes.process.request)
+	.post(routes.process.request)
+app.get('/accept/:object', routes.process.accept)
+app.get('/decline/:object', routes.process.decline)
 
-// app.route('/:lang/mobilize/:space') // THIS SHOULD BE DEPRECATED
-// 	.get(routes.render.login, routes.dispatch.mobilize)
-// 	.post(routes.dispatch.mobilize)
 
-app.post('/deploy', routes.process.deploy)
-app.get('/demobilize', routes.process.demobilize)
+// app.post('/deploy', routes.process.deploy)
+// app.get('/demobilize', routes.process.demobilize)
 
 // app.post('/intercept/:method', routes.process.intercept)
 app.post('/call/api', routes.process.callapi)
 
-// TO DO: CHECK IF THIS IS STILL RELEVANT
-app.post('/:lang/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
+// app.post('/:language/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
 
 
 app.post('/upload/img', upload.array('img'), routes.process.upload)
@@ -94,30 +112,23 @@ app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
 app.post('/screenshot', routes.process.screenshot)
 
 
-// THIS IS DEPRECATED
-app.post('/storeImport', routes.render.login, routes.storeImport)
-app.post('/forwardGeocoding', routes.forwardGeocoding) // TO DO: SET THIS UP IN PAD
+// TO DO: UPDATE SCHEMA BELOW
+app.post('/storeImport', routes.render.login, routes.storeImport) // UPDATE DO save/import
+app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forward
 
 
 // API
-app.get('/api/skills', routes.api.skills)
-app.get('/api/methods', routes.api.methods)
+app.get('/api/skills', routes.api.skills) // TO DO: THIS SHOULD BE DEPRECATED
+app.get('/api/methods', routes.api.methods) // TO DO: THIS SHOULD BE DEPRECATED
 app.route('/api/datasources')
 	.get(routes.api.datasources)
 	.post(routes.api.datasources)
 
+// INSTANCES
+app.route('/:language/:instance')
+	.get(routes.render.login, routes.dispatch.browse)
 
-
-Array.prototype.flat = function () {
-	return [].concat.apply([], this)
-}
-Array.prototype.diff = function (V2) {
-	const diff = []
-	this.forEach(d => { if (!V2.includes(d)) diff.push(d) })
-	V2.forEach(d => { if (!this.includes(d)) diff.push(d) })
-	return diff
-}
 
 app.get('*', routes.notfound)
 
-app.listen(process.env.PORT || 2000, _ => console.log(`the app is running on port ${process.env.PORT}`))
+app.listen(process.env.PORT || 2000, _ => console.log(`the app is running on port ${process.env.PORT || 2000}`))

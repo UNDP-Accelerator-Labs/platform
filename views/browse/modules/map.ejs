@@ -1,0 +1,223 @@
+<% 
+	// CREATE ALIASES
+	const space = locals.metadata.page.space
+
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && !locals.pinboard?.editable && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
+%>
+
+<div class='map-container<% if (mapscale !== "full-screen") { %> lg<% } %> <%- mapscale %>'>
+	<div id='map'>
+	</div>
+	<!-- <% if (locals.session_data?.logged) { %>
+		<div class='btn-group'>
+			<a class='mtype <% if (locals.mtype === "locations") { %>active<% } %>' data-type='locations'><%- capitalize(vocabulary['location'][locals.lang](true)) %></a>
+			<a class='mtype <% if (locals.mtype === "labs") { %>active<% } %>' data-type='labs'><%- capitalize(vocabulary['lab'][locals.lang](true)) %></a>
+		</div>
+	<% } %> -->
+	<% if (
+		!(space === 'pinned' 
+		&& !locals.pinboard?.editable)
+	) { %>
+		<div class='btn-group map-scale lg'>
+			<a class='mscale'>
+				<i class='material-icons'>
+					<% if (mapscale === 'contain') { %>
+						open_in_full
+					<% } else { %>
+						close_fullscreen
+					<% } %>
+				</i>
+			</a>
+		</div>
+	<% } %>
+</div>
+
+<script type='text/javascript'>
+
+const centerpoint = <%- JSON.stringify(locals.metadata.user?.country?.lnglat || null) %>;
+const clusters = <%- JSON.stringify(locals.clusters || []) %>;
+console.log(clusters)
+// THE LEAFLET CODE
+// const drawMap = window.matchMedia("(min-width: 576px)").matches || clusters.length || data.map(d => d.location).filter(d => d).length
+// const drawMap = window.matchMedia("(min-width: 576px)").matches
+const drawMap = true
+
+if (drawMap) {
+	const map = L.map('map', { boxZoom: false, minZoom: 2 })
+
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+		maxZoom: 19,
+	}).addTo(map)
+
+	if (!clusters.length) {
+		if (!centerpoint) map.fitWorld()
+		else map.setView([centerpoint.lat, centerpoint.lng], 2)
+	} else {
+		d3.select('.map-container').classed('hide', false)
+
+		const singlepin = L.divIcon({
+			className: 'single-pin',
+			iconAnchor: [0, 24],
+			labelAnchor: [-6, 0],
+			popupAnchor: [0, -36],
+			html: '<i class="material-icons">place</i>'
+		})
+
+		clusters.forEach(d => {
+		// const markers = clusters.map(d => {
+			const markerScale = d3.scaleLinear()
+				.domain([1, d3.max(d, c => c.properties.count)])
+				.range([10, 50])
+			
+			d.markers = d.map(c => {
+				const clusterpin = L.divIcon({
+					className: 'cluster-pin',
+					iconSize: markerScale(c.properties.count),
+					popupAnchor: [0, -markerScale(c.properties.count)],
+					html: `${c.properties.count}`
+				})
+				const marker = L.marker([c.geometry.coordinates[1], c.geometry.coordinates[0]], { icon: clusterpin })
+					.on('click', function () {
+						// if (c.properties.count > 1) return window.location = `?pads=${c.properties.pads.join('&pads=')}`
+						// else return loadPopup(this._popup, c.properties.pads[0])
+						return loadPopup(this._popup, c.properties.pads)
+					})
+				// if (c.properties.count === 1) 
+				marker.bindPopup()
+				return marker
+			})
+		})
+
+		async function loadPopup (popup, ids) {
+			// let { data } = await POST('/<%- locals.lang %>/explore/pads', { pads: [id] })
+			let { data } = await POST('/<%- locals.metadata.page.language %>/browse/pads/<%- space %>', { pads: ids })
+			// data = data[0]
+			console.log(data)
+
+			const section = document.createElement('section')
+			section.classList.add('container')
+			const body = d3.select(section)
+				.addElems('div', 'layout')
+			.addElems('article', null, data)
+				.each(function (d) {
+					d3.select(this).classed(`status-${d.status}`, true)
+				}).addElems('div', 'inner')
+				.addElems('div', 'body')
+
+			// IMAGE
+			body.addElems('div', 'media media-img')
+				.addElems('a', 'pad-link', d => d.img)
+			.addElems('img', 'vignette')
+				.attrs({
+					'src': d => d,
+					'alt': vocabulary['missing image']['<%- locals.lang %>']
+				})
+
+			// SDGs
+			const sdgs = body.addElems('div', 'meta row-1')
+				.addElems('div', 'meta meta-sdgs', d => d.sdgs)
+			sdgs.addElems('span')
+				.html(d => `${vocabulary['sdg']['<%- locals.metadata.page.language %>']((d?.length || 0) > 1)}:`)
+			sdgs.addElems('a', 'sdg-link', d => d)
+				.attr('href', d => `?sdgs=${d.key || d}`)
+				.html(d => d.key || d) // THIS IS LEGACY FOR ACTION PLANS PLATFORM
+			// TAGS
+			body.addElems('div', 'meta meta-tags', d => d.tags)
+				.addElems('a', 'tag-link', d => d)
+				.attr('href', d => `?tags=${d}`)
+			.addElems('div', 'tag')
+				.addElems('label')
+				.attr('title', d => d)
+				.html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
+			// TITLE
+			body.addElems('div', 'media media-title', d => d.title ? [d.title] : [])
+				.addElems('a', 'pad-link')
+				.attr('href', d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`)
+				.html(d => {
+					if (d === null || d === undefined || d === '') return `[${vocabulary['untitled pad']['<%- locals.lang %>']}]`
+					else return d
+				})
+			// CONTRIBUTOR INFO
+			body.addElems('div', 'meta meta-contributor')
+				// .html(d => vocabulary['credit']?.['<%- locals.metadata.page.language %>'](d.contributor, d.contributorname, 'contributors')) // TO DO: UPDATE THIS TO MATCH NEW CREDIT STRUCTURE
+				// .html('credit')
+			// section.appendChild(body.node())
+
+			console.log(section)
+
+			popup.setContent(section)
+		}
+
+		// const locations = clusters.last().markers
+		// (<%- JSON.stringify(locals.locations || []) %>).map(d => {
+		// 	let centerpoints = d.location?.centerpoints || [d.location?.centerpoint] || []
+		// 	centerpoints = centerpoints.filter(c => c?.lat && c?.lng)
+		// 	return centerpoints.map(c => {
+		// 		return L.marker([c.lat, c.lng], { icon: singlepin })
+		// 			// .on('click', _ => window.location = `?pads=${c.id}`)
+		// 			.on('click', function () { loadPopup(this._popup, c.id) })
+		// 			.bindPopup()
+		// 	})
+		// }).flat()
+
+		let group
+		let bounds = L.featureGroup(clusters.last().markers)
+
+		if (Math.max(...clusters.map(d => d.length)) > 1) map.fitBounds(bounds.getBounds(), { padding: [15, 15] })
+		else map.setView([centerpoint.lat, centerpoint.lng], 2)
+		
+		function setZoomLayer (map, group, clusters) {
+			const currentZoom = map.getZoom()
+			if (group) map.removeLayer(group)
+			
+			if (currentZoom < 4) group = L.featureGroup(clusters[0].markers)
+			// else if (currentZoom < 6) group = L.featureGroup(clusters[1].markers)
+			else group = L.featureGroup(clusters.last().markers)
+			
+			group.addTo(map)
+
+			return group
+		}
+		group = setZoomLayer(map, group, clusters)
+
+		// ONLY CHANGE CLUSTERS IF THERE ARE DIFFERENT CLUSTER LEVELS IN THE DATA
+		if (clusters.length > 1) {
+			map.on('zoomend', _ => { group = setZoomLayer(map, group, clusters) })
+		}
+		
+		d3.select('.map-container')
+			.call(multiSelection, { class: '.leaflet-marker-icon', constraint: evt => evt.ctrlKey || evt.metaKey })
+		.on('mousedown', _ => {
+			const evt = d3.event
+			if (evt.ctrlKey || evt.metaKey) map.dragging.disable()
+		})
+		.on('mouseup', _ => {
+			map.dragging.enable()
+		})
+
+		// SWITCH MAP TYPE: THIS IS NOT USED FOR NOW // TO DO
+		d3.selectAll('.map-container a.mtype').each(function () {
+			const sel = d3.select(this)
+			const url = new URL(window.location)
+			const queryparams = new URLSearchParams(url.search)
+			queryparams.set('mtype', sel.attr('data-type'))
+			sel.attr('href', `?${queryparams.toString()}`)
+		})
+		// SWITCH MAP SIZE
+		d3.select('.map-container a.mscale')
+		.attr('href', function () {
+			const url = new URL(window.location)
+			const queryparams = new URLSearchParams(url.search)
+			<% if (mapscale === 'contain') { %>queryparams.set('mscale', 'full-screen')
+			<% } else { %>queryparams.set('mscale', 'contain')<% } %>
+			return `?${queryparams.toString()}`
+		})
+	}
+}
+</script>

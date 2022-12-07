@@ -1,142 +1,257 @@
 <!DOCTYPE html>
-<html lang='<%- locals.lang %>'>
+<%
+	// CREATE ALIASES
+	const uuid = locals.metadata.user.uuid
+	const languages = locals.metadata.site.languages
+	const language = locals.metadata.page.language
+%>
+<html lang='<%- language %>'>
 <head>
 
 	<%- include ('partials/head.ejs') %>
-	<script type='text/javascript' src='/js/template.js'></script>
 
 </head>
 
-
 <body>
 
-<%- include ('partials/navigate.ejs') %>
+<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
+
+<!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
+<header>
+	<div class='inner'>
+		<%- include ('partials/menu-logo.ejs') %> 
+	</div>
+</header>
 
 <main id='mobilize-new'>
 	<!-- FIRST MODAL: TITLE -->
-	<form action='/deploy' method='POST'>
-		<div class='modal m-1'>
-			<div class='inner'>
-				<div class='body'>
-					<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onblur='fixLabel(this); enableNext(this)'>
-					<label class='placeholder' for='title'>Provide a title for the mobilization</label>
-				</div>
-				<div class='foot'>
-					<button type='button' disabled onclick='<% if (locals.metadata.page?.query?.copy?.[0] === "true") { %>advanceTo(3)<% } else { %>advanceTo(2)<% } %>'>
-						<label>Next</label>
-						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
-					</button>
-				</div>
-			</div>
-		</div>
-		<!-- SECOND MODAL: TEMPLATE -->
-		<% if (locals.metadata.page?.query?.copy?.[0] === "true") { %>
+	<form action='/publish/mobilizations' method='POST'>
+		<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
 		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
 		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
 			<input type='hidden' name='template' value='<%- locals.templates.id %>'>
 			<input type='hidden' name='copy' value='true'>
-		<% } else { %>
-			<div class='modal m-2 hide'>
-				<button type='button' class='back' onclick='advanceTo(1)'>
-					<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
-					<label>Back</label>
-				</button>
+		<% } %>
+		<% if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>
+		<!-- THE NEW MOBILIZATION IS A CHILD -->
+			<input type='hidden' name='child' value='true'>
+		<% } %>
+
+		<div class='modal m-1'>
+			<div class='inner'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.title) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back' disabled>
+							<label><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.title) { %>disabled<% } %>>
+							<label><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+				<div class='body'>
+					<h1><%- vocabulary['name campaign'][language] %></h1>
+					<div class='input'>
+						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language](false, true) %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } %>>
+						<label class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
+					</div>
+				</div>
+				<div class='foot'>
+					<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+					<label for='public-status'></label>
+					<p><%- vocabulary['public mobilization'][language] %></p>
+				</div>
+			</div>
+		</div>
+		<!-- SECOND MODAL: LANGUAGE -->
+		<div class='modal m-2 hide'>
+			<!-- DROPDOWN FOR LANGUAGE: TO DO: ONLY FOR PUBLIC MOBILIZATIONS -->
+			<div class='inner'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.language) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back' onclick='prev(this)'>
+							<label><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.language) { %>disabled<% } %>>
+							<label><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+				<div class='body'>
+					<h1><%- vocabulary['select campaign language'][language] %></h1>
+					<div class='filter'>
+						<input type='text' id='language' onblur='fixLabel(this)'>
+						<label for='language'><%- vocabulary['search'][language]() %></label>
+
+						<menu>
+							<% languages.forEach(c => { %>
+								<li <% if (locals.sourceinfo?.language === c.language) { %>class='checked'<% } %>>
+									<div class='hide'>
+										<input type='radio' id='c-<%- c.language %>' name='language' value='<%- c.language %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo?.language === c.language) { %>checked<% } %>>
+									</div>
+									<div class='main grow'>
+										<label for='c-<%- c.language %>'><%- c.name %></label>
+									</div>
+									<!-- TO DO: TRANSLATE LANGUAGE NAMES (e.g. FRENCH TO FRANÇAIS) -->
+								</li>
+							<% }) %>
+						</menu>
+					</div>
+				</div>
+				<div class='foot'>
+				</div>
+			</div>
+		</div>
+		<!-- THIRD MODAL: DESCRIPTION -->
+		<div class='modal m-3 hide'>
+			<div class='inner'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.description) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back' onclick='prev(this)'>
+							<label><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.description) { %>disabled<% } %>>
+							<label><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+				<div class='body'>
+					<h1><%- vocabulary['state objectives'][language] %></h1>
+					<div class='input'>
+						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%= locals.sourceinfo?.description %></textarea>
+						<label class='placeholder' for='description'><%- vocabulary['describe intent'][language] %></label>
+					</div>
+					<script type='text/javascript'>
+						function adjustarea(node) { 
+							node.style.height = `${ node.scrollHeight - 30 }px` // WE HAVE A 2x10px PADDING IN THE CSS
+							const submit = d3.select(node.parentNode).select('button[type=submit]').node()
+							d3.select(node).findAncestor('modal').select('.head button.next').node().disabled = node.value.trim().length === 0 
+						}
+						d3.selectAll('textarea').each(function () { 
+							adjustarea(this) 
+							fixLabel(this)
+						})
+					</script>
+				</div>
+				<div class='foot'>
+				</div>
+			</div>
+		</div>
+		<!-- THIRD MODAL: TEMPLATE -->
+		<% if (!locals.metadata.page?.query?.copy?.some(d => d === "true")) { %>
+			<div class='modal m-4 hide'>
 				<div class='inner'>
-					<div class='head'>
-						<div class='title'>
-							<i class='material-icons'>keyboard_arrow_right</i>
-							Templates <!-- TO DO: TRANSLATION -->
+					<div class='head meta-status status-0'>
+						<div class='btn-group'>
+							<button type='button' class='back' onclick='prev(this)'>
+								<label><%- vocabulary['back'][language] %></label>
+							</button>
+							<button type='submit' class='next public hide' disabled>
+								<label><%- vocabulary['launch'][language] %></label>
+							</button>
+							<button type='button' class='next private' onclick='next(this)' disabled>
+								<label><%- vocabulary['next'][language] %></label>
+							</button>
 						</div>
 					</div>
 					<div class='body'>
-						<ul class='opts'>
-							<% locals.templates.forEach(t => { %>
-								<li class='opt'>
-									<div class='hide'>
-										<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>' onchange='toggleChecked(this); enableNext(this)'>
-									</div>
-									<div class='preview' onclick='previewTemplate(<%- t.id %>)' title='Preview template.'>
-										<i class='material-icons'>visibility</i>
-									</div>
-									<div class='grow'>
-										<label for='t-<%- t.id %>'><%- t.title %></label>
-									</div>
-									<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
-								</li>
-							<% }) %>
-						</ul>
+						<h1><%- vocabulary['select template'][language] %></h1>
+						<div class='filter'>
+							<input type='text' id='templates' onblur='fixLabel(this)'>
+							<label for='templates'><%- vocabulary['search'][language]() %></label>
+
+							<menu>
+								<% locals.templates.forEach(t => { %>
+									<li class='status-<%- t.status %>'>
+										<div class='hide'>
+											<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>' onchange='toggleChecked(this); enableNext(this)'>
+										</div>
+										<div class='preview' title='Preview template.'>
+											<a href='../view/template?id=<%- t.id %>' target='_blank'><i class='material-icons'>visibility</i></a>
+										</div>
+										<div class='main'>
+											<label for='t-<%- t.id %>'><%- t.title || `[${vocabulary["untitled template"][language]}]` %></label>
+										</div>
+										<div class='grow position'>
+											<% if (t.owner !== uuid) { %>
+												<label for='t-<%- t.id %>'><%- vocabulary['created by'][language](t.ownername) %></label>
+											<% } %>
+										</div>
+										<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
+									</li>
+								<% }) %>
+							</menu>
+						</div>
 					</div>
 					<div class='foot'>
-						<button type='button' disabled onclick='advanceTo(3)'>
-							<label>Next</label>
-							<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
-						</button>
 					</div>
 				</div>
 			</div>
 		<% } %>
 		<!-- THIRD MODAL: COHORT -->
-		<div class='modal m-3 hide'>
-			<button type='button' class='back' onclick='<% if (locals.metadata.page?.query?.copy?.[0] === "true") { %>advanceTo(1)<% } else { %>advanceTo(2)<% } %>'>
-				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
-				<label>Back</label>
-			</button>
+		<div class='modal m-5 hide'>
 			<div class='inner'>
-				<div class='head'>
-					<div class='title'>
-						<i class='material-icons'>keyboard_arrow_right</i>
-						Cohort <!-- TO DO: TRANSLATION -->
-					</div>
-					<div class='contributor-count'>0 invited contributors</div><!-- TO DO: TRANSLATION -->
-					<div class='global-opt'>
-						<input type='checkbox' id='select-all' onchange='selectAllOpts(this); enableNext(this)'>
-						<label for='select-all'>Select all</label>
+				<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true"))) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back' onclick='prev(this)'>
+							<label><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== 'true'))) { %>disabled<% } %>>
+							<label><%- vocabulary['next'][language] %></label>
+						</button>
 					</div>
 				</div>
+
 				<div class='body'>
-					<ul class='opts'>
-						<% locals.cohort.forEach(c => { %>
-							<li class='opt'>
-								<div class='hide'>
-									<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)'>
-								</div>
-								<div><label for='c-<%- c.id %>'><%- c.name %></label></div>
-								<div class='grow count'><label for='c-<%- c.id %>'><%- c.position %></label></div>
-								<div class='count'><label for='c-<%- c.id %>'><%- c.country %></label></div>
-							</li>
-						<% }) %>
-					</ul>
+					<h1><%- vocabulary['invite contributors'][language] %></h1>
+					<div class='filter'>
+						<input type='text' id='contributors' onblur='fixLabel(this)'>
+						<label for='contributors'><%- vocabulary['search'][language](true) %></label>
+
+						<menu>
+							<% locals.cohort.forEach(c => { %>
+								<li class='<% if (locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true")) { %>checked<% } %>'>
+									<div class='hide'>
+										<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== 'true')) { %>checked<% } %>>
+									</div>
+									<div class='main'>
+										<label for='c-<%- c.id %>'><%- c.ownername %></label>
+									</div>
+									<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
+									<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
+								</li>
+							<% }) %>
+						</menu>
+					</div>
 				</div>
-				<div class='foot'>
-					<!-- <button type='submit' disabled>Deploy</button> -->
-					<button type='button' disabled onclick='advanceTo(4)'>
-						<label>Next</label>
-						<!-- <label>Next<i class='material-icons'>keyboard_arrow_right</i></label> -->
-					</button>
+				<div class='foot stretch'>
+					<div class='global-opt'>
+						<button type='button' onclick='selectAllOpts(this); enableNext(this)'><%- vocabulary['select all'][language] %></button>
+					</div>
+					<div class='contributor-count'><%- vocabulary['invited contributors'][language](0) %></div>
 				</div>
 			</div>
 		</div>
-		<div class='modal m-4 hide'>
-			<button type='button' class='back' onclick='advanceTo(3)'>
-				<!-- <i class='material-icons'>keyboard_arrow_left</i> -->
-				<label>Back</label>
-			</button>
+		<div class='modal m-6 hide'>
 			<div class='inner'>
-				<div class='head'>
-					<div class='title'>
-						Submissions limit <!-- TO DO: TRANSLATION -->
+				<div class='head meta-status status-1'>
+					<div class='btn-group'>
+						<button type='button' class='back' onclick='prev(this)'>
+							<label><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='submit' class='next'>
+							<label><%- vocabulary['launch'][language] %></label>
+						</button>
 					</div>
-					<!-- <div class='contributor-count'>0 invited contributors</div>
-					<div class='global-opt'>
-						<input type='checkbox' id='select-all' onchange='selectAllOpts(this); enableNext(this)'>
-						<label for='select-all'>Select all</label>
-					</div> -->
 				</div>
-				<div class='body'>
-					<input type='number' name='pad_limit' value=3 min=1 placeholder='Number of pads.'>
+
+				<div class='body center'>
+					<label for='pad-limit' class='inline'><%- vocabulary['limit to'][language] %></label>
+					<input id='pad-limit' type='number' name='pad_limit' value=3 min=1 placeholder='Number of pads.'>
+					<label for='pad-limit' class='inline small'><%- vocabulary['submissions per contributor'][language] %></label>
 				</div>
 				<div class='foot'>
-					<button type='submit'>Deploy</button>
 				</div>
 			</div>
 		</div>
@@ -144,16 +259,16 @@
 	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 </main>
 
+
 <footer>
 </footer>
 
 <script type='text/javascript'>
 	const activity = '<%- locals.metadata.page.activity %>';
-	const lang = '<%- locals.metadata.page.lang %>';
+	const lang = '<%- language %>';
 	const editing = false
 
 	// CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
-	const url = new URL(window.location)
 	const queryparams = new URLSearchParams(url.search)
 	const source = queryparams.get('id')
 
@@ -167,83 +282,83 @@
 			})
 	}
 
+	d3.selectAll('input[type=text]')
+	.each(function () { fixLabel(this) })
+
+	d3.selectAll('.filter input[type=text]')
+	.on('keyup', function () {
+		const node = this
+		const menu = d3.select(node).findAncestor('filter').select('menu')
+
+		menu.selectAll('li')
+			.classed('hide', function () {
+				return !this.textContent.trim().toLowerCase()
+				.includes(node.value.trim().toLowerCase())
+			})
+	})
+
 	
 	function preventSubmit (node, evt) {
 		if (evt.code === 'Enter' || evt.keyCode === 13) {
 			evt.preventDefault()
 			node.blur()
-			d3.select(node).findAncestor('modal').select('.foot button').node().click()
+			d3.select(node).findAncestor('modal').select('.head button.next').node().click()
 		}
 	}
 	function enableNext (node) {
 		const parent = d3.select(node).findAncestor('modal')
-		const button = parent.select('.foot button').node()
-		button.disabled = (node.type === 'text' && node.value.trim().length === 0)
-			|| (parent.selectAll('.opt').node() !== null && parent.selectAll('.opt.checked').size() === 0)
+		const button = parent.select('.head button.next:not(.hide)').node()
+		const disabled = ((node.nodeName === 'TEXTAREA' || node.type === 'text') && node.value.trim().length === 0)
+			|| (parent.selectAll('li').node() !== null && parent.selectAll('li.checked').size() === 0)
+		
+		if (button) button.disabled = disabled
+		parent.select('.head').classed('status-0', disabled)
+			.classed('status-1', !disabled)
 	}
-	function advanceTo (id) {
-		// d3.select('#mobilize-new').attr('class', `screen-${id}`)
-		d3.selectAll('.modal').classed('hide', true)
-		d3.select(`.modal.m-${id}`).classed('hide', false)
+	function next (node) {
+		const current = d3.select(node).findAncestor('modal')
+		const next = current.node().nextElementSibling
+		if (next.classList.contains('modal')) {
+			d3.selectAll('.modal').classed('hide', true)
+			d3.select(next).classed('hide', false)
+		}
+	}
+	function prev (node) {
+		const current = d3.select(node).findAncestor('modal')
+		const next = current.node().previousElementSibling
+		if (next.classList.contains('modal')) {
+			d3.selectAll('.modal').classed('hide', true)
+			d3.select(next).classed('hide', false)
+		}
+	}
+	function togglePublic (node) {
+		d3.selectAll('.public').classed('hide', !node.checked).each(function () { enableNext(this) })
+		d3.selectAll('.private').classed('hide', node.checked).each(function () { enableNext(this) })
+		d3.select('#pad-limit').node().value = node.checked ? 1000 : 3 // THIS IS AN ARBITRARY LARGE NUMBER
 	}
 	function toggleChecked (node) {
 		const parent = d3.select(node).findAncestor('modal')
-		parent.selectAll('.opt').classed('checked', function () { return d3.select(this).select('input').node().checked })
-		const count = parent.selectAll('.opt.checked').size()
-		parent.select('.contributor-count').html(`${count} invited contributor${count !== 1 ? 's' : ''}`) // TO DO: TRANSLATION
-	}
-	async function previewTemplate (id) { // THIS SHOULD BE REMOVED
-		const template = await POST(`/${lang}/preview/template`, { id: id })
-
-		const screen = d3.select('div.screen.ter').classed('hide', false)
-		const modal = screen.addElems('div', 'modal template-preview')
-		modal.addElems('button', 'close')
-		.on('click', function () {
-			modal.remove()
-			screen.classed('hide', true)
-		}).html('Close')
-
-		const main = modal.addElems('main', 'template')
-			.attr('id', 'template')
-		const inner = main.addElems('div', 'inner')
-		
-		if (template) {
-			const head = inner.addElems('div', 'head')
-			head.addElems('div', 'title')
-				.attr('data-placeholder', vocabulary['untitled template'][lang])
-			.html(template.title)
-
-			const body = inner.addElems('div', 'body')
-			const descriptionLayout = body.addElems('div', `description-layout layout ${activity}`)
-			descriptionLayout.addElems('div', 'input-type')
-				.addElems('label').html(vocabulary['description'][lang])
-			const mediaLayout = body.addElems('div', `media-layout layout ${activity}`)
-			mediaLayout.addElems('div', 'input-type')
-				.addElems('label').html(vocabulary['media'][lang])
-			const metaLayout = body.addElems('div', `meta-layout layout ${activity}`)
-			metaLayout.addElems('div', 'input-type')
-				.addElems('label').html(vocabulary['metadata'][lang])
-
-			head.select('.title').html(template.title)
-			descriptionLayout.addElems('div', 'media-container')
-				.addElems('div', 'media-txt')
-				.text(template.description || vocabulary["missing template description"][lang])
-			if (template.items) template.items.forEach(d => {
-				if (d.type === 'title') addTitle(d)
-				if (d.type === 'img') addImg(d)
-				if (d.type === 'txt') addTxt(d)
-				if (d.type === 'checklist') addChecklist(d)
-				if (d.type === 'location') addMap(d)
-				if (d.type === 'sdgs') addSDGs(d)
-				if (d.type === 'tags') addTags(d)
+		parent.selectAll('li')
+			.classed('checked', function () { return d3.select(this).select('input').node().checked })
+		// d3.select(node).findAncestor('li').moveToBack()
+		const count = parent.selectAll('li.checked').size()
+		parent.select('.contributor-count')
+			.html(_ => {
+				return Function("'use strict';return (<%- vocabulary['invited contributors'][language] %>)")()(count)
 			})
+		// IF THERE IS A FILTER MENU, CLEAR SEARCH TERM
+		if (parent.select('.filter input[type=text]').node()) {
+			parent.select('.filter input[type=text]').node().value = null
+			fixLabel(parent.select('.filter input[type=text]').node())
+			parent.selectAll('menu li').classed('hide', false)
 		}
 	}
 	function selectAllOpts (node) {
 		const parent = d3.select(node).findAncestor('modal')
-		parent.select('.global-opt').classed('active', node.checked)
-		parent.selectAll('.opt input[type=checkbox]').each(function () { 
-			this.checked = node.checked
+		parent.select('.global-opt').toggleClass('active')
+			.select('button').html(_ => parent.select('.global-opt').classed('active') ? '<%- vocabulary["deselect all"][language] %>' : '<%- vocabulary["select all"][language] %>')
+		parent.selectAll('li:not(.hide) input[type=checkbox]').each(function () { 
+			this.checked = parent.select('.global-opt').classed('active')
 			toggleChecked(this) 
 		})
 	}

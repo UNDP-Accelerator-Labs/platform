@@ -1,16 +1,17 @@
-const { modules } = require('../../config.js')
-// const { language } = require('../header/')
-// const DB = require('../../db-config.js')
+const { modules } = include('config')
 
-// const pad = require('./pad/')
-// const template = require('./template/')
-// const mobilizations = require('./mobilizations/') // TO DO
+const pad = require('./pad')
+const template = require('./template')
 
-exports.contribute = require('./contribute').main
-exports.edit = require('./edit').main
-exports.view = require('./view').main
-exports.save = require('./save').main
-exports.generate = require('./generate').main
-exports.publish = require('./publish').main
-exports.forward = require('./forward').main
-exports.delete = require('./delete').main
+exports.main = (req, res) => {
+	const { referer } = req.headers || {}
+	const { uuid, rights } = req.session || {}
+	const { object } = req.params || {}
+
+	if (modules.some(d => d.type === `${object}s`)) {
+		if (object === 'pad' && (rights >= modules.find(d => d.type === 'pads').rights.write || !uuid)) pad.main(req, res) // THE || uuid IS FOR PUBLIC ACCESS DURING MOBILIZATIONS
+		else if (object === 'template' && rights >= modules.find(d => d.type === 'templates').rights.write) template.main(req, res)
+		else if (object === 'review' && rights >= modules.find(d => d.type === 'reviews').rights.write) pad.main(req, res)
+		else res.redirect(referer)
+	} else res.redirect('/module-error')
+}

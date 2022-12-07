@@ -30,41 +30,380 @@
 			"es": "Explorar",
 			"pt": "Explorar"
 		},
-		"public": {
-			"en": "Pads from the network",
-			"fr": "Bloc-notes du réseau",
-			"es": "Libretas de la red",
-			"pt": "Blocos de notas da rede"
+		"cohort": {
+			"en": plural => { return plural ? "Cohorts" : "Cohort" },
+			"fr": plural => { return plural ? "Cohorte" : "Cohorts" },
+			"es": plural => { return plural ? "Cohorte" : "Cohortes" },
+			"pt": plural => { return plural ? "Coorte" : "Coortes" }
 		},
-		"public templates": {
-			"en": "Templates from the network",
-			"fr": "Gabarits du réseau",
-			"es": "Plantillas de la red",
-			"pt": "Modelos da rede"
+		
+
+
+		"space": {
+			"en": (object, space) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (space === 'private') return "My pads"
+					if (space === 'curated') return "Content curation"
+					if (space === 'pinned') return "My collections"
+					if (space === 'shared') return "Preprints"
+					if (space === 'reviewing') return "Under review"
+					if (space === 'public') return "Published pads"
+				} else if (['template', 'templates'].includes(object)) {
+					if (space === 'private') return "My templates"
+					if (space === 'curated') return "Content curation"
+					if (space === 'shared') return "Shared templates"
+					if (space === 'public') return "Published templates"
+					if (space === 'reviews') return "Review templates"
+				} else if (['file', 'files'].includes(object)) {
+					if (space === 'private') return "My files"
+					if (space === 'curated') return "Content curation"
+					if (space === 'shared') return "Shared files"
+					if (space === 'public') return "Published files"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (space === 'private') return "My reviews"
+					if (space === 'shared') return "Completed reviews"
+				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'ongoing') return "Ongoing campaigns"
+					if (space === 'past') return "Past campaigns"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (space === 'invited') return "Contributors"
+					if (space === 'pinned') return "My teams"
+				}
+			},
+			"fr": (object, space) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (space === 'private') return "Mes bloc-notes"
+					if (space === 'curated') return "Curation de contenu"
+					if (space === 'pinned') return "Mes collections"
+					if (space === 'shared') return "Prépublications"
+					if (space === 'reviewing') return "En cours de relecture"
+					if (space === 'public') return "Bloc-notes publiés"
+				} else if (['template', 'templates'].includes(object)) {
+					if (space === 'private') return "Mes gabarits"
+					if (space === 'curated') return "Curation de contenu"
+					if (space === 'shared') return "Gabarits partagés"
+					if (space === 'public') return "Gabarits publiés"
+					if (space === 'reviews') return "Gabarits pour relectures"
+				} else if (['file', 'files'].includes(object)) {
+					if (space === 'private') return "Mes fichiers"
+					if (space === 'curated') return "Curation de contenu"
+					if (space === 'shared') return "Fichiers partagés"
+					if (space === 'public') return "Fichiers publiés"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (space === 'private') return "Mes relectures"
+					if (space === 'shared') return "Relectures terminées"
+				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'ongoing') return "Campagnes en cours"
+					if (space === 'past') return "Campagnes passées"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (space === 'invited') return "Contributeurs"
+					if (space === 'pinned') return "Mes équipes"
+				}
+			},
+			"es": (object, space) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (space === 'private') return "Mis libretas"
+					if (space === 'curated') return "Curación de contenidos"
+					if (space === 'pinned') return "Mis colecciones"
+					if (space === 'shared') return "Prepublicaciones" 
+					if (space === 'reviewing') return "Bajo revisión"
+					if (space === 'public') return "Libretas publicadas"
+				} else if (['template', 'templates'].includes(object)) {
+					if (space === 'private') return "Mis plantillas"
+					if (space === 'curated') return "Curación de contenidos"
+					if (space === 'shared') return "Plantillas compartidas"
+					if (space === 'public') return "Plantillas publicadas"
+					if (space === 'reviews') return "Plantilla para reseñas"
+				} else if (['file', 'files'].includes(object)) {
+					if (space === 'private') return "Mis archivos"
+					if (space === 'curated') return "Curación de contenidos"
+					if (space === 'shared') return "Archivos compartidos"
+					if (space === 'public') return "Archivos publicados"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (space === 'private') return "Mis reseñas"
+					if (space === 'shared') return "Revisiones completadas"
+				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'ongoing') return "Campañas en curso"
+					if (space === 'past') return "Campañas pasadas"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (space === 'invited') return "Colaborador.e.a.s"
+					if (space === 'pinned') return "Mis equipos"
+				}
+			},
+			"pt": (object, space) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (space === 'private') return "Meus blocos de notas"
+					if (space === 'curated') return "Restauração de conteúdo"
+					if (space === 'pinned') return "Minhas coleções"
+					if (space === 'shared') return "Pré-publicações" 
+					if (space === 'reviewing') return "Sob revisão"
+					if (space === 'public') return "Blocos de notas publicados"
+				} else if (['template', 'templates'].includes(object)) {
+					if (space === 'private') return "Meus modelos"
+					if (space === 'curated') return "Restauração de conteúdo"
+					if (space === 'shared') return "Modelos compartilhados"
+					if (space === 'public') return "Modelos publicados"
+					if (space === 'reviews') return "Modelo para comentários"
+				} else if (['file', 'files'].includes(object)) {
+					if (space === 'private') return "Meus arquivos"
+					if (space === 'curated') return "Restauração de conteúdo"
+					if (space === 'shared') return "Arquivos compartilhados"
+					if (space === 'public') return "Arquivos publicados"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (space === 'private') return "Meus comentários"
+					if (space === 'shared') return "Revisões concluídas"
+				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'ongoing') return "Campanhas em andamento"
+					if (space === 'past') return "Campanhas anteriores"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (space === 'invited') return "Contribuidor.e.a.s"
+					if (space === 'pinned') return "Minhas equipes"
+				}
+			}
+			// "pt": (object, space) => {
+			// 	if (['pad', 'pads'].includes(object)) {
+			// 		if (space === 'private') return
+			// 		if (space === 'curated') return
+			// 		if (space === 'pinned') return
+			// 		if (space === 'shared') return 
+			// 		if (space === 'reviewing') return
+			// 		if (space === 'public') return
+			// 	} else if (['template', 'templates'].includes(object)) {
+			// 		if (space === 'private') return 
+			// 		if (space === 'curated') return
+			// 		if (space === 'shared') return
+			// 		if (space === 'reviews') return
+			// 	} else if (['file', 'files'].includes(object)) {
+			// 		if (space === 'private') return 
+			// 		if (space === 'curated') return
+			// 		if (space === 'shared') return
+			// 		if (space === 'public') return
+			// 	} else if (['review', 'reviews'].includes(object)) {
+			// 		if (space === 'private') return 
+			// 		if (space === 'shared') return
+			// 	} else if (['mobilization', 'mobilizations'].includes(object)) {
+			// 		if (space === 'ongoing') return
+			// 		if (space === 'past') return
+			// 	} else if (['contributor', 'contributors'].includes(object)) {
+			// 		if (space === 'invited') return
+			// 		if (space === 'pinned') return
+			// 	}
+			// }
 		},
+
+		"import pads": {
+			"en": "Import pads",
+			"fr": "Importer des bloc-notes",
+			"es": "Importar libretas",
+			"pt": "Importar blocos de notas"
+		},
+		"upload source file": {
+			"en": "<strong>Choose a .xlsx file</strong> or drag it here.",
+			"fr": "<strong>Choisissez un fichier .xlsx</strong> ou glissez-le ici.",
+			"es": "<strong>Elija un archivo .xlsx</strong> o arrástrelo aquí.",
+			"pt": "<strong>Escolha um arquivo .xlsx</strong> ou arraste-o aqui."
+		},
+		"chose file": {
+			"en": filetype => {
+				if (filetype === 'xlsx') return "Please choose a <strong>.xlsx file.</strong>"
+			},
+			"fr": filetype => {
+				if (filetype === 'xlsx') return "Veuillez choisir un fichier <strong>.xlsx.</strong>"
+			},
+			"es": filetype => {
+				if (filetype === 'xlsx') return "Elija un archivo <strong>.xlsx.</strong>"
+			},
+			"pt": filetype => {
+				if (filetype === 'xlsx') return "Escolha um arquivo <strong>.xlsx.</strong>"
+			}
+		},
+		"chose only one file": {
+			"en": filetype => {
+				if (filetype === 'xlsx') return "Please choose <strong>only one .xlsx file.</strong>"
+			},
+			"fr": filetype => {
+				if (filetype === 'xlsx') return "Veuillez choisir <strong>un seul fichier .xlsx.</strong>"
+			},
+			"es": filetype => {
+				if (filetype === 'xlsx') return "Elija <strong>solo un archivo .xlsx.</strong>"
+			},
+			"pt": filetype => {
+				if (filetype === 'xlsx') return "Escolha <strong>apenas um arquivo .xlsx.</strong>"
+			}
+		},
+		"import to workspace or mobilization": {
+			"en": "Choose a workspace or campaign to import pads to.",
+			"fr": "Choisissez un espace de travail ou une campagne vers laquelle importer les bloc-notes.",
+			"es": "Elija un espacio de trabajo o campañas para importar a las libretas.",
+			"pt": "Escolha um espaço de trabalho ou campanha para importar os blocos de notas."
+		},
+		"generated template": { // USED
+			"en": filename => `Template generated from the columns in “${filename}”.`,
+			"fr": filename => `Gabarit généré à partir des colonnes du fichier « ${filename} ».`,
+			"es": filename => `Plantilla generada a partir de columnas de archivo “${filename}”.`,
+			"pt": filename => `Modelo gerado a partir das colunas do arquivo “${filename}”.`
+		},
+		"import table description": {
+			"en": (rowcount, colcount, displayed) => `${rowcount} entries and ${colcount} columns (${rowcount} x ${colcount} table) were detected. ${displayed} entries are displayed.`,
+			"fr": (rowcount, colcount, displayed) => `${rowcount} entrées et ${colcount} colonnes (un tableau de ${rowcount} x ${colcount}) ont été détectées. ${displayed} entrées sont affichées.`,
+			"es": (rowcount, colcount, displayed) => `Se detectaron ${rowcount} entradas y ${colcount} columnas (una tabla de ${rowcount} x ${colcount}). Se muestran ${displayed} entradas.`,
+			"pt": (rowcount, colcount, displayed) => `${rowcount} entradas e ${colcount} colunas (uma tabela ${rowcount} x ${colcount}) foram detectadas. ${displayed} entradas são exibidas.`
+		},
+		"select destination": {
+			"en": "Select a destination",
+			"fr": "Choisissez une destination",
+			"es": "Seleccione un destino",
+			"pt": "Selecione um destino"
+		},
+		"import": {
+			"en": "Import",
+			"fr": "Importer",
+			"es": "Importar",
+			"pt": "Importar"
+		},
+		"image upload success": {
+			"en": "Image successfully uploaded.",
+			"fr": "Image téléchargée avec succès.",
+			"es": "Imagen cargada correctamente.",
+			"pt": "Imagem carregada com sucesso."
+		},
+		
+
+		"publish": { // USED
+			"en": "Publish",
+			"fr": "Publier",
+			"es": "Publicar",
+			"pt": "Publicar"
+		},
+		"publish all": {
+			"en": "Publish all",
+			"fr": "Tout publier",
+			"es": "Publicar todo",
+			"pt": "Publicar tudo"
+		},
+		"unpublish": { // USED
+			"en": "Retract",
+			"fr": "Rétracter",
+			"es": "Retraer",
+			"pt": "Retrair"
+		},
+		"submit": { // USED
+			"en": "Submit",
+			"fr": "Soumettre",
+			"es": "Entregar",
+			"pt": "Submeter"
+		},
+		"submit for review": { // USED
+			"en": "Submit for review",
+			"fr": "Soumettre pour relecture",
+			"es": "Enviar para revisión",
+			"pt": "Enviar para revisão"
+		},
+		"show template as slideshow": { // USED
+			"en": "Show this template as a slideshow",
+			"fr": "Afficher le gabarit sous forme de diaporama",
+			"es": "Mostrar plantilla como presentación de diapositivas",
+			"pt": "Mostrar modelo como apresentação de slides"
+		},
+		"add tags": { // USED
+			"en": tagtype => `Add one or more ${tagtype} tag(s).`, // TO DO: tagtype MIGHT NEED A TRANSLATION
+			"fr": tagtype => `Ajouter une ou plusieurs étiquettes ${tagtype}.`,
+			"es": tagtype => `Agregue una o más etiquetas ${tagtype}.`,
+			"pt": tagtype => `Adicione uma ou mais tags ${tagtype}.`
+		},
+
+		"comment": { // USED
+			"en": (verb, plural) => verb ? "Comment" : `Comment${plural ? 's' : ''}`,
+			"fr": (verb, plural) => verb ? "Commenter" : `Commentaire${plural ? 's' : ''}`,
+			"es": (verb, plural) => verb ? "Comentar" : `Comentario${plural ? 's' : ''}`,
+			"pt": (verb, plural) => verb ? "Comentar" : plural ? 'Comentários' : 'Comente'
+		},
+		"comment publicly": { // USED
+			"en": "Comment publicly",
+			"fr": "Commenter publiquement",
+			"es": "Comentar públicamente",
+			"pt": "Comentar publicamente"
+		},
+		"reply": { // USED: TO DO: UPDATE THIS TO INCLUDE verb AND plural
+			"en": (verb, plural) => verb ? "Reply" : `Repl${plural ? 'ies' : 's'}`,
+			"fr": (verb, plural) => verb ? "Répondre" : `Réponse${plural ? 's' : ''}`,
+			"es": (verb, plural) => verb ? "Responder" : `Respuesta${plural ? 's' : ''}`,
+			"pt": (verb, plural) => verb ? "Responda" : `Resposta${plural ? 's' : ''}`
+		},
+		"reply publicly": { // USED
+			"en": "Respond publicly",
+			"fr": "Répondre publiquement",
+			"es": "Responder públicamente",
+			"pt": "Responder publicamente"
+		},
+		"expand replies": { // USED
+			"en": count => `Read ${count} repl${count !== 1 ? 'ies' : 'y'}`,
+			"fr": count => `Lire ${count} réponse${count !== 1 ? 's' : ''}`,
+			"es": count => `Leer ${count} respuesta${count !== 1 ? 's' : ''}`,
+			"pt": count => `Leia ${count} resposta${count !== 1 ? 's' : ''}`
+		},
+		"accept": { // USED
+			"en": "Accept",
+			"fr": "Accepter",
+			"es": "Aceptar",
+			"pt": "Aceitar"
+		},
+		"decline": { // USED
+			"en": "Decline",
+			"fr": "Décliner",
+			"es": "Rechazar",
+			"pt": "Declínio"
+		},
+		"reject": { // USED
+			"en": "Reject",
+			"fr": "Rejeter",
+			"es": "Rechazar",
+			"pt": "Rejeitar"
+		},
+		"reviewers accepted": { // USED
+			"en": (count, total) => `<strong>${count}</strong><small> / ${total}</small> reviewers have accepted.`,
+			"fr": (count, total) => `<strong>${count}</strong><small> / ${total}</small> relect.eur.rice.s ont accepté.`,
+			"es": (count, total) => `<strong>${count}</strong><small> / ${total}</small> evisor.e.a.s han aceptado.`,
+			"pt": (count, total) => `<strong>${count}</strong><small> / ${total}</small> revisores aceitaram.`
+		},
+		"accept or reject pad": { // USED
+			"en": "Is this pad ready for publication?",
+			"fr": "Ce bloc-notes est-il prêt à être publié ?",
+			"es": "¿Está este bloc listo para su publicación?",
+			"pt": "Este bloco está pronto para publicação?"
+		},
+		"review template description": {
+			"en": language => `This is a template for reviews in ${language}.`,
+			"fr": language => `Ceci est un gabarit pour les relectures en ${language}.`,
+			"es": language => `Esta es una plantilla para reseñas en ${language}.`,
+			"pt": language => `Este é um modelo para resenhas em ${language}.`
+		},
+
+
 		"bookmarks": {
 			"en": "My bookmarks",
 			"fr": "Mes favoris",
 			"es": "Mis favoritos",
 			"pt": "Meus favoritos"
 		},
-		"private": {
-			"en": "My pads",
-			"fr": "Mes bloc-notes",
-			"es": "Mis libretas",
-			"pt": "Blocos de notas"
+		
+		"invited contributors": {
+			"en": "My contributors",
+			"fr": "Mes contribut.eur.rice.s",
+			"es": "Mis colaboradora.e.s",
+			"pt": "Meus colaboradores"
 		},
-		"private templates": {
-			"en": "My templates",
-			"fr": "Mes gabarits",
-			"es": "Mis plantillas",
-			"pt": "Meus modelos"
+		"log in": {
+			"en": "Log in",
+			"fr": "Connexion",
+			"es": "iniciar sesión",
+			"pt": "Conecte-se"
 		},
 		"logged in": {
-			"en": user => { return `You are logged in as <u>${user}</u>` },
-			"fr": user => { return `Vous êtes identifé.e en tant que <u>${user}</u>` },
-			"es": user => { return `Has iniciado sesión como <u>${user}</u>` },
-			"pt": user => { return `Você está logado como <u>${user}</u>` }
+			"en": (user, uuid) => { return `You are logged in as <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` },
+			"fr": (user, uuid) => { return `Vous êtes identifé.e en tant que <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` },
+			"es": (user, uuid) => { return `Has iniciado sesión como <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` },
+			"pt": (user, uuid) => { return `Você está logado como <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` }
 		},
 		"log out": {
 			"en": "Log out",
@@ -72,29 +411,29 @@
 			"es": "Cerrar sesión",
 			"pt": "Sair"
 		},
-		"SDG": {
+		"sdg": {
 			"en": plural => { return plural ? "SDGs": "SDG" },
 			"fr": plural => { return plural ? "ODD": "ODD" },
 			"es": plural => { return plural ? "ODS": "ODS" },
 			"pt": plural => { return plural ? "ODS": "ODS" }
 		},
-		"thematic area": {
+		"thematic area": { // USED
 			"en": plural => { return `Thematic area${plural ? 's' : ''}` },
 			"fr": plural => { return `Thématique${plural ? 's' : ''}` },
 			"es": plural => { return `Tema${plural ? 's' : ''}` },
 			"pt": plural => { return `Tema${plural ? 's' : ''}` }
 		},
-		"templated doc": {
-			"en": plural => { return `Templated pad${plural ? 's' : ''}` },
-			"fr": plural => { return `Bloc-note${plural ? 's' : ''} à partir de gabarit` },
-			"es": plural => { return `Libreta${plural ? 's' : ''} con plantilla` },
-			"pt": plural => { return `Bloco${plural ? 's' : ''} de notas com modelo` }
-		},
 		"contributor": {
-			"en": plural => { return `Contributor${plural ? 's' : ''}` },
-			"fr": plural => { return `Contributeur${plural ? 's' : ''}` },
-			"es": plural => { return `Contribuyente${plural ? 's' : ''}` },
-			"pt": plural => { return `Contribuidor${plural ? 'es' : ''}` }
+			"en": plural => { return `Contributor${plural ? "s" : ""}` },
+			"fr": plural => { return `Contributeur${plural ? "s" : ""}` },
+			"es": plural => { return `Contribuyente${plural ? "s" : ""}` },
+			"pt": plural => { return `Contribuidor${plural ? "es" : ""}` }
+		},
+		"item": {
+			"en": plural => { return `Item${plural ? "s" : ""}` },
+			"fr": plural => { return `Item${plural ? "s" : ""}` },
+			"es": plural => { return `Artículo{plural ? "s" : ""}` },
+			"pt": plural => { return `Ite${plural ? "ns" : "m"}` }
 		},
 		"solution": {
 			"en": (article, plural) => { 
@@ -134,21 +473,177 @@
 				}
 			}
 		},
+
 		"pad": {
 			"en": plural => { return plural ? "Pads" : "Pad" },
-			"fr": plural => { return plural ? "Bloc-notes" : "Bloc-note" },
+			"fr": plural => { return plural ? "Blocs-notes" : "Bloc-notes" },
 			"es": plural => { return plural ? "Libretas" : "Libreta" },
-			"pt": plural => { return plural ? "Blocos de notas" : "Bloco de nota" }
+			"pt": plural => { return plural ? "Blocos de notas" : "Bloco de notas" }
 		},
-		"free pad": {
+		
+
+		// [NEW] MENU
+		"new": { // NEW
+			"en": "New",
+			"fr": "Nouv.eau.elle",
+			"es": "Nuev.o.a",
+			"pt": "Nov.o.a"
+		},
+
+		"blank pad": { // USED
 			"en": "Blank pad",
-			"fr": "Bloc-note vierge",
+			"fr": "Bloc-notes vierge",
 			"es": "Libreta en blanco",
 			"pt": "bloco de notas em branco"
 		},
+		"templated pad": { // USED
+			"en": "Use a template",
+			"fr": "Utiliser un gabarit",
+			"es": "Usar una plantilla",
+			"pt": "Usar um modelo"
+		},
+		"campaign pad": { // USED
+			"en": "Contribute to a campaign",
+			"fr": "Contribuer à une campagne",
+			"es": "Contribuir a una campaña",
+			"pt": "Contribuir para uma campanha"
+		},
+
+		"template": { // USED
+			"en": (plural, article) => { 
+				if (plural) {
+					if (article) return "Multiple templates"
+					else return "Templates"
+				} else {
+					if (article) return "A template"
+					else return "Template"
+				}
+			},
+			"fr": (plural, article) => { 
+				if (plural) {
+					if (article) return "Plusieurs gabarits"
+					else return "Gabarits"
+				} else {
+					if (article) return "Un gabarit"
+					else return "Gabarit"
+				}
+			},
+			"es": (plural, article) => { 
+				if (plural) {
+					if (article) return "Múltiples plantillas"
+					else return "Plantillas"
+				} else {
+					if (article) return "Una plantilla"
+					else return "Plantilla"
+				}
+			},
+			"pt": (plural, article) => { 
+				if (plural) {
+					if (article) return "Vários modelos"
+					else return "Modelos"
+				} else {
+					if (article) return "Um modelo"
+					else return "Modelo"
+				}
+			}
+		},
+		"blank template": { // USED
+			"en": "Blank template",
+			"fr": "Gabarit vierge",
+			"es": "Plantilla en blanco",
+			"pt": "Modelo em branco"
+		},
+		"copy template": { // USED
+			"en": "Copy a template",
+			"fr": "Copier un gabarit",
+			"es": "Copiar una plantilla",
+			"pt": "Copiar um modelo"
+		},
+		"review template": { // USED
+			"en": "Template for reviews",
+			"fr": "Gabarit pour relectures",
+			"es": "Plantilla para reseñas",
+			"pt": "Modelo para comentários"
+		},
+
+		"file": { // USED
+			"en": plural => { return plural ? "Files" : "File" },
+			"fr": plural => { return plural ? "Fichiers" : "Fichier" },
+			"es": plural => { return plural ? "Archivos" : "Archivo" },
+			"pt": plural => { return plural ? "Arquivos" : "Arquivo" }
+		},
+
+		"mobilization": { // USED
+			"en": plural => { return plural ? "Campaigns" : "Campaign" },
+			"fr": plural => { return plural ? "Campagnes" : "Campagne" },
+			"es": plural => { return plural ? "Campañas" : "Campaña" },
+			"pt": plural => { return plural ? "Campanhas" : "Campañas" }
+		},	
+		"call for contributions": { // USED
+			"en": "Call for contributions",
+			"fr": "Appeler à contribuer",
+			"es": "Llama para contribuir",
+			"pt": "Chamada para contribuições"
+		},
+		"followup mobilization": { // USED
+			"en": "Follow up on a campaign",
+			"fr": "Donner suite à une campagne",
+			"es": "Seguimiento de una campaña",
+			"pt": "Acompanhar uma campanha"
+		},
+		"copy mobilization": { // USED
+			"en": "Copy a past campaign",
+			"fr": "Copier un campagne passée",
+			"es": "Copiar una campaña anterior",
+			"pt": "Copiar uma campanha anterior"
+		},
+		"expand mobilization": { // USED
+			"en": "Expand a campaign",
+			"fr": "Étendre une campagne",
+			"es": "Ampliar una campaña",
+			"pt": "Expandir uma campanha"
+		},
+		"demobilize": { // USED
+			"en": "End campaign",
+			"fr": "Terminer la campagne",
+			"es": "Terminar la campaña",
+			"pt": "Encerrar a campanha"
+		}, 
+
+		"created by": { // USED
+			"en": user => `Created by ${user}.`,
+			"fr": user => `Créé par ${user}.`,
+			"es": user => `Creado por ${user}.`,
+			"pt": user => `Criado por ${user}.`
+		},
+		"launched by": { // USED
+			"en": (user, date) => {
+				if (user && date) return `Launched by ${user} on ${date}.`
+				else if (user) return `Launched by ${user}.`
+				else if (date) return `Launched on ${date}.`
+			},
+			"fr": (user, date) => {
+				if (user && date) return `Lancée par ${user} le ${date}.`
+				else if (user) return `Lancée by ${user}.`
+				else if (date) return `Lancée on ${date}.`
+			},
+			"es": (user, date) => {
+				if (user && date) return `Lanzado por ${user} el ${date}.`
+				else if (user) return `Lanzado por ${user}.`
+				else if (date) return `Lanzado el ${date}.`
+			},
+			"pt": (user, date) => {
+				if (user && date) return `Lançado por ${user} em ${date}.`
+				else if (user) return `Lançado por ${user}.`
+				else if (date) return `Lançado em ${date}.`
+			}
+		},
+
+
+
 		"untitled pad": {
 			"en": "Untitled pad",
-			"fr": "Bloc-note sans titre",
+			"fr": "Bloc-notes sans titre",
 			"es": "Libreta sin título",
 			"pt": "Bloco de notas sem título"
 		},
@@ -158,50 +653,7 @@
 			"es": "Solución sin título",
 			"pt": "Solução sem título"
 		},
-		"file": {
-			"en": plural => { return plural ? "Files" : "File" },
-			"fr": plural => { return plural ? "Fichiers" : "Fichier" },
-			"es": plural => { return plural ? "Archivos" : "Archivo" },
-			"pt": plural => { return plural ? "Arquivos" : "Arquivo" }
-		},
-		"template": {
-			"en": (article, plural) => { 
-				if (plural) {
-					if (article) return "multiple templates"
-					else return "templates"
-				} else {
-					if (article) return "a template"
-					else return "template"
-				}
-			},
-			"fr": (article, plural) => { 
-				if (plural) {
-					if (article) return "plusieurs gabarits"
-					else return "gabarits"
-				} else {
-					if (article) return "un gabarit"
-					else return "gabarit"
-				}
-			},
-			"es": (article, plural) => { 
-				if (plural) {
-					if (article) return "múltiples plantillas"
-					else return "plantillas"
-				} else {
-					if (article) return "una plantilla"
-					else return "plantilla"
-				}
-			},
-			"pt": (article, plural) => { 
-				if (plural) {
-					if (article) return "vários modelos"
-					else return "modelos"
-				} else {
-					if (article) return "um modelo"
-					else return "modelo"
-				}
-			}
-		},
+		
 		"untitled template": {
 			"en": "Untitled template",
 			"fr": "Gabarit sans titre",
@@ -220,38 +672,58 @@
 			"es": "Cargar una plantilla",
 			"pt": "Carregar um modelo"
 		},
-		"cohort": {
-			"en": plural => { return plural ? "Cohorts" : "Cohort" },
-			"fr": plural => { return plural ? "Cohorte" : "Cohorts" },
-			"es": plural => { return plural ? "Cohorte" : "Cohortes" },
-			"pt": plural => { return plural ? "Coorte" : "Coortes" }
-		},
+		
+
 		"credit": {
-			"en": (cid, name) => { return `Contributed by <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"fr": (cid, name) => { return `Contribué par <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"es": (cid, name) => { return `Contribuido por <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"pt": (cid, name) => { return `Contribuíram por <a href='../browse/public?contributors=${cid}'>${name}</a>.` }
+			"en": (cid, name, type) => { return `Contributed by <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` },
+			"fr": (cid, name, type) => { return `Contribué par <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` },
+			"es": (cid, name, type) => { return `Contribuido por <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` },
+			"pt": (cid, name, type) => { return `Contribuíram por <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` }
 		},
 		"host credit": {
-			"en": (cid, name) => { return `Hosted by <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"fr": (cid, name) => { return `Convoqué par <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"es": (cid, name) => { return `Convocado por <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"pt": (cid, name) => { return `Convocado por <a href='../browse/public?contributors=${cid}'>${name}</a>.` }
+			"en": (cid, name) => { return `Hosted by <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` },
+			"fr": (cid, name) => { return `Convoqué par <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` },
+			"es": (cid, name) => { return `Convocado por <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` },
+			"pt": (cid, name) => { return `Convocado por <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` }
 		},
 		"missing contributor": {
 
 		},
-		"filter": {
+		"filter": { // USED
 			"en": (verb, plural) => { return verb ? "Filter" : plural ? "Filters" : "Filter" },
 			"fr": (verb, plural) => { return verb ? "Filtrer" : plural ? "Filtres" : "Filtre" },
 			"es": (verb, plural) => { return verb ? "Filtrar" : plural ? "Filtros" : "Filtro" },
 			"pt": (verb, plural) => { return verb ? "Filtro" : plural ? "Filtros" : "Filtro" }
 		},
-		"search": {
-			"en": 'Looking for something?',
-			"fr": 'À la recherche de quelque chose ?',
-			"es": '¿Buscando algo?',
-			"pt": 'Procurando por algo?'
+		"apply filters": { // USED
+			"en": "Apply filters",
+			"fr": "Appliquer les filtres",
+			"es": "Aplicar filtros",
+			"pt": "Aplicar filtros"
+		},
+		"search": { // USED
+			"en": (person) => { return `Looking for ${person ? 'someone' : 'something'}?` },
+			"fr": (person) => { return `À la recherche de ${person ? 'quelqu’un' : 'quelque chose'} ?` },
+			"es": (person) => { return `¿Buscando ${person ? 'a alguien' : 'algo'}?` },
+			"pt": (person) => { return `Procurando por ${person ? 'alguém' : 'algo'}?` }
+		},
+		"search or add": {
+			"en": "Looking for something or want to add it?",
+			"fr": "À la recherche de quleque chose ou besoin de l’ajouter ?",
+			"es": "¿Busca algo o necesita agregarlo?",
+			"pt": "Procurando algo ou precisa adicioná-lo?"
+		},
+		"search place": {
+			"en": "Looking for a place?",
+			"fr": "À la recherche d’un emplacement ?",
+			"es": "Buscando una ubicación?",
+			"pt": "Procurando um local?"
+		},
+		"search terms": { // USED
+			"en": "Search terms",
+			"fr": "Termes de recherche",
+			"es": "Términos de búsqueda",
+			"pt": "Termos de pesquisa"
 		},
 		"description": {
 			"en": 'Description',
@@ -277,6 +749,18 @@
 			"es": "Salvar",
 			"pt": "Salve"
 		},
+		"save changes": {
+			"en": "Save changes",
+			"fr": "Enregistrer les modifications",
+			"es": "Guardar cambios",
+			"pt": "Salvar mudanças"
+		},
+		"changes saved": {
+			"en": "Changes saved",
+			"fr": "Modifications enregistrées",
+			"es": "Cambios guardados",
+			"pt": "Alterações salvas"
+		},
 		"back to browse": {
 			"en": "Return to browsing",
 			"fr": "Retour à la galerie",
@@ -294,6 +778,1425 @@
 			"fr": (cid, name) => { return `Cette solution a été testée et approuvée par <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
 			"es": (cid, name) => { return `Esta solución ha sido probada y aprobada por <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
 			"pt": (cid, name) => { return `Esta solução foi testada e aprovada por <a href='../browse/public?contributors=${cid}'>${name}</a>.` }
-		}
+		},
+
+		"status": {
+			"en": (object, status) => {
+				if (['pad', 'pads', 'file', 'files'].includes(object)) {
+					if (status === 0) return "Unfinished"
+					if (status === 1) return "Publishable"
+					if (status === 2) return "Preprint"
+					if (status === 3) return "Published"
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) return "Unfinished"
+					if (status === 1) return "Publishable"
+					if (status === 2) return "Shared"
+					if (status === 3) return "Published"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) return "Pending"
+					if (status === 0) return "Unfinished"
+					if (status === 1) return "Publishable"
+					if (status === 2) return "Completed"
+					if (status === 3) return "Published"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) return "Pending"
+					if (status === 1) return "Confirmed"
+					if (status === 2) return "Has contributed"
+				}
+			},
+			"fr": (object, status) => {
+				if (['pad', 'pads', 'file', 'files'].includes(object)) {
+					if (status === 0) return "Incomplet"
+					if (status === 1) return "Publiable"
+					if (status === 2) return "Prépublication"
+					if (status === 3) return "Publié"
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) return "Incomplet"
+					if (status === 1) return "Publiable"
+					if (status === 2) return "Partagé"
+					if (status === 3) return "Publié"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) return "En attente"
+					if (status === 0) return "Incomplet"
+					if (status === 1) return "Publiable"
+					if (status === 2) return "Terminé"
+					if (status === 3) return "Publié"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) return "En attente"
+					if (status === 1) return "Confrimé.e"
+					if (status === 2) return "A contribué"
+				}
+			},
+			"es": (object, status) => {
+				if (['pad', 'pads', 'file', 'files'].includes(object)) {
+					if (status === 0) return "incompletas"
+					if (status === 1) return "Publicables"
+					if (status === 2) return "Prepublicación"
+					if (status === 3) return "Publicada"
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) return "Incompleta"
+					if (status === 1) return "Publicable"
+					if (status === 2) return "Compartidas"
+					if (status === 3) return "Publicada"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) return "Pendiente"
+					if (status === 0) return "Incompleta"
+					if (status === 1) return "Publicable"
+					if (status === 2) return "Completada"
+					if (status === 3) return "Publicada"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) return "Pendiente"
+					if (status === 1) return "Confirmad.o.a"
+					if (status === 2) return "Ha contribuido"
+				}
+			},
+			"pt": (object, status) => {
+				if (['pad', 'pads', 'file', 'files'].includes(object)) {
+					if (status === 0) return "Incompleto"
+					if (status === 1) return "Publicável"
+					if (status === 2) return "Pré-publicação"
+					if (status === 3) return "Publicados"
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) return "Incompleto"
+					if (status === 1) return "Publicável"
+					if (status === 2) return "Compartilhado"
+					if (status === 3) return "Publicado"
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) return "Pendente"
+					if (status === 0) return "Incompleta"
+					if (status === 1) return "Publicável"
+					if (status === 2) return "Concluída"
+					if (status === 3) return "Publicada"
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) return "Pendente"
+					if (status === 1) return "Confirmad.o.a"
+					if (status === 2) return "Ha contribuido"
+				}
+			}
+		},
+		"object status": {
+			"en": (object, status, plural) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Unfinished pads"
+						else return "Unfinished pad"
+					}
+					if (status === 1) {
+						if (plural) return "Publishable pads"
+						else return "Publishable pad"
+					}
+					if (status === 2) {
+						if (plural) return "Preprints"
+						else return "Preprint"
+					}
+					if (status === 3) {
+						if (plural) return "Published pads"
+						else return "Published pad"
+					}
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Unfinished templates"
+						else return "Unfinished template"
+					}
+					if (status === 1) {
+						if (plural) return "Publishable templates"
+						else return "Publishable template"
+					}
+					if (status === 2) {
+						if (plural) return "Shared templates"
+						else return "Shared template"
+					}
+					if (status === 3) {
+						if (plural) return "Published templates"
+						else return "Published template"
+					}
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) {
+						if (plural) return "Pending"
+						else return "Pending"
+					}
+					if (status === 0) {
+						if (plural) return "Unfinished reviews"
+						else return "Unfinished review"
+					}
+					if (status === 1) {
+						if (plural) return "Publishable reviews"
+						else return "Publishable review"
+					}
+					if (status === 2) {
+						if (plural) return "Completed reviews"
+						else return "Completed review"
+					}
+					if (status === 3) {
+						if (plural) return
+						else return
+					}
+				} else if (['file', 'files'].includes(object)) {
+					if (status === 0) {
+						if (plural) return
+						else return
+					}
+					if (status === 1) {
+						if (plural) return
+						else return
+					}
+					if (status === 2) {
+						if (plural) return "Shared files"
+						else return "Shared file"
+					}
+					if (status === 3) {
+						if (plural) return "Published files"
+						else return "Published file"
+					}
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Pending"
+						else return "Pending"
+					}
+					if (status === 1) {
+						if (plural) return "Confirmed"
+						else return "Confirmed"
+					}
+					if (status === 2) {
+						if (plural) return "Has contributed"
+						else return "Has contributed"
+					}
+				// THIS IS PROBABLY NOT USED
+					if (status === 3) {
+						if (plural) return "Fellow contributors"
+						else return "Fellow contributor"
+					}
+				}
+			},
+			"fr": (object, status, plural) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Blocs-notes incomplets"
+						else return "Bloc-notes incomplet"
+					}
+					if (status === 1) {
+						if (plural) return "Blocs-notes publiables"
+						else return "Bloc-notes publiable"
+					}
+					if (status === 2) {
+						if (plural) return "Prépublications"
+						else return "Prépublication"
+					}
+					if (status === 3) {
+						if (plural) return "Blocs-notes publiés"
+						else return "Bloc-notes publié"
+					}
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Gabarits incomplets"
+						else return "Gabarit incomplet"
+					}
+					if (status === 1) {
+						if (plural) return "Gabarits publiables"
+						else return "Gabarit publiable"
+					}
+					if (status === 2) {
+						if (plural) return "Gabarits partagés"
+						else return "Gabarit partagé"
+					}
+					if (status === 3) {
+						if (plural) return "Gabarits publiés"
+						else return "Gabarit publié"
+					}
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) {
+						if (plural) return "En attente"
+						else return "En attente"
+					}
+					if (status === 0) {
+						if (plural) return "Relectures incomplètes"
+						else return "Relecture incomplète"
+					}
+					if (status === 1) {
+						if (plural) return "Relectures publiables"
+						else return "Relecture publiable"
+					}
+					if (status === 2) {
+						if (plural) return "Relectures terminées"
+						else return "Relecture terminée"
+					}
+					if (status === 3) {
+						if (plural) return 
+						else return
+					}
+				} else if (['file', 'files'].includes(object)) {
+					if (status === 0) {
+						if (plural) return 
+						else return
+					}
+					if (status === 1) {
+						if (plural) return
+						else return
+					}
+					if (status === 2) {
+						if (plural) return "Fichiers partagés"
+						else return "Fichier partagé"
+					}
+					if (status === 3) {
+						if (plural) return "Fichiers publiés"
+						else return "Fichier partagé"
+					}
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "En attente"
+						else return "En attente"
+					}
+					if (status === 1) {
+						if (plural) return "Confrimé.es"
+						else return "Confrimé.e"
+					}
+					if (status === 2) {
+						if (plural) return "A contribué"
+						else return "A contribué"
+					}
+					if (status === 3) {
+						if (plural) return "Collègues contribut.eur.rice.s"
+						else return "Collègue contribut.eur.rice"
+					}
+				}
+			},
+			"es": (object, status, plural) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Libretas incompletas"
+						else return "Libreta incompleta"
+					}
+					if (status === 1) {
+						if (plural) return "Libretas publicables"
+						else return "Libreta publicable"
+					}
+					if (status === 2) {
+						if (plural) return "Prepublicaciones"
+						else return "Prepublicación"
+					}
+					if (status === 3) {
+						if (plural) return "Libretas publicadas"
+						else return "Libreta publicada"
+					}
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Plantillas incompletas"
+						else return "Plantilla incompleta"
+					}
+					if (status === 1) {
+						if (plural) return "Plantillas publicables"
+						else return "Plantilla publicable"
+					}
+					if (status === 2) {
+						if (plural) return "Plantillas compartidas"
+						else return "Plantilla compartida"
+					}
+					if (status === 3) {
+						if (plural) return "Plantillas publicadas"
+						else return "Plantilla publicada"
+					}
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) {
+						if (plural) return "Pendiente"
+						else return "Pendiente"
+					}
+					if (status === 0) {
+						if (plural) return "Revisiones incompletas"
+						else return "Revisión incompleta"
+					}
+					if (status === 1) {
+						if (plural) return "Revisiones publicables"
+						else return "Revisión publicable"
+					}
+					if (status === 2) {
+						if (plural) return "Revisiones completadas"
+						else return "Revisión completa"
+					}
+					if (status === 3) {
+						if (plural) return
+						else return
+					}
+				} else if (['file', 'files'].includes(object)) {
+					if (status === 0) {
+						if (plural) return
+						else return
+					}
+					if (status === 1) {
+						if (plural) return
+						else return
+					}
+					if (status === 2) {
+						if (plural) return "Archivos compartidos"
+						else return "Archivo compartido"
+					}
+					if (status === 3) {
+						if (plural) return "Archivos publicados"
+						else return "Archivo publicado"
+					}
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Pendiente"
+						else return "Pendiente"
+					}
+					if (status === 1) {
+						if (plural) return "Confirmad.o.a"
+						else return "Confirmad.o.a"
+					}
+					if (status === 2) {
+						if (plural) return "Ha contribuido"
+						else return "Ha contribuido"
+					}
+					if (status === 3) {
+						if (plural) return "Compañer.o.a.s contribuyentes"
+						else return "Compañer.o.a contribuyente"
+					}
+				}
+			},
+			"pt": (object, status, plural) => {
+				if (['pad', 'pads'].includes(object)) {
+					if (status === 0) { 
+						if (plural) return "Blocos de notas incompletos"
+						else return "Bloco de notas incompleto"
+					}
+					if (status === 1) { 
+						if (plural) return "Blocos de notas publicáveis"
+						else return "Bloco de notas publicável"
+					}
+					if (status === 2) { 
+						if (plural) return "Pré-publicações"
+						else return "Pré-publicação"
+					}
+					if (status === 3) { 
+						if (plural) return "Blocos de notas publicados"
+						else return "Bloco de notas publicado"
+					}
+				} else if (['template', 'templates'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Modelos incompletos"
+						else return "Modelo incompleto"
+					}
+					if (status === 1) {
+						if (plural) return "Modelos publicáveis"
+						else return "Modelo publicável"
+					}
+					if (status === 2) {
+						if (plural) return "Modelos compartilhados"
+						else return "Modelo compartilhado"
+					}
+					if (status === 3) {
+						if (plural) return "Modelos publicados"
+						else return "Modelo publicado"
+					}
+				} else if (['review', 'reviews'].includes(object)) {
+					if (status === -1) {
+						if (plural) return "Pendente"
+						else return "Pendente"
+					}
+					if (status === 0) {
+						if (plural) return "Revisões incompletas"
+						else return "Revisão incompleta"
+					}
+					if (status === 1) {
+						if (plural) return "Revisões publicáveis"
+						else return "Revisão publicável"
+					}
+					if (status === 2) {
+						if (plural) return "Revisões concluídas"
+						else return "Revisão concluída"
+					}
+					if (status === 3) {
+						if (plural) return
+						else return
+					}
+				} else if (['file', 'files'].includes(object)) {
+					if (status === 0) {
+						if (plural) return
+						else return
+					}
+					if (status === 1) {
+						if (plural) return
+						else return
+					}
+					if (status === 2) {
+						if (plural) return "Arquivos compartilhados"
+						else return "Arquivo compartilhado"
+					}
+					if (status === 3) {
+						if (plural) return "Arquivos publicados"
+						else return "Arquivo publicado"
+					}
+				} else if (['contributor', 'contributors'].includes(object)) {
+					if (status === 0) {
+						if (plural) return "Pendente"
+						else return "Pendente"
+					}
+					if (status === 1) {
+						if (plural) return "Confirmad.o.a"
+						else return "Confirmad.o.a"
+					}
+					if (status === 2) {
+						if (plural) return "Ha contribuido"
+						else return "Ha contribuido"
+					}
+					if (status === 3) {
+						if (plural) return "Colegas colaboradores"
+						else return "Colega colaborador"
+					}
+				}
+			}
+		},
+		"date": function (date, language) { // USED
+			// USEFUL TABLE: https://web.library.yale.edu/cataloging/months
+			const matches = date.match(/\d+/g)
+			if (language === 'en') {
+				if (matches.length === 1) {
+					const num = parseInt(matches[0])
+					if (date.includes('minutes ago')) return `${num} minute${num === 1 ? '' : 's'} ago`
+					if (date.includes('hours ago')) return `${num} hour${num === 1 ? '' : 's'} ago`
+					if (date.includes('days ago')) return `${num} day${num === 1 ? '' : 's'} ago`
+				} else return date
+			}
+			if (language === 'fr') {
+				if (matches.length === 1) {
+					const num = parseInt(matches[0])
+					if (date.includes('minutes ago')) return `il y a ${num} minute${num === 1 ? '' : 's'}`
+					if (date.includes('hours ago')) return `il y a ${num} heure${num === 1 ? '' : 's'}`
+					if (date.includes('days ago')) return `il y a ${num} jour${num === 1 ? '' : 's'}`
+				} else return date.replace(/Jan/i, 'janv.')
+					.replace(/Feb/i, 'févr.')
+					.replace(/Mar/i, 'mars')
+					.replace(/Apr/i, 'avr.')
+					.replace(/May/i, 'mai')
+					.replace(/Jun/i, 'juin')
+					.replace(/Jul/i, 'juill.')
+					.replace(/Aug/i, 'août')
+					.replace(/Sep/i, 'sept.')
+					.replace(/Oct/i, 'oct.')
+					.replace(/Nov/i, 'nov.')
+					.replace(/Dec/i, 'déc.')
+			}
+			if (language === 'es') {
+				if (matches.length === 1) {
+					const num = parseInt(matches[0])
+					if (date.includes('minutes ago')) return `hace ${num} minuto${num === 1 ? '' : 's'}`
+					if (date.includes('hours ago')) return `hace ${num} hora${num === 1 ? '' : 's'}`
+					if (date.includes('days ago')) return `hace ${num} día${num === 1 ? '' : 's'}`
+				} else return date.replace(/Jan/i, 'enero')
+					.replace(/Feb/i, 'feb')
+					.replace(/Mar/i, 'mar')
+					.replace(/Apr/i, 'abr')
+					.replace(/May/i, 'mayo')
+					.replace(/Jun/i, 'jun')
+					.replace(/Jul/i, 'jul')
+					.replace(/Aug/i, 'agosto')
+					.replace(/Sep/i, 'sept')
+					.replace(/Oct/i, 'oct')
+					.replace(/Nov/i, 'nov')
+					.replace(/Dec/i, 'dic')
+			}
+			if (language === 'pt') {
+				if (matches.length === 1) {
+					const num = parseInt(matches[0])
+					if (date.includes('minutes ago')) return `${num} minuto${num === 1 ? '' : 's'} atrás`
+					if (date.includes('hours ago')) return `${num} hora${num === 1 ? '' : 's'} atrás`
+					if (date.includes('days ago')) return `${num} dia${num === 1 ? '' : 's'} atrás`
+				} else return date.replace(/Jan/i, 'jan.')
+					.replace(/Feb/i, 'fev.')
+					.replace(/Mar/i, 'março')
+					.replace(/Apr/i, 'abril')
+					.replace(/May/i, 'maio')
+					.replace(/Jun/i, 'junho')
+					.replace(/Jul/i, 'julho')
+					.replace(/Aug/i, 'agosto')
+					.replace(/Sep/i, 'set.')
+					.replace(/Oct/i, 'out.')
+					.replace(/Nov/i, 'nov.')
+					.replace(/Dec/i, 'dez.')
+			}
+		},
+		
+		"download": {
+			"en": "Download",
+			"fr": "Télécharger",
+			"es": "Descargar",
+			"pt": "Download"
+		},
+		"download all": {
+			"en": "Download all",
+			"fr": "Tout télécharger",
+			"es": "Descarga todo",
+			"pt": "Download tudo"
+		},
+		"empty txt": {
+			"en": "empty text field",
+			"fr": "champ de texte vide",
+			"es": "campo de texto vacío",
+			"pt": "campo de texto vazio"
+		},
+		"empty embed": {
+			"en": "empty embedding field",
+			"fr": "champ d’intégration vide",
+			"es": "campo de incrustación vacío",
+			"pt": "campo de incorporação vazio"
+		},
+		"missing image": {
+			"en": "Missing image.",
+			"fr": "Image manquante.",
+			"es": "Falta una imagen.",
+			"pt": "Faltando uma imagem."
+		},
+		"new checklist item": {
+			"en": "Add an item to the checklist",
+			"fr": "Ajouter un élément à la liste",
+			"es": "Agregar un elemento a la lista",
+			"pt": "Adicione um item à lista"
+		},
+		"missing SDG": {
+			"en": "missing SDG(s)",
+			"fr": "ODD manquant.s",
+			"es": "ODS faltante(s)",
+			"pt": "faltando ODS"
+		},
+		"missing tag": {
+			"en": "missing tag(s)",
+			"fr": "mot.s clé.s manquant",
+			"es": "etiqueta(s) faltante(s)",
+			"pt": "etiqueta(s) faltando"
+		},
+		"missing external_resource": {
+			"en": "missing resource(s)",
+			"fr": "ressource.s manquante.s",
+			"es": "rescurso(s) faltante(s)",
+			"pt": "recurso(s) ausente(s)"
+		},
+
+		"request": {
+			"en": type => {
+				if (type === 'group') return "describe group"
+				if (type === 'title') return "request a title"
+				if (type === 'img') return "request one or several images"
+				if (type === 'drawing') return "request a drawing"
+				if (type === 'txt') return "request a description"
+				if (type === 'embed') return "request a link or embedded HMTL code"
+				if (type === 'checklist') return "request a response from multiple choices"
+				if (type === 'radiolist') return "request a unique response from multiple choices"
+				if (type === 'location') return "request a location"
+				if (type === 'index') return "request one or more SDG tags" // TO DO: UPDATE THIS
+				if (type === 'tag') return "request one or more thematic area tags" // TO DO: UPDATE THIS
+				if (type === 'external_resource') return "request an external resource"
+			},
+			"fr": type => {
+				if (type === 'group') return "décrire le groupe"
+				if (type === 'title') return "demander un titre"
+				if (type === 'img') return "demander une ou plusieurs images"
+				if (type === 'drawing') return "demander un dessin"
+				if (type === 'txt') return "demander une description"
+				if (type === 'embed') return "demander un lien ou du code HMTL intégré"
+				if (type === 'checklist') return "demander une réponse parmi plusieurs choix"
+				if (type === 'radiolist') return "demander une réponse unique parmi plusieurs choix"
+				if (type === 'location') return "demander un emplacement"
+				if (type === 'index') return "demander une ou plusieurs étiquettes ODDs"
+				if (type === 'tag') return "demander une ou plusieurs étiquettes thématiques"
+				if (type === 'external_resource') return "demander une ressources externes"
+			},
+			"es": type => {
+				if (type === 'group') return "describir grupo"
+				if (type === 'title') return "solicitar un título"
+				if (type === 'img') return "solicitar una o varias imágenes"
+				if (type === 'drawing') return "solicitar un dibujo"
+				if (type === 'txt') return "solicitar una descripción"
+				if (type === 'embed') return "solicitar un enlace o código HMTL incrustado"
+				if (type === 'checklist') return "solicitar una respuesta de múltiples opciones"
+				if (type === 'radiolist') return "solicitar una única respuesta entre varias opciones"
+				if (type === 'location') return "solicitar una ubicación"
+				if (type === 'index') return "solicitar una o más etiquetas de ODS"
+				if (type === 'tag') return "solicitar una o más etiquetas de área temática"
+				if (type === 'external_resource') return "solicitar un recurso externo"
+			},
+			"pt": type => {
+				if (type === 'group') return "descrever o grupo"
+				if (type === 'title') return "solicite um título"
+				if (type === 'img') return "solicite uma ou várias imagens"
+				if (type === 'drawing') return "solicitar um desenho"
+				if (type === 'txt') return "solicite uma descrição"
+				if (type === 'embed') return "solicitar um link ou código HMTL incorporado"
+				if (type === 'checklist') return "solicitar uma resposta de várias escolhas"
+				if (type === 'radiolist') return "solicitar uma resposta única de várias opções"
+				if (type === 'location') return "solicite uma localização"
+				if (type === 'index') return "solicitar um ou mais etiquetas de ODS"
+				if (type === 'tag') return "solicitar uma ou mais etiquetas de área temática"
+				if (type === 'external_resource') return "solicitar um recurso externo"
+			}
+			// "OTHER LANGUAGE": type => {
+			// 	if (type === 'group') return 
+			// 	if (type === 'title') return 
+			// 	if (type === 'img') return 
+			// 	if (type === 'drawing') return 
+			// 	if (type === 'txt') return 
+			// 	if (type === 'embed') return 
+			// 	if (type === 'checklist') return 
+			// 	if (type === 'radiolist') return 
+			// 	if (type === 'location') return 
+			// 	if (type === 'index') return 
+			// 	if (type === 'tag') return 
+			// 	if (type === 'external_resource') return 
+			// }
+		},
+		"expect": {
+			"en": type => {
+				if (['group', 'title', 'lead', 'txt'].includes(type)) return "<strong>Text</strong> expected."
+				if (type === 'img') return "<i class='material-icons'>photo</i><br><strong>Image(s)</strong> expected." // TO DO: CHANGE THIS
+				if (type === 'drawing') return "<strong>Drawing</strong> expected."
+				if (type === 'embed') return "<strong>URL</strong> or <strong>HTML code</strong> expected."
+				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected."
+				if (type === 'location') return "<strong>Direct input</strong> or <strong>text</strong> expected."
+				if (type === 'tag') return "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected."
+				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Direct input</strong> or <strong>text</strong> expected."
+				if (type === 'repeat') return "<strong>Direct input</strong> expected."
+			},
+			"fr": type => {
+				if (['group', 'title', 'lead', 'txt'].includes(type)) return "<strong>Texte</strong> attendu."
+				if (type === 'img') return "<i class='material-icons'>photo</i><br><strong>Image.s</strong> attendue.s."
+				if (type === 'drawing') return "<strong>Dessin</strong> attendu."
+				if (type === 'embed') return "<strong>URL</strong> ou <strong>code HTML</strong> attendu."
+				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Saisie directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue."
+				if (type === 'location') return "<strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
+				if (type === 'tag') return "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu."
+				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
+				if (type === 'repeat') return "<strong>Saisie directe</strong> attendu."
+			},
+			"es": type => {
+				if (['group', 'title', 'lead', 'txt'].includes(type)) return "<strong>Texto</strong> esperado."
+				if (type === 'img') return "<i class='material-icons'>photo</i><br><strong>Imagen(es)</strong> esperada(s)."
+				if (type === 'drawing') return "<strong>Dibujo</strong> esperado."
+				if (type === 'embed') return "<strong>URL</strong> o <strong>código HTML</strong> esperado."
+				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados."
+				if (type === 'location') return "<strong>Entrada directa</strong> o <strong>texto</strong> esperado."
+				if (type === 'tag') return "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados."
+				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada directa</strong> o <strong>texto</strong> esperados."
+				if (type === 'repeat') return "<strong>Entrada directa</strong> esperada."
+			},
+			"pt": type => {
+				if (['group', 'title', 'lead', 'txt'].includes(type)) return "<strong>Texto</strong> esperado."
+				if (type === 'img') return "<i class='material-icons'>photo</i><br><strong>Image.m.ns</strong> esperada.s."
+				if (type === 'drawing') return "<strong>Desenho</strong> esperado."
+				if (type === 'embed') return "<strong>URL</strong> ou <strong>código HTML</strong> esperado."
+				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
+				if (type === 'location') return "<strong>Entrada direta</strong> ou <strong>texto</strong> esperado."
+				if (type === 'tag') return "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
+				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada direta</strong> ou <strong>texto</strong> esperados."
+				if (type === 'repeat') return "<strong>Entrada direta</strong> esperada."
+			}
+			// "OTHER LANGUAGE": type => {
+			// 	if (type === 'group') return
+			// 	if (type === 'title') return
+			// 	if (type === 'lead') return
+			// 	if (type === 'img') return
+			// 	if (type === 'drawing') return
+			// 	if (type === 'txt') return
+			// 	if (type === 'embed') return
+			// 	if (type === 'checklist') return
+			// 	if (type === 'radiolist') return
+			// 	if (type === 'location') return
+			// 	if (type === 'index') return
+			// 	if (type === 'tag') return
+			// 	if (type === 'external_resource') return
+			// 	if (type === 'repeat') return
+			// }
+		},
+
+		"public mobilization": { // USED
+			"en": "Public campaign",
+			"fr": "Campagne publique",
+			"es": "Campaña pública",
+			"pt": "Campanha publica"
+		},
+		"name campaign": { // USED
+			"en": "Name your campaign",
+			"fr": "Nommer votre campagne",
+			"es": "Nombra tu campaña",
+			"pt": "Nomeie sua campanha"
+		},
+		"add mobilization title": { // USED
+			"en": "Provide a title for the campaign",
+			"fr": "Donner un titre à la campagne",
+			"es": "Proporcionar un título para la campaña",
+			"pt": "Fornecer um título para a campanha"
+		},
+		"copy": { // USED // TO DO: ADD VERB OPTION
+			"en": (verb, preposition) => verb ? 'Copy' : `Copy ${preposition ? 'of' : ''}`,
+			"fr": (verb, preposition) => verb ? 'Copier' : `Copie ${preposition ? 'de' : ''}`,
+			"es": (verb, preposition) => verb ? 'Copiar' : `Copia ${preposition ? 'de' : ''}`,
+			"pt": (verb, preposition) => verb ? 'Copiar' : `Cópia ${preposition ? 'de' : ''}`
+		},
+		"copied": {
+			"en": "Copied",
+			"fr": "Copié",
+			"es": "Copiada",
+			"pt": "Copiada"
+		},
+		"copy link": { // USED
+			"en": "Copy link",
+			"fr": "Copier le lien",
+			"es": "Copia el enlace",
+			"pt": "Copie o link"
+		},
+		"follow up": { // USED
+			"en": transitive => transitive ? "Follow up" : "Follow up of",
+			"fr": transitive => transitive ? "Donner suite" : "Suite de",
+			"es": transitive => transitive ? "Dar seguimiento" : "Seguimiento de",
+			"pt": transitive => transitive ? "Acompanhamento" : "Acompanhamento de"
+		},
+		"expansion": { // USED
+			"en": "Expansion of",
+			"fr": "Extension de",
+			"es": "Extensión de",
+			"pt": "Extensão de"
+		},
+		"select campaign language": { // USED
+			"en": "Set the primary language of the campaign",
+			"fr": "Définir la langue principale de la campagne",
+			"es": "Definir el idioma principal de la campaña",
+			"pt": "Definir o idioma principal da campanha"
+		},
+		"state objectives": { // USED
+			"en": "State the objectives of the campaign",
+			"fr": "Indiquer les objectifs de la campagne",
+			"es": "Indicar los objetivos de la campaña",
+			"pt": "Descreva os objetivos da campanha"
+		},
+		"describe intent": { // USED
+			"en": "Describe your intent and what you expect from this campaign",
+			"fr": "Décrivez votre intention et ce que vous attendez de cette campagne",
+			"es": "Describa su intención y lo que espera de esta campaña",
+			"pt": "Descreva sua intenção e o que espera desta campanha"
+		},
+		"select template": { // USED
+			"en": "Select a template for campaign contributions",
+			"fr": "Choisir un gabarit pour les contributions à la campagne",
+			"es": "Elija una plantilla para contribuciones de campaña",
+			"pt": "Escolha um modelo para contribuições de campanha"
+		},
+		"invite contributors": { // USED
+			"en": "Invite contributors",
+			"fr": "Inviter des contributeurs",
+			"es": "Invitar a colaboradores",
+			"pt": "Convidar colaboradores"
+		},
+		"invited contributors": { // USED
+			"en": count => `${count} invited contributor${count !== 1 ? 's' : ''}`,
+			"fr": count => `${count} contributeur${count !== 1 ? 's' : ''} invité${count !== 1 ? 's' : ''}`,
+			"es": count => `${count} contribuyente${count !== 1 ? 's' : ''} invitad.o.a${count !== 1 ? '.s' : ''}`,
+			"pt": count => `${count} contribuidore${count !== 1 ? 's' : ''} convidado${count !== 1 ? 's' : ''}`
+		},
+		"limit to": { // USED
+			"en": "Limit to:",
+			"fr": "Limiter à :",
+			"es": "Límite a:",
+			"pt": "Limite de:"
+		},
+		"submissions per contributor": { // USED
+			"en": `submission(s)<br/>per contributor`,
+			"fr": `soumission(s)<br/>par contributeur`,
+			"es": `envìo(s)<br/>por contribuador.a`,
+			"pt": `envio(s)<br/><br/>por colaborador`
+		},
+		"next": { // USED
+			"en": "Next",
+			"fr": "Suivant",
+			"es": "Siguiente",
+			"pt": "Próximo"
+		},
+		"back": { // USED
+			"en": "Previous",
+			"fr": "Précédent",
+			"es": "Previo",
+			"pt": "Anterior"
+		},
+		"launch": { // USED
+			"en": "Launch the campaign",
+			"fr": "Lancer la campagne",
+			"es": "Lanzar la campaña",
+			"pt": "Lançar a campanha"
+		},
+		"select all": { // USED
+			"en": "Select all",
+			"fr": "Tout sélectionner",
+			"es": "Seleccionar todo",
+			"pt": "Selecionar tudo"
+		},
+		"deselect all": { // USED
+			"en": "Deselect all",
+			"fr": "Tout déselectionner",
+			"es": "Deseleccionar todo",
+			"pt": "Deselecionar todos"
+		},
+
+		"contributor profile": { // USED
+			"en": "Contributor profile",
+			"fr": "Profil du contributeur",
+			"es": "Perfil de colaborador",
+			"pt": "Perfil do colaborador"
+		},
+		"name": { // USED
+			"en": "Name",
+			"fr": "Nom",
+			"es": "Nombre",
+			"pt": "Nome"
+		},
+		"first and last name": { // USED
+			"en": "First and last name",
+			"fr": "Prénom et nom",
+			"es": "Nombre y apellido",
+			"pt": "Primeiro e último nome"
+		},
+		"email": { // USED
+			"en": "Email",
+			"fr": "E-mail",
+			"es": "Email",
+			"pt": "Email"
+		},
+		"email address": { // USED
+			"en": "Email address",
+			"fr": "Adresse e-mail",
+			"es": "Dirección de correo electrónico",
+			"pt": "Endereço de email"
+		},
+		"job title": { // USED
+			"en": "Job title",
+			"fr": "Intitulé de poste",
+			"es": "Título profesional",
+			"pt": "Cargo"
+		},
+		"country": { // USED
+			"en": "Country",
+			"fr": "Pays",
+			"es": "País",
+			"pt": "País"
+		},
+		"countries": { // USED
+			"en": "Countries",
+			"fr": "Pays",
+			"es": "Países",
+			"pt": "Países"
+		},
+		"select country": { // USED
+			"en": "Select a country",
+			"fr": "Sélectionner un pays",
+			"es": "Seleccione un país",
+			"pt": "Selecione um pais"
+		},
+		"preferred language": { // USED
+			"en": "Preferred language",
+			"fr": "Langue préférée",
+			"es": "Idioma preferido",
+			"pt": "Língua preferida"
+		},
+		"select language": { // USED
+			"en": plural => plural ? "Select languages" : "Select a language",
+			"fr": plural => plural ? "Sélectionner des langues" : "Sélectionner une langue",
+			"es": plural => plural ? "Seleccionar idiomas" : "Selecciona un idioma",
+			"pt": plural => plural ? "Selecionar idiomas" : "Selecione um idioma"
+		},
+		"other languages": { // USED
+			"en": "Other fluent languages",
+			"fr": "Autres langues courantes",
+			"es": "Otros idiomas fluidos",
+			"pt": "Outros idiomas fluentes"
+		},
+		"add other languages": { // USED
+			"en": "Add other fluent lanugages",
+			"fr": "Ajouter d'autres langues courantes",
+			"es": "Agregar otros idiomas fluidos",
+			"pt": "Adicionar outros idiomas fluentes"
+		},
+		"user rights": { // USED
+			"en": "User rights",
+			"fr": "Droits d’utilisateurs",
+			"es": "Derechos de usuario",
+			"pt": "Direitos de uso"
+		},
+		"grant rights": { // USED
+			"en": "Grant rights",
+			"fr": "Accorder les droits",
+			"es": "Otorgar derechos",
+			"pt": "Conceder direitos"
+		},
+		"teams": { // USED
+			"en": "Teams",
+			"fr": "Équipes",
+			"es": "Equipos",
+			"pt": "Times"
+		},
+		"assign to teams": { // USED
+			"en": "Assign to teams",
+			"fr": "Assigner à des équipes",
+			"es": "Asignar a equipos",
+			"pt": "Atribuir a equipes"
+		},
+		"accept to review": { // USED
+			"en": "Accept to review",
+			"fr": "Accepter de relire",
+			"es": "Aceptar revisar",
+			"pt": "Aceitar revisar"
+		},
+		"yes": { // USED
+			"en": "Yes",
+			"fr": "Oui",
+			"es": "Sí",
+			"pt": "Sim"
+		},
+		"no": { // USED
+			"en": "No",
+			"fr": "Non",
+			"es": "No",
+			"pt": "não"
+		},
+		"email notifications": { // USED
+			"en": "Receive email notifications",
+			"fr": "Recevoir des notifications par e-mail",
+			"es": "Recibir notificaciones por correo electrónico",
+			"pt": "Receber notificações por e-mail"
+		},
+		"browse publications": { // USED
+			"en": "Browse publications",
+			"fr": "Parcourir les publications",
+			"es": "Navegar por las publicaciones",
+			"pt": "Procurar publicações"
+		},
+		"reset password": { // USED
+			"en": "Reset password",
+			"fr": "Réinitialiser le mot de passe",
+			"es": "Restablecer la contraseña",
+			"pt": "Redefinir senha"
+		},
+		"old password": { // USED
+			"en": "Old password",
+			"fr": "Ancien mot de passe",
+			"es": "Contraseña anterior",
+			"pt": "Senha antiga"
+		},
+		"verify old password": { // USED
+			"en": "Verify old password",
+			"fr": "Vérifier l’ancien mot de passe",
+			"es": "Verificar contraseña anterior",
+			"pt": "Verifique a senha antiga"
+		},
+		"new password": { // USED
+			"en": "New password",
+			"fr": "Nouveau mot de passe",
+			"es": "Nueva contraseña",
+			"pt": "Nova senha"
+		},
+		"confirm new password": { // USED
+			"en": "Confirm new password",
+			"fr": "Confirmer le nouveau mot de passe",
+			"es": "Confirmar nueva contraseña",
+			"pt": "Confirme a nova senha"
+		},
+		"confirm password": { // USED
+			"en": "Confirm password",
+			"fr": "Confirmer le mot de passe",
+			"es": "Confirmar contraseña",
+			"pt": "Confirme a senha"
+		},
+		"password": { // USED
+			"en": "Password",
+			"fr": "Mot de passe",
+			"es": "Contraseña",
+			"pt": "Senha"
+		},
+		"slideshow": { // USED
+			"en": "Slideshow",
+			"fr": "Diaporama",
+			"es": "Diapositivas",
+			"pt": "Apresentação de slides"
+		},
+		"no entries": { // USED
+			"en": "No entries",
+			"fr": "Aucune entrée",
+			"es": "No entrar",
+			"pt": "Sem entradas"
+		},
+		"unknown": { // USED
+			"en": "Unknown",
+			"fr": "Inconnu",
+			"es": "Desconocido",
+			"pt": "Desconhecido"
+		},
+		
+		"section header": { // USED
+			"en": "Section header",
+			"fr": "En-tête de section",
+			"es": "Encabezado de sección",
+			"pt": "Cabeçalho da seção"
+		},
+		"lead paragraph": { // USED
+			"en": "Lead paragraph",
+			"fr": "Chapeau",
+			"es": "Entradilla",
+			"pt": "Lide"
+		},
+		"repeat section": { // USED
+			"en": "Repeat section",
+			"fr": "Répéter la section",
+			"es": "Repetir la sección",
+			"pt": "Repita a seção"
+		},
+		"repeat group": { // USED
+			"en": "Repeat group",
+			"fr": "Répéter le groupe",
+			"es": "Repetir el grupo",
+			"pt": "Repita o grupo"
+		},
+		"limit input": { // USED
+			"en": (input, max) => {
+				if (input === "characters") return "Limit the input to " + max + "characters." // THIS CANNOT BE A LITERAL SINCE IT NEEDS TO BE EVALUATED AS A JS MULTILINE FUNCTION
+				else if (input === 'locations') return "Limit the input to " + max + "locations."
+				else if (input === 'tags') return "Limit the input to " + max + "tags."
+				else if (input === 'groups') return "Repeat this group at most " + max + " times."
+			},
+			"fr": (input, max) => {
+				if (input === "characters") return "Limiter la saisie à " + max + " caractères."
+				else if (input === 'locations') return "Limiter la saisie à " + max + " emplacements."
+				else if (input === 'tags') return "Limiter la saisie à " + max + " étiquettes."
+				else if (input === 'groups') return "Répéter ce groupe au maximum " + max + " fois"
+			},
+			"es": (input, max) => {
+				if (input === "characters") return "Limitar la entrada a " + max + " caracteres."
+				else if (input === 'locations') return "Limitar la entrada a " + max + " ubicaciones."
+				else if (input === 'tags') return "Limitar la entrada a " + max + " etiquetas."
+				else if (input === 'groups') return "Repetir este grupo como máximo " + max + " veces"
+			},
+			"pt": (input, max) => {
+				if (input === "characters") return "Limitar a entrada a " + max + " caracteres."
+				else if (input === 'locations') return "Limitar a entrada para " + max + " locais."
+				else if (input === 'tags') return "Limitar a entrada para " + max + " etiquetas."
+				else if (input === 'groups') return "Repita este grupo no máximo " + max + " vezes"
+			}
+		},
+		"limit length": { // USED
+			"en": "Limit length",
+			"fr": "Limiter la longueur",
+			"es": "Limitar la longitud",
+			"pt": "Limitar o comprimento"
+		},
+		"": { // USED
+			"en": "",
+			"fr": "",
+			"es": "",
+			"pt": ""
+		},
+		"": { // USED
+			"en": "",
+			"fr": "",
+			"es": "",
+			"pt": ""
+		},
+
+
+		"showing range": { // USED
+			"en": (min, max) => `Showing range [ ${min} – ${max} ]`,
+			"fr": (min, max) => `Affichant l’intervale [ ${min} – ${max} ]`,
+			"es": (min, max) => `Mostrando rango [ ${min} – ${max} ]`,
+			"pt": (min, max) => `Mostrando alcance [ ${min} – ${max} ]`
+		},
+		"showing letter": { // USED
+			"en": (count, letter) => `Showing ${count} whose name(s) start(s) with ${letter}`,
+			"fr": (count, letter) => `Affichant ${count} dont le(s) nom(s) commence(nt) par ${letter}`,
+			"es": (count, letter) => `Mostrando ${count} cuyo(s) nombre(s) comienza(n) con ${letter}`,
+			"pt": (count, letter) => `Mostrando ${count} cujo(s) nome(s) começa(m) com ${letter}`
+		},
+		"distinct locations": { // USED
+			"en": plural => `Distinct location${plural ? 's' : ''}`,
+			"fr": plural => `Emplacement${plural ? 's' : ''} distinct${plural ? 's' : ''}`,
+			"es": plural => plural ? 'Ubicaciones distintas' : 'Ubicación distinta',
+			"pt": plural => plural ? 'Locais distintos' : 'Localização distinta'
+		},
+
+
+
+
+
+		"location instruction": {
+			"en": "Think to include in the instruction that locations need to follow the pattern: village/ town, city, district/ region, and country name (in this order, from smallest administrative unit to largest).",
+			"fr": "Penser à mentioner dans l’instruction qu’un emplacement doit être décrit de la manière suivante : village/ ville, département, région et pays (dans cet ordre, de la plus petite entité administrative à la plus large).",
+			"es": "Escriba un pueblo/ ciudad, distrito/ región y nombre de país (en este orden).",
+			"pt": "Digite uma vila/ cidade, distrito/ região e nome do país (nesta ordem)."
+		},
+		"index instruction": {
+			"en": "List of possible responses:",
+			"fr": "Liste de réponses possibles:",
+			"es": "Lista de posibles respuestas:",
+			"pt": "Lista de respostas possíveis:"
+		},
+		"tag instruction": {
+			"en": "List of possible responses:",
+			"fr": "Liste de réponses possibles:",
+			"es": "Lista de posibles respuestas:",
+			"pt": "Lista de respostas possíveis:"
+		},
+
+		
+		"remove pin": {
+			"en": "Remove pin",
+			"fr": "Supprimer l’emplacement",
+			"es": "Eliminar ubicación",
+			"pt": "Deletar localização"
+		},
+
+		"dblclick to preview": {
+			"en": object => {
+				if (object === 'pad') return 'Double click to view pad.'
+			},
+			"fr": object => {
+				if (object === 'pad') return 'Double-cliquez pour afficher le bloc-notes.'
+			},
+			"es": object => {
+				if (object === 'pad') return 'Haga doble clic para ver la libreta.'
+			},
+			"pt": object => {
+				if (object === 'pad') return 'Clique duas vezes para visualizar o bloco de notas.'
+			}
+		},
+		"click to search or add locations": {
+			"en": "Click to search and add locations",
+			"fr": "Cliquer pour chercher et ajouter des emplacements",
+			"es": "Haga clic para buscar y agregar ubicaciones",
+			"pt": "Clique para pesquisar e adicionar locais"
+		},
+		"click to see options": {
+			"en": "Click to see options",
+			"fr": "Cliquer pour voir les options",
+			"es": "Haga clic para ver opciones",
+			"pt": "Clique para ver as opçōes"
+		},
+		"write instruction": {
+			"en": "Write an instruction",
+			"fr": "Donner une instruction",
+			"es": "Escribe una instrucción",
+			"pt": "Escreva uma instrução"
+		},
+		"add someone": { 
+			"en": "Want to add someone?",
+			"fr": "Ajouter quelqu’un ?",
+			"es": "¿Agregar a alguien?",
+			"pt": "Adicionar alguém?"
+		},
+		"add external resource": { // USED
+			"en": "Add an external resource.",
+			"fr": "Ajouter une ressource externe.",
+			"es": "Agregar un recurso externo.",
+			"pt": "Adicione um recurso externo."
+		},
+		"or paste link": { // USED
+			"en": "Or paste a link.",
+			"fr": "Ou collez un lien.",
+			"es": "O pegar un enlace.",
+			"pt": "Ou cole um link."
+		},
+		"link file": { // USED
+			"en": "Link a file",
+			"fr": "Lier un fichier",
+			"es": "Vincular un archivo",
+			"pt": "Vincular um arquivo"
+		},
+		"successful upload mediatype": { // USED
+			"en": media => {
+				if (media === "video") return "Video successfully uploaded."
+			},
+			"fr": media => {
+				if (media === "video") return "Vidéo téléchargée avec succès."
+			},
+			"es": media => {
+				if (media === "video") return "Video subido con exito."
+			},
+			"pt": media => {
+				if (media === "video") return "Vídeo enviado com sucesso."
+			}
+		},
+		"hide source": { // USED
+			"en": "Hide source",
+			"fr": "Masquer la source",
+			"es": "Ocultar la fuente",
+			"pt": "Esconder a fonte"
+		},
+		"display source": { // USED
+			"en": "Display source",
+			"fr": "Afficher la source",
+			"es": "Mostrar la fuente",
+			"pt": "Mostrar a fonte"
+		},
+		"hide reviews": { // USED
+			"en": "Hide reviews",
+			"fr": "Masquer les avis des relecteurs",
+			"es": "Ocultar las reseñas",
+			"pt": "Esconder os comentários"
+		},
+		"display reviews": { // USED
+			"en": "Display reviews",
+			"fr": "Display les avis des relecteurs",
+			"es": "Mostrar las reseñas",
+			"pt": "Exibir os comentários"
+		},
+		"review": { // USED
+			"en": (verb, plural, preposition) => `${verb ? "Review" : `Review${plural ? 's' : ''}`}${preposition ? " of" : ""}`,
+			"fr": (verb, plural, preposition) => `${verb ? "Relire" : `Relecture${plural ? 's' : ''}`}${preposition ? " de" : ""}`,
+			"es": (verb, plural, preposition) => `${verb ? "Esa reseña" : plural ? "Reseñas" : "Revisión"}${preposition ? " de" : "" }`,
+			"pt": (verb, plural, preposition) => `${verb ? "Rever" : plural ? "Comentários" : "Comente"}${preposition ? " de" : ""}`
+		},
+		"display filters": { // USED
+			"en": "Display the filters",
+			"fr": "Afficher les filtres",
+			"es": "Mostrar los filtros",
+			"pt": "Exibir os filtros"
+		},
+		"display map": { // USED
+			"en": "Display the map",
+			"fr": "Afficher la carte",
+			"es": "Mostrar el mapa",
+			"pt": "Exibir o mapa"
+		},
+		"full screen": { // USED
+			"en": "Full screen",
+			"fr": "Plein écran",
+			"es": "Pantalla completa",
+			"pt": "Tela cheia"
+		},
+
+		"pad based on": { // USED
+			"en": "This pad is based on:",
+			"fr": "Ce bloc-notes est basé sur :",
+			"es": "Este libreta se basa en:",
+			"pt": "Este bloco de notas é baseado em:"
+		},
+		"internally": { // USED
+			"en": "Internally",
+			"fr": "En interne",
+			"es": "Internamente",
+			"pt": "Internamente"
+		},
+		"externally": { // USED
+			"en": "Publicly",
+			"fr": "Publiquement",
+			"es": "En público",
+			"pt": "Publicamente"
+		},
+		"missing reviewers": { // USED
+			"en": "There are not enough reviewers who speak this language.",
+			"fr": "Il n'y a pas assez de relecteurs qui parlent cette langue.",
+			"es": "No hay suficientes revisores que hablen este idioma.",
+			"pt": "Não há revisores suficientes que falem esse idioma."
+		},
+		"select review language": { // USED
+			"en": "Select the language the pad should be reviewed in.",
+			"fr": "Sélectionner la langue dans laquelle le bloc-notes doit être relu.",
+			"es": "Seleccione el idioma en el que se debe revisar el bloc.",
+			"pt": "Selecione o idioma em que o bloco deve ser revisado."
+		},
+		"generate file": { // USED
+			"en": filetype => `Generate a ${filetype} file`,
+			"fr": filetype => `Générer un fichier ${filetype}`,
+			"es": filetype => `Generar un archivo ${filetype}`,
+			"pt": filetype => `Gerar um arquivo ${filetype}`
+		},
+		"pads to display": { // USED
+			"en": count => `${count} pad${count !== 1 ? 's' : ''} to display.`,
+			"fr": count => `${count} bloc${count !== 1 ? 's' : ''}-notes à afficher.`,
+			"es": count => `${count} libreta${count !== 1 ? 's' : ''} para mostrar.`,
+			"pt": count => `${count} bloco${count !== 1 ? 's' : ''} de notas para exibir.`
+		},
+
+		"anonymous contributor": { // USED
+			"en": "Anonymous contributor",
+			"fr": "Contribut.eur.rice anonyme",
+			"es": "Colaborador.or.a anónim.o.a",
+			"pt": "Contribuidor anônimo"
+		},
+		"global": { // USED
+			"en": "Global",
+			"fr": "Global",
+			"es": "Global",
+			"pt": "Global"
+		},
+		"blinded for review": { // USED
+			"en": "Blinded for review",
+			"fr": "Anonymisé pour relecture",
+			"es": "Anonimizado para revisión",
+			"pt": "Anonimizado para revisão"
+		},
+		"delete": { // USED
+			"en": "Delete",
+			"fr": "Effacer",
+			"es": "Eliminar",
+			"pt": "Excluir"
+		},
+		"read more": { // USED
+			"en": "Read more",
+			"fr": "Lire la suite",
+			"es": "Lee mas",
+			"pt": "Consulte mais informação"
+		},
+		"forward": { // USED
+			"en": "Forward to",
+			"fr": "Transférer vers",
+			"es": "Transferir a",
+			"pt": "Transferir para"
+		},
+		"forwarded from": { // USED
+			"en": "Forwarded from",
+			"fr": "Transféré de",
+			"es": "Transferido de",
+			"pt": "Transferido de"
+		},
+		"add to collection": { // USED
+			"en": "Add to collection",
+			"fr": "Ajouter à une collection",
+			"es": "Añadir a una colección",
+			"pt": "Adicionar a uma coleção"
+		},
+		"cancel": { // USED
+			"en": "Cancel",
+			"fr": "Annuler",
+			"es": "Cancelar",
+			"pt": "Cancelar"
+		},
+		"confirm": { // USED
+			"en": "Confirm",
+			"fr": "Confirmer",
+			"es": "Confirmar",
+			"pt": "Confirmar"
+		},
+		"what pads to delete": { // USED
+			"en": "Which pads should be deleted?",
+			"fr": "Quels bloc-notes faut-il supprimer ?",
+			"es": "¿Qué plantillas se deben eliminar?",
+			"pt": "Quais blocos de notas devem ser excluídos?"
+		},
+		"all selected": { // USED
+			"en": "All selected",
+			"fr": "Tous les sélectionnés",
+			"es": "Todo los seleccionado",
+			"pt": "Tudo os selecionado"
+		},
+		"only pad": { // USED
+			"en": padnmame => `Only “${padnmame}”`,
+			"fr": padnmame => `Seulement « ${padnmame} »`,
+			"es": padnmame => `Solamente “${padnmame}”`,
+			"pt": padnmame => `Só “${padnmame}”`
+		},
+		"": { // USED
+			"en": "",
+			"fr": "",
+			"es": "",
+			"pt": ""
+		},
+		"": { // USED
+			"en": "",
+			"fr": "",
+			"es": "",
+			"pt": ""
+		},
+
 	}
 %>

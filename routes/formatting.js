@@ -1,3 +1,5 @@
+const helpers = include('routes/helpers/')
+
 exports.regexQuery = (_data, _language) => { // DO SOMETHING HERE FOR RTL LANGUAGES
 	let m = '\\m' // WORD BOUNDARIES
 	let M = '\\M'
@@ -35,9 +37,9 @@ exports.documents = _data => {
 	}
 
 	let terms = []
-	if (embeddings) terms = embeddings.flat().unique().filter(d => d.charAt(0) !== '-')
+	if (embeddings) terms = helpers.unique.call(embeddings.flat()).filter(d => d.charAt(0) !== '-')
 	let filteredTerms = []
-	if (filters) filteredTerms = filters.flat().unique().filter(d => d.charAt(0) !== '-')
+	if (filters) filteredTerms = helpers.unique.call(filters.flat()).filter(d => d.charAt(0) !== '-')
 	
 	return documents.map(d => {
 		d.matches = []
@@ -45,7 +47,7 @@ exports.documents = _data => {
 			let match
 			if (c.indexOf('*') !== -1) match = [d.description, d.insights, d.application].join(' ').match(new RegExp(`${b}(\#)?${c.trim()}(\\w+)?`, 'gi'))
 			else match = [d.description, d.insights, d.application].join(' ').match(new RegExp(`${b}(\#)?${c.trim()}(\\S+)?`, 'gi'))
-			if (match) match.unique().forEach(b => {
+			if (match) helpers.unique.call(match).forEach(b => {
 				d.description = d.description ? d.description.replace(b, `<span class='highlight-term'>${b}</span>`) : null
 				d.insights = d.insights ? d.insights.replace(b, `<span class='highlight-term'>${b}</span>`) : null
 				d.application = d.application ? d.application.replace(b, `<span class='highlight-term'>${b}</span>`) : null
@@ -63,20 +65,17 @@ exports.documents = _data => {
 	})
 }
 
-// ARRAY FUNCTIONS
-Array.prototype.flat = function () {
-	return [].concat.apply([], this)
-}
-Array.prototype.unique = function (key, onkey) {
-	const arr = []
-	this.forEach(d => {
-		if (!key) {
-			if (arr.indexOf(d) === -1) arr.push(d)
-		}
-		else {
-			if (onkey) { if (arr.map(c => c).indexOf(d[key]) === -1) arr.push(d[key]) }
-			else { if (arr.map(c => c[key]).indexOf(d[key]) === -1) arr.push(d) }
-		}
-	})
-	return arr
-}
+
+// Array.prototype.unique = function (key, onkey) {
+// 	const arr = []
+// 	this.forEach(d => {
+// 		if (!key) {
+// 			if (arr.indexOf(d) === -1) arr.push(d)
+// 		}
+// 		else {
+// 			if (onkey) { if (arr.map(c => c).indexOf(d[key]) === -1) arr.push(d[key]) }
+// 			else { if (arr.map(c => c[key]).indexOf(d[key]) === -1) arr.push(d) }
+// 		}
+// 	})
+// 	return arr
+// }

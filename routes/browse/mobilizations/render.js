@@ -1,96 +1,90 @@
-const DB = require('../../../db-config.js')
-const header_data = require('../../header/').data
-const load = require('./load').main
-const { page_content_limit, modules, lazyload, followup_count } = require('../../../config.js')
+const { page_content_limit, modules, metafields, lazyload, DB } = include('config')
+const header_data = include('routes/header/').data
+const load = require('./load')
+const { array, datastructures } = include('routes/helpers/')
+
 // TO DO: INTEGRATE OPTIONS FROM config.js
 const filter = require('./filter').main
 
 exports.main = (req, res) => {
 	const { object, space } = req.params || {}
+	const { display } = req.query || {}
 	// GET FILTERS
-	const [f_space, order, page] = filter(req)
+	const [ f_space, order, page, full_filters ] = filter(req)
 
 	DB.conn.tx(async t => {
-		const data = await load({ connection: t, req: req })
-		const { pagetitle, path, uuid, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
+		const { participations } = await header_data({ connection: t, req: req })
 	
 		const batch = []
-		// GET MOBILIZATIONS COUNT
-		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (mob.id))::INT, mob.status FROM mobilizations mob
-			WHERE mob.host IN (SELECT id FROM contributors WHERE uuid = $1)
-				OR $1 IN (SELECT c.uuid FROM contributors c INNER JOIN mobilization_contributors mc ON mc.contributor = c.id WHERE mc.mobilization = mob.id)
-			GROUP BY mob.status
-			ORDER BY mob.status
-		;`, [uuid]))
-		// GET MOBILIZATIONS COUNT, ACCORDING TO FILTERS
-		// TO DO
-		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (mob.id))::INT, mob.status FROM mobilizations mob
-			WHERE mob.host IN (SELECT id FROM contributors WHERE uuid = $1)
-				OR $1 IN (SELECT c.uuid FROM contributors c INNER JOIN mobilization_contributors mc ON mc.contributor = c.id WHERE mc.mobilization = mob.id)
-			GROUP BY mob.status
-			ORDER BY mob.status
-		;`, [uuid])) // TO DO: UPDATE FILTER
-		// ;`, [f_search, f_contributors, f_space])) // TO DO: UPDATE FILTER
-		// GET CONTRBIUTOR BREAKDOWN
-		// batch.push(t.any(`
-		// 	SELECT COUNT(t.id), c.name, c.id, c.uuid FROM templates t 
-		// 	INNER JOIN contributors c 
-		// 		ON t.contributor = c.id 
-		// 	WHERE TRUE
-		// 		$1:raw $2:raw $3:raw 
-		// 	GROUP BY c.id
-		// 	ORDER BY c.name
-		// ;`, [f_search, f_contributors, f_space]))
+		
+		// PADS DATA
+		batch.push(load.data({ connection: t, req }))
+		// FILTERS_MENU
+		batch.push(load.filters_menu({ connection: t, participations, req }))
+		// SUMMARY STATISTICS
+		batch.push(load.statistics({ connection: t, req }))
 
 		return t.batch(batch)
-		.then(results => {
-			let [totalcounts, filteredcounts] = results
+		.then(async results => {
+			let [ data,
+				filters_menu,
+				statistics
+			] = results
 
-			return {
-				metadata : {
-					site: {
-						modules: modules
-					},
-					page: {
-						title: pagetitle, 
-						path: path,
-						id: page,
-						lang: lang,
-						activity: path[1],
-						object: object,
-						space: space,
-						query: query
-					},
-					menu : {
-						templates: templates,
-						participations: participations
-					},
-					user: {
-						name: username,
-						country: country,
-						// centerpoint: JSON.stringify(centerpoint),
-						rights: rights
-					}
-				},
-				stats: { 
-					total: totalcounts.sum('count'), 
-					filtered: filteredcounts.sum('count'),
+			const stats = { 
+					total: array.sum.call(statistics.total, 'count'), 
+					filtered: array.sum.call(statistics.filtered, 'count'),
 					
-					ongoing: totalcounts.filter(d => d.status === 1).sum('count'),
-					past: totalcounts.filter(d => d.status === 2).sum('count'),
+					ongoing: statistics.ongoing,
+					past: statistics.past,
 					
 					displayed: data.count,
-					breakdown: filteredcounts,
-					// contributors: contributors.unique('id').length
-				},
-				// filters: filters,
+					breakdown: statistics.filtered,
+					persistent_breakdown: statistics.total
+					// contributors: statistics.contributors,
+				}
+
+			const metadata = await datastructures.pagemetadata({ req, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), display: display || 'rows' })
+			return Object.assign(metadata, { sections: data.sections, stats, filters_menu })
+
+			// return {
+			// 	metadata : {
+			// 		site: {
+			// 			modules,
+			// 			metafields
+			// 		},
+			// 		page: {
+			// 			title: pagetitle, 
+			// 			path,
+			// 			id: page,
+			// 			count: Math.ceil(array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit),
+			// 			// count: Math.ceil(array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit),
+			// 			lazyload,
+			// 			language,
+			// 			activity: path[1],
+			// 			object,
+			// 			space,
+			// 			query,
+			// 			map: false
+			// 		},
+			// 		menu : {
+			// 			templates,
+			// 			participations
+			// 		},
+			// 		user: {
+			// 			uuid,
+			// 			name: username,
+			// 			country,
+			// 			centerpoint: JSON.stringify(req.session.country?.lnglat || {}),
+			// 			rights
+			// 		}
+			// 	},
+			// 	filters_menu,
 				
-				// mobilizations: data.mobilizations,
-				sections: data.sections
-			}
+			// 	// mobilizations: data.mobilizations,
+			// 	sections: data.sections
+			// }
 		})
-	}).then(data => res.render('browse-mobilizations', data))
+	}).then(data => res.render('browse/', data))
 	.catch(err => console.log(err))
 }

@@ -1,0 +1,7 @@
+exports.translations = {
+	"email notifications": {
+
+	}
+}
+
+

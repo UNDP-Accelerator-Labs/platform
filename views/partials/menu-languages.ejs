@@ -1,36 +1,51 @@
+<%
+	// CREATE ALIASES
+	const publicpage = locals.metadata.page.public
+	const languages = locals.metadata.site.languages
+	const language = locals.metadata.page.language
+	const username = locals.metadata.user.name
+	const uuid = locals.metadata.user.uuid
+
+%>
+
 <nav id='languages'>
-	<ul>
-		<li class='home-btn'>
+	<menu>
+		<!-- TO DO: PASS THIS FROM CONFIG FILE (THERE MIGHT NOT ALWAYS BE A SUITE) -->
+		<li class='home-btn lg'>
 			<a href='https://acclabs-global.azurewebsites.net/'>Accelerator Labs Suite</a>
 		</li>
-		<li id='lang-en'>
-			<a class='<% if (locals.metadata.page.lang === "en") { %>active<% } %>'>EN</a>
+		<li class='options'>
+			<ul>
+				<% languages.forEach(d => { %>
+					<li id='lang-<%- d.language %>'>
+						<a class='<% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
+					</li>
+				<% }) %>
+			</ul>
 		</li>
-		<li id='lang-fr'>
-			<a class='<% if (locals.metadata.page.lang === "fr") { %>active<% } %>'>FR</a>
-		</li>
-		<li id='lang-ar' class='disabled'>
-			<a>AR</a>
-		</li>
-		<li id='lang-es'>
-			<a class='<% if (locals.metadata.page.lang === "es") { %>active<% } %>'>ES</a>
-		</li>
-		<li id='lang-pt'>
-			<a class='<% if (locals.metadata.page.lang === "pt") { %>active<% } %>'>PT</a>
-		</li>
-
 		<li class='user-id'>
-			<span class='lg'><%- vocabulary['logged in'][locals.metadata.page.lang](locals.metadata.user.name) %>. | </span><a href='/logout' class='logout'><%- vocabulary['log out'][locals.metadata.page.lang] %></a>
+			<% if (!publicpage) { %>
+				<span><%- vocabulary['logged in'][language](username, uuid) %>. | </span><a href='/logout' class='logout'><%- vocabulary['log out'][language] %></a>
+			<% } else { %>
+				<a href='/login' class='login'><%- vocabulary['log in'][language] %></a> 
+			<% } %>
 		</li>
-	</ul>
+	</menu>
 </nav>
+<button id='expand-nav' class='expand-filters xs' onclick='expandmenu(this)'>
+	<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
+</button>
 
 <script type='text/javascript'>
 	// SET PATHS
 	const url = new URL(window.location)
 	const pathname = `${url.pathname.split('/').slice(2).join('/')}${url.search}`
-	d3.select('#lang-en a').attr('href', `/en/${pathname}`)
-	d3.select('#lang-fr a').attr('href', `/fr/${pathname}`)
-	d3.select('#lang-es a').attr('href', `/es/${pathname}`)
-	d3.select('#lang-pt a').attr('href', `/pt/${pathname}`)
+	<% languages.forEach(d => { %>
+		d3.select('#lang-<%- d.language %> a').attr('href', `/<%- d.language %>/${pathname}`)
+	<% }) %>
+
+	function expandmenu (node) {
+		d3.select(node).toggleClass('close')
+		d3.select('header').toggleClass('open')
+	}
 </script>

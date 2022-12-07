@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang='<%- locals.metadata.page.lang %>'>
+<html lang='<%- locals.metadata.page.language %>'>
 <head>
 
 <%- include ('partials/head.ejs') %> 
-
-<!-- <script type='text/javascript' src='/js/template.js'></script> -->
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
 	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
@@ -37,13 +35,13 @@
 		<div class='head'>
 			<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
 				<% if (locals.metadata.page.activity === 'edit') { %>
-					<a href='<%- locals.metadata.page.referrer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
+					<a href='<%- locals.metadata.page.referer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.language] %></a>
 				<% } %>
-				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.lang] %>' onblur='partialSave("title")' contenteditable><%- locals.mobilization.title %></div>
+				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>' onblur='partialSave("title")' contenteditable><%- locals.mobilization.title %></div>
 			<% } else { %>
-				<a href='<%- locals.metadata.page.referrer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.lang] %></a>
-				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.lang] %>'><%- locals.mobilization.title %></div>
-				<div class='contributor'><%- vocabulary['host credit'][locals.metadata.page.lang](locals.mobilization.host, locals.mobilization.hostname) %></div>
+				<a href='<%- locals.metadata.page.referer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.language] %></a>
+				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>'><%- locals.mobilization.title %></div>
+				<div class='contributor'><%- vocabulary['host credit'][locals.metadata.page.language](locals.mobilization.host, locals.mobilization.hostname) %></div>
 			<% } %>
 		</div>
 		
@@ -52,7 +50,7 @@
 
 			<!-- <section class='media-layout layout <%- locals.metadata.page.activity %>'>
 				<div class='input-type'>
-					<label><%- vocabulary['media'][locals.metadata.page.lang] %></label>
+					<label><%- vocabulary['media'][locals.metadata.page.language] %></label>
 				</div>
 			</section> -->
 
@@ -69,7 +67,7 @@
 
 <script type='text/javascript'>
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
-	var lang = '<%- locals.metadata.page.lang %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
+	var lang = '<%- locals.metadata.page.language %>'; // THIS NEEDS TO BE A GLOBAL VARIABLE
 	
 	let activity = '<%- locals.metadata.page.activity %>';
 	const editing = ['contribute', 'edit'].includes(activity)
@@ -185,20 +183,19 @@
 	// POPULATE THE PAGE
 	if (['edit', 'view'].includes(activity)) {
 		// const data = <%- JSON.stringify(locals.data || {}) %>;
-		// published = data.published
 
 		// head.select('.title').html(data.title)
 		// descriptionLayout.select('.media-container .media-txt').text(data.description)
 		// if (data.sections) {
 		// 	data.sections.forEach(d => {
-		// 		addSection({ data: d, lang: '<%- locals.metadata.page.lang %>' })
+		// 		addSection({ data: d, lang: '<%- locals.metadata.page.language %>' })
 		// 	})
 		// }
 		//// CLEAR CHANGES
 		// window.sessionStorage.removeItem('changed-content')
 	} else {
-		// addSection({ lang: '<%- locals.metadata.page.lang %>' })
-		// addTitle({ lang: '<%- locals.metadata.page.lang %>' })
+		// addSection({ lang: '<%- locals.metadata.page.language %>' })
+		// addTitle({ lang: '<%- locals.metadata.page.language %>' })
 		//// CLEAR CHANGES
 		// window.sessionStorage.removeItem('changed-content')
 	}

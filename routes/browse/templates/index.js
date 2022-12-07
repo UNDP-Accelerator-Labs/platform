@@ -1,3 +1,3 @@
-exports.load = require('./load').main
+exports.load = require('./load').data
 exports.render = require('./render').main
 exports.filter = require('./filter').main

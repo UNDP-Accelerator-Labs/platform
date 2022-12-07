@@ -1,299 +1,198 @@
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, DB } = include('config')
+const header_data = include('routes/header/').data
+const { array, datastructures, checklanguage, join } = include('routes/helpers/')
+
 const fetch = require('node-fetch')
-const DB = require('../../../db-config.js')
-const header_data = require('../../header/').data
-const load = require('./load').main
-const { page_content_limit, modules, lazyload, followup_count } = require('../../../config.js')
+
+const load = require('./load')
 const filter = require('./filter').main
 
-exports.main = (req, res) => { 
-	const { object, space } = req.params || {}
+exports.main = async (req, res) => { 
+	let { mscale, display, pinboard } = req.query || {}
+	const { instance } = req.params || {}
+	if (instance) pinboard = res.locals.instance_vars.pinboard
+	
+	if (req.session.uuid) { // USER IS LOGGED IN
+		var { uuid, rights, collaborators, public } = req.session || {}
+	} else { // PUBLIC/ NO SESSION
+		var { uuid, rights, collaborators, public } = datastructures.sessiondata({ public: true }) || {}
+	}
+	const language = checklanguage(req.params?.language || req.session.language)
+
 	// GET FILTERS
-	const [f_space, order, page, full_filters] = filter(req)
+	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	let collaborators_ids = collaborators.filter(d => d.rights > 0).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
 
 	DB.conn.tx(async t => {
-		const data = await load({ connection: t, req })
-		const { pagetitle, path, uuid, username, country, rights, lang, query, templates, participations } = await header_data({ connection: t, req: req })
+		const { participations } = await header_data({ connection: t, req })
 		
 		const batch = []
 		
+		// PADS DATA
+		batch.push(load.data({ connection: t, req, res }))
+		// FILTERS MENU DATA
+		batch.push(load.filters_menu({ connection: t, participations, req, res }))
 		// SUMMARY STATISTICS
+		batch.push(load.statistics({ connection: t, req, res }))
+		// LOCATIONS DATA
 		batch.push(t.task(t1 => {
 			const batch1 = []
-			// GET PADS COUNT BY STATUS
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, p.status FROM pads p
-				WHERE TRUE
-					$1:raw
-				GROUP BY p.status
-				ORDER BY p.status
-			;`, [f_space]).then(d => { return { totalcounts: d } }))
-			// GET PADS COUNT, ACCORDING TO FILTERS
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, p.status FROM pads p
-				LEFT JOIN mobilization_contributions mob
-					ON p.id = mob.pad
-				WHERE TRUE 
-					$1:raw $2:raw
-				GROUP BY p.status
-				ORDER BY p.status
-			;`, [full_filters, f_space]).then(d => { return { filteredcounts: d } }))
-			// GET PRIVATE PADS COUNT
-			batch1.push(t1.one(`
-				SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-				WHERE p.contributor IN (SELECT id FROM contributors WHERE country = $1)
-				OR $2 > 2
-			;`, [country, rights], d => d.count).then(d => { return { privatecount: d } }))
-			// GET PUBLIC PADS COUNT
-			batch1.push(t1.one(`
-				SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-				WHERE p.status = 2
-			;`, [], d => d.count).then(d => { return { publiccount: d } }))
+			// GET LOCATIONS, ACCORDING TO FILTERS
+			if (metafields.some(d => d.type === 'location') && map) {
+				// TO DO: DEFAULT HERE IS DBSCAN, MAKE THIS DEPENDENT ON req.query
+				// WE NEED CLUSTERS
+				// [1000, 100] ARE THE DISTANCES (IN KM) FOR THE DBSCAN CLUSTERING
+				[1000, 100].forEach(d => {
+					batch1.push(t1.any(`
+						SELECT 
+						jsonb_build_object(
+							'type', 'Feature',
+							'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
+							'properties', json_build_object('pads', json_agg(DISTINCT (clusters.pad)), 'count', COUNT(clusters.pad), 'cid', clusters.cid)::jsonb
+						) AS json
+						FROM (
+							SELECT points.pad, ST_ClusterDBSCAN(points.projected_geom, eps := $1, minpoints := 2) over () AS cid, points.geo
+							FROM (
+								SELECT ST_Transform(ST_SetSRID(ST_Point(l.lng, l.lat), 4326), 3857) AS projected_geom, ST_Point(l.lng, l.lat) AS geo, l.pad 
+								FROM locations l
+								INNER JOIN pads p
+									ON l.pad = p.id
+								WHERE TRUE
+									$2:raw
+							) AS points
+						) clusters
+						GROUP BY (clusters.cid)
+						ORDER BY clusters.cid
+					;`, [ d * 1000, full_filters ])
+					.then(results => results.map(d => d.json))
+					.catch(err => console.log(err)))
+				})
+				// NEED EXTRA LEVEL WITH SINGLE (NOT CLUSTERED) POINTS
+				batch1.push(t1.any(`
+					SELECT 
+					jsonb_build_object(
+						'type', 'Feature',
+						'geometry', ST_AsGeoJson(points.geo)::jsonb,
+						'properties', json_build_object('pads', json_agg(DISTINCT (points.pad)), 'count', COUNT(points.pad), 'cid', NULL)::jsonb
+					) AS json
+					FROM (
+						SELECT ST_Point(l.lng, l.lat) AS geo, l.pad 
+						FROM locations l
+						INNER JOIN pads p
+							ON l.pad = p.id
+						WHERE TRUE
+							$1:raw
+					) AS points
+					GROUP BY (points.geo)
+				;`, [ full_filters ])
+				.then(results => results.map(d => d.json))
+				.catch(err => console.log(err)))
+			} else if (map) { 
+				// USERS CANNOT INPUT LOCATIONS, BUT THERE IS A MAP SO WE POPULATE IT WITH USER LOCATION INFO
+				batch1.push(t1.any(`
+					SELECT p.id AS pad, p.owner FROM pads p
+					WHERE p.id NOT IN (SELECT review FROM reviews)
+						$1:raw
+				;`, [ full_filters ])
+				.then(results => {
+					if (results.length) {
+						const columns = Object.keys(results[0])
+						const values = DB.pgp.helpers.values(results, columns)
+						const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
+						
+						return DB.general.any(`
+							SELECT 
+							jsonb_build_object(
+								'type', 'Feature',
+								'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
+								'properties', json_build_object('pads', json_agg(clusters.pad), 'count', COUNT(clusters.pad), 'cid', clusters.cid)::jsonb
+							) AS json
+							FROM (
+								SELECT c.iso3 AS cid, ST_Point(c.lng, c.lat) AS geo, t.pad FROM countries c
+								INNER JOIN users u 
+									ON u.iso3 = c.iso3
+								INNER JOIN ($1:raw) t
+									ON t.owner::uuid = u.uuid::uuid
+							) AS clusters
+							GROUP BY (clusters.cid)
+							ORDER BY clusters.cid
+						;`, [ set_table ])
+						.then(results => results.map(d => d.json))
+						.catch(err => console.log(err))
+					} else return null
+				}).catch(err => console.log(err)))
+			}
+			// batch1.push(t1.any())
 			return t1.batch(batch1)
-		}).then(d => d.flatObj()))
-
-		// GET LOCATIONS, ACCORDING TO FILTERS
-		// THIS IS CURRENTLY NOT USED
-		batch.push(t.any(`
-			SELECT p.location, p.status FROM pads p
-			LEFT JOIN mobilization_contributions mob
-				ON p.id = mob.pad
-			WHERE TRUE
-				$1:raw $2:raw
-		;`, [full_filters, f_space]))
-		// GET THE CENTERPOINT FOR THE MAPPER, IN CASE THERE ARE NO SOLUTIONS (THE MAPS AUTO-CENTERS ON THE LOCATION OF THE CONTRIBUTOR)
-		// THIS IS CURRENTLY NOT USED
-		batch.push(t.one(`
-			SELECT cp.lat, cp.lng FROM centerpoints cp
-			INNER JOIN contributors c
-				ON c.country = cp.country
-			WHERE c.uuid = $1
-		;`, [uuid]))
-		
-		// THE FOLLOWING IS MAINLY FOR THE "NEW" MENU
-		// GET TEMPLATE BREAKDOWN
-		// batch.push(t.any(`
-		// 	SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
-		// 	INNER JOIN templates t 
-		// 		ON p.template = t.id
-		// 	WHERE (t.contributor = (SELECT id FROM contributors WHERE uuid = $1) AND t.status >= 1)
-		// 		OR t.status = 2
-		// 	GROUP BY t.id
-		// ;`, [uuid]))
-		// GET CONTRBIUTOR BREAKDOWN
-		// DEPENDING ON space, GET names OR COUNTRIES
-		batch.push(t.any(`
-			SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.id FROM pads p 
-			INNER JOIN contributors c 
-				ON p.contributor = c.id 
-			LEFT JOIN mobilization_contributions mob
-				ON p.id = mob.pad
-			WHERE TRUE
-				$1:raw
-			GROUP BY c.id
-			ORDER BY c.name
-		;`, [full_filters]))
-		// GET MOBILIZATIONS BREAKDOWN
-		// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
-		// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
-		if (participations.length) { // TO DO: PB HERE
-			// mob SHUOLD BE ON TABLE mobilization_contributions, NOT mobilizations IF FILTERING OR MOBILIZATION
+			.catch(err => console.log(err))
+		}))
+		// PINBOARDS LIST
+		if (modules.some(d => d.type === 'pinboards' && d.rights.read <= rights)) {
 			batch.push(t.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, m.id, m.title FROM pads p 
-				INNER JOIN mobilization_contributions mob 
-					ON mob.pad = p.id
-				INNER JOIN mobilizations m
-					ON m.id = mob.mobilization
-				WHERE m.id IN ($1:csv)
-					$2:raw $3:raw
-				GROUP BY m.id
-				ORDER BY m.title
-			;`, [participations.map(d => d.id), full_filters, f_space]))
-		} else batch.push([])
+				SELECT p.id, p.title, 
+					COALESCE(
+						(SELECT COUNT (DISTINCT (pad)) FROM pinboard_contributions WHERE pinboard = p.id),
+						(SELECT COUNT (DISTINCT (pad)) FROM mobilization_contributions WHERE mobilization = p.mobilization),
+					0)::INT AS count 
 
-		// GET THE FILTERS
-		batch.push(t.task(t1 => {
-			const batch1 = []
-			// GET CONTRBIUTOR BREAKDOWN
-			// DEPENDING ON space, GET names OR COUNTRIES
-			if (space === 'private') {
-				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, c.name, c.country, c.id FROM pads p 
-					INNER JOIN contributors c 
-						ON p.contributor = c.id 
-					WHERE TRUE
-						$1:raw
-					GROUP BY c.id
-					ORDER BY c.name
-				;`, [f_space]).then(d => { return { contributors: d } }))
-			} else if (space === 'public') {
-				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, c.country AS name, cp.id FROM pads p 
-					INNER JOIN contributors c 
-						ON p.contributor = c.id 
-					INNER JOIN centerpoints cp
-						ON c.country = cp.country
-					WHERE TRUE
-						$1:raw
-					GROUP BY (c.country, cp.id)
-					ORDER BY c.country
-				;`, [f_space]).then(d => { return { countries: d } }))
-			} else batch1.push([])
-			// GET TEMPLATE BREAKDOWN
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
-				INNER JOIN templates t 
-					ON p.template = t.id
-				WHERE TRUE 
-					$1:raw
-				GROUP BY t.id
-			;`, [f_space]).then(d => { return { templates: d } }))
-			// GET MOBILIZATIONS BREAKDOWN
-			// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
-			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
-			if (participations.length) {
-				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, mob.id, mob.title FROM pads p 
-					INNER JOIN mobilization_contributions mc 
-						ON mc.pad = p.id
-					INNER JOIN mobilizations mob
-						ON mob.id = mc.mobilization
-					WHERE mob.id IN ($1:csv)
-						$2:raw
-					GROUP BY mob.id
-					ORDER BY mob.title
-				;`, [participations.map(d => d.id), f_space]).then(d => { return { mobilizations: d } }))
-			} else batch1.push({ mobilizations: [] })
-			// GET THE THEMATIC AREA BREAKDOWN
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
-				WHERE type = 'tags'
-				GROUP BY (tag_name, tag_id)
-				ORDER BY tag_name
-			;`).then(d => { return { thematic_areas: d } }))
-			// GET THE SDGs BREAKDOWN
-			// batch1.push(t1.any(`
-			// 	SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
-			// 	WHERE type = 'sdgs'
-			// 	GROUP BY (tag_name, tag_id)
-			// 	ORDER BY tag_id
-			// ;`).then(d => { return { sdgs: d } }))
-			// THE LOGIC FOR SDGs SHOULD BE SLIGHTLY DIFFERENT: WE ONLY WANT THE SDG KEY, AS THERE MAY BE NAMES STORED IN MULTIPLE LANGUAGES
-			// NAMES WILL BE RETRIEVED ON THE FRONT END FROM THE SOLUTIONS MAPPING PLATFORM (OR MAYBE DOWN THE ROAD FROM THE GLOBAL LOGIN PLATFORM)
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (pad))::INT, tag_id FROM tagging
-				WHERE type = 'sdgs'
-				GROUP BY tag_id
-				ORDER BY tag_id
-			;`).then(d => { return { sdgs: d } }))
-			// GET THE METHODS (SKILLS) BREAKDOWN
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
-				WHERE type = 'skills'
-				GROUP BY (tag_name, tag_id)
-				ORDER BY tag_name
-			;`).then(d => { return { methods: d } }))
-			// GET THE DATA SOURCES BREAKDOWN
-			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (pad))::INT, tag_name, tag_id FROM tagging
-				WHERE type = 'datasources'
-				GROUP BY (tag_name, tag_id)
-				ORDER BY tag_name
-			;`).then(d => { return { datasources: d } }))
-			return t1.batch(batch1)
-		}).then(d => d.flatObj()))
-		// CHECK NUMBER OF PUBLISHED PADS
-		// THIS IS TO LIMIT THE NUMBER THAT CAN BE PUBLISHED
-		// THIS IS ALSO PROBABLY DEPRECATED NOW
-		batch.push(t.one(`
-			SELECT COUNT (id)::INT FROM pads
-			WHERE status = 2
-			AND contributor IN 
-				(SELECT id FROM contributors WHERE country = (SELECT country FROM contributors WHERE uuid = $1))
-		;`, [uuid]))
+				FROM pinboards p
+				
+				WHERE $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = p.id)
+				GROUP BY p.id
+				ORDER BY p.title
+			;`, [ uuid ]))
+		} else batch.push(null)
+		// PINBOARD 
+		if (modules.some(d => d.type === 'pinboards') && pinboard) {
+			batch.push(t.one(`
+				SELECT *, 
+					CASE WHEN owner = $1
+					OR $2 > 2
+						THEN TRUE
+						ELSE FALSE
+					END AS editable
+
+				FROM pinboards
+				WHERE id = $3::INT
+			;`, [ uuid, rights, pinboard ])
+			.then(async result => {
+				const data = await join.users(result, [ language, 'owner' ])
+				return data
+			}).catch(err => console.log(err)))
+		} else batch.push(null)
 
 		return t.batch(batch)
 		.then(async results => {
-			// let [totalcounts, filteredcounts, locations, centerpoint, sdgs, thematic_areas, templates, contributors, mobilizations] = results
-			let [ statistics, 
-				locations, 
-				centerpoint, 
-				// templates, 
-				contributors, 
-				mobilizations, 
-				filters,
-				publications ] = results
+			let [ data,
+				filters_menu,
+				statistics, 
+				clusters,
+				pinboards_list,
+				pinboard,
+			] = results
 
-			// IF SDG TAGS ARE USED, GO FETCH THE NAME AND DETAILS FROM THE SOlUTIONS MAPPING PLATFORM
-			await new Promise(resolve => {
-				if (filters.sdgs.length) {
-					fetch(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${lang}`)
-						.then(response => response.json())
-						.then(sdgs => {
-							filters.sdgs.forEach(d => {
-								d.tag_name = sdgs.find(s => +s.key === +d.tag_id)?.name
-							})
-							resolve()
-						}).catch(err => console.log(err))					
-				} else resolve()
-			})
-			
-			return { 
-				metadata : {
-					site: {
-						modules: modules
-					},
-					page: {
-						title: pagetitle, 
-						path: path,
-						id: page,
-						count: Math.ceil((statistics.filteredcounts.sum('count') || 0) / page_content_limit),
-						// count: Math.ceil((statistics.filteredcounts.find(d => d.status === pubstatus)?.count || 0) / lazyLimit),
-						lazyload: lazyload,
-						lang: lang,
-						activity: path[1],
-						object: object,
-						space: space,
-						query: query
-					},
-					menu : {
-						templates: templates,
-						participations: participations
-					},
-					user: {
-						name: username,
-						country: country,
-						centerpoint: JSON.stringify(centerpoint),
-						rights: rights
-					}
-				},
-				stats: { 
-					total: statistics.totalcounts.sum('count'), 
-					filtered: statistics.filteredcounts.sum('count'), 
-					
-					privatecount: statistics.privatecount,
-					publiccount: statistics.publiccount,
-					
-					displayed: data.count,
-					breakdown: statistics.filteredcounts,
-					contributors: contributors.unique('id').length,
-					// sdgs: sdgs.unique('key').length,
-					// thematic_areas: thematic_areas.unique('name').length
-				},
-				filters: filters,
-
-				pads: data.pads, // STILL NEED THIS FOR THE MAP AND PIE CHARTS. ULTIMATELY REMOVE WHEN NEW EXPLORE VIEW IS CREATED
-				sections: data.sections,
-				publications: publications.count
+			const { sections, pads } = data
+			const stats = { 
+				total: array.sum.call(statistics.total, 'count'), 
+				filtered: array.sum.call(statistics.filtered, 'count'), 
 				
-				// locations: JSON.stringify(locations), 
-				// clusters: JSON.stringify(clusters),
+				private: statistics.private,
+				curated: statistics.curated,
+				shared: statistics.shared,
+				reviewing: statistics.reviewing,
+				public: statistics.public,
+				
+				displayed: data.count,
+				breakdown: statistics.filtered,
+				persistent_breakdown: statistics.persistent,
+				contributors: statistics.contributors,
+				tags: statistics.tags
 			}
-		})
-	}).then(data => res.render('browse-pads', data))
-	.catch(err => console.log(err))
-}
 
-Array.prototype.flatObj = function () {
-	// FLATTEN OBJECT: https://stackoverflow.com/questions/31136422/flatten-array-with-objects-into-1-object
-	return Object.assign.apply(Object, this)
+			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && !pinboard?.editable ? 'slideshow' : display, mscale })
+			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, stats, filters_menu })
+		}).catch(err => console.log(err))
+	}).then(data => res.render('browse/', data))
+	.catch(err => console.log(err))
 }

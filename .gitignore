@@ -12,3 +12,4 @@ dep.*
 tmp/
 routes/scripts/
 public/generated/
+presentations/

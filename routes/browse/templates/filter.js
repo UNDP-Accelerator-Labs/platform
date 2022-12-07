@@ -1,33 +1,91 @@
-const DB = require('../../../db-config.js')
+const { DB, engagementtypes } = include('config')
+const { parsers } = include('routes/helpers')
 
 exports.main = req => {
-	const { uuid, rights, restricted, restrictedTemplate } = req.session || {}
+	const { uuid, rights, collaborators } = req.session || {}
 	const { space } = req.params
-	
-	let { query, mappers, mobilizations, page } = req.query && Object.keys(req.query).length ? req.query : req.body && Object.keys(req.body).length ? req.body : {}
-	const sudo = rights > 2
+	let { search, status, contributors, countries, templates, mobilizations, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
-	// CONVERT EVERYTHING TO ARRAYS
-	if (mappers && !Array.isArray(mappers)) mappers = [mappers]
-	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations]
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
-	else page = +page
+	else page = +page	
 
-	const 	q_parsed 			= query 				? query.trim().toLowerCase().split(' or ').map(d => d.split(' ')) 				: null
-	const 	q_contributors		= mappers 				? mappers.map(d => +d) 															: null
-	const 	q_mobilizations		= mobilizations 		? mobilizations.map(d => +d)													: null
+	let collaborators_ids = collaborators.filter(d => d.rights > 0).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+	
 	// FILTERS
-	const 	f_search 			= q_parsed 				? DB.pgp.as.format(`AND (t.full_text ~* $1)`, [format.regexQuery(q_parsed)])	: ''
-	const 	f_contributors		= q_contributors		? DB.pgp.as.format(`AND t.contributor IN ($1:csv)`, [q_contributors]) 			: ''
-	const 	f_mobilizations		= q_mobilizations 		? DB.pgp.as.format(`AND mob.id IN ($1:csv)`, [q_mobilizations])		: ''
-	// PUBLIC/ PRIVATE FILTERS
-	let f_space = ''
-	if (space === 'private' && !sudo) 					f_space					= DB.pgp.as.format(`AND t.contributor IN (SELECT id FROM contributors WHERE uuid = $1)`, [uuid])
-	if (space === 'bookmarks') 							f_space		 			= DB.pgp.as.format(`AND t.id IN (SELECT pad FROM engagement_templates WHERE contributor = (SELECT id FROM contributors WHERE uuid = $1) AND type = 'bookmark')`, [uuid])
-	if (space === 'public')	 							f_space 				= DB.pgp.as.format(`AND t.status = 2`)
-	// ORDER
-	let 	order 				= DB.pgp.as.format(`ORDER BY t.status ASC, t.date DESC`)
+	return new Promise(async resolve => {
 
-	return [f_search, f_contributors, f_mobilizations, f_space, order, page]
+		// BASE FILTERS
+		const base_filters = []
+		if (search) base_filters.push(DB.pgp.as.format(`AND t.full_text ~* $1`, [ parsers.regexQuery(search) ]))
+		if (status) base_filters.push(DB.pgp.as.format(`AND t.status IN ($1:csv)`, [ status ]))
+
+		let f_space = ''
+		if (space === 'private') f_space = DB.pgp.as.format(`AND (t.owner IN ($1:csv) AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
+		if (space === 'curated') f_space = DB.pgp.as.format(`
+			AND (t.id IN (
+					SELECT template FROM mobilizations 
+					WHERE child = TRUE 
+						AND source IN (
+							SELECT id FROM mobilizations WHERE owner IN ($1:csv)
+						)
+					) 
+				OR $2 > 2) 
+			AND (t.owner NOT IN ($1:csv) OR t.owner IS NULL) AND t.status < 2`, [ collaborators_ids, rights ])
+		engagementtypes.forEach(e => {
+			if (space === `${e}s`) f_space = DB.pgp.as.format(`AND t.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'template' AND type = $2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ uuid, e ])
+		})
+		if (space === 'shared') f_space = DB.pgp.as.format(`AND (t.status = 2 AND t.id NOT IN (SELECT template FROM review_templates))`)
+		if (space === 'public') f_space = DB.pgp.as.format(`AND (t.status = 3 t.id NOT IN (SELECT template FROM review_templates))`)
+		if (space === 'reviews') f_space = DB.pgp.as.format(`AND t.id IN (SELECT template FROM review_templates)`)
+		// TO DO: curated SPACE FOR SUDO
+
+		base_filters.push(f_space)
+
+		// PLATFORM FILTERS
+		const platform_filters = []
+		if (templates) platform_filters.push(DB.pgp.as.format(`t.id IN ($1:csv)`, [ templates ]))
+		if (contributors) platform_filters.push(DB.pgp.as.format(`t.owner IN ($1:csv)`, [ contributors ]))
+		if (countries) {
+			platform_filters.push(await DB.general.any(`
+				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
+			;`, [ countries ])
+			.then(results =>  DB.pgp.as.format(`t.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.catch(err => console.log(err)))
+		}
+		if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.id IN (SELECT template FROM mobilizations WHERE id IN ($1:csv))`, [ mobilizations ]))
+
+		// ORDER
+		let order = DB.pgp.as.format(`ORDER BY t.date DESC`)
+
+		const filters = [ base_filters.filter(d => d).join(' '), platform_filters.filter(d => d).join(' OR ') ].filter(d => d).join(' AND ')
+		resolve([ f_space, order, page, filters ])
+	})
+
+	// const platform_filters = [f_contributors, f_countries, f_mobilizations].filter(d => d).join(' OR ')
+	// const content_filters = [].filter(d => d).join(' OR ')
+	// const display_filters = []
+
+	// let filters = ''
+	// if (f_templates) {
+	// 	filters += f_templates
+	// 	if (f_search || f_status || platform_filters !== '' || (platform_filters === '' && content_filters !== '')) filters += ' AND '
+	// }
+	// if (f_search) {
+	// 	filters += f_search
+	// 	if (f_status || platform_filters !== '' || (platform_filters === '' && content_filters !== '')) filters += ' AND '
+	// }
+	// if (f_status) {
+	// 	filters += f_status
+	// 	if (platform_filters !== '' || (platform_filters === '' && content_filters !== '')) filters += ' AND '
+	// }
+	// if (platform_filters !== '') {
+	// 	filters += `(${platform_filters})`
+	// 	if (content_filters !== '') filters += ' AND '
+	// }
+	// if (content_filters !== '') filters += `(${content_filters})`
+	// if (filters.length) filters = `AND ${filters}`
+
+	// return [ f_space, order, page, filters ]
 }

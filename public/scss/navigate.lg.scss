@@ -77,7 +77,7 @@ nav.tabs {
 	padding: 0 15px;
 	border-bottom: 1px solid $c-dark-blue;
 	background-color: #FFF;
-	z-index: 100;
+	z-index: 10000;
 
 	.inner {
 		width: 100%;
@@ -275,10 +275,9 @@ header {
 		flex-direction: column;
 		justify-content: space-between;
 		height: 100vh;
-		/*width: 15%;*/
 		width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
 		top: 0;
-		z-index: 1000;
+		z-index: 10001;
 
 		nav#site-title {
 			display: block;
@@ -698,91 +697,94 @@ header {
 	vertical-align: top;
 	width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
 	min-height: 100vh;
+}
+.sidebar > .inner {
+	position: relative;
+	width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
+	height: 100vh;
 
-	.inner {
-		position: relative;
-		width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
-		height: 100vh;
-
-		#statistics {
-			padding: 45px 30px 15px 5px;
-		
-			.statistic {
-				position: relative;
-				width: 50%;
-				margin: 15px 0;
-				float: left;
-				text-align: center;
-				
-				h1 {
-					font-size: $t-large;
-					line-height: 1.5em;
-					color: $c-dark-blue;
-				}
-				p {
-					margin: 0;
-					font-style: normal;
-					font-size: $t-mid-small;
-					line-height: 1.5em;
-					color: $c-dark-blue;
-				}
-				small {
-					font-size: $t-small;
-					line-height: 1.5em;
-					color: $c-light-grey;
-				}
+	#statistics {
+		display: flex;
+		flex-wrap: wrap;
+		padding: 45px 30px 15px 5px;
+	
+		.statistic {
+			display: inline-block;
+			position: relative;
+			width: 50%;
+			margin: 15px 0;
+			text-align: center;
+			
+			h1 {
+				font-size: $t-large;
+				line-height: 1.5em;
+				color: $c-dark-blue;
 			}
-			.statistic:first-child {
-				width: 100%;
-				margin: 15px 0;
-
-				h1 {
-					font-size: $t-xlarge;
-					line-height: 1.2em;
-				}
-				p {
-					font-size: $t-main;
-				}
+			p {
+				margin: 0;
+				font-style: normal;
+				font-size: $t-mid-small;
+				line-height: 1.5em;
+				color: $c-dark-blue;
 			}
-			.statistic:nth-child(2n) {
-				&::after {
-					content: '';
-					position: absolute;
-					left: 100%;
-					top: 0;
-					width: 0;
-					height: 100%;
-					border-right: 1px dotted $c-light-grey;
-				}
+			small {
+				font-size: $t-small;
+				line-height: 1.5em;
+				color: $c-light-grey;
 			}
 		}
+		.statistic:first-child {
+			width: 100%;
+			margin: 15px 0;
 
-		#filters {
-			clear: both;
+			h1 {
+				font-size: $t-xlarge;
+				line-height: 1.2em;
+			}
+			p {
+				font-size: $t-main;
+			}
+		}
+		.statistic:nth-child(2n) {
+			&::after {
+				content: '';
+				position: absolute;
+				left: 100%;
+				top: 0;
+				width: 0;
+				height: 100%;
+				border-right: 1px dotted $c-light-grey;
+			}
+		}
+	}
+
+	#filters {
+		overflow: scroll;
+
+		.inner {
 			padding: 30px;
 			
 			p {
-				clear: both;
 				padding: 10px 0 5px 0;
 				font-size: $t-main;
 				font-style: italic;
 				color: $c-light-grey;
-				/*text-align: center;*/
 			}
 			.active-filters {
 				width: 100%;
+				display: flex;
+				flex-wrap: wrap;
 
-				.tag {
+				/*.tag {
 					display: flex;
-					/*justify-content: space-between;*/
 					align-items: center;
 					border: 1px solid $c-light-grey;
 					padding: 0 0 0 10px;
 					margin: 2.5px;
 					background-color: #FFF;
 					font-size: $t-small;
+					line-height: 1.5em;
 					color: $c-light-grey;
-					float: left;
 
 					label {
 						cursor: pointer;
@@ -794,7 +796,6 @@ header {
 						border-right: 1px dotted $c-light-grey;
 					}
 					.name {
-						/*flex-grow: 1;*/
 						margin: 0 10px 0 5px;
 						white-space: nowrap;
 						color: $c-dark-grey;
@@ -802,12 +803,76 @@ header {
 					.close {
 						flex-shrink: 0;
 						display: inline-block;
-						width: 30px;
-						padding: 5px 0;
+						width: calc(#{$t-mid-small} * 1.5);
+						padding: 0 0;
 						background-color: $c-light-grey;
 						text-align: center;
 						color: #FFF;
 						font-size: $t-mid-small;
+						line-height: 1.5em;
+
+						&::before {
+
+						}
+						&::after {
+
+						}
+					}
+				}*/
+
+				.tag {
+					display: inline-block;
+					height: calc(#{$t-small} * 1.5);
+					padding: 0;
+					margin: 2.5px;
+					font-size: $t-small;
+					line-height: 1.5em;
+					border: 1px solid $c-light-grey;
+					color: $c-light-grey;
+					white-space: nowrap;
+
+					label {
+						cursor: pointer;
+						vertical-align: top;
+					}
+					.type {
+						font-size: $t-xsmall;
+						padding-right: 5px;
+						margin: 0 0 0 5px;
+						border-right: 1px dotted $c-light-grey;
+					}
+					.name {
+						margin: 0 5px 0 5px;
+						white-space: nowrap;
+						color: $c-dark-grey;
+					}
+					.close {
+						display: inline-block;
+						position: relative;
+						width: calc(#{$t-small} * 1.5);
+						height: calc(#{$t-small} * 1.5);
+						background-color: $c-light-grey;
+
+						&::before {
+							content: '';
+							position: absolute;
+							height: 100%;
+							width: 0;
+							left: 50%;
+							border-left: 1px solid #FFF;
+							transform: rotate(45deg);
+							transform-origin: center;
+						}
+						&::after {
+							content: '';
+							position: absolute;
+							height: 100%;
+							width: 0;
+							left: 50%;
+							border-left: 1px solid #FFF;
+							transform: rotate(-45deg);
+							transform-origin: center;
+						}
 					}
 				}
 			}

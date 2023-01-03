@@ -33,34 +33,51 @@ exports.tags = (data, args = []) => {
 	if (!key) return false
 
 	if (data?.length) {
-
 		return DB.general.tx(t => {
 			return t.any(`SELECT id AS $1:name, key, language FROM tags WHERE id IN ($2:csv);`, [ key, data.map(d => d[key]) ])
 			.then(results => {
-				if (results.every(d => ![undefined, null].includes(d.key)) && results.length === data.length) {
-					// THERE ARE keys SO THERE SHOULD BE TRANSLATIONS
-					return t.any(`
-						SELECT id AS $1:name, key, name FROM tags 
-						WHERE type = $2
+				data = this.multijoin.call(data, [ results, key ])
+
+				const batch = []
+
+				const tags_with_equivalences = data.filter(d => ![undefined, null].includes(d.key))
+				const tags_without_equivalences = data.filter(d => [undefined, null].includes(d.key))
+
+				if (tags_with_equivalences.length) {
+					batch.push(t.any(`
+						SELECT t.id AS $1:name, t.key, t.name,
+
+						COALESCE((SELECT jsonb_agg(id) FROM tags WHERE key = t.key GROUP BY key), '[]') AS equivalents
+
+						FROM tags t
+						WHERE t.type = $2
 							AND key IN ($3:csv)
 							AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
-					;`, [ key, tagname, results.map(d => d.key), lang ])
+					;`, [ key, tagname, tags_with_equivalences.map(d => d.key), lang ])
 					.then(tags => {
-						data = this.multijoin.call(data, [ results, key ])
-						return this.multijoin.call(data, [ tags, 'key' ])
-					}).catch(err => console.log(err))
-				} else {
-					return t.any(`
+						// data = this.multijoin.call(data, [ results, key ])
+						return this.multijoin.call(tags_with_equivalences, [ tags, 'key' ])
+						// return { key: 'key', tags }
+					}).catch(err => console.log(err)))	
+				}
+				if (tags_without_equivalences.length) {
+					batch.push(t.any(`
 						SELECT id AS $1:name, key, name FROM tags 
 						WHERE type = $2
 							AND id IN ($3:csv)
 							AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
-					;`, [ key, tagname, data.map(d => d[key]), lang ])
+					;`, [ key, tagname, tags_without_equivalences.map(d => d[key]), lang ])
 					.then(tags => {
-						return this.multijoin.call(data, [ tags, key ])
-					}).catch(err => console.log(err))
+						return this.multijoin.call(tags_without_equivalences, [ tags, key ])
+						// return { key, tags }
+					}).catch(err => console.log(err)))
 				}
-			})
+
+				return t.batch(batch)
+				.then(results => {
+					return results.flat()
+				}).catch(err => console.log(err))
+			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 
 		// FIND LANGUAGE OF TAGS IN DATA

@@ -29,24 +29,33 @@ exports.main = kwargs => {
 			t.title AS template_title, 
 			t.description AS template_description,
 
-			CASE WHEN AGE(now(), m.start_date) < '1 hour'::interval
-					THEN EXTRACT(minute FROM AGE(now(), m.start_date))::text || ' minutes ago'
-				WHEN AGE(now(), m.start_date) < '1 day'::interval
-					THEN EXTRACT(hour FROM AGE(now(), m.start_date))::text || ' hours ago'
-				WHEN AGE(now(), m.start_date) < '1 month'::interval
-					THEN EXTRACT(day FROM AGE(now(), m.start_date))::text || ' days ago'
-				ELSE to_char(m.start_date, 'DD Mon YYYY')
+			CASE 				
+				WHEN AGE(now(), m.start_date) < '0 second'::interval
+					THEN jsonb_build_object('type', 'start', 'interval', 'positive', 'date', to_char(m.start_date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(m.start_date, now())), 'hours', EXTRACT(hour FROM AGE(m.start_date, now())), 'days', EXTRACT(day FROM AGE(m.start_date, now())), 'months', EXTRACT(month FROM AGE(m.start_date, now())))
+				ELSE jsonb_build_object('type', 'start', 'interval', 'negative', 'date', to_char(m.start_date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), m.start_date)), 'hours', EXTRACT(hour FROM AGE(now(), m.start_date)), 'days', EXTRACT(day FROM AGE(now(), m.start_date)), 'months', EXTRACT(month FROM AGE(now(), m.start_date)))
+
+				-- WHEN AGE(now(), m.start_date) < '1 hour'::interval
+				-- 	THEN EXTRACT(minute FROM AGE(now(), m.start_date))::text || ' minutes ago'
+				-- WHEN AGE(now(), m.start_date) < '1 day'::interval
+				-- 	THEN EXTRACT(hour FROM AGE(now(), m.start_date))::text || ' hours ago'
+				-- WHEN AGE(now(), m.start_date) < '1 month'::interval
+				-- 	THEN EXTRACT(day FROM AGE(now(), m.start_date))::text || ' days ago'
+				-- ELSE to_char(m.start_date, 'DD Mon YYYY')
 			END AS start_date,
 
 			CASE WHEN m.end_date IS NULL 
-					THEN ''
-				WHEN AGE(now(), m.end_date) < '1 hour'::interval
-					THEN EXTRACT(minute FROM AGE(now(), m.end_date))::text || ' minutes ago'
-				WHEN AGE(now(), m.end_date) < '1 day'::interval
-					THEN EXTRACT(hour FROM AGE(now(), m.end_date))::text || ' hours ago'
-				WHEN AGE(now(), m.end_date) < '1 month'::interval
-					THEN EXTRACT(day FROM AGE(now(), m.end_date))::text || ' days ago'
-				ELSE to_char(m.end_date, 'DD Mon YYYY')
+					THEN 'null'
+				WHEN AGE(now(), m.end_date) < '0 second'::interval
+					THEN jsonb_build_object('type', 'end', 'interval', 'positive', 'date', to_char(m.end_date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(m.end_date, now())), 'hours', EXTRACT(hour FROM AGE(m.end_date, now())), 'days', EXTRACT(day FROM AGE(m.end_date, now())), 'months', EXTRACT(month FROM AGE(m.end_date, now())))
+				ELSE jsonb_build_object('type', 'end','interval', 'negative', 'date', to_char(m.end_date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), m.end_date)), 'hours', EXTRACT(hour FROM AGE(now(), m.end_date)), 'days', EXTRACT(day FROM AGE(now(), m.end_date)), 'months', EXTRACT(month FROM AGE(now(), m.end_date)))
+
+				-- WHEN AGE(now(), m.end_date) < '1 hour'::interval
+				-- 	THEN EXTRACT(minute FROM AGE(now(), m.end_date))::text || ' minutes ago'
+				-- WHEN AGE(now(), m.end_date) < '1 day'::interval
+				-- 	THEN EXTRACT(hour FROM AGE(now(), m.end_date))::text || ' hours ago'
+				-- WHEN AGE(now(), m.end_date) < '1 month'::interval
+				-- 	THEN EXTRACT(day FROM AGE(now(), m.end_date))::text || ' days ago'
+				-- ELSE to_char(m.end_date, 'DD Mon YYYY')
 			END AS end_date,
 
 			CASE WHEN m.source IS NOT NULL
@@ -149,7 +158,7 @@ exports.main = kwargs => {
 	]).then(async results => {
 		const data = await join.users(results, [ language, 'owner' ])
 		data.forEach(d => {
-			d.date = `${d.start_date} – ${d.end_date}`
+			//d.date = `${d.start_date} – ${d.end_date}`
 		})
 
 		return { 

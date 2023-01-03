@@ -14,12 +14,12 @@
 	const editing = ['contribute', 'edit'].includes(activity)
 	const templated = locals.templated || locals.display_template !== null
 %>
-<html lang='<%= language %>'>
+<html lang='<%- language %>'>
 <head>
 
 <% if (locals.data?.status >= 2 && !locals.data?.is_review) { %>
 	<!-- TO DO: FINISH THIS -->
-	<meta property='og:title' content='<%= locals.data.title %>' />
+	<meta property='og:title' content='<%- locals.data.title %>' />
 	<meta property='og:type' content='article' />
 	<!-- <meta property='og:url' content='https://www.imdb.com/title/tt0117500/' /> -->
 	<!-- <meta property='og:image' content='https://ia.media-imdb.com/images/rock.jpg' /> -->
@@ -35,6 +35,15 @@
 	crossorigin=''></script>
 
 <script type="text/javascript">
+	// INIT THE SOCKET
+	const socket = io()
+	// const socket = io.connect('localhost:3000', {
+	// 	reconnection: true,
+	// 	reconnectionDelay: 1000,
+	// 	reconnectionDelayMax : 5000,
+	// 	reconnectionAttempts: Infinity
+	// })
+
 	// THE FOLLOWING IS INSPIRED BY: 
 	// https://www.programmersought.com/article/5248306768/
 	// https://stackoverflow.com/questions/926916/how-to-get-the-bodys-content-of-an-iframe-in-javascript
@@ -77,7 +86,7 @@
 <body>
 <!-- <div class='fixed-bg hashed'></div> -->
 
-<%- include ('../../partials/multi-language.ejs') %> 
+<%- include ('../../partials/translations.ejs') %> 
 <%- include ('../../partials/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
@@ -502,7 +511,7 @@
 							<div class='head'>
 								<div class='meta meta-data'>
 									<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- d.ownername %></a></div>
-									<div class='meta meta-date'><%- vocabulary['date'](d.date, language) %></div>
+									<div class='meta meta-date'><%- vocabulary['date'][language](d.date) %></div>
 								</div>
 							</div>
 							<div class='body'>
@@ -521,7 +530,7 @@
 												<div class='head'>
 													<div class='meta meta-data'>
 														<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
-														<div class='meta meta-date'><%- vocabulary['date'](c.date, language) %></div>
+														<div class='meta meta-date'><%- vocabulary['date'][language](c.date) %></div>
 													</div>
 												</div>
 												<div class='body'>
@@ -1015,7 +1024,7 @@
 				if (mediaSize === 'xs') {
 					const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 					save_btn.select('button')
-						.html(vocabulary['changes saved']['<%- language %>'])
+						.html('<%- vocabulary["changes saved"][language] %>')
 					window.setTimeout(_ => {
 						save_btn.classed('saved', false)
 						.select('button').each(function () { this.disabled = true })
@@ -1025,7 +1034,7 @@
 					const menu_logo = d3.select('nav#site-title .inner')
 					menu_logo.select('.save').classed('saved', true)
 						.select('button')
-						.html(vocabulary['changes saved']['<%- language %>'])
+						.html('<%- vocabulary["changes saved"][language] %>')
 					window.setTimeout(_ => {
 						menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
 						menu_logo.selectAll('div.save').classed('hide', true)
@@ -1498,6 +1507,7 @@
 		})
 		return idx = i
 	}
+
 
 </script>
 </body>

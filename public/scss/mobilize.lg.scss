@@ -275,6 +275,17 @@ main#mobilize-new {
 						transition: transform .25s, font-size .25s;
 						cursor: pointer;
 					}
+					input[type=checkbox] + label {
+						position: static;
+						transform: none;
+					}
+					input[type=checkbox] + label + p {
+						font-size: $t-mid-small;
+						color: $c-light-grey;
+					}
+					input[type=checkbox]:checked + label + p {
+						color: $c-dark-blue;
+					}
 					input[type=text] + label {
 						pointer-events: none;
 					}
@@ -344,6 +355,35 @@ main#mobilize-new {
 						line-height: 1.5em;
 						color: $c-dark-blue;
 						text-align: center;
+					}
+					.cron-option {
+						display: flex;
+						align-items: center;
+						margin: 15px 0;
+
+						.toggle-option {
+							width: 150px;
+							padding: 0 30px;
+							text-align: center;
+						}
+						input[type=date] {
+							padding-bottom: 5px;
+							border: none;
+							border-bottom: 1px solid $c-light-grey;
+							outline: none;
+							font-size: $t-main;
+							font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
+							color: $c-dark-blue;
+
+							&::before {
+								content: none;
+							}
+						}
+						input[type=date]:disabled {
+							color: $c-light-grey;
+							background-color: transparent;
+							border-color: $c-light-2;
+						}
 					}
 				}
 				.body.center {
@@ -694,7 +734,7 @@ main#mobilize-existing {
 										margin-top: 10px;
 										/*padding: 0 20px;*/
 										font-size: $t-main;
-										line-height: 1.4em;
+										line-height: 1.5em;
 										color: $c-dark-1;
 										font-weight: 700;
 									}
@@ -710,7 +750,7 @@ main#mobilize-existing {
 										overflow-wrap: break-word;
 										margin-top: 10px;
 										font-size: $t-main;
-										line-height: 1.4em;
+										line-height: 1.5em;
 										color: $c-mid-2;
 
 										small {

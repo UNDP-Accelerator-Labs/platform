@@ -10,7 +10,12 @@
 %>
 
 <menu>
-	<% if (object === 'mobilizations') { %>
+	<% if (object === 'reviews') { %>
+		<li class='<% if (space === "pending") { %>active<% } %>'>
+			<a href='./pending'>
+				<button><%- vocabulary['space'][language](object, 'pending') %><div class='count'><%- locals.stats?.pending %></div></button>
+			</a>
+		</li>
 		<li class='<% if (space === "ongoing") { %>active<% } %>'>
 			<a href='./ongoing'>
 				<button><%- vocabulary['space'][language](object, 'ongoing') %><div class='count'><%- locals.stats?.ongoing %></div></button>
@@ -18,7 +23,23 @@
 		</li>
 		<li class='<% if (space === "past") { %>active<% } %>'>
 			<a href='./past'>
-				<button>Past mobilizations<div class='count'><%- locals.stats?.past %></div></button>
+				<button><%- vocabulary['space'][language](object, 'past') %><div class='count'><%- locals.stats?.past %></div></button>
+			</a>	
+		</li>
+	<% } else if (object === 'mobilizations') { %>
+		<li class='<% if (space === "scheduled") { %>active<% } %>'>
+			<a href='./scheduled'>
+				<button><%- vocabulary['space'][language](object, 'scheduled') %><div class='count'><%- locals.stats?.scheduled %></div></button>
+			</a>
+		</li>
+		<li class='<% if (space === "ongoing") { %>active<% } %>'>
+			<a href='./ongoing'>
+				<button><%- vocabulary['space'][language](object, 'ongoing') %><div class='count'><%- locals.stats?.ongoing %></div></button>
+			</a>
+		</li>
+		<li class='<% if (space === "past") { %>active<% } %>'>
+			<a href='./past'>
+				<button><%- vocabulary['space'][language](object, 'past') %><div class='count'><%- locals.stats?.past %></div></button>
 			</a>	
 		</li>
 	<% } else if (object === 'contributors') { %>

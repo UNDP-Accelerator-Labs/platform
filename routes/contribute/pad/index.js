@@ -142,28 +142,46 @@ exports.main = (req, res) => {
 					if (engagementtypes.includes('comment')) {
 						batch.push(t.any(`
 							SELECT c.id, c.message, c.contributor,
-								CASE WHEN AGE(now(), c.date) < '1 hour'::interval
-										THEN to_char(AGE(now(), c.date), 'MI') || ' minutes ago'
-									WHEN AGE(now(), c.date) < '1 day'::interval
-										THEN to_char(AGE(now(), c.date), 'HH24') || ' hours ago'
-									WHEN AGE(now(), c.date) < '10 days'::interval
-										THEN to_char(AGE(now(), c.date), 'DD') || ' days ago'
-									ELSE to_char(c.date, 'DD Mon YYYY')
+
+								CASE
+									WHEN AGE(now(), c.date) < '0 second'::interval
+										THEN jsonb_build_object('interval', 'positive', 'date', to_char(c.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(c.date, now())), 'hours', EXTRACT(hour FROM AGE(c.date, now())), 'days', EXTRACT(day FROM AGE(c.date, now())), 'months', EXTRACT(month FROM AGE(c.date, now())))
+									ELSE jsonb_build_object('interval', 'negative', 'date', to_char(c.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), c.date)), 'hours', EXTRACT(hour FROM AGE(now(), c.date)), 'days', EXTRACT(day FROM AGE(now(), c.date)), 'months', EXTRACT(month FROM AGE(now(), c.date)))
 								END AS date,
 
 								COALESCE(jsonb_agg(jsonb_build_object(
 									'id', r.id, 
 									'message', r.message, 
 									'contributor', r.contributor,
-									'date', CASE WHEN AGE(now(), r.date) < '1 hour'::interval
-											THEN to_char(AGE(now(), r.date), 'MI') || ' minutes ago'
-										WHEN AGE(now(), r.date) < '1 day'::interval
-											THEN to_char(AGE(now(), r.date), 'HH24') || ' hours ago'
-										WHEN AGE(now(), r.date) < '10 days'::interval
-											THEN to_char(AGE(now(), r.date), 'DD') || ' days ago'
-										ELSE to_char(r.date, 'DD Mon YYYY')
+									'date', CASE 
+										WHEN AGE(now(), r.date) < '0 second'::interval -- TECHNICALLY THIS SHOULD NOT BE NEEDED, AS MESSAGES CANNOT BE PROGRAMMED FOR LATER SEND
+											THEN jsonb_build_object('interval', 'positive', 'date', to_char(r.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(r.date, now())), 'hours', EXTRACT(hour FROM AGE(r.date, now())), 'days', EXTRACT(day FROM AGE(r.date, now())), 'months', EXTRACT(month FROM AGE(r.date, now())))
+										ELSE jsonb_build_object('interval', 'negative', 'date', to_char(r.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), r.date)), 'hours', EXTRACT(hour FROM AGE(now(), r.date)), 'days', EXTRACT(day FROM AGE(now(), r.date)), 'months', EXTRACT(month FROM AGE(now(), r.date)))
 										END
 								)) FILTER (WHERE r.id IS NOT NULL), '[]') AS replies
+								
+								-- CASE WHEN AGE(now(), c.date) < '1 hour'::interval
+								-- 		THEN to_char(AGE(now(), c.date), 'MI') || ' minutes ago'
+								-- 	WHEN AGE(now(), c.date) < '1 day'::interval
+								-- 		THEN to_char(AGE(now(), c.date), 'HH24') || ' hours ago'
+								-- 	WHEN AGE(now(), c.date) < '10 days'::interval
+								-- 		THEN to_char(AGE(now(), c.date), 'DD') || ' days ago'
+								-- 	ELSE to_char(c.date, 'DD Mon YYYY')
+								-- END AS date,
+
+								-- COALESCE(jsonb_agg(jsonb_build_object(
+								-- 	'id', r.id, 
+								-- 	'message', r.message, 
+								-- 	'contributor', r.contributor,
+								-- 	'date', CASE WHEN AGE(now(), r.date) < '1 hour'::interval
+								-- 			THEN to_char(AGE(now(), r.date), 'MI') || ' minutes ago'
+								-- 		WHEN AGE(now(), r.date) < '1 day'::interval
+								-- 			THEN to_char(AGE(now(), r.date), 'HH24') || ' hours ago'
+								-- 		WHEN AGE(now(), r.date) < '10 days'::interval
+								-- 			THEN to_char(AGE(now(), r.date), 'DD') || ' days ago'
+								-- 		ELSE to_char(r.date, 'DD Mon YYYY')
+								-- 		END
+								-- )) FILTER (WHERE r.id IS NOT NULL), '[]') AS replies
 
 							FROM comments c
 
@@ -175,6 +193,7 @@ exports.main = (req, res) => {
 								AND c.source IS NULL
 								AND c.message IS NOT NULL
 							GROUP BY c.id
+							ORDER BY c.date DESC
 						;`, [ id ]).then(async results => {
 							const data = await join.users(results, [ language, 'contributor' ])
 							return Promise.all(data.map(async d => { 

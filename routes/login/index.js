@@ -15,6 +15,8 @@ exports.render = (req, res, next) => {
 
 	if (uuid) next() // A USER IS LOGGED
 	else if (token) this.process(req, res) // A LOGIN TOKEN IS RECEIVED
+	
+
 	else if (object === 'pad') { // A POTENTIALLY PUBLIC PAD IS SOUGHT
 		const { id, mobilization } = req.query || {}
 		if (path.match(contribute) && mobilization) { // THE PAD IS NEW OR CAN BE EDITED
@@ -36,6 +38,8 @@ exports.render = (req, res, next) => {
 			}).catch(err => console.log(err))
 		} else res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
 	
+	
+
 	} else if (object === 'pads' && !uuid) { // THIS SHOULD ALWAYS BE A PUBLIC VIEW
 		if (space === 'public') next() 
 		else if (space === 'pinned') {
@@ -46,6 +50,9 @@ exports.render = (req, res, next) => {
 				else res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
 			})
 		} else res.redirect('./public')
+	
+	
+
 	} else if (![null, undefined].includes(instance)) { // THIS IS FOR THE /:language/:instance PATH (FOR PUBLIC VIEW)
 		// CHECK IF INSTANCE IS IN COUNTRY LIST
 		// OR IN TEAMS LIST
@@ -144,10 +151,13 @@ exports.process = (req, res) => { // REROUTE
 				res.redirect('/login')
 			}
 		}
-	} else {
+	} 
+	else {
 		const { username, password, originalUrl } = req.body || {}
 
 		// TO DO: SET UP CONFIG FOR PUBLIC VIEW
+		
+		
 		if (!username || !password) res.redirect('/login')
 		else { 
 
@@ -219,26 +229,6 @@ exports.process = (req, res) => { // REROUTE
 					}
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err))
-
-			// DB.conn.oneOrNone(`
-			// 	SELECT uuid, name, country, rights, lang FROM contributors
-			// 	WHERE (name = $1 OR email = $1)
-			// 		AND password = CRYPT($2, password)
-			// ;`, [username, password])
-			// .then(result => {
-			// 	if (result) {
-			// 		req.session.uuid = result.uuid
-			// 		req.session.username = result.name
-			// 		req.session.country = result.country
-			// 		req.session.sudo = result.name === 'sudo' // THIS SHOULD BE DEPRECATED
-			// 		req.session.rights = result.rights
-			// 		if (!result.lang) req.session.lang = 'en'
-			// 		else req.session.lang = language(result.lang)
-
-			// 		res.redirect(originalUrl)
-
-			// 	} else res.redirect('/login')
-			// }).catch(err => console.log(err))
 		}
 	}
 }

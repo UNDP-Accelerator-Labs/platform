@@ -25,8 +25,8 @@
 </head>
 
 <body>
-<!-- INCLUDE MULTI-LANGUAGE VOCABULARY FOR ejs -->
-<% include ('../partials/multi-language.ejs') %> 
+
+<% include ('../partials/translations.ejs') %> 
 
 <%- include ('../partials/menu-languages.ejs') %> 
 <%- include ('../partials/modals.ejs') %> 
@@ -40,10 +40,10 @@
 			<% slides.forEach(d => { %>
 				<div class='slide'>
 					<div class='media media-txt'>
-						<h1><%- d.title %></h1>
-						<p><% if (d.txt[0]?.length > 500) { %><%- d.txt[0].slice(0, 499).trim() %>…<% } else { %><%- d.txt[0] %><% } %></p>
+						<h1><span><%- d.title %></span></h1>
+						<p><span><% if (d.txt[0]?.length > 500) { %><%- d.txt[0].slice(0, 499).trim() %>…<% } else { %><%- d.txt[0] %><% } %></span></p>
 					</div>
-					<img src='<%- d.img[0] %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
+					<img src='<%- d.img[0].replace("uploads/sm/", "uploads/") %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
 				</div>
 			<% }) %>
 		</div>
@@ -82,9 +82,9 @@
 			animateCarousel(0)
 		</script>
 	</div>
-	<h1 class='site-title'><%= locals.metadata.site.title %></h1>
-	<% if (locals.metadata.page.instance_title) { %><h2><%= locals.metadata.page.instance_title %></h2><% } %>
-	<% if (locals.metadata.site.description?.[language]) { %><p class='lead'><%= locals.metadata.site.description[language] %></p><% } %>
+	<h1 class='site-title'><%- locals.metadata.site.title %></h1>
+	<% if (locals.metadata.page.instance_title) { %><h2><%- locals.metadata.page.instance_title %></h2><% } %>
+	<% if (locals.metadata.site.description?.[language]) { %><p class='lead'><%- locals.metadata.site.description[language] %></p><% } %>
 </div>
 <% } %>
 
@@ -236,7 +236,7 @@
 						<div class='description' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave()' contenteditable><%- (locals.pinboard.description) %></div>
 					<% } else { %>
 						<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'><%- locals.pinboard.title %></div>
-						<div class='contributor'><%- vocabulary['credit'][language](locals.pinboard.owner, locals.pinboard.ownername, 'contributors') %></div>
+						<div class='contributor'><%- vocabulary['curation credit'][language](locals.pinboard.owner, locals.pinboard.ownername, 'contributors') %></div>
 						<% if (locals.pinboard.description) { %>
 							<!-- <div class='description' onblur='partialSave()'><%- (locals.pinboard.description) %></div> -->
 							<div class='description'><%- (locals.pinboard.description) %></div>
@@ -299,7 +299,7 @@
 			) { %>
 				<%- include ('./modules/map') %>
 			<% } else { %>
-				<% if (object === 'pads' && pagedisplay !== 'slideshow') { %>
+				<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.pads?.length === 0) { %>
 					<small class='no-results lg'>
 						<%- vocabulary['pads to display'][language](0) %>
 					</small>
@@ -325,7 +325,7 @@
 	</main>
 </div>
 
-<% if (pagedisplay !== 'slideshow') { %>
+<% if (pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 	<div class='sidebar lg'>
 		<div class='inner'>
 			<%- include ('./modules/statistics.ejs') %>
@@ -457,7 +457,15 @@
 					})
 				metainfo.addElems('div', 'meta meta-date')
 					.html(d => {
-						if (d.date) return vocabulary['date'](d.date, '<%- language %>')
+						console.log(d.start_date)
+						console.log(d.end_date)
+
+						if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)
+						else if (d.start_date) {
+							if (d.end_date) {
+								return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date) + ' – ' + Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.end_date)
+							} else return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date)
+						}
 						else return d.email
 					})
 			}.bind(this),
@@ -500,7 +508,7 @@
 								<% } %>
 							}
 						<% } else if (object === 'reviews') { %>
-							<% if (space === 'private') { %>
+							<% if (space === 'pending') { %>
 								if (!d.is_review) {
 									if (d.reviewers < <%- modules.find(d => d.type === 'reviews')?.reviewers %>) {
 										opts.push({ 
@@ -537,8 +545,8 @@
 							}
 							opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', fn: download })
 							if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
-							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id, target: '_blank' })
-							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }], target: '_blank' })
+							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
+							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
 						<% } %>
 
 						return opts
@@ -656,12 +664,13 @@
 						}, 'target': '_blank'
 					})
 				.addElems('img', 'vignette')
-					.attrs({ 'loading': 'lazy', 'alt': _ => '<%= vocabulary["missing image"][language] %>' })
+					.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })
 				.each(function (d) {
 					const node = this
 					const img = new Image()
 					img.onload = function () { node.src = this.src }
-					img.src = d.img
+					if (display === 'slideshow') img.src = d.img[0].replace('uploads/sm/', 'uploads/')
+					else img.src = d.img[0]
 				})
 			}.bind(this),
 			stats: function (_sel) {
@@ -675,7 +684,7 @@
 						const obj = {}
 						obj.type = 'item'
 						// obj.label = vocabulary['item']['<%- language %>'](d.items !== 1)
-						obj.label = Function('"use strict";return (<%- vocabulary["item"][language] %>)')()(d.items !== 1)
+						obj.label = Function(`"use strict";return (<%- vocabulary["item"][language] %>)`)()(d.items !== 1)
 						obj.count = d.items
 						data.push(obj)
 					}
@@ -683,7 +692,7 @@
 						const obj = {}
 						obj.type = 'contributor'
 						// obj.label = vocabulary['contributor']['<%- language %>'](d.count !== 1)
-						obj.label = Function('"use strict";return (<%- vocabulary["contributor"][language] %>)')()(d.participants !== 1)
+						obj.label = Function(`"use strict";return (<%- vocabulary["contributor"][language] %>)`)()(d.participants !== 1)
 						obj.count = d.contributors
 						obj.text = `${d.contributors} <small class='total'>/ ${d.participants}</small>`
 						data.push(obj)
@@ -692,7 +701,7 @@
 						const obj = {}
 						obj.type = 'pad'
 						// obj.label = `${vocabulary['status']['<%- language %>'](0, d.count !== 1)} ${vocabulary['pad']['<%- language %>'](d.count !== 1).toLowerCase()}`
-						obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 0, d.private_associated_pads !== 1)} ${Function('"use strict";return (<%- vocabulary["pad"][language] %>)')()(d.private_associated_pads !== 1).toLowerCase()}`
+						obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 0, d.private_associated_pads !== 1)} ${Function(`"use strict";return (<%- vocabulary["pad"][language] %>)`)()(d.private_associated_pads !== 1).toLowerCase()}`
 						obj.count = d.private_associated_pads
 						obj.href = `../../browse/pads/curated?<%- object %>=${d.id}&status=0&status=1`
 						data.push(obj)
@@ -701,7 +710,7 @@
 						const obj = {}
 						obj.type = 'pad'
 						// obj.label = `${vocabulary['status']['<%- language %>'](2, d.count !== 1)} ${vocabulary['pad']['<%- language %>'](d.count !== 1).toLowerCase()}`
-						obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 2, d.associated_pads !== 1)} ${Function('"use strict";return (<%- vocabulary["pad"][language] %>)')()(d.associated_pads !== 1).toLowerCase()}`
+						obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 2, d.associated_pads !== 1)} ${Function(`"use strict";return (<%- vocabulary["pad"][language] %>)`)()(d.associated_pads !== 1).toLowerCase()}`
 						obj.count = d.associated_pads
 						obj.href = `../../browse/pads/shared?<%- object %>=${d.id}`
 						data.push(obj)
@@ -709,7 +718,8 @@
 					if (d.ongoing_associated_mobilizations !== undefined) {
 						const obj = {}
 						obj.type = 'mobilization'
-						obj.label = vocabulary['mobilization']['<%- language %>'](d.count !== 1).toLowerCase()
+						// obj.label = vocabulary['mobilization']['<%- language %>'](d.count !== 1).toLowerCase()
+						obj.label = Function(`"use strict";return (<%- vocabulary["mobilization"][language] %>)`)()(d.count !== 1).toLowerCase()
 						obj.count = d.ongoing_associated_mobilizations
 						obj.href = `../../browse/mobilizations/ongoing?<%- object %>=${d.id}`
 						data.push(obj)
@@ -717,7 +727,8 @@
 					if (d.past_associated_mobilizations !== undefined) {
 						const obj = {}
 						obj.type = 'mobilization'
-						obj.label = vocabulary['mobilization']['<%- language %>'](d.count !== 1).toLowerCase()
+						// obj.label = vocabulary['mobilization']['<%- language %>'](d.count !== 1).toLowerCase()
+						obj.label = Function(`"use strict";return (<%- vocabulary["mobilization"][language] %>)`)()(d.count !== 1).toLowerCase()
 						obj.count = d.past_associated_mobilizations
 						obj.href = `../../browse/mobilizations/ongoing?<%- object %>=${d.id}`
 						data.push(obj)
@@ -764,7 +775,7 @@
 				title.addElems('span')
 					.html(d => {
 						if (d.is_review) return `[<%- vocabulary["review"][language](false, false, true) %>] ${d.source_title}`
-						else return d.title || d.name || `[${vocabulary[`untitled <%- object.slice(0, -1) %>`]['<%- language %>']}]`
+						else return d.title || d.name || '[<%- vocabulary[`untitled ${object.slice(0, -1)}`]?.[language] %>]'
 					})
 			}.bind(this),
 			txt: function (_sel) {
@@ -811,7 +822,7 @@
 				const taggroup = _sel.addElems('div', 'meta tag-group')
 				const sdgs = taggroup.addElems('div', 'meta meta-sdgs', d => d.sdgs?.length ? [d.sdgs] : [])
 				sdgs.addElems('span')
-					.html(d => `${vocabulary['sdg']['<%- language %>']((d?.length || 0) > 1)}:`)
+					.html(d => Function(`"use strict";return (<%- vocabulary["sdg"][language] %>)`)()((d?.length || 0) > 1))
 				sdgs.addElems('a', 'sdg-link', d => d)
 					.attr('href', d => `?sdgs=${d.key || d}`)
 					.html(d => d.key || d)
@@ -892,7 +903,7 @@
 					_sel.addElems('div', 'meta meta-reviewers', d => {
 						return !d.reviewer_pooled && ![null, undefined].includes(d.reviewers) ? [d] : []
 					}).html(d => {
-						return Function('"use strict";return (<%- vocabulary["reviewers accepted"][language] %>)')()(d.reviewers, <%- modules.find(d => d.type === 'reviews').reviewers %>)
+						return Function(`"use strict";return (<%- vocabulary["reviewers accepted"][language] %>)`)()(d.reviewers, <%- modules.find(d => d.type === 'reviews').reviewers %>)
 					})
 				<% } %>
 			}.bind(this),
@@ -920,9 +931,9 @@
 							.addElems('menu')
 						.addElems('li', 'follow-up-option', d => d.followups)
 						.addElems('a')
-							.attrs({ 'href': d => `../../contribute/<%- object.slice(0, -1) %>?source=${d.source}&template=${d.template}&mobilization=${d.id}&display=adjacent-source`, 'target': '_blank' })
+							.attrs({ 'href': d => `../../contribute/<%- object.slice(0, -1) %>?source=${d.source}&template=${d.template}&mobilization=${d.id}&display=adjacent-source` })
 							.addElems('button')
-							.html(d => d.title)
+							.html(d => d.title.length > 40 ? `${d.title.slice(0, 40)}…` : d.title)
 						.on('click', function (d) {
 							const sel = d3.select(this)
 							const li = sel.findAncestor('follow-up-option')
@@ -1031,29 +1042,48 @@
 						const pin = _group.addElems('div', 'pin tag', d => {
 							return _data.map(c => Object.assign(Object.assign({}, c), { object_id: d.id }))
 						})
-						pin.addElems('label', 'name').html(d => d.title)
-						pin.addElems('label', 'close').html('x')
+						pin.addElems('label', 'name')
+							.attr('title', d => d.title)
+							.html(d => {
+								if (d.title.length > 25) return `${d.title.slice(0, 25)}…`
+								else return d.title
+							})
+						pin.addElems('label', 'close')
 						.on('click', async function (d) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
-								pins.call(renderPins, res.pins)
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard').filter(c => c.id === d.id)
-								.each(function (c) {
-									c.count -= 1
-									const sel = d3.select(this)
-									if (c.count === 0) {
-										sel.remove()
-										// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-										renderPinNavigation(res.pinboards_list)
-									} else {
-										if (d.object_id === c.object_id) {
-											d.checked = null
-											sel.select('input').attr('checked', d.checked)
+								<% if (space === 'pinned') { %>
+									location.reload()
+								<% } else { %>
+									pins.call(renderPins, res.pins)
+									d3.selectAll('.pinboard-group .dropdown')
+										.selectAll('.pinboard')
+									.filter(c => c.id === d.id)
+									.each(function (c) {
+										// c.count -= 1
+										const sel = d3.select(this)
+										if (c.count === 0) { // IF NOT ASSOCIATED TO A MOBILIZATION
+											sel.remove()
+											// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
+											renderPinNavigation(res.pinboards_list)
+										} else {
+											if (d.object_id === c.object_id) {
+												d.checked = null
+												sel.select('input').attr('checked', d.checked)
+												sel.select('input').node().checked = false
+											}
+											// sel.select('.count').html(c.count)
 										}
-										sel.select('.count').html(c.count)
-									}
-								})
+									})
+
+									// DECREMENT THE NUMBER OF PINNED PADS FOR THE SELECTED BOARD
+									pinboards.find(b => b.id === d.id).count -= 1
+									// RESET THE MENU
+									d3.select(this).findAncestor('pinboard-group')
+									.each(function (b) {
+										b.pinboards = b.pinboards.filter(a => a.id !== d.id)
+									})
+								<% } %>
 							}
 						})
 					}
@@ -1068,13 +1098,24 @@
 								'checked': d => d.checked
 							})
 						.on('change', async function (d) {
-							const pins = d3.select(this).findAncestor('pinboard-group').select('.pins')
+							const sel = d3.select(this)
+							const pins = sel.findAncestor('pinboard-group').select('.pins')
+
 							if (this.checked) {
 								const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
 									pins.call(renderPins, res.pins)
-									d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count').filter(c => c.id === d.id)
+									
+									pinboards.find(b => b.id === d.id).count += 1
+									d3.selectAll('.pinboard-group .dropdown')
+										.selectAll('.pinboard .count')
+										.filter(c => c.id === d.id)
 									.html(c => c.count += 1)
+
+									sel.findAncestor('pinboard-group')
+									.each(function (c) {
+										c.pinboards.push({ id: d.id, title: d.title })
+									})
 								}
 							} else {
 								const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
@@ -1084,6 +1125,8 @@
 										.selectAll('.pinboard').filter(c => c.id === d.id)
 									.each(function (c) {
 										c.count -= 1
+										pinboards.find(b => b.id === d.id).count -= 1
+
 										const sel = d3.select(this)
 										if (c.count === 0) {
 											sel.remove()
@@ -1093,6 +1136,7 @@
 											if (d.object_id === c.object_id) {
 												d.checked = null
 												sel.select('input').attr('checked', d.checked)
+												sel.select('input').node().checked = false
 											}
 											sel.select('.count').html(c.count)
 										}
@@ -1229,7 +1273,7 @@
 						else return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'
 					})
 				name.addElems('span')
-					.html(d => d.name || `[${vocabulary[`untitled <%- object.slice(0, -1) %>`]['<%- language %>']}]`)
+					.html(d => d.name || '[<%- vocabulary[`untitled ${object.slice(0, -1)}`]?.[language] %>]')
 
 				
 				_sel.addElems('div', 'meta meta-email')
@@ -1451,7 +1495,7 @@
 				{ 
 					node: 'button', 
 					type: 'button', 
-					label: Function('"use strict";return (<%- vocabulary["only pad"][language] %>)')()(datum.title),
+					label: Function(`"use strict";return (<%- vocabulary["only pad"][language] %>)`)()(datum.title),
 					resolve: [datum.id] 
 				}
 			]

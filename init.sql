@@ -167,6 +167,7 @@ CREATE TABLE pinboards (
 	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
 );
 ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
+
 CREATE TABLE pinboard_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -178,6 +179,7 @@ CREATE TABLE pinboard_contributions (
 	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, pinboard);
 
 CREATE TABLE tagging (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

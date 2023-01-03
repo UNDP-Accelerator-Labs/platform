@@ -14,7 +14,7 @@
 
 <body>
 
-<%- include ('partials/multi-language.ejs') %> 
+<%- include ('partials/translations.ejs') %> 
 <%- include ('partials/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
@@ -51,7 +51,7 @@
 					</div>
 				</div>
 				<div class='body'>
-					<h1><%- vocabulary['name campaign'][language] %></h1>
+					<h1><%- vocabulary['name mobilization'][language] %></h1>
 					<div class='input'>
 						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language](false, true) %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } %>>
 						<label class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
@@ -103,8 +103,73 @@
 				</div>
 			</div>
 		</div>
-		<!-- THIRD MODAL: DESCRIPTION -->
+		<!-- SET DATE RANGES -->
 		<div class='modal m-3 hide'>
+			<div class='inner'>
+				<div class='head meta-status status-1'>
+					<div class='btn-group'>
+						<button type='button' class='back' onclick='prev(this)'>
+							<label><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' onclick='next(this)'>
+							<label><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+
+				<div class='body'>
+					<h1><%- vocabulary['set mobilization dates'][language] %></h1>
+					<p><%- vocabulary['mobilization dates default'][language] %></p>
+
+					<% 
+						const today = new Date()
+						const tomorrow = new Date(today)
+						tomorrow.setDate(tomorrow.getDate() + 1)
+						
+						const dd = String(today.getDate()).padStart(2, '0')
+						const mm = String(today.getMonth() + 1).padStart(2, '0')
+						const yyyy = today.getFullYear()
+
+						const dd1 = String(tomorrow.getDate()).padStart(2, '0')
+						const mm1 = String(tomorrow.getMonth() + 1).padStart(2, '0')
+						const yyyy1 = tomorrow.getFullYear()
+					%>
+
+					<!-- SET THE DEFAULT STATUS OF THE PAD -->
+					<input type='hidden' name='status' value=1>
+
+					<!-- OPTION FOR START TODAY -->
+					<div class='cron-option start'>
+						<div class='toggle-option'>
+							<input id='cron-start' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+							<label for='cron-start'></label>
+							<p><%- vocabulary['set start date'][language] %></p>
+						</div>
+
+						<div>
+							<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' onchange='offsetMinEndDate(this)' disabled>
+						</div>
+					</div>	
+
+					<!-- OPTION FOR NO END DATE -->
+					<div class='cron-option end'>
+						<div class='toggle-option'>
+							<input id='cron-end' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+							<label for='cron-end'></label>
+							<p><%- vocabulary['set end date'][language] %></p>
+						</div>
+
+						<div>
+							<input id='end-date' type='date' name='end_date' min='<%- `${yyyy1}-${mm1}-${dd1}` %>' disabled>
+						</div>
+					</div>
+				</div>
+				<div class='foot'>
+				</div>
+			</div>
+		</div>
+		<!-- DESCRIPTION -->
+		<div class='modal m-4 hide'>
 			<div class='inner'>
 				<div class='head meta-status <% if (!locals.sourceinfo?.description) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
@@ -119,7 +184,7 @@
 				<div class='body'>
 					<h1><%- vocabulary['state objectives'][language] %></h1>
 					<div class='input'>
-						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%= locals.sourceinfo?.description %></textarea>
+						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%- locals.sourceinfo?.description %></textarea>
 						<label class='placeholder' for='description'><%- vocabulary['describe intent'][language] %></label>
 					</div>
 					<script type='text/javascript'>
@@ -138,9 +203,9 @@
 				</div>
 			</div>
 		</div>
-		<!-- THIRD MODAL: TEMPLATE -->
+		<!-- TEMPLATE -->
 		<% if (!locals.metadata.page?.query?.copy?.some(d => d === "true")) { %>
-			<div class='modal m-4 hide'>
+			<div class='modal m-5 hide'>
 				<div class='inner'>
 					<div class='head meta-status status-0'>
 						<div class='btn-group'>
@@ -190,7 +255,7 @@
 			</div>
 		<% } %>
 		<!-- THIRD MODAL: COHORT -->
-		<div class='modal m-5 hide'>
+		<div class='modal m-6 hide'>
 			<div class='inner'>
 				<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true"))) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
@@ -233,7 +298,8 @@
 				</div>
 			</div>
 		</div>
-		<div class='modal m-6 hide'>
+		<!-- LAST MODAL -->
+		<div class='modal m-7 hide'>
 			<div class='inner'>
 				<div class='head meta-status status-1'>
 					<div class='btn-group'>
@@ -336,6 +402,30 @@
 		d3.selectAll('.private').classed('hide', node.checked).each(function () { enableNext(this) })
 		d3.select('#pad-limit').node().value = node.checked ? 1000 : 3 // THIS IS AN ARBITRARY LARGE NUMBER
 	}
+	function toggleCronJob (node) {
+		const sel = d3.select(node)
+		const parent = sel.findAncestor('cron-option')
+		parent.select('input[type=date]').attr('disabled', node.checked ? null : true)
+	}
+	function offsetMinEndDate (node) {
+		const sel = d3.select(node)
+		const parent = sel.findAncestor('modal')
+
+		const start = new Date(node.value)
+		const end = new Date(node.value)
+		end.setDate(end.getDate() + 1)
+
+		const dd = String(end.getDate()).padStart(2, '0')
+		const mm = String(end.getMonth() + 1).padStart(2, '0')
+		const yyyy = end.getFullYear()
+
+		parent.select('input[name="end_date"]')
+			.attr('min', `${yyyy}-${mm}-${dd}`)
+
+		// IF THE START DATE IS NOT NOW, THEN CHANGE THE status VALUE FOR THE MOBILIZATION
+		const now = new Date()
+		parent.select('input[name="status"]').node().value = start >= now ? 0 : 1
+	}
 	function toggleChecked (node) {
 		const parent = d3.select(node).findAncestor('modal')
 		parent.selectAll('li')
@@ -344,7 +434,7 @@
 		const count = parent.selectAll('li.checked').size()
 		parent.select('.contributor-count')
 			.html(_ => {
-				return Function("'use strict';return (<%- vocabulary['invited contributors'][language] %>)")()(count)
+				return Function(`"use strict";return (<%- vocabulary["invited contributors"][language] %>)`)()(count)
 			})
 		// IF THERE IS A FILTER MENU, CLEAR SEARCH TERM
 		if (parent.select('.filter input[type=text]').node()) {

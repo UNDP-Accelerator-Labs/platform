@@ -2,6 +2,7 @@
 	
 	// CREATE ALIASES
 	const object = locals.metadata.page.object
+	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
 
@@ -33,25 +34,8 @@
 				<label for='search-field'><%- vocabulary['search'][language](object === 'contributors') %></label>
 				<button id='search' type='submit'><img src='/imgs/icons/i-search.svg'></button>
 			</div>
-			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
-				<div class='status'>
-					<menu>
-						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
-							<li>
-								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>
-								<label for='status-<%- d.status %>' data-content='<%- d.count %>'></label>
-								<p>
-									<%- vocabulary['status'][language](object, d.status, d.count) %>
-								</p>
-							</li>
-						<% }) %>
-					</menu>
-				</div>
-			<% } %>
+
 			<% if (locals.filters_menu?.length) { %>
-				<button type='button' class='expand-filters' onclick='expandfilters(this)'>
-					<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
-				</button>
 				<div class='filters'>
 					<% locals.filters_menu?.forEach(d => { %>
 						<section>
@@ -63,7 +47,12 @@
 										<menu>
 											<% d[key]?.forEach(c => { %>
 												<li>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %>>
+													<% if (c.equivalents?.length) { %>
+														<% c.equivalents.filter(b => b !== c.id).forEach(b => { %>
+															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id.toString())) { %>disabled<% } %>>
+														<% }) %>
+													<% } %>
+													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this)'>
 													<label for='<%- key %>-<%- c.id %>'><%- (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 												</li>
 											<% }) %>
@@ -79,6 +68,56 @@
 					</button>
 				</div>
 			<% } %>
+
+			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
+				<div class='status'>
+					<menu>
+						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
+							<li>
+								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>
+								<label for='status-<%- d.status %>' data-content='<%- d.count %>'></label>
+								<p>
+									<%- vocabulary['status'][language](object, d.status, d.count) %>
+								</p>
+							</li>
+						<% }) %>
+					</menu>
+				</div>
+			<% } %>
+
+			
+			<div class='global-actions'>
+				<% if (space !== 'pinned') { %>
+					<% if (query.search?.length || Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
+						<div class='add filter pinboards'>
+							<input type='text' id='pin-all'>
+							<!-- TO DO: TRANSLATE -->
+							<label for='pin-all'>Add all <%- locals.stats?.filtered %> pads to a collection</label>
+							<div class='dropdown'>
+								<menu>
+									<% locals.pinboards_list.forEach(d => { %>
+										<li class='pinboard'>
+											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
+											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+										</li>
+									<% }) %>
+								</menu>
+							</div>
+						</div>
+					<% } %>
+				<% } %>
+
+				<!-- TO DO: TRANSLATE -->
+				<!-- TO DO: HAVE POP UP WITH OPTIONS: IF TEMPLATES, ASK WHETHER SPLIT UP PER TEMPLATE -->
+				<!-- xslx OR json -->
+				<button type='button' class='download lg'>Download all data</button>
+			</div>
+
+			<% if (locals.filters_menu?.length) { %>
+				<button type='button' class='expand-filters' onclick='expandfilters(this)'>
+					<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
+				</button>
+			<% } %>
 		</form>
 	</nav>
 <% } else { %>
@@ -86,6 +125,14 @@
 <% } %>
 
 <script type='text/javascript'>
+	async function pinAll (node) {
+		node.checked = true
+		const id = node.value
+
+		await POST('/pin', { board_id: id, object_id: <%- JSON.stringify(locals.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+		location.reload()
+	}
+
 	function expandfilters (node) {
 		d3.select(node).toggleClass('close')
 		const filters = node.form.querySelector('.filters')
@@ -96,6 +143,12 @@
 			filters.style.overflow = 'hidden'
 		} else filters.style.maxHeight = `${filters.scrollHeight + padding}px`
 	}
+	function addequivalents (node, equivalents) {
+		const parent = d3.select(node.parentNode)
+		parent.selectAll('input[type=hidden]')
+			.attr('disabled', node.checked ? null : true)
+	}
+	// MAIN SEARCH BAR
 	d3.selectAll('.filter input[type=text]')
 	.on('keyup', function () {
 		const node = this
@@ -118,5 +171,49 @@
 	}).on('blur', function () {
 		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
 		if (dropdown.node()) dropdown.node().style.maxHeight = null
+	})
+
+	// PIN ALL SEARCH BAR
+	d3.select('#pin-all')
+	.on('keydown', async function (d) { // EVERYWHERE ELSE THIS IS keyup BUT WE USE keydown HERE TO PREVENT THE FORM FROM FIRING WHEN THE Enter KEY IS PRESSED (TRIGGERED ON keydown)
+		const evt = d3.event
+		const node = this
+		const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
+		dropdown.selectAll('menu li')
+			.classed('hide', function () {
+				return !this.textContent.trim().toLowerCase()
+				.includes(node.value.trim().toLowerCase())
+			})
+
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
+				const match = [...this.childNodes].filter(function (d) { 
+					return d.nodeType === Node.TEXT_NODE
+				}).map(d => d.textContent.trim().toLowerCase()).join(' ')
+				return match === node.value.trim().toLowerCase()
+			})
+
+			if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
+				pinAll(existingBoard.node().previousElementSibling)							
+			} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
+				const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: <%- JSON.stringify(locals.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+				window.location = `./pinned?pinboard=${board_id}`
+			}
+			// RESET DROPDOWN
+			this.value = ''
+			dropdown.selectAll('menu li').classed('hide', false)
+		}
+	}).on('focus', function (d) {
+		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+		dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+
+		dropdown.selectAll('li').on('mousedown', function () { 
+			d3.event.preventDefault()
+		})
+	}).on('blur', function () {
+		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+		dropdown.node().style.maxHeight = null
+		fixLabel(this) // THIS IS NOT WORKING
 	})
 </script>

@@ -1,7 +1,7 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
-	include ('../../partials/multi-language.ejs')
+	include ('../../partials/translations.ejs')
 %>
 <script type='text/javascript'>
 const obsvars = {
@@ -39,15 +39,16 @@ const observer = new MutationObserver(evt => {
 // MEDIA PROTOTYPE
 const Media = function (kwargs) {
 	let { parent, container, sibling, type, datum, focus, lang } = kwargs || {}
-	let { level, name } = datum
+	let { id, level, name } = datum
+	if (!id) id = datum.id = uuidv4()
 	if (!level) level = 'media'
 	parent = d3.select(parent).classed('focus', focus)
-
+	
 	this.type = type
 	this.lang = lang
 	this.constraint = datum.constraint
 
-	this.id = uuidv4()
+	this.id = id
 	this.container = (container || parent.insertElem(function () { 
 		// return sibling || parent.select('.repeat-container').node() 
 		if (this.contains(sibling)) return sibling
@@ -191,6 +192,13 @@ Media.prototype.move = function (dir) {
 					}
 				}, 1000)
 				if (openInset.node()) window.setTimeout(_ => openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`, 1250)
+
+				// TO DO: CONTINUE HERE
+				// socket.emit('move-up', { id: this.id })
+			// MOVE THIS OUT
+				// socket.on('move-up', data => { 
+				// 	console.log(data)
+				// })
 			}
 		} else {
 			const target = this.container.node().nextSibling
@@ -254,7 +262,7 @@ const Taglist = function (kwargs) {
 	Meta.call(this, kwargs)
 	const meta = this
 
-	const initialvalues = meta.media.attr('data-placeholder', '<%= vocabulary["missing tag"][language] %>')
+	const initialvalues = meta.media.attr('data-placeholder', '<%- vocabulary["missing tag"][language] %>')
 	if (imglink) {
 		initialvalues
 		.addElems('img', 'tag', c => c.tags)
@@ -400,8 +408,8 @@ const Taglist = function (kwargs) {
 		meta.filter.addElem('label')
 			.attr('for', `filter-${meta.id}`)
 			.html(_ => {
-				if (opencode) return '<%= vocabulary["search or add"][language] %>'
-				else return '<%= vocabulary["search"][language]() %>'
+				if (opencode) return '<%- vocabulary["search or add"][language] %>'
+				else return '<%- vocabulary["search"][language]() %>'
 			})
 
 		meta.filter.addElems('button',  'add')
@@ -552,7 +560,6 @@ function addLoader (sel) {
 
 function populateSection (data, lang = 'en', section) {
 	// MEDIA
-	console.log(data)
 	if (data.type === 'title' && publicpage) addTitle({ data, lang, section })
 	if (data.type === 'img') addImg({ data, lang, section })
 	if (data.type === 'mosaic') addMosaic({ data, lang, section })
@@ -704,7 +711,7 @@ function autofillTitle () {
 
 function addSection (kwargs) {
 	const { data, lang, sibling, repeated, focus } = kwargs || {}
-	let { title, lead, structure, items, repeat, group, instruction } = data || {}
+	let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
 	if (!title) title = ''
 	if (!lead) lead = ''
 	if (!structure) structure = []
@@ -719,7 +726,7 @@ function addSection (kwargs) {
 		// .insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
 		.classed('repeat', repeat || false)
 		.classed('focus', focus && !templated)
-		.datum({ type: 'section', title, lead, structure, items, repeat, group })
+		.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
 	// .on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
@@ -857,7 +864,7 @@ function addSection (kwargs) {
 
 function addTitle (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, txt, instruction, constraint, required } = data || {}
+	let { id, level, type, name, txt, instruction, constraint, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'title'
 	if (!name) name = null
@@ -870,7 +877,7 @@ function addTitle (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, txt, instruction, constraint, required },
+		datum: { id, level, type, name, txt, instruction, constraint, required },
 		focus: focus || false,
 		lang
 	})
@@ -880,7 +887,7 @@ function addTitle (kwargs) {
 	if (media.input) media.input.remove()
 	
 	media.media.attrs({ 
-		'data-placeholder': '<%= vocabulary["untitled pad"][language] %>',
+		'data-placeholder': '<%- vocabulary["untitled pad"][language] %>',
 		'contenteditable': editing ? true : null 
 	}).html(d => d.txt)
 	.on('keydown', function (d) {
@@ -900,7 +907,7 @@ function addTitle (kwargs) {
 }
 function addImg (kwargs) {
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
-	let { level, type, name, src, textalign, scale, instruction, required } = data || {}
+	let { id, level, type, name, src, textalign, scale, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'img'
 	if (!name) name = null
@@ -921,7 +928,7 @@ function addImg (kwargs) {
 		sibling,
 		container,
 		type, 
-		datum: { level, type, name, textalign, scale, src, instruction, required },
+		datum: { id, level, type, name, textalign, scale, src, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -950,7 +957,7 @@ function addImg (kwargs) {
 			.html(d => d.label)
 	}
 
-	media.media.attr('data-placeholder', d => '<%= vocabulary["missing image"][language] %>')
+	media.media.attr('data-placeholder', d => '<%- vocabulary["missing image"][language] %>')
 	
 	if (src) {
 		const img = new Image()
@@ -1004,7 +1011,7 @@ function addImg (kwargs) {
 }
 function addMosaic (kwargs) {
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
-	let { level, type, name, srcs, verticalalign, instruction, required } = data || {}
+	let { id, level, type, name, srcs, verticalalign, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'mosaic'
 	if (!name) name = null
@@ -1024,7 +1031,7 @@ function addMosaic (kwargs) {
 		sibling,
 		container,
 		type, 
-		datum: { level, type, name, verticalalign, srcs, instruction, required },
+		datum: { id, level, type, name, verticalalign, srcs, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -1146,7 +1153,7 @@ function addMosaic (kwargs) {
 }
 function addVideo (kwargs) { 
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
-	let { level, type, name, src, textalign, instruction, required } = data || {}
+	let { id, level, type, name, src, textalign, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'video'
 	if (!name) name = null
@@ -1166,7 +1173,7 @@ function addVideo (kwargs) {
 		sibling,
 		container,
 		type, 
-		datum: { level, type, name, textalign, src, instruction, required },
+		datum: { id, level, type, name, textalign, src, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -1234,7 +1241,7 @@ function addVideo (kwargs) {
 }
 function addDrawing (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, shapes, size, instruction, required } = data || {}
+	let { id, level, type, name, shapes, size, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'drawing'
 	if (!name) name = null
@@ -1254,7 +1261,7 @@ function addDrawing (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, shapes, size, instruction, required },
+		datum: { id, level, type, name, shapes, size, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -1411,7 +1418,7 @@ function addDrawing (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required } = data || {}
+	let { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'txt'
 	if (!name) name = null
@@ -1433,7 +1440,7 @@ function addTxt (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required },
+		datum: { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required },
 		focus: focus || false,
 		lang
 	})
@@ -1489,7 +1496,7 @@ function addTxt (kwargs) {
 	}
 	
 	media.media.attrs({ 
-		'data-placeholder': '<%= vocabulary["empty txt"][language] %>',
+		'data-placeholder': '<%- vocabulary["empty txt"][language] %>',
 		'contenteditable': editing ? true : null 
 	}).styles({	
 		'min-height': d => `${d.fontsize}rem`, 
@@ -1516,7 +1523,7 @@ function addTxt (kwargs) {
 }
 function addEmbed (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, textalign, html, src, instruction, required } = data || {}
+	let { id, level, type, name, textalign, html, src, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'embed'
 	if (!name) name = null
@@ -1536,7 +1543,7 @@ function addEmbed (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, src, textalign, html, instruction, required },
+		datum: { id, level, type, name, src, textalign, html, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -1565,7 +1572,7 @@ function addEmbed (kwargs) {
 	}
 
 	media.media.attrs({
-		'data-placeholder': '<%= vocabulary["empty embed"][language] %>',
+		'data-placeholder': '<%- vocabulary["empty embed"][language] %>',
 		'contenteditable': editing
 	}).classed('padded', true)
 	.style('text-align', d => d.textalign)
@@ -1635,7 +1642,7 @@ function addEmbed (kwargs) {
 }
 function addChecklist (kwargs) { 
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
+	let { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'checklist'
 	if (!name) name = null
@@ -1669,7 +1676,7 @@ function addChecklist (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, fontsize, fontweight, fontstyle, options, instruction, required },
+		datum: { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -1777,7 +1784,7 @@ function addChecklist (kwargs) {
 			.addElems('label',  'list-item')
 			.attrs({ 
 				'for': d => `check-item-${checklist_id}-${d.id}`,
-				'data-placeholder': '<%= vocabulary["new checklist item"][language] %>',
+				'data-placeholder': '<%- vocabulary["new checklist item"][language] %>',
 				'contenteditable': activity !== 'view' && !templated ? true : null
 			})
 		.on('keydown', function () {
@@ -1823,7 +1830,7 @@ function addChecklist (kwargs) {
 }
 function addRadiolist (kwargs) { 
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
+	let { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'radiolist'
 	if (!name) name = null
@@ -1857,7 +1864,7 @@ function addRadiolist (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, fontsize, fontweight, fontstyle, options, instruction, required },
+		datum: { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required },
 		focus: focus || false,
 		lang
 	})
@@ -1963,7 +1970,7 @@ function addRadiolist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({ 
 				'for': d => `radio-item-${radiolist_id}-${d.id}`,
-				'data-placeholder': '<%= vocabulary["new checklist item"][language] %>',
+				'data-placeholder': '<%- vocabulary["new checklist item"][language] %>',
 				'contenteditable': activity !== 'view' && !templated ? true : null // TO DO: FIGURE OUT WHY HERE WE USE activity !== 'view' RATHER THAN editing
 			})
 		.on('keydown', function () {
@@ -2011,7 +2018,7 @@ function addRadiolist (kwargs) {
 function addLocations (kwargs) {
 	// TO DO: INCLUDE CONSTRAINT
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, centerpoints, caption, constraint, required } = data || {}
+	let { id, level, type, name, instruction, centerpoints, caption, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'location'
 	if (!name) name = null
@@ -2028,14 +2035,14 @@ function addLocations (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type,
-		datum: { level, type, name, centerpoints, caption, instruction, constraint, required },
+		datum: { id, level, type, name, centerpoints, caption, instruction, constraint, required },
 		focus: focus || false,
 		lang,
 		maxheight: 300
 	})
 
 	if (meta.opts) {
-		meta.opts.addElems('div', 'opt-group', ['<%= vocabulary["click to search or add locations"][language] %>'])
+		meta.opts.addElems('div', 'opt-group', ['<%- vocabulary["click to search or add locations"][language] %>'])
 			.addElems('label')
 			.html(d => d)
 	}
@@ -2053,7 +2060,7 @@ function addLocations (kwargs) {
 
 	function rmPin (marker, container) {
 		const btn = document.createElement('BUTTON')
-		btn.innerHTML = '<%= vocabulary["remove pin"][language] %>'
+		btn.innerHTML = '<%- vocabulary["remove pin"][language] %>'
 		btn.addEventListener('click', _ => {
 			group.removeLayer(marker)
 			markers = markers.filter(m => m !== marker)
@@ -2126,7 +2133,7 @@ function addLocations (kwargs) {
 
 		filter.addElem('label')
 			.attr('for', 'search-field')
-			.html('<%= vocabulary["search place"][language] %>')
+			.html('<%- vocabulary["search place"][language] %>')
 
 		filter.addElems('button',  'search')
 			.on('click', searchLocation)
@@ -2243,7 +2250,7 @@ function addLocations (kwargs) {
 }
 async function addIndexes (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, tags, constraint, required } = data || {}
+	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'index'
 	if (!name) name = null
@@ -2261,7 +2268,7 @@ async function addIndexes (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, tags, instruction, constraint, required },
+		datum: { id, level, type, name, tags, instruction, constraint, required },
 		opencode: metafields.find(d => d.label === name)?.opencode || false,
 		focus: focus || false,
 		lang,
@@ -2272,7 +2279,7 @@ async function addIndexes (kwargs) {
 
 	if (list.opts) {
 		list.opts.addElem('div', 'opt-group')
-			.datum('<%= vocabulary["click to see options"][language] %>')
+			.datum('<%- vocabulary["click to see options"][language] %>')
 		.addElems('label', 'instruction')
 			.html(d => d)
 
@@ -2289,7 +2296,7 @@ async function addIndexes (kwargs) {
 }
 async function addTags (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, tags, constraint, required } = data || {}
+	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'tag'
 	if (!name) name = null
@@ -2305,7 +2312,7 @@ async function addTags (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, tags, instruction, constraint, required },
+		datum: { id, level, type, name, tags, instruction, constraint, required },
 		opencode: metafields.find(d => d.label === name)?.opencode || false,
 		focus: focus || false,
 		lang,
@@ -2314,7 +2321,7 @@ async function addTags (kwargs) {
 
 	if (list.opts) {
 		list.opts.addElem('div', 'opt-group')
-			.datum('<%= vocabulary["click to see options"][language] %>')
+			.datum('<%- vocabulary["click to see options"][language] %>')
 		.addElems('label', 'instruction')
 			.html(d => d)
 
@@ -2333,7 +2340,7 @@ async function addTags (kwargs) {
 // THIS IS THE CONSENT MODULE FROM THE SM PLATFORM
 async function addExternalResource (kwargs) {
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
-	let { level, type, name, srcs, instruction, required } = data || {}
+	let { id, level, type, name, srcs, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'external_resource'
 	if (!name) name = null
@@ -2350,13 +2357,13 @@ async function addExternalResource (kwargs) {
 		sibling,
 		container,
 		type,
-		datum: { level, type, name, srcs, instruction, required },
+		datum: { id, level, type, name, srcs, instruction, required },
 		focus: focus || false,
 		lang
 	})
 
 	if (meta.opts) {
-		meta.opts.addElems('div', 'opt-group', ['<%= vocabulary["click to search or add locations"][language] %>']) // TO DO: UPDATE TEXT
+		meta.opts.addElems('div', 'opt-group', ['<%- vocabulary["click to search or add locations"][language] %>']) // TO DO: UPDATE TEXT
 			.addElems('label')
 			.html(d => d)
 	}
@@ -2446,7 +2453,7 @@ async function addExternalResource (kwargs) {
 // GROUPS
 function addGroup (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, structure, items, values, instruction, repeat } = data || {} // NOT SURE WHY values IS USED HERE, IT IS NOT USED ANYWHERE ELSE
+	let { id, level, type, name, structure, items, values, instruction, repeat } = data || {} // NOT SURE WHY values IS USED HERE, IT IS NOT USED ANYWHERE ELSE
 	if (!level) level = 'media'
 	if (!type) type = 'group'
 	if (!name) name = null
@@ -2462,7 +2469,7 @@ function addGroup (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type,
-		datum: { level, type, name, structure, items, instruction, repeat },
+		datum: { id, level, type, name, structure, items, instruction, repeat },
 		focus: focus || false,
 		lang
 	})
@@ -2539,7 +2546,7 @@ function switchButtons (lang = 'en') {
 	if (mediaSize === 'xs') {
 		d3.select('.meta-status .btn-group .save button')
 		.each(function () { this.disabled = false })
-			.html('<%= vocabulary["save changes"][language] %>')
+			.html('<%- vocabulary["save changes"][language] %>')
 	} else {
 		const menu_logo = d3.select('nav#site-title .inner')
 		window.sessionStorage.setItem('changed-content', true)
@@ -2548,7 +2555,7 @@ function switchButtons (lang = 'en') {
 			.select('button')
 		.on('click', _ => {
 			if (editing) partialSave()
-		}).html('<%= vocabulary["save changes"][language] %>')
+		}).html('<%- vocabulary["save changes"][language] %>')
 	}
 }
 </script>

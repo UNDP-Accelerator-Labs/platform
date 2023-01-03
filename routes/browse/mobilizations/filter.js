@@ -18,6 +18,7 @@ exports.main = req => {
 
 	// ONGOING OR PAST MOBILIZATION
 	let f_space = null
+	if (space === 'scheduled') f_space = DB.pgp.as.format(`AND m.status = 0`)
 	if (space === 'ongoing') f_space = DB.pgp.as.format(`AND m.status = 1`)
 	if (space === 'past') f_space = DB.pgp.as.format(`AND m.status = 2`)
 
@@ -25,7 +26,7 @@ exports.main = req => {
 
 	// ORDER
 	let order = null
-	if (space === 'ongoing') order = DB.pgp.as.format(`ORDER BY m.start_date DESC`)
+	if (['ongoing', 'scheduled'].includes(space)) order = DB.pgp.as.format(`ORDER BY m.start_date DESC`)
 	if (space === 'past') order = DB.pgp.as.format(`ORDER BY m.end_date DESC, m.start_date DESC`)
 
 	return [ f_space, order, page, filters.join(' ') ]

@@ -1,6 +1,9 @@
 <% 
 	// CREATE ALIASES
+	const publicpage = locals.metadata.page.public
 	const space = locals.metadata.page.space
+	const object = locals.metadata.page.object
+	const language = locals.metadata.page.language
 
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -15,8 +18,8 @@
 	</div>
 	<!-- <% if (locals.session_data?.logged) { %>
 		<div class='btn-group'>
-			<a class='mtype <% if (locals.mtype === "locations") { %>active<% } %>' data-type='locations'><%- capitalize(vocabulary['location'][locals.lang](true)) %></a>
-			<a class='mtype <% if (locals.mtype === "labs") { %>active<% } %>' data-type='labs'><%- capitalize(vocabulary['lab'][locals.lang](true)) %></a>
+			<a class='mtype <% if (locals.mtype === "locations") { %>active<% } %>' data-type='locations'><%- capitalize(vocabulary['location'][language](true)) %></a>
+			<a class='mtype <% if (locals.mtype === "labs") { %>active<% } %>' data-type='labs'><%- capitalize(vocabulary['lab'][language](true)) %></a>
 		</div>
 	<% } %> -->
 	<% if (
@@ -41,7 +44,7 @@
 
 const centerpoint = <%- JSON.stringify(locals.metadata.user?.country?.lnglat || null) %>;
 const clusters = <%- JSON.stringify(locals.clusters || []) %>;
-console.log(clusters)
+
 // THE LEAFLET CODE
 // const drawMap = window.matchMedia("(min-width: 576px)").matches || clusters.length || data.map(d => d.location).filter(d => d).length
 // const drawMap = window.matchMedia("(min-width: 576px)").matches
@@ -95,61 +98,41 @@ if (drawMap) {
 		})
 
 		async function loadPopup (popup, ids) {
-			// let { data } = await POST('/<%- locals.lang %>/explore/pads', { pads: [id] })
-			let { data } = await POST('/<%- locals.metadata.page.language %>/browse/pads/<%- space %>', { pads: ids })
-			// data = data[0]
-			console.log(data)
+			let { data } = await POST('/<%- language %>/browse/pads/<%- space %>', { pads: ids })
 
 			const section = document.createElement('section')
 			section.classList.add('container')
+			section.classList.add('<%- object %>')
 			const body = d3.select(section)
-				.addElems('div', 'layout')
-			.addElems('article', null, data)
-				.each(function (d) {
-					d3.select(this).classed(`status-${d.status}`, true)
-				}).addElems('div', 'inner')
-				.addElems('div', 'body')
+				.addElems('div', 'layout columns', [data])
+			.each(function (d) {
+				const section = d3.select(this)
 
-			// IMAGE
-			body.addElems('div', 'media media-img')
-				.addElems('a', 'pad-link', d => d.img)
-			.addElems('img', 'vignette')
-				.attrs({
-					'src': d => d,
-					'alt': vocabulary['missing image']['<%- locals.lang %>']
+				d.forEach(c => {
+					const entry = new Entry({ 
+						parent: section, 
+						data: c,
+						display: 'columns',
+						language: '<%- language %>'
+					})
+					// CREATE ALIAS FOR render
+					const render = entry.render
+					render.img(entry.head)
+					render.actions(entry.head)
+					render.title(entry.body)
+					render.owner(entry.body)
+					if (data.img?.length === 0) render.txt(entry.body)
+					<% if (!publicpage) { %>
+						render.metainfo(entry.body)
+						render.followup(entry.body)
+					<% } %>
+					render.tags(entry.body)
+					if (mediaSize !== 'xs') render.stats(entry.foot)
+					render.engagement(entry.foot)
+					render.pin(entry.foot)
+					render.delete(entry.outer)
 				})
-
-			// SDGs
-			const sdgs = body.addElems('div', 'meta row-1')
-				.addElems('div', 'meta meta-sdgs', d => d.sdgs)
-			sdgs.addElems('span')
-				.html(d => `${vocabulary['sdg']['<%- locals.metadata.page.language %>']((d?.length || 0) > 1)}:`)
-			sdgs.addElems('a', 'sdg-link', d => d)
-				.attr('href', d => `?sdgs=${d.key || d}`)
-				.html(d => d.key || d) // THIS IS LEGACY FOR ACTION PLANS PLATFORM
-			// TAGS
-			body.addElems('div', 'meta meta-tags', d => d.tags)
-				.addElems('a', 'tag-link', d => d)
-				.attr('href', d => `?tags=${d}`)
-			.addElems('div', 'tag')
-				.addElems('label')
-				.attr('title', d => d)
-				.html(d => d.length <= 12 ? d.capitalize() : `${d.slice(0, 12).capitalize()}…`)
-			// TITLE
-			body.addElems('div', 'media media-title', d => d.title ? [d.title] : [])
-				.addElems('a', 'pad-link')
-				.attr('href', d => d.editable ? `../../edit/pad?id=${d.id}` : `../../view/pad?id=${d.id}`)
-				.html(d => {
-					if (d === null || d === undefined || d === '') return `[${vocabulary['untitled pad']['<%- locals.lang %>']}]`
-					else return d
-				})
-			// CONTRIBUTOR INFO
-			body.addElems('div', 'meta meta-contributor')
-				// .html(d => vocabulary['credit']?.['<%- locals.metadata.page.language %>'](d.contributor, d.contributorname, 'contributors')) // TO DO: UPDATE THIS TO MATCH NEW CREDIT STRUCTURE
-				// .html('credit')
-			// section.appendChild(body.node())
-
-			console.log(section)
+			})
 
 			popup.setContent(section)
 		}

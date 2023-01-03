@@ -31,14 +31,23 @@
 			"pt": "Explorar"
 		},
 		"cohort": {
-			"en": plural => { return plural ? "Cohorts" : "Cohort" },
-			"fr": plural => { return plural ? "Cohorte" : "Cohorts" },
-			"es": plural => { return plural ? "Cohorte" : "Cohortes" },
-			"pt": plural => { return plural ? "Coorte" : "Coortes" }
+			"en": plural => { 
+				if (plural) return "Cohorts"
+				else return "Cohort" 
+			},
+			"fr": plural => { 
+				if (plural) return "Cohortes"
+				else return "Cohorte"
+			},
+			"es": plural => { 
+				if (plural) return "Cohortes"
+				else return "Cohorte"
+			},
+			"pt": plural => { 
+				if (plural) return "Coortes"
+				else return "Coorte"
+			}
 		},
-		
-
-
 		"space": {
 			"en": (object, space) => {
 				if (['pad', 'pads'].includes(object)) {
@@ -60,9 +69,11 @@
 					if (space === 'shared') return "Shared files"
 					if (space === 'public') return "Published files"
 				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'private') return "My reviews"
-					if (space === 'shared') return "Completed reviews"
+					if (space === 'pending') return "Pending reviews"
+					if (space === 'ongoing') return "Accepted reviews"
+					if (space === 'past') return "Completed reviews"
 				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'scheduled') return "Scheduled campaigns"
 					if (space === 'ongoing') return "Ongoing campaigns"
 					if (space === 'past') return "Past campaigns"
 				} else if (['contributor', 'contributors'].includes(object)) {
@@ -90,9 +101,11 @@
 					if (space === 'shared') return "Fichiers partagés"
 					if (space === 'public') return "Fichiers publiés"
 				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'private') return "Mes relectures"
-					if (space === 'shared') return "Relectures terminées"
+					if (space === 'pending') return "Relectures en attente"
+					if (space === 'ongoing') return "Relectures en cours"
+					if (space === 'past') return "Relectures terminées"
 				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'scheduled') return "Campagnes programmées"
 					if (space === 'ongoing') return "Campagnes en cours"
 					if (space === 'past') return "Campagnes passées"
 				} else if (['contributor', 'contributors'].includes(object)) {
@@ -120,9 +133,11 @@
 					if (space === 'shared') return "Archivos compartidos"
 					if (space === 'public') return "Archivos publicados"
 				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'private') return "Mis reseñas"
-					if (space === 'shared') return "Revisiones completadas"
+					if (space === 'pending') return "Revisiones pendientes"
+					if (space === 'ongoing') return "Revisiones aceptadas"
+					if (space === 'past') return "Revisiones completadas"
 				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'scheduled') return "Campañas programadas"
 					if (space === 'ongoing') return "Campañas en curso"
 					if (space === 'past') return "Campañas pasadas"
 				} else if (['contributor', 'contributors'].includes(object)) {
@@ -150,9 +165,11 @@
 					if (space === 'shared') return "Arquivos compartilhados"
 					if (space === 'public') return "Arquivos publicados"
 				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'private') return "Meus comentários"
-					if (space === 'shared') return "Revisões concluídas"
+					if (space === 'pending') return "Revisões pendentes"
+					if (space === 'ongoing') return "Revisões aceitos"
+					if (space === 'past') return "Revisões concluídas"
 				} else if (['mobilization', 'mobilizations'].includes(object)) {
+					if (space === 'scheduled') return "Campanhas agendadas"
 					if (space === 'ongoing') return "Campanhas em andamento"
 					if (space === 'past') return "Campanhas anteriores"
 				} else if (['contributor', 'contributors'].includes(object)) {
@@ -238,16 +255,16 @@
 			"pt": "Escolha um espaço de trabalho ou campanha para importar os blocos de notas."
 		},
 		"generated template": { // USED
-			"en": filename => `Template generated from the columns in “${filename}”.`,
-			"fr": filename => `Gabarit généré à partir des colonnes du fichier « ${filename} ».`,
-			"es": filename => `Plantilla generada a partir de columnas de archivo “${filename}”.`,
-			"pt": filename => `Modelo gerado a partir das colunas do arquivo “${filename}”.`
+			"en": filename => "Template generated from the columns in “" + filename + "”.",
+			"fr": filename => "Gabarit généré à partir des colonnes du fichier « " + filename + " ».",
+			"es": filename => "Plantilla generada a partir de columnas de archivo “" + filename + "”.",
+			"pt": filename => "Modelo gerado a partir das colunas do arquivo “" + filename + "”."
 		},
 		"import table description": {
-			"en": (rowcount, colcount, displayed) => `${rowcount} entries and ${colcount} columns (${rowcount} x ${colcount} table) were detected. ${displayed} entries are displayed.`,
-			"fr": (rowcount, colcount, displayed) => `${rowcount} entrées et ${colcount} colonnes (un tableau de ${rowcount} x ${colcount}) ont été détectées. ${displayed} entrées sont affichées.`,
-			"es": (rowcount, colcount, displayed) => `Se detectaron ${rowcount} entradas y ${colcount} columnas (una tabla de ${rowcount} x ${colcount}). Se muestran ${displayed} entradas.`,
-			"pt": (rowcount, colcount, displayed) => `${rowcount} entradas e ${colcount} colunas (uma tabela ${rowcount} x ${colcount}) foram detectadas. ${displayed} entradas são exibidas.`
+			"en": (rowcount, colcount, displayed) => rowcount + " entries and " + colcount + " columns (" + rowcount + " x " + colcount + " table) were detected. " + displayed + " entries are displayed.",
+			"fr": (rowcount, colcount, displayed) => rowcount + " entrées et " + colcount + " colonnes (un tableau de " + rowcount + " x " + colcount + ") ont été détectées. " + displayed + " entrées sont affichées.",
+			"es": (rowcount, colcount, displayed) => "Se detectaron " + rowcount + " entradas y " + colcount + " columnas (una tabla de " + rowcount + " x " + colcount + "). Se muestran " + displayed + " entradas.",
+			"pt": (rowcount, colcount, displayed) => rowcount + " entradas e " + colcount + " colunas (uma tabela " + rowcount + " x " + colcount + ") foram detectadas. " + displayed + " entradas são exibidas."
 		},
 		"select destination": {
 			"en": "Select a destination",
@@ -267,8 +284,6 @@
 			"es": "Imagen cargada correctamente.",
 			"pt": "Imagem carregada com sucesso."
 		},
-		
-
 		"publish": { // USED
 			"en": "Publish",
 			"fr": "Publier",
@@ -306,17 +321,41 @@
 			"pt": "Mostrar modelo como apresentação de slides"
 		},
 		"add tags": { // USED
-			"en": tagtype => `Add one or more ${tagtype} tag(s).`, // TO DO: tagtype MIGHT NEED A TRANSLATION
-			"fr": tagtype => `Ajouter une ou plusieurs étiquettes ${tagtype}.`,
-			"es": tagtype => `Agregue una o más etiquetas ${tagtype}.`,
-			"pt": tagtype => `Adicione uma ou mais tags ${tagtype}.`
+			"en": tagtype => "Add one or more " + tagtype + " tag(s).", // TO DO: tagtype MIGHT NEED A TRANSLATION
+			"fr": tagtype => "Ajouter une ou plusieurs étiquettes " + tagtype + ".",
+			"es": tagtype => "Agregue una o más etiquetas " + tagtype + ".",
+			"pt": tagtype => "Adicione uma ou mais tags " + tagtype + "."
 		},
 
 		"comment": { // USED
-			"en": (verb, plural) => verb ? "Comment" : `Comment${plural ? 's' : ''}`,
-			"fr": (verb, plural) => verb ? "Commenter" : `Commentaire${plural ? 's' : ''}`,
-			"es": (verb, plural) => verb ? "Comentar" : `Comentario${plural ? 's' : ''}`,
-			"pt": (verb, plural) => verb ? "Comentar" : plural ? 'Comentários' : 'Comente'
+			"en": (verb, plural) => {
+				if (verb) return "Comment"
+				else {
+					if (plural) return "Comments"
+					else return "Comment"
+				}
+			},
+			"fr": (verb, plural) => {
+				if (verb) return "Commenter"
+				else {
+					if (plural) return "Commentaires"
+					else return "Commentaire"
+				}
+			},
+			"es": (verb, plural) => {
+				if (verb) return "Comentar"
+				else {
+					if (plural) return "Comentarios"
+					return "Comentario"
+				}
+			},
+			"pt": (verb, plural) => {
+				if (verb) return "Comentar"
+				else {
+					if (plural) return 'Comentários'
+					else return 'Comentário'
+				}
+			}
 		},
 		"comment publicly": { // USED
 			"en": "Comment publicly",
@@ -324,11 +363,35 @@
 			"es": "Comentar públicamente",
 			"pt": "Comentar publicamente"
 		},
-		"reply": { // USED: TO DO: UPDATE THIS TO INCLUDE verb AND plural
-			"en": (verb, plural) => verb ? "Reply" : `Repl${plural ? 'ies' : 's'}`,
-			"fr": (verb, plural) => verb ? "Répondre" : `Réponse${plural ? 's' : ''}`,
-			"es": (verb, plural) => verb ? "Responder" : `Respuesta${plural ? 's' : ''}`,
-			"pt": (verb, plural) => verb ? "Responda" : `Resposta${plural ? 's' : ''}`
+		"reply": { // USED
+			"en": (verb, plural) => {
+				if (verb) return "Reply"
+				else {
+					if (plural) return "Responses"
+					else return "Response"
+				}
+			},
+			"fr": (verb, plural) => {
+				if (verb) return "Répondre"
+				else {
+					if (plural) return "Réponses"
+					else return "Réponse"
+				}
+			},
+			"es": (verb, plural) => {
+				if (verb) return "Responder"
+				else {
+					if (plural) return "Respuestas"
+					else return "Respuesta"
+				}
+			},
+			"pt": (verb, plural) => {
+				if (verb) return "Responda"
+				else {
+					if (plural) return "Respostas"
+					else return "Resposta"
+				}
+			}
 		},
 		"reply publicly": { // USED
 			"en": "Respond publicly",
@@ -337,10 +400,22 @@
 			"pt": "Responder publicamente"
 		},
 		"expand replies": { // USED
-			"en": count => `Read ${count} repl${count !== 1 ? 'ies' : 'y'}`,
-			"fr": count => `Lire ${count} réponse${count !== 1 ? 's' : ''}`,
-			"es": count => `Leer ${count} respuesta${count !== 1 ? 's' : ''}`,
-			"pt": count => `Leia ${count} resposta${count !== 1 ? 's' : ''}`
+			"en": count => {
+				if (count !== 1) return "Read " + count + " replies"
+				else return "Read " + count + " reply"
+			},
+			"fr": count => {
+				if (count !== 1) return "Lire " + count + " réponses"
+				else return "Lire " + count + " réponse"
+			},
+			"es": count => {
+				if (count !== 1) return "Leer " + count + " respuestas"
+				else return "Leer " + count + " respuesta"
+			},
+			"pt": count => {
+				if (count !== 1) return "Leia " + count + "respostas"
+				else return "Leia " + count + "resposta"
+			}
 		},
 		"accept": { // USED
 			"en": "Accept",
@@ -361,10 +436,10 @@
 			"pt": "Rejeitar"
 		},
 		"reviewers accepted": { // USED
-			"en": (count, total) => `<strong>${count}</strong><small> / ${total}</small> reviewers have accepted.`,
-			"fr": (count, total) => `<strong>${count}</strong><small> / ${total}</small> relect.eur.rice.s ont accepté.`,
-			"es": (count, total) => `<strong>${count}</strong><small> / ${total}</small> evisor.e.a.s han aceptado.`,
-			"pt": (count, total) => `<strong>${count}</strong><small> / ${total}</small> revisores aceitaram.`
+			"en": (count, total) => "<strong>" + count + "</strong><small> / " + total + "</small> reviewers have accepted.",
+			"fr": (count, total) => "<strong>" + count + "</strong><small> / " + total + "</small> relect.eur.rice.s ont accepté.",
+			"es": (count, total) => "<strong>" + count + "</strong><small> / " + total + "</small> evisor.e.a.s han aceptado.",
+			"pt": (count, total) => "<strong>" + count + "</strong><small> / " + total + "</small> revisores aceitaram."
 		},
 		"accept or reject pad": { // USED
 			"en": "Is this pad ready for publication?",
@@ -373,10 +448,10 @@
 			"pt": "Este bloco está pronto para publicação?"
 		},
 		"review template description": {
-			"en": language => `This is a template for reviews in ${language}.`,
-			"fr": language => `Ceci est un gabarit pour les relectures en ${language}.`,
-			"es": language => `Esta es una plantilla para reseñas en ${language}.`,
-			"pt": language => `Este é um modelo para resenhas em ${language}.`
+			"en": language => "This is a template for reviews in " + language + ".",
+			"fr": language => "Ceci est un gabarit pour les relectures en " + language + ".",
+			"es": language => "Esta es una plantilla para reseñas en " + language + ".",
+			"pt": language => "Este é um modelo para resenhas em " + language + "."
 		},
 
 
@@ -400,10 +475,10 @@
 			"pt": "Conecte-se"
 		},
 		"logged in": {
-			"en": (user, uuid) => { return `You are logged in as <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` },
-			"fr": (user, uuid) => { return `Vous êtes identifé.e en tant que <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` },
-			"es": (user, uuid) => { return `Has iniciado sesión como <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` },
-			"pt": (user, uuid) => { return `Você está logado como <a href='/en/edit/contributor?id=${uuid}'><u>${user}</u></a>` }
+			"en": (user, uuid) => "You are logged in as <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"fr": (user, uuid) => "Vous êtes identifé.e en tant que <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"es": (user, uuid) => "Has iniciado sesión como <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"pt": (user, uuid) => "Você está logado como <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>"
 		},
 		"log out": {
 			"en": "Log out",
@@ -412,28 +487,76 @@
 			"pt": "Sair"
 		},
 		"sdg": {
-			"en": plural => { return plural ? "SDGs": "SDG" },
-			"fr": plural => { return plural ? "ODD": "ODD" },
-			"es": plural => { return plural ? "ODS": "ODS" },
-			"pt": plural => { return plural ? "ODS": "ODS" }
+			"en": plural => { 
+				if (plural) return "SDGs"
+				else return "SDG" 
+			},
+			"fr": plural => { 
+				if (plural) return "ODD"
+				else return "ODD"
+			},
+			"es": plural => { 
+				if (plural) return "ODS" 
+				else return "ODS"
+			},
+			"pt": plural => { 
+				if (plural) return "ODS"
+				else return "ODS"
+			}
 		},
 		"thematic area": { // USED
-			"en": plural => { return `Thematic area${plural ? 's' : ''}` },
-			"fr": plural => { return `Thématique${plural ? 's' : ''}` },
-			"es": plural => { return `Tema${plural ? 's' : ''}` },
-			"pt": plural => { return `Tema${plural ? 's' : ''}` }
+			"en": plural => { 
+				if (plural) return "Thematic areas"
+				else return "Thematic area"
+			},
+			"fr": plural => { 
+				if (plural) return "Thématiques"
+				else return "Thématique"
+			},
+			"es": plural => { 
+				if (plural) return "Temas"
+				else return "Tema"
+			},
+			"pt": plural => { 
+				if (plural) return "Temas"
+				else return "Tema"
+			}
 		},
 		"contributor": {
-			"en": plural => { return `Contributor${plural ? "s" : ""}` },
-			"fr": plural => { return `Contributeur${plural ? "s" : ""}` },
-			"es": plural => { return `Contribuyente${plural ? "s" : ""}` },
-			"pt": plural => { return `Contribuidor${plural ? "es" : ""}` }
+			"en": plural => { 
+				if (plural) return "Contributors"
+				else return "Contributor"
+			},
+			"fr": plural => { 
+				if (plural) return "Contributeurs"
+				else return "Contributeurs"
+			},
+			"es": plural => { 
+				if (plural) return "Contribuyentes"
+				else return "Contribuyente"
+			},
+			"pt": plural => { 
+				if (plural) return "Contribuidores"
+				else return "Contribuidor"
+			}
 		},
 		"item": {
-			"en": plural => { return `Item${plural ? "s" : ""}` },
-			"fr": plural => { return `Item${plural ? "s" : ""}` },
-			"es": plural => { return `Artículo{plural ? "s" : ""}` },
-			"pt": plural => { return `Ite${plural ? "ns" : "m"}` }
+			"en": plural => { 
+				if (plural) return "Items"
+				else return "Item"
+			},
+			"fr": plural => { 
+				if (plural) return "Champs"
+				else return "Champ"
+			},
+			"es": plural => { 
+				if (plural) return "Artículos"
+				else return "Artículo"
+			},
+			"pt": plural => { 
+				if (plural) return "Itens"
+				else return "Item"
+			}
 		},
 		"solution": {
 			"en": (article, plural) => { 
@@ -473,15 +596,24 @@
 				}
 			}
 		},
-
 		"pad": {
-			"en": plural => { return plural ? "Pads" : "Pad" },
-			"fr": plural => { return plural ? "Blocs-notes" : "Bloc-notes" },
-			"es": plural => { return plural ? "Libretas" : "Libreta" },
-			"pt": plural => { return plural ? "Blocos de notas" : "Bloco de notas" }
+			"en": plural => { 
+				if (plural) return "Pads"
+				else return "Pad"
+			},
+			"fr": plural => { 
+				if (plural) return "Blocs-notes"
+				else return "Bloc-notes"
+			},
+			"es": plural => { 
+				if (plural) return "Libretas"
+				else return "Libreta"
+			},
+			"pt": plural => { 
+				if (plural) return "Blocos de notas"
+				else return "Bloco de notas"
+			}
 		},
-		
-
 		// [NEW] MENU
 		"new": { // NEW
 			"en": "New",
@@ -567,17 +699,41 @@
 		},
 
 		"file": { // USED
-			"en": plural => { return plural ? "Files" : "File" },
-			"fr": plural => { return plural ? "Fichiers" : "Fichier" },
-			"es": plural => { return plural ? "Archivos" : "Archivo" },
-			"pt": plural => { return plural ? "Arquivos" : "Arquivo" }
+			"en": plural => { 
+				if (plural) return "Files"
+				else return "File"
+			},
+			"fr": plural => { 
+				if (plural) return "Fichiers"
+				else return "Fichier"
+			},
+			"es": plural => { 
+				if (plural) return "Archivos"
+				else return "Archivo"
+			},
+			"pt": plural => { 
+				if (plural) return "Arquivos"
+				else return "Arquivo"
+			}
 		},
 
 		"mobilization": { // USED
-			"en": plural => { return plural ? "Campaigns" : "Campaign" },
-			"fr": plural => { return plural ? "Campagnes" : "Campagne" },
-			"es": plural => { return plural ? "Campañas" : "Campaña" },
-			"pt": plural => { return plural ? "Campanhas" : "Campañas" }
+			"en": plural => { 
+				if (plural) return "Campaigns"
+				else return "Campaign"
+			},
+			"fr": plural => { 
+				if (plural) return "Campagnes"
+				else return "Campagne"
+			},
+			"es": plural => { 
+				if (plural) return "Campañas"
+				else return "Campaña"
+			},
+			"pt": plural => { 
+				if (plural) return "Campanhas"
+				else return "Campañas"
+			}
 		},	
 		"call for contributions": { // USED
 			"en": "Call for contributions",
@@ -611,37 +767,40 @@
 		}, 
 
 		"created by": { // USED
-			"en": user => `Created by ${user}.`,
-			"fr": user => `Créé par ${user}.`,
-			"es": user => `Creado por ${user}.`,
-			"pt": user => `Criado por ${user}.`
+			"en": user => "Created by " + user + ".",
+			"fr": user => "Créé par " + user + ".",
+			"es": user => "Creado por " + user + ".",
+			"pt": user => "Criado por " + user + "."
 		},
 		"launched by": { // USED
 			"en": (user, date) => {
-				if (user && date) return `Launched by ${user} on ${date}.`
-				else if (user) return `Launched by ${user}.`
-				else if (date) return `Launched on ${date}.`
+				if (user && date) return "Launched by " + user + " on " + date + "."
+				else if (user) return "Launched by " + user + "."
+				else if (date) return "Launched on " + date + "."
 			},
 			"fr": (user, date) => {
-				if (user && date) return `Lancée par ${user} le ${date}.`
-				else if (user) return `Lancée by ${user}.`
-				else if (date) return `Lancée on ${date}.`
+				if (user && date) return "Lancée par " + user + " le " + date + "."
+				else if (user) return "Lancée par " + user + "."
+				else if (date) return "Lancée le " + date + "."
 			},
 			"es": (user, date) => {
-				if (user && date) return `Lanzado por ${user} el ${date}.`
-				else if (user) return `Lanzado por ${user}.`
-				else if (date) return `Lanzado el ${date}.`
+				if (user && date) return "Lanzado por " + user + " el " + date + "."
+				else if (user) return "Lanzado por " + user + "."
+				else if (date) return "Lanzado el " + date + "."
 			},
 			"pt": (user, date) => {
-				if (user && date) return `Lançado por ${user} em ${date}.`
-				else if (user) return `Lançado por ${user}.`
-				else if (date) return `Lançado em ${date}.`
+				if (user && date) return "Lançado por " + user + " em " + date + "."
+				else if (user) return "Lançado por " + user + "."
+				else if (date) return "Lançado em " + date + "."
 			}
 		},
-
-
-
 		"untitled pad": {
+			"en": "Untitled pad",
+			"fr": "Bloc-notes sans titre",
+			"es": "Libreta sin título",
+			"pt": "Bloco de notas sem título"
+		},
+		"untitled review": { // TO DO
 			"en": "Untitled pad",
 			"fr": "Bloc-notes sans titre",
 			"es": "Libreta sin título",
@@ -653,12 +812,23 @@
 			"es": "Solución sin título",
 			"pt": "Solução sem título"
 		},
-		
 		"untitled template": {
 			"en": "Untitled template",
 			"fr": "Gabarit sans titre",
 			"es": "Plantilla sin título",
 			"pt": "Modelo sem título"
+		},
+		"untitled contributor": { // USED: THIS IS THE SAME AS BELOW, BUT NECESSARY FOR SIMPLIFICATION OF browse/index.ejs
+			"en": "Anonymous contributor",
+			"fr": "Contribut.eur.rice anonyme",
+			"es": "Colaborador.or.a anónim.o.a",
+			"pt": "Contribuidor anônimo"
+		},
+		"anonymous contributor": { // USED
+			"en": "Anonymous contributor",
+			"fr": "Contribut.eur.rice anonyme",
+			"es": "Colaborador.or.a anónim.o.a",
+			"pt": "Contribuidor anônimo"
 		},
 		"missing template description": {
 			"en": "Missing description of the template.",
@@ -672,28 +842,56 @@
 			"es": "Cargar una plantilla",
 			"pt": "Carregar um modelo"
 		},
-		
-
 		"credit": {
-			"en": (cid, name, type) => { return `Contributed by <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` },
-			"fr": (cid, name, type) => { return `Contribué par <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` },
-			"es": (cid, name, type) => { return `Contribuido por <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` },
-			"pt": (cid, name, type) => { return `Contribuíram por <a href='../browse/pads/public?${type}=${cid}'>${name}</a>.` }
+			"en": (cid, name, type) => "Contributed by <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>.",
+			"fr": (cid, name, type) => "Contribué par <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>.",
+			"es": (cid, name, type) => "Contribuido por <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>.",
+			"pt": (cid, name, type) => "Contribuíram por <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>."
 		},
 		"host credit": {
-			"en": (cid, name) => { return `Hosted by <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` },
-			"fr": (cid, name) => { return `Convoqué par <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` },
-			"es": (cid, name) => { return `Convocado por <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` },
-			"pt": (cid, name) => { return `Convocado por <a href='../browse/pads/public?contributors=${cid}'>${name}</a>.` }
+			"en": (cid, name) => "Hosted by <a href='../browse/pads/public?contributors=" + cid + "'>" + name + "</a>.",
+			"fr": (cid, name) => "Convoqué par <a href='../browse/pads/public?contributors=" + cid + "'>" + name + "</a>.",
+			"es": (cid, name) => "Convocado por <a href='../browse/pads/public?contributors=" + cid + "'>" + name + "</a>.",
+			"pt": (cid, name) => "Convocado por <a href='../browse/pads/public?contributors=" + cid + "'>" + name + "</a>."
 		},
-		"missing contributor": {
+		"curation credit": {
+			"en": (cid, name, type) => "Curated by <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>.",
+			"fr": (cid, name, type) => "Edité par <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>.",
+			"es": (cid, name, type) => "Comisariada por <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>.",
+			"pt": (cid, name, type) => "Curadoria de <a href='../browse/pads/public?" + type + "=" + cid + "'>" + name + "</a>."
+		},
+		// "missing contributor": {
 
-		},
+		// },
 		"filter": { // USED
-			"en": (verb, plural) => { return verb ? "Filter" : plural ? "Filters" : "Filter" },
-			"fr": (verb, plural) => { return verb ? "Filtrer" : plural ? "Filtres" : "Filtre" },
-			"es": (verb, plural) => { return verb ? "Filtrar" : plural ? "Filtros" : "Filtro" },
-			"pt": (verb, plural) => { return verb ? "Filtro" : plural ? "Filtros" : "Filtro" }
+			"en": (verb, plural) => { 
+				if (verb) return "Filter"
+				else {
+					if (plural) return "Filters"
+					else return "Filter" 
+				}
+			},
+			"fr": (verb, plural) => { 
+				if (verb) return "Filtrer"
+				else {
+					if (plural) return "Filtres"
+					else return "Filtre"
+				}
+			},
+			"es": (verb, plural) => { 
+				if (verb) return "Filtrar"
+				else {
+					if (plural) return "Filtros"
+					else return "Filtro"
+				}
+			},
+			"pt": (verb, plural) => { 
+				if (verb) return "Filtro"
+				else {
+					if (plural) return "Filtros"
+					else return "Filtro"
+				}
+			}
 		},
 		"apply filters": { // USED
 			"en": "Apply filters",
@@ -702,10 +900,22 @@
 			"pt": "Aplicar filtros"
 		},
 		"search": { // USED
-			"en": (person) => { return `Looking for ${person ? 'someone' : 'something'}?` },
-			"fr": (person) => { return `À la recherche de ${person ? 'quelqu’un' : 'quelque chose'} ?` },
-			"es": (person) => { return `¿Buscando ${person ? 'a alguien' : 'algo'}?` },
-			"pt": (person) => { return `Procurando por ${person ? 'alguém' : 'algo'}?` }
+			"en": (person) => { 
+				if (person) return "Looking for someone?"
+				else return "Looking for something?"
+			},
+			"fr": (person) => { 
+				if (person) return "À la recherche de quelqu’un ?"
+				else return "À la recherche de quelque chose ?"
+			},
+			"es": (person) => { 
+				if (person) return "¿Buscando a alguien?"
+				else return "¿Buscando algo"
+			},
+			"pt": (person) => { 
+				if (person) return "Procurando por alguém?"
+				else return "Procurando por algo?"
+			}
 		},
 		"search or add": {
 			"en": "Looking for something or want to add it?",
@@ -726,10 +936,10 @@
 			"pt": "Termos de pesquisa"
 		},
 		"description": {
-			"en": 'Description',
-			"fr": 'Description',
-			"es": 'Descripción',
-			"pt": 'Descrição'
+			"en": "Description",
+			"fr": "Description",
+			"es": "Descripción",
+			"pt": "Descrição"
 		},
 		"media": {
 			"en": 'Media',
@@ -768,16 +978,28 @@
 			"pt": "De volta à galeria"
 		},
 		"bookmark": {
-			"en": active => { return active ? "Bookmarked" : "Bookmark" },
-			"fr": active => { return active ? "Favori" : "Marquer" },
-			"es": active => { return active ? "Favorito" : "Marcador" },
-			"pt": active => { return active ? "Favorito" : "Marcar" }
+			"en": active => { 
+				if (active) return "Bookmarked"
+				else return "Bookmark"
+			},
+			"fr": active => { 
+				if (active) return "Favori"
+				else return "Marquer"
+			},
+			"es": active => { 
+				if (active) return "Favorito"
+				else return "Marcador"
+			},
+			"pt": active => { 
+				if (active) return "Favorito"
+				else return "Marcar"
+			}
 		},
 		"tested and approved": {
-			"en": (cid, name) => { return `This solution has been tested and approved by <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"fr": (cid, name) => { return `Cette solution a été testée et approuvée par <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"es": (cid, name) => { return `Esta solución ha sido probada y aprobada por <a href='../browse/public?contributors=${cid}'>${name}</a>.` },
-			"pt": (cid, name) => { return `Esta solução foi testada e aprovada por <a href='../browse/public?contributors=${cid}'>${name}</a>.` }
+			"en": (cid, name) => "This solution has been tested and approved by <a href='../browse/public?contributors=" + cid + "'>" + name + "</a>.",
+			"fr": (cid, name) => "Cette solution a été testée et approuvée par <a href='../browse/public?contributors=" + cid + "'>" + name + "</a>.",
+			"es": (cid, name) => "Esta solución ha sido probada y aprobada por <a href='../browse/public?contributors=" + cid + "'>" + name + "</a>.",
+			"pt": (cid, name) => "Esta solução foi testada e aprovada por <a href='../browse/public?contributors=" + cid + "'>" + name + "</a>."
 		},
 
 		"status": {
@@ -928,17 +1150,17 @@
 						else return "Completed review"
 					}
 					if (status === 3) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 				} else if (['file', 'files'].includes(object)) {
 					if (status === 0) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 1) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 2) {
 						if (plural) return "Shared files"
@@ -1021,17 +1243,17 @@
 						else return "Relecture terminée"
 					}
 					if (status === 3) {
-						if (plural) return 
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 				} else if (['file', 'files'].includes(object)) {
 					if (status === 0) {
-						if (plural) return 
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 1) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 2) {
 						if (plural) return "Fichiers partagés"
@@ -1113,17 +1335,17 @@
 						else return "Revisión completa"
 					}
 					if (status === 3) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 				} else if (['file', 'files'].includes(object)) {
 					if (status === 0) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO 
+						else return // TO DO
 					}
 					if (status === 1) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 2) {
 						if (plural) return "Archivos compartidos"
@@ -1205,17 +1427,17 @@
 						else return "Revisão concluída"
 					}
 					if (status === 3) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 				} else if (['file', 'files'].includes(object)) {
 					if (status === 0) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 1) {
-						if (plural) return
-						else return
+						if (plural) return // TO DO
+						else return // TO DO
 					}
 					if (status === 2) {
 						if (plural) return "Arquivos compartilhados"
@@ -1245,76 +1467,373 @@
 				}
 			}
 		},
-		"date": function (date, language) { // USED
+		"date": { // USED
 			// USEFUL TABLE: https://web.library.yale.edu/cataloging/months
-			const matches = date.match(/\d+/g)
-			if (language === 'en') {
-				if (matches.length === 1) {
-					const num = parseInt(matches[0])
-					if (date.includes('minutes ago')) return `${num} minute${num === 1 ? '' : 's'} ago`
-					if (date.includes('hours ago')) return `${num} hour${num === 1 ? '' : 's'} ago`
-					if (date.includes('days ago')) return `${num} day${num === 1 ? '' : 's'} ago`
-				} else return date
-			}
-			if (language === 'fr') {
-				if (matches.length === 1) {
-					const num = parseInt(matches[0])
-					if (date.includes('minutes ago')) return `il y a ${num} minute${num === 1 ? '' : 's'}`
-					if (date.includes('hours ago')) return `il y a ${num} heure${num === 1 ? '' : 's'}`
-					if (date.includes('days ago')) return `il y a ${num} jour${num === 1 ? '' : 's'}`
-				} else return date.replace(/Jan/i, 'janv.')
-					.replace(/Feb/i, 'févr.')
-					.replace(/Mar/i, 'mars')
-					.replace(/Apr/i, 'avr.')
-					.replace(/May/i, 'mai')
-					.replace(/Jun/i, 'juin')
-					.replace(/Jul/i, 'juill.')
-					.replace(/Aug/i, 'août')
-					.replace(/Sep/i, 'sept.')
-					.replace(/Oct/i, 'oct.')
-					.replace(/Nov/i, 'nov.')
-					.replace(/Dec/i, 'déc.')
-			}
-			if (language === 'es') {
-				if (matches.length === 1) {
-					const num = parseInt(matches[0])
-					if (date.includes('minutes ago')) return `hace ${num} minuto${num === 1 ? '' : 's'}`
-					if (date.includes('hours ago')) return `hace ${num} hora${num === 1 ? '' : 's'}`
-					if (date.includes('days ago')) return `hace ${num} día${num === 1 ? '' : 's'}`
-				} else return date.replace(/Jan/i, 'enero')
-					.replace(/Feb/i, 'feb')
-					.replace(/Mar/i, 'mar')
-					.replace(/Apr/i, 'abr')
-					.replace(/May/i, 'mayo')
-					.replace(/Jun/i, 'jun')
-					.replace(/Jul/i, 'jul')
-					.replace(/Aug/i, 'agosto')
-					.replace(/Sep/i, 'sept')
-					.replace(/Oct/i, 'oct')
-					.replace(/Nov/i, 'nov')
-					.replace(/Dec/i, 'dic')
-			}
-			if (language === 'pt') {
-				if (matches.length === 1) {
-					const num = parseInt(matches[0])
-					if (date.includes('minutes ago')) return `${num} minuto${num === 1 ? '' : 's'} atrás`
-					if (date.includes('hours ago')) return `${num} hora${num === 1 ? '' : 's'} atrás`
-					if (date.includes('days ago')) return `${num} dia${num === 1 ? '' : 's'} atrás`
-				} else return date.replace(/Jan/i, 'jan.')
-					.replace(/Feb/i, 'fev.')
-					.replace(/Mar/i, 'março')
-					.replace(/Apr/i, 'abril')
-					.replace(/May/i, 'maio')
-					.replace(/Jun/i, 'junho')
-					.replace(/Jul/i, 'julho')
-					.replace(/Aug/i, 'agosto')
-					.replace(/Sep/i, 'set.')
-					.replace(/Oct/i, 'out.')
-					.replace(/Nov/i, 'nov.')
-					.replace(/Dec/i, 'dez.')
+			"en": (kwargs) => {
+				const { date, months, days, hours, minutes, interval, type } = kwargs
+				if (!months || months >= 1) {
+					if (interval === 'positive') {
+						if (type === 'start') return 'starts on ' + date
+						else if (type === 'end') return 'ends on ' + date
+					} else if (interval === 'negative') {
+						if (type === 'start') return 'started on ' + date
+						else if (type === 'end') return 'ended on ' + date
+						else return date
+					} else return date
+				} else {
+					if (days >= 1) {
+						if (interval === 'positive') {
+							if (type === 'start') {
+								if (days === 1) return 'starts in ' + days + ' day'
+								else return 'starts in ' + days + ' days'
+							} else if (type === 'end') {
+								if (days === 1) return 'ends in ' + days + ' day'
+								else return 'ends in ' + days + ' days'
+							}
+						} else if (interval === 'negative') {
+							if (type === 'start') {
+								if (days === 1) return 'started ' +  days + ' day ago'
+								else return 'started ' + days + ' days ago'
+							} else if (type === 'end') {
+								if (days === 1) return 'ended ' +  days + ' day ago'
+								else return 'ended ' + days + ' days ago'
+							} else {
+								if (days === 1) return days + ' day ago'
+								else return days + ' days ago'
+							}
+						}
+					} else {
+						if (hours >= 1) {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (hours === 1) return 'starts in ' + hours + ' hour'
+									else return 'starts in ' + hours + ' hours'
+								} else if (type === 'end') {
+									if (hours === 1) return 'ends in ' + hours + ' hour'
+									else return 'ends in ' + hours + ' hours'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (hours === 1) return 'started ' + hours + ' hour ago'
+									else return 'started ' + hours + ' hours ago'
+								} else if (type === 'end') {
+									if (hours === 1) return 'ended ' + hours + ' hour ago'
+									else return 'ended ' + hours + ' hours ago'
+								} else {
+									if (hours === 1) return hours + ' hour ago'
+									else return hours + ' hours ago'
+								}
+							}
+						}
+						else {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (minutes === 1) return 'starts in ' + minutes + ' minute'
+									else return 'starts in ' + minutes + ' minutes'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'ends in ' + minutes + ' minute'
+									else return 'ends in ' + minutes + ' minutes'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (minutes === 1) return 'started ' + minutes + ' minute ago'
+									else return 'started ' + minutes + ' minutes ago'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'ended ' + minutes + ' minute ago'
+									else return 'ended ' + minutes + ' minutes ago'
+								} else {
+									if (minutes === 1) return minutes + ' minute ago'
+									else return minutes + ' minutes ago'
+								}
+							}
+						}
+					}
+				}
+			},
+			"fr": (kwargs) => {
+				let { date, months, days, hours, minutes, interval, type } = kwargs
+				if (!months || months >= 1) {
+					date = date.replace(/Jan/i, 'janv.')
+						.replace(/Feb/i, 'févr.')
+						.replace(/Mar/i, 'mars')
+						.replace(/Apr/i, 'avr.')
+						.replace(/May/i, 'mai')
+						.replace(/Jun/i, 'juin')
+						.replace(/Jul/i, 'juill.')
+						.replace(/Aug/i, 'août')
+						.replace(/Sep/i, 'sept.')
+						.replace(/Oct/i, 'oct.')
+						.replace(/Nov/i, 'nov.')
+						.replace(/Dec/i, 'déc.')
+
+					if (interval === 'positive') {
+						if (type === 'start') return 'commence le ' + date
+						else if (type === 'end') return 'finit le ' + date
+					} else if (interval === 'negative') {
+						if (type === 'start') return 'commencé le ' + date
+						else if (type === 'end') return 'fini le ' + date
+						else return date
+					} else return date
+				} else {
+					if (days >= 1) {
+						if (interval === 'positive') {
+							if (type === 'start') {
+								if (days === 1) return 'commence dans ' + days + ' jour'
+								else return 'commence dans ' + days + ' jours'
+							} else if (type === 'end') {
+								if (days === 1) return 'finit dans ' + days + ' jour'
+								else return 'finit dans ' + days + ' jours'
+							}
+						} else if (interval === 'negative') {
+							if (type === 'start') {
+								if (days === 1) return 'commencé il y a ' +  days + ' jour'
+								else return 'commencé il y a ' + days + ' jours'
+							} else if (type === 'end') {
+								if (days === 1) return 'fini il y a ' +  days + ' jour'
+								else return 'fini il y a ' + days + ' jours'
+							} else {
+								if (days === 1) return 'il y a ' + days + ' jour'
+								else return 'il y a ' + days + ' jours'
+							}
+						}
+					} else {
+						if (hours >= 1) {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (hours === 1) return 'commence dans ' + hours + ' heure'
+									else return 'commence dans ' + hours + ' heures'
+								} else if (type === 'end') {
+									if (hours === 1) return 'finit dans ' + hours + ' heure'
+									else return 'finit dans ' + hours + ' heures'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (hours === 1) return 'commencé il y a ' + hours + ' heure'
+									else return 'commencé il y a ' + hours + ' heures'
+								} else if (type === 'end') {
+									if (hours === 1) return 'fini il y a ' + hours + ' heure'
+									else return 'fini il y a ' + hours + ' heures'
+								} else {
+									if (hours === 1) return 'il y a ' + hours + ' heure'
+									else return 'il y a ' + hours + ' heures'
+								}
+							}
+						}
+						else {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (minutes === 1) return 'commence dans ' + minutes + ' minute'
+									else return 'commence dans ' + minutes + ' minutes'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'finit dans ' + minutes + ' minute'
+									else return 'finit dans ' + minutes + ' minutes'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (minutes === 1) return 'commencé il y a ' + minutes + ' minute'
+									else return 'commencé il y a ' + minutes + ' minutes'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'fini il y a ' + minutes + ' minute'
+									else return 'fini il y a ' + minutes + ' minutes'
+								} else {
+									if (minutes === 1) return 'il y a ' + minutes + ' minute'
+									else return 'il y a ' + minutes + ' minutes'
+								}
+							}
+						}
+					}
+				}
+			},
+			"es": (kwargs) => {
+				let { date, months, days, hours, minutes, interval, type } = kwargs
+				if (!months || months >= 1) {
+					date = date.replace(/Jan/i, 'enero')
+						.replace(/Feb/i, 'feb')
+						.replace(/Mar/i, 'mar')
+						.replace(/Apr/i, 'abr')
+						.replace(/May/i, 'mayo')
+						.replace(/Jun/i, 'jun')
+						.replace(/Jul/i, 'jul')
+						.replace(/Aug/i, 'agosto')
+						.replace(/Sep/i, 'sept')
+						.replace(/Oct/i, 'oct')
+						.replace(/Nov/i, 'nov')
+						.replace(/Dec/i, 'dic')
+
+					if (interval === 'positive') {
+						if (type === 'start') return 'comienza el ' + date
+						else if (type === 'end') return 'termina el ' + date
+					} else if (interval === 'negative') {
+						if (type === 'start') return 'comenzó el ' + date
+						else if (type === 'end') return 'terminó el ' + date
+						else return date
+					} else return date
+				} else {
+					if (days >= 1) {
+						if (interval === 'positive') {
+							if (type === 'start') {
+								if (days === 1) return 'comienza en ' + days + ' día'
+								else return 'comienza en ' + days + ' días'
+							} else if (type === 'end') {
+								if (days === 1) return 'termina en ' + days + ' día'
+								else return 'termina en ' + days + ' días'
+							}
+						} else if (interval === 'negative') {
+							if (type === 'start') {
+								if (days === 1) return 'comenzó hace ' +  days + ' día'
+								else return 'comenzó hace ' + days + ' días'
+							} else if (type === 'end') {
+								if (days === 1) return 'terminó hace ' +  days + ' día'
+								else return 'terminó hace ' + days + ' días'
+							} else {
+								if (days === 1) return 'hace ' + days + ' día'
+								else return 'hace ' + days + ' días'
+							}
+						}
+					} else {
+						if (hours >= 1) {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (hours === 1) return 'comienza en ' + hours + ' hora'
+									else return 'comienza en ' + hours + ' horas'
+								} else if (type === 'end') {
+									if (hours === 1) return 'termina en ' + hours + ' hora'
+									else return 'termina en ' + hours + ' horas'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (hours === 1) return 'comenzó hace ' + hours + ' hora'
+									else return 'comenzó hace ' + hours + ' horas'
+								} else if (type === 'end') {
+									if (hours === 1) return 'terminó hace ' + hours + ' hora'
+									else return 'terminó hace ' + hours + ' horas'
+								} else {
+									if (hours === 1) return 'hace ' + hours + ' hora'
+									else return 'hace ' + hours + ' horas'
+								}
+							}
+						}
+						else {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (minutes === 1) return 'comienza en ' + minutes + ' minuto'
+									else return 'comienza en ' + minutes + ' minutos'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'termina en ' + minutes + ' minuto'
+									else return 'termina en ' + minutes + ' minutos'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (minutes === 1) return 'comenzó hace ' + minutes + ' minuto'
+									else return 'comenzó hace ' + minutes + ' minutos'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'terminó hace ' + minutes + ' minuto'
+									else return 'terminó hace ' + minutes + ' minutos'
+								} else {
+									if (minutes === 1) return 'hace ' + minutes + ' minuto'
+									else return 'hace ' + minutes + ' minutos'
+								}
+							}
+						}
+					}
+				}
+			},
+			"pt": (kwargs) => {
+				let { date, months, days, hours, minutes, interval, type } = kwargs
+				if (!months || months >= 1) {
+					date = date.replace(/Jan/i, 'jan.')
+						.replace(/Feb/i, 'fev.')
+						.replace(/Mar/i, 'março')
+						.replace(/Apr/i, 'abril')
+						.replace(/May/i, 'maio')
+						.replace(/Jun/i, 'junho')
+						.replace(/Jul/i, 'julho')
+						.replace(/Aug/i, 'agosto')
+						.replace(/Sep/i, 'set.')
+						.replace(/Oct/i, 'out.')
+						.replace(/Nov/i, 'nov.')
+						.replace(/Dec/i, 'dez.')
+
+					if (interval === 'positive') {
+						if (type === 'start') return 'começa em ' + date
+						else if (type === 'end') return 'termina em ' + date
+					} else if (interval === 'negative') {
+						if (type === 'start') return 'começou em ' + date
+						else if (type === 'end') return 'terminou em ' + date
+						else return date
+					} else return date
+				} else {
+					if (days >= 1) {
+						if (interval === 'positive') {
+							if (type === 'start') {
+								if (days === 1) return 'começa em ' + days + ' dia'
+								else return 'começa em ' + days + ' dias'
+							} else if (type === 'end') {
+								if (days === 1) return 'acaba em ' + days + ' dia'
+								else return 'acaba em ' + days + ' dias'
+							}
+						} else if (interval === 'negative') {
+							if (type === 'start') {
+								if (days === 1) return 'começou há ' +  days + ' dia'
+								else return 'começou há ' + days + ' dias'
+							} else if (type === 'end') {
+								if (days === 1) return 'terminou há ' +  days + ' dia'
+								else return 'terminou há ' + days + ' dias'
+							} else {
+								if (days === 1) return days + ' dia atrás'
+								else return days + ' dias atrás'
+							}
+						}
+					} else {
+						if (hours >= 1) {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (hours === 1) return 'começa em ' + hours + ' hora'
+									else return 'começa em ' + hours + ' horas'
+								} else if (type === 'end') {
+									if (hours === 1) return 'acaba em ' + hours + ' hora'
+									else return 'acaba em ' + hours + ' horas'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (hours === 1) return 'começou há ' + hours + ' hora'
+									else return 'começou há ' + hours + ' horas'
+								} else if (type === 'end') {
+									if (hours === 1) return 'terminou há ' + hours + ' hora'
+									else return 'terminou há ' + hours + ' horas'
+								} else {
+									if (hours === 1) return hours + ' hora atrás'
+									else return hours + ' horas atrás'
+								}
+							}
+						}
+						else {
+							if (interval === 'positive') {
+								if (type === 'start') {
+									if (minutes === 1) return 'começa em ' + minutes + ' minuto'
+									else return 'começa em ' + minutes + ' minutos'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'acaba em ' + minutes + ' minuto'
+									else return 'acaba em ' + minutes + ' minutos'
+								}
+							} else if (interval === 'negative') {
+								if (type === 'start') {
+									if (minutes === 1) return 'começou há ' + minutes + ' minuto'
+									else return 'começou há ' + minutes + ' minutos'
+								} else if (type === 'end') {
+									if (minutes === 1) return 'terminou há ' + minutes + ' minuto'
+									else return 'terminou há ' + minutes + ' minutos'
+								} else {
+									if (minutes === 1) return minutes + ' minuto atrás'
+									else return minutes + ' minutos atrás'
+								}
+							}
+						}
+					}
+				}
 			}
 		},
-		
+
 		"download": {
 			"en": "Download",
 			"fr": "Télécharger",
@@ -1511,7 +2030,7 @@
 			"es": "Campaña pública",
 			"pt": "Campanha publica"
 		},
-		"name campaign": { // USED
+		"name mobilization": { // USED
 			"en": "Name your campaign",
 			"fr": "Nommer votre campagne",
 			"es": "Nombra tu campaña",
@@ -1523,11 +2042,59 @@
 			"es": "Proporcionar un título para la campaña",
 			"pt": "Fornecer um título para a campanha"
 		},
-		"copy": { // USED // TO DO: ADD VERB OPTION
-			"en": (verb, preposition) => verb ? 'Copy' : `Copy ${preposition ? 'of' : ''}`,
-			"fr": (verb, preposition) => verb ? 'Copier' : `Copie ${preposition ? 'de' : ''}`,
-			"es": (verb, preposition) => verb ? 'Copiar' : `Copia ${preposition ? 'de' : ''}`,
-			"pt": (verb, preposition) => verb ? 'Copiar' : `Cópia ${preposition ? 'de' : ''}`
+		"set mobilization dates": { // USED
+			"en": "Set the start and end dates of your campaign",
+			"fr": "Définissez les dates de début et de fin de votre campagne",
+			"es": "Establece las fechas de inicio y fin de tu campaña",
+			"pt": "Defina as datas de início e término da sua campanha"
+		},
+		"mobilization dates default": { // USED
+			"en": "By default, your campaign starts immediately, and lasts until you manually end it.",
+			"fr": "Par défaut, votre campagne démarre immédiatement et dure jusqu’à ce que vous la terminiez manuellement.",
+			"es": "De forma predeterminada, su campaña comienza de inmediato y dura hasta que la finaliza manualmente.",
+			"pt": "Por padrão, sua campanha começa imediatamente e dura até que você a finalize manualmente."
+		},
+		"set start date": { // USED
+			"en": "Set start date",
+			"fr": "Définir la date de début",
+			"es": "Establecer fecha de inicio",
+			"pt": "Definir data de início"
+		},
+		"set end date": { // USED
+			"en": "Set end date",
+			"fr": "Définir la date de fin",
+			"es": "Establecer fecha de finalización",
+			"pt": "Definir data de término"
+		},
+		"copy": { // USED 
+			"en": (verb, preposition) => {
+				if (verb) return "Copy"
+				else {
+					if (preposition) return "Copy of"
+					else return "Copy"
+				}
+			},
+			"fr": (verb, preposition) => {
+				if (verb) return "Copier"
+				else {
+					if (preposition) return "Copie de"
+					else return "Copie"
+				}
+			},
+			"es": (verb, preposition) => {
+				if (verb) return 'Copiar'
+				else {
+					if (preposition) return "Copia de"
+					else return "Copia"
+				}
+			},
+			"pt": (verb, preposition) => {
+				if (verb) return 'Copiar'
+				else {
+					if (preposition) return "Cópia de"
+					else return "Cópia"
+				}
+			}
 		},
 		"copied": {
 			"en": "Copied",
@@ -1542,10 +2109,22 @@
 			"pt": "Copie o link"
 		},
 		"follow up": { // USED
-			"en": transitive => transitive ? "Follow up" : "Follow up of",
-			"fr": transitive => transitive ? "Donner suite" : "Suite de",
-			"es": transitive => transitive ? "Dar seguimiento" : "Seguimiento de",
-			"pt": transitive => transitive ? "Acompanhamento" : "Acompanhamento de"
+			"en": transitive => {
+				if (transitive) return "Follow up"
+				else return "Follow up of"
+			},
+			"fr": transitive => {
+				if (transitive) return "Donner suite"
+				else return "Suite de"
+			},
+			"es": transitive => {
+				if (transitive) return "Dar seguimiento"
+				else return "Seguimiento de"
+			},
+			"pt": transitive => {
+				if (transitive) return "Acompanhamento"
+				else return "Acompanhamento de"
+			}
 		},
 		"expansion": { // USED
 			"en": "Expansion of",
@@ -1584,10 +2163,22 @@
 			"pt": "Convidar colaboradores"
 		},
 		"invited contributors": { // USED
-			"en": count => `${count} invited contributor${count !== 1 ? 's' : ''}`,
-			"fr": count => `${count} contributeur${count !== 1 ? 's' : ''} invité${count !== 1 ? 's' : ''}`,
-			"es": count => `${count} contribuyente${count !== 1 ? 's' : ''} invitad.o.a${count !== 1 ? '.s' : ''}`,
-			"pt": count => `${count} contribuidore${count !== 1 ? 's' : ''} convidado${count !== 1 ? 's' : ''}`
+			"en": count => {
+				if (count !== 1) return count + " invited contributors"
+				else return count + " invited contributor"
+			},
+			"fr": count => {
+				if (count !== 1) return count + " contributeurs invités"
+				else return count + " contributeur invité"
+			},
+			"es": count => {
+				if (count !== 1) return count + " contribuyentes invitad.o.a.s"
+				else return count + " contribuyente invitad.o.a"
+			},
+			"pt": count => {
+				if (count !== 1) return count + " contribuidores convidados"
+				else return count + " contribuidore convidado"
+			}
 		},
 		"limit to": { // USED
 			"en": "Limit to:",
@@ -1596,10 +2187,10 @@
 			"pt": "Limite de:"
 		},
 		"submissions per contributor": { // USED
-			"en": `submission(s)<br/>per contributor`,
-			"fr": `soumission(s)<br/>par contributeur`,
-			"es": `envìo(s)<br/>por contribuador.a`,
-			"pt": `envio(s)<br/><br/>por colaborador`
+			"en": "submission(s)<br/>per contributor",
+			"fr": "soumission(s)<br/>par contributeur",
+			"es": "envìo(s)<br/>por contribuador.a",
+			"pt": "envio(s)<br/><br/>por colaborador"
 		},
 		"next": { // USED
 			"en": "Next",
@@ -1693,10 +2284,22 @@
 			"pt": "Língua preferida"
 		},
 		"select language": { // USED
-			"en": plural => plural ? "Select languages" : "Select a language",
-			"fr": plural => plural ? "Sélectionner des langues" : "Sélectionner une langue",
-			"es": plural => plural ? "Seleccionar idiomas" : "Selecciona un idioma",
-			"pt": plural => plural ? "Selecionar idiomas" : "Selecione um idioma"
+			"en": plural => {
+				if (plural) return "Select languages"
+				else return "Select a language"
+			},
+			"fr": plural => {
+				if (plural) return "Sélectionner des langues"
+				else return "Sélectionner une langue"
+			},
+			"es": plural => {
+				if (plural) return "Seleccionar idiomas"
+				else return "Selecciona un idioma"
+			},
+			"pt": plural => {
+				if (plural) return "Selecionar idiomas"
+				else return "Selecione um idioma"
+			}
 		},
 		"other languages": { // USED
 			"en": "Other fluent languages",
@@ -1851,7 +2454,7 @@
 		},
 		"limit input": { // USED
 			"en": (input, max) => {
-				if (input === "characters") return "Limit the input to " + max + "characters." // THIS CANNOT BE A LITERAL SINCE IT NEEDS TO BE EVALUATED AS A JS MULTILINE FUNCTION
+				if (input === "characters") return "Limit the input to " + max + "characters."
 				else if (input === 'locations') return "Limit the input to " + max + "locations."
 				else if (input === 'tags') return "Limit the input to " + max + "tags."
 				else if (input === 'groups') return "Repeat this group at most " + max + " times."
@@ -1881,42 +2484,53 @@
 			"es": "Limitar la longitud",
 			"pt": "Limitar o comprimento"
 		},
-		"": { // USED
-			"en": "",
-			"fr": "",
-			"es": "",
-			"pt": ""
-		},
-		"": { // USED
-			"en": "",
-			"fr": "",
-			"es": "",
-			"pt": ""
-		},
-
 
 		"showing range": { // USED
-			"en": (min, max) => `Showing range [ ${min} – ${max} ]`,
-			"fr": (min, max) => `Affichant l’intervale [ ${min} – ${max} ]`,
-			"es": (min, max) => `Mostrando rango [ ${min} – ${max} ]`,
-			"pt": (min, max) => `Mostrando alcance [ ${min} – ${max} ]`
+			"en": (min, max) => {
+				return "Showing range [ " + min + " – " + max + " ]"
+			},
+			"fr": (min, max) => {
+				return "Affichant l’intervale [ " + min + " – " + max + " ]"
+			},
+			"es": (min, max) => {
+				return "Mostrando rango [ " + min + " – " + max + " ]"
+			},
+			"pt": (min, max) => {
+				return "Mostrando alcance [ " + min + " – " + max + " ]"
+			}
 		},
 		"showing letter": { // USED
-			"en": (count, letter) => `Showing ${count} whose name(s) start(s) with ${letter}`,
-			"fr": (count, letter) => `Affichant ${count} dont le(s) nom(s) commence(nt) par ${letter}`,
-			"es": (count, letter) => `Mostrando ${count} cuyo(s) nombre(s) comienza(n) con ${letter}`,
-			"pt": (count, letter) => `Mostrando ${count} cujo(s) nome(s) começa(m) com ${letter}`
+			"en": (count, letter) => {
+				return "Showing " + count + " whose name(s) start(s) with " + letter
+			},
+			"fr": (count, letter) => {
+				return "Affichant " + count + " dont le(s) nom(s) commence(nt) par " + letter
+			},
+			"es": (count, letter) => {
+				return "Mostrando " + count + " cuyo(s) nombre(s) comienza(n) con " + letter
+			},
+			"pt": (count, letter) => {
+				return "Mostrando " + count + " cujo(s) nome(s) começa(m) com " + letter
+			}
 		},
 		"distinct locations": { // USED
-			"en": plural => `Distinct location${plural ? 's' : ''}`,
-			"fr": plural => `Emplacement${plural ? 's' : ''} distinct${plural ? 's' : ''}`,
-			"es": plural => plural ? 'Ubicaciones distintas' : 'Ubicación distinta',
-			"pt": plural => plural ? 'Locais distintos' : 'Localização distinta'
+			"en": plural => {
+				if (plural) return "Distinct locations"
+				else return "Distinct location"
+			},
+			"fr": plural => {
+				if (plural) return "Emplacements distincts"
+				else return "Emplacement distinct"
+			},
+			"es": plural => {
+				if (plural) return "Ubicaciones distintas"
+				else return "Ubicación distinta"
+			},
+			"pt": plural => {
+				if (plural) return "Locais distintos"
+				else return "Localização distinta"
+			}
 		},
-
-
-
-
 
 		"location instruction": {
 			"en": "Think to include in the instruction that locations need to follow the pattern: village/ town, city, district/ region, and country name (in this order, from smallest administrative unit to largest).",
@@ -1947,16 +2561,16 @@
 
 		"dblclick to preview": {
 			"en": object => {
-				if (object === 'pad') return 'Double click to view pad.'
+				if (object === "pad") return "Double click to view pad."
 			},
 			"fr": object => {
-				if (object === 'pad') return 'Double-cliquez pour afficher le bloc-notes.'
+				if (object === "pad") return "Double-cliquez pour afficher le bloc-notes."
 			},
 			"es": object => {
-				if (object === 'pad') return 'Haga doble clic para ver la libreta.'
+				if (object === "pad") return "Haga doble clic para ver la libreta."
 			},
 			"pt": object => {
-				if (object === 'pad') return 'Clique duas vezes para visualizar o bloco de notas.'
+				if (object === "pad") return "Clique duas vezes para visualizar o bloco de notas."
 			}
 		},
 		"click to search or add locations": {
@@ -2040,10 +2654,54 @@
 			"pt": "Exibir os comentários"
 		},
 		"review": { // USED
-			"en": (verb, plural, preposition) => `${verb ? "Review" : `Review${plural ? 's' : ''}`}${preposition ? " of" : ""}`,
-			"fr": (verb, plural, preposition) => `${verb ? "Relire" : `Relecture${plural ? 's' : ''}`}${preposition ? " de" : ""}`,
-			"es": (verb, plural, preposition) => `${verb ? "Esa reseña" : plural ? "Reseñas" : "Revisión"}${preposition ? " de" : "" }`,
-			"pt": (verb, plural, preposition) => `${verb ? "Rever" : plural ? "Comentários" : "Comente"}${preposition ? " de" : ""}`
+			"en": (verb, plural, preposition) => {
+				if (verb) return "Review" 
+				else {
+					if (plural) {
+						if (preposition) return "Reviews of"
+						else return "Reviews"
+					} else {
+						if (preposition) return "Review of"
+						else return "Review"
+					}
+				}
+			},
+			"fr": (verb, plural, preposition) => {
+				if (verb) return "Relire"
+				else {
+					if (plural) {
+						if (preposition) return "Relectures de"
+						else return "Relectures"
+					} else {
+						if (preposition) return "Relecture de"
+						else return "Relecture"
+					}
+				}
+			},
+			"es": (verb, plural, preposition) => {
+				if (verb) return "Esa reseña"
+				else {
+					if (plural) {
+						if (preposition) return "Reseñas de"
+						else return "Reseñas"
+					} else {
+						if (preposition) return "Revisión de"
+						else return "Revisión"
+					}
+				}
+			},
+			"pt": (verb, plural, preposition) => {
+				if (verb) return "Rever"
+				else {
+					if (plural) {
+						if (preposition) return "Comentários de"
+						else return "Comentários"
+					} else {
+						if (preposition) return "Comente"
+						else return "Comente de"
+					}
+				}
+			}
 		},
 		"display filters": { // USED
 			"en": "Display the filters",
@@ -2095,24 +2753,30 @@
 			"pt": "Selecione o idioma em que o bloco deve ser revisado."
 		},
 		"generate file": { // USED
-			"en": filetype => `Generate a ${filetype} file`,
-			"fr": filetype => `Générer un fichier ${filetype}`,
-			"es": filetype => `Generar un archivo ${filetype}`,
-			"pt": filetype => `Gerar um arquivo ${filetype}`
+			"en": filetype => "Generate a " + filetype + " file",
+			"fr": filetype => "Générer un fichier " + filetype,
+			"es": filetype => "Generar un archivo " + filetype,
+			"pt": filetype => "Gerar um arquivo " + filetype
 		},
 		"pads to display": { // USED
-			"en": count => `${count} pad${count !== 1 ? 's' : ''} to display.`,
-			"fr": count => `${count} bloc${count !== 1 ? 's' : ''}-notes à afficher.`,
-			"es": count => `${count} libreta${count !== 1 ? 's' : ''} para mostrar.`,
-			"pt": count => `${count} bloco${count !== 1 ? 's' : ''} de notas para exibir.`
+			"en": count => {
+				if (count !== 1) return count + " pads to display."
+				else return count + " pad to display."
+			},
+			"fr": count => {
+				if (count !== 1) return count + " blocs-notes à afficher."
+				else return count + " bloc-notes à afficher."
+			},
+			"es": count => {
+				if (count !== 1) return count + " libretas para mostrar."
+				else return count + " libreta para mostrar."
+			},
+			"pt": count => {
+				if (count !== 1) return count + " blocos de notas para exibir."
+				else return count + " bloco de notas para exibir."
+			}
 		},
 
-		"anonymous contributor": { // USED
-			"en": "Anonymous contributor",
-			"fr": "Contribut.eur.rice anonyme",
-			"es": "Colaborador.or.a anónim.o.a",
-			"pt": "Contribuidor anônimo"
-		},
 		"global": { // USED
 			"en": "Global",
 			"fr": "Global",
@@ -2180,10 +2844,10 @@
 			"pt": "Tudo os selecionado"
 		},
 		"only pad": { // USED
-			"en": padnmame => `Only “${padnmame}”`,
-			"fr": padnmame => `Seulement « ${padnmame} »`,
-			"es": padnmame => `Solamente “${padnmame}”`,
-			"pt": padnmame => `Só “${padnmame}”`
+			"en": padnmame => "Only “" + padnmame + "”",
+			"fr": padnmame => "Seulement « " + padnmame + " »",
+			"es": padnmame => "Solamente “" + padnmame + "”",
+			"pt": padnmame => "Só “" + padnmame + "”"
 		},
 		"": { // USED
 			"en": "",
@@ -2191,12 +2855,7 @@
 			"es": "",
 			"pt": ""
 		},
-		"": { // USED
-			"en": "",
-			"fr": "",
-			"es": "",
-			"pt": ""
-		},
+		
 
 	}
 %>

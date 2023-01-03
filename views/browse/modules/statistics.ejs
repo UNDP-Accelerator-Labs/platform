@@ -10,7 +10,7 @@
 <div id='statistics'>
 	<div class='statistic'>
 		<h1><%- locals.stats?.filtered %></h1>
-		<p><%- vocabulary[object.slice(0, -1)]?.[language](true)?.capitalize() || object.capitalize() %></p>
+		<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
 		
 		<% if (locals.metadata.page.count > 1) { %>
 			<small><%- vocabulary['showing range'][language](locals.stats?.displayed * (page - 1) + 1, Math.min(locals.stats?.displayed * page, locals.stats?.filtered) + 1) %></small>
@@ -24,7 +24,7 @@
 			<p><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
 		</div>
 	<% } %>
-	<% if (locals.metadata.page.map && locals.stats?.total > 0) { %>
+	<% if (locals.metadata.page.map && locals.stats?.filtered > 0) { %>
 		<div class='statistic'>
 			<h1><%- locals.clusters[locals.clusters.length - 1]?.length %></h1>
 			<p><%- vocabulary['distinct locations'][language](locals.clusters[locals.clusters.length - 1]?.length !== 1) %></p>

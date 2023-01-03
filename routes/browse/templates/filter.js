@@ -18,13 +18,13 @@ exports.main = req => {
 
 		// BASE FILTERS
 		const base_filters = []
-		if (search) base_filters.push(DB.pgp.as.format(`AND t.full_text ~* $1`, [ parsers.regexQuery(search) ]))
-		if (status) base_filters.push(DB.pgp.as.format(`AND t.status IN ($1:csv)`, [ status ]))
+		if (search) base_filters.push(DB.pgp.as.format(`t.full_text ~* $1`, [ parsers.regexQuery(search) ]))
+		if (status) base_filters.push(DB.pgp.as.format(`t.status IN ($1:csv)`, [ status ]))
 
 		let f_space = ''
-		if (space === 'private') f_space = DB.pgp.as.format(`AND (t.owner IN ($1:csv) AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
+		if (space === 'private') f_space = DB.pgp.as.format(`(t.owner IN ($1:csv) AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
 		if (space === 'curated') f_space = DB.pgp.as.format(`
-			AND (t.id IN (
+			(t.id IN (
 					SELECT template FROM mobilizations 
 					WHERE child = TRUE 
 						AND source IN (
@@ -34,11 +34,11 @@ exports.main = req => {
 				OR $2 > 2) 
 			AND (t.owner NOT IN ($1:csv) OR t.owner IS NULL) AND t.status < 2`, [ collaborators_ids, rights ])
 		engagementtypes.forEach(e => {
-			if (space === `${e}s`) f_space = DB.pgp.as.format(`AND t.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'template' AND type = $2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ uuid, e ])
+			if (space === `${e}s`) f_space = DB.pgp.as.format(`t.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'template' AND type = $2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ uuid, e ])
 		})
-		if (space === 'shared') f_space = DB.pgp.as.format(`AND (t.status = 2 AND t.id NOT IN (SELECT template FROM review_templates))`)
-		if (space === 'public') f_space = DB.pgp.as.format(`AND (t.status = 3 t.id NOT IN (SELECT template FROM review_templates))`)
-		if (space === 'reviews') f_space = DB.pgp.as.format(`AND t.id IN (SELECT template FROM review_templates)`)
+		if (space === 'shared') f_space = DB.pgp.as.format(`(t.status = 2 AND t.id NOT IN (SELECT template FROM review_templates))`)
+		if (space === 'public') f_space = DB.pgp.as.format(`(t.status = 3 t.id NOT IN (SELECT template FROM review_templates))`)
+		if (space === 'reviews') f_space = DB.pgp.as.format(`t.id IN (SELECT template FROM review_templates)`)
 		// TO DO: curated SPACE FOR SUDO
 
 		base_filters.push(f_space)
@@ -59,8 +59,15 @@ exports.main = req => {
 		// ORDER
 		let order = DB.pgp.as.format(`ORDER BY t.date DESC`)
 
-		const filters = [ base_filters.filter(d => d).join(' '), platform_filters.filter(d => d).join(' OR ') ].filter(d => d).join(' AND ')
-		resolve([ f_space, order, page, filters ])
+		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' OR ') ]
+			.filter(d => d)
+			.map(d => `(${d.trim()})`)
+			.join(' AND ')
+			.trim()
+
+		if (filters.length && filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
+		
+		resolve([ `AND ${f_space}`, order, page, filters ])
 	})
 
 	// const platform_filters = [f_contributors, f_countries, f_mobilizations].filter(d => d).join(' OR ')

@@ -1,7 +1,7 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
-	include ('../../partials/multi-language.ejs')
+	include ('../../partials/translations.ejs')
 %>
 <script type='text/javascript'>
 const obsvars = {
@@ -35,14 +35,16 @@ const observer = new MutationObserver(evt => {
 // MEDIA PROTOTYPE
 const Media = function (kwargs) {
 	let { parent, container, sibling, type, datum, focus, lang } = kwargs || {}
-	const { level, name } = datum
+	let { id, level, name } = datum
+	if (!id) id = datum.id = uuidv4()
+	if (!level) level = 'media'
 	parent = d3.select(parent).classed('focus', focus)
 
 	this.type = type
 	this.lang = lang
 	this.constraint = datum.constraint
 
-	this.id = uuidv4()
+	this.id = id
 	// NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
 	// this.container = (container || parent.insertElem('.repeat-container', 'div', `media-container ${type}-container template`)) // MAYBE ADD ACTIVITY AS CLASS HERE
 	this.container = (container || parent.insertElem(function () { 
@@ -63,7 +65,7 @@ const Media = function (kwargs) {
 	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	if (editing) {
 		this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-		this.opts.addElems('div', 'opt-group', ['<%= vocabulary["write instruction"][language] %>'])
+		this.opts.addElems('div', 'opt-group', ['<%- vocabulary["write instruction"][language] %>'])
 			.addElems('label')
 				.html(d => d)
 	}
@@ -265,7 +267,7 @@ const Taglist = function (kwargs) {
 		console.log(list)
 		const panel = meta.inset.addElems('div', `inset-${type}`)
 			.addElems('ul', 'panel')
-		panel.addElems('li', 'instruction', [{ value: '<%= vocabulary["tag instruction"][language] %>' }])
+		panel.addElems('li', 'instruction', [{ value: '<%- vocabulary["tag instruction"][language] %>' }])
 			.html(d => `* ${d.value}`)
 		panel.addElems('li', 'opt', list)
 		.each(function (d, i) {
@@ -427,7 +429,7 @@ function addSection (kwargs) {
 }
 function addTitle (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, required, editable } = data || {}
+	let { id, level, type, name, instruction, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'title'
 	if (!name) name = null
@@ -439,7 +441,7 @@ function addTitle (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, required, editable },
+		datum: { id, level, type, name, instruction, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -456,7 +458,7 @@ function addTitle (kwargs) {
 }
 function addImg (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, required, editable } = data || {}
+	let { id, level, type, name, instruction, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'img'
 	if (!name) name = null
@@ -473,7 +475,7 @@ function addImg (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, required, editable },
+		datum: { id, level, type, name, instruction, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -487,7 +489,7 @@ function addImg (kwargs) {
 }
 function addDrawing (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, required, editable } = data || {}
+	let { id, level, type, name, instruction, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'drawing'
 	if (!name) name = null
@@ -504,7 +506,7 @@ function addDrawing (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, required, editable },
+		datum: { id, level, type, name, instruction, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -518,7 +520,7 @@ function addDrawing (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, constraint, required, editable } = data || {}
+	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'txt'
 	if (!instruction) instruction = ''
@@ -535,7 +537,7 @@ function addTxt (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, constraint, required, editable },
+		datum: { id, level, type, name, instruction, constraint, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -585,7 +587,7 @@ function addTxt (kwargs) {
 }
 function addEmbed (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, required, editable } = data || {}
+	let { id, level, type, name, instruction, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'embed'
 	if (!name) name = null
@@ -602,7 +604,7 @@ function addEmbed (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, required, editable },
+		datum: { id, level, type, name, instruction, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -617,7 +619,7 @@ function addEmbed (kwargs) {
 }
 function addChecklist (kwargs) { 
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, options, instruction, required, editable } = data || {}
+	let { id, level, type, name, options, instruction, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'checklist'
 	if (!name) name = null
@@ -647,7 +649,7 @@ function addChecklist (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, options, instruction, required, editable },
+		datum: { id, level, type, name, options, instruction, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -701,7 +703,7 @@ function addChecklist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({ 
 				'for': d => `check-item-${checklist_id}-${d.id}`,
-				'data-placeholder': '<%= vocabulary["new checklist item"][language] %>',
+				'data-placeholder': '<%- vocabulary["new checklist item"][language] %>',
 				'contenteditable': editable ? true : null
 			})
 		.on('keydown', function (d) {
@@ -743,7 +745,7 @@ function addChecklist (kwargs) {
 }
 function addRadiolist (kwargs) { 
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, options, instruction, required, editable } = data || {}
+	let { id, level, type, name, options, instruction, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'radiolist'
 	if (!name) name = null
@@ -773,7 +775,7 @@ function addRadiolist (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, options, instruction, required, editable },
+		datum: { id, level, type, name, options, instruction, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -827,7 +829,7 @@ function addRadiolist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({ 
 				'for': d => `radio-item-${radiolist_id}-${d.id}`,
-				'data-placeholder': '<%= vocabulary["new checklist item"][language] %>',
+				'data-placeholder': '<%- vocabulary["new checklist item"][language] %>',
 				'contenteditable': editable ? true : null
 			})
 		.on('keydown', function (d) {
@@ -873,7 +875,7 @@ function addRadiolist (kwargs) {
 // META ELEMENTS
 function addLocations (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, constraint, required, editable } = data || {}
+	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'location'
 	if (!name) name = null
@@ -889,7 +891,7 @@ function addLocations (kwargs) {
 		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, constraint, required, editable },
+		datum: { id, level, type, name, instruction, constraint, required, editable },
 		focus: focus,
 		lang
 	})
@@ -938,7 +940,7 @@ function addLocations (kwargs) {
 	if (meta.inset) {
 		meta.inset.addElems('div', `inset-${type}`)
 			.addElems('ul', 'panel')
-			.addElems('li', 'instruction', [{ value: '<%= vocabulary["location instruction"][language] %>' }])
+			.addElems('li', 'instruction', [{ value: '<%- vocabulary["location instruction"][language] %>' }])
 			.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END FOR SMS DEPLOYMENT
 	}
 
@@ -946,7 +948,7 @@ function addLocations (kwargs) {
 }
 function addIndexes (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, constraint, required, editable } = data || {}
+	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'index'
 	if (!name) name = null
@@ -961,7 +963,7 @@ function addIndexes (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, constraint, required, editable },
+		datum: { id, level, type, name, instruction, constraint, required, editable },
 		focus: focus || false,
 		lang,
 		list: taglists[name]
@@ -971,7 +973,7 @@ function addIndexes (kwargs) {
 }
 function addTags (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, constraint, required, editable } = data || {}
+	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'tag'
 	if (!name) name = null
@@ -986,7 +988,7 @@ function addTags (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, constraint, required, editable },
+		datum: { id, level, type, name, instruction, constraint, required, editable },
 		focus: focus || false,
 		lang,
 		list: taglists[name]
@@ -996,7 +998,7 @@ function addTags (kwargs) {
 }
 function addExternalResource (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, instruction, constraint, required, editable } = data || {}
+	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'external_resource'
 	if (!name) name = null
@@ -1011,7 +1013,7 @@ function addExternalResource (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, instruction, constraint, required, editable },
+		datum: { id, level, type, name, instruction, constraint, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -1027,7 +1029,7 @@ function addExternalResource (kwargs) {
 // GROUPS
 function addGroup (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { level, type, name, structure, instruction, repeat, editable } = data || {}
+	let { id, level, type, name, structure, instruction, repeat, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'group'
 	if (!name) name = null
@@ -1039,7 +1041,7 @@ function addGroup (kwargs) {
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { level, type, name, structure, instruction, repeat, editable },
+		datum: { id, level, type, name, structure, instruction, repeat, editable },
 		focus: focus || false,
 		lang
 	})
@@ -1110,7 +1112,7 @@ function switchButtons (lang = 'en') {
 	if (mediaSize === 'xs') {
 		d3.select('.meta-status .btn-group .save button')
 		.each(function () { this.disabled = false })
-			.html('<%= vocabulary["save changes"][language] %>')
+			.html('<%- vocabulary["save changes"][language] %>')
 	} else {
 		const menu_logo = d3.select('nav#site-title .inner')
 		window.sessionStorage.setItem('changed-content', true)
@@ -1118,7 +1120,7 @@ function switchButtons (lang = 'en') {
 		menu_logo.selectAll('div.save').classed('hide saved', false)
 			.select('button')
 		.on('click', _ => partialSave())
-			.html('<%= vocabulary["save changes"][language] %>')
+			.html('<%- vocabulary["save changes"][language] %>')
 	}
 }
 </script>

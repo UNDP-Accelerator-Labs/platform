@@ -60,29 +60,37 @@ exports.main = async kwargs => {
 			ORDER BY status
 		;`, [ uuid, full_filters.replace(/\-\- BEGIN STATUS FILTER \-\-[\s\S]*\-\- END STATUS FILTER \-\-/g, '') ]).then(d => { return { persistent: d } }))
 		// EXPLANATION FOR [\s\S] IN REGEX ABOVE: https://stackoverflow.com/questions/6711971/regular-expressions-match-anything
-		// GET PRIVATE PADS COUNT
-		batch.push(t.one(`
-			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE p.id IN (SELECT pad FROM review_requests
-				WHERE id IN (SELECT request FROM reviewer_pool WHERE reviewer = $1 AND status = 0)
-				OR (id IN (SELECT request FROM reviewer_pool WHERE reviewer = $1 AND status = 1)
-					AND pad NOT IN (SELECT pad FROM reviews WHERE reviewer = $1))
-			) OR p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
-		;`, [ uuid ], d => d.count).then(d => { return { private: d } }))
 		
-		// GET SHARED REVIEWS COUNT
+		// GET PENDING REVIEWS COUNT
+		// TO DO: THE COUNT IS NO GOOD HERE
 		batch.push(t.one(`
-			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
-				AND p.status >= 2
-		;`, [ uuid ], d => d.count).then(d => { return { shared: d } }))
+			SELECT COUNT (DISTINCT(pad))::INT FROM review_requests
+			WHERE id IN (SELECT request FROM reviewer_pool WHERE (reviewer = $1 OR $2 > 2) AND status = 0)
+				AND pad NOT IN (SELECT pad FROM reviews WHERE reviewer = $1)
+		;`, [ uuid, rights ], d => d.count).then(d => { return { pending: d } }))
 		
-		// GET PUBLIC REVIEWS COUNT // THIS IS NOT USED FOR NOW
+		// GET ONGOING/ ACCEPTED REVIEWS COUNT
 		batch.push(t.one(`
-			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE p.id IN (SELECT review FROM reviews)
-				AND p.status = 3
-		;`, [], d => d.count).then(d => { return { public: d } }))
+			SELECT COUNT (DISTINCT(review)) FROM reviews
+			WHERE reviewer = $1
+				AND status < 2
+
+			-- SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
+			-- WHERE p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
+			--	 AND p.status < 2
+		;`, [ uuid ], d => d.count).then(d => { return { ongoing: d } }))
+
+		// GET PAST REVIEWS COUNT
+		batch.push(t.one(`
+			SELECT COUNT (DISTINCT(review)) FROM reviews
+			WHERE reviewer = $1
+				AND status >= 2
+
+			-- SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
+			-- WHERE p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
+			--	AND p.status >= 2
+		;`, [ uuid ], d => d.count).then(d => { return { past: d } }))
+		
 		
 		return t.batch(batch)
 	}).then(d => flatObj.call(d))

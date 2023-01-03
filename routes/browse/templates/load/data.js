@@ -26,14 +26,21 @@ exports.main = async kwargs => {
 				ELSE TRUE
 			END AS retractable,
 			
-			CASE WHEN AGE(now(), t.date) < '1 hour'::interval
-					THEN EXTRACT(minute FROM AGE(now(), t.date))::text || ' minutes ago'
-				WHEN AGE(now(), t.date) < '1 day'::interval
-					THEN EXTRACT(hour FROM AGE(now(), t.date))::text || ' hours ago'
-				WHEN AGE(now(), t.date) < '1 month'::interval
-					THEN EXTRACT(day FROM AGE(now(), t.date))::text || ' days ago'
-				ELSE to_char(t.date, 'DD Mon YYYY')
+
+			CASE
+				WHEN AGE(now(), t.date) < '0 second'::interval
+					THEN jsonb_build_object('interval', 'positive', 'date', to_char(t.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(t.date, now())), 'hours', EXTRACT(hour FROM AGE(t.date, now())), 'days', EXTRACT(day FROM AGE(t.date, now())), 'months', EXTRACT(month FROM AGE(t.date, now())))
+				ELSE jsonb_build_object('interval', 'negative', 'date', to_char(t.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), t.date)), 'hours', EXTRACT(hour FROM AGE(now(), t.date)), 'days', EXTRACT(day FROM AGE(now(), t.date)), 'months', EXTRACT(month FROM AGE(now(), t.date)))
 			END AS date,
+
+			-- CASE WHEN AGE(now(), t.date) < '1 hour'::interval
+			-- 		THEN EXTRACT(minute FROM AGE(now(), t.date))::text || ' minutes ago'
+			-- 	WHEN AGE(now(), t.date) < '1 day'::interval
+			-- 		THEN EXTRACT(hour FROM AGE(now(), t.date))::text || ' hours ago'
+			-- 	WHEN AGE(now(), t.date) < '1 month'::interval
+			-- 		THEN EXTRACT(day FROM AGE(now(), t.date))::text || ' days ago'
+			-- 	ELSE to_char(t.date, 'DD Mon YYYY')
+			-- END AS date,
 
 			-- THESE ARE THE ENGAGEMENT COALESCE STATEMENTS
 			$3:raw,

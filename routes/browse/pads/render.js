@@ -31,6 +31,17 @@ exports.main = async (req, res) => {
 		
 		// PADS DATA
 		batch.push(load.data({ connection: t, req, res }))
+		// LIST OF ALL PAD IDS, BASED ON FILTERS
+		// GET PADS COUNT, ACCORDING TO FILTERS: TO DO: MOVE THIS TO load/data.js
+		batch.push(t.any(`
+			SELECT p.id FROM pads p
+			LEFT JOIN mobilization_contributions mob
+				ON p.id = mob.pad
+			WHERE p.id NOT IN (SELECT review FROM reviews)
+				$1:raw
+		;`, [ full_filters ]).then(d => d.map(c => c.id))
+		.catch(err => console.log(err)))
+
 		// FILTERS MENU DATA
 		batch.push(load.filters_menu({ connection: t, participations, req, res }))
 		// SUMMARY STATISTICS
@@ -162,9 +173,12 @@ exports.main = async (req, res) => {
 			}).catch(err => console.log(err)))
 		} else batch.push(null)
 
+
+
 		return t.batch(batch)
 		.then(async results => {
 			let [ data,
+				pads,
 				filters_menu,
 				statistics, 
 				clusters,
@@ -172,7 +186,8 @@ exports.main = async (req, res) => {
 				pinboard,
 			] = results
 
-			const { sections, pads } = data
+			// const { sections, pads } = data
+			const { sections } = data
 			const stats = { 
 				total: array.sum.call(statistics.total, 'count'), 
 				filtered: array.sum.call(statistics.filtered, 'count'), 

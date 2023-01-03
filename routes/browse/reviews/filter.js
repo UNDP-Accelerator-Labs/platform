@@ -17,10 +17,10 @@ exports.main = req => {
 	
 	// BASE FILTERS
 	const base_filters = []
-	if (search) base_filters.push(DB.pgp.as.format(`AND p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
+	if (search) base_filters.push(DB.pgp.as.format(`p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
 	if (status) base_filters.push(DB.pgp.as.format(`
 		-- BEGIN STATUS FILTER --
-		AND (
+		(
 			(
 				-- ASSIGNED REVIEWER
 				$1 IN (SELECT reviewer FROM reviewer_pool 
@@ -61,23 +61,20 @@ exports.main = req => {
 	`, [ uuid, status, rights, modules.find(d => d.type === 'reviews')?.reviewers || 0 ]))
 
 	let f_space = null
-	if (space === 'private') f_space = DB.pgp.as.format(`
-		AND (
-			(
-				p.id IN (
-					SELECT DISTINCT(pad) 
-					FROM review_requests 
-					WHERE id IN (SELECT request FROM reviewer_pool WHERE reviewer = $1) 
-						OR $2 > 2
-				) AND p.id NOT IN (SELECT pad FROM reviews WHERE reviewer = $1)
-			) OR (
-				p.id IN (SELECT review FROM reviews WHERE reviewer = $1 AND status < 2)
-			)
-		)
+	if (space === 'pending') f_space = DB.pgp.as.format(`
+		(p.id IN (
+			SELECT DISTINCT (pad) 
+			FROM review_requests 
+			WHERE id IN (SELECT request FROM reviewer_pool WHERE (reviewer = $1 OR $2 > 2) AND status = 0) 
+		) AND p.id NOT IN (SELECT pad FROM reviews WHERE reviewer = $1))
 	`, [ uuid, rights ])
+	
+	if (space === 'ongoing') f_space = DB.pgp.as.format(`
+		p.id IN (SELECT review FROM reviews WHERE reviewer = $1 AND status < 2)
+	`, [ uuid ])
 
-	if (space === 'shared') f_space = DB.pgp.as.format(`
-		AND (p.id IN (SELECT pad FROM reviews WHERE reviewer = $1 AND status >= 2))
+	if (space === 'past') f_space = DB.pgp.as.format(`
+		p.id IN (SELECT pad FROM reviews WHERE reviewer = $1 AND status >= 2)
 	`, [ uuid ])
 		
 	base_filters.push(f_space)
@@ -93,8 +90,14 @@ exports.main = req => {
 	// ORDER
 	const order = DB.pgp.as.format(`ORDER BY p.date DESC`)
 
-	const filters = [ base_filters.filter(d => d).join(' '), platform_filters.filter(d => d).join(' OR '), content_filters.filter(d => d).join(' OR ') ].filter(d => d).join(' AND ')
+	let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' OR '), content_filters.filter(d => d).join(' OR ') ]
+		.filter(d => d?.length)
+		.map(d => `(${d.trim()})`)
+		.join(' AND ')
+		.trim()
 
-	return [ f_space, order, page, filters ]
+	if (filters.length && filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
+
+	return [ `AND ${f_space}`, order, page, filters ]
 
 }

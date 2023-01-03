@@ -123,22 +123,23 @@ exports.main = async kwargs => {
 			.catch(err => console.log(err))
 		}).catch(err => console.log(err)))
 		
+		// GET TAGS AND INDEXES BREAKDOWN
 		batch.push(t.task(t1 => {
 			const batch1 = []
 			
 			metafields.filter(d => ['tag', 'index'].includes(d.type))
 			.forEach(d => {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (t.pad))::INT, t.tag_id AS id FROM tagging t
+					SELECT COUNT (DISTINCT (t.pad))::INT, t.tag_id AS id, t.type FROM tagging t
 					INNER JOIN pads p
 						ON p.id = t.pad
 					WHERE t.type = $1
 						AND p.id NOT IN (SELECT review FROM reviews)
 						$2:raw
-					GROUP BY tag_id
+					GROUP BY (tag_id, t.type)
 				;`, [ d.label, full_filters ]).then(async results => { 
 					const tags = await join.tags(results, [ language, 'id', d.label, d.type ])
-					// if (d.label.toLowerCase() === 'sdgs') {
+
 					if (d.type === 'index') {
 						tags.forEach(d => {
 							d.name = `${d.key} – ${d.name}`
@@ -154,7 +155,7 @@ exports.main = async kwargs => {
 						obj[d.label.toLowerCase()] = tags
 					}
 					return obj
-				}))
+				}).catch(err => console.log(err)))
 			})
 
 			return t1.batch(batch1)

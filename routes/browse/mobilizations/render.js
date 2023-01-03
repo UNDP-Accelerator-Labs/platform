@@ -35,6 +35,7 @@ exports.main = (req, res) => {
 					total: array.sum.call(statistics.total, 'count'), 
 					filtered: array.sum.call(statistics.filtered, 'count'),
 					
+					scheduled: statistics.scheduled,
 					ongoing: statistics.ongoing,
 					past: statistics.past,
 					

@@ -20,14 +20,24 @@ exports.main = async kwargs => {
 			p.template, p.title AS pad_title, 
 			t.title AS template_title,
 
-			CASE WHEN AGE(now(), f.date) < '1 hour'::interval
-					THEN EXTRACT(minute FROM AGE(now(), f.date))::text || ' minutes ago'
-				WHEN AGE(now(), f.date) < '1 day'::interval
-					THEN EXTRACT(hour FROM AGE(now(), f.date))::text || ' hours ago'
-				WHEN AGE(now(), f.date) < '1 month'::interval
-					THEN EXTRACT(day FROM AGE(now(), f.date))::text || ' days ago'
-				ELSE to_char(f.date, 'DD Mon YYYY')
+
+			CASE
+				WHEN AGE(now(), f.date) < '0 second'::interval
+					THEN jsonb_build_object('interval', 'positive', 'date', to_char(f.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(f.date, now())), 'hours', EXTRACT(hour FROM AGE(f.date, now())), 'days', EXTRACT(day FROM AGE(f.date, now())), 'months', EXTRACT(month FROM AGE(f.date, now())))
+				ELSE jsonb_build_object('interval', 'negative', 'date', to_char(f.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), f.date)), 'hours', EXTRACT(hour FROM AGE(now(), f.date)), 'days', EXTRACT(day FROM AGE(now(), f.date)), 'months', EXTRACT(month FROM AGE(now(), f.date)))
 			END AS date,
+
+
+			-- CASE WHEN AGE(now(), f.date) < '1 hour'::interval
+			-- 		THEN EXTRACT(minute FROM AGE(now(), f.date))::text || ' minutes ago'
+			-- 	WHEN AGE(now(), f.date) < '1 day'::interval
+			-- 		THEN EXTRACT(hour FROM AGE(now(), f.date))::text || ' hours ago'
+			-- 	WHEN AGE(now(), f.date) < '1 month'::interval
+			-- 		THEN EXTRACT(day FROM AGE(now(), f.date))::text || ' days ago'
+			-- 	ELSE to_char(f.date, 'DD Mon YYYY')
+			-- END AS date,
+
+
 
 			-- CASE WHEN f.source IS NOT NULL
 			-- 	AND m.id IS NOT NULL

@@ -44,9 +44,9 @@ exports.main = async (req, res) => {
 				total: array.sum.call(statistics.total, 'count'), 
 				filtered: array.sum.call(statistics.filtered, 'count'), 
 				
-				private: statistics.private,
-				shared: statistics.shared,
-				public: statistics.public,
+				pending: statistics.pending,
+				ongoing: statistics.ongoing,
+				past: statistics.past,
 				
 				displayed: data.count,
 				breakdown: statistics.filtered,

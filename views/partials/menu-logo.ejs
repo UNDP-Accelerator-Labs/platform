@@ -29,7 +29,7 @@
 										<ul>
 											<% if (rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) { %>
 												<li>
-													<a href='/<%- language %>/contribute/pad' target='_blank'>
+													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
 															<label><%- vocabulary['blank pad'][language] %></label>
 														</button>
@@ -52,7 +52,7 @@
 																<% } %>
 																<% locals.metadata.menu.templates.forEach(t => { %>
 																	<li class='status-<%- t.status %>'>
-																		<a href='/<%- language %>/contribute/pad?template=<%- t.id %>' target='_blank'>
+																		<a href='/<%- language %>/contribute/pad?template=<%- t.id %>'>
 																			<% if (t.title) { %>
 																				<button class='wrapable'>
 																					<label><%- t.title %></label>
@@ -100,14 +100,14 @@
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1)
 															.forEach(p => { %>
 																<li>
-																	<a href='/<%- language %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>' target='_blank'>
+																	<a href='/<%- language %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>'>
 																		<button class='wrapable'>
 																			<label><%- p.title %></label>
 																			<div class='sub'>
 																				<% if (p.owner !== uuid) { %>
-																					<%- vocabulary['launched by'][language](p.ownername, vocabulary['date'](p.start_date, language)) %>
+																					<%- vocabulary['launched by'][language](p.ownername, vocabulary['date'][language]({ date: p.start_date })) %>
 																				<% } else { %>
-																					<%- vocabulary['launched by'][language](null, vocabulary['date'](p.start_date, language)) %>
+																					<%- vocabulary['launched by'][language](null, vocabulary['date'][language]({ date: p.start_date })) %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -123,7 +123,7 @@
 											
 											<% if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)) { %>
 												<li class='lg'>
-													<a href='/<%- language %>/import/pads' target='_blank'>
+													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
 													</a>
 												</li>
@@ -144,7 +144,7 @@
 									<div class='dropdown'>
 										<ul>
 											<li>
-												<a href='/<%- language %>/contribute/template' target='_blank'>
+												<a href='/<%- language %>/contribute/template'>
 													<button>
 														<label><%- vocabulary['blank template'][language] %></label>
 													</button>
@@ -167,7 +167,7 @@
 															<% } %>
 															<% locals.metadata.menu.templates.forEach(t => { %>
 																<li class='status-<%- t.status %>'>
-																	<a href='/<%- language %>/contribute/template?source=<%- t.id %>' target='_blank'>
+																	<a href='/<%- language %>/contribute/template?source=<%- t.id %>'>
 																		<% if (t.title) { %>
 																			<button class='wrapable'>
 																				<label><%- t.title %></label>
@@ -214,7 +214,7 @@
 															<% } %> -->
 															<% languages.forEach(d => { %>
 																<% if (!locals.metadata.menu.review_templates.some(c => c.language === d.language)) { %>
-																	<a href='/<%- language %>/contribute/template?review_template=true&language=<%- d.language %>' target='_blank'>
+																	<a href='/<%- language %>/contribute/template?review_template=true&language=<%- d.language %>'>
 																		<li>
 																			<button><label><%- d.name %></label></button>
 																			<!-- TO DO: TRANSLATE LANGUAGE NAMES (e.g. FRENCH > FRANÇAIS) -->
@@ -252,7 +252,7 @@
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'contributors')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'contributors')?.rights.write ?? Infinity)) { %>
 								<li>
-									<a href='/<%- language %>/mobilize/contributor' target='_blank'>
+									<a href='/<%- language %>/mobilize/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
 											<label><%- vocabulary['contributor'][language](false).capitalize() %></label>
@@ -273,7 +273,7 @@
 									<div class='dropdown'>
 										<ul>
 											<li>
-												<a href='/<%- language %>/mobilize/cohort' target='_blank'>
+												<a href='/<%- language %>/mobilize/cohort'>
 													<button>
 														<label><%- vocabulary['call for contributions'][language] %></label>
 													</button>
@@ -297,7 +297,7 @@
 															<% locals.metadata.menu.mobilizations.filter(d => !d.target_id)
 															.forEach(d => { %>
 																<li class='status-<%- d.status %>'>
-																	<a href='/<%- language %>/mobilize/cohort?id=<%- d.id %>' target='_blank'>
+																	<a href='/<%- language %>/mobilize/cohort?id=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -330,7 +330,7 @@
 															<% } %>
 															<% locals.metadata.menu.mobilizations.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/mobilize/cohort?copy=true&id=<%- d.id %>' target='_blank'>
+																	<a href='/<%- language %>/mobilize/cohort?copy=true&id=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -367,14 +367,14 @@
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child)
 															.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/mobilize/cohort?child=true&id=<%- d.id %>' target='_blank'>
+																	<a href='/<%- language %>/mobilize/cohort?child=true&id=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%- vocabulary['launched by'][language](d.ownername, vocabulary['date'](d.start_date, language)) %>
+																					<%- vocabulary['launched by'][language](d.ownername, vocabulary['date'][language]({ date: d.start_date })) %>
 																				<% } else { %>
-																					<%- vocabulary['launched by'][language](null, vocabulary['date'](d.start_date, language)) %>
+																					<%- vocabulary['launched by'][language](null, vocabulary['date'][language]({ date: d.start_date })) %>
 																				<% } %>	
 																			</div>
 																		</button>
@@ -396,6 +396,14 @@
 									<button>
 										<label><%- vocabulary['analyse']?.[language](false, false)?.capitalize() || 'Analysis' %></label>
 										<span class='expandable'>></span>
+									</button>
+								</li>
+
+								<!-- TO DO: FINISH THIS -->
+								<li>
+									<button>
+										<label>Crowdsource annotations</label>
+										<!-- TO DO: TRANSLATE -->
 									</button>
 								</li>
 							<% } %>
@@ -437,7 +445,7 @@
 			<% } else if (d.type === 'contributors') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } else if (d.type === 'reviews') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language](false, true)?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary[d.type.slice(0, -1)]?.[language](false, true)?.capitalize() || d.type.capitalize() %></a>
 			<% } else { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } %>

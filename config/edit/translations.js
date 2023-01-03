@@ -1,6 +1,6 @@
 exports.translations = {
 	"email notifications": {
-
+		
 	}
 }
 

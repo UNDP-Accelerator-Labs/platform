@@ -74,25 +74,25 @@ exports.main = async (req, res) => {
 	return new Promise(async resolve => {
 		// BASE FILTERS
 		const base_filters = []
-		if (search) base_filters.push(DB.pgp.as.format(`AND p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
-		if (status) base_filters.push(DB.pgp.as.format(`AND p.status IN ($1:csv)`, [ status ]))
+		if (search) base_filters.push(DB.pgp.as.format(`p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
+		if (status) base_filters.push(DB.pgp.as.format(`p.status IN ($1:csv)`, [ status ]))
 
 		let f_space = null
-		if (space === 'private') f_space = DB.pgp.as.format(`AND p.owner IN ($1:csv)`, [ collaborators_ids ])
+		if (space === 'private') f_space = DB.pgp.as.format(`p.owner IN ($1:csv)`, [ collaborators_ids ])
 		engagementtypes.forEach(e => {
-			if (space === `${e}s`) f_space = DB.pgp.as.format(`AND p.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'pad' AND type = $2)`, [ uuid, e ])
+			if (space === `${e}s`) f_space = DB.pgp.as.format(`p.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'pad' AND type = $2)`, [ uuid, e ])
 		})
-		if (space === 'curated') f_space = DB.pgp.as.format(`AND (p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
-		if (space === 'shared') f_space = DB.pgp.as.format(`AND p.status = 2`)
+		if (space === 'curated') f_space = DB.pgp.as.format(`(p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
+		if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
 		if (space === 'reviewing') f_space = DB.pgp.as.format(`
-			AND ((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) 
+			((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) 
 				OR (p.owner IN ($1:csv)))
 			AND p.id IN (SELECT pad FROM review_requests)
 		`, [ collaborators_ids, rights ])
-		if (space === 'public' || !uuid) f_space = DB.pgp.as.format(`AND p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		if (space === 'public' || !uuid) f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		if (space === 'pinned') {
-			if (uuid) f_space = DB.pgp.as.format(`AND (p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
-			else f_space = DB.pgp.as.format(`AND (p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
+			if (uuid) f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
+			else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
 		}
 		base_filters.push(f_space)
 
@@ -137,8 +137,14 @@ exports.main = async (req, res) => {
 		// ORDER
 		const order = DB.pgp.as.format(`ORDER BY p.date DESC`)
 
-		let filters = [ base_filters.filter(d => d).join(' '), platform_filters.filter(d => d).join(' OR '), content_filters.filter(d => d).join(' OR ') ].filter(d => d).join(' AND ').trim()
-		if (filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
-		resolve([ f_space, order, page, filters ])
+		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' OR '), content_filters.filter(d => d).join(' OR ') ]
+			.filter(d => d?.length)
+			.map(d => `(${d.trim()})`)
+			.join(' AND ')
+			.trim()
+
+		if (filters.length && filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
+
+		resolve([ `AND ${f_space}`, order, page, filters ])
 	})
 }

@@ -1,10 +1,14 @@
 const { DB } = include('config')
 const { checklanguage, email: sendemail } = include('routes/helpers/')
 
+const cron = require('node-cron')
+
 exports.main = (req, res) => {
-	let { title, description, cohort, template, public } = req.body || {}
+	let { title, description, cohort, template, public, start_date, end_date } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]
+	if (start_date) start_date = new Date(start_date)
+	if (end_date) end_date = new Date(end_date)
 	
 	const { uuid } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
@@ -28,6 +32,43 @@ exports.main = (req, res) => {
 		.then(result => { // INSERT THE COHORT FOR THE MOBILIZATION
 			const { id } = result
 			const batch = []
+
+			// TO DO: TO OPTIMIZE THE CRON JOBS, KEEP TRACK OF THE UNIQUE mobilization-job(s) IN CASE THE MOBILIZATION IS ENDED PREMATURELY OR DELETED
+			// IF THE MOBILIZATION IS SCHEDULED FOR A LATER DATE, SO SET UP A CRON JOB
+			const now = new Date()
+			if (start_date && start_date >= now) {
+				const min = start_date.getMinutes()
+				const hour = start_date.getHours()
+				const day = start_date.getDate()
+				const month = start_date.getMonth() + 1
+				const year = start_date.getFullYear()
+
+				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
+					DB.conn.none(`
+						UPDATE mobilizations
+						SET status = 1
+						WHERE id = $1
+					;`, [ id ])
+					.catch(err => console.log(err))
+				})
+			} 
+			// IF THE MOBILIZATION HAS AN END DATE, SET UP A CRON JOB
+			if (end_date && end_date >= now) {
+				const min = end_date.getMinutes()
+				const hour = end_date.getHours()
+				const day = end_date.getDate()
+				const month = end_date.getMonth() + 1
+				const year = end_date.getFullYear()
+
+				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
+					DB.conn.none(`
+						UPDATE mobilizations
+						SET status = 2
+						WHERE id = $1
+					;`, [ id ])
+					.catch(err => console.log(err))
+				})
+			}
 
 			if (!public) {
 				cohort.forEach(d => {

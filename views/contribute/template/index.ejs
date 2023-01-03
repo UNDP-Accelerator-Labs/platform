@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <%
 	// CREATE ALIASES
-	const modules = locals.metadata.site.modules
 	const activity = locals.metadata.page.activity
-	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
 	const languages = locals.metadata.site.languages
 	const language = locals.metadata.page.language
-	const rights = locals.metadata.user.rights
-	const pagedisplay = locals.metadata.page.display
 
 	const review_template = locals.metadata.page.query?.review_template?.includes('true') || locals.data?.review_template || false
 	const review_language = locals.metadata.page.query?.language?.[0] || locals.data?.review_language || undefined
 %>
-<html lang='<%= language %>'>
+<html lang='<%- language %>'>
 <head>
 
 <%- include ('../../partials/head.ejs') %> 
@@ -32,7 +28,7 @@
 <body>
 
 
-<% include ('../../partials/multi-language.ejs') %> 
+<% include ('../../partials/translations.ejs') %> 
 
 <%- include ('../../partials/menu-languages.ejs') %> 
 <%- include ('../../partials/modals.ejs') %> 
@@ -63,7 +59,7 @@
 						<% if (['contribute', 'edit'].includes(activity)) { %>
 							<div class='save xs'>
 								<form>
-									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][locals.metadata.page.language] %></button>
+									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][language] %></button>
 								</form>
 							</div>
 						<% } %>
@@ -91,22 +87,22 @@
 			<div class='head'>
 				<% if (['contribute', 'edit'].includes(activity)) { %>
 					<% if (activity === 'edit') { %>
-						<a href='<%- locals.metadata.page.referer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.language] %></a>
+						<a href='<%- locals.metadata.page.referer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][language] %></a>
 					<% } %>
-					<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
+					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
 				<% } else { %>
-					<a href='<%- locals.metadata.page.referer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.language] %></a>
-					<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>'></div>
-					<div class='contributor'><%- vocabulary['credit'][locals.metadata.page.language](locals.data.contributor, locals.data.contributorname, 'contributors') %></div>
+					<a href='<%- locals.metadata.page.referer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>'></div>
+					<div class='contributor'><%- vocabulary['credit'][language](locals.data.contributor, locals.data.contributorname, 'contributors') %></div>
 				<% } %>
 			</div>
 			<div class='body'>
 				<section class='description-layout layout <%- activity %>'>
 					<div class='input-type'>
-						<label><%- vocabulary['description'][locals.metadata.page.language] %></label>
+						<label><%- vocabulary['description'][language] %></label>
 					</div>
 					<div class='media-container txt-container lead' onclick='d3.select(this).classed("focus", true)'>
-						<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][locals.metadata.page.language] %>' onblur='partialSave("description")' contenteditable><% if (review_template) { %><%- locals.template_description || vocabulary["review template description"][language](languages.find(d => d.language === review_language).name) %><% } else { %><%- locals.template_description %><% } %></div>
+						<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][language] %>' onblur='partialSave("description")' contenteditable><% if (review_template) { %><%- locals.template_description || vocabulary["review template description"][language](languages.find(d => d.language === review_language).name) %><% } else { %><%- locals.template_description %><% } %></div>
 						<!-- TO DO: TRANSLATE LANGUAGE NAME (e.g. FRENCH > FRANÇAIS) -->
 					</div>
 					<% if (!review_template) { %>
@@ -183,7 +179,7 @@
 			<h2><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>
 			<form action='/comment' method='POST'>
 				<input type='hidden' name='id' value='<%- locals.data?.id %>'>
-				<input type='hidden' name='object' value='<%- locals.metadata.page.object %>'>
+				<input type='hidden' name='object' value='<%- object %>'>
 				<textarea id='input-media-comment' name='message' onkeyup='adjustarea(this)' data-placeholder='test' onchange='fixLabel(this)' onfocus='changeLabel(this, true)' onblur='changeLabel(this, false)' required></textarea>
 				<label for='input-media-comment'><%- vocabulary['comment publicly'][language] %></label>
 				<div class='btn-group'>
@@ -197,7 +193,7 @@
 						<div class='head'>
 							<div class='meta meta-data'>
 								<div class='meta meta-contributor'><a href='../browse/templates/shared?contributors=<%- d.contributor %>'><%- d.ownername %></a></div>
-								<div class='meta meta-date'><%- vocabulary['date'](d.date, locals.metadata.page.language) %></div>
+								<div class='meta meta-date'><%- vocabulary['date'][language](d.date) %></div>
 							</div>
 						</div>
 						<div class='body'>
@@ -216,7 +212,7 @@
 											<div class='head'>
 												<div class='meta meta-data'>
 													<div class='meta meta-contributor'><a href='../browse/templates/shared?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
-													<div class='meta meta-date'><%- vocabulary['date'](c.date, locals.metadata.page.language) %></div>
+													<div class='meta meta-date'><%- vocabulary['date'][language](c.date) %></div>
 												</div>
 											</div>
 											<div class='body'>
@@ -228,7 +224,7 @@
 								<% } %>
 								<form action='/comment' method='POST'>
 									<input type='hidden' name='id' value='<%- locals.data?.id %>'>
-									<input type='hidden' name='object' value='<%- locals.metadata.page.object %>'>
+									<input type='hidden' name='object' value='<%- object %>'>
 									<input type='hidden' name='source' value='<%- d.id %>'>
 									<textarea id='input-media-comment' name='message' onkeyup='adjustarea(this)' data-placeholder='test' onchange='fixLabel(this)' onfocus='changeLabel(this, true)' onblur='changeLabel(this, false)' required></textarea>
 									<!-- <label for='input-media-comment' data-label='Jeremy'>Reply publicly</label> -->
@@ -281,7 +277,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-layout.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addSection({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addSection({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -289,7 +285,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-layout.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addSection({ data: { repeat: true }, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addSection({ data: { repeat: true }, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -297,7 +293,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addGroup({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addGroup({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -305,7 +301,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addImg({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addImg({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 	
@@ -313,7 +309,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addDrawing({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addDrawing({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -321,7 +317,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addTxt({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addTxt({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 	
@@ -329,7 +325,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addEmbed({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addEmbed({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 	
@@ -337,7 +333,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addChecklist({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addChecklist({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -345,7 +341,7 @@
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addRadiolist({ lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+		addRadiolist({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -359,15 +355,15 @@
 			this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling || null
 		}).on('click', function () { 
 			const data = { level: 'meta', name: d.label, required: d.required } 
-			if (d.type === 'txt') addTxt({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
-			if (d.type === 'embed') addEmbed({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
-			if (d.type === 'checklist') addChecklist({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
-			if (d.type === 'radiolist') addRadiolist({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'radiolist') addRadiolist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			// THE FOLLOWING ARE ALWAYS META
-			if (d.type === 'tag') addTags({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })	
-			else if (d.type === 'index') addIndexes({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
-			else if (d.type === 'location') addLocations({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
-			else if (d.type === 'external_resource') addExternalResource({ data, lang: '<%- locals.metadata.page.language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'tag') addTags({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })	
+			else if (d.type === 'index') addIndexes({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			else if (d.type === 'location') addLocations({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			else if (d.type === 'external_resource') addExternalResource({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 
 			d3.select(this).select('label').style('width', 0)
 			this['__active_node__'] = null
@@ -468,7 +464,7 @@
 					d3.select('#input-media-embed').node().click()
 				}
 			} else {
-				// switchButtons('<%- locals.metadata.page.language %>')
+				// switchButtons('<%- language %>')
 				if ((d3.select(e.srcElement).classed('media')
 						|| d3.select(e.srcElement).classed('meta')
 						|| d3.select(e.srcElement).classed('title')
@@ -480,7 +476,7 @@
 						)
 					)
 				) {
-					switchButtons('<%- locals.metadata.page.language %>') 
+					switchButtons('<%- language %>') 
 					// THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS 
 				}
 			}
@@ -717,17 +713,17 @@
 			if (mediaSize === 'xs') {
 				const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 				save_btn.select('button')
-					.html(vocabulary['changes saved']['<%- locals.metadata.page.language %>'])
+					.html(vocabulary['changes saved']['<%- language %>'])
 				window.setTimeout(_ => {
 					save_btn.classed('saved', false)
 					.select('button').each(function () { this.disabled = true })
-						.html('<%- vocabulary["save"][locals.metadata.page.language] %>')
+						.html('<%- vocabulary["save"][language] %>')
 				}, 1000)
 			} else {
 				const menu_logo = d3.select('nav#site-title .inner')
 				menu_logo.select('.save').classed('saved', true)
 					.select('button')
-					.html(vocabulary['changes saved']['<%- locals.metadata.page.language %>'])
+					.html(vocabulary['changes saved']['<%- language %>'])
 				window.setTimeout(_ => {
 					menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
 					menu_logo.selectAll('div.save').classed('hide', true)
@@ -771,13 +767,13 @@
 		descriptionLayout.select('.media-container .media-txt').text(data.description)
 		if (data.sections) {
 			data.sections.forEach(d => {
-				addSection({ data: d, lang: '<%- locals.metadata.page.language %>' })
+				addSection({ data: d, lang: '<%- language %>' })
 			})
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	<% } else { %>
-		addSection({ lang: '<%- locals.metadata.page.language %>' })
+		addSection({ lang: '<%- language %>' })
 		<% if (review_template) { %>
 			const radiodata = {
 				level: 'meta',
@@ -788,9 +784,9 @@
 				required: true,
 				editable: false
 			}
-			addRadiolist({ data: radiodata, lang: '<%- locals.metadata.page.language %>', focus: false })
+			addRadiolist({ data: radiodata, lang: '<%- language %>', focus: false })
 		<% } else { %>
-			addTitle({ lang: '<%- locals.metadata.page.language %>' })
+			addTitle({ lang: '<%- language %>' })
 		<% } %>
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')

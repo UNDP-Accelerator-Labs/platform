@@ -35,6 +35,13 @@ exports.main = async kwargs => {
 			GROUP BY m.status
 			ORDER BY m.status
 		;`, [ uuid, rights, full_filters ] ).then(d => { return { filtered: d } }))
+		// GET SCHEDULED MOBILIZATIONS COUNT
+		batch.push(t.one(`
+			SELECT COUNT (DISTINCT (m.id))::INT FROM mobilizations m
+			WHERE (m.owner = $1
+				OR $2 > 2)
+			AND m.status = 0
+		;`, [ uuid, rights ], d => d.count).then(d => { return { scheduled: d } }))
 		// GET ONGOIONG MOBILIZATIONS COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (m.id))::INT FROM mobilizations m

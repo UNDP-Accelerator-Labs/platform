@@ -1,8 +1,10 @@
 const { DB } = include('config')
+// const { checklanguage } = include('routes/helpers/')
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id, mobilization } = req.body || {}
+	// const language = checklanguage(req.params?.language || req.session.language)
 	
 	if (!board_id) { // CREATE NEW BOARD
 		if (board_title?.trim().length > 0) {
@@ -27,7 +29,7 @@ exports.pin = (req, res) => {
 
 					batch.push(t.none(`
 						INSERT INTO pinboard_contributors (pinboard, participant)
-						VALUES ($1, $2)
+						VALUES ($1::INT, $2)
 					;`, [ id, uuid ]))
 					
 					batch.push(
@@ -39,14 +41,15 @@ exports.pin = (req, res) => {
 					return t.batch(batch)
 					.then(_ => {
 						const batch = []
+						batch.push(id)
 						batch.push(t.any(retrievepins(object_id)))
 						batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
 						return t.batch(batch)
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
 			}).then(results => {
-				const [ pins, pinboards_list ] = results
-				res.json({ status: 200, message: 'Successfully created pinboard and added pad.', pins, pinboards_list })
+				const [ id, pins, pinboards_list ] = results
+				res.json({ status: 200, message: 'Successfully created pinboard and added pad.', board_id: id, pins, pinboards_list })
 			}).catch(err => console.log(err))
 		} else res.json({ status: 400, message: 'You need to create a title for a new pinboard.' })
 	} else { // SIMPLY ADD PAD TO BOARD
@@ -63,8 +66,7 @@ exports.pin = (req, res) => {
 				.catch(err => console.log(err))
 			}).then(results => {
 				const [ pins, pinboards_list ] = results
-				console.log(results)
-				res.json({ status: 200, message: 'Successfully created pinboard and added pad.', pins, pinboards_list })
+				res.json({ status: 200, message: 'Successfully added pad.', board_id, pins, pinboards_list })
 			}).catch(err => console.log(err))
 		} else res.json({ status: 400, message: 'You are not adding a pad.' })
 	}
@@ -101,10 +103,18 @@ exports.unpin = (req, res) => {
 
 function insertpads (_id, _object_id, _mobilization) {
 	if (_object_id) {
-		return DB.pgp.as.format(`
-			INSERT INTO pinboard_contributions (pinboard, pad)
-			VALUES ($1, $2::INT)
-		;`, [ _id, _object_id ])
+		if (!Array.isArray(_object_id)) _object_id = [_object_id]
+		const data = _object_id.map(d => {
+			const obj = {}
+			obj.pinboard = _id
+			obj.pad = d
+			return obj
+		})
+
+		const insert = DB.pgp.helpers.insert(data, ['pinboard', 'pad'], 'pinboard_contributions')
+		const constraint = DB.pgp.as.format(`ON CONFLICT ON CONSTRAINT unique_pad_pinboard DO NOTHING`)
+		return `${insert} ${constraint}`
+
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
@@ -115,10 +125,11 @@ function insertpads (_id, _object_id, _mobilization) {
 }
 function removepads (_id, _object_id, _mobilization) {
 	if (_object_id) {
+		if (!Array.isArray(_object_id)) _object_id = [_object_id]
 		return DB.pgp.as.format(`
 			DELETE FROM pinboard_contributions
 			WHERE pinboard = $1::INT
-				AND pad = $2::INT
+				AND pad IN ($2:csv)
 		;`, [ _id, _object_id ])
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`
@@ -157,13 +168,14 @@ function updatestatus (_id, _object_id, _mobilization) {
 	}
 }
 function retrievepins (_object_id) {
+	if (!Array.isArray(_object_id)) _object_id = [_object_id]
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
 		INNER JOIN pads p
 			ON pbc.pad = p.id
-		WHERE p.id = $1::INT
+		WHERE p.id IN ($1:csv)
 	;`, [ _object_id ])
 }
 function retrievepinboards (_owners) {

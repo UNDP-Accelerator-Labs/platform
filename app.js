@@ -91,7 +91,9 @@ app.route('/publish/:object')
 app.get('/unpublish/:object', routes.process.unpublish)
 app.get('/forward/:object', routes.process.forward)
 app.get('/delete/:object', routes.process.delete)
+
 app.post('/download/:object', routes.process.download)
+
 app.route('/request/:object')
 	.get(routes.process.request)
 	.post(routes.process.request)
@@ -175,7 +177,6 @@ DB.conn.tx(t => {
 				const day = ref_date.getDate()
 				const month = ref_date.getMonth() + 1
 				const year = ref_date.getFullYear()
-				console.log(`${min} ${hour} ${day} ${month}`)
 
 				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
 					DB.conn.none(`

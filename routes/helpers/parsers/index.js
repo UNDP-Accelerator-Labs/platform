@@ -1,19 +1,33 @@
-exports.getImg = (_json = {}) => {
+exports.getImg = (_json = {}, _unique = true) => { 
 	if (_json?.sections) {
 		const media = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
-		const img = media.find(c => c.type === 'img' && c.src)
-		const mosaic = media.find(c => c.type === 'mosaic' && c.srcs?.[0])
-		const embed = media.find(c => c.type === 'embed' && c.src)
-		if (img) {
-			if (this.isURL(img.src)) return [img.src]
-			else return [`/${img.src.replace('uploads', 'uploads/sm')}`]
-		} else if (mosaic) {
-			if (this.isURL(mosaic.srcs?.[0])) return [mosaic.srcs?.[0]]
-			else return [`/${mosaic.srcs?.[0].replace('uploads', 'uploads/sm')}`]
-		} else if (embed) {
-			if (this.isURL(embed.src)) return [embed.src]
-			else return [`${embed.src.replace('uploads', 'uploads/sm')}`]
-		} else return []
+		const img = media.filter(c => c.type === 'img' && c.src).map(d => {
+			if (this.isURL(d.src)) return d.src
+			else return `/${d.src.replace('uploads', 'uploads/sm')}`
+		})
+		const mosaic = media.filter(c => c.type === 'mosaic' && c.srcs?.length > 0).map(d => d.srcs).flat().map(d => {
+			if (this.isURL(d)) return d
+			else return `/${d.replace('uploads', 'uploads/sm')}`
+		})
+		const embed = media.filter(c => c.type === 'embed' && c.src).map(d => d.src).filter(d => d).map(d => {
+			if (this.isURL(d)) return d
+			else return `/${d.replace('uploads', 'uploads/sm')}`
+		})
+		const results = img?.concat(mosaic, embed)
+		
+		if (_unique) return [results[0]].filter(d => d)
+		else return results.filter(d => d)
+
+		// if (img) {
+		// 	if (this.isURL(img.src)) return [img.src]
+		// 	else return [`/${img.src.replace('uploads', 'uploads/sm')}`]
+		// } else if (mosaic) {
+			// if (this.isURL(mosaic.srcs?.[0])) return [mosaic.srcs?.[0]]
+			// else return [`/${mosaic.srcs?.[0].replace('uploads', 'uploads/sm')}`]
+		// } else if (embed) {
+			// if (this.isURL(embed.src)) return [embed.src]
+			// else return [`${embed.src.replace('uploads', 'uploads/sm')}`]
+		// } else return []
 	} else return []
 }
 exports.getSDGs = function (_json = {}) {
@@ -49,6 +63,18 @@ exports.getReviewScore = function (_json = {}) {
 		const score = media.find(d => d.type === 'radiolist' && d.name === 'review_score')?.options.find(d => d.checked)?.value
 		return score ?? null
 	} else return null
+}
+exports.getExternalResources = (_json = {}) => { 
+	if (_json?.sections) {
+		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
+		const external_resources = meta.filter(c => c.type === 'external_resource' && c.srcs?.filter(b => b).length > 0)
+			.map(d => d.srcs).flat()
+			// .map(d => {
+			// 	if (this.isURL(d.src)) return d.src
+			// 	else return `/${d.src.replace('uploads', 'uploads/sm')}`
+			// })
+		return external_resources
+	} else return []
 }
 exports.regexQuery = require('./search.js').sqlregex
 

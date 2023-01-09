@@ -95,7 +95,7 @@ exports.difference = function (V2) {
 	V2.forEach(d => { if (!this.includes(d)) diff.push(d) })
 	return diff
 }
-exports.chunk = function(size = 1) {
+exports.chunk = function (size = 1) {
 	const groups = []
 	for (let i = 0; i < this.length; i += size) {
 		groups.push(this.slice(i, i + size))
@@ -126,4 +126,16 @@ exports.group = function (kwargs = {}) {
 	})
 	arr.forEach(d => d.p = d.count / this.length)
 	return arr
+}
+exports.shuffle = function () {
+	let currentIndex = this.length, temporaryValue, randomIndex
+
+	while (0 !== currentIndex) {
+		randomIndex = Math.floor(Math.random() * currentIndex)
+		currentIndex -= 1;
+		temporaryValue = this[currentIndex]
+		this[currentIndex] = this[randomIndex]
+		this[randomIndex] = temporaryValue
+	}
+	return this
 }

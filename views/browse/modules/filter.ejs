@@ -88,7 +88,7 @@
 			
 			<div class='global-actions'>
 				<% if (space !== 'pinned') { %>
-					<% if (query.search?.length || Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
+					<%# if (query.search?.length || Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
 						<div class='add filter pinboards'>
 							<input type='text' id='pin-all'>
 							<!-- TO DO: TRANSLATE -->
@@ -104,7 +104,7 @@
 								</menu>
 							</div>
 						</div>
-					<% } %>
+					<%# } %>
 				<% } %>
 
 				<!-- TO DO: TRANSLATE -->

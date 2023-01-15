@@ -4,6 +4,7 @@
 	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
 	const language = locals.metadata.page.language
+	const page_content_limit = locals.metadata.page.page_content_limit
 
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -73,7 +74,6 @@ if (drawMap) {
 		})
 
 		clusters.forEach(d => {
-		// const markers = clusters.map(d => {
 			const markerScale = d3.scaleLinear()
 				.domain([1, d3.max(d, c => c.properties.count)])
 				.range([10, 50])
@@ -87,18 +87,17 @@ if (drawMap) {
 				})
 				const marker = L.marker([c.geometry.coordinates[1], c.geometry.coordinates[0]], { icon: clusterpin })
 					.on('click', function () {
-						// if (c.properties.count > 1) return window.location = `?pads=${c.properties.pads.join('&pads=')}`
-						// else return loadPopup(this._popup, c.properties.pads[0])
 						return loadPopup(this._popup, c.properties.pads)
 					})
-				// if (c.properties.count === 1) 
 				marker.bindPopup()
 				return marker
 			})
 		})
 
-		async function loadPopup (popup, ids) {
-			let { data } = await POST('/<%- language %>/browse/pads/<%- space %>', { pads: ids })
+		async function loadPopup (popup, pads, page = 1) {
+			let { data } = await POST('/<%- language %>/browse/pads/<%- space %>', { pads, page })
+
+			const max_pages = Math.ceil(pads.length / <%- page_content_limit %>)
 
 			const section = document.createElement('section')
 			section.classList.add('container')
@@ -121,20 +120,56 @@ if (drawMap) {
 					render.actions(entry.head)
 					render.title(entry.body)
 					render.owner(entry.body)
-					if (data.img?.length === 0) render.txt(entry.body)
+					if (c.img?.length === 0) render.txt(entry.body)
 					<% if (!publicpage) { %>
 						render.metainfo(entry.body)
 						render.followup(entry.body)
 					<% } %>
 					render.tags(entry.body)
-					if (mediaSize !== 'xs') render.stats(entry.foot)
+					// if (mediaSize !== 'xs') render.stats(entry.foot)
 					render.engagement(entry.foot)
 					render.pin(entry.foot)
 					render.delete(entry.outer)
 				})
+
+				const pagination = section.addElems('nav', 'pagination')
+					.addElems('div', 'inner')
+				pagination.addElems('div', 'caroussel')
+					.addElems('div', 'dots')
+					.addElems('div', 'dot', new Array(d.length).fill(0).map((c, i) => i + 1))
+
+				pagination.addElems('ul')
+				.addElems('li', null, new Array(max_pages).fill(0).map((c, i) => i + 1))
+				.addElems('a', 'page-link')
+					.classed('active', c => c === page)
+					.attr('data-page', c => c)
+					.html(c => c)
+				.on('click', c => {
+					return loadPopup (popup, pads, c)
+				})
 			})
 
+			function animateCarousel (idx) {
+				const deck = d3.select('.layout.columns')
+				const slides = deck.selectAll('article.pad')
+				const delay = 3000
+
+				if (idx === slides.size()) idx = 0
+				deck.node().scrollTo({
+					top: 0,
+					left: idx * (slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth),
+					behavior: 'smooth'
+				})
+				d3.selectAll('.caroussel .dots .dot')
+					.classed('highlight', (d, i) => i === idx)
+				.on('click', function (d, i) {
+					idx = i
+					animateCarousel(idx)
+				})
+			}
+
 			popup.setContent(section)
+			animateCarousel(0)
 		}
 
 		// const locations = clusters.last().markers

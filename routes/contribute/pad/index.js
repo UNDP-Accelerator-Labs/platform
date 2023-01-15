@@ -39,7 +39,7 @@ exports.main = (req, res) => {
 				// GET POTENTIAL MOBILIZATION INFORMATION
 				let mobilization_clause = ''
 				if (mobilization) mobilization_clause = DB.pgp.as.format(`id = $1::INT`, [ mobilization ])
-				else if (id) mobilization_clause = DB.pgp.as.format(`id IN (SELECT mobilization FROM mobilization_contributions WHERE pad = $1::INT)`, [ id ])
+				else if (id) mobilization_clause = DB.pgp.as.format(`id IN (SELECT MAX(mobilization) FROM mobilization_contributions WHERE pad = $1::INT)`, [ id ])
 				else mobilization_clause = DB.pgp.as.format('FALSE')
 				batch.push(t.oneOrNone(`
 					SELECT id, title, description, language FROM mobilizations

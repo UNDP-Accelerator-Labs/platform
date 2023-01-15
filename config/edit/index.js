@@ -6,6 +6,7 @@ exports.app_suite = 'acclab_platform'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = {
 	'en': 'This is a description of the app.',
+	// 'en': '<br/><br/>Intriguing solutions are those that, when observed, make you wonder ‘why did they do that?’. You see something happening, but you don’t immediately understand the need behind it. These are solutions that get a mapper to investigate further and dig deeper to understand why.',
 	'fr': 'Ceci est une description de l’appli.',
 	'es': 'This is a description of the app.',
 	'pt': 'This is a description of the app.',
@@ -13,8 +14,6 @@ exports.app_description = {
 
 
 // DESIRED MODULES
-	// OPTIONS: ['files', 'templates', 'mobilizations', 'analyses']
-// exports.modules = ['pads', 'files', 'templates', 'mobilizations', 'analyses']
 exports.modules = [
 	{ type: 'pads', rights: { read: 0, write: 1 } }, 
 	{ type: 'pinboards', rights: { read: 0, write: 1 } },
@@ -36,11 +35,11 @@ exports.modules = [
 exports.metafields = [
 	{ type: 'index', name: 'SDGs', required: true, opencode: false }, 
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true }, 
-	{ type: 'tag', name: 'methods', required: true, opencode: false },
-	{ type: 'tag', name: 'datasources', required: true, opencode: true },
-	// { type: 'location', name: 'locations', required: true },
+	// { type: 'tag', name: 'methods', required: true, opencode: false },
+	// { type: 'tag', name: 'datasources', required: true, opencode: true },
+	{ type: 'location', name: 'locations', required: true },
 	// { type: 'external_resource', name: 'consent', required: true, uris: [ { uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file' }, { uri: undefined } ] }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
-	// { type: 'external_resource', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ] } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
+	{ type: 'external_resource', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ] } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 	// { type: 'txt', name: 'mapper name', required: true } // THIS IS A SIMPLE TEST OF ANOTHER TYPE OF MEDIA (txt)
 ]
 // DESIRED ENGAGEMENT TYPES

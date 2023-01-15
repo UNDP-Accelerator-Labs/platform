@@ -27,12 +27,12 @@ d3.selection.prototype.addElems = function (_element, _class, _data, _key) {
 }
 d3.selection.prototype.findAncestor = function (_target) {
 	if (!this.node().classList || this.node().nodeName === 'BODY') return null
-	if (this.classed(_target) || this.node().nodeName === _target.toUpperCase()) return this
+	if (this.classed(_target) || this.node().nodeName === _target?.toUpperCase()) return this
 	return d3.select(this.node().parentNode)?.findAncestor(_target);
 }
 d3.selection.prototype.hasAncestor = function (_target) {
 	if (this.node().nodeName === 'BODY') return false
-	if (this.classed(_target) || this.node().nodeName === _target.toUpperCase()) return true
+	if (this.classed(_target) || this.node().nodeName === _target?.toUpperCase()) return true
 	return d3.select(this.node().parentNode)?.hasAncestor(_target);
 }
 d3.selection.prototype.moveToFront = function() {

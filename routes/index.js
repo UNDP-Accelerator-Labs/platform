@@ -25,21 +25,14 @@ if (!exports.dispatch) { exports.dispatch = {} }
 exports.forwardGeocoding = (req, res) => {
 	const { locations, list } = req.body || {}
 	const { country } = req.session || {}
-	// DB.conn.one(`
-	// 	SELECT p.lat, p.lng FROM centerpoints cp
-	// 	INNER JOIN contributors c
-	// 		ON c.country = cp.country
-	// 	WHERE c.uuid = $1
-	// ;`, [req.session.uuid])
-	// .then(centerpoint => {
-		const promises = geocode(locations, country.lnglat, list)
-		Promise.all(promises)
-		.then(data => res.json(data))
-		.catch(err => {
-			console.log(err)
-			res.json({ status: 500, message: 'Oops! Something went wrong while searching for locations.' })
-		})
-	// }).catch(err => console.log(err))
+	
+	const promises = geocode(locations, country.lnglat, list)
+	Promise.all(promises)
+	.then(data => res.json(data))
+	.catch(err => {
+		console.log(err)
+		res.json({ status: 500, message: 'Oops! Something went wrong while searching for locations.' })
+	})
 }
 function geocode (locations, centerpoint, list = false, dir = 'forward') { // FOR NOW WE ONLY DO FORWARD GEOCODING
 	console.log('pay attention to forward geocode')
@@ -199,6 +192,7 @@ exports.dispatch.mobilize = require('./mobilize/').main
 // TO DO: CHANGE THIS TO THE GENERAL save/ MECHANISM
 exports.storeImport = require('./import/').save
 
+
 /* =============================================================== */
 /* ====================== SAVING MECHANISMS ====================== */
 /* =============================================================== */
@@ -351,31 +345,12 @@ exports.process.decline = require('./accept/').decline
 
 
 
-exports.process.download = (req, res) => { // TO DO: FINISH THIS
+// THIS IS DEPRECATED
+exports.process.download = (req, res) => {
 	const { uuid } = req.session || {}
 	const { object } = req.params || {}
 	const { id } = req.body || {}
 
-	// if (source === 'bookmarks') { // DOWNLOAD MULTIPLE PADS
-	// 	saveSQL = DB.pgp.as.format(`
-	// 		SELECT p.id, p.title, p.sections, c.name AS contributor, p.date, p.full_text, p.location, p.sdgs, p.tags FROM pads p
-	// 		INNER JOIN contributors c
-	// 			ON p.contributor = c.id
-	// 		WHERE p.id IN (
-	// 			SELECT docid FROM engagement
-	// 			WHERE user = $1
-	//				AND doctype = $2
-	// 				AND type = 'bookmark'
-	// 		)
-	// 	;`, [ uuid, 'pad' ])
-	// } else { // DOWNLOAD SINGLE PAD
-	// 	saveSQL = DB.pgp.as.format(`
-	// 		SELECT p.id, p.title, p.sections, c.name AS contributor, p.date, p.full_text, p.location, p.sdgs, p.tags FROM pads p
-	// 		INNER JOIN contributors c
-	// 			ON p.contributor = c.id
-	// 		WHERE p.id = $1
-	// 	;`, [source])
-	// }
 	if (object === 'mobilization') {
 		DB.conn.tx(t => {
 			const batch = []
@@ -398,17 +373,6 @@ exports.process.download = (req, res) => { // TO DO: FINISH THIS
 		}).then(async results => {
 			const [ template, pads ] = results
 			
-			// function getImg (d) {
-			// 	if (d && d.sections) {
-			// 		const img = d.sections.map(d => d.items).flat().filter(c => c.type === 'img' && c.src)
-			// 		const mosaic = d.sections.map(d => d.items).flat().filter(c => c.type === 'mosaic' && c.srcs)
-			// 		const embed = d.sections.map(d => d.items).flat().filter(c => c.type === 'embed' && c.src)
-			// 		if (img.length) return img.map(c => c.src)
-			// 		else if (mosaic.length) return mosaic.map(c => c.srcs).flat()
-			// 		else if (embed.length) return embed.map(c => c.src)
-			// 		else return [null]
-			// 	} else return [null]
-			// }
 
 			function getImg (d) {
 				if (d?.sections) {
@@ -550,7 +514,7 @@ exports.process.download = (req, res) => { // TO DO: FINISH THIS
 	// })
 }
 
-// TO DO: MIGRATE THE FOLLOWING TO helpers
+// MIGRATE THE FOLLOWING TO helpers // THIS IS DEPRECATED
 function extractItem (d = {}, section = null, group = null) {
 	if (d.type === 'img') return { key: d.instruction, value: d.src ? d.src : null, section: section, group: group }
 	if (d.type === 'mosaic') return { key: d.instruction, value: d.srcs.length ? d.srcs.join(', ') : null, section: section, group: group }
@@ -657,6 +621,7 @@ function compileTable (template = {}, pads = []) { // TO DO: ISSUE IS HERE
 	})
 	return [structure, entries]
 }
+// THIS IS DEPRECATED
 function dumpCSV (structure, entries) {
 	let csv = structure.map(d => {
 		if (typeof d.key === 'string') {
@@ -694,7 +659,10 @@ exports.process.validate = (req, res) => {
 /* =============================================================== */
 /* ============================= API ============================= */
 /* =============================================================== */
+exports.dispatch.apis = require('./apis')
+
 if (!exports.api) exports.api = {}
+// THE TAGS APIS SHOULD BE DEPRECATED FOR NOW
 exports.api.skills = (req, res) => {
 	// DB.conn.any(`
 	// 	SELECT id, category, name FROM skills ORDER BY category, name

@@ -15,7 +15,9 @@ html, body {
 	font-size: $t-main;
 	line-height: 1.5em;
 }
-.xs {
+.xs,
+.sm,
+.m {
 	display: none;
 }
 .no-bg {
@@ -109,8 +111,8 @@ html, body {
 					transition: transform .25s, font-size .25s;
 					cursor: pointer;
 				}
-				input:focus + label,
-				input.has-value + label,
+				input:not([type=checkbox]):not([type=radio]):focus + label,
+				input.has-value:not([type=checkbox]):not([type=radio]) + label,
 				textarea:focus + label,
 				textarea.has-value + label {
 					font-size: $t-small;
@@ -223,6 +225,16 @@ html, body {
 							}
 						}
 					}
+				}
+			}
+			li.default {
+				text-align: left;
+
+				label {
+					position: static;
+					margin-left: 10px;
+					color: $c-dark-grey;
+					font-size: $t-mid-small;
 				}
 			}
 			li:hover {

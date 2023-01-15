@@ -105,6 +105,7 @@
 
 		form.addElems('ul', 'opts', opts ? [opts] : [])
 			.addElems('li', 'opt link', d => d)
+			.classed('default', d => d.default || false)
 		.each(function (d) {
 			d3.select(this).call(addInputNode, { d })
 		})
@@ -216,7 +217,8 @@
 					'type': d.type,
 					'name': d.name,
 					'value': d.value,
-					'required': d.required || null
+					'required': d.required || null,
+					'checked': d.checked || null
 				}).html(d.label)
 			.on('click', async d => { // PROBABLY d DOES NOT NEED TO BE PASSED HERE (LIKE IN THE keyup BELOW)
 				if (['button', 'submit'].includes(d.type)) {
@@ -253,19 +255,21 @@
 				.attr('for', nodeid)
 				.html(d.placeholder)
 
-			_sel.addElems('button', 'input-submit')
-				.attr('type', 'button')
-			.on('click', d => {
-				if (resolve) {
-					if (typeof d.resolve === 'function') {
-						const resolved = d.resolve()
-						resolve(resolved)
+			if (!['checkbox', 'radio'].includes(d.type)) {
+				_sel.addElems('button', 'input-submit')
+					.attr('type', 'button')
+				.on('click', d => {
+					if (resolve) {
+						if (typeof d.resolve === 'function') {
+							const resolved = d.resolve()
+							resolve(resolved)
+						}
+						else resolve(d.resolve)
+						modal.remove()
+						screen.classed('hide', true)
 					}
-					else resolve(d.resolve)
-					modal.remove()
-					screen.classed('hide', true)
-				}
-			}).html('<%- vocabulary["save"][locals.metadata.page.language] %>')
+				}).html('<%- vocabulary["save"][locals.metadata.page.language] %>')
+			}
 		}
 	}
 

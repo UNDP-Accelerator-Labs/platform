@@ -1846,13 +1846,73 @@
 			"es": "Descarga todo",
 			"pt": "Download tudo"
 		},
-		"empty txt": {
+		"select download options": {
+			"en": "Select download options.",
+			"fr": "Sélectionner les options de téléchargement.",
+			"es": "Seleccionar opciones de descarga.",
+			"pt": "Selecione as opções de download."
+		},
+		"select format": { // USED
+			"en": "Select a format",
+			"fr": "Sélectionner un format",
+			"es": "Seleccionar un formato",
+			"pt": "Selecione um formato"
+		},
+		"use templates": { // USED
+			"en": "Use templates",
+			"fr": "Utiliser les gabartis",
+			"es": "Usa las plantillas",
+			"pt": "Use os modelos"
+		},
+		"include data": { // USED
+			"en": "Include data",
+			"fr": "Inclure les données",
+			"es": "Incluir los datos",
+			"pt": "Inclua os dados"
+		},
+		"include media": { // USED
+			"en": "Include media (images, videos, etc.)",
+			"fr": "Inclure les médias (images, vidéos, etc.)",
+			"es": "Incluir medios (imágenes, videos, etc.)",
+			"pt": "Incluir mídia (imagens, vídeos, etc.)"
+		},
+		"include tags": { // USED
+			"en": "Include tags",
+			"fr": "Inclure les étiquettes",
+			"es": "Incluir las etiquetas",
+			"pt": "Incluir as etiquetas"
+		},
+		"include locations": { // USED
+			"en": "Include locations",
+			"fr": "Inclure les emplacements",
+			"es": "Incluir las ubicaciones",
+			"pt": "Incluir os locais"
+		},
+		"include external resources": { // USED
+			"en": "Include external resources",
+			"fr": "Inclure les resources externes",
+			"es": "Incluir los recursos externos",
+			"pt": "Incluir os recursos externos"
+		},
+		"include engagement": { // USED
+			"en": "Include engagement metrics",
+			"fr": "Inclure les métriques d’engagement",
+			"es": "Incluir las métricas de participación",
+			"pt": "Inclua as métricas de engajamento"
+		},
+		"include comments": { // USED
+			"en": "Include comments",
+			"fr": "Inclure les commentaires",
+			"es": "Incluir los comentarios",
+			"pt": "Incluir os comentários"
+		},
+		"empty txt": { // USED
 			"en": "empty text field",
 			"fr": "champ de texte vide",
 			"es": "campo de texto vacío",
 			"pt": "campo de texto vazio"
 		},
-		"empty embed": {
+		"empty embed": { // USED
 			"en": "empty embedding field",
 			"fr": "champ d’intégration vide",
 			"es": "campo de incrustación vacío",
@@ -2819,6 +2879,24 @@
 			"es": "Añadir a una colección",
 			"pt": "Adicionar a uma coleção"
 		},
+		"add all to collection": { // USED
+			"en": count => {
+				if (count !== 1) return "Add all " + count + " pads to a collection"
+				else return "Add " + count + " pad to a collection"
+			},
+			"fr": count => {
+				if (count !== 1) return "Ajouter les " + count + " blocs-notes à une collection"
+				else return "Ajouter " + count + " bloc-notes à une collection"
+			},
+			"es": count => {
+				if (count !== 1) return "Agregue los " + count + " plantillas a una colección"
+				return "Agregar " + count + " bloc de notas a una colección"
+			},
+			"pt": count => {
+				if (count !== 1) return "Adicione os " + count + " blocos de notas a uma coleção"
+				else return "Adicionar " + count + " bloco de notas a uma coleção"
+			}
+		},
 		"cancel": { // USED
 			"en": "Cancel",
 			"fr": "Annuler",
@@ -2837,6 +2915,12 @@
 			"es": "¿Qué plantillas se deben eliminar?",
 			"pt": "Quais blocos de notas devem ser excluídos?"
 		},
+		"what pads to unpublish": { // USED
+			"en": "Which pads should be retracted?",
+			"fr": "Quels bloc-notes faut-il retracter ?",
+			"es": "¿Qué plantillas deben retraerse?",
+			"pt": "Quais blocos de notas devem ser recolhidos?"
+		},
 		"all selected": { // USED
 			"en": "All selected",
 			"fr": "Tous les sélectionnés",
@@ -2844,10 +2928,10 @@
 			"pt": "Tudo os selecionado"
 		},
 		"only pad": { // USED
-			"en": padnmame => "Only “" + padnmame + "”",
-			"fr": padnmame => "Seulement « " + padnmame + " »",
-			"es": padnmame => "Solamente “" + padnmame + "”",
-			"pt": padnmame => "Só “" + padnmame + "”"
+			"en": padnmame => "Only “<strong>" + padnmame + "</strong>”",
+			"fr": padnmame => "Seulement « <strong>" + padnmame + "</strong> »",
+			"es": padnmame => "Solamente “<strong>" + padnmame + "</strong>”",
+			"pt": padnmame => "Só “<strong>" + padnmame + "</strong>”"
 		},
 		"": { // USED
 			"en": "",

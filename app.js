@@ -1,5 +1,6 @@
 // INSPIRED BY https://coderwall.com/p/th6ssq/absolute-paths-require
 global.include = path => require(`${__dirname}/${path}`)
+global.rootpath = __dirname
 
 const { app_title_short, app_suite, DB } = include('config')
 const express = require('express')
@@ -12,7 +13,7 @@ const multer = require('multer')
 const upload = multer({ dest: './tmp' })
 const fs = require('fs')
 
-const { execFile } = require('child_process')
+const { spawn } = require('child_process')
 
 const app = express()
 
@@ -25,6 +26,14 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 
 if (process.env.NODE_ENV === 'production') {
 	app.set('trust proxy', 1) // trust first proxy
+	// MAKE SURE ffmpeg IS INSTALLED
+	const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'ffmpeg'])
+	install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
+	install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
+	install_ffmpeg.on('error', err => console.log(err))
+	install_ffmpeg.on('exit', code => {
+		console.log(`ffmpeg installation exited: ${code}`)
+	})
 }
 
 const sessionMiddleware = session({ 
@@ -123,6 +132,10 @@ app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forw
 
 
 // API
+app.route('/apis/:action')
+	.get(routes.dispatch.apis)
+	.post(routes.dispatch.apis)
+
 app.get('/api/skills', routes.api.skills) // TO DO: THIS SHOULD BE DEPRECATED
 app.get('/api/methods', routes.api.methods) // TO DO: THIS SHOULD BE DEPRECATED
 app.route('/api/datasources')

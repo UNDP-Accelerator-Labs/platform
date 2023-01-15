@@ -1107,6 +1107,7 @@
 		template.sections = JSON.stringify(sections)
 		template.full_text = full_text
 		template.medium = 'xlsx'
+		template.imported = true
 
 		const completion = []
 		metafields.filter(d => d.required).forEach(d => {

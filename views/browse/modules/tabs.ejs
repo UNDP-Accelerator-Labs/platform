@@ -50,7 +50,9 @@
 				</button>
 			</a>
 		</li>
-		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.read) && locals.pinboards_list?.length) { %>
+		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.read) 
+			&& locals.pinboards_list?.length) 
+		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
@@ -95,7 +97,7 @@
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %></label>
+					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
 				</div>
 
 				<div id='pinboards-list' class='dropdown'>

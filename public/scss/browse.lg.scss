@@ -23,13 +23,9 @@ div.public-page-header {
 
 				.media-txt {
 					position: absolute;
-					/*left: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
 					left: 120px;
 					width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
-					/*bottom: 60px;*/
 					bottom: 30px;
-					/*max-width: calc((300px * 3 + 15px * 4) / 2);*/
-					/*padding: 30px;*/
 					color: $c-dark-blue;
 
 					span {
@@ -781,7 +777,8 @@ div.browse {
 												border-color: $c-light-blue;
 												color: #FFF;
 											}
-											button.delete.active {
+											button.delete.active,
+											button.unpublish.active {
 												border-color: $c-dark-red;
 												background-color: $c-dark-red;
 											}
@@ -890,7 +887,7 @@ div.browse {
 								.media-txt {
 									display: block;
 									margin-bottom: 10px;
-									font-size: $t-main;
+									font-size: $t-mid-small;
 									line-height: 1.5em;
 									white-space: pre-line;
 
@@ -1370,8 +1367,8 @@ div.browse {
 										overflow: hidden;
 									}
 									button.cancel {
-										border-color: $c-dark-blue;
-										color: $c-dark-blue;
+										border-color: $c-mid-grey;
+										color: $c-mid-grey;
 									}
 								}
 							}
@@ -1600,7 +1597,8 @@ div.browse {
 											border-color: $c-light-blue;
 											color: #FFF;
 										}
-										button.delete.active {
+										button.delete.active,
+										button.unpublish.active {
 											border-color: $c-dark-red;
 											background-color: $c-dark-red;
 										}

@@ -104,8 +104,8 @@ exports.main = (req, res) => {
 
 	DB.conn.tx(t => {
 		return t.one(`
-			SELECT * FROM pads WHERE id = $1
-		;`, [+id]).then(result => {
+			SELECT * FROM pads WHERE id = $1::INT
+		;`, [ id ]).then(result => {
 			console.log('data to generate pdf with')
 			
 			const dir = path.join(__dirname, `../../public/generated/`)

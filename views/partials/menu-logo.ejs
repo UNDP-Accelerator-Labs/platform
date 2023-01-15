@@ -2,11 +2,20 @@
 	// CREATE ALIASES
 	const publicpage = locals.metadata.page.public
 	const modules = locals.metadata.site.modules
+	const activity = locals.metadata.page.activity
+	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
 	const languages = locals.metadata.site.languages
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
 	const uuid = locals.metadata.user.uuid
+
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && !locals.pinboard?.editable && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
@@ -420,7 +429,7 @@
 			</h2>
 		<% } %>
 		
-		<% if (['contribute', 'edit'].includes(locals.metadata.page.activity)) { %>
+		<% if (['contribute', 'edit'].includes(activity)) { %>
 			<div class='save lg hide'>
 				<button><%- vocabulary['save'][language] %></button>
 			</div>
@@ -433,7 +442,7 @@
 		if (rights < d.rights.write) return false
 		else return !['pinboards', 'teams'].includes(d.type)
 	}).forEach(d => { %>		
-		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(locals.metadata.page.activity) 
+		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity) 
 			&& [d.type, d.type.slice(0, -1)].includes(object)) 
 		{ %>
 			<li class='active'>
@@ -454,7 +463,9 @@
 	</menu>
 </nav>
 <nav class='pagination lg'>
-	<% if (locals.metadata.page?.activity === 'browse' || locals.instance_vars?.activity === 'browse') { %><%- include('../browse/modules/pagination') %><% } %>
+	<% if ((activity === 'browse' || locals.instance_vars?.activity === 'browse') && mapscale !== 'full-screen') { %>
+		<%- include('../browse/modules/pagination') %>
+	<% } %>
 </nav>
 
 <script type='text/javascript'>

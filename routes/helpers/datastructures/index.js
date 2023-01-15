@@ -1,15 +1,16 @@
-const { app_title: title, app_description: description, app_languages, modules, metafields, engagementtypes, lazyload, browse_display, DB } = include('config')
+const { app_title: title, app_description: description, app_languages, modules, metafields, engagementtypes, lazyload, browse_display, page_content_limit, DB } = include('config')
 const checklanguage = require('../language').main
 const join = require('../joins')
 const array = require('../array')
 
 exports.sessiondata = _data => {
-	let { uuid, name, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
 	obj.uuid = uuid || null
 	obj.username = name || 'Anonymous user'
+	obj.email = email || null
 	obj.team = team || null
 	obj.collaborators = collaborators || []
 	obj.rights = rights ?? 0
@@ -178,7 +179,8 @@ exports.pagemetadata = (_kwargs) => {
 				lazyload,
 				map: map || false,
 				mscale: mscale || 'contain',
-				display: display || browse_display
+				display: display || browse_display,
+				page_content_limit
 			},
 			menu: {
 				templates, 

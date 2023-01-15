@@ -4,6 +4,7 @@
 
 /* Small devices (landscape phones, 480px and up) */
 @media (max-width: 480px) {
+/*@media (max-width: 480px) and (orientation: portrait) {*/
 	@import 'vars.xs';
 	@import 'navigate.xs';
 	@import 'filter.lg';
@@ -16,11 +17,27 @@
 }
 /* Medium devices (tablets, 768px and up) */
 @media (max-width: 768px) {
-
+	@import 'vars.xs';
+	@import 'navigate.xs';
+	@import 'filter.lg';
+	@import 'map.lg';
+	
+	@import 'pad.xs';
+	@import 'profile.xs';
+	@import 'browse.xs';
+	@import 'mobilize.lg';
 }
 /* Large devices (desktops, 1024px and up) */
 @media (max-width: 1024px) {
-
+	@import 'vars.m';
+	@import 'navigate.m';
+	@import 'filter.lg';
+	@import 'map.lg';
+	
+	@import 'pad.xs';
+	@import 'profile.xs';
+	@import 'browse.m';
+	@import 'mobilize.lg';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -34,4 +51,75 @@
 	@import 'import.lg';
 	@import 'browse.lg';
 	@import 'mobilize.lg';
+}
+
+@media print {
+	@import 'vars.lg';
+	@import 'pad.lg';
+	@page {
+		size: A4 portrait;
+		margin: 20mm 30mm;
+
+		@bottom-left {
+			content: counter(page);
+		}
+	}
+	a::after {
+		content: " (" attr(href) ")";
+	}
+	nav#languages {
+		display: none;
+	}
+	button#expand-nav {
+		display: none;
+	}
+	header {
+		display: none;
+	}
+	.document {
+		border: none !important;
+		width: 100% !important;
+		min-height: unset !important;
+
+		*:empty,
+		*:empty:before {
+			display: none;
+		}
+	}
+
+		/*main {
+			.inner {*/
+				
+
+				.meta-status {
+					display: none;
+				}
+				.meta-info.mobilization-info,
+				.scroll-nav {
+					display: none !important;
+				}
+				.head {
+					a.return {
+						display: none;
+					}
+				}
+/*				.body {*/
+					.input-toolbox {
+						display: none;
+					}
+					section {
+						.required {
+							display: none;
+						}
+					}
+/*				}*/
+				.inset {
+					display: none;
+				}
+		/*	}
+		}
+	}*/
+	footer {
+		display: none;
+	}
 }

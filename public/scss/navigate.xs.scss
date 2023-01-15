@@ -239,6 +239,24 @@ nav.tabs {
 						transition: transform .25s, font-size .25s;
 						text-align: center;
 
+						.count {
+							position: relative;
+							display: inline-block;
+							font-size: $t-small;
+							margin: 0 0 5px 15px;
+							color: $c-light-grey;
+						}
+						.count::before {
+							content: '';
+							position: absolute;
+							vertical-align: middle;
+							height: 20px;
+							width: 0;
+							left: -10px;
+							top: 0;
+							border-left: 1px dotted $c-light-grey;
+						}
+
 						&::after {
 							content: '';
 							position: absolute;
@@ -257,6 +275,10 @@ nav.tabs {
 						font-size: $t-small;
 						line-height: 1.5em;
 						transform: translateY(-5px);
+
+						&::after {
+							top: 2px;
+						}
 					}
 
 					.dropdown {

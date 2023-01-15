@@ -388,7 +388,8 @@ div.browse {
 												border-color: $c-light-blue;
 												color: #FFF;
 											}
-											button.delete.active {
+											button.delete.active,
+											button.unpublish.active {
 												border-color: $c-dark-red;
 												background-color: $c-dark-red;
 											}
@@ -474,7 +475,7 @@ div.browse {
 								.media-txt {
 									display: block;
 									margin-bottom: 10px;
-									font-size: $t-main;
+									font-size: $t-mid-small;
 									line-height: 1.5em;
 									white-space: pre-line;
 
@@ -926,8 +927,8 @@ div.browse {
 										overflow: hidden;
 									}
 									button.cancel {
-										border-color: $c-dark-blue;
-										color: $c-dark-blue;
+										border-color: $c-mid-grey;
+										color: $c-mid-grey;
 									}
 								}
 							}
@@ -1141,7 +1142,8 @@ div.browse {
 											border-color: $c-light-blue;
 											color: #FFF;
 										}
-										button.delete.active {
+										button.delete.active,
+										button.unpublish.active {
 											border-color: $c-dark-red;
 											background-color: $c-dark-red;
 										}

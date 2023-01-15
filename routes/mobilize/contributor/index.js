@@ -99,7 +99,7 @@ exports.main = async (req, res) => {
 }
 
 function check_authorization (_kwargs) {
-	const conn = _kwargs.connection || DB.conn
+	const conn = _kwargs.connection || DB.general
 	const { id, uuid, rights } = _kwargs
 
 	if (id) {

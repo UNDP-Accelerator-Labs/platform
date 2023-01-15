@@ -101,7 +101,7 @@
 	) { %>
 		<nav class='tabs <% if (mapscale === "full-screen") { %>no-bg<% } %>'>
 			<div class='inner'>
-				<div class='xs'>
+				<div class='xs sm m'>
 					<button class='space'>Spaces</button>
 					<div class='dropdown'>
 						<%- include('./modules/tabs.ejs') %>
@@ -118,10 +118,10 @@
 			</div>
 			<script type='text/javascript'>
 				if (!mediaSize) var mediaSize = getMediaSize()
-				if (mediaSize === 'xs') {
-					const tabs = d3.select('nav.tabs .inner .xs')
+				if (['xs', 'sm', 'm'].includes(mediaSize)) {
+					const tabs = d3.select(`nav.tabs .inner .${mediaSize}`)
 					let activetab = d3.select('.dropdown menu li.active')
-					const button = d3.select('nav.tabs .inner .xs button.space')
+					const button = d3.select(`nav.tabs .inner .${mediaSize} button.space`)
 					
 					if (activetab.select('input')?.node()) {
 						button.html(activetab.select('input').node().value)
@@ -335,7 +335,7 @@
 <% } %>
 
 <footer>
-	<nav class='pagination xs'>
+	<nav class='pagination xs sm m'>
 		<% if (locals.metadata.page.activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
 	</nav>
 	<% if (pagedisplay === 'slideshow') { %>
@@ -457,9 +457,6 @@
 					})
 				metainfo.addElems('div', 'meta meta-date')
 					.html(d => {
-						console.log(d.start_date)
-						console.log(d.end_date)
-
 						if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)
 						else if (d.start_date) {
 							if (d.end_date) {
@@ -481,7 +478,7 @@
 							if (d.editable && !d.owner) opts.push({ node: 'button', type: 'button', classname: 'delete', label: '<%- vocabulary["delete"][language] %>', fn: deleteArticles })
 						<% } %>
 						<% if (object === 'pads') { %>
-							opts.push({ node: 'button', type: 'button', classname: 'download', label: '<%- vocabulary["download"][language] %>', disabled: d.status < 2, fn: downloadPads })
+							opts.push({ node: 'button', type: 'button', classname: 'download', label: '<%- vocabulary["download"][language] %>', name: 'pads', value: d.id, disabled: d.status < 2, fn: setDownloadOptions })
 						<% } %>
 						// CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
 						<% if (['files', 'pads'].includes(object)) { %>
@@ -497,14 +494,18 @@
 
 								if (publish_dropdown.length > 0) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'button', value: d.id, disabled: !(d.editable && [1, 2].includes(d.status) && (d.available_publications === undefined || d.available_publications > 0)), classname: 'publish', label: '<%- vocabulary["publish"][language] %>', dropdown: publish_dropdown, inputs: [{ name: 'id', value: d.id }, { name: 'title', value: d.title }] })
 								
-								if (d.status > 1) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
+								// if (d.status > 1) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
+								
+								if (d.status > 1) opts.push({ node: 'button', type: 'button', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', fn: unpublishArticles })
 							}
 						<% } else if (object === 'templates') { %>
 							if (d.editable) {
 								if (d.status === 1) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'publish', label: '<%- vocabulary["publish"][language] %>', inputs: [{ name: 'status', value: 2 }] })
 
 								<% if (space !== 'reviews') { %>
-									if (d.status > 1 && d.retractable) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
+									// if (d.status > 1 && d.retractable) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
+
+									if (d.status > 1 && d.retractable) opts.push({ node: 'button', type: 'button', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', fn: unpublishArticles })
 								<% } %>
 							}
 						<% } else if (object === 'reviews') { %>
@@ -543,7 +544,7 @@
 							if (d.status === 1) {
 								opts.push({ node: 'button', type: 'button', classname: 'copy', label: '<%- vocabulary["copy link"][language] %>', value: d.id, inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }], fn: copyLink })
 							}
-							opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', fn: download })
+							opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', name: 'mobilizations', value: d.id, fn: setDownloadOptions })
 							if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
@@ -567,7 +568,7 @@
 							.classed(d.classname.toLowerCase(), true)
 							.attrs({
 								'type': c => c.type, 
-								'name': 'id',
+								'name': c => c.name || 'id',
 								'value': c => c.value,
 								'disabled': c => c.disabled || null 
 							}).html(c => c.label)
@@ -1229,15 +1230,44 @@
 						.html('<%- vocabulary["add to collection"][language] %>')
 				<% } %>
 			}.bind(this),
+			unpublish: function (_sel) {
+				const form = _sel.addElems('form', 'unpublish hide')
+					.attrs({
+						'method': 'GET',
+						'action': '/publish/<%- object %>'
+					})
+				form.addElems('input', 'pad-id')
+					.attrs({
+						'type': 'hidden',
+						'name': 'id',
+						'value': d => d.id
+					})
+				form.addElems('input', 'pad-status')
+					.attrs({
+						'type': 'hidden',
+						'name': 'status',
+						'value': 1
+					})
+
+				form.addElems('button', 'opt', d => {
+					const opts = []
+					opts.push({ type: 'button', label: '<%- vocabulary["confirm"][language] %>', fn: confirmRemoval })
+					opts.push({ type: 'button', label: '<%- vocabulary["cancel"][language] %>', fn: unpublishArticles })
+					return opts
+				}).attrs({
+					'class': d => d.label.toLowerCase(),
+					'type': d => d.type,
+					'value': d => d.value
+				}).html(d => d.label)
+					.on('click', function (d) { d.fn ? d.fn.call(this, 'unpublish') : null })
+			}.bind(this),
 			delete: function (_sel) {
-				// TO DO: CHECK IF MULTIPLE PADS ARE FLAGGED FOR DELETION
-				// IF SO: OPEN MODAL TO MAKE SURE ALL SHOULD BE DELETED
-				const form = _sel.addElems('form')
+				const form = _sel.addElems('form', 'delete hide')
 					.attrs({
 						'method': 'GET',
 						'action': '/delete/<%- object %>'
 					})
-				form.addElems('input')
+				form.addElems('input', 'pad-id')
 					.attrs({
 						'type': 'hidden',
 						'name': 'id',
@@ -1246,7 +1276,7 @@
 
 				form.addElems('button', 'opt', d => {
 					const opts = []
-					opts.push({ type: 'button', label: '<%- vocabulary["confirm"][language] %>', fn: confirmDeletion })
+					opts.push({ type: 'button', label: '<%- vocabulary["confirm"][language] %>', fn: confirmRemoval })
 					opts.push({ type: 'button', label: '<%- vocabulary["cancel"][language] %>', fn: deleteArticles })
 					return opts
 				}).attrs({
@@ -1254,7 +1284,7 @@
 					'type': d => d.type,
 					'value': d => d.value
 				}).html(d => d.label)
-					.on('click', function (d) { d.fn ? d.fn.call(this) : null })
+					.on('click', function (d) { d.fn ? d.fn.call(this, 'delete') : null })
 			}.bind(this),
 			contributor: function (_sel) { // THIS DOES NOT SEEM TO BE USED
 				const name = _sel.addElems('div', 'media media-name')
@@ -1284,7 +1314,7 @@
 
 				_sel.addElems('div', 'meta meta-country')
 				.html(d => d.countryname)
-			}
+			}.bind(this)
 		}
 	}
 
@@ -1319,6 +1349,7 @@
 			render.engagement(entry.foot)
 			render.pin(entry.foot)
 			render.delete(entry.outer)
+			render.unpublish(entry.outer)
 		} else if (display === 'slideshow') {
 			render.img(entry.head)
 			render.owner(entry.metagroup)
@@ -1341,6 +1372,7 @@
 			render.stats(entry.foot)
 			render.pin(entry.inner)
 			render.delete(entry.outer)
+			render.unpublish(entry.outer)
 		}		
 	}
 
@@ -1479,9 +1511,20 @@
 		const article = sel.findAncestor('article')
 		article.selectAll('button.delete')
 			.toggleClass('active')
-		article.select('div.outer').toggleClass('expand')
+		const outer = article.select('div.outer').toggleClass('expand')
+		outer.select('form.unpublish').classed('hide', true)
+		outer.select('form.delete').toggleClass('hide')
 	}
-	async function confirmDeletion () {
+	function unpublishArticles () {
+		const sel = d3.select(this)
+		const article = sel.findAncestor('article')
+		article.selectAll('button.unpublish')
+			.toggleClass('active')
+		const outer = article.select('div.outer').toggleClass('expand')
+		outer.select('form.delete').classed('hide', true)
+		outer.select('form.unpublish').toggleClass('hide')
+	}
+	async function confirmRemoval (action) {
 		const sel = d3.select(this)
 		const datum = d3.select(this.parentNode).datum()
 		const form = this.form
@@ -1489,18 +1532,23 @@
 
 		if (flagged.size() === 1) form.submit()
 		else {
-			const message = '<%- vocabulary["what pads to delete"][language] %>'
+			let message = ''
+			if (action === 'delete') message = '<%- vocabulary["what pads to delete"][language] %>'
+			else if (action === 'unpublish') message = '<%- vocabulary["what pads to unpublish"][language] %>'
+			
 			const opts = [
 				{ node: 'button', type: 'button', label: '<%- vocabulary["all selected"][language] %>', resolve: _ => d3.selectAll('article .outer.expand').data().map(d => d.id) },
 				{ 
 					node: 'button', 
 					type: 'button', 
 					label: Function(`"use strict";return (<%- vocabulary["only pad"][language] %>)`)()(datum.title),
-					resolve: [datum.id] 
+					resolve: [ datum.id ]
 				}
 			]
-			const deletion = await renderPromiseModal({ message: message, opts: opts })
-			d3.select(form).addElems('input', null, deletion)
+			const removal = await renderPromiseModal({ message, opts })
+
+			d3.select(form)
+			.addElems('input', 'pad-id', removal)
 				.attrs({
 					'type': 'hidden',
 					'name': 'id',
@@ -1509,111 +1557,6 @@
 			form.submit()
 		}
 	}
-
-	async function downloadPads (source) {
-		alert('sorry this feature is not yet available')
-		// if (source !== 'bookmarks') source = source.datum().id // IF A SINGLE SOLUTION, EXTRACT id
-		// const headline = source === 'bookmarks' ? vocabulary['download all']['<%- language %>'] : vocabulary['download']['<%- language %>']
-		// const opts = [
-		// 	{ node: 'button', type: 'button', label: 'raw data', resolve: 'raw' }, 
-		// 	// { node: 'button', type: 'button', label: 'as .pdf', resolve: 'pdf' } // TO DO
-		// ]
-		// const format = await renderPromiseModal({ headline: headline, opts: opts })
-		// const res = await POST(`/download/${format}`, { source: source }, false)
-
-		// const a = document.createElement('a')
-		// res.blob().then(b => {
-		// 	var url = window.URL.createObjectURL(b)
-		// 	a.href = url
-		// 	a.download = `solutions_${(new Date(Date.now())).display_for_query()}.zip`
-		// 	a.click()
-		// 	window.URL.revokeObjectURL(url)
-		// 	a.remove()
-		// })
-	}
-
-	async function download (id) { // THIS IS THE FUNCTION FOR THE MOBILIZATION
-		console.log(id)
-		// let headline = vocabulary['download all']['<%- language %>']
-		
-		// if (!['bookmarks', 'private'].includes(source)) {
-		// 	source = source.datum().id // IF A SINGLE SOLUTION, EXTRACT id
-		// 	vocabulary['download']['<%- language %>']
-		// }
-		// const opts = [
-		// 	{ node: 'button', type: 'button', label: 'raw data', resolve: 'raw' }, 
-		// 	// { node: 'button', type: 'button', label: 'as .pdf', resolve: 'pdf' } // TO DO
-		// ]
-		// const format = await renderPromiseModal({ headline: headline, opts: opts })
-		const res = await POST(`/download/mobilization`, { id: id }, false)
-		const a = document.createElement('a')
-		res.blob().then(b => {
-			var url = window.URL.createObjectURL(b)
-			a.href = url
-			a.download = `mobilization_${id}_${(new Date(Date.now())).display_for_query()}.zip`
-			a.click()
-			window.URL.revokeObjectURL(url)
-			a.remove()
-		})
-	}
-
-	// THIS IS FOR PUBLISHING FROM THE PRIVATE VIEW
-
-	// async function createXLS () {
-	// 	const pads = d3.selectAll('.pad.flagged')
-	// 	const solutions = pads.data()
-
-	// 	// STRUCTURE OF THE EXCEL: id, title, contributor, contribution_date, full_text, location, sdgs * 5, tags * 5, images
-	// 	const imgs = solutions.map(d => {
-	// 		return d.media.filter(c => ['img', 'mosaic'].includes(c.type) && (c.src || c.srcs))
-	// 		.map(c => {
-	// 			if (c.srcs) return c.srcs
-	// 			else return c.src
-	// 		}).flat()
-	// 	})
-
-	// 	const xlsdata = [[
-	// 		'id', 
-	// 		'title', 
-	// 		'contributor', 
-	// 		'contribution_date', 
-	// 		'full_text', 
-	// 		'location_JSON', 
-	// 		d3.range(5).map((d, i) => `SDG_tag_${i + 1}`),
-	// 		d3.range(5).map((d, i) => `thematic_area_tag_${i + 1}`),
-	// 		d3.range(d3.max(imgs, d => d.length)).map((d, i) => `image_${i + 1}`)
-	// 	].flat()]
-	// 	solutions.forEach(d => {
-	// 		const imgIdx = d.media.filter(c => ['img', 'mosaic'].includes(c.type) && (c.src || c.srcs))
-	// 		.map(c => {
-	// 			if (c.srcs) return c.srcs
-	// 			else return c.src
-	// 		}).flat()
-	// 		.map(c => `file: img-${imgs.flat().indexOf(c) + 1}`)
-			
-	// 		xlsdata.push([
-	// 			d.id.toString(), 
-	// 			d.title, 
-	// 			d.ownername, 
-	// 			d.date.toString(), 
-	// 			d.full_text, 
-	// 			JSON.stringify(d.location.centerpoints || d.location.centerpoint), 
-	// 			d3.range(5).map(c => d.sdgs[c] ? d.sdgs[c].toString() : ''), 
-	// 			d3.range(5).map(c => d.tags[c] ? d.tags[c].toString() : ''),
-	// 			d3.range(d3.max(imgs, c => c.length)).map(c => imgIdx[c] ? imgIdx[c].toString() : '')
-	// 		].flat())
-	// 	})
-	// 	const res = await POST(`/export`, { data: xlsdata, imgs: imgs.flat() }, false)
-
-	// 	const a = document.createElement('a')
-	// 	var fileName = res.blob().then(b => {
-	// 		var url = window.URL.createObjectURL(b)
-	// 		a.href = url
-	// 		a.download = `solutions_${(new Date(Date.now())).display_for_query()}.zip`
-	// 		a.click()
-	// 		window.URL.revokeObjectURL(url)
-	// 	})
-	// }
 
 	<% if (pagedisplay === 'slideshow') { %>
 		window.addEventListener('keydown', function (e) {

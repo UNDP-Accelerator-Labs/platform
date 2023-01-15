@@ -26,25 +26,6 @@ exports.main = async (req, res) => {
 
 		// GET LOCATIONS, ACCORDING TO FILTERS
 		// THIS IS CURRENTLY NOT USED
-		// batch.push(t.any(`
-		// 	SELECT f.location, f.status FROM files f
-		// 	LEFT JOIN pads p
-		// 		ON f.source = p.id
-		// 	LEFT JOIN mobilization_contributions mob
-		// 		ON p.id = mob.pad
-		// 	WHERE TRUE
-		// 		$1:raw $2:raw
-		// ;`, [full_filters, f_space]))
-		
-		// GET THE CENTERPOINT FOR THE MAPPER, IN CASE THERE ARE NO SOLUTIONS 
-		// (THE MAPS AUTO-CENTERS ON THE LOCATION OF THE CONTRIBUTOR)
-		// THIS IS CURRENTLY NOT USED
-		// batch.push(t.one(`
-		// 	SELECT cp.lat, cp.lng FROM centerpoints cp
-		// 	INNER JOIN contributors c
-		// 		ON c.country = cp.country
-		// 	WHERE c.uuid = $1
-		// ;`, [uuid]))
 
 		return t.batch(batch)
 		.then(async results => {

@@ -88,7 +88,7 @@ input:-webkit-autofill:active {
   /*background-color: rgba(255,255,255,.75);*/
   background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75) 3px, rgba(229, 229, 229, 0.75) 3px, rgba(229, 229, 229, 0.75) 6px);
   animation: fade-in 0.25s;
-  z-index: 9999;
+  z-index: 99999;
 }
 .screen .modal .close {
   float: right;

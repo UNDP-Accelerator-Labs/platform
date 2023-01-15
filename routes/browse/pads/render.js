@@ -10,7 +10,7 @@ const filter = require('./filter').main
 exports.main = async (req, res) => { 
 	let { mscale, display, pinboard } = req.query || {}
 	const { instance } = req.params || {}
-	if (instance) pinboard = res.locals.instance_vars.pinboard
+	if (instance) pinboard = res.locals.instance_vars?.pinboard
 	
 	if (req.session.uuid) { // USER IS LOGGED IN
 		var { uuid, rights, collaborators, public } = req.session || {}

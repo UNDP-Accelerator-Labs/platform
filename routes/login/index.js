@@ -182,7 +182,7 @@ exports.process = (req, res) => { // REROUTE
 								res.redirect('/login')
 							} else {
 								return t.oneOrNone(`
-									SELECT u.uuid, u.rights, u.name, u.iso3, c.lng, c.lat, c.bureau,
+									SELECT u.uuid, u.rights, u.name, u.email, u.iso3, c.lng, c.lat, c.bureau,
 
 									CASE WHEN u.language IN ($1:csv)
 										THEN u.language

@@ -93,6 +93,7 @@
 					scroll-snap-type: x mandatory;
 					overflow: scroll;
 					margin-top: 0;
+					padding-bottom: 75px;
 					grid-gap: 0;
 
 					article {
@@ -121,34 +122,21 @@
 								a {
 									color: $c-light-blue;
 								}
-
-								/*.media-img {
-									margin: 0;
-
-									a {
-										display: block;
-										position: relative;
-										width: 100%;
-										height: 100%;
-
-										img {
-											display: block;
-											width: 300px;
-											background-color: $c-light-2;
-											height: 200px;
-											color: $c-mid-blue;
-											font-size: $t-small;
-											line-height: 200px;
-											text-align: center;
-										}
-									}
-								}*/
 																 
 								.media-title {
 									a {
 										text-decoration: none;
 										color: $c-dark-blue;
 										font-weight: 700;
+									}
+								}
+								.media-txt {
+									font-size: $t-mid-small;
+									line-height: 1.5em;
+									white-space: pre-line;
+
+									a {
+										color: $c-dark-grey;
 									}
 								}
 							}
@@ -177,6 +165,59 @@
 					}
 					article:hover {
 						background-color: transparent;
+					}
+					nav.pagination {
+						position: fixed;
+						bottom: 0;
+						margin: 0;
+						padding: 15px 0;
+						border-top: 1px dotted $c-light-grey;
+						background-color: rgba(255,255,255,.9);
+
+						.caroussel {
+							position: relative;
+							margin-bottom: 5px;
+
+							.dots {
+								width: calc(100% - 60px);
+								padding: 0 30px;
+								text-align: center;
+
+								.dot {
+									height: 15px;
+									width: 15px;
+									margin: 0 2.5px;
+									background-color: rgba(0,0,0,.1);
+									border-radius: 50%;
+									display: inline-block;
+									transition: background-color .25s ease;
+									cursor: pointer;
+								}
+								.dot.highlight {
+									background-color: $c-mid-blue;
+								}
+							}
+						}
+
+						ul {
+							text-align: center;
+
+							li {
+								display: inline-block;
+								margin: 0 5px;
+
+								a {
+									color: $c-light-blue;
+									text-decoration: none;
+									font-size: $t-mid-small;
+									cursor: pointer;
+								}
+								a.active {
+									font-weight: 700;
+									text-decoration: underline;
+								}
+							}
+						}
 					}
 				}
 			}

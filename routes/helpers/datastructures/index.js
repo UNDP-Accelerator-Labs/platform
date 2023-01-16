@@ -3,6 +3,8 @@ const checklanguage = require('../language').main
 const join = require('../joins')
 const array = require('../array')
 
+if (!exports.legacy) exports.legacy = {}
+
 exports.sessiondata = _data => {
 	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
 
@@ -192,8 +194,49 @@ exports.pagemetadata = (_kwargs) => {
 		return obj
 	}).catch(err => console.log(err))
 }
+exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIONS MAPPING PLATFORM
+	const conn = _kwargs.connection || DB.conn
+	const { data } = _kwargs
 
+	const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
+	if (other_metadata.length > 0) {
+		if (Array.isArray(data)) {
+			return Promise.all(data.map(d => {
+				return conn.any(`
+					SELECT type, name, value FROM metafields
+					WHERE pad = $1::INT
+				;`, [ d.id ])
+				.then(meta => {
+					const nesting = array.nest.call(meta, { key: c => `${c.type}-${c.name}`, keep: ['type', 'name'] })
+					const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
 
+					d.publishable = (d.status >= 1 && has_metadata) || false
+					return d
+				}).catch(err => console.log(err))
+			}))
+		} else {
+			return conn.any(`
+				SELECT type, name, value FROM metafields
+				WHERE pad = $1::INT
+			;`, [ data.id ])
+			.then(meta => {
+				const nesting = array.nest.call(meta, { key: d => `${d.type}-${d.name}`, keep: ['type', 'name'] })
+				const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
+
+				data.publishable = (data.status >= 1 && has_metadata) || false
+				return data
+			}).catch(err => console.log(err))
+		}
+	} else {
+		return new Promise(resolve => {
+			if (Array.isArray(data)) {
+				data.forEach(d => d.publishable = (d.status >= 1 || false))
+			} else data.publishable = data.status >= 1 || false
+
+			resolve(data)
+		})
+	}
+}
 
 // THE REST IS NOT USED FOR NOW
 exports.pagedata = (_req, _data) => {

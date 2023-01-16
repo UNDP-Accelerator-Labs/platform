@@ -68,10 +68,11 @@ exports.unique = function (kwargs = {}) {
 	const arr = []
 	this.forEach(d => {
 		if (!key) {
-			if (arr.indexOf(d) === -1) arr.push(d)
+			if (!arr.includes(d)) arr.push(d)
 		} else {
-			if (onkey) { if (arr.map(c => c).indexOf(d[key]) === -1) arr.push(d[key]) }
-			else { if (arr.map(c => c[key]).indexOf(d[key]) === -1) arr.push(d) }
+			const groupby = typeof key === 'function' ? key(d) : d[key]
+			if (onkey) { if (!arr.map(c => c).includes(groupby)) arr.push(groupby) }
+			else { if (!arr.map(c => c[key]).includes(groupby)) arr.push(d) }
 		}
 	})
 	return arr

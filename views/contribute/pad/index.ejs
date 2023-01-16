@@ -19,8 +19,8 @@
 
 <% if (locals.data?.status >= 2 && !locals.data?.is_review) { %>
 	<!-- TO DO: FINISH THIS -->
-	<meta property='og:title' content='<%- locals.data.title %>' />
-	<meta property='og:type' content='article' />
+	<!-- <meta property='og:title' content='<%- locals.data.title %>' /> -->
+	<!-- <meta property='og:type' content='article' /> -->
 	<!-- <meta property='og:url' content='https://www.imdb.com/title/tt0117500/' /> -->
 	<!-- <meta property='og:image' content='https://ia.media-imdb.com/images/rock.jpg' /> -->
 <% } %>
@@ -36,7 +36,7 @@
 
 <script type="text/javascript">
 	// INIT THE SOCKET
-	const socket = io()
+	// const socket = io()
 	// const socket = io.connect('localhost:3000', {
 	// 	reconnection: true,
 	// 	reconnectionDelay: 1000,
@@ -229,6 +229,7 @@
 						<form method='GET' action='/publish/<%- `${object}s` %>'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
 							<% if ((locals.data?.status || 0) < 1 
+								|| ((locals.data?.status || 0) === 2 && !locals.data?.publishable)
 								|| (locals.data?.status || 0) === 3 
 								|| (object === 'review' && (locals.data?.status || 0) === 2)) 
 							{ %>
@@ -287,7 +288,7 @@
 													</button>
 												</li>
 											<% } %>
-											<% if (locals.data?.status <= 2) { %>
+											<% if (locals.data?.status <= 2 && locals.data?.publishable) { %>
 												<li class='opt'>
 													<button type='submit' name='status' value='3'>
 														<%- vocabulary['externally'][language] %>
@@ -331,29 +332,32 @@
 							</script>
 						</form>
 						<% if (!publicpage) { %>
-							<form class='lg' method='POST' action='/generate/pdf'>
-								<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
-								<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
-								<!-- TO DO: THIS DOES NOT WORK WHEN THE PAD HAS JUST BEEN CREATED -->
-								<!-- AND MAKE SURE ALL FIELDS ARE CLEARED BEFORE SHOWING THIS -->
-								<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
-								<% if (locals.data?.status === 0 || !locals.data?.status) { %>
-									<button type='submit' class='generate-pdf' disabled>
-										<%- vocabulary['generate file'][language]('.pdf') %>
-									</button>
-								<% } else if (locals.data?.status > 0) { %>
-									<button type='submit' class='generate-pdf'>
-										<%- vocabulary['generate file'][language]('.pdf') %>
-									</button>
-								<% } %>
-							</form>
+							<!-- TO DO: THIS DOES NOT WORK WHEN THE PAD HAS JUST BEEN CREATED -->
+							<!-- AND MAKE SURE ALL FIELDS ARE CLEARED BEFORE SHOWING THIS -->
+							<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
+							<!-- TO DO: REMOVE if (false) TO REACTIVATE THIS -->
+							<% if (false) { %>
+								<form class='lg' method='POST' action='/generate/pdf'>
+									<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
+									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
+									<% if (locals.data?.status === 0 || !locals.data?.status) { %>
+										<button type='submit' class='generate-pdf' disabled>
+											<%- vocabulary['generate file'][language]('.pdf') %>
+										</button>
+									<% } else if (locals.data?.status > 0) { %>
+										<button type='submit' class='generate-pdf'>
+											<%- vocabulary['generate file'][language]('.pdf') %>
+										</button>
+									<% } %>
+								</form>
+							<% } %>
 						<% } %>
 					</div>
 				</div>
 			<% } %>
 
 			<!-- IF THE PAD IS A CONTRIBUTION TO A MOBILIZATION, DISPLAY THE MOBILIZATION INFORMATION -->
-			<% if (locals.display_mobilization && editing) { %>
+			<% if (locals.display_mobilization && !locals.data?.id && editing) { %>
 				<div class='meta-info mobilization-info'>
 					<h1><%- locals.display_mobilization.title %></h1>
 					<p><%- locals.display_mobilization.description %></p>
@@ -381,21 +385,22 @@
 			<% if (!(publicpage && editing && templated)) { %>
 				<div class='head'>
 					<% if (object !== 'review' && !locals.data?.is_review) { %>
+						<% if (locals.metadata.page.referer?.includes('browse/pads')) { %>
+							<a href='<%- locals.metadata.page.referer %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+						<% } else { %>
+							<a href='<%- `/${language}/browse/pads/private` %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+						<% } %>
 						<% if (editing) { %>
-							<% if (activity === 'edit') { %>
-								<a href='<%- locals.metadata.page.referer || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][language] %></a>
-							<% } %>
 							<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
 						<% } else { %>
-							<a href='<%- locals.metadata.page.referer || "/en/browse/pads/private" %>' class='return'><%- vocabulary['back to browse'][language] %></a>
 							<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'></div>
-							<!-- TO DO: FIX THIS: FOR SOME REASON NOTHING WORKS HERE WHEN IN REVIEW MODE -->
-							<% if (!anonymized) { %>
-								<% if (activity === 'edit') { %>
-									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
-								<% } else { %>
-									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
-								<% } %>
+						<% } %>
+						<!-- TO DO: FIX THIS: FOR SOME REASON NOTHING WORKS HERE WHEN IN REVIEW MODE -->
+						<% if (!anonymized) { %>
+							<% if (activity === 'edit') { %>
+								<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
+							<% } else { %>
+								<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
 							<% } %>
 						<% } %>
 					<% } else { %><!-- IF THE PAD IS A REVIEW, SO THE TITLE ONLY NEEDS TO BE THE REVIEWER ID -->
@@ -702,7 +707,7 @@
 		}).on('mousedown', function () {
 			this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling || null
 		}).on('click', function () {
-			const data = { level: 'meta', name: d.label, required: d.required } 
+			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required } 
 			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
@@ -804,7 +809,7 @@
 	function getStatus () {
 		const completion = []
 		
-		const title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node()).innerText
+		const title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || '<%- vocabulary["missing title"][language] %>'
 		completion.push(title?.trim()?.length > 0)
 
 		let metacompletion = JSON.parse(JSON.stringify(metafields)).filter(d => d.required).map(d => d.label)
@@ -866,7 +871,7 @@
 		const content = {}
 		// COLLECT TITLE
 		// let title = head.select('.title').node().innerText
-		let title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node()).innerText
+		let title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || '<%- vocabulary["missing title"][language] %>'
 		if (title.length > 99) title = `${title.slice(0, 98)}…`
 		// MAYBE INCLUDE ALERT IF title IS EMPTY
 		// COLLECT ALL MEDIA

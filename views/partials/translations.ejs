@@ -1888,11 +1888,11 @@
 			"es": "Incluir las ubicaciones",
 			"pt": "Incluir os locais"
 		},
-		"include external resources": { // USED
-			"en": "Include external resources",
-			"fr": "Inclure les resources externes",
-			"es": "Incluir los recursos externos",
-			"pt": "Incluir os recursos externos"
+		"include metafields": { // USED
+			"en": "Include other metadata (attachments, metatext, etc.)",
+			"fr": "Inclure les autres métadonnées (pièces jointes, métatexte, etc.)",
+			"es": "Incluir los otros metadatos (archivos adjuntos, metatexto, etc.)",
+			"pt": "Incluir os outros metadados (anexos, metatexto, etc.)"
 		},
 		"include engagement": { // USED
 			"en": "Include engagement metrics",
@@ -1917,6 +1917,12 @@
 			"fr": "champ d’intégration vide",
 			"es": "campo de incrustación vacío",
 			"pt": "campo de incorporação vazio"
+		},
+		"missing title": { // USED
+			"en": "Missing title",
+			"fr": "Titre manquant",
+			"es": "Título faltante",
+			"pt": "Título ausente"
 		},
 		"missing image": {
 			"en": "Missing image.",
@@ -2030,7 +2036,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected."
 				if (type === 'location') return "<strong>Direct input</strong> or <strong>text</strong> expected."
 				if (type === 'tag') return "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected."
-				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Direct input</strong> or <strong>text</strong> expected."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-attachment-btn.svg'><strong>Direct input</strong> or <strong>text</strong> expected."
 				if (type === 'repeat') return "<strong>Direct input</strong> expected."
 			},
 			"fr": type => {
@@ -2041,7 +2047,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Saisie directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue."
 				if (type === 'location') return "<strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
 				if (type === 'tag') return "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu."
-				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-attachment-btn.svg'><strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
 				if (type === 'repeat') return "<strong>Saisie directe</strong> attendu."
 			},
 			"es": type => {
@@ -2052,7 +2058,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados."
 				if (type === 'location') return "<strong>Entrada directa</strong> o <strong>texto</strong> esperado."
 				if (type === 'tag') return "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados."
-				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada directa</strong> o <strong>texto</strong> esperados."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-attachment-btn.svg'><strong>Entrada directa</strong> o <strong>texto</strong> esperados."
 				if (type === 'repeat') return "<strong>Entrada directa</strong> esperada."
 			},
 			"pt": type => {
@@ -2063,7 +2069,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
 				if (type === 'location') return "<strong>Entrada direta</strong> ou <strong>texto</strong> esperado."
 				if (type === 'tag') return "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
-				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada direta</strong> ou <strong>texto</strong> esperados."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-attachment-btn.svg'><strong>Entrada direta</strong> ou <strong>texto</strong> esperados."
 				if (type === 'repeat') return "<strong>Entrada direta</strong> esperada."
 			}
 			// "OTHER LANGUAGE": type => {
@@ -2638,6 +2644,12 @@
 			"fr": "Cliquer pour chercher et ajouter des emplacements",
 			"es": "Haga clic para buscar y agregar ubicaciones",
 			"pt": "Clique para pesquisar e adicionar locais"
+		},
+		"click to add attachment": {
+			"en": "Click to add attachment",
+			"fr": "Cliquer pour attacher un document",
+			"es": "Haga clic para agregar un archivo adjunto",
+			"pt": "Clique para adicionar um anexo"
 		},
 		"click to see options": {
 			"en": "Click to see options",

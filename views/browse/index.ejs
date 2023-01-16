@@ -490,7 +490,7 @@
 								<% } else { %>
 									if (d.status === 1) publish_dropdown.push({ name: 'status', value: 2, classname: 'internally', label: '<%- vocabulary["internally"][language] %>' })
 									// TO DO: MAKE SURE THIS IS ONLY POSSIBLE WHEN ALL META FIELDS ARE FILLED OUT
-									if (d.status <= 2) publish_dropdown.push({ name: 'status', value: 3, classname: 'externally', label: '<%- vocabulary["externally"][language] %>' })
+									if (d.status <= 2 && d.publishable) publish_dropdown.push({ name: 'status', value: 3, classname: 'externally', label: '<%- vocabulary["externally"][language] %>' })
 								<% } %>
 
 								if (publish_dropdown.length > 0) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'button', value: d.id, disabled: !(d.editable && [1, 2].includes(d.status) && (d.available_publications === undefined || d.available_publications > 0)), classname: 'publish', label: '<%- vocabulary["publish"][language] %>', dropdown: publish_dropdown, inputs: [{ name: 'id', value: d.id }, { name: 'title', value: d.title }] })
@@ -663,7 +663,7 @@
 							<% } %>
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					})
 				.addElems('img', 'vignette')
 					.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })
@@ -763,7 +763,7 @@
 							<% } %>
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).addElems('h1')
 				title.addElems('img')
 					.attr('src', d => {
@@ -813,7 +813,7 @@
 							<% } %>
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).html(d => {
 						if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[<%- vocabulary["read more"][language] %>]</span>`
 						else return d.txt
@@ -844,7 +844,7 @@
 						'href': d => {
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
 							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).html(d => d.source_title)
 
 				_sel.addElems('div', 'meta meta-forward', d => d.source && d.is_forward ? [d] : [])
@@ -855,7 +855,7 @@
 						'href': d => {
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
 							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).html(d => d.source_title)
 
 				_sel.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
@@ -866,7 +866,7 @@
 						'href': d => {
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
 							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).html(d => d.source_title)
 
 				_sel.addElems('div', 'meta meta-child', d => d.source && d.is_child ? [d] : [])
@@ -877,7 +877,7 @@
 						'href': d => {
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
 							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).html(d => d.source_title)
 
 				_sel.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
@@ -897,8 +897,8 @@
 					.html('<i><%- vocabulary["template"][language](false, false) %>:</i> ')
 				.addElems('a')
 					.attrs({ 
-						'href': d => `../../view/template?id=${d.template}`,
-						'target': '_blank'
+						'href': d => `../../view/template?id=${d.template}`
+						//'target': '_blank'
 					}).html(d => d.template_title?.length > 25 ? `${d.template_title.slice(0, 25)}…` : d.template_title)
 
 				<% if (object === 'reviews' && space === 'private') { %>
@@ -1252,11 +1252,11 @@
 
 				form.addElems('button', 'opt', d => {
 					const opts = []
-					opts.push({ type: 'button', label: '<%- vocabulary["confirm"][language] %>', fn: confirmRemoval })
-					opts.push({ type: 'button', label: '<%- vocabulary["cancel"][language] %>', fn: unpublishArticles })
+					opts.push({ type: 'button', class: '<%- vocabulary["confirm"]["en"] %>', label: '<%- vocabulary["confirm"][language] %>', fn: confirmRemoval })
+					opts.push({ type: 'button', class: '<%- vocabulary["cancel"]["en"] %>', label: '<%- vocabulary["cancel"][language] %>', fn: unpublishArticles })
 					return opts
 				}).attrs({
-					'class': d => d.label.toLowerCase(),
+					'class': d => d.class.toLowerCase(),
 					'type': d => d.type,
 					'value': d => d.value
 				}).html(d => d.label)
@@ -1277,11 +1277,11 @@
 
 				form.addElems('button', 'opt', d => {
 					const opts = []
-					opts.push({ type: 'button', label: '<%- vocabulary["confirm"][language] %>', fn: confirmRemoval })
-					opts.push({ type: 'button', label: '<%- vocabulary["cancel"][language] %>', fn: deleteArticles })
+					opts.push({ type: 'button', class: '<%- vocabulary["confirm"]["en"] %>', label: '<%- vocabulary["confirm"][language] %>', fn: confirmRemoval })
+					opts.push({ type: 'button', class: '<%- vocabulary["cancel"]["en"] %>', label: '<%- vocabulary["cancel"][language] %>', fn: deleteArticles })
 					return opts
 				}).attrs({
-					'class': d => d.label.toLowerCase(),
+					'class': d => d.class.toLowerCase(),
 					'type': d => d.type,
 					'value': d => d.value
 				}).html(d => d.label)
@@ -1295,7 +1295,7 @@
 							let query = `id=${d.uuid}`
 							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${query}`
 							else return `../../view/<%- object.slice(0, -1) %>?${query}`
-						}, 'target': '_blank'
+						}//, 'target': '_blank'
 					}).addElems('h1')
 				name.addElems('img')
 					.attr('src', d => {

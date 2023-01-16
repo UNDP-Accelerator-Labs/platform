@@ -13,14 +13,13 @@ const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers
 const filter = include('routes/browse/pads/filter').main
 
 exports.main = async (req, res) => {
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_attachments, include_engagement, include_comments } = req.body || {}
-	const pw = req.session.email || 'password'
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = req.body || {}
+	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.body.language || req.session.language)
 
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
 	if (output === 'csv') {
-		// output = 'xlsx'
 		var single_sheet = true
 	}
 
@@ -107,6 +106,13 @@ exports.main = async (req, res) => {
 							ORDER BY pad
 						;`, [ ids ]))
 					} else batch1.push(null)
+					if (include_metafields) {
+						batch1.push(t1.any(`
+							SELECT pad AS pad_id, type, name, value FROM metafields
+							WHERE pad IN ($1:csv)
+							ORDER BY pad
+						;`, [ ids ]))
+					} else batch1.push(null)
 					if (include_engagement) {
 						batch1.push(t1.any(`
 							SELECT docid AS pad_id, type, count(type) FROM engagement
@@ -126,7 +132,7 @@ exports.main = async (req, res) => {
 					} else batch1.push(null)
 					return t1.batch(batch1)
 					.then(results => {
-						const [ tags, locations, engagement, comments ] = results
+						const [ tags, locations, metadata, engagement, comments ] = results
 
 						const wb = XLSX.utils.book_new()
 
@@ -151,6 +157,7 @@ exports.main = async (req, res) => {
 							}
 							// DETERMINE MAX TAGS BY TYPE
 							if (include_tags) {
+								// TO DO: UPDATE THIS TO type-name
 								const tag_types = array.unique.call(tags, { key: 'type', onkey: true })
 								const tag_counts = array.nest.call(tags, { key: 'pad_id' })
 									.map(d => {
@@ -169,27 +176,22 @@ exports.main = async (req, res) => {
 								if (max_locations.length) max_locations = Math.max(...max_locations)
 								else max_locations = 0	
 							}
-							// EXTRACT EXTERNAL RESOURCES (CONSENT LINKS) AND DETERMINE MAX EXTERNAL RESOURCES
-							if (include_attachments) {
-								// function count_attachments (items, pad_id, resources = []) {
-								// 	items?.forEach(d => {
-								// 		if (!['section', 'group'].includes(d.type) && !Array.isArray(d)) {											
-								// 			if (d.type === 'attachment' && d.srcs?.filter(c => c).length > 0) {
-								// 				d.srcs?.filter(c => c).forEach(c => {
-								// 					resources.push({ pad_id, resource: c })
-								// 				})
-								// 			}
-								// 		}
-
-								// 		if (d.items) resources = count_attachments(d.items, pad_id, resources)
-								// 		else if (Array.isArray(d)) resources = count_attachments(d, pad_id, resources)
-								// 	})
-								// 	return resources
-								// }
-								// var attachments = pad_group.values.map(d => count_attachments(d.sections, d.pad_id))
+							// EXTRACT METAFIELDS AND DETERMINE MAX METAFIELDS
+							if (include_metafields) {
+								const meta_types = array.unique.call(metadata, { key: d => `${d.type}-${d.name}`, onkey: true })
+								const meta_counts = array.nest.call(metadata, { key: 'pad_id' })
+									.map(d => {
+										return array.nest.call(d.values, { key: c => `${c.type}-${c.name}` })
+									}).flat()
+								var max_metafields = meta_types.map(d => {
+									const obj = {}
+									obj.type = d
+									obj.max = Math.max(...meta_counts.filter(c => c.key === d).map(c => c.count))
+									return obj
+								})
 	
-								var attachments = pad_group.values.map(d => parsers.getAttachments(d).map(c => { return { pad_id: d.pad_id, resource: c } }))
-								var max_attachments = Math.max(...attachments.map(d => d.length))
+								// var attachments = pad_group.values.map(d => parsers.getAttachments(d).map(c => { return { pad_id: d.pad_id, resource: c } }))
+								// var max_attachments = Math.max(...attachments.map(d => d.length))
 							}
 
 
@@ -249,7 +251,7 @@ exports.main = async (req, res) => {
 												}
 											} else if (include_tags && ['index', 'tag'].includes(d.type)) {
 												const max = max_tags.find(c => c.type === d.name)?.max ?? 0
-												
+
 												// d.tags?.forEach((c, i) => {
 												// 	const obj = {}
 												// 	obj.id = `${cid}--${i}`
@@ -269,14 +271,29 @@ exports.main = async (req, res) => {
 													obj.content = d.tags[i]?.name ?? null
 													structure.push(obj)	
 												}
-											} else if (include_attachments && d.type === 'attachment') {
-												for (let i = 0; i < max_attachments; i ++) {
+											} else if (include_metafields && metafields.filter(c => !['tag', 'index', 'location'].includes(c.type)).some(c => c.type === d.type && c.name === d.name)) {
+												const max = max_metafields.find(c => c.type === `${d.type}-${d.name}`)?.max ?? 0
+
+												// for (let i = 0; i < max_attachments; i ++) {
+												// 	const obj = {}
+												// 	obj.id = `${cid}--${i}`
+												// 	obj.repetition = structure.some(c => c.id === obj.id) ? structure.filter(c => c.id === obj.id).length : 0
+												// 	obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
+
+												// 	obj.content = d.srcs[i] ?? null
+												// 	structure.push(obj)	
+												// }
+
+												for (let i = 0; i < max; i ++) {
+													const valuekey = Object.keys(d).find(c => !['type', 'name', 'level', 'required', 'has_content'].includes(c))
+													const value = d[valuekey]
+
 													const obj = {}
 													obj.id = `${cid}--${i}`
 													obj.repetition = structure.some(c => c.id === obj.id) ? structure.filter(c => c.id === obj.id).length : 0
 													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
 
-													obj.content = d.srcs[i] ?? null
+													obj.content = value[i] ?? null
 													structure.push(obj)	
 												}
 											} else {
@@ -404,9 +421,11 @@ exports.main = async (req, res) => {
 							const locations_sheet = XLSX.utils.json_to_sheet(locations)
 							XLSX.utils.book_append_sheet(wb, locations_sheet, 'metadata-locations')
 						}
-						if (!single_sheet && attachments?.flat().length) {
-							const consent_sheet = XLSX.utils.json_to_sheet(attachments.flat())
-							XLSX.utils.book_append_sheet(wb, consent_sheet, 'metadata-external-resources')
+						// if (!single_sheet && attachments?.flat().length) {
+							// const consent_sheet = XLSX.utils.json_to_sheet(attachments.flat())
+						if (!single_sheet && metadata?.length) {
+							const consent_sheet = XLSX.utils.json_to_sheet(metadata)
+							XLSX.utils.book_append_sheet(wb, consent_sheet, 'metadata-other')
 						}
 						if (!single_sheet && engagement?.length) {
 							// ADD ENGAGEMENT TO WORKBOOK

@@ -84,9 +84,7 @@ exports.main = (req, res) => {
 			if (metadata?.length) {
 				// SAVE THE METADATA
 				metadata.forEach(d => d.pad = newID || id)
-				console.log('metadata')
-				console.log(metadata)
-				const sql = DB.pgp.helpers.insert(locations, ['pad', 'type', 'name', 'value'], 'metafields')
+				const sql = DB.pgp.helpers.insert(metadata, ['pad', 'type', 'name', 'value'], 'metafields')
 				batch.push(t.none(`
 					$1:raw
 					ON CONFLICT ON CONSTRAINT pad_value_type

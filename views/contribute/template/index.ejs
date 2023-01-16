@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%
 	// CREATE ALIASES
+	const publicpage = locals.metadata.page.public
 	const activity = locals.metadata.page.activity
 	const object = locals.metadata.page.object
 	const languages = locals.metadata.site.languages
@@ -71,29 +72,40 @@
 								<button type='submit' class='publish' name='status' value='2'><%- vocabulary['publish'][language] %></button>
 							<% } %>
 						</form>
-						<% if (!locals.metadata.page.public) { %>
-							<form class='lg' method='POST' action='/generate/pdf'>
-								<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
-								<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
-								<% if (locals.data?.status === 0 || !locals.data?.status) { %><button type='submit' class='generate-pdf' disabled>Generate PDF</button>
-								<% } else if (locals.data?.status > 0) { %><button type='submit' class='generate-pdf'>Generate PDF</button>
-								<% } %>
-							</form>
+						<% if (!publicpage) { %>
+							<!-- TO DO: THIS DOES NOT WORK WHEN THE PAD HAS JUST BEEN CREATED -->
+							<!-- AND MAKE SURE ALL FIELDS ARE CLEARED BEFORE SHOWING THIS -->
+							<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
+							<!-- TO DO: REMOVE if (false) TO REACTIVATE THIS -->
+							<% if (false) { %>
+								<form class='lg' method='POST' action='/generate/pdf'>
+									<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
+									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
+									<% if (locals.data?.status === 0 || !locals.data?.status) { %><button type='submit' class='generate-pdf' disabled>Generate PDF</button>
+									<% } else if (locals.data?.status > 0) { %><button type='submit' class='generate-pdf'>Generate PDF</button>
+									<% } %>
+								</form>
+							<% } %>
 						<% } %>
 					</div>
 				</div>
 			<% } %>
 
 			<div class='head'>
+				<% if (locals.metadata.page.referer?.includes('browse/templates')) { %>
+					<a href='<%- locals.metadata.page.referer %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+				<% } else { %>
+					<a href='<%- `/${language}/browse/templates/private` %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+				<% } %>
 				<% if (['contribute', 'edit'].includes(activity)) { %>
-					<% if (activity === 'edit') { %>
-						<a href='<%- locals.metadata.page.referer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][language] %></a>
-					<% } %>
 					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
 				<% } else { %>
-					<a href='<%- locals.metadata.page.referer || "/en/browse/templates/private" %>' class='return'><%- vocabulary['back to browse'][language] %></a>
 					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>'></div>
-					<div class='contributor'><%- vocabulary['credit'][language](locals.data.contributor, locals.data.contributorname, 'contributors') %></div>
+				<% } %>
+				<% if (activity === 'edit') { %>
+					<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
+				<% } else { %>
+					<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
 				<% } %>
 			</div>
 			<div class='body'>
@@ -354,7 +366,7 @@
 		}).on('mousedown', function () {
 			this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling || null
 		}).on('click', function () { 
-			const data = { level: 'meta', name: d.label, required: d.required } 
+			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required } 
 			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })

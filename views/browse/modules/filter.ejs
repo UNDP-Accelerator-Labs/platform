@@ -183,7 +183,7 @@
 			opts.push({ node: 'input', type: 'checkbox', name: 'include_locations', value: true, placeholder: '<%- vocabulary["include locations"][language] %>', default: true })
 		<% } %>
 		<% if (metafields.some(d => d.type === 'attachment')) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_attachments', value: true, placeholder: '<%- vocabulary["include external resources"][language] %>', default: true })
+			opts.push({ node: 'input', type: 'checkbox', name: 'include_metafields', value: true, placeholder: '<%- vocabulary["include metafields"][language] %>', default: true })
 		<% } %>
 		// TO DO: ADD OTHER POSSIBLE METAFIELDS HERE AND IN BACKEND
 

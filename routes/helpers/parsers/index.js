@@ -66,7 +66,7 @@ exports.getReviewScore = function (_json = {}) {
 }
 exports.getAttachments = (_json = {}) => { 
 	if (_json?.sections) {
-		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
+		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b)).flat(3)
 		const attachments = meta.filter(c => c.type === 'attachment' && c.srcs?.filter(b => b).length > 0)
 			.map(d => d.srcs).flat()
 			// .map(d => {

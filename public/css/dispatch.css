@@ -2103,6 +2103,8 @@ div.document main .inner .meta-status.status-3 {
   }
   div.document main .inner .head .return {
     display: block;
+    font-size: 14px;
+    line-height: 1.5em;
     margin-bottom: 15px;
   }
   div.document main .inner .head i {
@@ -2118,12 +2120,14 @@ div.document main .inner .meta-status.status-3 {
     font-weight: 700;
   }
   div.document main .inner .head .title:focus {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .head .contributor {
-    font-size: 12px;
+    margin-top: 10px;
+    font-size: 14px;
     line-height: 1.5em;
-    color: #0468B1;
+    color: #969696;
   }
   div.document main .inner .head .dropdown {
     display: none;
@@ -2168,7 +2172,8 @@ div.document main .inner .meta-status.status-3 {
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .section-header h1:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .placement-opts {
     position: absolute;
@@ -2176,7 +2181,8 @@ div.document main .inner .meta-status.status-3 {
     top: calc(-24px);
     right: 100%;
     height: 100%;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .placement-opts .opt {
     display: inline-block;
@@ -2265,7 +2271,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt.bru
     -webkit-appearance: none;
     width: 100%;
     height: 0px;
-    border-top: 1px solid #FFF32A;
+    /*border-top: 1px solid $c-light-yellow;*/
+    border-top: 1px solid #E5E5E5;
     outline: none;
     /*transform: translateY(5px);*/
   }
@@ -2314,7 +2321,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt:las
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.active,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after {
@@ -2334,7 +2342,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group label {
     /*top: 15px;*/
     height: 45px;
     padding: 0 10px;
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     line-height: 45px;
     white-space: nowrap;
@@ -2342,7 +2351,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group label {
   div.document main .inner .body .layout .media-container .placement-opts,
 div.document main .inner .body .layout .meta-container .placement-opts {
     top: 0;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts .opt i,
 div.document main .inner .body .layout .meta-container .placement-opts .opt i {
@@ -2403,7 +2413,8 @@ div.document main .inner .body .layout .meta-container .media-lead.focus {
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
 div.document main .inner .body .layout .meta-container .media-lead:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt {
@@ -2483,8 +2494,8 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt {
-    /*background-color: $c-dark-1;*/
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-mosaic.x2,
 div.document main .inner .body .layout .meta-container .media-mosaic.x2 {
@@ -2858,8 +2869,6 @@ div.document main .inner .body .layout .meta-container .media-repeat button {
     min-height: 65px;
     padding: 10px;
     margin-top: 30px;
-    /*background-color: $c-light-yellow;*/
-    /*background: linear-gradient(180deg, $c-light-yellow 0%, rgba(255,255,255,0) 100%);*/
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     border-top: 1px solid #969696;
@@ -2981,7 +2990,8 @@ div.document main .inner .body .layout .meta-container .inset .inset-location {
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel {
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt {
@@ -3288,7 +3298,8 @@ div.document main .inner .body .layout .meta-container .response.template {
     left: -30px;
     width: 0;
     height: 100%;
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #969696;
   }
   div.document main .inner .body .layout .group-container .media-group-items.animate-in {
     opacity: 0;
@@ -3304,7 +3315,8 @@ div.document main .inner .body .layout .meta-container .response.template {
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 div.document main .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
 div.document main .inner .body .layout .meta-container:not(.group-container):hover .opts:not(.index-opts) {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts) .opt-group,
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts) .opt-group,
@@ -3336,7 +3348,8 @@ div.document main .inner .body .layout .meta-container:not(.group-container):hov
 div.document main .inner .body .layout .media-container:not(.group-container):hover canvas,
 div.document main .inner .body .layout .meta-container:not(.group-container).focus canvas,
 div.document main .inner .body .layout .meta-container:not(.group-container):hover canvas {
-    border-color: #FFF32A;
+    /*border-color: $c-light-yellow;*/
+    border-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus .media-group-items:hover .placement-opts,
 div.document main .inner .body .layout .media-container:hover .media-group-items:hover .placement-opts {
@@ -3350,8 +3363,8 @@ div.document main .inner .body .layout .media-container:hover .add-opt i {
   }
   div.document main .inner .body .layout .media-container.focus > .opts,
 div.document main .inner .body .layout .media-container:hover > .opts {
-    /*border-bottom-color: $c-light-2;*/
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus > .opts .opt-group,
 div.document main .inner .body .layout .media-container:hover > .opts .opt-group {
@@ -3393,7 +3406,8 @@ div.document main .inner .body .layout.view .meta-container .meta {
     margin-top: 0;
     padding-bottom: 30px;
     clear: both;
-    border-top-color: #FFF32A;
+    /*border-top-color: $c-light-yellow;*/
+    border-top-color: #E5E5E5;
     border-bottom: 1px dotted #969696;
   }
   div.document main .inner .body .description-layout .media-container .media,
@@ -3687,7 +3701,8 @@ footer .inner form textarea.has-value + label {
     height: 30px;
     padding: 0 10px;
     border-radius: 0;
-    background-color: #FFC10E;
+    /*background-color: $c-mid-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     color: #FFF;
     float: right;
@@ -3698,7 +3713,8 @@ footer .inner form textarea.has-value + label {
   }
   footer .inner form textarea:focus + label + .btn-group,
 footer .inner form textarea.has-value + label + .btn-group {
-    border-color: #FFC10E;
+    /*border-color: $c-mid-yellow;*/
+    border-color: #E5E5E5;
   }
   footer .inner form textarea:focus + label + .btn-group button,
 footer .inner form textarea.has-value + label + .btn-group button {
@@ -8100,6 +8116,8 @@ div.document main .inner .meta-status.status-3 {
   }
   div.document main .inner .head .return {
     display: block;
+    font-size: 14px;
+    line-height: 1.5em;
     margin-bottom: 15px;
   }
   div.document main .inner .head i {
@@ -8115,12 +8133,14 @@ div.document main .inner .meta-status.status-3 {
     font-weight: 700;
   }
   div.document main .inner .head .title:focus {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .head .contributor {
-    font-size: 12px;
+    margin-top: 10px;
+    font-size: 14px;
     line-height: 1.5em;
-    color: #0468B1;
+    color: #969696;
   }
   div.document main .inner .head .dropdown {
     display: none;
@@ -8165,7 +8185,8 @@ div.document main .inner .meta-status.status-3 {
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .section-header h1:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .placement-opts {
     position: absolute;
@@ -8173,7 +8194,8 @@ div.document main .inner .meta-status.status-3 {
     top: calc(-24px);
     right: 100%;
     height: 100%;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .placement-opts .opt {
     display: inline-block;
@@ -8262,7 +8284,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt.bru
     -webkit-appearance: none;
     width: 100%;
     height: 0px;
-    border-top: 1px solid #FFF32A;
+    /*border-top: 1px solid $c-light-yellow;*/
+    border-top: 1px solid #E5E5E5;
     outline: none;
     /*transform: translateY(5px);*/
   }
@@ -8311,7 +8334,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt:las
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.active,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after {
@@ -8331,7 +8355,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group label {
     /*top: 15px;*/
     height: 45px;
     padding: 0 10px;
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     line-height: 45px;
     white-space: nowrap;
@@ -8339,7 +8364,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group label {
   div.document main .inner .body .layout .media-container .placement-opts,
 div.document main .inner .body .layout .meta-container .placement-opts {
     top: 0;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts .opt i,
 div.document main .inner .body .layout .meta-container .placement-opts .opt i {
@@ -8400,7 +8426,8 @@ div.document main .inner .body .layout .meta-container .media-lead.focus {
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
 div.document main .inner .body .layout .meta-container .media-lead:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt {
@@ -8480,8 +8507,8 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt {
-    /*background-color: $c-dark-1;*/
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-mosaic.x2,
 div.document main .inner .body .layout .meta-container .media-mosaic.x2 {
@@ -8855,8 +8882,6 @@ div.document main .inner .body .layout .meta-container .media-repeat button {
     min-height: 65px;
     padding: 10px;
     margin-top: 30px;
-    /*background-color: $c-light-yellow;*/
-    /*background: linear-gradient(180deg, $c-light-yellow 0%, rgba(255,255,255,0) 100%);*/
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     border-top: 1px solid #969696;
@@ -8978,7 +9003,8 @@ div.document main .inner .body .layout .meta-container .inset .inset-location {
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel {
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt {
@@ -9285,7 +9311,8 @@ div.document main .inner .body .layout .meta-container .response.template {
     left: -30px;
     width: 0;
     height: 100%;
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #969696;
   }
   div.document main .inner .body .layout .group-container .media-group-items.animate-in {
     opacity: 0;
@@ -9301,7 +9328,8 @@ div.document main .inner .body .layout .meta-container .response.template {
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 div.document main .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
 div.document main .inner .body .layout .meta-container:not(.group-container):hover .opts:not(.index-opts) {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts) .opt-group,
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts) .opt-group,
@@ -9333,7 +9361,8 @@ div.document main .inner .body .layout .meta-container:not(.group-container):hov
 div.document main .inner .body .layout .media-container:not(.group-container):hover canvas,
 div.document main .inner .body .layout .meta-container:not(.group-container).focus canvas,
 div.document main .inner .body .layout .meta-container:not(.group-container):hover canvas {
-    border-color: #FFF32A;
+    /*border-color: $c-light-yellow;*/
+    border-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus .media-group-items:hover .placement-opts,
 div.document main .inner .body .layout .media-container:hover .media-group-items:hover .placement-opts {
@@ -9347,8 +9376,8 @@ div.document main .inner .body .layout .media-container:hover .add-opt i {
   }
   div.document main .inner .body .layout .media-container.focus > .opts,
 div.document main .inner .body .layout .media-container:hover > .opts {
-    /*border-bottom-color: $c-light-2;*/
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus > .opts .opt-group,
 div.document main .inner .body .layout .media-container:hover > .opts .opt-group {
@@ -9390,7 +9419,8 @@ div.document main .inner .body .layout.view .meta-container .meta {
     margin-top: 0;
     padding-bottom: 30px;
     clear: both;
-    border-top-color: #FFF32A;
+    /*border-top-color: $c-light-yellow;*/
+    border-top-color: #E5E5E5;
     border-bottom: 1px dotted #969696;
   }
   div.document main .inner .body .description-layout .media-container .media,
@@ -9684,7 +9714,8 @@ footer .inner form textarea.has-value + label {
     height: 30px;
     padding: 0 10px;
     border-radius: 0;
-    background-color: #FFC10E;
+    /*background-color: $c-mid-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     color: #FFF;
     float: right;
@@ -9695,7 +9726,8 @@ footer .inner form textarea.has-value + label {
   }
   footer .inner form textarea:focus + label + .btn-group,
 footer .inner form textarea.has-value + label + .btn-group {
-    border-color: #FFC10E;
+    /*border-color: $c-mid-yellow;*/
+    border-color: #E5E5E5;
   }
   footer .inner form textarea:focus + label + .btn-group button,
 footer .inner form textarea.has-value + label + .btn-group button {
@@ -14098,6 +14130,8 @@ div.document main .inner .meta-status.status-3 {
   }
   div.document main .inner .head .return {
     display: block;
+    font-size: 14px;
+    line-height: 1.5em;
     margin-bottom: 15px;
   }
   div.document main .inner .head i {
@@ -14113,12 +14147,14 @@ div.document main .inner .meta-status.status-3 {
     font-weight: 700;
   }
   div.document main .inner .head .title:focus {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .head .contributor {
-    font-size: 12px;
+    margin-top: 10px;
+    font-size: 14px;
     line-height: 1.5em;
-    color: #0468B1;
+    color: #969696;
   }
   div.document main .inner .head .dropdown {
     display: none;
@@ -14163,7 +14199,8 @@ div.document main .inner .meta-status.status-3 {
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .section-header h1:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .placement-opts {
     position: absolute;
@@ -14171,7 +14208,8 @@ div.document main .inner .meta-status.status-3 {
     top: calc(-24px);
     right: 100%;
     height: 100%;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .placement-opts .opt {
     display: inline-block;
@@ -14260,7 +14298,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt.bru
     -webkit-appearance: none;
     width: 100%;
     height: 0px;
-    border-top: 1px solid #FFF32A;
+    /*border-top: 1px solid $c-light-yellow;*/
+    border-top: 1px solid #E5E5E5;
     outline: none;
     /*transform: translateY(5px);*/
   }
@@ -14309,7 +14348,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt:las
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.active,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after {
@@ -14329,7 +14369,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group label {
     /*top: 15px;*/
     height: 45px;
     padding: 0 10px;
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     line-height: 45px;
     white-space: nowrap;
@@ -14337,7 +14378,8 @@ div.document main .inner .body .layout .meta-container .opts .opt-group label {
   div.document main .inner .body .layout .media-container .placement-opts,
 div.document main .inner .body .layout .meta-container .placement-opts {
     top: 0;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts .opt i,
 div.document main .inner .body .layout .meta-container .placement-opts .opt i {
@@ -14398,7 +14440,8 @@ div.document main .inner .body .layout .meta-container .media-lead.focus {
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
 div.document main .inner .body .layout .meta-container .media-lead:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt {
@@ -14478,8 +14521,8 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt {
-    /*background-color: $c-dark-1;*/
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-mosaic.x2,
 div.document main .inner .body .layout .meta-container .media-mosaic.x2 {
@@ -14853,8 +14896,6 @@ div.document main .inner .body .layout .meta-container .media-repeat button {
     min-height: 65px;
     padding: 10px;
     margin-top: 30px;
-    /*background-color: $c-light-yellow;*/
-    /*background: linear-gradient(180deg, $c-light-yellow 0%, rgba(255,255,255,0) 100%);*/
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     border-top: 1px solid #969696;
@@ -14976,7 +15017,8 @@ div.document main .inner .body .layout .meta-container .inset .inset-location {
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel {
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt {
@@ -15283,7 +15325,8 @@ div.document main .inner .body .layout .meta-container .response.template {
     left: -30px;
     width: 0;
     height: 100%;
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #969696;
   }
   div.document main .inner .body .layout .group-container .media-group-items.animate-in {
     opacity: 0;
@@ -15299,7 +15342,8 @@ div.document main .inner .body .layout .meta-container .response.template {
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 div.document main .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
 div.document main .inner .body .layout .meta-container:not(.group-container):hover .opts:not(.index-opts) {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts) .opt-group,
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts) .opt-group,
@@ -15331,7 +15375,8 @@ div.document main .inner .body .layout .meta-container:not(.group-container):hov
 div.document main .inner .body .layout .media-container:not(.group-container):hover canvas,
 div.document main .inner .body .layout .meta-container:not(.group-container).focus canvas,
 div.document main .inner .body .layout .meta-container:not(.group-container):hover canvas {
-    border-color: #FFF32A;
+    /*border-color: $c-light-yellow;*/
+    border-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus .media-group-items:hover .placement-opts,
 div.document main .inner .body .layout .media-container:hover .media-group-items:hover .placement-opts {
@@ -15345,8 +15390,8 @@ div.document main .inner .body .layout .media-container:hover .add-opt i {
   }
   div.document main .inner .body .layout .media-container.focus > .opts,
 div.document main .inner .body .layout .media-container:hover > .opts {
-    /*border-bottom-color: $c-light-2;*/
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus > .opts .opt-group,
 div.document main .inner .body .layout .media-container:hover > .opts .opt-group {
@@ -15388,7 +15433,8 @@ div.document main .inner .body .layout.view .meta-container .meta {
     margin-top: 0;
     padding-bottom: 30px;
     clear: both;
-    border-top-color: #FFF32A;
+    /*border-top-color: $c-light-yellow;*/
+    border-top-color: #E5E5E5;
     border-bottom: 1px dotted #969696;
   }
   div.document main .inner .body .description-layout .media-container .media,
@@ -15682,7 +15728,8 @@ footer .inner form textarea.has-value + label {
     height: 30px;
     padding: 0 10px;
     border-radius: 0;
-    background-color: #FFC10E;
+    /*background-color: $c-mid-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     color: #FFF;
     float: right;
@@ -15693,7 +15740,8 @@ footer .inner form textarea.has-value + label {
   }
   footer .inner form textarea:focus + label + .btn-group,
 footer .inner form textarea.has-value + label + .btn-group {
-    border-color: #FFC10E;
+    /*border-color: $c-mid-yellow;*/
+    border-color: #E5E5E5;
   }
   footer .inner form textarea:focus + label + .btn-group button,
 footer .inner form textarea.has-value + label + .btn-group button {
@@ -21146,6 +21194,8 @@ div.document main#template .inner .head .return,
 div.document main#mobilization .inner .head .return {
     display: block;
     margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.5em;
   }
   div.document main .inner .head i,
 div.document main#pad .inner .head i, div.document main#reference .inner .head i,
@@ -21169,15 +21219,15 @@ div.document main#mobilization .inner .head .title {
 div.document main#pad .inner .head .title:focus, div.document main#reference .inner .head .title:focus,
 div.document main#template .inner .head .title:focus,
 div.document main#mobilization .inner .head .title:focus {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .head .contributor,
 div.document main#pad .inner .head .contributor, div.document main#reference .inner .head .contributor,
 div.document main#template .inner .head .contributor,
 div.document main#mobilization .inner .head .contributor {
-    font-size: 12px;
-    line-height: 1.5em;
-    color: #0468B1;
+    margin-top: 12.5px;
+    color: #969696;
   }
   div.document main .inner .head .dropdown,
 div.document main#pad .inner .head .dropdown, div.document main#reference .inner .head .dropdown,
@@ -21257,7 +21307,8 @@ div.document main#mobilization .inner .body .layout .section-header h1 {
 div.document main#pad .inner .body .layout .section-header h1:focus, div.document main#reference .inner .body .layout .section-header h1:focus,
 div.document main#template .inner .body .layout .section-header h1:focus,
 div.document main#mobilization .inner .body .layout .section-header h1:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .placement-opts,
 div.document main#pad .inner .body .layout .placement-opts, div.document main#reference .inner .body .layout .placement-opts,
@@ -21268,7 +21319,8 @@ div.document main#mobilization .inner .body .layout .placement-opts {
     top: calc(-24px);
     right: 100%;
     height: 100%;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .placement-opts .opt,
 div.document main#pad .inner .body .layout .placement-opts .opt, div.document main#reference .inner .body .layout .placement-opts .opt,
@@ -21380,6 +21432,7 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     outline: none;
     background-color: transparent;
     cursor: pointer;
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt i,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt i,
@@ -21391,7 +21444,6 @@ div.document main#template .inner .body .layout .meta-container .opts .opt-group
 div.document main#mobilization .inner .body .layout .media-container .opts .opt-group .opt i,
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt i {
     font-size: 16px;
-    /*line-height: 30px;*/
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt .constraint,
@@ -21436,7 +21488,8 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     -webkit-appearance: none;
     width: 100%;
     height: 0px;
-    border-top: 1px solid #FFF32A;
+    /*border-top: 1px solid $c-light-yellow;*/
+    border-top: 1px solid #E5E5E5;
     outline: none;
     /*transform: translateY(5px);*/
   }
@@ -21541,7 +21594,8 @@ div.document main#template .inner .body .layout .media-container .opts .opt-grou
 div.document main#template .inner .body .layout .meta-container .opts .opt-group .opt.active,
 div.document main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.active,
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after,
@@ -21574,10 +21628,12 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     left: 0;
     height: 30px;
     padding: 0 10px;
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     line-height: 30px;
     white-space: nowrap;
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts,
 div.document main .inner .body .layout .meta-container .placement-opts,
@@ -21589,7 +21645,8 @@ div.document main#template .inner .body .layout .meta-container .placement-opts,
 div.document main#mobilization .inner .body .layout .media-container .placement-opts,
 div.document main#mobilization .inner .body .layout .meta-container .placement-opts {
     top: 0;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts .opt i,
 div.document main .inner .body .layout .meta-container .placement-opts .opt i,
@@ -21728,7 +21785,8 @@ div.document main#template .inner .body .layout .media-container .media-lead:foc
 div.document main#template .inner .body .layout .meta-container .media-lead:focus,
 div.document main#mobilization .inner .body .layout .media-container .media-lead:focus,
 div.document main#mobilization .inner .body .layout .meta-container .media-lead:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt,
@@ -21899,8 +21957,8 @@ div.document main#template .inner .body .layout .media-container .media-mosaic .
 div.document main#template .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main#mobilization .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main#mobilization .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt {
-    /*background-color: $c-dark-1;*/
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-mosaic.x2,
 div.document main .inner .body .layout .meta-container .media-mosaic.x2,
@@ -23216,8 +23274,6 @@ div.document main#mobilization .inner .body .layout .meta-container .media-repea
     min-height: 65px;
     padding: 10px;
     margin-top: 30px;
-    /*background-color: $c-light-yellow;*/
-    /*background: linear-gradient(180deg, $c-light-yellow 0%, rgba(255,255,255,0) 100%);*/
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     border-top: 1px solid #969696;
@@ -23538,7 +23594,8 @@ div.document main#template .inner .body .layout .media-container .inset .inset-l
 div.document main#template .inner .body .layout .meta-container .inset .inset-location .panel,
 div.document main#mobilization .inner .body .layout .media-container .inset .inset-location .panel,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-location .panel {
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt,
@@ -24507,7 +24564,8 @@ div.document main#mobilization .inner .body .layout .group-container .media-grou
     left: -30px;
     width: 0;
     height: 100%;
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #969696;
   }
   div.document main .inner .body .layout .group-container .media-group-items.animate-in,
 div.document main#pad .inner .body .layout .group-container .media-group-items.animate-in, div.document main#reference .inner .body .layout .group-container .media-group-items.animate-in,
@@ -24544,7 +24602,8 @@ div.document main#mobilization .inner .body .layout .media-container:not(.group-
 div.document main#mobilization .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container):hover .opts:not(.index-opts) {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts) .opt-group,
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts) .opt-group,
@@ -24651,7 +24710,8 @@ div.document main#mobilization .inner .body .layout .media-container:not(.group-
 div.document main#mobilization .inner .body .layout .media-container:not(.group-container):hover canvas,
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container).focus canvas,
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container):hover canvas {
-    border-color: #FFF32A;
+    /*border-color: $c-light-yellow;*/
+    border-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus .media-group-items:hover .placement-opts,
 div.document main .inner .body .layout .media-container:hover .media-group-items:hover .placement-opts,
@@ -24686,8 +24746,8 @@ div.document main#template .inner .body .layout .media-container.focus > .opts,
 div.document main#template .inner .body .layout .media-container:hover > .opts,
 div.document main#mobilization .inner .body .layout .media-container.focus > .opts,
 div.document main#mobilization .inner .body .layout .media-container:hover > .opts {
-    /*border-bottom-color: $c-light-2;*/
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus > .opts .opt-group,
 div.document main .inner .body .layout .media-container:hover > .opts .opt-group,
@@ -24787,7 +24847,8 @@ div.document main#mobilization .inner .body .description-layout {
     margin-top: 10px;
     padding-bottom: 30px;
     clear: both;
-    border-top-color: #FFF32A;
+    /*border-top-color: $c-light-yellow;*/
+    border-top-color: #E5E5E5;
     border-bottom: 1px dotted #969696;
   }
   div.document main .inner .body .description-layout .media-container .media,
@@ -25366,7 +25427,8 @@ footer .inner form textarea.has-value + label {
     height: 30px;
     padding: 0 10px;
     border-radius: 0;
-    background-color: #FFC10E;
+    /*background-color: $c-mid-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     color: #FFF;
     float: right;
@@ -25377,7 +25439,8 @@ footer .inner form textarea.has-value + label {
   }
   footer .inner form textarea:focus + label + .btn-group,
 footer .inner form textarea.has-value + label + .btn-group {
-    border-color: #FFC10E;
+    /*border-color: $c-mid-yellow;*/
+    border-color: #E5E5E5;
   }
   footer .inner form textarea:focus + label + .btn-group button,
 footer .inner form textarea.has-value + label + .btn-group button {
@@ -29597,6 +29660,8 @@ div.document main#template .inner .head .return,
 div.document main#mobilization .inner .head .return {
     display: block;
     margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.5em;
   }
   div.document main .inner .head i,
 div.document main#pad .inner .head i, div.document main#reference .inner .head i,
@@ -29620,15 +29685,15 @@ div.document main#mobilization .inner .head .title {
 div.document main#pad .inner .head .title:focus, div.document main#reference .inner .head .title:focus,
 div.document main#template .inner .head .title:focus,
 div.document main#mobilization .inner .head .title:focus {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .head .contributor,
 div.document main#pad .inner .head .contributor, div.document main#reference .inner .head .contributor,
 div.document main#template .inner .head .contributor,
 div.document main#mobilization .inner .head .contributor {
-    font-size: 12px;
-    line-height: 1.5em;
-    color: #0468B1;
+    margin-top: 12.5px;
+    color: #969696;
   }
   div.document main .inner .head .dropdown,
 div.document main#pad .inner .head .dropdown, div.document main#reference .inner .head .dropdown,
@@ -29708,7 +29773,8 @@ div.document main#mobilization .inner .body .layout .section-header h1 {
 div.document main#pad .inner .body .layout .section-header h1:focus, div.document main#reference .inner .body .layout .section-header h1:focus,
 div.document main#template .inner .body .layout .section-header h1:focus,
 div.document main#mobilization .inner .body .layout .section-header h1:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .placement-opts,
 div.document main#pad .inner .body .layout .placement-opts, div.document main#reference .inner .body .layout .placement-opts,
@@ -29719,7 +29785,8 @@ div.document main#mobilization .inner .body .layout .placement-opts {
     top: calc(-24px);
     right: 100%;
     height: 100%;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .placement-opts .opt,
 div.document main#pad .inner .body .layout .placement-opts .opt, div.document main#reference .inner .body .layout .placement-opts .opt,
@@ -29831,6 +29898,7 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     outline: none;
     background-color: transparent;
     cursor: pointer;
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt i,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt i,
@@ -29842,7 +29910,6 @@ div.document main#template .inner .body .layout .meta-container .opts .opt-group
 div.document main#mobilization .inner .body .layout .media-container .opts .opt-group .opt i,
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt i {
     font-size: 16px;
-    /*line-height: 30px;*/
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt .constraint,
@@ -29887,7 +29954,8 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     -webkit-appearance: none;
     width: 100%;
     height: 0px;
-    border-top: 1px solid #FFF32A;
+    /*border-top: 1px solid $c-light-yellow;*/
+    border-top: 1px solid #E5E5E5;
     outline: none;
     /*transform: translateY(5px);*/
   }
@@ -29992,7 +30060,8 @@ div.document main#template .inner .body .layout .media-container .opts .opt-grou
 div.document main#template .inner .body .layout .meta-container .opts .opt-group .opt.active,
 div.document main#mobilization .inner .body .layout .media-container .opts .opt-group .opt.active,
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.active {
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.color.active::after,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.color.active::after,
@@ -30025,10 +30094,12 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     left: 0;
     height: 30px;
     padding: 0 10px;
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     line-height: 30px;
     white-space: nowrap;
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts,
 div.document main .inner .body .layout .meta-container .placement-opts,
@@ -30040,7 +30111,8 @@ div.document main#template .inner .body .layout .meta-container .placement-opts,
 div.document main#mobilization .inner .body .layout .media-container .placement-opts,
 div.document main#mobilization .inner .body .layout .meta-container .placement-opts {
     top: 0;
-    color: #FFC10E;
+    /*color: $c-mid-yellow;*/
+    color: #646464;
   }
   div.document main .inner .body .layout .media-container .placement-opts .opt i,
 div.document main .inner .body .layout .meta-container .placement-opts .opt i,
@@ -30179,7 +30251,8 @@ div.document main#template .inner .body .layout .media-container .media-lead:foc
 div.document main#template .inner .body .layout .meta-container .media-lead:focus,
 div.document main#mobilization .inner .body .layout .media-container .media-lead:focus,
 div.document main#mobilization .inner .body .layout .meta-container .media-lead:focus {
-    border-bottom-color: #FFC10E;
+    /*border-bottom-color: $c-mid-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt,
@@ -30350,8 +30423,8 @@ div.document main#template .inner .body .layout .media-container .media-mosaic .
 div.document main#template .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main#mobilization .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts .opt,
 div.document main#mobilization .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts .opt {
-    /*background-color: $c-dark-1;*/
-    background-color: #FFF32A;
+    /*background-color: $c-light-yellow;*/
+    background-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .media-mosaic.x2,
 div.document main .inner .body .layout .meta-container .media-mosaic.x2,
@@ -31667,8 +31740,6 @@ div.document main#mobilization .inner .body .layout .meta-container .media-repea
     min-height: 65px;
     padding: 10px;
     margin-top: 30px;
-    /*background-color: $c-light-yellow;*/
-    /*background: linear-gradient(180deg, $c-light-yellow 0%, rgba(255,255,255,0) 100%);*/
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     border-top: 1px solid #969696;
@@ -31989,7 +32060,8 @@ div.document main#template .inner .body .layout .media-container .inset .inset-l
 div.document main#template .inner .body .layout .meta-container .inset .inset-location .panel,
 div.document main#mobilization .inner .body .layout .media-container .inset .inset-location .panel,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-location .panel {
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #E5E5E5;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt,
@@ -32958,7 +33030,8 @@ div.document main#mobilization .inner .body .layout .group-container .media-grou
     left: -30px;
     width: 0;
     height: 100%;
-    border-left: 1px solid #FFC10E;
+    /*border-left: 1px solid $c-mid-yellow;*/
+    border-left: 1px solid #969696;
   }
   div.document main .inner .body .layout .group-container .media-group-items.animate-in,
 div.document main#pad .inner .body .layout .group-container .media-group-items.animate-in, div.document main#reference .inner .body .layout .group-container .media-group-items.animate-in,
@@ -32995,7 +33068,8 @@ div.document main#mobilization .inner .body .layout .media-container:not(.group-
 div.document main#mobilization .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts),
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container).focus .opts:not(.index-opts),
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container):hover .opts:not(.index-opts) {
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container:not(.group-container).focus .opts:not(.index-opts) .opt-group,
 div.document main .inner .body .layout .media-container:not(.group-container):hover .opts:not(.index-opts) .opt-group,
@@ -33102,7 +33176,8 @@ div.document main#mobilization .inner .body .layout .media-container:not(.group-
 div.document main#mobilization .inner .body .layout .media-container:not(.group-container):hover canvas,
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container).focus canvas,
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container):hover canvas {
-    border-color: #FFF32A;
+    /*border-color: $c-light-yellow;*/
+    border-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus .media-group-items:hover .placement-opts,
 div.document main .inner .body .layout .media-container:hover .media-group-items:hover .placement-opts,
@@ -33137,8 +33212,8 @@ div.document main#template .inner .body .layout .media-container.focus > .opts,
 div.document main#template .inner .body .layout .media-container:hover > .opts,
 div.document main#mobilization .inner .body .layout .media-container.focus > .opts,
 div.document main#mobilization .inner .body .layout .media-container:hover > .opts {
-    /*border-bottom-color: $c-light-2;*/
-    border-bottom-color: #FFF32A;
+    /*border-bottom-color: $c-light-yellow;*/
+    border-bottom-color: #E5E5E5;
   }
   div.document main .inner .body .layout .media-container.focus > .opts .opt-group,
 div.document main .inner .body .layout .media-container:hover > .opts .opt-group,
@@ -33238,7 +33313,8 @@ div.document main#mobilization .inner .body .description-layout {
     margin-top: 10px;
     padding-bottom: 30px;
     clear: both;
-    border-top-color: #FFF32A;
+    /*border-top-color: $c-light-yellow;*/
+    border-top-color: #E5E5E5;
     border-bottom: 1px dotted #969696;
   }
   div.document main .inner .body .description-layout .media-container .media,
@@ -33817,7 +33893,8 @@ footer .inner form textarea.has-value + label {
     height: 30px;
     padding: 0 10px;
     border-radius: 0;
-    background-color: #FFC10E;
+    /*background-color: $c-mid-yellow;*/
+    background-color: #E5E5E5;
     font-size: 12px;
     color: #FFF;
     float: right;
@@ -33828,7 +33905,8 @@ footer .inner form textarea.has-value + label {
   }
   footer .inner form textarea:focus + label + .btn-group,
 footer .inner form textarea.has-value + label + .btn-group {
-    border-color: #FFC10E;
+    /*border-color: $c-mid-yellow;*/
+    border-color: #E5E5E5;
   }
   footer .inner form textarea:focus + label + .btn-group button,
 footer .inner form textarea.has-value + label + .btn-group button {

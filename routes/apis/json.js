@@ -13,13 +13,17 @@ const { checklanguage, array, join, parsers } = include('routes/helpers')
 const filter = include('routes/browse/pads/filter').main
 
 exports.main = async (req, res) => {
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_attachments, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body || {}
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body || {}
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 	let cors_filter = ''
 	if (!pw) cors_filter = DB.pgp.as.format(`AND p.status > 2`)
+
+	if (output === 'geojson') {
+		include_locations = true
+	}
 
 	// CREATE A tmp FOLDER TO STORE EVERYTHING
 	if (render) {
@@ -31,7 +35,6 @@ exports.main = async (req, res) => {
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 	}
 
-	// TO DO: INCLUDE FILTER MECHANISM
 	return DB.conn.any(`
 		SELECT p.id AS pad_id, 
 			p.owner AS contributor_id, 
@@ -47,6 +50,8 @@ exports.main = async (req, res) => {
 			COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('tag_id', t.tag_id, 'type', t.type))) FILTER (WHERE t.tag_id IS NOT NULL), '[]') AS tags,
 
 			COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
+			
+			COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', m.type, 'name', m.name, 'value', m.value))) FILTER (WHERE m.value IS NOT NULL), '[]') AS metadata,
 
 			COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', e.type, 'count', (SELECT count(type) FROM engagement WHERE type = e.type AND docid = p.id )))) FILTER (WHERE e.type IS NOT NULL), '[]') AS engagement,
 
@@ -59,6 +64,9 @@ exports.main = async (req, res) => {
 
 		LEFT JOIN locations l
 			ON l.pad = p.id
+
+		LEFT JOIN metafields m
+			ON m.pad = p.id
 
 		LEFT JOIN engagement e
 			ON e.docid = p.id
@@ -124,6 +132,9 @@ exports.main = async (req, res) => {
 							d.tags = tags.flat()
 						} else delete d.tags
 
+						// SET LOCATIONS
+						if (!include_locations) delete d.locations
+
 						// SET IMAGES
 						if (include_imgs) {
 							d.media = d.media?.map(c => {
@@ -135,10 +146,11 @@ exports.main = async (req, res) => {
 
 						}
 
-						// SET EXTERNAL RESOURCES
-						if (include_attachments) {
-							d.attachments = parsers.getAttachments(d)
-						}
+						// SET METAFIELDS
+						// if (include_attachments) {
+						// 	d.attachments = parsers.getAttachments(d)
+						// }
+						if (!include_metafields) delete d.metadata
 
 						// SET ENGAGEMENT
 						if (!include_engagement) delete d.engagement

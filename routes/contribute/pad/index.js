@@ -115,7 +115,8 @@ exports.main = (req, res) => {
 						) e ON e.docid = p.id
 						
 						WHERE p.id = $3::INT
-					;`, [ engagement.cases, uuid, id ]).then(async result => {
+					;`, [ engagement.cases, uuid, id ])
+					.then(async result => {
 						if (result.reviews?.length > 0) {
 							if (result.reviews.length % modules.find(d => d.type === 'reviews')?.reviewers !== 0) {
 								result.reviews = result.reviews.filter(d => d.owner === uuid)
@@ -205,8 +206,10 @@ exports.main = (req, res) => {
 				}
 				return t.batch(batch)
 				.then(async results => {
-					const [ display_template, display_mobilization, tags, data, ...engagementdata ] = results
+					let [ display_template, display_mobilization, tags, data, ...engagementdata ] = results
 					const [ engagement, comments ] = engagementdata || []
+
+					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data })
 
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
@@ -216,7 +219,6 @@ exports.main = (req, res) => {
 		}).catch(err => console.log(err))
 	}).catch(err => console.log(err))
 }
-
 
 function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn

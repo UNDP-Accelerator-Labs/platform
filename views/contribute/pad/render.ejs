@@ -2340,7 +2340,7 @@ async function addTags (kwargs) {
 // THIS IS THE CONSENT MODULE FROM THE SM PLATFORM
 async function addAttachment (kwargs) {
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
-	let { id, level, type, name, srcs, instruction, required } = data || {}
+	let { id, level, type, name, srcs, instruction, constraint, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'attachment'
 	if (!name) name = null
@@ -2363,9 +2363,19 @@ async function addAttachment (kwargs) {
 	})
 
 	if (meta.opts) {
-		meta.opts.addElems('div', 'opt-group', ['<%- vocabulary["click to search or add locations"][language] %>']) // TO DO: UPDATE TEXT
+		meta.opts.addElems('div', 'opt-group', ['<%- vocabulary["click to add attachment"][language] %>']) // TO DO: UPDATE TEXT
 			.addElems('label')
 			.html(d => d)
+
+		if (constraint) {
+			const opt = meta.opts.addElem('div', 'opt-group')
+				.datum({ key: 'constraint', label: 'block', value: constraint })
+				.addElems('button', 'opt active')
+			opt.addElems('i', 'material-icons')
+				.html(d => d.label)
+			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+				.html(d => d.value - srcs.length)
+		}
 	}
 
 	// THIS IS THE MODAL FOR INPUT
@@ -2417,7 +2427,7 @@ async function addAttachment (kwargs) {
 	}
 
 	// THIS IS THE ORIGINAL CODE FROM THE SM PLATFORM
-	meta.media.addElems('a', 'external-resource', d => { return d.srcs.map(c => { return { src: c, name: d.name } }) })
+	meta.media.addElems('a', 'attachment', d => { return d.srcs.map(c => { return { src: c, name: d.name } }) })
 		.attrs({ 
 			'href': d => d.src,
 			'target': '_blank',
@@ -2431,7 +2441,7 @@ async function addAttachment (kwargs) {
 		}
 		img.onerror = function (err) {
 			if (err) console.log(err)
-			img.src = `/imgs/icons/i-external-resource.svg`
+			img.src = `/imgs/icons/i-attachment.svg`
 		}
 		img.src = `/imgs/icons/i-${d.name}.svg`
 	})

@@ -1,5 +1,5 @@
-const { page_content_limit, followup_count, engagementtypes, map, DB } = include('config')
-const { checklanguage, datastructures, engagementsummary, parsers, join } = include('routes/helpers')
+const { page_content_limit, followup_count, metafields, engagementtypes, map, DB } = include('config')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers')
 
 const filter = require('../filter').main
 
@@ -212,6 +212,8 @@ exports.main = async kwargs => {
 					d.tags = parsers.getTags(d)
 					d.txt = parsers.getTxt(d)
 					delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
+
+					// d.publishable = d.status >= 1
 				})
 
 				// IF ALL PADS ARE ALREADY RETRIEVED, THEN GROUP THEM
@@ -226,6 +228,12 @@ exports.main = async kwargs => {
 
 				return results
 			}).catch(err => console.log(err))
+		}).then(results => {
+			// THIS IS A LEGACY FIX FOR THE SOLUTIONS MAPPING PLATFORM
+			// NEED TO CHECK WHETHER THERE IS A CONSENT FORM ATTACHED FOR SOLUTIONS THAT ARE NOT PUBLIC (status = 2)
+			// ONLY THESE CAN BE PUBLISED IN THE FRONT-END
+			if (results.length) return datastructures.legacy.publishablepad({ connection: t, data: results })
+			else return results
 		}).catch(err => console.log(err))
 	}).then(async results => {
 		const data = await join.users(results, [ language, 'owner' ])

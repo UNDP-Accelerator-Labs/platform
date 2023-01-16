@@ -489,6 +489,7 @@
 									if (d.status <= 2 && d.review_status === 0) publish_dropdown.push({ name: 'review_status', value: 1, classname: 'review',label: '<%- vocabulary["submit for review"][language] %>', fn: selectReviewLanguage })
 								<% } else { %>
 									if (d.status === 1) publish_dropdown.push({ name: 'status', value: 2, classname: 'internally', label: '<%- vocabulary["internally"][language] %>' })
+									// TO DO: MAKE SURE THIS IS ONLY POSSIBLE WHEN ALL META FIELDS ARE FILLED OUT
 									if (d.status <= 2) publish_dropdown.push({ name: 'status', value: 3, classname: 'externally', label: '<%- vocabulary["externally"][language] %>' })
 								<% } %>
 

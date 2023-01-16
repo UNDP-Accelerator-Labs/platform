@@ -711,7 +711,7 @@
 			if (d.type === 'tag') addTags({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })	
 			if (d.type === 'index') addIndexes({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'location') addLocations({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
-			if (d.type === 'external_resource') addExternalResource({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'attachment') addAttachment({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 
 			d3.select(this).select('label').style('width', 0)
 			this['__active_node__'] = null
@@ -795,7 +795,7 @@
 			datum.has_content = (datum.sdgs?.length || datum.tags?.length) > 0 // THIS IS LEGACY FOR THE ACTION PLANNING PLATFORM: TO DO: DEPRECATE
 			items.push(datum)
 		}
-		else if (datum.type === 'external_resource') {
+		else if (datum.type === 'attachment') {
 			datum.has_content = datum.srcs?.length > 0
 			items.push(datum)
 		}
@@ -928,7 +928,7 @@
 			main.selectAll(`.${d.label}-container .tag input:checked`)
 			.each(c => {
 				// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY tags WERE ONLY THE names, NOT THE { id: INT, name: STR } OBJECT
-				if (c.id && c.name && c.type) allTags.push({ id: c.id, name: c.name, type: c.type })
+				if (c.id && c.name && c.type) allTags.push({ id: c.id, type: c.type, name: c.name })
 			})
 		})
 		content.tagging = allTags
@@ -937,6 +937,25 @@
 			content.locations = main.select('.location-container')?.datum()?.centerpoints
 		} else content.locations = null
 		
+		const otherMetadata = []
+		metafields.filter(d => !['tag', 'index', 'location'].includes(d.type)).forEach(d => {
+			main.selectAll(`.${d.label}-container`)
+			.each(c => {
+				retrieveItems(d3.select(this), c, otherMetadata)
+			})
+		})
+		content.metadata = otherMetadata.map(d => {
+			const { id, level, has_content, instruction, required, ...metadata } = d
+			const { type, name } = metadata
+			const valuekey = Object.keys(metadata).find(c => !['type', 'name'].includes(c))
+			const value = metadata[valuekey]
+			if (Array.isArray(value)) {
+				return value.map(c => {
+					return { type, name, value: c }
+				})
+			} else return { type, name, value }
+		}).flat()
+
 		// COMPILE FULL TXT FOR SEARCH
 		const fullTxt = `${title}\n\n
 			${sections.map(d => d.title).join('\n\n').trim()}\n\n
@@ -1512,52 +1531,55 @@
 </script>
 
 <script type='text/javascript'>
-	class MyHandler extends Paged.Handler { 
-		// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
-		constructor(chunker, polisher, caller) {
-			super(chunker, polisher, caller);
-		}
+	const paged_pdf = false
+	if (paged_pdf) {
+		class MyHandler extends Paged.Handler { 
+			// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
+			constructor(chunker, polisher, caller) {
+				super(chunker, polisher, caller);
+			}
 
-		beforeParsed(content) {
-			console.log(content)
-			const main = d3.select(content).select('main')
-			// TO DO: FLATTEN EVERYTHING TO OPTIMIZE PAGE FLOW
-			main.selectAll('.layout:not(.description-layout)')
-			.each(function (d) {
-				const items = []
-				const sel = d3.select(this)
-				console.log(d)
-				
-				sel.selectAll('.media-container, .meta-container')
-				.each(function (c) {
+			beforeParsed(content) {
+				console.log(content)
+				const main = d3.select(content).select('main')
+				// TO DO: FLATTEN EVERYTHING TO OPTIMIZE PAGE FLOW
+				main.selectAll('.layout:not(.description-layout)')
+				.each(function (d) {
+					const items = []
 					const sel = d3.select(this)
-					const ingroup = sel.findAncestor('group-container')	
-					// GROUPS
-					console.log(this, c)
-					if (c.type === 'group') {
-						// const groupitems = []
-						sel.selectAll('.media-group-items')
-							.each(function () { 
-								const sel = d3.select(this)
-								const subitems = []
-								sel.selectAll('.media-container, .meta-container')
-									.each(function (b) { 
-										retrieveItems(d3.select(this), b, subitems) 
-									})
-								completion.push(subitems.map(checkCompletion).every(d => d === true))
-							})
-					} else {
-						if (!ingroup) {
-							console.log(sel.node())
-							retrieveItems(sel, c, items)
+					console.log(d)
+					
+					sel.selectAll('.media-container, .meta-container')
+					.each(function (c) {
+						const sel = d3.select(this)
+						const ingroup = sel.findAncestor('group-container')	
+						// GROUPS
+						console.log(this, c)
+						if (c.type === 'group') {
+							// const groupitems = []
+							sel.selectAll('.media-group-items')
+								.each(function () { 
+									const sel = d3.select(this)
+									const subitems = []
+									sel.selectAll('.media-container, .meta-container')
+										.each(function (b) { 
+											retrieveItems(d3.select(this), b, subitems) 
+										})
+									completion.push(subitems.map(checkCompletion).every(d => d === true))
+								})
+						} else {
+							if (!ingroup) {
+								console.log(sel.node())
+								retrieveItems(sel, c, items)
+							}
 						}
-					}
+					})
+					if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
 				})
-				if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
-			})
+			}
 		}
+		Paged.registerHandlers(MyHandler);
 	}
-	Paged.registerHandlers(MyHandler);
 </script>
 
 </body>

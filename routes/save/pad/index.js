@@ -3,13 +3,13 @@ const fs = require('fs')
 const path = require('path')
 
 exports.main = (req, res) => {
-	const { id, tagging, locations, deletion, mobilization } = req.body || {}
+	const { id, tagging, locations, metadata, deletion, mobilization } = req.body || {}
 	const { uuid } = req.session || {}
 
 	if (!id) { // INSERT OBJECT
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
-			.filter(key => !['id', 'deletion', 'mobilization', 'tagging', 'locations'].includes(key))
+			.filter(key => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(key))
 			.reduce((obj, key) => {
 				obj[key] = req.body[key]
 				return obj
@@ -22,7 +22,7 @@ exports.main = (req, res) => {
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
-		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations'].includes(d)), 'pads') + condition
+		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
 	}	
 
 	DB.conn.tx(t => { 
@@ -77,6 +77,30 @@ exports.main = (req, res) => {
 				;`, [ locations.map(d => d.pad), values ]))
 			} else batch.push(t.none(`
 				DELETE FROM locations
+				WHERE pad = $1
+			;`, [ newID || id ]))
+
+			// SAVE EXTRA METADATA INFO
+			if (metadata?.length) {
+				// SAVE THE METADATA
+				metadata.forEach(d => d.pad = newID || id)
+				console.log('metadata')
+				console.log(metadata)
+				const sql = DB.pgp.helpers.insert(locations, ['pad', 'type', 'name', 'value'], 'metafields')
+				batch.push(t.none(`
+					$1:raw
+					ON CONFLICT ON CONSTRAINT pad_value_type
+						DO NOTHING
+				;`, [ sql ]))
+				// REMOVE ALL OLD METADATA
+				const values = DB.pgp.helpers.values(metadata, ['type', 'name', 'value'])
+				batch.push(t.none(`
+					DELETE FROM metafields
+					WHERE pad = $1
+						AND (type, name, value) NOT IN ($2:raw)
+				;`, [ newID || id, values ]))
+			} else batch.push(t.none(`
+				DELETE FROM metafields
 				WHERE pad = $1
 			;`, [ newID || id ]))
 			

@@ -363,7 +363,7 @@
 			if (d.type === 'tag') addTags({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })	
 			else if (d.type === 'index') addIndexes({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			else if (d.type === 'location') addLocations({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
-			else if (d.type === 'external_resource') addExternalResource({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			else if (d.type === 'attachment') addAttachment({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 
 			d3.select(this).select('label').style('width', 0)
 			this['__active_node__'] = null
@@ -571,8 +571,8 @@
 			items.push(datum)
 			// items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
-		else if (datum.type === 'external_resource') {
-			datum.instruction = sel.select('.meta-external_resource').node().innerHTML
+		else if (datum.type === 'attachment') {
+			datum.instruction = sel.select('.meta-attachment').node().innerHTML
 			items.push(datum)
 		}
 	}

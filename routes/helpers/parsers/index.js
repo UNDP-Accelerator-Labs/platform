@@ -64,16 +64,16 @@ exports.getReviewScore = function (_json = {}) {
 		return score ?? null
 	} else return null
 }
-exports.getExternalResources = (_json = {}) => { 
+exports.getAttachments = (_json = {}) => { 
 	if (_json?.sections) {
 		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
-		const external_resources = meta.filter(c => c.type === 'external_resource' && c.srcs?.filter(b => b).length > 0)
+		const attachments = meta.filter(c => c.type === 'attachment' && c.srcs?.filter(b => b).length > 0)
 			.map(d => d.srcs).flat()
 			// .map(d => {
 			// 	if (this.isURL(d.src)) return d.src
 			// 	else return `/${d.src.replace('uploads', 'uploads/sm')}`
 			// })
-		return external_resources
+		return attachments
 	} else return []
 }
 exports.regexQuery = require('./search.js').sqlregex

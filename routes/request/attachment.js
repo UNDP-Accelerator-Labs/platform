@@ -52,7 +52,7 @@ function POST (req, res) {
 			;`, [ join_id ]) 
 			.then(result => {
 				let { title, sections, template, status } = result
-				const resource = sections.find(d => d.items?.find(c => c.type === 'external_resource'))
+				const resource = sections.find(d => d.items?.find(c => c.type === 'attachment'))
 
 				const completion = []
 				completion.push(title?.trim().length > 0)
@@ -71,12 +71,12 @@ function POST (req, res) {
 				if (completion.every(d => d === true)) status = Math.max(status, 1)
 				
 				if (![null, undefined].includes(resource)) { // IF THERE IS ALREADY A CONSENT ELEMENT, FIND IT AND UPDATE IT
-					const item = resource.items.find(d => d.type === 'external_resource')
+					const item = resource.items.find(d => d.type === 'attachment')
 					// if (resource.srcs) item.srcs.push(src)
 					// else item.srcs = [src]
 					
 					// ALWAYS RESET srcs HERE
-					// TO DO: ESTABLISH A FRONT END MECHANISM FOR MULTIPLE external_resource INPUT
+					// TO DO: ESTABLISH A FRONT END MECHANISM FOR MULTIPLE attachment INPUT
 					// NOTE THIS IS NOT NEEDED RIGHT NOW
 					item.srcs = [src]
 					item.has_content = true

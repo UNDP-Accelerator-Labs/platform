@@ -1942,7 +1942,7 @@
 			"es": "etiqueta(s) faltante(s)",
 			"pt": "etiqueta(s) faltando"
 		},
-		"missing external_resource": {
+		"missing attachment": {
 			"en": "missing resource(s)",
 			"fr": "ressource.s manquante.s",
 			"es": "rescurso(s) faltante(s)",
@@ -1962,7 +1962,7 @@
 				if (type === 'location') return "request a location"
 				if (type === 'index') return "request one or more SDG tags" // TO DO: UPDATE THIS
 				if (type === 'tag') return "request one or more thematic area tags" // TO DO: UPDATE THIS
-				if (type === 'external_resource') return "request an external resource"
+				if (type === 'attachment') return "request an external resource"
 			},
 			"fr": type => {
 				if (type === 'group') return "décrire le groupe"
@@ -1976,7 +1976,7 @@
 				if (type === 'location') return "demander un emplacement"
 				if (type === 'index') return "demander une ou plusieurs étiquettes ODDs"
 				if (type === 'tag') return "demander une ou plusieurs étiquettes thématiques"
-				if (type === 'external_resource') return "demander une ressources externes"
+				if (type === 'attachment') return "demander une ressources externes"
 			},
 			"es": type => {
 				if (type === 'group') return "describir grupo"
@@ -1990,7 +1990,7 @@
 				if (type === 'location') return "solicitar una ubicación"
 				if (type === 'index') return "solicitar una o más etiquetas de ODS"
 				if (type === 'tag') return "solicitar una o más etiquetas de área temática"
-				if (type === 'external_resource') return "solicitar un recurso externo"
+				if (type === 'attachment') return "solicitar un recurso externo"
 			},
 			"pt": type => {
 				if (type === 'group') return "descrever o grupo"
@@ -2004,7 +2004,7 @@
 				if (type === 'location') return "solicite uma localização"
 				if (type === 'index') return "solicitar um ou mais etiquetas de ODS"
 				if (type === 'tag') return "solicitar uma ou mais etiquetas de área temática"
-				if (type === 'external_resource') return "solicitar um recurso externo"
+				if (type === 'attachment') return "solicitar um recurso externo"
 			}
 			// "OTHER LANGUAGE": type => {
 			// 	if (type === 'group') return 
@@ -2018,7 +2018,7 @@
 			// 	if (type === 'location') return 
 			// 	if (type === 'index') return 
 			// 	if (type === 'tag') return 
-			// 	if (type === 'external_resource') return 
+			// 	if (type === 'attachment') return 
 			// }
 		},
 		"expect": {
@@ -2030,7 +2030,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Direct input</strong> or comma-separated <strong>list of numbers</strong> expected."
 				if (type === 'location') return "<strong>Direct input</strong> or <strong>text</strong> expected."
 				if (type === 'tag') return "<strong>Direct input</strong>, comma-separated <strong>list of numbers</strong>, or <strong>text</strong> expected."
-				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Direct input</strong> or <strong>text</strong> expected."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Direct input</strong> or <strong>text</strong> expected."
 				if (type === 'repeat') return "<strong>Direct input</strong> expected."
 			},
 			"fr": type => {
@@ -2041,7 +2041,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Saisie directe</strong> ou <strong>liste de nombres</strong> séparés par des virgules attendue."
 				if (type === 'location') return "<strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
 				if (type === 'tag') return "<strong>Saisie directe</strong>, <strong>liste de nombres</strong> séparés par des virgules, ou <strong>texte</strong> attendu."
-				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Saisie directe</strong> ou <strong>texte</strong> attendu."
 				if (type === 'repeat') return "<strong>Saisie directe</strong> attendu."
 			},
 			"es": type => {
@@ -2052,7 +2052,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Entrada directa</strong> o <strong>lista de números</strong> separados por comas esperados."
 				if (type === 'location') return "<strong>Entrada directa</strong> o <strong>texto</strong> esperado."
 				if (type === 'tag') return "<strong>Entrada directa</strong>, <strong>lista de números</strong> separados por comas o <strong>texto</strong> esperados."
-				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada directa</strong> o <strong>texto</strong> esperados."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada directa</strong> o <strong>texto</strong> esperados."
 				if (type === 'repeat') return "<strong>Entrada directa</strong> esperada."
 			},
 			"pt": type => {
@@ -2063,7 +2063,7 @@
 				if (['checklist', 'radiolist', 'index'].includes(type)) return "<strong>Entrada direta</strong> ou <strong>lista de números</strong> separada por vírgulas esperados."
 				if (type === 'location') return "<strong>Entrada direta</strong> ou <strong>texto</strong> esperado."
 				if (type === 'tag') return "<strong>Entrada direta</strong>, <strong>lista de números</strong> separada por vírgulas ou <strong>texto</strong> esperados."
-				if (type === 'external_resource') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada direta</strong> ou <strong>texto</strong> esperados."
+				if (type === 'attachment') return "<img src='/imgs/icons/i-generic-external-resource-btn.svg'><strong>Entrada direta</strong> ou <strong>texto</strong> esperados."
 				if (type === 'repeat') return "<strong>Entrada direta</strong> esperada."
 			}
 			// "OTHER LANGUAGE": type => {
@@ -2079,7 +2079,7 @@
 			// 	if (type === 'location') return
 			// 	if (type === 'index') return
 			// 	if (type === 'tag') return
-			// 	if (type === 'external_resource') return
+			// 	if (type === 'attachment') return
 			// 	if (type === 'repeat') return
 			// }
 		},

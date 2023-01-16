@@ -13,7 +13,7 @@ const { checklanguage, array, join, parsers } = include('routes/helpers')
 const filter = include('routes/browse/pads/filter').main
 
 exports.main = async (req, res) => {
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_external_resources, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body || {}
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_attachments, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body || {}
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.session.language)
 
@@ -136,8 +136,8 @@ exports.main = async (req, res) => {
 						}
 
 						// SET EXTERNAL RESOURCES
-						if (include_external_resources) {
-							d.external_resources = parsers.getExternalResources(d)
+						if (include_attachments) {
+							d.attachments = parsers.getAttachments(d)
 						}
 
 						// SET ENGAGEMENT

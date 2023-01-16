@@ -189,6 +189,16 @@ CREATE TABLE tagging (
 	type VARCHAR(19)
 );
 ALTER TABLE tagging ADD CONSTRAINT unique_pad_tag_type UNIQUE (pad, tag_id, type);
+
+CREATE TABLE metafields (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	type VARCHAR(19),
+	name CITEXT,
+	value TEXT,
+	CONSTRAINT pad_value_type UNIQUE (pad, value, type)
+);
+
 -- TO DO
 -- CREATE TABLE engagement_pads (
 CREATE TABLE engagement (

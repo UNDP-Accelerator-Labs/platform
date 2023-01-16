@@ -297,7 +297,7 @@ function populateSection (data, lang = 'en', section) {
 	if (data.type === 'location') addLocations({ data, lang, section })
 	if (data.type === 'index') addIndexes({ data, lang, section })
 	if (data.type === 'tag') addTags({ data, lang, section })
-	if (data.type === 'external_resource') addExternalResource({ data, lang, section })
+	if (data.type === 'attachment') addAttachment({ data, lang, section })
 	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
 	// GROUP
 	if (data.type === 'group') addGroup({ data, lang, section })
@@ -996,11 +996,11 @@ function addTags (kwargs) {
 
 	if (focus) taglist.media.node().focus()
 }
-function addExternalResource (kwargs) {
+function addAttachment (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
 	if (!level) level = 'meta'
-	if (!type) type = 'external_resource'
+	if (!type) type = 'attachment'
 	if (!name) name = null
 	if (!instruction) instruction = ''
 	required = required ?? true

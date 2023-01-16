@@ -13,7 +13,7 @@ const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers
 const filter = include('routes/browse/pads/filter').main
 
 exports.main = async (req, res) => {
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_external_resources, include_engagement, include_comments } = req.body || {}
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_attachments, include_engagement, include_comments } = req.body || {}
 	const pw = req.session.email || 'password'
 	const language = checklanguage(req.params?.language || req.body.language || req.session.language)
 
@@ -170,26 +170,26 @@ exports.main = async (req, res) => {
 								else max_locations = 0	
 							}
 							// EXTRACT EXTERNAL RESOURCES (CONSENT LINKS) AND DETERMINE MAX EXTERNAL RESOURCES
-							if (include_external_resources) {
-								// function count_external_resources (items, pad_id, resources = []) {
+							if (include_attachments) {
+								// function count_attachments (items, pad_id, resources = []) {
 								// 	items?.forEach(d => {
 								// 		if (!['section', 'group'].includes(d.type) && !Array.isArray(d)) {											
-								// 			if (d.type === 'external_resource' && d.srcs?.filter(c => c).length > 0) {
+								// 			if (d.type === 'attachment' && d.srcs?.filter(c => c).length > 0) {
 								// 				d.srcs?.filter(c => c).forEach(c => {
 								// 					resources.push({ pad_id, resource: c })
 								// 				})
 								// 			}
 								// 		}
 
-								// 		if (d.items) resources = count_external_resources(d.items, pad_id, resources)
-								// 		else if (Array.isArray(d)) resources = count_external_resources(d, pad_id, resources)
+								// 		if (d.items) resources = count_attachments(d.items, pad_id, resources)
+								// 		else if (Array.isArray(d)) resources = count_attachments(d, pad_id, resources)
 								// 	})
 								// 	return resources
 								// }
-								// var external_resources = pad_group.values.map(d => count_external_resources(d.sections, d.pad_id))
+								// var attachments = pad_group.values.map(d => count_attachments(d.sections, d.pad_id))
 	
-								var external_resources = pad_group.values.map(d => parsers.getExternalResources(d).map(c => { return { pad_id: d.pad_id, resource: c } }))
-								var max_external_resources = Math.max(...external_resources.map(d => d.length))
+								var attachments = pad_group.values.map(d => parsers.getAttachments(d).map(c => { return { pad_id: d.pad_id, resource: c } }))
+								var max_attachments = Math.max(...attachments.map(d => d.length))
 							}
 
 
@@ -269,8 +269,8 @@ exports.main = async (req, res) => {
 													obj.content = d.tags[i]?.name ?? null
 													structure.push(obj)	
 												}
-											} else if (include_external_resources && d.type === 'external_resource') {
-												for (let i = 0; i < max_external_resources; i ++) {
+											} else if (include_attachments && d.type === 'attachment') {
+												for (let i = 0; i < max_attachments; i ++) {
 													const obj = {}
 													obj.id = `${cid}--${i}`
 													obj.repetition = structure.some(c => c.id === obj.id) ? structure.filter(c => c.id === obj.id).length : 0
@@ -404,8 +404,8 @@ exports.main = async (req, res) => {
 							const locations_sheet = XLSX.utils.json_to_sheet(locations)
 							XLSX.utils.book_append_sheet(wb, locations_sheet, 'metadata-locations')
 						}
-						if (!single_sheet && external_resources?.flat().length) {
-							const consent_sheet = XLSX.utils.json_to_sheet(external_resources.flat())
+						if (!single_sheet && attachments?.flat().length) {
+							const consent_sheet = XLSX.utils.json_to_sheet(attachments.flat())
 							XLSX.utils.book_append_sheet(wb, consent_sheet, 'metadata-external-resources')
 						}
 						if (!single_sheet && engagement?.length) {

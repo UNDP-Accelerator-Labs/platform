@@ -906,7 +906,7 @@ div.document {
 						.meta-datasources.template:empty:not(:focus):before {
 							line-height: initial;
 						}
-						.meta-external_resource {
+						.meta-attachment {
 							text-align: center;
 							a {
 								img {
@@ -915,7 +915,7 @@ div.document {
 								}
 							}
 						}
-						.meta-external_resource.template {
+						.meta-attachment.template {
 							text-align: left;
 						}
 						.media-repeat {

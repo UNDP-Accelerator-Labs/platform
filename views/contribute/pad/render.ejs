@@ -573,7 +573,7 @@ function populateSection (data, lang = 'en', section) {
 	if (data.type === 'location') addLocations({ data, lang, section })
 	if (data.type === 'index') addIndexes({ data, lang, section })
 	if (data.type === 'tag') addTags({ data, lang, section })
-	if (data.type === 'external_resource') addExternalResource({ data, lang, section })
+	if (data.type === 'attachment') addAttachment({ data, lang, section })
 	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
 	// GROUP
 	if (data.type === 'group') addGroup({ data, lang, section })
@@ -2338,11 +2338,11 @@ async function addTags (kwargs) {
 }
 
 // THIS IS THE CONSENT MODULE FROM THE SM PLATFORM
-async function addExternalResource (kwargs) {
+async function addAttachment (kwargs) {
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
 	let { id, level, type, name, srcs, instruction, required } = data || {}
 	if (!level) level = 'media'
-	if (!type) type = 'external_resource'
+	if (!type) type = 'attachment'
 	if (!name) name = null
 	if (!srcs) srcs = []
 	required = required ?? false
@@ -2386,7 +2386,7 @@ async function addExternalResource (kwargs) {
 					resolve: _ => {
 						return new Promise(async resolve => {
 							const id = await partialSave('meta')
-							resolve(window.location = `/request/external_resource?uri=${encodeURI(d.uri)}&join_id=${id}&name=${name}`)
+							resolve(window.location = `/request/attachment?uri=${encodeURI(d.uri)}&join_id=${id}&name=${name}`)
 						})
 					}
 				})
@@ -2401,7 +2401,7 @@ async function addExternalResource (kwargs) {
 						if (input.isURL()) {
 							return new Promise(async resolve => {
 								const id = await partialSave('meta')
-								POST('/request/external_resource', { name, join_id: id, src: input })
+								POST('/request/attachment', { name, join_id: id, src: input })
 								.then(res => {
 									if (res.status === 200) resolve(window.location.reload())
 									else resolve(console.log(res))
@@ -2443,7 +2443,7 @@ async function addExternalResource (kwargs) {
 			.on('click', d => {
 				kwargs.focus = true
 				kwargs.container = meta.container
-				addExternalResource(kwargs)
+				addAttachment(kwargs)
 			}).addElems('i', 'material-icons')
 			.html('badge')
 		}

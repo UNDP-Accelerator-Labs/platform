@@ -2838,17 +2838,17 @@ div.document main .inner .body .layout .meta-container .meta-methods.template:em
 div.document main .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before {
     line-height: initial;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource,
-div.document main .inner .body .layout .meta-container .meta-external_resource {
+  div.document main .inner .body .layout .media-container .meta-attachment,
+div.document main .inner .body .layout .meta-container .meta-attachment {
     text-align: center;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource a img,
-div.document main .inner .body .layout .meta-container .meta-external_resource a img {
+  div.document main .inner .body .layout .media-container .meta-attachment a img,
+div.document main .inner .body .layout .meta-container .meta-attachment a img {
     width: 120px;
     height: 120px;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource.template,
-div.document main .inner .body .layout .meta-container .meta-external_resource.template {
+  div.document main .inner .body .layout .media-container .meta-attachment.template,
+div.document main .inner .body .layout .meta-container .meta-attachment.template {
     text-align: left;
   }
   div.document main .inner .body .layout .media-container .media-repeat button,
@@ -8835,17 +8835,17 @@ div.document main .inner .body .layout .meta-container .meta-methods.template:em
 div.document main .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before {
     line-height: initial;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource,
-div.document main .inner .body .layout .meta-container .meta-external_resource {
+  div.document main .inner .body .layout .media-container .meta-attachment,
+div.document main .inner .body .layout .meta-container .meta-attachment {
     text-align: center;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource a img,
-div.document main .inner .body .layout .meta-container .meta-external_resource a img {
+  div.document main .inner .body .layout .media-container .meta-attachment a img,
+div.document main .inner .body .layout .meta-container .meta-attachment a img {
     width: 120px;
     height: 120px;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource.template,
-div.document main .inner .body .layout .meta-container .meta-external_resource.template {
+  div.document main .inner .body .layout .media-container .meta-attachment.template,
+div.document main .inner .body .layout .meta-container .meta-attachment.template {
     text-align: left;
   }
   div.document main .inner .body .layout .media-container .media-repeat button,
@@ -14833,17 +14833,17 @@ div.document main .inner .body .layout .meta-container .meta-methods.template:em
 div.document main .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before {
     line-height: initial;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource,
-div.document main .inner .body .layout .meta-container .meta-external_resource {
+  div.document main .inner .body .layout .media-container .meta-attachment,
+div.document main .inner .body .layout .meta-container .meta-attachment {
     text-align: center;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource a img,
-div.document main .inner .body .layout .meta-container .meta-external_resource a img {
+  div.document main .inner .body .layout .media-container .meta-attachment a img,
+div.document main .inner .body .layout .meta-container .meta-attachment a img {
     width: 120px;
     height: 120px;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource.template,
-div.document main .inner .body .layout .meta-container .meta-external_resource.template {
+  div.document main .inner .body .layout .media-container .meta-attachment.template,
+div.document main .inner .body .layout .meta-container .meta-attachment.template {
     text-align: left;
   }
   div.document main .inner .body .layout .media-container .media-repeat button,
@@ -23168,38 +23168,38 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-method
 div.document main#mobilization .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before {
     line-height: initial;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource,
-div.document main .inner .body .layout .meta-container .meta-external_resource,
-div.document main#pad .inner .body .layout .media-container .meta-external_resource,
-div.document main#pad .inner .body .layout .meta-container .meta-external_resource, div.document main#reference .inner .body .layout .media-container .meta-external_resource,
-div.document main#reference .inner .body .layout .meta-container .meta-external_resource,
-div.document main#template .inner .body .layout .media-container .meta-external_resource,
-div.document main#template .inner .body .layout .meta-container .meta-external_resource,
-div.document main#mobilization .inner .body .layout .media-container .meta-external_resource,
-div.document main#mobilization .inner .body .layout .meta-container .meta-external_resource {
+  div.document main .inner .body .layout .media-container .meta-attachment,
+div.document main .inner .body .layout .meta-container .meta-attachment,
+div.document main#pad .inner .body .layout .media-container .meta-attachment,
+div.document main#pad .inner .body .layout .meta-container .meta-attachment, div.document main#reference .inner .body .layout .media-container .meta-attachment,
+div.document main#reference .inner .body .layout .meta-container .meta-attachment,
+div.document main#template .inner .body .layout .media-container .meta-attachment,
+div.document main#template .inner .body .layout .meta-container .meta-attachment,
+div.document main#mobilization .inner .body .layout .media-container .meta-attachment,
+div.document main#mobilization .inner .body .layout .meta-container .meta-attachment {
     text-align: center;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource a img,
-div.document main .inner .body .layout .meta-container .meta-external_resource a img,
-div.document main#pad .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#pad .inner .body .layout .meta-container .meta-external_resource a img, div.document main#reference .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#reference .inner .body .layout .meta-container .meta-external_resource a img,
-div.document main#template .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#template .inner .body .layout .meta-container .meta-external_resource a img,
-div.document main#mobilization .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#mobilization .inner .body .layout .meta-container .meta-external_resource a img {
+  div.document main .inner .body .layout .media-container .meta-attachment a img,
+div.document main .inner .body .layout .meta-container .meta-attachment a img,
+div.document main#pad .inner .body .layout .media-container .meta-attachment a img,
+div.document main#pad .inner .body .layout .meta-container .meta-attachment a img, div.document main#reference .inner .body .layout .media-container .meta-attachment a img,
+div.document main#reference .inner .body .layout .meta-container .meta-attachment a img,
+div.document main#template .inner .body .layout .media-container .meta-attachment a img,
+div.document main#template .inner .body .layout .meta-container .meta-attachment a img,
+div.document main#mobilization .inner .body .layout .media-container .meta-attachment a img,
+div.document main#mobilization .inner .body .layout .meta-container .meta-attachment a img {
     width: 120px;
     height: 120px;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource.template,
-div.document main .inner .body .layout .meta-container .meta-external_resource.template,
-div.document main#pad .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#pad .inner .body .layout .meta-container .meta-external_resource.template, div.document main#reference .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#reference .inner .body .layout .meta-container .meta-external_resource.template,
-div.document main#template .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#template .inner .body .layout .meta-container .meta-external_resource.template,
-div.document main#mobilization .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#mobilization .inner .body .layout .meta-container .meta-external_resource.template {
+  div.document main .inner .body .layout .media-container .meta-attachment.template,
+div.document main .inner .body .layout .meta-container .meta-attachment.template,
+div.document main#pad .inner .body .layout .media-container .meta-attachment.template,
+div.document main#pad .inner .body .layout .meta-container .meta-attachment.template, div.document main#reference .inner .body .layout .media-container .meta-attachment.template,
+div.document main#reference .inner .body .layout .meta-container .meta-attachment.template,
+div.document main#template .inner .body .layout .media-container .meta-attachment.template,
+div.document main#template .inner .body .layout .meta-container .meta-attachment.template,
+div.document main#mobilization .inner .body .layout .media-container .meta-attachment.template,
+div.document main#mobilization .inner .body .layout .meta-container .meta-attachment.template {
     text-align: left;
   }
   div.document main .inner .body .layout .media-container .media-repeat button,
@@ -31619,38 +31619,38 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-method
 div.document main#mobilization .inner .body .layout .meta-container .meta-datasources.template:empty:not(:focus):before {
     line-height: initial;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource,
-div.document main .inner .body .layout .meta-container .meta-external_resource,
-div.document main#pad .inner .body .layout .media-container .meta-external_resource,
-div.document main#pad .inner .body .layout .meta-container .meta-external_resource, div.document main#reference .inner .body .layout .media-container .meta-external_resource,
-div.document main#reference .inner .body .layout .meta-container .meta-external_resource,
-div.document main#template .inner .body .layout .media-container .meta-external_resource,
-div.document main#template .inner .body .layout .meta-container .meta-external_resource,
-div.document main#mobilization .inner .body .layout .media-container .meta-external_resource,
-div.document main#mobilization .inner .body .layout .meta-container .meta-external_resource {
+  div.document main .inner .body .layout .media-container .meta-attachment,
+div.document main .inner .body .layout .meta-container .meta-attachment,
+div.document main#pad .inner .body .layout .media-container .meta-attachment,
+div.document main#pad .inner .body .layout .meta-container .meta-attachment, div.document main#reference .inner .body .layout .media-container .meta-attachment,
+div.document main#reference .inner .body .layout .meta-container .meta-attachment,
+div.document main#template .inner .body .layout .media-container .meta-attachment,
+div.document main#template .inner .body .layout .meta-container .meta-attachment,
+div.document main#mobilization .inner .body .layout .media-container .meta-attachment,
+div.document main#mobilization .inner .body .layout .meta-container .meta-attachment {
     text-align: center;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource a img,
-div.document main .inner .body .layout .meta-container .meta-external_resource a img,
-div.document main#pad .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#pad .inner .body .layout .meta-container .meta-external_resource a img, div.document main#reference .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#reference .inner .body .layout .meta-container .meta-external_resource a img,
-div.document main#template .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#template .inner .body .layout .meta-container .meta-external_resource a img,
-div.document main#mobilization .inner .body .layout .media-container .meta-external_resource a img,
-div.document main#mobilization .inner .body .layout .meta-container .meta-external_resource a img {
+  div.document main .inner .body .layout .media-container .meta-attachment a img,
+div.document main .inner .body .layout .meta-container .meta-attachment a img,
+div.document main#pad .inner .body .layout .media-container .meta-attachment a img,
+div.document main#pad .inner .body .layout .meta-container .meta-attachment a img, div.document main#reference .inner .body .layout .media-container .meta-attachment a img,
+div.document main#reference .inner .body .layout .meta-container .meta-attachment a img,
+div.document main#template .inner .body .layout .media-container .meta-attachment a img,
+div.document main#template .inner .body .layout .meta-container .meta-attachment a img,
+div.document main#mobilization .inner .body .layout .media-container .meta-attachment a img,
+div.document main#mobilization .inner .body .layout .meta-container .meta-attachment a img {
     width: 120px;
     height: 120px;
   }
-  div.document main .inner .body .layout .media-container .meta-external_resource.template,
-div.document main .inner .body .layout .meta-container .meta-external_resource.template,
-div.document main#pad .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#pad .inner .body .layout .meta-container .meta-external_resource.template, div.document main#reference .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#reference .inner .body .layout .meta-container .meta-external_resource.template,
-div.document main#template .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#template .inner .body .layout .meta-container .meta-external_resource.template,
-div.document main#mobilization .inner .body .layout .media-container .meta-external_resource.template,
-div.document main#mobilization .inner .body .layout .meta-container .meta-external_resource.template {
+  div.document main .inner .body .layout .media-container .meta-attachment.template,
+div.document main .inner .body .layout .meta-container .meta-attachment.template,
+div.document main#pad .inner .body .layout .media-container .meta-attachment.template,
+div.document main#pad .inner .body .layout .meta-container .meta-attachment.template, div.document main#reference .inner .body .layout .media-container .meta-attachment.template,
+div.document main#reference .inner .body .layout .meta-container .meta-attachment.template,
+div.document main#template .inner .body .layout .media-container .meta-attachment.template,
+div.document main#template .inner .body .layout .meta-container .meta-attachment.template,
+div.document main#mobilization .inner .body .layout .media-container .meta-attachment.template,
+div.document main#mobilization .inner .body .layout .meta-container .meta-attachment.template {
     text-align: left;
   }
   div.document main .inner .body .layout .media-container .media-repeat button,

@@ -27,13 +27,13 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 if (process.env.NODE_ENV === 'production') {
 	app.set('trust proxy', 1) // trust first proxy
 	// MAKE SURE ffmpeg IS INSTALLED
-	const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'ffmpeg'])
-	install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
-	install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
-	install_ffmpeg.on('error', err => console.log(err))
-	install_ffmpeg.on('exit', code => {
-		console.log(`ffmpeg installation exited: ${code}`)
-	})
+	// const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'ffmpeg'])
+	// install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
+	// install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
+	// install_ffmpeg.on('error', err => console.log(err))
+	// install_ffmpeg.on('exit', code => {
+	// 	console.log(`ffmpeg installation exited: ${code}`)
+	// })
 }
 
 const sessionMiddleware = session({ 
@@ -153,82 +153,82 @@ const server = app.listen(process.env.PORT || 2000, _ => console.log(`the app is
 
 
 // INITIATE ALL CRON JOBS
-const cron = require('node-cron')
-DB.conn.tx(t => {
-	return t.none(`
-		UPDATE mobilizations 
-		SET status = status + 1
-		WHERE (start_date <= NOW() AND status = 0)
-			OR (end_date <= NOW() AND status = 1)
-	;`).then(_ => {
-		return t.any(`
-			SELECT id, start_date, end_date FROM mobilizations
-			WHERE start_date >= NOW()
-				OR end_date >= NOW()
-		;`).then(results => {
-			results.forEach(d => {
-				const now = new Date()
-				const start_date = new Date(d.start_date)
-				const end_date = new Date(d.end_date)
+// const cron = require('node-cron')
+// DB.conn.tx(t => {
+// 	return t.none(`
+// 		UPDATE mobilizations 
+// 		SET status = status + 1
+// 		WHERE (start_date <= NOW() AND status = 0)
+// 			OR (end_date <= NOW() AND status = 1)
+// 	;`).then(_ => {
+// 		return t.any(`
+// 			SELECT id, start_date, end_date FROM mobilizations
+// 			WHERE start_date >= NOW()
+// 				OR end_date >= NOW()
+// 		;`).then(results => {
+// 			results.forEach(d => {
+// 				const now = new Date()
+// 				const start_date = new Date(d.start_date)
+// 				const end_date = new Date(d.end_date)
 
-				let expected_status
-				let ref_date
+// 				let expected_status
+// 				let ref_date
 
-				if (start_date >= now) {
-					console.log('mobilization has not started')
-					expected_status = 1
-					ref_date = start_date
-				}
-				if (end_date >= now) {
-					console.log('mobilization has not ended')
-					expected_status = 2
-					ref_date = end_date
-				}
+// 				if (start_date >= now) {
+// 					console.log('mobilization has not started')
+// 					expected_status = 1
+// 					ref_date = start_date
+// 				}
+// 				if (end_date >= now) {
+// 					console.log('mobilization has not ended')
+// 					expected_status = 2
+// 					ref_date = end_date
+// 				}
 
-				const min = ref_date.getMinutes()
-				const hour = ref_date.getHours()
-				const day = ref_date.getDate()
-				const month = ref_date.getMonth() + 1
-				const year = ref_date.getFullYear()
+// 				const min = ref_date.getMinutes()
+// 				const hour = ref_date.getHours()
+// 				const day = ref_date.getDate()
+// 				const month = ref_date.getMonth() + 1
+// 				const year = ref_date.getFullYear()
 
-				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
-					DB.conn.none(`
-						UPDATE mobilizations
-						SET status = $1
-						WHERE id = $2
-					;`, [ expected_status, d.id ])
-					.catch(err => console.log(err))
-				})
-			})
+// 				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
+// 					DB.conn.none(`
+// 						UPDATE mobilizations
+// 						SET status = $1
+// 						WHERE id = $2
+// 					;`, [ expected_status, d.id ])
+// 					.catch(err => console.log(err))
+// 				})
+// 			})
 
-		}).catch(err => console.log(err))
-	}).catch(err => console.log(err))
-}).catch(err => console.log(err))
+// 		}).catch(err => console.log(err))
+// 	}).catch(err => console.log(err))
+// }).catch(err => console.log(err))
 
-const io = require('socket.io')(server)
-// CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session
-const wrap = middleware => (socket, next) => middleware(socket.request, {}, next)
-io.use(wrap(sessionMiddleware))
+// const io = require('socket.io')(server)
+// // CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session
+// const wrap = middleware => (socket, next) => middleware(socket.request, {}, next)
+// io.use(wrap(sessionMiddleware))
 
 
-io.on('connection', socket => {
-	console.log('someone is connected')
+// io.on('connection', socket => {
+// 	console.log('someone is connected')
 
-	const session = socket.request.session
-	// console.log(session)
+// 	const session = socket.request.session
+// 	// console.log(session)
 
-	socket.on('hello', data => {
-		console.log(data)
-		socket.emit('world', data)
-	})
+// 	socket.on('hello', data => {
+// 		console.log(data)
+// 		socket.emit('world', data)
+// 	})
 
-	// socket.on('move-up', data => {
+// 	// socket.on('move-up', data => {
 		
-	// })
+// 	// })
 
-	socket.on('disconnect', _ => {
-		// const dropid = connections.map(d => d.uuid).indexOf(socket.handshake.session.uuid)
-		// connections.splice(dropid, 1)
-		console.log('someone disconnected')
-	})
-})
+// 	socket.on('disconnect', _ => {
+// 		// const dropid = connections.map(d => d.uuid).indexOf(socket.handshake.session.uuid)
+// 		// connections.splice(dropid, 1)
+// 		console.log('someone disconnected')
+// 	})
+// })

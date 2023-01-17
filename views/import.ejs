@@ -561,39 +561,40 @@
 			const obj = []
 			// CHECK FOR LOCATIONS
 			if (metafields.some(c => c.type === 'location')) {
-
-				obj.push({ label: 'location', value: 'location-txt', disabled: d.types.some(c => ['string', 'list of strings'].includes(c)) ? null : true })
-				obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
-				obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
-
-				// CHECK FOR TEXT LOCATIONS
-				// if (d.types.includes('string') || d.types.includes('list of strings')) { 
-				// 	obj.push({ label: 'location', value: 'location-txt', disabled: null })
-
-				// } else obj.push({ label: 'location', value: 'location-txt', disabled: true })
-
-				// CHECK FOR LAT/ LNG
-				// if (d.types.includes('list of numbers') 
-				// && !d.entries.filter(c => ![null, undefined].includes(c)).map(c => c?.length === 2).includes(false)) {
-				// 	obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', disabled: null })
-				// 	obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', disabled: null })
-				// } else {
-				// 	obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', disabled: true })
-				// 	obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', disabled: true })
-				// }
+				const limit = metafields.find(c => c.type === 'location')?.limit ?? null
+				// THIS ONLY AFFORDS UPLOADING ONE LOCATION PER ENTRY
+				obj.push({ label: 'location', value: 'location-txt', limit, disabled: d.types.some(c => ['string', 'list of strings'].includes(c)) ? null : true })
+				obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', limit, disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
+				obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', limit, disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
 			}
 			
 			metafields.filter(c => c.type !== 'location')
 			.forEach(c => {
 				let disabled = true
-				if (c.type === 'tag' && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b))) disabled = null
-				if (c.type === 'index' && d.types.some(b => ['number', 'list of numbers'].includes(b))) disabled = null
-				if (['txt', 'embed'].includes(c.type) && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b))) disabled = null
-				if (c.type === 'img' && d.types.some(b => (b === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(b) && containsURLs))) disabled = null
-				// if (c.type === 'video') // TO DO: COMPLETE FOR VIDEO
-				if (['checklist', 'radiolist'].includes(c.type) && !d.type.includes('object')) disabled = null
+				const containsURLs = d.entries.flat().filter(c => ![null, undefined].includes(c)).every(c => typeof c === 'string' && c.isURL())
 
-				obj.push({ label: c.name, value: c.label, disabled }) // TO DO: TRANSLATE c.name
+				// CHECK FOR LIMITED INPUTS
+				let max_entries = 1
+				let constrained = false
+				
+				if (!['txt', 'embed'].includes(c.type)) { // THE LIMIT IS ON THE NUMBER OF ITEMS
+					if (d.entries.every(b => Array.isArray(b))) max_entries = Math.max(...d.entries.map(b => b.length))
+				} else { // THE LIMIT IS ON THE NUMBER OF CHARACTERS
+					max_entries = Math.max(...d.entries.flat().map(b => b.trim().length))
+				}
+				if (max_entries > (c.limit ?? Infinity)) constrained = true
+
+				if (c.type === 'tag' && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b)) && !constrained) disabled = null
+				if (c.type === 'index' && d.types.some(b => ['number', 'list of numbers'].includes(b)) && !constrained) disabled = null
+				
+				if (c.type === 'attachment' && d.types.some(b => ['string', 'list of strings'].includes(b) && containsURLs) && !constrained) disabled = null
+
+				if (['txt', 'embed'].includes(c.type) && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b)) && !constrained) disabled = null
+				if (c.type === 'img' && d.types.some(b => (b === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(b) && containsURLs)) && !constrained) disabled = null
+				// if (c.type === 'video') // TO DO: COMPLETE FOR VIDEO
+				if (['checklist', 'radiolist'].includes(c.type) && !d.type.includes('object')) disabled = null // THERE SHOULD BE NO CONSTRAINTS HERE AS FAR AS I CAN TELL
+
+				obj.push({ label: c.name, value: c.label, limit: c.limit || null, disabled }) // TO DO: TRANSLATE c.name
 			})
 
 			return obj
@@ -604,7 +605,10 @@
 				if (type === d.value) return true
 				else return null
 			}, 'disabled': d => d.disabled
-		}).html(d => d.label)
+		}).html(d => {
+			if (d.limit) return `${d.label} (limited to ${d.limit})` // TO DO: TRANSLATION
+			else return d.label
+		})
 
 		// IMMEDIATELY DISABLE OPTIONS ACCORDING TO INFERRED TYPES
 		columntypes.each(function (d) { this.dispatchEvent(new Event('change')) }) 
@@ -868,11 +872,11 @@
 									let locations = []
 									if (Array.isArray(c.entries[i])) locations = c.entries[i]
 									else locations = [c.entries[i]]
-									locations = locations.filter(d => d)
+									locations = locations.filter(b => b)
 
 									if (locations?.length) {
 										// const results = await POST('/forwardGeocoding', { locations: locations })
-										const geocoded = compiledLocations.filter(d => locations.includes(d.input))
+										const geocoded = compiledLocations.filter(b => locations.includes(b.input))
 										item.centerpoints = geocoded.map(c => c.centerpoint)
 										item.caption = `Originally input location${locations.length > 1 ? 's' : ''}: <strong>${locations.map(l => l.trim().capitalize()).join('</strong>, <strong>')}</strong>.<br/>`
 										if (geocoded.filter(c => c.found).length > 1) item.caption += `Multiple locations found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`
@@ -895,7 +899,7 @@
 									let locations = []
 									if (Array.isArray(c.entries[i])) locations = c.entries[i]
 									else locations = [c.entries[i]]
-									locations = locations.filter(d => d)
+									locations = locations.filter(b => b)
 
 									if (locations.length) item.centerpoints = [{ lat: locations[0], lng: locations[1] }]
 
@@ -909,7 +913,7 @@
 									let locations = []
 									if (Array.isArray(c.entries[i])) locations = c.entries[i]
 									else locations = [c.entries[i]]
-									locations = locations.filter(d => d)
+									locations = locations.filter(b => b)
 
 									if (locations.length) item.centerpoints = [{ lat: locations[1], lng: locations[0] }]
 
@@ -921,7 +925,7 @@
 							}
 						}
 
-						// ALL TAGs ARE LOOPED BELOW BASED ON AVAILABLE metafields
+						// ALL TAGs AND ATTACHMENTS ARE LOOPED BELOW BASED ON AVAILABLE metafields
 						if (metafields.some(b => b.type !== 'location' && b.label === c.type)) {
 							if (['tag', 'index'].includes(metafields.find(b => b.label === c.type)?.type)) {
 								if (!structureOnly) {
@@ -954,6 +958,19 @@
 										item.tags = [obj]
 									}
 									item.has_content = item?.tags?.length > 0
+								}
+								item.type = metafields.find(b => b.label === c.type)?.type
+								item.name = metafields.find(b => b.label === c.type)?.label
+								item.level = 'meta'
+							
+							} else if (metafields.find(b => b.label === c.type)?.type === 'attachment') { 
+								if (!structureOnly) {
+									if (Array.isArray(c.entries[i])) {
+										item.srcs = c.entries[i].filter(b => ![null, undefined].includes(b)).map(b => b.trim())
+									} else {
+										item.srcs = [c.entries[i].trim()]
+									}
+									item.has_content = item?.srcs?.length > 0
 								}
 								item.type = metafields.find(b => b.label === c.type)?.type
 								item.name = metafields.find(b => b.label === c.type)?.label
@@ -1039,7 +1056,27 @@
 					imgs: results.filter(d => ['img', 'mosaic'].includes(d.type)).map(d => d.src || d.srcs).flat(),
 
 					tags: results.filter(d => metafields.some(c => ['tag', 'index'].includes(c.type) && c.label === d.name)).map(d => d.tags).flat(),
-					locations: results.filter(d => d.type === 'location').map(d => d.centerpoints).flat()
+					locations: results.filter(d => d.type === 'location').map(d => d.centerpoints).flat(),
+					
+					metadata: results.filter(d => metafields.some(c => !['tag', 'index', 'location'].includes(c.type) && c.label === d.name)).map(d => {
+							const valuekey = Object.keys(d).find(c => !['type', 'name', 'level', 'required', 'instruction', 'has_content'].includes(c))
+							
+							if (Array.isArray(d[valuekey])) {
+								return d[valuekey].map(c => {
+									const obj = {}
+									obj.type = d.type
+									obj.name = d.name
+									obj.value = c
+									return obj
+								})
+							} else {
+								const obj = {}
+								obj.type = d.type
+								obj.name = d.name
+								obj.value = d[valuekey]
+								return obj
+							}
+						}).flat()
 				})
 			})
 		})
@@ -1123,7 +1160,6 @@
 		const cols = d3.select('table.xls-preview').datum()
 		const data = await compilePads(idx)
 		const datum = data[0]
-		console.log(data)
 
 		const screen = d3.select('div.screen').classed('hide', false)
 		const modal = screen.addElems('div', 'modal pad-preview')
@@ -1186,7 +1222,6 @@
 		if (evt.preventDefault) evt.preventDefault()
 		
 		// 1) SELECT MOBILIZATION TO CONTRIBUTE TO
-		// TO DO: IMPROVE THIS
 		const target_opts = <%- JSON.stringify(locals.metadata.menu.participations.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1)) %>.map(d => { return { label: d.title, value: d.id, type: 'radio' } })
 		target_opts.unshift({ label: '<%- vocabulary["space"][language]("pads", "private") %>', value: 0, type: 'radio' })
 
@@ -1196,6 +1231,9 @@
 			{ node: 'button', type: 'button', label: '<%- vocabulary["import"][language] %>', resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value }
 		]
 		const mobilization = await renderPromiseModal({ message, opts })
+
+		// IF NO MOBILIZATION HAS BEEN SELECTED, THE USER HAS LIKELY JUST CANCELED THE OPERATION SO DO NO PROCEED WITH THE SUBMIT
+		if ([null, undefined].includes(mobilization)) return false
 
 		// COMPILE PADS AND TEMPLATE
 		const pads = await compilePads()

@@ -26139,15 +26139,13 @@ div#reviews .review:not(:last-child)::after {
     position: fixed;
     display: flex;
     justify-content: center;
-    top: calc(105px + 1px);
-    /*left: 15%;*/
+    top: 0;
     left: calc((100vw - (300px * 3 + 15px * 4)) / 2);
-    /*width: calc(85% - 5%);*/
     width: calc(100vw - ((100vw - (300px * 3 + 15px * 4)) / 2) - 120px);
-    padding-top: 14px;
+    padding-top: 120px;
     border-bottom: 1px solid #E5E5E5;
     background-color: #FFF;
-    z-index: 100;
+    z-index: 10;
   }
   div.table main .inner .body .btn-group form {
     border-top: 1px solid #E5E5E5;

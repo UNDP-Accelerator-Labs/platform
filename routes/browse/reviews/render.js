@@ -1,12 +1,12 @@
 // THIS IS HEAVILY INSPIRED BY browse/pads/render.js
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, DB } = include('config')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, DB } = include('config/')
 const header_data = include('routes/header/').data
 const { array, datastructures, checklanguage, join } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
 
-const load = require('./load')
-const filter = require('./filter').main
+const load = require('./load/')
+const filter = require('./filter.js').main
 
 exports.main = async (req, res) => { 
 	const { object, space } = req.params || {}

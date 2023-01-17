@@ -2,7 +2,7 @@
 global.include = path => require(`${__dirname}/${path}`)
 global.rootpath = __dirname
 
-const { app_title_short, app_suite, DB } = include('config')
+const { app_title_short, app_suite, DB } = include('config/')
 const express = require('express')
 const path = require('path')
 const bodyparser = require('body-parser')
@@ -53,7 +53,7 @@ const sessionMiddleware = session({
 
 app.use(sessionMiddleware)
 
-const routes = require('./routes')
+const routes = require('./routes/')
 
 // app.get('/', routes.redirect.home, routes.render.login)
 

@@ -1,5 +1,5 @@
-const xlsx = require('./xlsx').main
-const json = require('./json').main
+const xlsx = require('./xlsx.js').main
+const json = require('./json.js').main
 
 module.exports = async (req, res) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']

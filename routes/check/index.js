@@ -1,4 +1,4 @@
-const password = require('./password')
+const password = require('./password.js')
 
 exports.main = (req, res) => {
 	const { object } = req.params || {}

@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 // const { checklanguage } = include('routes/helpers/')
 
 exports.pin = (req, res) => {

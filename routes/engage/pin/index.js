@@ -1,7 +1,7 @@
-const { modules } = include('config')
+const { modules } = include('config/')
 
-const pad = require('./pad')
-const contributor = require('./contributor')
+const pad = require('./pad.js')
+const contributor = require('./contributor.js')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}

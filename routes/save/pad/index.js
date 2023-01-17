@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 const fs = require('fs')
 const path = require('path')
 

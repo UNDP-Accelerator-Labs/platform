@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 
 exports.joinObj = function (obj = {}) {
 	return {...this, ...obj}

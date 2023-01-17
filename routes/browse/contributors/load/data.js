@@ -1,4 +1,4 @@
-const { page_content_limit, engagementtypes, DB } = include('config')
+const { page_content_limit, engagementtypes, DB } = include('config/')
 const { array, join, checklanguage } = include('routes/helpers/')
 
 const filter = require('../filter').main

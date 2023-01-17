@@ -1,11 +1,11 @@
-const { page_content_limit, modules, metafields, lazyload, DB } = include('config')
+const { page_content_limit, modules, metafields, lazyload, DB } = include('config/')
 const header_data = include('routes/header/').data
 const helpers = include('routes/helpers/')
 
 const fetch = require('node-fetch')
 
-const load = require('./load')
-const filter = require('./filter').main
+const load = require('./load/')
+const filter = require('./filter.js').main
 
 exports.main = async (req, res) => { 
 	const { object, space } = req.params || {}

@@ -1,4 +1,4 @@
-const { modules, DB } = include('config')
+const { modules, DB } = include('config/')
 // const header_data = include('routes/header').data
 const helpers = include('routes/helpers/')
 

@@ -1,11 +1,11 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 
-exports.array = require('./array')
-exports.join = require('./joins')
-exports.parsers = require('./parsers')
-exports.datastructures = require('./datastructures')
-exports.checklanguage = require('./language').main
-exports.email = require('./email').main
+exports.array = require('./array/')
+exports.join = require('./joins/')
+exports.parsers = require('./parsers/')
+exports.datastructures = require('./datastructures/')
+exports.checklanguage = require('./language/').main
+exports.email = require('./email/').main
 
 exports.flatObj = function () {
 	// FLATTEN OBJECT: https://stackoverflow.com/questions/31136422/flatten-array-with-objects-into-1-object

@@ -1,11 +1,11 @@
-const { page_content_limit, DB } = include('config')
+const { page_content_limit, DB } = include('config/')
 const header_data = include('routes/header/').data
 const { array, checklanguage, datastructures } = include('routes/helpers/')
 
-const load = require('./load')
+const load = require('./load/')
 
 // TO DO: INTEGRATE OPTIONS FROM config.js
-const filter = require('./filter').main
+const filter = require('./filter.js').main
 
 exports.main = async (req, res) => {
 	const { object, space } = req.params || {}

@@ -1,5 +1,5 @@
-const { app_title, DB } = include('config')
-const { datastructures, checklanguage } = include('routes/helpers')
+const { app_title, DB } = include('config/')
+const { datastructures, checklanguage } = include('routes/helpers/')
 
 exports.main = (kwargs) => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn

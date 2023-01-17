@@ -1,8 +1,8 @@
-const { modules } = include('config')
-const { checklanguage } = include('routes/helpers')
+const { modules } = include('config/')
+const { checklanguage } = include('routes/helpers/')
 
-const pad = require('./pad')
-const template = require('./template')
+const pad = require('./pad/')
+const template = require('./template/')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}

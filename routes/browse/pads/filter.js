@@ -1,5 +1,5 @@
-const { app_title, DB, engagementtypes, metafields } = include('config')
-const { checklanguage, datastructures, parsers } = include('routes/helpers')
+const { app_title, DB, engagementtypes, metafields } = include('config/')
+const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 exports.main = async (req, res) => {
 	if (req.session.uuid) { // USER IS LOGGED IN

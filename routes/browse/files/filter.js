@@ -1,5 +1,5 @@
-const { DB, engagementtypes } = include('config')
-const { parsers } = include('routes/helpers')
+const { DB, engagementtypes } = include('config/')
+const { parsers } = include('routes/helpers/')
 
 exports.main = req => {
 	const { uuid, country, rights, collaborators } = req.session || {}

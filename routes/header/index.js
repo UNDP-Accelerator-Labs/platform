@@ -1,2 +1,2 @@
-exports.data = require('./data').main
-exports.language = require('./language').main
+exports.data = require('./data.js').main
+exports.language = require('./language.js').main

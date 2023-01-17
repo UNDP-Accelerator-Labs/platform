@@ -1,4 +1,4 @@
-const { app_title, DB } = include('config')
+const { app_title, DB } = include('config/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 const format = require('./formatting.js')
@@ -109,13 +109,13 @@ exports.process.callapi = (req, res) => {
 /* =============================================================== */
 /* =========================== LOGIN ============================= */
 /* =============================================================== */
-exports.render.login = require('./login').render
-exports.process.login = require('./login').process
-exports.process.logout = require('./login').logout
-exports.redirect.home = require('./login').redirect
+exports.render.login = require('./login/').render
+exports.process.login = require('./login/').process
+exports.process.logout = require('./login/').logout
+exports.redirect.home = require('./login/').redirect
 
 exports.redirect.public = (req, res) => res.redirect('/public')
-exports.dispatch.public = require('./login').public
+exports.dispatch.public = require('./login/').public
 
 
 /* =============================================================== */
@@ -659,7 +659,7 @@ exports.process.validate = (req, res) => {
 /* =============================================================== */
 /* ============================= API ============================= */
 /* =============================================================== */
-exports.dispatch.apis = require('./apis')
+exports.dispatch.apis = require('./apis/')
 
 if (!exports.api) exports.api = {}
 // THE TAGS APIS SHOULD BE DEPRECATED FOR NOW

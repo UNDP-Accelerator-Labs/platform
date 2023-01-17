@@ -1,9 +1,9 @@
-const { modules } = include('config')
-const { checklanguage } = include('routes/helpers')
+const { modules } = include('config/')
+const { checklanguage } = include('routes/helpers/')
 
-const pad = require('./pad')
-// const template = require('./template')
-// const mobilization = require('./mobilization')
+const pad = require('./pad/')
+// const template = require('./template/')
+// const mobilization = require('./mobilization/')
 
 exports.main = (req, res) => {
 	const { uuid, rights } = req.session || {}

@@ -705,10 +705,12 @@ exports.api.sdgs = (req, res) => {
 		DB.general.any(`
 			SELECT key, name, description FROM tags
 			WHERE type = 'sdgs'
-				language = $1
+				AND language = $1
 			ORDER BY key
-		;`, [ language ]).then(results => res.status(200).json(results))
-		.catch(err => res.status(500).send(err))
+		;`, [ language ])
+		.then(results => {
+			res.status(200).json(results)
+		}).catch(err => res.status(500).send(err))
 	} else {
 		DB.general.any(`
 			SELECT key, name, lang, description FROM tags

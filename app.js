@@ -27,13 +27,13 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 if (process.env.NODE_ENV === 'production') {
 	app.set('trust proxy', 1) // trust first proxy
 	// MAKE SURE ffmpeg IS INSTALLED
-	// const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'ffmpeg'])
-	// install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
-	// install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
-	// install_ffmpeg.on('error', err => console.log(err))
-	// install_ffmpeg.on('exit', code => {
-	// 	console.log(`ffmpeg installation exited: ${code}`)
-	// })
+	const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'ffmpeg'])
+	install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
+	install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
+	install_ffmpeg.on('error', err => console.log(err))
+	install_ffmpeg.on('exit', code => {
+		console.log(`ffmpeg installation exited: ${code}`)
+	})
 }
 
 const sessionMiddleware = session({ 

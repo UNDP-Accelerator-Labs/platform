@@ -14,3 +14,4 @@ routes/scripts/
 public/generated/
 presentations/
 dump/
+template.env

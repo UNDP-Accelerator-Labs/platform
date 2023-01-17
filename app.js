@@ -153,57 +153,57 @@ const server = app.listen(process.env.PORT || 2000, _ => console.log(`the app is
 
 
 // INITIATE ALL CRON JOBS
-// const cron = require('node-cron')
-// DB.conn.tx(t => {
-// 	return t.none(`
-// 		UPDATE mobilizations 
-// 		SET status = status + 1
-// 		WHERE (start_date <= NOW() AND status = 0)
-// 			OR (end_date <= NOW() AND status = 1)
-// 	;`).then(_ => {
-// 		return t.any(`
-// 			SELECT id, start_date, end_date FROM mobilizations
-// 			WHERE start_date >= NOW()
-// 				OR end_date >= NOW()
-// 		;`).then(results => {
-// 			results.forEach(d => {
-// 				const now = new Date()
-// 				const start_date = new Date(d.start_date)
-// 				const end_date = new Date(d.end_date)
+const cron = require('node-cron')
+DB.conn.tx(t => {
+	return t.none(`
+		UPDATE mobilizations 
+		SET status = status + 1
+		WHERE (start_date <= NOW() AND status = 0)
+			OR (end_date <= NOW() AND status = 1)
+	;`).then(_ => {
+		return t.any(`
+			SELECT id, start_date, end_date FROM mobilizations
+			WHERE start_date >= NOW()
+				OR end_date >= NOW()
+		;`).then(results => {
+			results.forEach(d => {
+				const now = new Date()
+				const start_date = new Date(d.start_date)
+				const end_date = new Date(d.end_date)
 
-// 				let expected_status
-// 				let ref_date
+				let expected_status
+				let ref_date
 
-// 				if (start_date >= now) {
-// 					console.log('mobilization has not started')
-// 					expected_status = 1
-// 					ref_date = start_date
-// 				}
-// 				if (end_date >= now) {
-// 					console.log('mobilization has not ended')
-// 					expected_status = 2
-// 					ref_date = end_date
-// 				}
+				if (start_date >= now) {
+					console.log('mobilization has not started')
+					expected_status = 1
+					ref_date = start_date
+				}
+				if (end_date >= now) {
+					console.log('mobilization has not ended')
+					expected_status = 2
+					ref_date = end_date
+				}
 
-// 				const min = ref_date.getMinutes()
-// 				const hour = ref_date.getHours()
-// 				const day = ref_date.getDate()
-// 				const month = ref_date.getMonth() + 1
-// 				const year = ref_date.getFullYear()
+				const min = ref_date.getMinutes()
+				const hour = ref_date.getHours()
+				const day = ref_date.getDate()
+				const month = ref_date.getMonth() + 1
+				const year = ref_date.getFullYear()
 
-// 				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
-// 					DB.conn.none(`
-// 						UPDATE mobilizations
-// 						SET status = $1
-// 						WHERE id = $2
-// 					;`, [ expected_status, d.id ])
-// 					.catch(err => console.log(err))
-// 				})
-// 			})
+				cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
+					DB.conn.none(`
+						UPDATE mobilizations
+						SET status = $1
+						WHERE id = $2
+					;`, [ expected_status, d.id ])
+					.catch(err => console.log(err))
+				})
+			})
 
-// 		}).catch(err => console.log(err))
-// 	}).catch(err => console.log(err))
-// }).catch(err => console.log(err))
+		}).catch(err => console.log(err))
+	}).catch(err => console.log(err))
+}).catch(err => console.log(err))
 
 // const io = require('socket.io')(server)
 // // CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session

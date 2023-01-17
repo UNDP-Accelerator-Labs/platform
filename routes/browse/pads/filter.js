@@ -1,4 +1,4 @@
-const { DB, engagementtypes, metafields } = include('config')
+const { app_title, DB, engagementtypes, metafields } = include('config')
 const { checklanguage, datastructures, parsers } = include('routes/helpers')
 
 exports.main = async (req, res) => {

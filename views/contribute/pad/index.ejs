@@ -1536,55 +1536,55 @@
 </script>
 
 <script type='text/javascript'>
-	const paged_pdf = false
-	if (paged_pdf) {
-		class MyHandler extends Paged.Handler { 
-			// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
-			constructor(chunker, polisher, caller) {
-				super(chunker, polisher, caller);
-			}
+	// const paged_pdf = false
+	// if (paged_pdf) {
+	// 	class MyHandler extends Paged.Handler { 
+	// 		// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
+	// 		constructor(chunker, polisher, caller) {
+	// 			super(chunker, polisher, caller);
+	// 		}
 
-			beforeParsed(content) {
-				console.log(content)
-				const main = d3.select(content).select('main')
-				// TO DO: FLATTEN EVERYTHING TO OPTIMIZE PAGE FLOW
-				main.selectAll('.layout:not(.description-layout)')
-				.each(function (d) {
-					const items = []
-					const sel = d3.select(this)
-					console.log(d)
+	// 		beforeParsed(content) {
+	// 			console.log(content)
+	// 			const main = d3.select(content).select('main')
+	// 			// TO DO: FLATTEN EVERYTHING TO OPTIMIZE PAGE FLOW
+	// 			main.selectAll('.layout:not(.description-layout)')
+	// 			.each(function (d) {
+	// 				const items = []
+	// 				const sel = d3.select(this)
+	// 				console.log(d)
 					
-					sel.selectAll('.media-container, .meta-container')
-					.each(function (c) {
-						const sel = d3.select(this)
-						const ingroup = sel.findAncestor('group-container')	
-						// GROUPS
-						console.log(this, c)
-						if (c.type === 'group') {
-							// const groupitems = []
-							sel.selectAll('.media-group-items')
-								.each(function () { 
-									const sel = d3.select(this)
-									const subitems = []
-									sel.selectAll('.media-container, .meta-container')
-										.each(function (b) { 
-											retrieveItems(d3.select(this), b, subitems) 
-										})
-									completion.push(subitems.map(checkCompletion).every(d => d === true))
-								})
-						} else {
-							if (!ingroup) {
-								console.log(sel.node())
-								retrieveItems(sel, c, items)
-							}
-						}
-					})
-					if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
-				})
-			}
-		}
-		Paged.registerHandlers(MyHandler);
-	}
+	// 				sel.selectAll('.media-container, .meta-container')
+	// 				.each(function (c) {
+	// 					const sel = d3.select(this)
+	// 					const ingroup = sel.findAncestor('group-container')	
+	// 					// GROUPS
+	// 					console.log(this, c)
+	// 					if (c.type === 'group') {
+	// 						// const groupitems = []
+	// 						sel.selectAll('.media-group-items')
+	// 							.each(function () { 
+	// 								const sel = d3.select(this)
+	// 								const subitems = []
+	// 								sel.selectAll('.media-container, .meta-container')
+	// 									.each(function (b) { 
+	// 										retrieveItems(d3.select(this), b, subitems) 
+	// 									})
+	// 								completion.push(subitems.map(checkCompletion).every(d => d === true))
+	// 							})
+	// 					} else {
+	// 						if (!ingroup) {
+	// 							console.log(sel.node())
+	// 							retrieveItems(sel, c, items)
+	// 						}
+	// 					}
+	// 				})
+	// 				if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
+	// 			})
+	// 		}
+	// 	}
+	// 	Paged.registerHandlers(MyHandler);
+	// }
 </script>
 
 </body>

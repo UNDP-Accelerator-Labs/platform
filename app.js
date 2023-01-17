@@ -205,30 +205,30 @@ DB.conn.tx(t => {
 	}).catch(err => console.log(err))
 }).catch(err => console.log(err))
 
-const io = require('socket.io')(server)
-// CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session
-const wrap = middleware => (socket, next) => middleware(socket.request, {}, next)
-io.use(wrap(sessionMiddleware))
+// const io = require('socket.io')(server)
+// // CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session
+// const wrap = middleware => (socket, next) => middleware(socket.request, {}, next)
+// io.use(wrap(sessionMiddleware))
 
 
-io.on('connection', socket => {
-	console.log('someone is connected')
+// io.on('connection', socket => {
+// 	console.log('someone is connected')
 
-	const session = socket.request.session
-	// console.log(session)
+// 	const session = socket.request.session
+// 	// console.log(session)
 
-	socket.on('hello', data => {
-		console.log(data)
-		socket.emit('world', data)
-	})
+// 	socket.on('hello', data => {
+// 		console.log(data)
+// 		socket.emit('world', data)
+// 	})
 
-	// socket.on('move-up', data => {
+// 	// socket.on('move-up', data => {
 		
-	// })
+// 	// })
 
-	socket.on('disconnect', _ => {
-		// const dropid = connections.map(d => d.uuid).indexOf(socket.handshake.session.uuid)
-		// connections.splice(dropid, 1)
-		console.log('someone disconnected')
-	})
-})
+// 	socket.on('disconnect', _ => {
+// 		// const dropid = connections.map(d => d.uuid).indexOf(socket.handshake.session.uuid)
+// 		// connections.splice(dropid, 1)
+// 		console.log('someone disconnected')
+// 	})
+// })

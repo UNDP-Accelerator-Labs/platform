@@ -1,5 +1,5 @@
 const { app_title, DB } = include('config/')
-const helpers = include('routes/helpers/')
+const { checklanguage, stripHTML, join, parsers, array } = include('routes/helpers/')
 // const request = require('request')
 const format = require('./formatting.js')
 const path = require('path')
@@ -130,7 +130,7 @@ exports.dispatch.browse = require('./browse/')
 exports.dispatch.analyse = (req, res) => {
 	const { uuid, rights } = req.session || {}
 	const { object } = req.params || {}
-	const language = helpers.checklanguage(req.params?.language || req.session.language)
+	const language = checklanguage(req.params?.language || req.session.language)
 
 	// if (rights > 0)	{
 	// 	if (object === 'pad') createPad(req, res)
@@ -625,16 +625,16 @@ function compileTable (template = {}, pads = []) { // TO DO: ISSUE IS HERE
 function dumpCSV (structure, entries) {
 	let csv = structure.map(d => {
 		if (typeof d.key === 'string') {
-			if (d.key.includes(',')) return `"${helpers.stripHTML.call(d.key.replace(/\"/g, '""'))}"`
-			else if (d.key.match(/\n/)) return `"${helpers.stripHTML.call(d.key.replace(/\"/g, '""'))}"`
+			if (d.key.includes(',')) return `"${stripHTML.call(d.key.replace(/\"/g, '""'))}"`
+			else if (d.key.match(/\n/)) return `"${stripHTML.call(d.key.replace(/\"/g, '""'))}"`
 			else return d.key
 		} else return d.key
 	}).join(',')
 	entries.forEach(d => {
 		csv += `\n${d.sections.map(c => {
 			if (typeof c.value === 'string') {
-				if (c.value.includes(',')) return `"${helpers.stripHTML.call(c.value.replace(/\"/g, '""'))}"` 
-				else if (c.value.match(/\n/)) return `"${helpers.stripHTML.call(c.value.replace(/\"/g, '""'))}"`
+				if (c.value.includes(',')) return `"${stripHTML.call(c.value.replace(/\"/g, '""'))}"` 
+				else if (c.value.match(/\n/)) return `"${stripHTML.call(c.value.replace(/\"/g, '""'))}"`
 				else return c.value
 			} else return c.value
 		}).join(',')}`
@@ -664,20 +664,12 @@ exports.dispatch.apis = require('./apis/')
 if (!exports.api) exports.api = {}
 // THE TAGS APIS SHOULD BE DEPRECATED FOR NOW
 exports.api.skills = (req, res) => {
-	// DB.conn.any(`
-	// 	SELECT id, category, name FROM skills ORDER BY category, name
-	// ;`).then(results => res.status(200).json(results))
-	// .catch(err => res.status(500).send(err))
 	DB.general.any(`
 		SELECT id, category, name FROM skills ORDER BY category, name
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }
 exports.api.methods = (req, res) => {
-	// DB.conn.any(`
-	// 	SELECT id, name FROM methods ORDER BY name
-	// ;`).then(results => res.status(200).json(results))
-	// .catch(err => res.status(500).send(err))
 	DB.general.any(`
 		SELECT id, name FROM methods ORDER BY name
 	;`).then(results => res.status(200).json(results))
@@ -685,12 +677,6 @@ exports.api.methods = (req, res) => {
 }
 exports.api.datasources = (req, res) => {
 	if (req.method === 'GET') {
-		// DB.conn.any(`
-		// 	SELECT d.id, d.name, d.description, c.country FROM datasources d
-		// 	LEFT JOIN contributors c
-		// 		ON d.contributor = c.id
-		// ;`).then(results => res.status(200).json(results))
-		// .catch(err => res.status(500).send(err))
 		DB.general.any(`
 			SELECT d.id, d.name, d.description, u.iso3 FROM datasources d
 			LEFT JOIN users u
@@ -701,16 +687,6 @@ exports.api.datasources = (req, res) => {
 		const { uuid } = req.session || {}
 		const { tag } = req.body || {}
 
-		// DB.conn.one(`
-		// 	INSERT INTO datasources (name, contributor)
-		// 	SELECT $1, id FROM contributors
-		// 	WHERE uuid = $2
-		// 		ON CONFLICT ON CONSTRAINT datasources_name_key
-		// 		DO NOTHING
-		// 	RETURNING id, name
-		// ;`, [tag.toLowerCase(), uuid || null])
-		// .then(result => res.status(200).json(result))
-		// .catch(err => res.status(500).send(err))
 		DB.general.one(`
 			INSERT INTO datasources (name, contributor)
 			VALUES ($1, $2)
@@ -722,7 +698,173 @@ exports.api.datasources = (req, res) => {
 		.catch(err => res.status(500).send(err))
 	}
 }
+exports.api.sdgs = (req, res) => {
+	let { lang } = req.query || {}
+	if (lang) {
+		const language = checklanguage(lang)
+		DB.general.any(`
+			SELECT key, name, description FROM tags
+			WHERE type = 'sdgs'
+				language = $1
+			ORDER BY key
+		;`, [ language ]).then(results => res.status(200).json(results))
+		.catch(err => res.status(500).send(err))
+	} else {
+		DB.general.any(`
+			SELECT key, name, lang, description FROM tags
+			WHERE type = 'sdgs'
+			ORDER BY key
+		;`).then(results => res.status(200).json(results))
+		.catch(err => res.status(500).send(err))
+	}
+}
+exports.api.thematic_areas = (req, res) => {
+	if (req.method === 'GET') {
+		DB.general.any(`
+			SELECT id, name FROM tags
+			WHERE type = 'thematic_areas' 
+			ORDER BY name
+		;`).then(results => res.status(200).json(results))
+		.catch(err => res.status(500).send(err))
+	} else if (req.method === 'POST') {
+		const { tag } = req.body || {}
+		
+		if (tag.trim().length) {
+			DB.general.one(`
+				INSERT INTO tags (name, type)
+				VALUES ($1, 'thematic_areas')
+					ON CONFLICT ON CONSTRAINT name_type_key
+					DO NOTHING
+				RETURNING id, name
+			;`, [ tag.trim().toLowerCase() ])
+			.then(result => res.status(200).json(result))
+			.catch(err => res.status(500).send(err))
+		} else res.status(200).json({ message: 'No tag was submitted.' })
+	}
+}
+exports.api.solutions = (req, res) => {
+	// CHECK TOKEN
+	const token = req.body.token || req.query.token || req.headers['x-access-token']
 
+	if (token) {
+		
+		const auth = jwt.verify(token, process.env.ACCLAB_PLATFORM_KEY)
+
+		if (auth?.authorization?.includes('api')) {
+			let { pads, sdgs, thematic_areas, contributors, limit } = req.query || {}
+
+			if (pads && !Array.isArray(pads)) pads = [pads]
+			if (sdgs && !Array.isArray(sdgs)) sdgs = [sdgs]
+			if (contributors && !Array.isArray(contributors)) contributors = [contributors]
+
+			if (pads?.length || sdgs?.length || thematic_areas?.length || contributors?.length) {
+				const f_pads = pads ? DB.pgp.as.format(`AND p.id IN ($1:csv)`, [pads.map(d => +d)]) : ''
+				// const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.sdgs @> ANY('{$1:csv}'::jsonb[])`, [sdgs.map(d => +d)]) : ''
+				const f_sdgs = sdgs ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND key IN ($1:csv))`, [ sdgs.map(d => +d) ]) : ''
+				// const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`AND p.tags ?| ARRAY[$1:csv]`, [thematic_areas]) : ''
+				const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'thematic_areas' AND name IN ($1:csv))`, [ thematic_areas ]) : ''
+				// const f_contributors = contributors ? DB.pgp.as.format(`AND p.contributor IN ($1:csv)`, [ contributors.map(d => +d) ]) : ''
+				const f_limit = limit ? DB.pgp.as.format(`LIMIT $1::INT`, [ limit ]) : ''
+
+				return DB.conn.tx(t => {
+					const batch = []
+					batch.push(t.oneOrNone(`
+						SELECT COUNT (p.id)::INT FROM pads p
+						WHERE p.status >= 2
+							$1:raw
+							$2:raw
+							$3:raw
+					;`, [ f_pads, f_sdgs, f_thematic_areas ], d => d ? d.count : d))
+					// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors], d => d ? d.count : d))
+					batch.push(t.any(`
+						SELECT p.id, p.sections, p.title, to_char(p.date, 'DD Mon YYYY') AS date, owner AS contributor_id FROM pads p
+						WHERE p.status >= 2
+							$1:raw
+							$2:raw
+							$3:raw
+						$4:raw
+					;`, [ f_pads, f_sdgs, f_thematic_areas, f_limit ])
+					.then(async results => {
+						const data = await join.users(pads, [ language, 'contributor_id' ])
+						return data
+					}).catch(err => console.log(err)))
+					// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors, f_limit]))
+					return t.batch(batch)
+					.catch(err => console.log(err))
+				}).then(results => {
+					const [ count, pads ] = results
+					pads.forEach(d => {
+						d.imgs = parsers.getImg(d)
+						d.sdgs = parsers.getSDGs(d)
+						d.thematic_areas = parsers.getTags(d)
+						if (thematic_areas) d.rank = array.intersection.call(d.thematic_areas, thematic_areas)?.length / (d.thematic_areas || 1)
+						else if (sdgs) d.rank = array.intersection.call(d.sdgs, sdgs)?.length / (d.sdgs.length || 1)
+						else d.rank = d.id
+					})
+					pads.sort((a, b) => {
+						return b.rank - a.rank
+						// THIS SHOULD THEN BE RANDOMIZED
+					})
+					res.status(200).json({ count: count, pads: pads })
+				}).catch(err => console.log(err))
+			} else res.status(400).json({ message: 'Missing filters. You cannot retrieve all data at once.' })
+		} else res.status(403).json({ message: 'It seems you do not have the authorization to use the api.' })
+
+
+		// return DB.conn.tx(t => {
+		// 	return t.any(`
+		// 		SELECT uuid FROM mappers
+		// 	;`).then(results => {
+		// 		results = results.map(d => d.uuid)
+		// 		// ADD PLATFORM REQUEST KEYS
+		// 		results.push(process.env.ACCLAB_PLATFORM_KEY)
+				
+		// 		const auth = results.map(d => {
+		// 			try {
+		// 				return jwt.verify(token, d)
+		// 			} catch (err) {
+		// 				return null
+		// 			}
+		// 		}).filter(d => d)?.[0]
+				
+				
+		// 	})
+		// }).catch(err => console.log(err))
+	} else res.status(403).json({ message: 'You need an access token for this api.' })
+}
+exports.api.file = (req, res) => {
+	// CHECK TOKEN
+	const token = req.body.token || req.query.token || req.headers['x-access-token']
+
+	if (token) {
+		
+		const auth = jwt.verify(token, process.env.ACCLAB_PLATFORM_KEY)
+
+		if (auth?.authorization?.includes('api')) {
+			const { filepath } = req.query || {}
+
+			if (filepath) res.sendFile(filepath)
+			else res.status(400).json({ message: 'Missing file path.' })
+		} else res.status(403).json({ message: 'It seems you do not have the authorization to use the api.' })
+
+		// return DB.conn.any(`
+		// 	SELECT uuid FROM mappers
+		// ;`).then(results => {
+		// 	results = results.map(d => d.uuid)
+		// 	// ADD PLATFORM REQUEST KEYS
+		// 	results.push(process.env.ACCLAB_PLATFORM_KEY)
+			
+		// 	const auth = results.map(d => {
+		// 		try {
+		// 			return jwt.verify(token, d)
+		// 		} catch (err) {
+		// 			return null
+		// 		}
+		// 	}).filter(d => d)?.[0]
+			
+		// }).catch(err => console.log(err))
+	} else res.status(403).json({ message: 'You need an access token for this api.' })
+}
 
 
 exports.notfound = (req, res) => {

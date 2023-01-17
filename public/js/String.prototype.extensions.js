@@ -44,7 +44,9 @@ String.prototype.isURL = function () {
 	// 	'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
 	// 	'(\\#[-a-z\\d_]*)?$', 'i') // extension
 	const url = new RegExp(`(?<!:)(${b}(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`, 'ig')
-	return !!url.test(encodeURI(this.valueOf().trim()))
+	if (this.valueOf().trim().match(url)?.length <= 1) {
+		return !!url.test(encodeURI(this.valueOf().trim()))
+	} else return false
 }
 RegExp.escape = function(string) {
 	// FROM https://makandracards.com/makandra/15879-javascript-how-to-generate-a-regular-expression-from-a-string

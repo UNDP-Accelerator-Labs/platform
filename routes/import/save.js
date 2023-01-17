@@ -81,6 +81,17 @@ exports.main = (req, res) => { // TO DO
 							;`, [ locations_sql ]))
 						}
 
+						if (d.metadata?.length) {
+							// SAVE METAFIELDS
+							d.metadata.forEach(c => c.pad = pad_id)
+							const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'value'], 'metafields')
+							batch1.push(t1.none(`
+								$1:raw
+								ON CONFLICT ON CONSTRAINT pad_value_type
+									DO NOTHING
+							;`, [ metadata_sql ]))
+						}
+
 						if (+mobilization !== 0) {
 							// SAVE MOBILIZATION INFO
 							// batch1.push(t.none(`

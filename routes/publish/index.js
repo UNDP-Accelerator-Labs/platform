@@ -1,4 +1,4 @@
-const { modules } = include('config')
+const { modules } = include('config/')
 
 const pads = require('./pads/')
 const pinboards = require('./pinboards/')

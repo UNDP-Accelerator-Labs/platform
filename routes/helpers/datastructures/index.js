@@ -1,4 +1,4 @@
-const { app_title: title, app_description: description, app_languages, modules, metafields, engagementtypes, lazyload, browse_display, page_content_limit, DB } = include('config')
+const { app_title: title, app_description: description, app_languages, modules, metafields, engagementtypes, lazyload, browse_display, page_content_limit, DB } = include('config/')
 const checklanguage = require('../language').main
 const join = require('../joins')
 const array = require('../array')

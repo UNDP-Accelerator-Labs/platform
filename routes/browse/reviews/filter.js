@@ -1,6 +1,6 @@
 // THIS IS HEAVILY INSPIRED BY browse/pads/filter.js
-const { modules, engagementtypes, metafields, DB } = include('config')
-const { checklanguage, datastructures, parsers } = include('routes/helpers')
+const { modules, engagementtypes, metafields, DB } = include('config/')
+const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 exports.main = req => {
 	const { space } = req.params || {}

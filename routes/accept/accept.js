@@ -1,4 +1,4 @@
-const { modules, DB } = include('config')
+const { modules, DB } = include('config/')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}

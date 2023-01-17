@@ -1,7 +1,7 @@
 const { fork } = require('child_process')
 const path = require('path')
 
-const { modules, DB } = include('config')
+const { modules, DB } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
 exports.main = (req, res) => {

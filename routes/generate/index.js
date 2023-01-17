@@ -1,4 +1,4 @@
-const { app_title, DB } = include('config')
+const { app_title, DB } = include('config/')
 const { vocabulary } = include('routes/header/language.js')
 // const DB = require('../../db-config.js')
 const path = require('path')

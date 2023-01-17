@@ -1,5 +1,5 @@
-const { followup_count, modules, engagementtypes, metafields, DB } = include('config')
-const header_data = include('routes/header').data
+const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
+const header_data = include('routes/header/').data
 const { checklanguage, engagementsummary, join, flatObj, datastructures } = include('routes/helpers/')
 
 exports.main = (req, res) => {	

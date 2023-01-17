@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 
 exports.array = require('./array')
 exports.join = require('./joins')

@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}

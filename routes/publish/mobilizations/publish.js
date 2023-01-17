@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 const { checklanguage, email: sendemail } = include('routes/helpers/')
 
 const cron = require('node-cron')

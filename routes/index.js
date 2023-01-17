@@ -1,4 +1,4 @@
-const { app_title, DB } = include('config')
+const { app_title, DB } = include('config/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 const format = require('./formatting.js')

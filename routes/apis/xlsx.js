@@ -7,8 +7,8 @@ const fs = require('fs')
 const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 const turf = require('@turf/turf')
 
-const { metafields, DB } = include('config')
-const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers')
+const { metafields, DB } = include('config/')
+const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter').main
 

@@ -1,4 +1,4 @@
-const { DB } = include('config')
+const { DB } = include('config/')
 const { datastructures, checklanguage, flatObj } = include('routes/helpers/')
 
 const filter = require('../filter').main

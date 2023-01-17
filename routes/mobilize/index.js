@@ -1,5 +1,5 @@
-const { modules } = include('config')
-const { checklanguage } = include('routes/helpers')
+const { modules } = include('config/')
+const { checklanguage } = include('routes/helpers/')
 
 const cohort = require('./cohort')
 const contributor = require('./contributor')

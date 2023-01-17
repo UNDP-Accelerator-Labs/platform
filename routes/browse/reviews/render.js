@@ -1,5 +1,5 @@
 // THIS IS HEAVILY INSPIRED BY browse/pads/render.js
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, DB } = include('config')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, DB } = include('config/')
 const header_data = include('routes/header/').data
 const { array, datastructures, checklanguage, join } = include('routes/helpers/')
 

@@ -1,5 +1,5 @@
-const { page_content_limit, followup_count, metafields, engagementtypes, map, DB } = include('config')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers')
+const { page_content_limit, followup_count, metafields, engagementtypes, map, DB } = include('config/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers/')
 
 const filter = require('../filter').main
 

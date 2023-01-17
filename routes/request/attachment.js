@@ -1,4 +1,4 @@
-const { metafields, app_suite, DB } = include('config')
+const { metafields, app_suite, DB } = include('config/')
 const jwt = require('jsonwebtoken')
 
 exports.main = (req, res) => {

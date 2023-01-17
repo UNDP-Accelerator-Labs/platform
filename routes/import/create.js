@@ -1,5 +1,5 @@
-const { modules, metafields, DB } = include('config')
-const header_data = include('routes/header').data
+const { modules, metafields, DB } = include('config/')
+const header_data = include('routes/header/').data
 const { checklanguage, flatObj, datastructures } = include('routes/helpers/')
 
 exports.main = async (req, res) => {

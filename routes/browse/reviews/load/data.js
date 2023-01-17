@@ -1,5 +1,5 @@
-const { page_content_limit, modules, DB } = include('config')
-const { checklanguage, datastructures, parsers, join } = include('routes/helpers')
+const { page_content_limit, modules, DB } = include('config/')
+const { checklanguage, datastructures, parsers, join } = include('routes/helpers/')
 
 const filter = require('../filter').main
 

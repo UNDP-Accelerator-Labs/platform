@@ -1,4 +1,4 @@
-const { app_title, app_suite, DB } = include('config')
+const { app_title, app_suite, DB } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
 exports.main = (req, res) => {

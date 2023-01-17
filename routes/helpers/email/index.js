@@ -1,4 +1,4 @@
-const { app_title } = include('config')
+const { app_title } = include('config/')
 const nodeMailer = require('nodemailer')
 
 exports.main = (kwargs) => {

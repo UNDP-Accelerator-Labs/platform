@@ -1,5 +1,5 @@
-const { modules, DB } = include('config')
-const header_data = include('routes/header').data
+const { modules, DB } = include('config/')
+const header_data = include('routes/header/').data
 const { checklanguage, join, datastructures } = include('routes/helpers/')
 
 exports.main = (req, res) => {

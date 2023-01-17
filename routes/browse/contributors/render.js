@@ -1,4 +1,4 @@
-const { page_content_limit, modules, metafields, lazyload, map, DB } = include('config')
+const { page_content_limit, modules, metafields, lazyload, map, DB } = include('config/')
 const header_data = include('routes/header/').data
 const load = require('./load')
 const { array, checklanguage, datastructures } = include('routes/helpers/')

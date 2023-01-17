@@ -1,5 +1,5 @@
-const { modules, engagementtypes, metafields, app_languages, DB } = include('config')
-// const header_data = include('routes/header').data
+const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
+// const header_data = include('routes/header/').data
 const { checklanguage, datastructures } = include('routes/helpers/')
 
 exports.main = async (req, res) => {	

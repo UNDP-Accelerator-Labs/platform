@@ -1,5 +1,5 @@
-const { modules } = include('config')
-const { checklanguage, datastructures } = include('routes/helpers')
+const { modules } = include('config/')
+const { checklanguage, datastructures } = include('routes/helpers/')
 
 const pad = require('../contribute/pad/')
 const template = require('../contribute/template/')

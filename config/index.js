@@ -13,9 +13,9 @@ let {
 	followup_count,
 	browse_display,
 	view_display
-} = require('./edit')
+} = require('./edit/')
 
-const { translations } = require('./edit/translations')
+const { translations } = require('./edit/translations.js')
 exports.translations = translations
 
 exports.app_title = app_title
@@ -69,7 +69,7 @@ exports.engagementtypes = engagementtypes || []
 exports.app_languages = app_languages.sort((a, b) => a.localeCompare(b))
 
 // DB CONNECTION
-exports.DB = require('./db').DB
+exports.DB = require('./db/').DB
 
 // DISPLAY VARIABLES
 exports.map = map

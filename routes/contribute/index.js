@@ -1,7 +1,7 @@
 const { modules } = include('config/')
 
-const pad = require('./pad')
-const template = require('./template')
+const pad = require('./pad/')
+const template = require('./template/')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}

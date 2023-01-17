@@ -1,5 +1,5 @@
-const attachment = require('./attachment')
-const review = require('./review')
+const attachment = require('./attachment.js')
+const review = require('./review.js')
 
 exports.main = (req, res) => {
 	const { object } = req.params || {}

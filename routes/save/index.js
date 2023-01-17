@@ -1,10 +1,10 @@
-const tag = require('./tag')
-const pinboard = require('./pinboard')
-const contributor = require('./contributor')
-const pad = require('./pad')
-const template = require('./template')
-const review = require('./review')
-const file = require('./file')
+const tag = require('./tag/')
+const pinboard = require('./pinboard/')
+const contributor = require('./contributor/')
+const pad = require('./pad/')
+const template = require('./template/')
+const review = require('./review/')
+const file = require('./file/')
 
 exports.main = (req, res) => {
 	const { object } = req.params || {}

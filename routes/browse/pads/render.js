@@ -4,8 +4,8 @@ const { array, datastructures, checklanguage, join } = include('routes/helpers/'
 
 const fetch = require('node-fetch')
 
-const load = require('./load')
-const filter = require('./filter').main
+const load = require('./load/')
+const filter = require('./filter.js').main
 
 exports.main = async (req, res) => { 
 	let { mscale, display, pinboard } = req.query || {}

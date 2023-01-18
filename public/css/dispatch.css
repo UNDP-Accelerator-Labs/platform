@@ -25017,8 +25017,7 @@ div.document main#mobilization .inner .body .media-input-group {
 div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
 div.document main#template .inner .body .media-input-group .inner,
 div.document main#mobilization .inner .body .media-input-group .inner {
-    max-height: calc(80vh - 20px);
-    padding: 10px 0;
+    max-height: 80vh;
     overflow: hidden;
   }
   div.document main .inner .body .media-input-group .inner .btn-group,
@@ -25028,6 +25027,7 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     display: flex;
     flex-direction: column;
     outline: none;
+    margin: 10px 0;
     background-color: #FFF;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input,
@@ -25249,12 +25249,11 @@ div.document main#template .inner .body .media-input-group button.scroll-down la
 div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
     transform: rotate(90deg);
   }
-  div.document main .inner .body .input-group.overflowing .inner,
-div.document main#pad .inner .body .input-group.overflowing .inner, div.document main#reference .inner .body .input-group.overflowing .inner,
-div.document main#template .inner .body .input-group.overflowing .inner,
-div.document main#mobilization .inner .body .input-group.overflowing .inner {
-    max-height: calc(80vh - 80px);
-    padding: 40px 0;
+  div.document main .inner .body .input-group.overflowing .inner .btn-group,
+div.document main#pad .inner .body .input-group.overflowing .inner .btn-group, div.document main#reference .inner .body .input-group.overflowing .inner .btn-group,
+div.document main#template .inner .body .input-group.overflowing .inner .btn-group,
+div.document main#mobilization .inner .body .input-group.overflowing .inner .btn-group {
+    margin: 40px 0;
   }
   div.document main .inner .body .input-group.inline .inner .btn-group,
 div.document main#pad .inner .body .input-group.inline .inner .btn-group, div.document main#reference .inner .body .input-group.inline .inner .btn-group,
@@ -33566,8 +33565,7 @@ div.document main#mobilization .inner .body .media-input-group {
 div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
 div.document main#template .inner .body .media-input-group .inner,
 div.document main#mobilization .inner .body .media-input-group .inner {
-    max-height: calc(80vh - 20px);
-    padding: 10px 0;
+    max-height: 80vh;
     overflow: hidden;
   }
   div.document main .inner .body .media-input-group .inner .btn-group,
@@ -33577,6 +33575,7 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     display: flex;
     flex-direction: column;
     outline: none;
+    margin: 10px 0;
     background-color: #FFF;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input,
@@ -33798,12 +33797,11 @@ div.document main#template .inner .body .media-input-group button.scroll-down la
 div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
     transform: rotate(90deg);
   }
-  div.document main .inner .body .input-group.overflowing .inner,
-div.document main#pad .inner .body .input-group.overflowing .inner, div.document main#reference .inner .body .input-group.overflowing .inner,
-div.document main#template .inner .body .input-group.overflowing .inner,
-div.document main#mobilization .inner .body .input-group.overflowing .inner {
-    max-height: calc(80vh - 80px);
-    padding: 40px 0;
+  div.document main .inner .body .input-group.overflowing .inner .btn-group,
+div.document main#pad .inner .body .input-group.overflowing .inner .btn-group, div.document main#reference .inner .body .input-group.overflowing .inner .btn-group,
+div.document main#template .inner .body .input-group.overflowing .inner .btn-group,
+div.document main#mobilization .inner .body .input-group.overflowing .inner .btn-group {
+    margin: 40px 0;
   }
   div.document main .inner .body .input-group.inline .inner .btn-group,
 div.document main#pad .inner .body .input-group.inline .inner .btn-group, div.document main#reference .inner .body .input-group.inline .inner .btn-group,

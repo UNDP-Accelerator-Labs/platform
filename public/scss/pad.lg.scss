@@ -1454,15 +1454,15 @@ div.document {
 					border-bottom: 1px solid $c-light-2;
 					z-index: 1000;
 					
-					.inner {
-						max-height: calc(80vh - 20px);
-						padding: 10px 0;
+					.inner {						
+						max-height: 80vh;
 						overflow: hidden;
 
 						.btn-group {
 							display: flex;
 							flex-direction: column;
 							outline: none;
+							margin: 10px 0;
 							background-color: #FFF;
 
 							input {
@@ -1596,8 +1596,9 @@ div.document {
 				}
 				.input-group.overflowing {
 					.inner {
-						max-height: calc(80vh - 80px);
-						padding: 40px 0;
+						.btn-group {
+							margin: 40px 0;
+						}
 					}
 				}
 				.input-group.inline {

@@ -431,13 +431,14 @@
 				<% } %>
 				
 
-				<% if (editing && !publicpage) { %>
+				<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium))) 
+				{ %>
 					<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
 					<div class='media-input-group input-group' tabindex=1>
-						<button class='scroll-up m lg'><label>&rsaquo;</label></button>
+						<% if (!templated) { %><button class='scroll-up m lg'><label>&rsaquo;</label></button><% } %>
 						<div class='inner'>
 							<div class='btn-group'>
-							<% if (!templated) { %>						
+							<% if (!templated) { %>
 								<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
 									
 								<div class='vertical-separator'></div>
@@ -459,7 +460,6 @@
 								
 								<div class='vertical-separator'></div>
 							<% } %>
-
 							<% if (!templated || ![null, undefined].includes(locals.display_template.medium)) { %>
 								<% metafields.forEach(d => { %>
 									<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
@@ -470,7 +470,7 @@
 							<% } %>
 							</div>
 						</div>
-						<button class='scroll-down m lg'><label>&rsaquo;</label></button>
+						<% if (!templated) { %><button class='scroll-down m lg'><label>&rsaquo;</label></button><% } %>
 					</div>
 					<script type='text/javascript'>
 						if (!mediaSize) var mediaSize = getMediaSize()
@@ -490,38 +490,40 @@
 								 d3.select('button.input-toolbox').classed('highlight', false)
 							})
 						}
-						d3.select('.media-input-group')
-						.each(function () {
-							const node = this
-							const sel = d3.select(this)
-							const inner = sel.select('.inner')
-							const height = inner.node().clientHeight || inner.node().offsetHeight
-							const scrollheight = inner.node().scrollHeight
-							const scrolltop = inner.node().scrollTop
-							const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
+						<% if (!templated) { %>
+							d3.select('.media-input-group')
+							.each(function () {
+								const node = this
+								const sel = d3.select(this)
+								const inner = sel.select('.inner')
+								const height = inner.node().clientHeight || inner.node().offsetHeight
+								const scrollheight = inner.node().scrollHeight
+								const scrolltop = inner.node().scrollTop
+								const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
 
-							sel.classed('overflowing', scrollheight > height)
-							
-							sel.select('button.scroll-up')
-								.classed('hide', scrollheight <= height && scrolltop > 0)
-							.on('click', function () {
-								inner.node().scrollTo({
-									top: scrolltop - (scrollheight - buttonheight),
-									left: 0,
-									behavior: 'smooth'
+								sel.classed('overflowing', scrollheight > height)
+								
+								sel.select('button.scroll-up')
+									.classed('hide', scrollheight <= height && scrolltop > 0)
+								.on('click', function () {
+									inner.node().scrollTo({
+										top: scrolltop - (scrollheight - buttonheight),
+										left: 0,
+										behavior: 'smooth'
+									})
+								})
+
+								sel.select('button.scroll-down')
+									.classed('hide', scrollheight <= height && scrolltop < scrollheight - height)
+								.on('click', function () {
+									inner.node().scrollTo({
+										top: scrolltop + scrollheight - buttonheight,
+										left: 0,
+										behavior: 'smooth'
+									})
 								})
 							})
-
-							sel.select('button.scroll-down')
-								.classed('hide', scrollheight <= height && scrolltop < scrollheight - height)
-							.on('click', function () {
-								inner.node().scrollTo({
-									top: scrolltop + scrollheight - buttonheight,
-									left: 0,
-									behavior: 'smooth'
-								})
-							})
-						})
+						<% } %>
 					</script>
 				<% } %>
 			</div>
@@ -1346,6 +1348,7 @@
 
 		if (data.sections) {
 			data.sections.forEach(async d => {
+				console.log(d)
 				<% if (pagedisplay === 'slideshow') { %>
 					await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
 				<% } else { %>

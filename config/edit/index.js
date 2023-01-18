@@ -45,7 +45,7 @@ exports.metafields = [
 	// { type: 'txt', name: 'mapper name', required: true } // THIS IS A SIMPLE TEST OF ANOTHER TYPE OF MEDIA (txt)
 	
 
-	{ type: 'radiolist', name: 'experiment status', required: true, 
+	{ type: 'radiolist', name: 'experiment status', instruction: 'Current status of experimental activity',
 	options: [
 		{ name: 'Idea stage' },
 		{ name: 'Design stage' },
@@ -53,13 +53,13 @@ exports.metafields = [
 		{ name: 'Implementation stage' },
 		{ name: 'Completed' }
 	] },
-	{ type: 'radiolist', name: 'experiment type', required: true, 
+	{ type: 'checklist', name: 'experiment type', instruction: 'Please categorize the type that best identifies this experimental activity:',
 	options: [
 		{ name: 'Pre experimental (trial and error, prototype, a/b testing)' },
 		{ name: 'Quasi experimental (Analytical, observations, etc)' },
 		{ name: 'Fully randomised (RCTs, etc.)' }
 	] },
-	{ type: 'checklist', name: 'partnering sector', required: true, 
+	{ type: 'checklist', name: 'partnering sector', instruction: 'Which sector are you partnering with for this activity? Please select all that apply',
 	options: [
 		{ name: 'United Nations agency' },
 		{ name: 'Public Sector' },
@@ -67,20 +67,20 @@ exports.metafields = [
 		{ name: 'Civil Society/ NGOs' },
 		{ name: 'Academia' }
 	]},
-	{ type: 'radiolist', name: 'control group', required: true, 
+	{ type: 'checklist', name: 'control group', instruction: 'Does the activity use a control group for comparison?',
 	options: [
 		{ name: 'Yes, a different group entirely' },
 		{ name: 'Yes, the same group but before the intervention' },
 		{ name: 'No, it does not use a control group' },
 		{ name: "Don't know" }
 	]},
-	{ type: 'radiolist', name: 'assignment type', required: true, 
+	{ type: 'checklist', name: 'assignment type', instruction: 'How is the intervention assigned to different groups in your experiment?',
 		options: [
 		{ name: 'Random assignment' },
 		{ name: 'non-random assignment' },
 		{ name: 'other' }
 	] },
-	{ type: 'radiolist', name: 'sample size', required: true, instruction: 'What is the estimated sample size?',
+	{ type: 'checklist', name: 'sample size', instruction: 'What is the estimated sample size?',
 	options: [
 		{ name: '1' },
 		{ name: '2-9' },
@@ -89,14 +89,14 @@ exports.metafields = [
 		{ name: '100-999' },
 		{ name: 'More than 1,000' }
 	] },
-	{ type: 'radiolist', name: 'total cost', required: true, instruction: 'What is the total estimated monetary resources needed for this experiment?',
+	{ type: 'radiolist', name: 'total cost', instruction: 'What is the total estimated monetary resources needed for this experiment?',
 	options: [
 		{ name: 'Less than 1,000 USD' },
 		{ name: 'Between 1,000 and 9,999 USD' },
 		{ name: 'Between 10,000- and 20,000 USD' },
 		{ name: 'More than 20,000 USD' }
 	] },
-	{ type: 'checklist', name: 'quality check', required: true, instruction: 'Quality Check',
+	{ type: 'checklist', name: 'quality check', instruction: 'Quality Check',
 	options: [
 		{ name: 'This activity is relevant to a CPD outcome' },
 		{ name: 'The hypothesis is clearly stated' },

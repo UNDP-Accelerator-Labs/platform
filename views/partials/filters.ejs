@@ -35,7 +35,6 @@
 						<% if (key in locals.filters_menu) { %>
 							<% query[key].forEach(d => { %>
 								<% if (locals.filters_menu[key]?.some(c => c.id.toString() === d)) { %>
-
 									<div class='tag' data-type='<%- key %>' data-value='<%- d %>'>
 										<label class='type'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](false).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label> 
 										<label class='name'>

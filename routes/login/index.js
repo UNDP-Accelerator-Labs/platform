@@ -1,6 +1,5 @@
 const { app_title, app_title_short, app_languages, DB } = include('config/')
 const { checklanguage, datastructures, join } = include('routes/helpers/')
-
 const jwt = require('jsonwebtoken')
 
 exports.render = (req, res, next) => {

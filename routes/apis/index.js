@@ -1,5 +1,6 @@
 const xlsx = require('./xlsx.js').main
 const json = require('./json.js').main
+const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']

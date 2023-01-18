@@ -783,8 +783,8 @@ exports.api.solutions = (req, res) => {
 					} else gbatch.push(null)
 					return gt.batch(gbatch)
 					.catch(err => console.log(err))
-				}).then(results => {
-					const [ thematic_areas_ids, sdg_ids ]
+				}).then(tags => {
+					const [ thematic_areas_ids, sdg_ids ] = tags
 					const f_pads = pads ? DB.pgp.as.format(`AND p.id IN ($1:csv)`, [pads.map(d => +d)]) : ''
 					// const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.sdgs @> ANY('{$1:csv}'::jsonb[])`, [sdgs.map(d => +d)]) : ''
 					const f_sdgs = sdg_ids ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND tag_id IN ($1:csv))`, [ sdg_ids.map(d => +d.id) ]) : ''
@@ -812,7 +812,8 @@ exports.api.solutions = (req, res) => {
 							$4:raw
 						;`, [ f_pads, f_sdgs, f_thematic_areas, f_limit ])
 						.then(async results => {
-							const data = await join.users(pads, [ language, 'contributor_id' ])
+							// const data = await join.users(results, [ language, 'contributor_id' ])
+							const data = await join.users(results, [ 'en', 'contributor_id' ])
 							return data
 						}).catch(err => console.log(err)))
 						// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors, f_limit]))
@@ -820,6 +821,7 @@ exports.api.solutions = (req, res) => {
 						.catch(err => console.log(err))
 					}).then(results => {
 						const [ count, pads ] = results
+						console.log(count, pads)
 						pads.forEach(d => {
 							d.imgs = parsers.getImg(d)
 							d.sdgs = parsers.getSDGs(d)

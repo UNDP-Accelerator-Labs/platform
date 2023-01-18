@@ -41,7 +41,6 @@
 					<% locals.filters_menu?.forEach(d => { %>
 						<section>
 							<% for (let key in d) { %>
-								<% console.log(key, key.slice(0, -1).replace(/_/g, ' '), vocabulary[key.slice(0, -1).replace(/_/g, ' ')]) %>
 								<div class='filter'>
 									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
 									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>

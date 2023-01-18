@@ -37,21 +37,25 @@
 									<div class='dropdown'>
 										<ul>
 											<% if (rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) { %>
-												<li>
-													<a href='/<%- language %>/contribute/pad'>
-			 											<button>
-															<label><%- vocabulary['blank pad'][language] %></label>
-														</button>
-													</a>
-												</li>
-												<% if (locals.metadata.menu.templates?.length > 0) { %>
+												<% if (false) { %>
 													<li>
-														<button>
-															<label><%- vocabulary['templated pad'][language] %></label>
-															<span class='expandable'>></span>
-														</button>
-														<div class='dropdown'>
-															<ul>
+														<a href='/<%- language %>/contribute/pad'>
+				 											<button>
+																<label><%- vocabulary['blank pad'][language] %></label>
+															</button>
+														</a>
+													</li>
+												<% } %>
+												<% if (locals.metadata.menu.templates?.length > 0) { %>
+													<% if (false) { %>
+														<li>
+															<button>
+																<label><%- vocabulary['templated pad'][language] %></label>
+																<span class='expandable'>></span>
+															</button>
+															<div class='dropdown'>
+																<ul>
+													<% } %>
 																<% if (locals.metadata.menu.templates.length > 2) { %>
 																	<li class='filter lg'>
 																		<input type='text' id='filter-pad-templates' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
@@ -84,9 +88,11 @@
 																		</a>
 																	</li>
 																<% }) %>
-															</ul>
-														</div>
-													</li>
+													<% if (false) { %>
+																</ul>
+															</div>
+														</li>
+													<% } %>
 												<% } %>
 											<% } %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>

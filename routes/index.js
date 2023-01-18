@@ -762,55 +762,79 @@ exports.api.solutions = (req, res) => {
 			if (contributors && !Array.isArray(contributors)) contributors = [contributors]
 
 			if (pads?.length || sdgs?.length || thematic_areas?.length || contributors?.length) {
-				const f_pads = pads ? DB.pgp.as.format(`AND p.id IN ($1:csv)`, [pads.map(d => +d)]) : ''
-				// const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.sdgs @> ANY('{$1:csv}'::jsonb[])`, [sdgs.map(d => +d)]) : ''
-				const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND key IN ($1:csv))`, [ sdgs.map(d => +d) ]) : ''
-				// const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`AND p.tags ?| ARRAY[$1:csv]`, [thematic_areas]) : ''
-				const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'thematic_areas' AND name IN ($1:csv))`, [ thematic_areas ]) : ''
-				// const f_contributors = contributors ? DB.pgp.as.format(`AND p.contributor IN ($1:csv)`, [ contributors.map(d => +d) ]) : ''
-				const f_limit = limit ? DB.pgp.as.format(`LIMIT $1::INT`, [ limit ]) : ''
-
-				return DB.conn.tx(t => {
-					const batch = []
-					batch.push(t.oneOrNone(`
-						SELECT COUNT (p.id)::INT FROM pads p
-						WHERE p.status >= 2
-							$1:raw
-							$2:raw
-							$3:raw
-					;`, [ f_pads, f_sdgs, f_thematic_areas ], d => d ? d.count : d))
-					// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors], d => d ? d.count : d))
-					batch.push(t.any(`
-						SELECT p.id, p.sections, p.title, to_char(p.date, 'DD Mon YYYY') AS date, owner AS contributor_id FROM pads p
-						WHERE p.status >= 2
-							$1:raw
-							$2:raw
-							$3:raw
-						$4:raw
-					;`, [ f_pads, f_sdgs, f_thematic_areas, f_limit ])
-					.then(async results => {
-						const data = await join.users(pads, [ language, 'contributor_id' ])
-						return data
-					}).catch(err => console.log(err)))
-					// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors, f_limit]))
-					return t.batch(batch)
+				
+				// GET THE tag IDs
+				DB.general.tx(gt => {
+					const gbatch = []
+					if (thematic_areas?.length > 0) {
+						gbatch.push(gt.any(`
+							SELECT id FROM tags
+							WHERE type = 'thematic_areas'
+							AND name IN ($1:csv)
+						;`, [ thematic_areas ]))
+					} else gbatch.push(null)
+					if (sdgs?.length > 0) {
+						gbatch.push(gt.any(`
+							SELECT id FROM tags
+							WHERE type = 'sdgs'
+							AND key IN ($1:csv)
+								OR name IN ($1:csv)
+						;`, [ sdgs ]))
+					} else gbatch.push(null)
+					return gt.batch(gbatch)
 					.catch(err => console.log(err))
 				}).then(results => {
-					const [ count, pads ] = results
-					pads.forEach(d => {
-						d.imgs = parsers.getImg(d)
-						d.sdgs = parsers.getSDGs(d)
-						d.thematic_areas = parsers.getTags(d)
-						if (thematic_areas) d.rank = array.intersection.call(d.thematic_areas, thematic_areas)?.length / (d.thematic_areas || 1)
-						else if (sdgs) d.rank = array.intersection.call(d.sdgs, sdgs)?.length / (d.sdgs.length || 1)
-						else d.rank = d.id
-					})
-					pads.sort((a, b) => {
-						return b.rank - a.rank
-						// THIS SHOULD THEN BE RANDOMIZED
-					})
-					res.status(200).json({ count: count, pads: pads })
-				}).catch(err => console.log(err))
+					const [ thematic_areas_ids, sdg_ids ]
+					const f_pads = pads ? DB.pgp.as.format(`AND p.id IN ($1:csv)`, [pads.map(d => +d)]) : ''
+					// const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.sdgs @> ANY('{$1:csv}'::jsonb[])`, [sdgs.map(d => +d)]) : ''
+					const f_sdgs = sdg_ids ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND tag_id IN ($1:csv))`, [ sdg_ids.map(d => +d.id) ]) : ''
+					// const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`AND p.tags ?| ARRAY[$1:csv]`, [thematic_areas]) : ''
+					const f_thematic_areas = thematic_areas_ids ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'thematic_areas' AND tag_id IN ($1:csv))`, [ thematic_areas_ids.map(d => +d.id) ]) : ''
+					// const f_contributors = contributors ? DB.pgp.as.format(`AND p.contributor IN ($1:csv)`, [ contributors.map(d => +d) ]) : ''
+					const f_limit = limit ? DB.pgp.as.format(`LIMIT $1::INT`, [ limit ]) : ''
+
+					return DB.conn.tx(t => {
+						const batch = []
+						batch.push(t.oneOrNone(`
+							SELECT COUNT (p.id)::INT FROM pads p
+							WHERE p.status >= 2
+								$1:raw
+								$2:raw
+								$3:raw
+						;`, [ f_pads, f_sdgs, f_thematic_areas ], d => d ? d.count : d))
+						// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors], d => d ? d.count : d))
+						batch.push(t.any(`
+							SELECT p.id, p.sections, p.title, to_char(p.date, 'DD Mon YYYY') AS date, owner AS contributor_id FROM pads p
+							WHERE p.status >= 2
+								$1:raw
+								$2:raw
+								$3:raw
+							$4:raw
+						;`, [ f_pads, f_sdgs, f_thematic_areas, f_limit ])
+						.then(async results => {
+							const data = await join.users(pads, [ language, 'contributor_id' ])
+							return data
+						}).catch(err => console.log(err)))
+						// ;`, [f_pads, f_sdgs, f_thematic_areas, f_contributors, f_limit]))
+						return t.batch(batch)
+						.catch(err => console.log(err))
+					}).then(results => {
+						const [ count, pads ] = results
+						pads.forEach(d => {
+							d.imgs = parsers.getImg(d)
+							d.sdgs = parsers.getSDGs(d)
+							d.thematic_areas = parsers.getTags(d)
+							if (thematic_areas) d.rank = array.intersection.call(d.thematic_areas, thematic_areas)?.length / (d.thematic_areas || 1)
+							else if (sdgs) d.rank = array.intersection.call(d.sdgs, sdgs)?.length / (d.sdgs.length || 1)
+							else d.rank = d.id
+						})
+						pads.sort((a, b) => {
+							return b.rank - a.rank
+							// THIS SHOULD THEN BE RANDOMIZED
+						})
+						res.status(200).json({ count: count, pads: pads })
+					}).catch(err => console.log(err))
+				})
 			} else res.status(400).json({ message: 'Missing filters. You cannot retrieve all data at once.' })
 		} else res.status(403).json({ message: 'It seems you do not have the authorization to use the api.' })
 

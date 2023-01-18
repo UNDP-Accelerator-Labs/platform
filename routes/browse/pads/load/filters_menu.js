@@ -123,7 +123,7 @@ exports.main = async kwargs => {
 			.catch(err => console.log(err))
 		}).catch(err => console.log(err)))
 		
-		// GET TAGS AND INDEXES BREAKDOWN
+		// GET TAGS, INDEXES, AND OTHER METAFILEDS BREAKDOWN
 		batch.push(t.task(t1 => {
 			const batch1 = []
 			
@@ -153,6 +153,32 @@ exports.main = async kwargs => {
 					if (tags.length) {
 						obj = {}
 						obj[d.label.toLowerCase()] = tags
+					}
+					return obj
+				}).catch(err => console.log(err)))
+			})
+
+			metafields.filter(d => !['tag', 'index', 'location', 'attachment'].includes(d.type))
+			.forEach(d => {
+				batch1.push(t1.any(`
+					SELECT COUNT (DISTINCT (m.pad))::INT, m.value AS name, m.key AS id FROM metafields m
+					INNER JOIN pads p
+						ON p.id = m.pad
+					WHERE m.name = $1
+						AND p.id NOT IN (SELECT review FROM reviews)
+						$2:raw
+					GROUP BY (m.name, m.value, m.key)
+				;`, [ d.label, full_filters ]).then(results => {
+
+					results.sort((a, b) => {
+						if (Number.isInteger(a?.id) && Number.isInteger(b?.id)) return a?.id - b?.id
+						else return a?.name?.localeCompare(b?.name)
+					})
+					
+					let obj = null
+					if (results.length) {
+						obj = {}
+						obj[d.label.toLowerCase()] = results
 					}
 					return obj
 				}).catch(err => console.log(err)))

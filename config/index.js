@@ -62,6 +62,8 @@ if (metafields.some(d => d.type === 'location')) map = true
 metafields.forEach(d => d.label = d.name.toLowerCase().trim().replace(/\s+/g, '_'))
 exports.metafields = metafields || []
 
+exports.media_value_keys = ['txt', 'html', 'src', 'srcs', 'shapes', 'options']
+
 // DESIRED ENGAGEMENT TYPES
 exports.engagementtypes = engagementtypes || []
 

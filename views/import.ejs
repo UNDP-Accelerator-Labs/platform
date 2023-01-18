@@ -1058,11 +1058,16 @@
 					tags: results.filter(d => metafields.some(c => ['tag', 'index'].includes(c.type) && c.label === d.name)).map(d => d.tags).flat(),
 					locations: results.filter(d => d.type === 'location').map(d => d.centerpoints).flat(),
 					
-					metadata: results.filter(d => metafields.some(c => !['tag', 'index', 'location'].includes(c.type) && c.label === d.name)).map(d => {
-							const valuekey = Object.keys(d).find(c => !['type', 'name', 'level', 'required', 'instruction', 'has_content'].includes(c))
+					metadata: results.filter(d => metafields.some(c => !['tag', 'index', 'location'].includes(c.type) && c.label === d.name))
+						.map(d => {
+							const valuekey = Object.keys(d).find(c => <%- JSON.stringify(locals.metadata.site.media_value_keys) %>.includes(c))
+							const value = d[valuekey]
+
+							// TO DO: IF valuekey = 'options' AND type = 'checklist' OR type = 'radiolist'
+							// NEED TO MAKE SURE THE INPUT IN THE xlsx MATCHES THE options IN THE metafield
 							
-							if (Array.isArray(d[valuekey])) {
-								return d[valuekey].map(c => {
+							if (Array.isArray(value)) {
+								return value.map(c => {
 									const obj = {}
 									obj.type = d.type
 									obj.name = d.name
@@ -1073,7 +1078,7 @@
 								const obj = {}
 								obj.type = d.type
 								obj.name = d.name
-								obj.value = d[valuekey]
+								obj.value = value
 								return obj
 							}
 						}).flat()

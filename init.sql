@@ -195,6 +195,7 @@ CREATE TABLE metafields (
 	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	type VARCHAR(19),
 	name CITEXT,
+	key INT,
 	value TEXT,
 	CONSTRAINT pad_value_type UNIQUE (pad, value, type)
 );

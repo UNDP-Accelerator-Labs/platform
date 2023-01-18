@@ -129,9 +129,12 @@ exports.main = async (req, res) => {
 		// CONTENT FILTERS
 		const content_filters = []
 		metafields.forEach(d => {
+			// TO DO: FINSIH THIS FOR OTHER METAFIELDS
 			if (Object.keys(req.query).includes(d.label)) {
 				if (['tag', 'index'].includes(d.type)) {
 					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, req.query[d.label] ]))
+				} else if (!['tag', 'index', 'location', 'attachment'].includes(d.type)) {
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, req.query[d.label] ]))
 				}
 			}
 		})

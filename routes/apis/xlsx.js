@@ -7,7 +7,7 @@ const fs = require('fs')
 const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 const turf = require('@turf/turf')
 
-const { metafields, DB } = include('config/')
+const { metafields, media_value_keys, DB } = include('config/')
 const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter').main
@@ -108,7 +108,7 @@ exports.main = async (req, res) => {
 					} else batch1.push(null)
 					if (include_metafields) {
 						batch1.push(t1.any(`
-							SELECT pad AS pad_id, type, name, value FROM metafields
+							SELECT pad AS pad_id, type, name, key, value FROM metafields
 							WHERE pad IN ($1:csv)
 							ORDER BY pad
 						;`, [ ids ]))
@@ -285,15 +285,17 @@ exports.main = async (req, res) => {
 												// }
 
 												for (let i = 0; i < max; i ++) {
-													const valuekey = Object.keys(d).find(c => !['type', 'name', 'level', 'required', 'has_content'].includes(c))
-													const value = d[valuekey]
+													const valuekey = Object.keys(d).find(c => media_value_keys.includes(c))
+													let value = d[valuekey]
+
+													if (Array.isArray(valuekey) && valuekey === 'options') value = value.filter(c => c.checked === true)
 
 													const obj = {}
 													obj.id = `${cid}--${i}`
 													obj.repetition = structure.some(c => c.id === obj.id) ? structure.filter(c => c.id === obj.id).length : 0
 													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
 
-													obj.content = value[i] ?? null
+													obj.content = (Array.isArray(value) ? value[i] : value) ?? null
 													structure.push(obj)	
 												}
 											} else {

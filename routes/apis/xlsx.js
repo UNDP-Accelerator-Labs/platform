@@ -34,7 +34,6 @@ exports.main = async (req, res) => {
 	}
 
 	DB.conn.tx(t => {
-		// TO DO: INCLUDE FILTER MECHANISM
 		return t.any(`
 			SELECT p.id AS pad_id, 
 				p.owner AS contributor_id, 

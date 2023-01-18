@@ -764,9 +764,9 @@ exports.api.solutions = (req, res) => {
 			if (pads?.length || sdgs?.length || thematic_areas?.length || contributors?.length) {
 				const f_pads = pads ? DB.pgp.as.format(`AND p.id IN ($1:csv)`, [pads.map(d => +d)]) : ''
 				// const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.sdgs @> ANY('{$1:csv}'::jsonb[])`, [sdgs.map(d => +d)]) : ''
-				const f_sdgs = sdgs ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND key IN ($1:csv))`, [ sdgs.map(d => +d) ]) : ''
+				const f_sdgs = sdgs ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'sdgs' AND key IN ($1:csv))`, [ sdgs.map(d => +d) ]) : ''
 				// const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`AND p.tags ?| ARRAY[$1:csv]`, [thematic_areas]) : ''
-				const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = 'thematic_areas' AND name IN ($1:csv))`, [ thematic_areas ]) : ''
+				const f_thematic_areas = thematic_areas ? DB.pgp.as.format(`AND p.id IN (SELECT pad FROM tagging WHERE type = 'thematic_areas' AND name IN ($1:csv))`, [ thematic_areas ]) : ''
 				// const f_contributors = contributors ? DB.pgp.as.format(`AND p.contributor IN ($1:csv)`, [ contributors.map(d => +d) ]) : ''
 				const f_limit = limit ? DB.pgp.as.format(`LIMIT $1::INT`, [ limit ]) : ''
 

@@ -12,6 +12,8 @@ const Pageres = require('pageres') // THIS IS FOR SCREENSHOTS
 const turf = require('@turf/turf')
 const archiver = require('archiver')
 
+const jwt = require('jsonwebtoken')
+
 
 if (!exports.redirect) { exports.redirect = {} }
 if (!exports.render) { exports.render = {} }

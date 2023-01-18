@@ -129,54 +129,91 @@
 				<% if (['contribute', 'edit'].includes(activity)) { %>
 					<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
 					<div class='media-input-group input-group' tabindex='1'>
-						
-						<% if (!review_template) { %>
-							<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
-							<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
-						<% } %>
-						
-						<button id='input-meta-group' title='Add a group of inputs.'><i class='material-icons'>dynamic_form</i></button>
-						<div class='vertical-separator'></div>
-						<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
-						<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
-						<!-- TO DO: TRANSLATE -->
-						<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
-						<% if (!review_template) { %>
-							<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>insert_photo</i></button>
-							<button id='input-media-drawing' title='Request a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
-						<% } %>
-						<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
-						
-						<% if (!review_template) { %>	
+						<button class='scroll-up'><label>&rsaquo;</label></button>
+						<div class='inner'>
+							<div class='btn-group'>
+							<% if (!review_template) { %>
+								<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
+								<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
+							<% } %>
+							
+							<button id='input-meta-group' title='Add a group of inputs.'><i class='material-icons'>dynamic_form</i></button>
 							<div class='vertical-separator'></div>
-							<% locals.metadata.site.metafields.forEach(d => { %>
-								<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
-									<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
-									<label>
-										<span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span>
-									</label>
-								</button>
-							<% }) %>
-							<script type='text/javascript'>
-								if (!mediaSize) var mediaSize = getMediaSize()
-								if (mediaSize === 'xs') {
-									d3.select('button.input-toolbox')
-									.on('touchend, click', function () {
-										d3.select(this).toggleClass('highlight')
-										d3.select('.media-input-group').node().focus() 
-									})
-									d3.select('.media-input-group').on('touchend', function () { this.focus() })
-									.on('focus', function () {
-										if (this.style.maxHeight) this.style.maxHeight = null
-										else this.style.maxHeight = `${this.scrollHeight}px`
-									}).on('blur', function () {
-										 this.style.maxHeight = null
-										 d3.select('button.input-toolbox').classed('highlight', false)
-									})
-								}
-							</script>
-						<% } %>
+							<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
+							<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
+							<!-- TO DO: TRANSLATE -->
+							<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
+							<% if (!review_template) { %>
+								<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>insert_photo</i></button>
+								<button id='input-media-drawing' title='Request a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
+							<% } %>
+							<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
+							
+							<% if (!review_template) { %>	
+								<div class='vertical-separator'></div>
+								<% locals.metadata.site.metafields.forEach(d => { %>
+									<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
+										<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
+										<label>
+											<span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span>
+										</label>
+									</button>
+								<% }) %>
+							<% } %>
+							</div>
+						</div>
+						<button class='scroll-down'><label>&rsaquo;</label></button>
 					</div>
+					<script type='text/javascript'>
+						if (!mediaSize) var mediaSize = getMediaSize()
+						if (mediaSize === 'xs') {
+							d3.select('button.input-toolbox')
+							.on('touchend, click', function () {
+								d3.select(this).toggleClass('highlight')
+								d3.select('.media-input-group').node().focus() 
+							})
+							d3.select('.media-input-group').on('touchend', function () { this.focus() })
+							.on('focus', function () {
+								if (this.style.maxHeight) this.style.maxHeight = null
+								else this.style.maxHeight = `${this.scrollHeight}px`
+							}).on('blur', function () {
+								 this.style.maxHeight = null
+								 d3.select('button.input-toolbox').classed('highlight', false)
+							})
+						}
+						d3.select('.media-input-group')
+						.each(function () {
+							const node = this
+							const sel = d3.select(this)
+							const inner = sel.select('.inner')
+							const height = inner.node().clientHeight || inner.node().offsetHeight
+							const scrollheight = inner.node().scrollHeight
+							const scrolltop = inner.node().scrollTop
+							const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
+
+							sel.classed('overflowing', scrollheight > height)
+							
+							sel.select('button.scroll-up')
+								.classed('hide', scrollheight <= height && scrolltop > 0)
+							.on('click', function () {
+								inner.node().scrollTo({
+									top: scrolltop - (scrollheight - buttonheight),
+									left: 0,
+									behavior: 'smooth'
+								})
+							})
+
+							sel.select('button.scroll-down')
+								.classed('hide', scrollheight <= height && scrolltop < scrollheight - height)
+							.on('click', function () {
+								inner.node().scrollTo({
+									top: scrolltop + scrollheight - buttonheight,
+									left: 0,
+									behavior: 'smooth'
+								})
+							})
+						})
+					</script>
 				<% } %>
 			</div>
 			
@@ -366,7 +403,7 @@
 		}).on('mousedown', function () {
 			this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling || null
 		}).on('click', function () { 
-			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required } 
+			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required, options: d.options || null } 
 			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
@@ -725,17 +762,20 @@
 			if (mediaSize === 'xs') {
 				const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 				save_btn.select('button')
-					.html(vocabulary['changes saved']['<%- language %>'])
+					// .html(vocabulary['changes saved']['<%- language %>'])
+					.html('<%- vocabulary["changes saved"][language] %>')
 				window.setTimeout(_ => {
 					save_btn.classed('saved', false)
 					.select('button').each(function () { this.disabled = true })
+						// .html('<%- vocabulary["save"][language] %>')
 						.html('<%- vocabulary["save"][language] %>')
 				}, 1000)
 			} else {
 				const menu_logo = d3.select('nav#site-title .inner')
 				menu_logo.select('.save').classed('saved', true)
 					.select('button')
-					.html(vocabulary['changes saved']['<%- language %>'])
+					// .html(vocabulary['changes saved']['<%- language %>'])
+					.html('<%- vocabulary["changes saved"][language] %>')
 				window.setTimeout(_ => {
 					menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
 					menu_logo.selectAll('div.save').classed('hide', true)

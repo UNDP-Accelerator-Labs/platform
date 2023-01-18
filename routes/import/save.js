@@ -83,8 +83,11 @@ exports.main = (req, res) => { // TO DO
 
 						if (d.metadata?.length) {
 							// SAVE METAFIELDS
-							d.metadata.forEach(c => c.pad = pad_id)
-							const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'value'], 'metafields')
+							d.metadata.forEach(c => {
+								c.pad = pad_id
+								if (!Number.isInteger(c.key)) c.key = null
+							})
+							const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'key', 'value'], 'metafields')
 							batch1.push(t1.none(`
 								$1:raw
 								ON CONFLICT ON CONSTRAINT pad_value_type

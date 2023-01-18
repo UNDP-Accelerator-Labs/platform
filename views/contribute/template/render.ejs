@@ -635,7 +635,7 @@ function addChecklist (kwargs) {
 	}
 	if (!instruction) instruction = ''
 	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+	if ([null, undefined].includes(editable)) editable = editing && level !== 'meta'
 
 	if (editable && !options.find(d => !d.name)) options.push({ checked: false })
 	if (!editable) options = options.filter(d => d.name)
@@ -655,7 +655,7 @@ function addChecklist (kwargs) {
 	})
 	
 	// DETERMINE ID FOR THE INPUT NAME
-	let checklist_id = media.id//uuidv4()
+	let checklist_id = media.id
 
 	// TO DO: CHANGE THIS INSTRUCTION TO MEDIA TEXT
 	media.media.addElem('div', 'instruction')
@@ -761,7 +761,7 @@ function addRadiolist (kwargs) {
 	}
 	if (!instruction) instruction = ''
 	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+	if ([null, undefined].includes(editable)) editable = editing && level !== 'meta'
 
 	if (editable && !options.find(d => !d.name)) options.push({ checked: false })
 	if (!editable) options = options.filter(d => d.name)

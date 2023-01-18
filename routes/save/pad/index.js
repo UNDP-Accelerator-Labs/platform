@@ -83,19 +83,22 @@ exports.main = (req, res) => {
 			// SAVE EXTRA METADATA INFO
 			if (metadata?.length) {
 				// SAVE THE METADATA
-				metadata.forEach(d => d.pad = newID || id)
-				const sql = DB.pgp.helpers.insert(metadata, ['pad', 'type', 'name', 'value'], 'metafields')
+				metadata.forEach(d => {
+					d.pad = newID || id
+					if (!Number.isInteger(d.key)) d.key = null
+				})
+				const sql = DB.pgp.helpers.insert(metadata, ['pad', 'type', 'name', 'key', 'value'], 'metafields')
 				batch.push(t.none(`
 					$1:raw
 					ON CONFLICT ON CONSTRAINT pad_value_type
 						DO NOTHING
 				;`, [ sql ]))
 				// REMOVE ALL OLD METADATA
-				const values = DB.pgp.helpers.values(metadata, ['type', 'name', 'value'])
+				const values = DB.pgp.helpers.values(metadata, ['type', 'name', 'key', 'value'])
 				batch.push(t.none(`
 					DELETE FROM metafields
 					WHERE pad = $1
-						AND (type, name, value) NOT IN ($2:raw)
+						AND (type, name, key, value) NOT IN ($2:raw)
 				;`, [ newID || id, values ]))
 			} else batch.push(t.none(`
 				DELETE FROM metafields

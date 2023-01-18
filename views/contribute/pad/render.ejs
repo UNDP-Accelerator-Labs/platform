@@ -1664,7 +1664,7 @@ function addChecklist (kwargs) {
 
 	if (!editing && options?.length === 0) return null
 
-	if (editing && !options.find(d => !d.name) && !templated) options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	if (level === 'meta' && name) {
@@ -1732,7 +1732,7 @@ function addChecklist (kwargs) {
 		})
 	list.call(addItem)	
 
-	if (editing && !templated) {
+	if (editing && !templated && level !== 'meta') {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
@@ -1809,7 +1809,7 @@ function addChecklist (kwargs) {
 			}
 		}).html(d => d.name)
 
-		if (editing && !templated) {
+		if (editing && !templated && level !== 'meta') {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons')
 				.html('clear')
@@ -1852,7 +1852,7 @@ function addRadiolist (kwargs) {
 
 	if (!editing && options?.length === 0) return null
 
-	if (editing && !options.find(d => !d.name) && !templated) options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	if (level === 'meta' && name) {
@@ -1920,7 +1920,7 @@ function addRadiolist (kwargs) {
 		})
 	list.call(addItem)	
 
-	if (editing && !templated) {
+	if (editing && !templated && level !== 'meta') {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
@@ -1995,7 +1995,7 @@ function addRadiolist (kwargs) {
 			}
 		}).html(d => d.name)
 
-		if (editing && !templated) {
+		if (editing && !templated && level !== 'meta') {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons')
 				.html('clear')
@@ -2336,12 +2336,10 @@ async function addTags (kwargs) {
 		}
 	}
 }
-
-// THIS IS THE CONSENT MODULE FROM THE SM PLATFORM
 async function addAttachment (kwargs) {
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
 	let { id, level, type, name, srcs, instruction, constraint, required } = data || {}
-	if (!level) level = 'media'
+	if (!level) level = 'meta'
 	if (!type) type = 'attachment'
 	if (!name) name = null
 	if (!srcs) srcs = []
@@ -2426,7 +2424,6 @@ async function addAttachment (kwargs) {
 		if (!srcs.length && result === null) meta.rmMedia()
 	}
 
-	// THIS IS THE ORIGINAL CODE FROM THE SM PLATFORM
 	meta.media.addElems('a', 'attachment', d => { return d.srcs.map(c => { return { src: c, name: d.name } }) })
 		.attrs({ 
 			'href': d => d.src,

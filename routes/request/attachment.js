@@ -99,7 +99,7 @@ function POST (req, res) {
 					const metadata = item.srcs.map(d => { 
 						return { pad: join_id, type: 'attachment', name, value: d } 
 					})
-					const sql = DB.pgp.helpers.insert(metadata, ['pad', 'type', 'name', 'value'], 'metafields')
+					const sql = DB.pgp.helpers.insert(metadata, ['pad', 'type', 'name', 'value'], 'metafields') // NO NEED TO PASS key HERE
 					batch.push(t.none(`
 						$1:raw
 						ON CONFLICT ON CONSTRAINT pad_value_type

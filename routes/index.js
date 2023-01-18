@@ -664,20 +664,12 @@ exports.dispatch.apis = require('./apis/')
 if (!exports.api) exports.api = {}
 // THE TAGS APIS SHOULD BE DEPRECATED FOR NOW
 exports.api.skills = (req, res) => {
-	// DB.conn.any(`
-	// 	SELECT id, category, name FROM skills ORDER BY category, name
-	// ;`).then(results => res.status(200).json(results))
-	// .catch(err => res.status(500).send(err))
 	DB.general.any(`
 		SELECT id, category, name FROM skills ORDER BY category, name
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }
 exports.api.methods = (req, res) => {
-	// DB.conn.any(`
-	// 	SELECT id, name FROM methods ORDER BY name
-	// ;`).then(results => res.status(200).json(results))
-	// .catch(err => res.status(500).send(err))
 	DB.general.any(`
 		SELECT id, name FROM methods ORDER BY name
 	;`).then(results => res.status(200).json(results))
@@ -685,12 +677,6 @@ exports.api.methods = (req, res) => {
 }
 exports.api.datasources = (req, res) => {
 	if (req.method === 'GET') {
-		// DB.conn.any(`
-		// 	SELECT d.id, d.name, d.description, c.country FROM datasources d
-		// 	LEFT JOIN contributors c
-		// 		ON d.contributor = c.id
-		// ;`).then(results => res.status(200).json(results))
-		// .catch(err => res.status(500).send(err))
 		DB.general.any(`
 			SELECT d.id, d.name, d.description, u.iso3 FROM datasources d
 			LEFT JOIN users u
@@ -701,16 +687,6 @@ exports.api.datasources = (req, res) => {
 		const { uuid } = req.session || {}
 		const { tag } = req.body || {}
 
-		// DB.conn.one(`
-		// 	INSERT INTO datasources (name, contributor)
-		// 	SELECT $1, id FROM contributors
-		// 	WHERE uuid = $2
-		// 		ON CONFLICT ON CONSTRAINT datasources_name_key
-		// 		DO NOTHING
-		// 	RETURNING id, name
-		// ;`, [tag.toLowerCase(), uuid || null])
-		// .then(result => res.status(200).json(result))
-		// .catch(err => res.status(500).send(err))
 		DB.general.one(`
 			INSERT INTO datasources (name, contributor)
 			VALUES ($1, $2)

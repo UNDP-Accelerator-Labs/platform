@@ -3497,7 +3497,7 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     background-color: #0A4C73;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group {
+  div.document main .inner .body .media-input-group .inner .btn-group {
     position: fixed;
     bottom: 105px;
     right: 22.5px;
@@ -3508,24 +3508,18 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: max-height 0.25s;
-    /*:first-child {
-    	padding-top: 5px;
-    }
-    :last-child {
-    	padding-bottom: 5px;
-    }*/
   }
-  div.document main .inner .body .media-input-group input {
+  div.document main .inner .body .media-input-group .inner .btn-group input {
     display: none;
   }
-  div.document main .inner .body .media-input-group form {
+  div.document main .inner .body .media-input-group .inner .btn-group form {
     position: relative;
     display: block;
     width: 60px;
     height: 45px;
   }
-  div.document main .inner .body .media-input-group label,
-div.document main .inner .body .media-input-group button {
+  div.document main .inner .body .media-input-group .inner .btn-group label,
+div.document main .inner .body .media-input-group .inner .btn-group button {
     position: relative;
     display: block;
     width: 45px;
@@ -3548,8 +3542,8 @@ div.document main .inner .body .media-input-group button {
     transition: background-color 0.25s;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group label label,
-div.document main .inner .body .media-input-group button label {
+  div.document main .inner .body .media-input-group .inner .btn-group label label,
+div.document main .inner .body .media-input-group .inner .btn-group button label {
     content: attr(title);
     position: absolute;
     top: 0;
@@ -3565,53 +3559,53 @@ div.document main .inner .body .media-input-group button label {
     white-space: nowrap;
     transition: padding 0.25s, width 0.25s;
   }
-  div.document main .inner .body .media-input-group label label span,
-div.document main .inner .body .media-input-group button label span {
+  div.document main .inner .body .media-input-group .inner .btn-group label label span,
+div.document main .inner .body .media-input-group .inner .btn-group button label span {
     padding: 0 10px;
   }
-  div.document main .inner .body .media-input-group label i,
-div.document main .inner .body .media-input-group button i {
+  div.document main .inner .body .media-input-group .inner .btn-group label i,
+div.document main .inner .body .media-input-group .inner .btn-group button i {
     font-size: 20px;
     line-height: 45px;
   }
-  div.document main .inner .body .media-input-group label img,
-div.document main .inner .body .media-input-group button img {
+  div.document main .inner .body .media-input-group .inner .btn-group label img,
+div.document main .inner .body .media-input-group .inner .btn-group button img {
     width: 20px;
     vertical-align: middle;
   }
-  div.document main .inner .body .media-input-group label:hover,
-div.document main .inner .body .media-input-group button:hover {
+  div.document main .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main .inner .body .media-input-group .inner .btn-group button:hover {
     background-color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group label.highlight,
-div.document main .inner .body .media-input-group button.highlight {
+  div.document main .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main .inner .body .media-input-group .inner .btn-group button.highlight {
     background-color: #333D51;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group input:disabled,
-div.document main .inner .body .media-input-group button:disabled {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group input:disabled img,
-div.document main .inner .body .media-input-group button:disabled img {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled img {
     filter: brightness(2);
   }
-  div.document main .inner .body .media-input-group .vertical-separator {
+  div.document main .inner .body .media-input-group .inner .btn-group .vertical-separator {
     width: 60px;
     height: 0px;
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline {
+  div.document main .inner .body .input-group.inline .inner .btn-group {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
   }
-  div.document main .inner .body .input-group.inline .vertical-separator {
+  div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed {
+  div.document main .inner .body .input-group.fixed .inner .btn-group {
     display: flex;
     align-items: center;
     position: absolute;
@@ -3620,7 +3614,7 @@ div.document main .inner .body .media-input-group button:disabled img {
     pointer-events: none;
     z-index: 100;
   }
-  div.document main .inner .body .input-group.fixed label {
+  div.document main .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
   }
   main#reference {
@@ -9510,7 +9504,7 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     background-color: #0A4C73;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group {
+  div.document main .inner .body .media-input-group .inner .btn-group {
     position: fixed;
     bottom: 105px;
     right: 22.5px;
@@ -9521,24 +9515,18 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: max-height 0.25s;
-    /*:first-child {
-    	padding-top: 5px;
-    }
-    :last-child {
-    	padding-bottom: 5px;
-    }*/
   }
-  div.document main .inner .body .media-input-group input {
+  div.document main .inner .body .media-input-group .inner .btn-group input {
     display: none;
   }
-  div.document main .inner .body .media-input-group form {
+  div.document main .inner .body .media-input-group .inner .btn-group form {
     position: relative;
     display: block;
     width: 60px;
     height: 45px;
   }
-  div.document main .inner .body .media-input-group label,
-div.document main .inner .body .media-input-group button {
+  div.document main .inner .body .media-input-group .inner .btn-group label,
+div.document main .inner .body .media-input-group .inner .btn-group button {
     position: relative;
     display: block;
     width: 45px;
@@ -9561,8 +9549,8 @@ div.document main .inner .body .media-input-group button {
     transition: background-color 0.25s;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group label label,
-div.document main .inner .body .media-input-group button label {
+  div.document main .inner .body .media-input-group .inner .btn-group label label,
+div.document main .inner .body .media-input-group .inner .btn-group button label {
     content: attr(title);
     position: absolute;
     top: 0;
@@ -9578,53 +9566,53 @@ div.document main .inner .body .media-input-group button label {
     white-space: nowrap;
     transition: padding 0.25s, width 0.25s;
   }
-  div.document main .inner .body .media-input-group label label span,
-div.document main .inner .body .media-input-group button label span {
+  div.document main .inner .body .media-input-group .inner .btn-group label label span,
+div.document main .inner .body .media-input-group .inner .btn-group button label span {
     padding: 0 10px;
   }
-  div.document main .inner .body .media-input-group label i,
-div.document main .inner .body .media-input-group button i {
+  div.document main .inner .body .media-input-group .inner .btn-group label i,
+div.document main .inner .body .media-input-group .inner .btn-group button i {
     font-size: 20px;
     line-height: 45px;
   }
-  div.document main .inner .body .media-input-group label img,
-div.document main .inner .body .media-input-group button img {
+  div.document main .inner .body .media-input-group .inner .btn-group label img,
+div.document main .inner .body .media-input-group .inner .btn-group button img {
     width: 20px;
     vertical-align: middle;
   }
-  div.document main .inner .body .media-input-group label:hover,
-div.document main .inner .body .media-input-group button:hover {
+  div.document main .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main .inner .body .media-input-group .inner .btn-group button:hover {
     background-color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group label.highlight,
-div.document main .inner .body .media-input-group button.highlight {
+  div.document main .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main .inner .body .media-input-group .inner .btn-group button.highlight {
     background-color: #333D51;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group input:disabled,
-div.document main .inner .body .media-input-group button:disabled {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group input:disabled img,
-div.document main .inner .body .media-input-group button:disabled img {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled img {
     filter: brightness(2);
   }
-  div.document main .inner .body .media-input-group .vertical-separator {
+  div.document main .inner .body .media-input-group .inner .btn-group .vertical-separator {
     width: 60px;
     height: 0px;
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline {
+  div.document main .inner .body .input-group.inline .inner .btn-group {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
   }
-  div.document main .inner .body .input-group.inline .vertical-separator {
+  div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed {
+  div.document main .inner .body .input-group.fixed .inner .btn-group {
     display: flex;
     align-items: center;
     position: absolute;
@@ -9633,7 +9621,7 @@ div.document main .inner .body .media-input-group button:disabled img {
     pointer-events: none;
     z-index: 100;
   }
-  div.document main .inner .body .input-group.fixed label {
+  div.document main .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
   }
   main#reference {
@@ -15524,7 +15512,7 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     background-color: #0A4C73;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group {
+  div.document main .inner .body .media-input-group .inner .btn-group {
     position: fixed;
     bottom: 105px;
     right: 22.5px;
@@ -15535,24 +15523,18 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: max-height 0.25s;
-    /*:first-child {
-    	padding-top: 5px;
-    }
-    :last-child {
-    	padding-bottom: 5px;
-    }*/
   }
-  div.document main .inner .body .media-input-group input {
+  div.document main .inner .body .media-input-group .inner .btn-group input {
     display: none;
   }
-  div.document main .inner .body .media-input-group form {
+  div.document main .inner .body .media-input-group .inner .btn-group form {
     position: relative;
     display: block;
     width: 60px;
     height: 45px;
   }
-  div.document main .inner .body .media-input-group label,
-div.document main .inner .body .media-input-group button {
+  div.document main .inner .body .media-input-group .inner .btn-group label,
+div.document main .inner .body .media-input-group .inner .btn-group button {
     position: relative;
     display: block;
     width: 45px;
@@ -15575,8 +15557,8 @@ div.document main .inner .body .media-input-group button {
     transition: background-color 0.25s;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group label label,
-div.document main .inner .body .media-input-group button label {
+  div.document main .inner .body .media-input-group .inner .btn-group label label,
+div.document main .inner .body .media-input-group .inner .btn-group button label {
     content: attr(title);
     position: absolute;
     top: 0;
@@ -15592,53 +15574,53 @@ div.document main .inner .body .media-input-group button label {
     white-space: nowrap;
     transition: padding 0.25s, width 0.25s;
   }
-  div.document main .inner .body .media-input-group label label span,
-div.document main .inner .body .media-input-group button label span {
+  div.document main .inner .body .media-input-group .inner .btn-group label label span,
+div.document main .inner .body .media-input-group .inner .btn-group button label span {
     padding: 0 10px;
   }
-  div.document main .inner .body .media-input-group label i,
-div.document main .inner .body .media-input-group button i {
+  div.document main .inner .body .media-input-group .inner .btn-group label i,
+div.document main .inner .body .media-input-group .inner .btn-group button i {
     font-size: 20px;
     line-height: 45px;
   }
-  div.document main .inner .body .media-input-group label img,
-div.document main .inner .body .media-input-group button img {
+  div.document main .inner .body .media-input-group .inner .btn-group label img,
+div.document main .inner .body .media-input-group .inner .btn-group button img {
     width: 20px;
     vertical-align: middle;
   }
-  div.document main .inner .body .media-input-group label:hover,
-div.document main .inner .body .media-input-group button:hover {
+  div.document main .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main .inner .body .media-input-group .inner .btn-group button:hover {
     background-color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group label.highlight,
-div.document main .inner .body .media-input-group button.highlight {
+  div.document main .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main .inner .body .media-input-group .inner .btn-group button.highlight {
     background-color: #333D51;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group input:disabled,
-div.document main .inner .body .media-input-group button:disabled {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group input:disabled img,
-div.document main .inner .body .media-input-group button:disabled img {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled img {
     filter: brightness(2);
   }
-  div.document main .inner .body .media-input-group .vertical-separator {
+  div.document main .inner .body .media-input-group .inner .btn-group .vertical-separator {
     width: 60px;
     height: 0px;
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline {
+  div.document main .inner .body .input-group.inline .inner .btn-group {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
   }
-  div.document main .inner .body .input-group.inline .vertical-separator {
+  div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed {
+  div.document main .inner .body .input-group.fixed .inner .btn-group {
     display: flex;
     align-items: center;
     position: absolute;
@@ -15647,7 +15629,7 @@ div.document main .inner .body .media-input-group button:disabled img {
     pointer-events: none;
     z-index: 100;
   }
-  div.document main .inner .body .input-group.fixed label {
+  div.document main .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
   }
   main#reference {
@@ -25010,35 +24992,47 @@ div.document main#pad .inner .body .media-input-group, div.document main#referen
 div.document main#template .inner .body .media-input-group,
 div.document main#mobilization .inner .body .media-input-group {
     position: fixed;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     top: 0;
     left: calc((100vw - (300px * 3 + 15px * 4)) / 2 + (300px * 3 + 15px * 2 - 30px));
+    max-height: 80vh;
+    transform: translateY(90px);
     border-top: 1px solid #E5E5E5;
     border-left: 1px solid #E5E5E5;
     border-bottom: 1px solid #E5E5E5;
-    outline: none;
+  }
+  div.document main .inner .body .media-input-group .inner,
+div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
+div.document main#template .inner .body .media-input-group .inner,
+div.document main#mobilization .inner .body .media-input-group .inner {
+    max-height: calc(80vh - 20px);
     padding: 10px 0;
+    overflow: hidden;
+  }
+  div.document main .inner .body .media-input-group .inner .btn-group,
+div.document main#pad .inner .body .media-input-group .inner .btn-group, div.document main#reference .inner .body .media-input-group .inner .btn-group,
+div.document main#template .inner .body .media-input-group .inner .btn-group,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group {
+    display: flex;
+    flex-direction: column;
+    outline: none;
     background-color: #FFF;
-    transform: translateY(90px);
     z-index: 1000;
   }
-  div.document main .inner .body .media-input-group input,
-div.document main#pad .inner .body .media-input-group input, div.document main#reference .inner .body .media-input-group input,
-div.document main#template .inner .body .media-input-group input,
-div.document main#mobilization .inner .body .media-input-group input {
+  div.document main .inner .body .media-input-group .inner .btn-group input,
+div.document main#pad .inner .body .media-input-group .inner .btn-group input, div.document main#reference .inner .body .media-input-group .inner .btn-group input,
+div.document main#template .inner .body .media-input-group .inner .btn-group input,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group input {
     display: none;
   }
-  div.document main .inner .body .media-input-group label,
-div.document main .inner .body .media-input-group button,
-div.document main#pad .inner .body .media-input-group label,
-div.document main#pad .inner .body .media-input-group button, div.document main#reference .inner .body .media-input-group label,
-div.document main#reference .inner .body .media-input-group button,
-div.document main#template .inner .body .media-input-group label,
-div.document main#template .inner .body .media-input-group button,
-div.document main#mobilization .inner .body .media-input-group label,
-div.document main#mobilization .inner .body .media-input-group button {
+  div.document main .inner .body .media-input-group .inner .btn-group label,
+div.document main .inner .body .media-input-group .inner .btn-group button,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button, div.document main#reference .inner .body .media-input-group .inner .btn-group label,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button,
+div.document main#template .inner .body .media-input-group .inner .btn-group label,
+div.document main#template .inner .body .media-input-group .inner .btn-group button,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button {
     position: relative;
     display: block;
     float: left;
@@ -25062,15 +25056,15 @@ div.document main#mobilization .inner .body .media-input-group button {
     transition: background-color 0.25s;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group label label,
-div.document main .inner .body .media-input-group button label,
-div.document main#pad .inner .body .media-input-group label label,
-div.document main#pad .inner .body .media-input-group button label, div.document main#reference .inner .body .media-input-group label label,
-div.document main#reference .inner .body .media-input-group button label,
-div.document main#template .inner .body .media-input-group label label,
-div.document main#template .inner .body .media-input-group button label,
-div.document main#mobilization .inner .body .media-input-group label label,
-div.document main#mobilization .inner .body .media-input-group button label {
+  div.document main .inner .body .media-input-group .inner .btn-group label label,
+div.document main .inner .body .media-input-group .inner .btn-group button label,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label label,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button label, div.document main#reference .inner .body .media-input-group .inner .btn-group label label,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button label,
+div.document main#template .inner .body .media-input-group .inner .btn-group label label,
+div.document main#template .inner .body .media-input-group .inner .btn-group button label,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label label,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button label {
     content: attr(title);
     position: absolute;
     top: 0;
@@ -25086,115 +25080,188 @@ div.document main#mobilization .inner .body .media-input-group button label {
     white-space: nowrap;
     transition: padding 0.25s, width 0.25s;
   }
-  div.document main .inner .body .media-input-group label label span,
-div.document main .inner .body .media-input-group button label span,
-div.document main#pad .inner .body .media-input-group label label span,
-div.document main#pad .inner .body .media-input-group button label span, div.document main#reference .inner .body .media-input-group label label span,
-div.document main#reference .inner .body .media-input-group button label span,
-div.document main#template .inner .body .media-input-group label label span,
-div.document main#template .inner .body .media-input-group button label span,
-div.document main#mobilization .inner .body .media-input-group label label span,
-div.document main#mobilization .inner .body .media-input-group button label span {
+  div.document main .inner .body .media-input-group .inner .btn-group label label span,
+div.document main .inner .body .media-input-group .inner .btn-group button label span,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button label span, div.document main#reference .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button label span,
+div.document main#template .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#template .inner .body .media-input-group .inner .btn-group button label span,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button label span {
     padding: 0 10px;
   }
-  div.document main .inner .body .media-input-group label i,
-div.document main .inner .body .media-input-group button i,
-div.document main#pad .inner .body .media-input-group label i,
-div.document main#pad .inner .body .media-input-group button i, div.document main#reference .inner .body .media-input-group label i,
-div.document main#reference .inner .body .media-input-group button i,
-div.document main#template .inner .body .media-input-group label i,
-div.document main#template .inner .body .media-input-group button i,
-div.document main#mobilization .inner .body .media-input-group label i,
-div.document main#mobilization .inner .body .media-input-group button i {
+  div.document main .inner .body .media-input-group .inner .btn-group label i,
+div.document main .inner .body .media-input-group .inner .btn-group button i,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label i,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button i, div.document main#reference .inner .body .media-input-group .inner .btn-group label i,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button i,
+div.document main#template .inner .body .media-input-group .inner .btn-group label i,
+div.document main#template .inner .body .media-input-group .inner .btn-group button i,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label i,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button i {
     font-size: 20px;
     line-height: 45px;
   }
-  div.document main .inner .body .media-input-group label img,
-div.document main .inner .body .media-input-group button img,
-div.document main#pad .inner .body .media-input-group label img,
-div.document main#pad .inner .body .media-input-group button img, div.document main#reference .inner .body .media-input-group label img,
-div.document main#reference .inner .body .media-input-group button img,
-div.document main#template .inner .body .media-input-group label img,
-div.document main#template .inner .body .media-input-group button img,
-div.document main#mobilization .inner .body .media-input-group label img,
-div.document main#mobilization .inner .body .media-input-group button img {
+  div.document main .inner .body .media-input-group .inner .btn-group label img,
+div.document main .inner .body .media-input-group .inner .btn-group button img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button img, div.document main#reference .inner .body .media-input-group .inner .btn-group label img,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button img,
+div.document main#template .inner .body .media-input-group .inner .btn-group label img,
+div.document main#template .inner .body .media-input-group .inner .btn-group button img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button img {
     width: 20px;
     vertical-align: middle;
   }
-  div.document main .inner .body .media-input-group label:hover,
-div.document main .inner .body .media-input-group button:hover,
-div.document main#pad .inner .body .media-input-group label:hover,
-div.document main#pad .inner .body .media-input-group button:hover, div.document main#reference .inner .body .media-input-group label:hover,
-div.document main#reference .inner .body .media-input-group button:hover,
-div.document main#template .inner .body .media-input-group label:hover,
-div.document main#template .inner .body .media-input-group button:hover,
-div.document main#mobilization .inner .body .media-input-group label:hover,
-div.document main#mobilization .inner .body .media-input-group button:hover {
+  div.document main .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main .inner .body .media-input-group .inner .btn-group button:hover,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button:hover, div.document main#reference .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button:hover,
+div.document main#template .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#template .inner .body .media-input-group .inner .btn-group button:hover,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:hover {
     background-color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group label.highlight,
-div.document main .inner .body .media-input-group button.highlight,
-div.document main#pad .inner .body .media-input-group label.highlight,
-div.document main#pad .inner .body .media-input-group button.highlight, div.document main#reference .inner .body .media-input-group label.highlight,
-div.document main#reference .inner .body .media-input-group button.highlight,
-div.document main#template .inner .body .media-input-group label.highlight,
-div.document main#template .inner .body .media-input-group button.highlight,
-div.document main#mobilization .inner .body .media-input-group label.highlight,
-div.document main#mobilization .inner .body .media-input-group button.highlight {
+  div.document main .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main .inner .body .media-input-group .inner .btn-group button.highlight,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button.highlight, div.document main#reference .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button.highlight,
+div.document main#template .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#template .inner .body .media-input-group .inner .btn-group button.highlight,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button.highlight {
     background-color: #333D51;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group input:disabled,
-div.document main .inner .body .media-input-group button:disabled,
-div.document main#pad .inner .body .media-input-group input:disabled,
-div.document main#pad .inner .body .media-input-group button:disabled, div.document main#reference .inner .body .media-input-group input:disabled,
-div.document main#reference .inner .body .media-input-group button:disabled,
-div.document main#template .inner .body .media-input-group input:disabled,
-div.document main#template .inner .body .media-input-group button:disabled,
-div.document main#mobilization .inner .body .media-input-group input:disabled,
-div.document main#mobilization .inner .body .media-input-group button:disabled {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled,
+div.document main#pad .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button:disabled, div.document main#reference .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button:disabled,
+div.document main#template .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#template .inner .body .media-input-group .inner .btn-group button:disabled,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group input:disabled img,
-div.document main .inner .body .media-input-group button:disabled img,
-div.document main#pad .inner .body .media-input-group input:disabled img,
-div.document main#pad .inner .body .media-input-group button:disabled img, div.document main#reference .inner .body .media-input-group input:disabled img,
-div.document main#reference .inner .body .media-input-group button:disabled img,
-div.document main#template .inner .body .media-input-group input:disabled img,
-div.document main#template .inner .body .media-input-group button:disabled img,
-div.document main#mobilization .inner .body .media-input-group input:disabled img,
-div.document main#mobilization .inner .body .media-input-group button:disabled img {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button:disabled img, div.document main#reference .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button:disabled img,
+div.document main#template .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#template .inner .body .media-input-group .inner .btn-group button:disabled img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:disabled img {
     filter: brightness(2);
   }
-  div.document main .inner .body .media-input-group .vertical-separator,
-div.document main#pad .inner .body .media-input-group .vertical-separator, div.document main#reference .inner .body .media-input-group .vertical-separator,
-div.document main#template .inner .body .media-input-group .vertical-separator,
-div.document main#mobilization .inner .body .media-input-group .vertical-separator {
+  div.document main .inner .body .media-input-group .inner .btn-group .vertical-separator,
+div.document main#pad .inner .body .media-input-group .inner .btn-group .vertical-separator, div.document main#reference .inner .body .media-input-group .inner .btn-group .vertical-separator,
+div.document main#template .inner .body .media-input-group .inner .btn-group .vertical-separator,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group .vertical-separator {
     width: 60px;
     height: 0px;
     /*border-top: 1px dotted $c-light-grey;*/
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline,
-div.document main#pad .inner .body .input-group.inline, div.document main#reference .inner .body .input-group.inline,
-div.document main#template .inner .body .input-group.inline,
-div.document main#mobilization .inner .body .input-group.inline {
+  div.document main .inner .body .media-input-group button.scroll-up,
+div.document main .inner .body .media-input-group button.scroll-down,
+div.document main#pad .inner .body .media-input-group button.scroll-up,
+div.document main#pad .inner .body .media-input-group button.scroll-down, div.document main#reference .inner .body .media-input-group button.scroll-up,
+div.document main#reference .inner .body .media-input-group button.scroll-down,
+div.document main#template .inner .body .media-input-group button.scroll-up,
+div.document main#template .inner .body .media-input-group button.scroll-down,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down {
+    position: absolute;
+    display: block;
+    height: 30px;
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    background-color: #E5E5E5;
+    outline: none;
+    border: none;
+    line-height: 30px;
+    z-index: 1000;
+    cursor: pointer;
+  }
+  div.document main .inner .body .media-input-group button.scroll-up label,
+div.document main .inner .body .media-input-group button.scroll-down label,
+div.document main#pad .inner .body .media-input-group button.scroll-up label,
+div.document main#pad .inner .body .media-input-group button.scroll-down label, div.document main#reference .inner .body .media-input-group button.scroll-up label,
+div.document main#reference .inner .body .media-input-group button.scroll-down label,
+div.document main#template .inner .body .media-input-group button.scroll-up label,
+div.document main#template .inner .body .media-input-group button.scroll-down label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 0 0 0 15px;
+    line-height: 26px;
+    text-align: center;
+    font-size: 20px;
+    transform-origin: center;
+    cursor: pointer;
+    color: #646464;
+  }
+  div.document main .inner .body .media-input-group button.scroll-up,
+div.document main#pad .inner .body .media-input-group button.scroll-up, div.document main#reference .inner .body .media-input-group button.scroll-up,
+div.document main#template .inner .body .media-input-group button.scroll-up,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up {
+    top: 0px;
+  }
+  div.document main .inner .body .media-input-group button.scroll-up label,
+div.document main#pad .inner .body .media-input-group button.scroll-up label, div.document main#reference .inner .body .media-input-group button.scroll-up label,
+div.document main#template .inner .body .media-input-group button.scroll-up label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up label {
+    transform: rotate(-90deg);
+  }
+  div.document main .inner .body .media-input-group button.scroll-down,
+div.document main#pad .inner .body .media-input-group button.scroll-down, div.document main#reference .inner .body .media-input-group button.scroll-down,
+div.document main#template .inner .body .media-input-group button.scroll-down,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down {
+    bottom: 0px;
+  }
+  div.document main .inner .body .media-input-group button.scroll-down label,
+div.document main#pad .inner .body .media-input-group button.scroll-down label, div.document main#reference .inner .body .media-input-group button.scroll-down label,
+div.document main#template .inner .body .media-input-group button.scroll-down label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
+    transform: rotate(90deg);
+  }
+  div.document main .inner .body .input-group.overflowing .inner,
+div.document main#pad .inner .body .input-group.overflowing .inner, div.document main#reference .inner .body .input-group.overflowing .inner,
+div.document main#template .inner .body .input-group.overflowing .inner,
+div.document main#mobilization .inner .body .input-group.overflowing .inner {
+    max-height: calc(80vh - 80px);
+    padding: 40px 0;
+  }
+  div.document main .inner .body .input-group.inline .inner .btn-group,
+div.document main#pad .inner .body .input-group.inline .inner .btn-group, div.document main#reference .inner .body .input-group.inline .inner .btn-group,
+div.document main#template .inner .body .input-group.inline .inner .btn-group,
+div.document main#mobilization .inner .body .input-group.inline .inner .btn-group {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
   }
-  div.document main .inner .body .input-group.inline .vertical-separator,
-div.document main#pad .inner .body .input-group.inline .vertical-separator, div.document main#reference .inner .body .input-group.inline .vertical-separator,
-div.document main#template .inner .body .input-group.inline .vertical-separator,
-div.document main#mobilization .inner .body .input-group.inline .vertical-separator {
+  div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator,
+div.document main#pad .inner .body .input-group.inline .inner .btn-group .vertical-separator, div.document main#reference .inner .body .input-group.inline .inner .btn-group .vertical-separator,
+div.document main#template .inner .body .input-group.inline .inner .btn-group .vertical-separator,
+div.document main#mobilization .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed,
-div.document main#pad .inner .body .input-group.fixed, div.document main#reference .inner .body .input-group.fixed,
-div.document main#template .inner .body .input-group.fixed,
-div.document main#mobilization .inner .body .input-group.fixed {
+  div.document main .inner .body .input-group.fixed .inner .btn-group,
+div.document main#pad .inner .body .input-group.fixed .inner .btn-group, div.document main#reference .inner .body .input-group.fixed .inner .btn-group,
+div.document main#template .inner .body .input-group.fixed .inner .btn-group,
+div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group {
     display: flex;
     align-items: center;
     position: absolute;
@@ -25203,10 +25270,10 @@ div.document main#mobilization .inner .body .input-group.fixed {
     pointer-events: none;
     z-index: 100;
   }
-  div.document main .inner .body .input-group.fixed label,
-div.document main#pad .inner .body .input-group.fixed label, div.document main#reference .inner .body .input-group.fixed label,
-div.document main#template .inner .body .input-group.fixed label,
-div.document main#mobilization .inner .body .input-group.fixed label {
+  div.document main .inner .body .input-group.fixed .inner .btn-group label,
+div.document main#pad .inner .body .input-group.fixed .inner .btn-group label, div.document main#reference .inner .body .input-group.fixed .inner .btn-group label,
+div.document main#template .inner .body .input-group.fixed .inner .btn-group label,
+div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
   }
   div.document.slideshow {
@@ -33474,35 +33541,47 @@ div.document main#pad .inner .body .media-input-group, div.document main#referen
 div.document main#template .inner .body .media-input-group,
 div.document main#mobilization .inner .body .media-input-group {
     position: fixed;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     top: 0;
     left: calc((100vw - (300px * 3 + 15px * 4)) / 2 + (300px * 3 + 15px * 2 - 30px));
+    max-height: 80vh;
+    transform: translateY(90px);
     border-top: 1px solid #E5E5E5;
     border-left: 1px solid #E5E5E5;
     border-bottom: 1px solid #E5E5E5;
-    outline: none;
+  }
+  div.document main .inner .body .media-input-group .inner,
+div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
+div.document main#template .inner .body .media-input-group .inner,
+div.document main#mobilization .inner .body .media-input-group .inner {
+    max-height: calc(80vh - 20px);
     padding: 10px 0;
+    overflow: hidden;
+  }
+  div.document main .inner .body .media-input-group .inner .btn-group,
+div.document main#pad .inner .body .media-input-group .inner .btn-group, div.document main#reference .inner .body .media-input-group .inner .btn-group,
+div.document main#template .inner .body .media-input-group .inner .btn-group,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group {
+    display: flex;
+    flex-direction: column;
+    outline: none;
     background-color: #FFF;
-    transform: translateY(90px);
     z-index: 1000;
   }
-  div.document main .inner .body .media-input-group input,
-div.document main#pad .inner .body .media-input-group input, div.document main#reference .inner .body .media-input-group input,
-div.document main#template .inner .body .media-input-group input,
-div.document main#mobilization .inner .body .media-input-group input {
+  div.document main .inner .body .media-input-group .inner .btn-group input,
+div.document main#pad .inner .body .media-input-group .inner .btn-group input, div.document main#reference .inner .body .media-input-group .inner .btn-group input,
+div.document main#template .inner .body .media-input-group .inner .btn-group input,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group input {
     display: none;
   }
-  div.document main .inner .body .media-input-group label,
-div.document main .inner .body .media-input-group button,
-div.document main#pad .inner .body .media-input-group label,
-div.document main#pad .inner .body .media-input-group button, div.document main#reference .inner .body .media-input-group label,
-div.document main#reference .inner .body .media-input-group button,
-div.document main#template .inner .body .media-input-group label,
-div.document main#template .inner .body .media-input-group button,
-div.document main#mobilization .inner .body .media-input-group label,
-div.document main#mobilization .inner .body .media-input-group button {
+  div.document main .inner .body .media-input-group .inner .btn-group label,
+div.document main .inner .body .media-input-group .inner .btn-group button,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button, div.document main#reference .inner .body .media-input-group .inner .btn-group label,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button,
+div.document main#template .inner .body .media-input-group .inner .btn-group label,
+div.document main#template .inner .body .media-input-group .inner .btn-group button,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button {
     position: relative;
     display: block;
     float: left;
@@ -33526,15 +33605,15 @@ div.document main#mobilization .inner .body .media-input-group button {
     transition: background-color 0.25s;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group label label,
-div.document main .inner .body .media-input-group button label,
-div.document main#pad .inner .body .media-input-group label label,
-div.document main#pad .inner .body .media-input-group button label, div.document main#reference .inner .body .media-input-group label label,
-div.document main#reference .inner .body .media-input-group button label,
-div.document main#template .inner .body .media-input-group label label,
-div.document main#template .inner .body .media-input-group button label,
-div.document main#mobilization .inner .body .media-input-group label label,
-div.document main#mobilization .inner .body .media-input-group button label {
+  div.document main .inner .body .media-input-group .inner .btn-group label label,
+div.document main .inner .body .media-input-group .inner .btn-group button label,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label label,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button label, div.document main#reference .inner .body .media-input-group .inner .btn-group label label,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button label,
+div.document main#template .inner .body .media-input-group .inner .btn-group label label,
+div.document main#template .inner .body .media-input-group .inner .btn-group button label,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label label,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button label {
     content: attr(title);
     position: absolute;
     top: 0;
@@ -33550,115 +33629,188 @@ div.document main#mobilization .inner .body .media-input-group button label {
     white-space: nowrap;
     transition: padding 0.25s, width 0.25s;
   }
-  div.document main .inner .body .media-input-group label label span,
-div.document main .inner .body .media-input-group button label span,
-div.document main#pad .inner .body .media-input-group label label span,
-div.document main#pad .inner .body .media-input-group button label span, div.document main#reference .inner .body .media-input-group label label span,
-div.document main#reference .inner .body .media-input-group button label span,
-div.document main#template .inner .body .media-input-group label label span,
-div.document main#template .inner .body .media-input-group button label span,
-div.document main#mobilization .inner .body .media-input-group label label span,
-div.document main#mobilization .inner .body .media-input-group button label span {
+  div.document main .inner .body .media-input-group .inner .btn-group label label span,
+div.document main .inner .body .media-input-group .inner .btn-group button label span,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button label span, div.document main#reference .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button label span,
+div.document main#template .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#template .inner .body .media-input-group .inner .btn-group button label span,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label label span,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button label span {
     padding: 0 10px;
   }
-  div.document main .inner .body .media-input-group label i,
-div.document main .inner .body .media-input-group button i,
-div.document main#pad .inner .body .media-input-group label i,
-div.document main#pad .inner .body .media-input-group button i, div.document main#reference .inner .body .media-input-group label i,
-div.document main#reference .inner .body .media-input-group button i,
-div.document main#template .inner .body .media-input-group label i,
-div.document main#template .inner .body .media-input-group button i,
-div.document main#mobilization .inner .body .media-input-group label i,
-div.document main#mobilization .inner .body .media-input-group button i {
+  div.document main .inner .body .media-input-group .inner .btn-group label i,
+div.document main .inner .body .media-input-group .inner .btn-group button i,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label i,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button i, div.document main#reference .inner .body .media-input-group .inner .btn-group label i,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button i,
+div.document main#template .inner .body .media-input-group .inner .btn-group label i,
+div.document main#template .inner .body .media-input-group .inner .btn-group button i,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label i,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button i {
     font-size: 20px;
     line-height: 45px;
   }
-  div.document main .inner .body .media-input-group label img,
-div.document main .inner .body .media-input-group button img,
-div.document main#pad .inner .body .media-input-group label img,
-div.document main#pad .inner .body .media-input-group button img, div.document main#reference .inner .body .media-input-group label img,
-div.document main#reference .inner .body .media-input-group button img,
-div.document main#template .inner .body .media-input-group label img,
-div.document main#template .inner .body .media-input-group button img,
-div.document main#mobilization .inner .body .media-input-group label img,
-div.document main#mobilization .inner .body .media-input-group button img {
+  div.document main .inner .body .media-input-group .inner .btn-group label img,
+div.document main .inner .body .media-input-group .inner .btn-group button img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button img, div.document main#reference .inner .body .media-input-group .inner .btn-group label img,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button img,
+div.document main#template .inner .body .media-input-group .inner .btn-group label img,
+div.document main#template .inner .body .media-input-group .inner .btn-group button img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button img {
     width: 20px;
     vertical-align: middle;
   }
-  div.document main .inner .body .media-input-group label:hover,
-div.document main .inner .body .media-input-group button:hover,
-div.document main#pad .inner .body .media-input-group label:hover,
-div.document main#pad .inner .body .media-input-group button:hover, div.document main#reference .inner .body .media-input-group label:hover,
-div.document main#reference .inner .body .media-input-group button:hover,
-div.document main#template .inner .body .media-input-group label:hover,
-div.document main#template .inner .body .media-input-group button:hover,
-div.document main#mobilization .inner .body .media-input-group label:hover,
-div.document main#mobilization .inner .body .media-input-group button:hover {
+  div.document main .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main .inner .body .media-input-group .inner .btn-group button:hover,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button:hover, div.document main#reference .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button:hover,
+div.document main#template .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#template .inner .body .media-input-group .inner .btn-group button:hover,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label:hover,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:hover {
     background-color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group label.highlight,
-div.document main .inner .body .media-input-group button.highlight,
-div.document main#pad .inner .body .media-input-group label.highlight,
-div.document main#pad .inner .body .media-input-group button.highlight, div.document main#reference .inner .body .media-input-group label.highlight,
-div.document main#reference .inner .body .media-input-group button.highlight,
-div.document main#template .inner .body .media-input-group label.highlight,
-div.document main#template .inner .body .media-input-group button.highlight,
-div.document main#mobilization .inner .body .media-input-group label.highlight,
-div.document main#mobilization .inner .body .media-input-group button.highlight {
+  div.document main .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main .inner .body .media-input-group .inner .btn-group button.highlight,
+div.document main#pad .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button.highlight, div.document main#reference .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button.highlight,
+div.document main#template .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#template .inner .body .media-input-group .inner .btn-group button.highlight,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group label.highlight,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button.highlight {
     background-color: #333D51;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group input:disabled,
-div.document main .inner .body .media-input-group button:disabled,
-div.document main#pad .inner .body .media-input-group input:disabled,
-div.document main#pad .inner .body .media-input-group button:disabled, div.document main#reference .inner .body .media-input-group input:disabled,
-div.document main#reference .inner .body .media-input-group button:disabled,
-div.document main#template .inner .body .media-input-group input:disabled,
-div.document main#template .inner .body .media-input-group button:disabled,
-div.document main#mobilization .inner .body .media-input-group input:disabled,
-div.document main#mobilization .inner .body .media-input-group button:disabled {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled,
+div.document main#pad .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button:disabled, div.document main#reference .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button:disabled,
+div.document main#template .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#template .inner .body .media-input-group .inner .btn-group button:disabled,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group input:disabled,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group input:disabled img,
-div.document main .inner .body .media-input-group button:disabled img,
-div.document main#pad .inner .body .media-input-group input:disabled img,
-div.document main#pad .inner .body .media-input-group button:disabled img, div.document main#reference .inner .body .media-input-group input:disabled img,
-div.document main#reference .inner .body .media-input-group button:disabled img,
-div.document main#template .inner .body .media-input-group input:disabled img,
-div.document main#template .inner .body .media-input-group button:disabled img,
-div.document main#mobilization .inner .body .media-input-group input:disabled img,
-div.document main#mobilization .inner .body .media-input-group button:disabled img {
+  div.document main .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main .inner .body .media-input-group .inner .btn-group button:disabled img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#pad .inner .body .media-input-group .inner .btn-group button:disabled img, div.document main#reference .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#reference .inner .body .media-input-group .inner .btn-group button:disabled img,
+div.document main#template .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#template .inner .body .media-input-group .inner .btn-group button:disabled img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group input:disabled img,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:disabled img {
     filter: brightness(2);
   }
-  div.document main .inner .body .media-input-group .vertical-separator,
-div.document main#pad .inner .body .media-input-group .vertical-separator, div.document main#reference .inner .body .media-input-group .vertical-separator,
-div.document main#template .inner .body .media-input-group .vertical-separator,
-div.document main#mobilization .inner .body .media-input-group .vertical-separator {
+  div.document main .inner .body .media-input-group .inner .btn-group .vertical-separator,
+div.document main#pad .inner .body .media-input-group .inner .btn-group .vertical-separator, div.document main#reference .inner .body .media-input-group .inner .btn-group .vertical-separator,
+div.document main#template .inner .body .media-input-group .inner .btn-group .vertical-separator,
+div.document main#mobilization .inner .body .media-input-group .inner .btn-group .vertical-separator {
     width: 60px;
     height: 0px;
     /*border-top: 1px dotted $c-light-grey;*/
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline,
-div.document main#pad .inner .body .input-group.inline, div.document main#reference .inner .body .input-group.inline,
-div.document main#template .inner .body .input-group.inline,
-div.document main#mobilization .inner .body .input-group.inline {
+  div.document main .inner .body .media-input-group button.scroll-up,
+div.document main .inner .body .media-input-group button.scroll-down,
+div.document main#pad .inner .body .media-input-group button.scroll-up,
+div.document main#pad .inner .body .media-input-group button.scroll-down, div.document main#reference .inner .body .media-input-group button.scroll-up,
+div.document main#reference .inner .body .media-input-group button.scroll-down,
+div.document main#template .inner .body .media-input-group button.scroll-up,
+div.document main#template .inner .body .media-input-group button.scroll-down,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down {
+    position: absolute;
+    display: block;
+    height: 30px;
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    background-color: #E5E5E5;
+    outline: none;
+    border: none;
+    line-height: 30px;
+    z-index: 1000;
+    cursor: pointer;
+  }
+  div.document main .inner .body .media-input-group button.scroll-up label,
+div.document main .inner .body .media-input-group button.scroll-down label,
+div.document main#pad .inner .body .media-input-group button.scroll-up label,
+div.document main#pad .inner .body .media-input-group button.scroll-down label, div.document main#reference .inner .body .media-input-group button.scroll-up label,
+div.document main#reference .inner .body .media-input-group button.scroll-down label,
+div.document main#template .inner .body .media-input-group button.scroll-up label,
+div.document main#template .inner .body .media-input-group button.scroll-down label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 0 0 0 15px;
+    line-height: 26px;
+    text-align: center;
+    font-size: 20px;
+    transform-origin: center;
+    cursor: pointer;
+    color: #646464;
+  }
+  div.document main .inner .body .media-input-group button.scroll-up,
+div.document main#pad .inner .body .media-input-group button.scroll-up, div.document main#reference .inner .body .media-input-group button.scroll-up,
+div.document main#template .inner .body .media-input-group button.scroll-up,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up {
+    top: 0px;
+  }
+  div.document main .inner .body .media-input-group button.scroll-up label,
+div.document main#pad .inner .body .media-input-group button.scroll-up label, div.document main#reference .inner .body .media-input-group button.scroll-up label,
+div.document main#template .inner .body .media-input-group button.scroll-up label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-up label {
+    transform: rotate(-90deg);
+  }
+  div.document main .inner .body .media-input-group button.scroll-down,
+div.document main#pad .inner .body .media-input-group button.scroll-down, div.document main#reference .inner .body .media-input-group button.scroll-down,
+div.document main#template .inner .body .media-input-group button.scroll-down,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down {
+    bottom: 0px;
+  }
+  div.document main .inner .body .media-input-group button.scroll-down label,
+div.document main#pad .inner .body .media-input-group button.scroll-down label, div.document main#reference .inner .body .media-input-group button.scroll-down label,
+div.document main#template .inner .body .media-input-group button.scroll-down label,
+div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
+    transform: rotate(90deg);
+  }
+  div.document main .inner .body .input-group.overflowing .inner,
+div.document main#pad .inner .body .input-group.overflowing .inner, div.document main#reference .inner .body .input-group.overflowing .inner,
+div.document main#template .inner .body .input-group.overflowing .inner,
+div.document main#mobilization .inner .body .input-group.overflowing .inner {
+    max-height: calc(80vh - 80px);
+    padding: 40px 0;
+  }
+  div.document main .inner .body .input-group.inline .inner .btn-group,
+div.document main#pad .inner .body .input-group.inline .inner .btn-group, div.document main#reference .inner .body .input-group.inline .inner .btn-group,
+div.document main#template .inner .body .input-group.inline .inner .btn-group,
+div.document main#mobilization .inner .body .input-group.inline .inner .btn-group {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
   }
-  div.document main .inner .body .input-group.inline .vertical-separator,
-div.document main#pad .inner .body .input-group.inline .vertical-separator, div.document main#reference .inner .body .input-group.inline .vertical-separator,
-div.document main#template .inner .body .input-group.inline .vertical-separator,
-div.document main#mobilization .inner .body .input-group.inline .vertical-separator {
+  div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator,
+div.document main#pad .inner .body .input-group.inline .inner .btn-group .vertical-separator, div.document main#reference .inner .body .input-group.inline .inner .btn-group .vertical-separator,
+div.document main#template .inner .body .input-group.inline .inner .btn-group .vertical-separator,
+div.document main#mobilization .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed,
-div.document main#pad .inner .body .input-group.fixed, div.document main#reference .inner .body .input-group.fixed,
-div.document main#template .inner .body .input-group.fixed,
-div.document main#mobilization .inner .body .input-group.fixed {
+  div.document main .inner .body .input-group.fixed .inner .btn-group,
+div.document main#pad .inner .body .input-group.fixed .inner .btn-group, div.document main#reference .inner .body .input-group.fixed .inner .btn-group,
+div.document main#template .inner .body .input-group.fixed .inner .btn-group,
+div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group {
     display: flex;
     align-items: center;
     position: absolute;
@@ -33667,10 +33819,10 @@ div.document main#mobilization .inner .body .input-group.fixed {
     pointer-events: none;
     z-index: 100;
   }
-  div.document main .inner .body .input-group.fixed label,
-div.document main#pad .inner .body .input-group.fixed label, div.document main#reference .inner .body .input-group.fixed label,
-div.document main#template .inner .body .input-group.fixed label,
-div.document main#mobilization .inner .body .input-group.fixed label {
+  div.document main .inner .body .input-group.fixed .inner .btn-group label,
+div.document main#pad .inner .body .input-group.fixed .inner .btn-group label, div.document main#reference .inner .body .input-group.fixed .inner .btn-group label,
+div.document main#template .inner .body .input-group.fixed .inner .btn-group label,
+div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
   }
   div.document.slideshow {

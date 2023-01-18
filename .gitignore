@@ -6,7 +6,7 @@ package-lock.json
 values.sql
 pads.env
 pads-distant.env
-public/uploads/
+public/*uploads/
 dep.*
 *.env
 tmp/

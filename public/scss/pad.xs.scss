@@ -1458,18 +1458,20 @@ div.document {
 					color: #FFF;
 				}
 				.media-input-group {
+					position: fixed;
+					bottom: 105px;
+					right: 22.5px;
+					max-height: 0;
+					z-index: 1000;
+					transition: max-height .25s;
+					box-shadow: 0 0 10px rgba(0,0,0,.1);
+					background-color: #FFF;
+					overflow: scroll;
+
 					.inner {
+
 						.btn-group {
-							position: fixed;
-							bottom: 105px;
-							right: 22.5px;
-							max-height: 0;
 							outline: none;
-							background-color: #FFF;
-							overflow: scroll;
-							box-shadow: 0 0 10px rgba(0,0,0,.1);
-							z-index: 1000;
-							transition: max-height .25s;
 
 							input {
 								display: none;
@@ -1563,11 +1565,12 @@ div.document {
 					}
 				}
 				.input-group.inline {
+					position: static;
+					margin-top: 10px;
+					padding-bottom: 0;
+
 					.inner {
 						.btn-group {
-							position: static;
-							margin-top: 10px;
-							padding-bottom: 0;
 
 							.vertical-separator {
 								margin: 5px 15px;
@@ -1576,15 +1579,16 @@ div.document {
 					}
 				}
 				.input-group.fixed {
+					position: absolute;
+					height: 100%;
+					padding-bottom: 0;
+					pointer-events: none;
+					z-index: 100;
+
 					.inner {
 						.btn-group {
 							display: flex;
 							align-items: center;
-							position: absolute;
-							height: 100%;
-							padding-bottom: 0;
-							pointer-events: none;
-							z-index: 100;
 
 							label {
 								pointer-events: all;

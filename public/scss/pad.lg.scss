@@ -1452,6 +1452,7 @@ div.document {
 					border-top: 1px solid $c-light-2;
 					border-left: 1px solid $c-light-2;
 					border-bottom: 1px solid $c-light-2;
+					z-index: 1000;
 					
 					.inner {
 						max-height: calc(80vh - 20px);
@@ -1463,7 +1464,6 @@ div.document {
 							flex-direction: column;
 							outline: none;
 							background-color: #FFF;
-							z-index: 1000;
 
 							input {
 								display: none;

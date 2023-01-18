@@ -129,7 +129,7 @@
 				<% if (['contribute', 'edit'].includes(activity)) { %>
 					<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
 					<div class='media-input-group input-group' tabindex='1'>
-						<button class='scroll-up'><label>&rsaquo;</label></button>
+						<button class='scroll-up m lg'><label>&rsaquo;</label></button>
 						<div class='inner'>
 							<div class='btn-group'>
 							<% if (!review_template) { %>
@@ -162,7 +162,7 @@
 							<% } %>
 							</div>
 						</div>
-						<button class='scroll-down'><label>&rsaquo;</label></button>
+						<button class='scroll-down m lg'><label>&rsaquo;</label></button>
 					</div>
 					<script type='text/javascript'>
 						if (!mediaSize) var mediaSize = getMediaSize()
@@ -175,7 +175,7 @@
 							d3.select('.media-input-group').on('touchend', function () { this.focus() })
 							.on('focus', function () {
 								if (this.style.maxHeight) this.style.maxHeight = null
-								else this.style.maxHeight = `${this.scrollHeight}px`
+								else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
 							}).on('blur', function () {
 								 this.style.maxHeight = null
 								 d3.select('button.input-toolbox').classed('highlight', false)

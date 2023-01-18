@@ -3497,17 +3497,19 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     background-color: #0A4C73;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group {
+  div.document main .inner .body .media-input-group {
     position: fixed;
     bottom: 105px;
     right: 22.5px;
     max-height: 0;
-    outline: none;
-    background-color: #FFF;
-    overflow: scroll;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: max-height 0.25s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #FFF;
+    overflow: scroll;
+  }
+  div.document main .inner .body .media-input-group .inner .btn-group {
+    outline: none;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input {
     display: none;
@@ -3597,7 +3599,7 @@ div.document main .inner .body .media-input-group .inner .btn-group button:disab
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline .inner .btn-group {
+  div.document main .inner .body .input-group.inline {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
@@ -3605,14 +3607,16 @@ div.document main .inner .body .media-input-group .inner .btn-group button:disab
   div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed .inner .btn-group {
-    display: flex;
-    align-items: center;
+  div.document main .inner .body .input-group.fixed {
     position: absolute;
     height: 100%;
     padding-bottom: 0;
     pointer-events: none;
     z-index: 100;
+  }
+  div.document main .inner .body .input-group.fixed .inner .btn-group {
+    display: flex;
+    align-items: center;
   }
   div.document main .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
@@ -9504,17 +9508,19 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     background-color: #0A4C73;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group {
+  div.document main .inner .body .media-input-group {
     position: fixed;
     bottom: 105px;
     right: 22.5px;
     max-height: 0;
-    outline: none;
-    background-color: #FFF;
-    overflow: scroll;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: max-height 0.25s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #FFF;
+    overflow: scroll;
+  }
+  div.document main .inner .body .media-input-group .inner .btn-group {
+    outline: none;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input {
     display: none;
@@ -9604,7 +9610,7 @@ div.document main .inner .body .media-input-group .inner .btn-group button:disab
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline .inner .btn-group {
+  div.document main .inner .body .input-group.inline {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
@@ -9612,14 +9618,16 @@ div.document main .inner .body .media-input-group .inner .btn-group button:disab
   div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed .inner .btn-group {
-    display: flex;
-    align-items: center;
+  div.document main .inner .body .input-group.fixed {
     position: absolute;
     height: 100%;
     padding-bottom: 0;
     pointer-events: none;
     z-index: 100;
+  }
+  div.document main .inner .body .input-group.fixed .inner .btn-group {
+    display: flex;
+    align-items: center;
   }
   div.document main .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
@@ -15512,17 +15520,19 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     background-color: #0A4C73;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group {
+  div.document main .inner .body .media-input-group {
     position: fixed;
     bottom: 105px;
     right: 22.5px;
     max-height: 0;
-    outline: none;
-    background-color: #FFF;
-    overflow: scroll;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: max-height 0.25s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #FFF;
+    overflow: scroll;
+  }
+  div.document main .inner .body .media-input-group .inner .btn-group {
+    outline: none;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input {
     display: none;
@@ -15612,7 +15622,7 @@ div.document main .inner .body .media-input-group .inner .btn-group button:disab
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .input-group.inline .inner .btn-group {
+  div.document main .inner .body .input-group.inline {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
@@ -15620,14 +15630,16 @@ div.document main .inner .body .media-input-group .inner .btn-group button:disab
   div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed .inner .btn-group {
-    display: flex;
-    align-items: center;
+  div.document main .inner .body .input-group.fixed {
     position: absolute;
     height: 100%;
     padding-bottom: 0;
     pointer-events: none;
     z-index: 100;
+  }
+  div.document main .inner .body .input-group.fixed .inner .btn-group {
+    display: flex;
+    align-items: center;
   }
   div.document main .inner .body .input-group.fixed .inner .btn-group label {
     pointer-events: all;
@@ -24999,6 +25011,7 @@ div.document main#mobilization .inner .body .media-input-group {
     border-top: 1px solid #E5E5E5;
     border-left: 1px solid #E5E5E5;
     border-bottom: 1px solid #E5E5E5;
+    z-index: 1000;
   }
   div.document main .inner .body .media-input-group .inner,
 div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
@@ -25016,7 +25029,6 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     flex-direction: column;
     outline: none;
     background-color: #FFF;
-    z-index: 1000;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input,
 div.document main#pad .inner .body .media-input-group .inner .btn-group input, div.document main#reference .inner .body .media-input-group .inner .btn-group input,
@@ -33548,6 +33560,7 @@ div.document main#mobilization .inner .body .media-input-group {
     border-top: 1px solid #E5E5E5;
     border-left: 1px solid #E5E5E5;
     border-bottom: 1px solid #E5E5E5;
+    z-index: 1000;
   }
   div.document main .inner .body .media-input-group .inner,
 div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
@@ -33565,7 +33578,6 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     flex-direction: column;
     outline: none;
     background-color: #FFF;
-    z-index: 1000;
   }
   div.document main .inner .body .media-input-group .inner .btn-group input,
 div.document main#pad .inner .body .media-input-group .inner .btn-group input, div.document main#reference .inner .body .media-input-group .inner .btn-group input,

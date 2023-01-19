@@ -1,4 +1,4 @@
-const { DB } = include('config/')
+const { modules, DB } = include('config/')
 // const { checklanguage } = include('routes/helpers/')
 
 exports.pin = (req, res) => {
@@ -6,6 +6,10 @@ exports.pin = (req, res) => {
 	const { board_id, board_title, object_id, mobilization } = req.body || {}
 	// const language = checklanguage(req.params?.language || req.session.language)
 	
+	const module_rights = modules.find(d => d.type === 'pads')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	if (!board_id) { // CREATE NEW BOARD
 		if (board_title?.trim().length > 0) {
 			return DB.conn.tx(t => {
@@ -43,7 +47,7 @@ exports.pin = (req, res) => {
 						const batch = []
 						batch.push(id)
 						batch.push(t.any(retrievepins(object_id)))
-						batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
+						batch.push(t.any(retrievepinboards(collaborators_ids)))
 						return t.batch(batch)
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
@@ -60,7 +64,7 @@ exports.pin = (req, res) => {
 				.then(_ => {
 					const batch = []
 					batch.push(t.any(retrievepins(object_id)))
-					batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
+					batch.push(t.any(retrievepinboards(collaborators_ids)))
 					return t.batch(batch)
 				})
 				.catch(err => console.log(err))
@@ -76,6 +80,10 @@ exports.unpin = (req, res) => {
 	const { collaborators } = req.session || {}
 	const { board_id, object_id, mobilization } = req.body || {}
 
+	const module_rights = modules.find(d => d.type === 'pads')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	if (object_id) {
 		return DB.conn.tx(t => {
 			return t.none(removepads(board_id, object_id, mobilization))
@@ -86,11 +94,11 @@ exports.unpin = (req, res) => {
 					WHERE id = $1::INT
 						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
 						AND owner IN ($2:csv)
-				;`, [ board_id, collaborators.filter(d => d.rights > 0).map(d => d.uuid) ])
+				;`, [ board_id, collaborators_ids ])
 			}).then(_ => {
 				const batch = []
 				batch.push(t.any(retrievepins(object_id)))
-				batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
+				batch.push(t.any(retrievepinboards(collaborators_ids)))
 				return t.batch(batch)
 			})
 		}).then(results => {

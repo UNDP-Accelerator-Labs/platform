@@ -1,4 +1,4 @@
-const { app_title, app_title_short, app_languages, DB } = include('config/')
+const { app_title, app_title_short, app_languages, modules, DB } = include('config/')
 const { checklanguage, datastructures, join } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
@@ -235,7 +235,7 @@ exports.redirect = (req, res, next) => {
 	const language = checklanguage(req.params?.language ? req.params.language : req.session.language)
 	if (req.session.uuid) {
 		console.log('should redirect as user is logged in')
-		if (req.session.rights > 0) res.redirect(`/${language}/browse/pads/private`)
+		if (req.session.rights > (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
 		else res.redirect(`/${language}/browse/pads/public`)
 	} else next()
 }

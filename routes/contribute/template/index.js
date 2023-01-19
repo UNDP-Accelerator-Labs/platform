@@ -12,6 +12,10 @@ exports.main = (req, res) => {
 	const path = req.path.substring(1).split('/')
 	const activity = path[1]
 
+	const module_rights = modules.find(d => d.type === 'templates')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A TEMPLATE
 		return check_authorization({ connection: t, id, rights, collaborators })
@@ -190,7 +194,7 @@ function check_authorization (_kwargs) {
 			SELECT TRUE AS bool FROM templates
 			WHERE id = $1::INT
 				AND (owner IN ($2:csv) OR $3 > 2)
-		;`, [ id, collaborators.filter(d => d.rights > 0).map(d => d.uuid), rights ])
+		;`, [ id, collaborators_ids, rights ])
 		.then(result => {
 			if (result) return { authorized: true, redirect: 'edit' }
 			else return { authorized: true, redirect: 'view' }

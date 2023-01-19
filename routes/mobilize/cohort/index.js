@@ -8,6 +8,10 @@ exports.main = (req, res) => {
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
+	const module_rights = modules.find(d => d.type === 'mobilizations')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	DB.conn.tx(async t => {		
 		const batch = []
 		
@@ -81,7 +85,7 @@ exports.main = (req, res) => {
 				
 				WHERE ((t.owner IN ($1:csv) OR $2 > 2) AND t.status >= 1)
 					OR t.status = 2
-			;`, [ collaborators.filter(d => d.rights > 0).map(d => d.uuid), rights ])
+			;`, [ collaborators_ids, rights ])
 			.then(async results => {
 				const data = await join.users(results, [ language, 'owner' ])
 				return data

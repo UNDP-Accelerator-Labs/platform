@@ -1,9 +1,13 @@
-const { DB } = include('config/')
+const { modules, DB } = include('config/')
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id } = req.body || {}
 	
+	const module_rights = modules.find(d => d.type === 'contributors')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	if (!board_id) { // CREATE NEW TEAM
 		if (board_title?.trim().length > 0) {
 			return DB.general.tx(t => {
@@ -39,7 +43,7 @@ exports.pin = (req, res) => {
 					.then(_ => {
 						const batch = []
 						batch.push(t.any(retrievepins(object_id)))
-						batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
+						batch.push(t.any(retrievepinboards(collaborators_ids)))
 						return t.batch(batch)
 					}).catch(err => console.log(err))
 				}).catch(err => {
@@ -53,13 +57,13 @@ exports.pin = (req, res) => {
 		} else res.json({ status: 400, message: 'You need to create a title for a new pinboard.' })
 	} else { // SIMPLY ADD PAD TO BOARD
 		if (object_id) {
-			return DB.conn.tx(t => {
+			return DB.general.tx(t => {
 				return t.none(insertmember(board_id, object_id))
 				// .then(_ => t.none(updatestatus(board_id, object_id)))
 				.then(_ => {
 					const batch = []
 					batch.push(t.any(retrievepins(object_id)))
-					batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
+					batch.push(t.any(retrievepinboards(collaborators_ids)))
 					return t.batch(batch)
 				})
 				.catch(err => console.log(err))
@@ -76,6 +80,10 @@ exports.unpin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, object_id } = req.body || {}
 
+	const module_rights = modules.find(d => d.type === 'contributors')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	if (object_id) {
 		return DB.general.tx(t => {
 			return t.none(removemember(board_id, object_id))
@@ -91,7 +99,7 @@ exports.unpin = (req, res) => {
 			}).then(_ => {
 				const batch = []
 				batch.push(t.any(retrievepins(object_id)))
-				batch.push(t.any(retrievepinboards(collaborators.filter(d => d.rights > 0).map(d => d.uuid))))
+				batch.push(t.any(retrievepinboards(collaborators_ids)))
 				return t.batch(batch)
 			})
 		}).then(results => {

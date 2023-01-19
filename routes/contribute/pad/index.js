@@ -11,6 +11,10 @@ exports.main = (req, res) => {
 	const path = req.path.substring(1).split('/')
 	const activity = path[1]
 
+	const module_rights = modules.find(d => d.type === 'pads')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
 		return check_authorization({ connection: t, id, mobilization, source, uuid, rights, collaborators })
@@ -249,7 +253,7 @@ function check_authorization (_kwargs) {
 					)
 					OR $3 > 2
 				)
-		;`, [ id, collaborators.filter(d => d.rights > 0).map(d => d.uuid), rights ])
+		;`, [ id, collaborators_ids, rights ])
 		.then(result => {
 			if (result) return { authorized: true, redirect: 'edit' }
 			else return { authorized: true, redirect: 'view' }

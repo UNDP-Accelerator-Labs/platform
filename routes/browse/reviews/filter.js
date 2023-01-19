@@ -3,7 +3,7 @@ const { modules, engagementtypes, metafields, DB } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 exports.main = req => {
-	const { space } = req.params || {}
+	const { object, space } = req.params || {}
 	const { uuid, country, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	let { search, status, contributors, countries, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
@@ -12,7 +12,8 @@ exports.main = req => {
 	if (!page) page = 1
 	else page = +page
 
-	let collaborators_ids = collaborators.filter(d => d.rights > 0).map(d => d.uuid)
+	const module_rights = modules.find(d => d.type === object)?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [null]
 	
 	// BASE FILTERS

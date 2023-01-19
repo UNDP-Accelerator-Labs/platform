@@ -80,7 +80,7 @@
 			</a>	
 		</li>
 		<% if (['pads', 'templates'].includes(object)
-			&& modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) 
+			&& (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) || rights > 2)
 			&& locals.stats?.curated > 0
 		) { %>
 			<li class='<% if (space === "curated") { %>active<% } %>'>

@@ -1,7 +1,7 @@
 //// EDIT THIS
 // GENERAL APP INFO
 exports.app_title = 'UNDP Accelerator Labs, Experiments' 
-exports.app_title_short = 'experiements'
+exports.app_title_short = 'exp_platform'
 exports.app_suite = 'acclab_platform'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = {

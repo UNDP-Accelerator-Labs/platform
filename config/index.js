@@ -40,12 +40,12 @@ if (modules.some(d => d.type === 'mobilizations')) {
 		modules.push({ type: 'contributors', rights })
 	}
 }
-if (modules.some(d => d.type === 'contributors')) {
-	if (!modules.some(d => d.type === 'mobilizations')) {
-		const rights = modules.find(d => d.type === 'contributors').rights
-		modules.push({ type: 'contributors', rights })
-	}
-}
+// if (modules.some(d => d.type === 'contributors')) {
+// 	if (!modules.some(d => d.type === 'mobilizations')) {
+// 		const rights = modules.find(d => d.type === 'contributors').rights
+// 		modules.push({ type: 'mobilizations', rights })
+// 	}
+// }
 // TO DO: MAKE SURE THAT mobilizations DOES NOT HAVE LOWER RIGHTS THAN templates
 // TO DO: MAKE SURE THAT mobilizations AND contributors HAVE THE SAME rights
 // TO DO: MAKE SURE THAT teams AND contributors HAVE THE SAME rights

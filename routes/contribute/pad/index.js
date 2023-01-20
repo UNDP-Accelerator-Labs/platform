@@ -228,6 +228,10 @@ function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
 	const { id, mobilization, source, uuid, rights, collaborators } = _kwargs
 
+	const module_rights = modules.find(d => d.type === 'pads')?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
+
 	if (!uuid || !modules.some(d => d.type === 'pads' && rights >= d.rights.write)) {
 		if (mobilization) {
 			return conn.one(`SELECT public FROM mobilizations WHERE id = $1`, [ mobilization ], d => d.public)

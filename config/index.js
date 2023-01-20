@@ -2,6 +2,7 @@ let {
 	app_title, 
 	app_title_short, 
 	app_suite,
+	app_suite_secret,
 	app_languages,
 	app_description,
 	modules, 
@@ -21,6 +22,7 @@ exports.translations = translations
 exports.app_title = app_title
 exports.app_title_short = app_title_short
 exports.app_suite = app_suite
+exports.app_suite_secret = app_suite_secret
 exports.app_description = app_description
 
 // DESIRED MODULES

@@ -227,7 +227,7 @@
 								</div>
 								<label class='instruction'><%- vocabulary['user rights'][language] %></label>
 								<div class='select'>
-									<% if (editable && locals.data?.rights < rights) { %>
+									<% if (editable && (!locals.data || locals.data?.rights <= rights)) { %>
 										<input type='text' id='new-rights' value='<%- locals.data?.rights %>'>
 										<label for='new-rights'><%- vocabulary['grant rights'][language] %></label>
 										<div class='dropdown'>
@@ -252,7 +252,7 @@
 									<% } %>
 								</div>
 							</li>
-							<% if (locals.data?.host_editor) { %>
+							<% if (!locals.data || locals.data?.host_editor) { %>
 								<li>
 									<label class='instruction'><%- vocabulary['teams'][language] %></label>
 									<div class='select'>

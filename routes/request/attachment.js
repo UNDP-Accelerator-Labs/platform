@@ -60,18 +60,27 @@ function POST (req, res) {
 				
 				if (![null, undefined].includes(template)) { 
 				// THE PAD IS TEMPLATED SO BASE THE requirements ON THE MANUALLY SET ONES
+					console.log('looking for template')
 					sections.forEach(d => {
 						d.items.forEach(c => {
-							if (c.required) completion.push(c.has_content || false)
+							if (d.type === 'group') {
+								c.items.forEach(b => {
+									if (b.required) completion.push(b.has_content || false)
+								})
+							} else {
+								if (c.required) completion.push(c.has_content || false)
+							}
 						})
 					})
 				} else {
+					console.log('looking for metafields')
 					metafields.filter(d => d.required && d.label !== name)
 					.forEach(d => {
 						// TO DO: POTENTIAL PB HERE WITH metafields NESTED IN groups
 						completion.push(sections.map(c => c.items).flat().find(c => c.name === d.label)?.has_content || false)
 					})
 				}
+				console.log(completion)
 				if (completion.every(d => d === true)) status = Math.max(status, 1)
 				
 				if (![null, undefined].includes(resource)) { // IF THERE IS ALREADY A CONSENT ELEMENT, FIND IT AND UPDATE IT

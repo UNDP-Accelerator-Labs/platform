@@ -9,7 +9,18 @@ const contributors = require('./contributors/')
 
 module.exports = async (req, res) => {
 	const { xhr } = req
-	let { object, instance } = req.params || {}
+	let { object, space, instance } = req.params || {}
+
+	// if (req.session.uuid) { // USER IS LOGGED IN
+	// 	var { rights } = req.session || {}
+	// } else { // PUBLIC/ NO SESSION
+	// 	var { rights } = datastructures.sessiondata({ public: true }) || {}
+	// }
+	// const language = checklanguage(req.params?.language || req.session.language)
+
+	// if (space === 'private' && rights < modules.find(d => d.type === object)?.rights?.write) { // THE USER DOES NOT HAVE THE RIGHT TO NAVIGATE TO A private VIEW
+		
+	// }
 
 	if (modules.some(d => d.type === object)) {
 		if (!xhr) {

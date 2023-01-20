@@ -3,6 +3,7 @@
 exports.app_title = 'UNDP Accelerator Labs, Experiments' 
 exports.app_title_short = 'exp_platform'
 exports.app_suite = 'acclab_platform'
+exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 

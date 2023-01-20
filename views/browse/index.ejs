@@ -95,7 +95,8 @@
 </header>
 
 <div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %>'>
-	<% if (rights > 0 
+	<% if (!publicpage
+		&& rights >= (modules.find(d => d.type === object)?.rights.read ?? infinity)
 		&& pagedisplay !== 'slideshow'
 		&& !(locals.metadata.page.map && mapscale === 'full-screen')
 	) { %>
@@ -467,7 +468,7 @@
 					})
 			}.bind(this),
 			actions: function (_sel) {
-				<% if (rights > 0) { %>
+				<% if (rights >= (modules.find(d => d.type === object)?.rights.write ?? Infinity)) { %>
 					_sel.addElems('div', 'btn-group')
 					.addElems('form', 'actions', d => {
 						const opts = []

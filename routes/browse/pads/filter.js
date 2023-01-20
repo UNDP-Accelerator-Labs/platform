@@ -1,4 +1,4 @@
-const { app_title, DB, engagementtypes, metafields } = include('config/')
+const { app_title, DB, modules, engagementtypes, metafields } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 exports.main = async (req, res) => {
@@ -8,7 +8,7 @@ exports.main = async (req, res) => {
 		var { uuid, country, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
 	}
 
-	let { space, instance } = req.params || {}
+	let { space, object, instance } = req.params || {}
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM DOWNLOAD)
 	
 	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
@@ -18,7 +18,8 @@ exports.main = async (req, res) => {
 	if (!page) page = 1
 	else page = +page
 
-	let collaborators_ids = collaborators.filter(d => d.rights > 0).map(d => d.uuid)
+	const module_rights = modules.find(d => d.type === object)?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [null]
 	
 	if (instance) {

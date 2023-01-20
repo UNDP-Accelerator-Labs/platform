@@ -191,23 +191,23 @@
 							const scrolltop = inner.node().scrollTop
 							const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
 
-							sel.classed('overflowing', scrollheight > height)
+							sel.classed('overflowing', scrollheight > (height + buttonheight))
 							
 							sel.select('button.scroll-up')
-								.classed('hide', scrollheight <= height && scrolltop > 0)
+								.classed('hide', scrollheight <= (height + buttonheight))
 							.on('click', function () {
 								inner.node().scrollTo({
-									top: scrolltop - (scrollheight - buttonheight),
+									top: scrolltop - (height - buttonheight),
 									left: 0,
 									behavior: 'smooth'
 								})
 							})
 
 							sel.select('button.scroll-down')
-								.classed('hide', scrollheight <= height && scrolltop < scrollheight - height)
+								.classed('hide', scrollheight <= (height + buttonheight))
 							.on('click', function () {
 								inner.node().scrollTo({
-									top: scrolltop + scrollheight - buttonheight,
+									top: scrolltop + height - buttonheight,
 									left: 0,
 									behavior: 'smooth'
 								})

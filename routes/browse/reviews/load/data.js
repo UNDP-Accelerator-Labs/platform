@@ -6,13 +6,15 @@ const filter = require('../filter').main
 exports.main = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req } = kwargs || {}
-	const { space } = req.params || {}
+	const { object, space } = req.params || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req)
-	let collaborators_ids = collaborators.filter(d => d.rights > 0).map(d => d.uuid)
+	
+	const module_rights = modules.find(d => d.type === object)?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [null]
 
 	return conn.any(`

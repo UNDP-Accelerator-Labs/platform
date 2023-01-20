@@ -1,4 +1,4 @@
-const { page_content_limit, engagementtypes, DB } = include('config/')
+const { page_content_limit, modules, engagementtypes, DB } = include('config/')
 const { checklanguage, engagementsummary, join } = include('routes/helpers/')
 
 const filter = require('../filter').main
@@ -6,11 +6,16 @@ const filter = require('../filter').main
 exports.main = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req } = kwargs || {}
+	const { object } = req.params || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req)
+
+	const module_rights = modules.find(d => d.type === object)?.rights
+	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	if (!collaborators_ids.length) collaborators_ids = [null]
 
 	const engagement = engagementsummary({ doctype: 'template', engagementtypes, uuid })
 
@@ -91,7 +96,7 @@ exports.main = async kwargs => {
 		LIMIT $11 OFFSET $12
 	;`, [ 
 		/* $1 */ uuid, 
-		/* $2 */ collaborators.filter(d => d.rights > 0).map(d => d.uuid), 
+		/* $2 */ collaborators_ids, 
 		/* $3 */ engagement.coalesce, 
 		/* $4 */ rights, 
 		/* $5 */ engagement.cases, 

@@ -134,7 +134,7 @@ exports.dispatch.analyse = (req, res) => {
 	const { object } = req.params || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
-	// if (rights > 0)	{
+	// if (rights >= (modules.find(d => d.type === 'analyses')?.rights.write ?? Infinity)) {
 	// 	if (object === 'pad') createPad(req, res)
 	// 	else if (object === 'import') createImport(req, res)
 	// 	else if (object === 'template') createTemplate(req, res)

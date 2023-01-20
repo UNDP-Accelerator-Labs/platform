@@ -323,9 +323,9 @@ exports.main = async (req, res) => {
 													}
 												}
 												if (include_imgs && d.type === 'video') obj.content = d.src
-												if (d.type === 'drawing') obj.content = d.shapes.join(', ')
+												if (d.type === 'drawing') obj.content = d.shapes?.join(', ')
 												if (d.type === 'txt') obj.content = d.txt
-												if (d.type === 'embed') obj.content = d.html.replace(/<[^>]*>/g, '') || d.src // THE replace IS IMPORTANT HERE TO AVOID xml INJECTION IN THE xlsx OUTPUT
+												if (d.type === 'embed') obj.content = d.html?.replace(/<[^>]*>/g, '') || d.src // THE replace IS IMPORTANT HERE TO AVOID xml INJECTION IN THE xlsx OUTPUT
 
 												if (!obj.content) obj.content = null
 

@@ -3,13 +3,9 @@
 exports.app_title = 'UNDP Accelerator Labs, Solutions Mapping' 
 exports.app_title_short = 'sm_platform'
 exports.app_suite = 'acclab_platform'
+exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
-exports.app_description = {
-	'en': '', // 'This is a description of the app.',
-	'fr': '', // 'Ceci est une description de l’appli.',
-	'es': '', // 'This is a description of the app.',
-	'pt': '', // 'This is a description of the app.',
-}
+exports.app_description = require('./translations.js').translations['app description']
 
 
 // DESIRED MODULES

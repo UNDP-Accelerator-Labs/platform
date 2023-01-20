@@ -55,9 +55,9 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const sessionMiddleware = session({ 
-	name: `${app_title_short}-session`,
+	name: `${app_suite}-session`,
 	// secret: 'acclabspadspass',
-	secret: `${app_suite}-${app_title_short}-pass`,
+	secret: `${app_suite}-${app_suite_secret}-pass`,
 	store: new pgSession({ pgPromise: DB.conn }),
 	resave: false,
 	saveUninitialized: false,

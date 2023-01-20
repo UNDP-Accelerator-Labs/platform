@@ -26,7 +26,7 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 
 if (process.env.NODE_ENV === 'production') {
 	app.set('trust proxy', 1) // trust first proxy
-	// MAKE SURE ffmpeg IS INSTALLED
+
 	async function install_dependencies () {
 		// MAKE SURE ffmpeg IS INSTALLED
 		await new Promise(resolve => {

@@ -175,8 +175,6 @@ exports.main = async (req, res) => {
 			}).catch(err => console.log(err)))
 		} else batch.push(null)
 
-
-
 		return t.batch(batch)
 		.then(async results => {
 			let [ data,

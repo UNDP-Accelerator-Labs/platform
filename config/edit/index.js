@@ -30,6 +30,7 @@ exports.modules = [
 exports.metafields = [
 	{ type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
+
 	{ type: 'location', name: 'locations', required: true },
 	{ type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file' }, { uri: undefined } ], limit: 1 }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 	// { type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ], limit: 1 } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK

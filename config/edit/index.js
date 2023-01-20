@@ -4,7 +4,7 @@ exports.app_title = 'UNDP AccLabs Pads, Generic pads'
 exports.app_title_short = 'pads'
 exports.app_suite = 'acclab_platform'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
-exports.app_description = require('./translations.js').app_description
+exports.app_description = require('./translations.js').translations['app description']
 
 
 // DESIRED MODULES

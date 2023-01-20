@@ -4336,7 +4336,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background-color: #0468B1;
   }
   div.public-page-header h1 {
-    margin: 60px 60px 0 60px;
+    margin: 60px 60px 45px 60px;
     text-align: center;
     font-size: 36px;
     line-height: 1.2em;
@@ -10347,7 +10347,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background-color: #0468B1;
   }
   div.public-page-header h1 {
-    margin: 60px 60px 0 60px;
+    margin: 60px 60px 45px 60px;
     text-align: center;
     font-size: 36px;
     line-height: 1.2em;
@@ -16363,7 +16363,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background-color: #0468B1;
   }
   div.public-page-header h1 {
-    margin: 60px 60px 0 60px;
+    margin: 60px 60px 45px 60px;
     text-align: center;
     font-size: 36px;
     line-height: 1.2em;
@@ -26531,7 +26531,7 @@ div#reviews .review:not(:last-child)::after {
     background-color: #0468B1;
   }
   div.public-page-header h1 {
-    margin: 60px 60px 0 60px;
+    margin: 60px 60px 45px 60px;
     text-align: center;
     font-size: 36px;
     line-height: 1.2em;

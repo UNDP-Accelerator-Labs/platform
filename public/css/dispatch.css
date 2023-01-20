@@ -19742,6 +19742,13 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     margin-top: 15px;
     font-size: 24px;
     line-height: 1.2em;
+    margin-bottom: 10px;
+    /*small {
+    	display: block;
+    	font-size: $t-mid;
+    	line-height: 1.2em;
+    	margin-bottom: 5px;
+    }*/
   }
   header .inner nav#site-title .inner h2 {
     margin: 5px 0;

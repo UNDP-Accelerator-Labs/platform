@@ -371,7 +371,7 @@
 						'name': 'secondary_languages', // TO DO: PROBABLY CHANGE THIS SO NO CONFLICT WITH OTHER language INPUTS
 						'value': d => d.language,
 						'data-label': d => d.name.capitalize(),
-						'disabled': d => d.language === d3.select('input[name="language"]:checked').node().value ? true : null
+						'disabled': d => d.language === d3.select('input[name="language"]:checked').node()?.value ? true : null
 					})
 				sel.addElems('label')
 					.attr('for', d => `secondary-language-${d.language}`)
@@ -449,17 +449,22 @@
 		selects.selectAll('input[type=text]')
 		.on('keyup', function () {
 			const node = this
+
 			const dropdown = d3.select(node).findAncestor('select').select('.dropdown')
 			dropdown.selectAll('menu li')
 				.classed('hide', function () {
+					console.log(Array.from(dropdown.selectAll('menu li input:checked').nodes()))
 					return !this.textContent.trim().toLowerCase()
 						.includes(node.value.trim().toLowerCase())
-					&& !Array.from(dropdown.selectAll('menu li input:checked').nodes())
+					
+					&& (!dropdown.selectAll('menu li input:checked').size() || !Array.from(dropdown.selectAll('menu li input:checked').nodes())
 						.every(sel => {
+							console.log(node)
+							console.log(node.value)
 							return node.value.trim().toLowerCase().split(',')
 							.map(d => d.trim())
 							.includes(sel.parentNode.textContent.trim().toLowerCase())
-						})
+						}))
 				})
 		}).on('focus', function () {
 			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')

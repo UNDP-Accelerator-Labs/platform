@@ -134,7 +134,7 @@ exports.pagemetadata = (_kwargs) => {
 		// TO WIDEN THE POSSIBLE REVIEWER POOL
 		if (review_templates) {
 			speakers = speakers.map(d => {
-				const l = d.secondary_languages
+				const l = d.secondary_languages || []
 				l.push(d.language)
 				return l
 			}).flat()

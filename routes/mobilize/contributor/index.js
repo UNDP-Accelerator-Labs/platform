@@ -34,6 +34,10 @@ exports.main = async (req, res) => {
 				batch.push(t.any(`
 					SELECT id, name FROM teams
 					WHERE host = $1
+						OR id IN (
+							SELECT team FROM team_members
+							WHERE member = $1
+						)
 					ORDER BY name
 				;`, [ uuid ]))
 				// GET DATA

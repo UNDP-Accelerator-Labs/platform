@@ -28,7 +28,7 @@ exports.render = (req, res, next) => {
 				} else res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
 			}).catch(err => console.log(err))
 		} else if (path.match(view) && id) { // THE PAD EXISTS AND CAN BE VIEWED
-			DB.conn.one(`SELECT status FROM pads WHERE id = $1;`, [ id ], d => d.status)
+			DB.conn.one(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => d.status)
 			.then(result => {
 				if (result === 3) {
 					Object.assign(req.session, datastructures.sessiondata({ public: true }))

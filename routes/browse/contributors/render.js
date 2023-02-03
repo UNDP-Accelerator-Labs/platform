@@ -36,9 +36,13 @@ exports.main = (req, res) => {
 					INNER JOIN team_members tm
 						ON tm.team = t.id
 					WHERE t.host IN ($1:csv)
+						OR t.id IN (
+							SELECT team FROM team_members
+							WHERE member = $2
+						)
 					GROUP BY t.id
 					ORDER BY t.name
-				;`, [ collaborators_ids ])
+				;`, [ collaborators_ids, uuid ])
 				.catch(err => console.log(err)))
 			} else batch.push(null)
 			// PINBOARD 

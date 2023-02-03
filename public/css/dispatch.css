@@ -17902,7 +17902,9 @@ div.browse main .inner section .layout.columns article .inner .head .media-img .
   }
   div.browse main .inner section .layout.columns article .inner .body .media-title a h1 {
     font-size: 20px;
-    line-height: 1.3em;
+    line-height: 1.2em;
+    margin: 0;
+    text-align: left;
   }
   div.browse main .inner section .layout.columns article .inner .body .media-title a h1 img {
     vertical-align: text-bottom;
@@ -28070,7 +28072,9 @@ div.browse main .inner section .layout.columns article .inner .head .media-img .
   }
   div.browse main .inner section .layout.columns article .inner .body .media-title a h1 {
     font-size: 20px;
-    line-height: 1.3em;
+    line-height: 1.2em;
+    margin: 0;
+    text-align: left;
   }
   div.browse main .inner section .layout.columns article .inner .body .media-title a h1 img {
     vertical-align: text-bottom;

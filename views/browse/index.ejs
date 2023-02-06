@@ -41,7 +41,7 @@
 				<div class='slide'>
 					<div class='media media-txt'>
 						<h1><span><%- d.title %></span></h1>
-						<p><span><% if (d.txt[0]?.length > 500) { %><%- d.txt[0].slice(0, 499).trim() %>…<% } else { %><%- d.txt[0] %><% } %></span></p>
+						<p><span><% if (d.txt.?[0]?.length > 500) { %><%- d.txt.?[0].slice(0, 499).replace(/<\/?[^>]+(>|$)/ig, '').trim() %>…<% } else { %><%- d.txt.?[0].replace(/<\/?[^>]+(>|$)/ig, '').trim() %><% } %></span></p>
 					</div>
 					<img src='<%- d.img[0].replace("uploads/sm/", "uploads/") %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
 				</div>

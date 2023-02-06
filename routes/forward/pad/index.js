@@ -1,4 +1,4 @@
-const { followup_count, DB } = include('config/')
+const { followup_count, metafields, DB } = include('config/')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}
@@ -34,6 +34,33 @@ exports.main = (req, res) => {
 							source = $1::INT
 						WHERE id = $2::INT
 					;`, [ id, result.id ]))
+					
+					// TO DO: MAKE SURE THIS WORKS
+					// FORWARD ALL THE TAGGING
+					if (metafields.some(d => ['tag', 'index'].includes(d.type))) {
+						batch.push(t.none(`
+							INSERT INTO tagging (pad, tag_id, type)
+							SELECT $1::INT, tag_id, type FROM tagging
+								WHERE pad = $2::INT
+						;`, [ result.id, id ]))
+					}
+					// FORWARD ALL THE LOCATIONS
+					if (metafields.some(d => d.type === 'location')) {
+						batch.push(t.none(`
+							INSERT INTO locations (pad, lat, lng)
+							SELECT $1::INT, lat, lng FROM locations
+								WHERE pad = $2::INT
+						;`, [ result.id, id ]))
+					}
+					// FORWARD ALL THE META FIELDS
+					if (metafields.some(d => !['tag', 'index', 'location'].includes(d.type))) {
+						batch.push(t.none(`
+							INSERT INTO metafields (pad, type, name, value, key)
+							SELECT $1::INT, type, name, value, key FROM metafields
+								WHERE pad = $2::INT
+						;`, [ result.id, id ]))
+					}
+					
 					// TO DO: AT SOME POINT, RECONSIDER FORWARDING IN DISTRIBUTED MOBILIZATIONS
 					batch.push(t.none(`
 						INSERT INTO mobilization_contributions (pad, mobilization)

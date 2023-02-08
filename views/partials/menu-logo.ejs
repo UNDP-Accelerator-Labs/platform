@@ -37,15 +37,15 @@
 									<div class='dropdown'>
 										<ul>
 											<% if (rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) { %>
-												<li>
+												<!-- <li>
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
 															<label><%- vocabulary['blank pad'][language] %></label>
 														</button>
 													</a>
-												</li>
+												</li> -->
 												<% if (locals.metadata.menu.templates?.length > 0) { %>
-													<li>
+													<!-- <li>
 														<button>
 															<label><%- vocabulary['templated pad'][language] %></label>
 															<span class='expandable'>></span>
@@ -86,17 +86,17 @@
 																<% }) %>
 															</ul>
 														</div>
-													</li>
+													</li> -->
 												<% } %>
 											<% } %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
-												<li>
+												<!-- <li>
 													<button>
 														<label><%- vocabulary['campaign pad'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown'>
-														<ul>
+														<ul> -->
 															<% if (locals.metadata.menu.participations
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1).length > 2) { %>
 																<li class='filter lg'>
@@ -123,19 +123,19 @@
 																	</a>
 																</li>
 															<% }) %>
-														</ul>
+												<!-- 		</ul>
 													</div>
-												</li>
+												</li> -->
 											<% } %>
 											<!-- IF WE WANT xlsx FUNCTIONALITY FOR MOBILIZATIONS, UNCOMMENT THE FOLLOWING -->
 											<!-- <%# if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)	|| locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %> -->
 											
 											<% if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)) { %>
-												<li class='lg'>
+												<!-- <li class='lg'>
 													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
 													</a>
-												</li>
+												</li> -->
 											<% } %>
 										</ul>
 									</div>

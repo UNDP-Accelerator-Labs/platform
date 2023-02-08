@@ -16,8 +16,8 @@ exports.modules = [
 	// { type: 'files', rights: { read: 0, write: 1 } }, 
 	{ type: 'reviews', rights: { read: 2, write: 2, coordinate: 3 }, reviewers: 2 }, // TO DO: UPDATE THIS TO 2
 	{ type: 'mobilizations', rights: { read: 3, write: 3 } }, 
-	{ type: 'contributors', rights: { read: 2, write: 2 } }, 
-	{ type: 'teams', rights: { read: 2, write: 2 } }
+	{ type: 'contributors', rights: { read: 3, write: 3 } }, 
+	{ type: 'teams', rights: { read: 3, write: 3 } }
 	
 	// { type: 'analyses', rights: { read: 1, write: 2 } }
 ]

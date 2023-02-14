@@ -42,6 +42,17 @@ exports.main = async kwargs => {
 			.then(results => { 
 				return results.length ? { countries: results } : null
 			}))
+
+			// GET RIGHTS BREAKDOWN
+			batch1.push(t1.any(`
+				SELECT COUNT (DISTINCT (u.id))::INT, u.rights AS id, u.rights AS name FROM users u
+				WHERE TRUE 
+					$1:raw
+				GROUP BY u.rights
+			;`, [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
+			.then(results => { 
+				return results.length ? { rights: results } : null
+			}))
 			
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))

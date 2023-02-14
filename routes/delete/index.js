@@ -3,6 +3,7 @@ const { checklanguage } = include('routes/helpers/')
 
 const pad = require('./pad/')
 const template = require('./template/')
+const contributor = require('./contributor/')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}
@@ -23,10 +24,10 @@ exports.main = (req, res) => {
 			else res.redirect(referer)
 		} else res.redirect('/module-error')
 	}
-	// if (object === 'contributors') {
-	// 	if (modules.some(d => d.type === 'contributors')) {
-	// 		if (rights >= modules.find(d => d.type === 'contributors').rights.write) contributor.main(req, res)
-	// 		else res.redirect(referer)
-	// 	} else res.redirect('/module-error')
-	// }
+	if (object === 'contributors') {
+		if (modules.some(d => d.type === 'contributors')) {
+			if (rights >= modules.find(d => d.type === 'contributors').rights.write) contributor.main(req, res)
+			else res.redirect(referer)
+		} else res.redirect('/module-error')
+	}
 }

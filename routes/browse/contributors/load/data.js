@@ -19,7 +19,10 @@ exports.main = kwargs => {
 
 	return conn.task(gt => {
 		return gt.any(`
-			SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status, cn.name AS country,
+			SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status, 
+			u.confirmed_at, u.left_at,
+			to_char(u.confirmed_at, 'DD Mon YYYY') AS start_date, to_char(u.left_at, 'DD Mon YYYY') AS end_date,
+			cn.name AS country,
 
 			CASE WHEN $1 > 2
 				THEN TRUE
@@ -40,10 +43,12 @@ exports.main = kwargs => {
 			)::TEXT, '[]')::JSONB
 			AS pinboards
 
-			FROM cohorts c
+			FROM users u
 
-			INNER JOIN users u
-				ON u.uuid = c.contributor
+			-- FROM cohorts c
+			-- INNER JOIN users u
+			-- 	ON u.uuid = c.contributor
+			
 			INNER JOIN country_names cn
 				ON cn.iso3 = u.iso3
 			INNER JOIN languages l

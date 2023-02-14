@@ -2145,7 +2145,7 @@ function addLocations (kwargs) {
 			const inset = sel.findAncestor('inset')
 			const location = sel.node().value.trim()
 
-			const listContainer = inset.addElem('div', 'inset-location') // TO DO: MAYBE UPDATE THIS TO locations (AS PER TYPE) FOR CONSISTENCY
+			const listContainer = inset.addElems('div', 'inset-location') // TO DO: MAYBE UPDATE THIS TO locations (AS PER TYPE) FOR CONSISTENCY
 			addLoader(listContainer)
 			// UPDATE THE MAX HEIGHT OF THE INSET
 			meta.expand({ maxheight: 300, forceopen: true })
@@ -2194,13 +2194,14 @@ function addLocations (kwargs) {
 			offset = [[], []]
 		}).on('mousedown', e => {
 			offset[0] = [e.containerPoint.x, e.containerPoint.x]
-			if (!dragging) timer = window.setTimeout(_ => addLocation(e.latlng), 500)
-		}).on('touchstart', e => {
-			offset[0] = [e.containerPoint.x, e.containerPoint.x]
-			if (!dragging) timer = window.setTimeout(_ => addLocation(e.latlng), 500)
+			if (!dragging) timer = window.setTimeout(_ => addLocation(e.latlng), 1000)
 		})
+		// .on('touchstart', e => {
+		// 	offset[0] = [e.containerPoint.x, e.containerPoint.x]
+		// 	if (!dragging) timer = window.setTimeout(_ => addLocation(e.latlng), 1000)
+		// })
 		.on('mousemove', e => offset[1] = [e.containerPoint.x, e.containerPoint.x])
-		.on('touchmove', e => offset[1] = [e.containerPoint.x, e.containerPoint.x])
+		// .on('touchmove', e => offset[1] = [e.containerPoint.x, e.containerPoint.x])
 
 		function addLocation (latlng) {
 			const duplicate = markers.find(d => {

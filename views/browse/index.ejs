@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <%
 	// CREATE ALIASES
-	const publicpage = locals.metadata.page.public
+	const activity = locals.metadata.page.activity
+	const publicpage = locals.metadata.page.public || activity === 'preview'
 	const modules = locals.metadata.site.modules
+	const metafields = locals.metadata.site.metafields
 	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
+	const query = locals.metadata.page.query
 	const languages = locals.metadata.site.languages
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
@@ -12,7 +15,7 @@
 	
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
-	if (space === 'pinned' && !locals.pinboard?.editable && locals.pinboard?.display_map) {
+	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
 		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
 		else mapscale = 'contain'
 	}
@@ -104,6 +107,7 @@
 			<div class='inner'>
 				<div class='xs sm m'>
 					<button class='space'>Spaces</button>
+					<!-- TO DO: TRANSLATION -->
 					<div class='dropdown'>
 						<%- include('./modules/tabs.ejs') %>
 					</div>
@@ -163,63 +167,83 @@
 		<div class='inner'>
 			<!-- (IF PINBOARD SPACE) PINBOARD TITLE -->
 			<% if (space === 'pinned' && locals.pinboard && pagedisplay !== 'slideshow') { %>
-				<% if (object === 'pads' && locals.pinboard.editable) { %>
+				<% if (activity !== 'preview' && object === 'pads' && locals.pinboard.editable) { %>
 					<div class='meta-status status-<%- locals.pinboard.status || 0 %>'>
 						<form id='pinboard-display-opts' method='GET' action='/publish/pinboards'>
 							<input type='hidden' name='id' value='<%- locals.pinboard.id %>'>
 							<menu class='opts'>
 								<li>
-									<p class='<% if (locals.pinboard.status < 2) { %>disabled<% } %>'><%- vocabulary['slideshow'][language] %>: </p>
-									<input type='checkbox' class='toggle' id='display-slideshow' value='true' name='slideshow' onchange='toggleOptions(this)' <% if (locals.pinboard.slideshow) { %>checked<% } %> <% if (locals.pinboard.status < 2) { %>disabled<% } %>>
+									<p class='<% if (locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['slideshow'][language] %>: </p>
+									<input type='checkbox' class='toggle' id='display-slideshow' value='true' name='slideshow' onchange='toggleOptions(this)' <% if (locals.pinboard.slideshow) { %>checked<% } %> <% if (locals.pinboard.display_map) { %>disabled<% } %>>
 									<label for='display-slideshow' data-content='<% if (locals.pinboard.slideshow) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
 								</li>
 								<li>
-									<p class='<% if (locals.pinboard.status < 2 || locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display filters'][language] %>: </p>
-									<input type='checkbox' class='toggle' id='display-filters' value='true' name='display_filters' onchange='toggleOptions(this)' <% if (locals.pinboard.display_filters) { %>checked<% } %> <% if (locals.pinboard.status < 2 || locals.pinboard.slideshow) { %>disabled<% } %>>
+									<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display filters'][language] %>: </p>
+									<input type='checkbox' class='toggle' id='display-filters' value='true' name='display_filters' onchange='toggleOptions(this)' <% if (locals.pinboard.display_filters) { %>checked<% } %> <% if (locals.pinboard.slideshow) { %>disabled<% } %>>
 									<label for='display-filters' data-content='<% if (locals.pinboard.display_filters) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
 								</li>
 								<li>
 									<ul>
 										<li>
-											<p class='<% if (locals.pinboard.status < 2 || locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display map'][language] %>: </p>
-											<input type='checkbox' class='toggle' id='display-map' value='true' name='display_map' onchange='toggleOptions(this)' <% if (locals.pinboard.display_map) { %>checked<% } %> <% if (locals.pinboard.status < 2 || locals.pinboard.slideshow) { %>disabled<% } %>>
+											<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display map'][language] %>: </p>
+											<input type='checkbox' class='toggle' id='display-map' value='true' name='display_map' onchange='toggleOptions(this)' <% if (locals.pinboard.display_map) { %>checked<% } %> <% if (locals.pinboard.slideshow) { %>disabled<% } %>>
 											<label for='display-map' data-content='<% if (locals.pinboard.display_map) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
 										</li>
 										<li>
-											<p class='<% if ((locals.pinboard.status < 2 || locals.pinboard.slideshow) || !locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['full screen'][language] %>: </p>
-											<input type='checkbox' class='toggle' id='display-fullscreen' value='true' name='display_fullscreen' onchange='toggleOptions(this)' <% if (locals.pinboard.display_fullscreen) { %>checked<% } %> <% if ((locals.pinboard.status < 2 || locals.pinboard.slideshow) || !locals.pinboard.display_map) { %>disabled<% } %>>
+											<p class='<% if (locals.pinboard.slideshow || !locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['full screen'][language] %>: </p>
+											<input type='checkbox' class='toggle' id='display-fullscreen' value='true' name='display_fullscreen' onchange='toggleOptions(this)' <% if (locals.pinboard.display_fullscreen) { %>checked<% } %> <% if ((locals.pinboard.slideshow) || !locals.pinboard.display_map) { %>disabled<% } %>>
 											<label for='display-fullscreen' data-content='<% if (locals.pinboard.display_fullscreen) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
 										</li>
 									</ul>
 								</li>
 							</menu>
 							<div class='btn-group'>
+								<button type='button' onclick='openPreview()'>Preview</button>
+								<!-- TO DO: TRANSLATE -->
 								<% if (locals.pinboard.status === 1) { %><button type='submit' class='publish' name='status' value='3'><%- vocabulary['publish'][language] %></button>
 								<% } else { %><button type='submit' class='publish' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
 							</div>
 
 							<script type='text/javascript'>
+								function openPreview () {
+									const url = new URL(window.location)
+									const href = url.href.replace('/browse/', '/preview/')
+									window.open(href, '_blank')
+								}
+
 								function toggleOptions (node) {
 									for (const label of node.labels) {
 										d3.select(label).attr('data-content', node.checked ? '<%- vocabulary["yes"][language] %>' : '<%- vocabulary["no"][language] %>')
 									}
 									// IF slideshow THEN PREVENT OTHERS
+									const sel = d3.select(node)
+									const menu = sel.findAncestor('menu')
+									const parent = sel.findAncestor('li')
 									if (node.name === 'slideshow') {
-										const sel = d3.select(node)
-										const menu = sel.findAncestor('menu')
-										const parent = sel.findAncestor('li')
-										menu.selectAll('li').filter(function () { return this !== parent.node() })
+										menu.selectAll('li')
 										.each(function () {
 											const sel = d3.select(this)
-											sel.select('p').classed('disabled', node.checked)
+											sel.select('p').classed('disabled', function () {
+												return this.parentNode !== parent.node() && node.checked
+											})
 											sel.selectAll('input[type=checkbox]').each(function () {
-												this.disabled = node.checked
+												this.disabled = this.parentNode !== parent.node() && node.checked
 											})
 										})
 									}
 									// IF map THEN ENABLE fullscreen OPTION
 									if (node.name === 'display_map') {
+										menu.selectAll('li')
+										.each(function () {
+											const sel = d3.select(this)
+											sel.select('p').classed('disabled', function () {
+												return this.parentNode !== parent.node() && this.nextElementSibling.name !== 'display_filters' && node.checked
+											})
+											sel.selectAll('input[type=checkbox]').each(function () {
+												this.disabled = this.parentNode !== parent.node() && this.name !== 'display_filters' && node.checked
+											})
+										})
 										const subnode = d3.select('input#display-fullscreen').node()
 										subnode.disabled = !node.checked
 										d3.select(subnode).findAncestor('li').select('p').classed('disabled', !node.checked)
@@ -232,7 +256,7 @@
 				<% } %>
 			
 				<div class='head'>
-					<% if (locals.pinboard.editable) { %>
+					<% if (activity !== 'preview' && locals.pinboard.editable) { %>
 						<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave()' contenteditable><%- locals.pinboard.title %></div>
 						<div class='description' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave()' contenteditable><%- (locals.pinboard.description) %></div>
 					<% } else { %>
@@ -282,7 +306,7 @@
 			<!-- SEARCH AND FILTER MENU -->
 			<% if (
 				!(space === 'pinned' 
-					&& !locals.pinboard?.editable 
+					&& (!locals.pinboard?.editable || activity === 'preview')
 					&& !locals.pinboard?.display_filters)
 				&& pagedisplay !== 'slideshow'
 			) { %>
@@ -294,7 +318,7 @@
 				(locals.metadata.page.map 
 					&& locals.stats?.filtered > 0)
 				&& !(space === 'pinned' 
-					&& !locals.pinboard?.editable 
+					&& (!locals.pinboard?.editable || activity === 'preview')
 					&& !locals.pinboard?.display_map)
 				&& pagedisplay !== 'slideshow'
 			) { %>
@@ -337,7 +361,7 @@
 
 <footer>
 	<nav class='pagination xs sm m'>
-		<% if (locals.metadata.page.activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
+		<% if (activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
 	</nav>
 	<% if (pagedisplay === 'slideshow') { %>
 		<div class='inner'>
@@ -460,9 +484,13 @@
 					.html(d => {
 						if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)
 						else if (d.start_date) {
-							if (d.end_date) {
-								return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date) + ' – ' + Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.end_date)
-							} else return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date)
+							<% if (object === 'contributors') { %>
+								return `Joined on ${d.start_date}${d.end_date ? `, left on ${d.end_date}` : '' }` // TO DO: TRANSLATE
+							<% } else { %>
+								if (d.end_date) {
+									return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date) + ' – ' + Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.end_date)
+								} else return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date)
+							<% } %>
 						}
 						else return d.email
 					})
@@ -550,6 +578,10 @@
 							if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
+						<% } else if (object === 'contributors') { %>
+							<% if (space === 'invited') { %>
+								opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'revoke', label: 'Revoke', name: 'contributor', value: d.id, disabled: [null, undefined].includes(d.left_at), fn: revoke }) // TO DO: TRANSLATE
+							<% } %>
 						<% } %>
 
 						return opts
@@ -642,6 +674,33 @@
 							sel.classed('active', false)
 							.html('<%- vocabulary["copy link"][language] %>')
 						}, 1000)
+					}
+					async function revoke () {
+						const sel = d3.select(this)
+						const { value } = sel.datum()
+
+						// SET END DATE
+						const formdata = { action: '/delete/<%- object %>',  method: 'GET' }
+						const message = 'Set an end date for the user’s contributions.' // TO DO: TRANSLATE
+						const opts = []
+
+						const today = new Date()
+						const dd = String(today.getDate()).padStart(2, '0')
+						const mm = String(today.getMonth() + 1).padStart(2, '0')
+						const yyyy = today.getFullYear()
+
+						// opts.push({ node: 'input', type: 'date', name: 'invite', value: `${yyyy}-${mm}-${dd}` })
+						opts.push({ node: 'input', type: 'date', name: 'date', value: `${yyyy}-${mm}-${dd}` })
+						// opts.push({ node: 'input', type: 'email', name: 'email' })
+					
+						// SET WHETHER TO EXCLUDE OR TO REMOVE RIGHTS
+						// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'revoke', placeholder: 'Remove user rights', checked: true, default: true }) // TO DO: TRANSLATE
+						// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'delete', placeholder: 'Exclude from platform and suite', checked: false, default: true }) // TO DO: TRANSLATE
+						
+						opts.push({ node: 'input', type: 'hidden', name: 'id', value: value })
+
+						opts.push({ node: 'button', type: 'submit', label: 'Revoke' }) // TO DO: TRANSLATE
+						const new_constraint = await renderFormModal({ message, formdata, opts })
 					}
 				<% } %>
 			}.bind(this),
@@ -1168,7 +1227,7 @@
 					const newpin = pingroup.addElems('div', 'add filter')
 					newpin.addElems('input')
 						.attrs({ 'type': 'text', 'id': 'new-pinboard' })
-					.on('keyup', async function (d) {
+					.on('keyup', function (d) {
 						const evt = d3.event
 						const node = this
 						const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
@@ -1179,36 +1238,8 @@
 							})
 
 						if (evt.code === 'Enter' || evt.keyCode === 13) {
-							const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
-								return this.textContent.trim().toLowerCase() === node.value.trim().toLowerCase()
-							})
-
-							if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
-								const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
-								if (res.status === 200) pins.call(renderPins, res.pins)
-								d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')
-									.filter(c => c.id === d.id)
-									.html(c => c.count += 1)
-							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
-								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
-								if (res.status === 200) {
-									d.pinboards = res.pins
-									// ADD THE NEW PIN TO THE OBJECT
-									pins.call(renderPins, res.pins)
-									// ADD THE NEW PINBOARD TO ALL LISTS
-									d3.selectAll('.pinboard-group').selectAll('.add.filter')
-									.each(function (c) { 
-										const data = res.pinboards_list.map(b => Object.assign(Object.assign({}, b), { object_id: c.id, checked: c.pinboards.map(a => a.id).includes(b.id) ? true : null }))
-										d3.select(this).call(renderPinOptions, data) 
-									})
-									// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-									renderPinNavigation(res.pinboards_list)
-								}
-
-							}
-							// RESET DROPDOWN
-							this.value = ''
-							dropdown.selectAll('menu li').classed('hide', false)
+							evt.preventDefault()
+							newpin.select('button').node().click()
 						}
 					}).on('focus', function (d) {
 						const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
@@ -1230,6 +1261,49 @@
 					newpin.addElems('label')
 						.attr('for', 'new-pinboard')
 						.html('<%- vocabulary["add to collection"][language] %>')
+					newpin.addElems('button')
+						.attr('type', 'button')
+						.on('click', async function (d) {
+							const node = newpin.select('input[type=text]').node()
+
+							if (node.value.trim().length) {
+								const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
+
+								const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
+									return this.textContent.trim().toLowerCase() === node.value.trim().toLowerCase()
+								})
+
+								if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
+									const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+									if (res.status === 200) pins.call(renderPins, res.pins)
+									d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')
+										.filter(c => c.id === d.id)
+										.html(c => c.count += 1)
+								} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
+									const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+									if (res.status === 200) {
+										// d.pinboards = res.pins
+										// // ADD THE NEW PIN TO THE OBJECT
+										// pins.call(renderPins, res.pins)
+										// // ADD THE NEW PINBOARD TO ALL LISTS
+										// d3.selectAll('.pinboard-group').selectAll('.add.filter')
+										// .each(function (c) { 
+										// 	const data = res.pinboards_list.map(b => Object.assign(Object.assign({}, b), { object_id: c.id, checked: c.pinboards.map(a => a.id).includes(b.id) ? true : null }))
+										// 	d3.select(this).call(renderPinOptions, data) 
+										// })
+										// // ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
+										// renderPinNavigation(res.pinboards_list)
+
+										// RELOAD THE PAGE
+										location.reload()
+									}
+
+								}
+								// RESET DROPDOWN
+								this.value = ''
+								dropdown.selectAll('menu li').classed('hide', false)
+							}
+						})
 				<% } %>
 			}.bind(this),
 			unpublish: function (_sel) {
@@ -1376,6 +1450,76 @@
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
 		}		
+	}
+
+	async function setDownloadOptions () {
+		const target_opts = [
+			{
+				label: '.csv',
+				value: 'csv',
+				type: 'radio',
+				required: true
+			},
+			{
+				label: '.xslx',
+				value: 'xlsx',
+				type: 'radio',
+				required: true
+			},
+			{
+				label: '.json',
+				value: 'json',
+				type: 'radio',
+				required: true
+			},
+			{
+				label: '.geojson',
+				value: 'geojson',
+				type: 'radio',
+				required: true
+			}
+		]
+
+		const formdata = { action: '/apis/download',  method: 'POST' }
+		const message = '<%- vocabulary["select download options"][language] %>'
+		const opts = []
+		
+		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts })
+		
+		opts.push({ node: 'input', type: 'checkbox', name: 'use_templates', value: true, placeholder: '<%- vocabulary["use templates"][language] %>', checked: true, default: true })
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_data', value: true, placeholder: '<%- vocabulary["include data"][language] %>', checked: true, default: true })
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_imgs', value: true, placeholder: '<%- vocabulary["include media"][language] %>', default: true })
+		
+		<% if (metafields.some(d => ['index', 'tag'].includes(d.type))) { %>
+			opts.push({ node: 'input', type: 'checkbox', name: 'include_tags', value: true, placeholder: '<%- vocabulary["include tags"][language] %>', default: true })
+		<% } %>
+		<% if (metafields.some(d => d.type === 'location')) { %>
+			opts.push({ node: 'input', type: 'checkbox', name: 'include_locations', value: true, placeholder: '<%- vocabulary["include locations"][language] %>', default: true })
+		<% } %>
+		<% if (metafields.some(d => !['tag', 'index', 'location'].includes(d.type))) { %>
+			opts.push({ node: 'input', type: 'checkbox', name: 'include_metafields', value: true, placeholder: '<%- vocabulary["include metafields"][language] %>', default: true })
+		<% } %>
+
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_engagement', value: true, placeholder: '<%- vocabulary["include engagement"][language] %>', default: true })
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_comments', value: true, placeholder: '<%- vocabulary["include comments"][language] %>', default: true })
+
+		// IN CASE THIS IS A SINGLE DOWNLOAD
+		if (this.name && this.value) opts.push({ node: 'input', type: 'hidden', name: this.name, value: this.value })
+		else { // ADD THE PAGE QUERY VARIABLES
+			<% Object.keys(query)?.forEach(d => {
+				if (Array.isArray(query[d])) { 
+					query[d].forEach(c => { %>
+						opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- c %>' })
+					<% })
+				} else { %>
+					opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- query[d] %>' })
+				<% } 
+			}) %>
+			opts.push({ node: 'input', type: 'hidden', name: 'space', value: '<%- space %>' })
+		}
+
+		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>' })
+		const new_constraint = await renderFormModal({ message, formdata, opts })
 	}
 
 	function initSlideshow () {

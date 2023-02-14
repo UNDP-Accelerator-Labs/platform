@@ -70,6 +70,8 @@ exports.main = (req, res) => {
 					pinboard
 				] = results
 
+				console.log(filters_menu)
+
 				const { sections } = data
 				const stats = { 
 					total: array.sum.call(statistics.total, 'count'), 
@@ -80,6 +82,7 @@ exports.main = (req, res) => {
 					persistent_breakdown: statistics.persistent,
 
 					invited: statistics.invited,
+					all: statistics.all,
 					// curated: statistics.curated,
 					// shared: statistics.shared,
 					// public: statistics.public,

@@ -752,9 +752,17 @@ div.document {
 						.media-embed,
 						.media-embed:empty:not(:focus):before {
 							font-family: Lucida Console, monospace;
+
+							img {
+								max-width: 100%;
+							}
 						}
 						.media-embed.padded {
 							padding: 5px 10px;
+
+							img {
+								max-width: 100%;
+							}
 						}
 						.media-checklist,
 						.media-radiolist,

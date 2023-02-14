@@ -384,6 +384,18 @@ input.toggle:disabled + label::after {
     font-size: 12px;
     transform: translateY(0px);
   }
+  .modal .inner ul li input[type=date] {
+    padding-bottom: 5px;
+    border: none;
+    border-bottom: 1px solid #969696;
+    outline: none;
+    font-size: 16px;
+    font-family: "Noto Sans", Helvetica, Arial, sans-serif;
+    color: #0A4C73;
+  }
+  .modal .inner ul li input[type=date]::before {
+    content: none;
+  }
   .modal .inner ul li:hover button {
     background-color: #0A4C73;
     color: #FFF;
@@ -2518,9 +2530,19 @@ div.document main .inner .body .layout .meta-container .media-embed,
 div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before {
     font-family: Lucida Console, monospace;
   }
+  div.document main .inner .body .layout .media-container .media-embed img,
+div.document main .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main .inner .body .layout .meta-container .media-embed img,
+div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img {
+    max-width: 100%;
+  }
   div.document main .inner .body .layout .media-container .media-embed.padded,
 div.document main .inner .body .layout .meta-container .media-embed.padded {
     padding: 5px 10px;
+  }
+  div.document main .inner .body .layout .media-container .media-embed.padded img,
+div.document main .inner .body .layout .meta-container .media-embed.padded img {
+    max-width: 100%;
   }
   div.document main .inner .body .layout .media-container .media-checklist,
 div.document main .inner .body .layout .media-container .media-radiolist,
@@ -6395,6 +6417,18 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     font-size: 12px;
     transform: translateY(0px);
   }
+  .modal .inner ul li input[type=date] {
+    padding-bottom: 5px;
+    border: none;
+    border-bottom: 1px solid #969696;
+    outline: none;
+    font-size: 16px;
+    font-family: "Noto Sans", Helvetica, Arial, sans-serif;
+    color: #0A4C73;
+  }
+  .modal .inner ul li input[type=date]::before {
+    content: none;
+  }
   .modal .inner ul li:hover button {
     background-color: #0A4C73;
     color: #FFF;
@@ -8529,9 +8563,19 @@ div.document main .inner .body .layout .meta-container .media-embed,
 div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before {
     font-family: Lucida Console, monospace;
   }
+  div.document main .inner .body .layout .media-container .media-embed img,
+div.document main .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main .inner .body .layout .meta-container .media-embed img,
+div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img {
+    max-width: 100%;
+  }
   div.document main .inner .body .layout .media-container .media-embed.padded,
 div.document main .inner .body .layout .meta-container .media-embed.padded {
     padding: 5px 10px;
+  }
+  div.document main .inner .body .layout .media-container .media-embed.padded img,
+div.document main .inner .body .layout .meta-container .media-embed.padded img {
+    max-width: 100%;
   }
   div.document main .inner .body .layout .media-container .media-checklist,
 div.document main .inner .body .layout .media-container .media-radiolist,
@@ -12406,6 +12450,18 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     font-size: 12px;
     transform: translateY(0px);
   }
+  .modal .inner ul li input[type=date] {
+    padding-bottom: 5px;
+    border: none;
+    border-bottom: 1px solid #969696;
+    outline: none;
+    font-size: 16px;
+    font-family: "Noto Sans", Helvetica, Arial, sans-serif;
+    color: #0A4C73;
+  }
+  .modal .inner ul li input[type=date]::before {
+    content: none;
+  }
   .modal .inner ul li:hover button {
     background-color: #0A4C73;
     color: #FFF;
@@ -14541,9 +14597,19 @@ div.document main .inner .body .layout .meta-container .media-embed,
 div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before {
     font-family: Lucida Console, monospace;
   }
+  div.document main .inner .body .layout .media-container .media-embed img,
+div.document main .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main .inner .body .layout .meta-container .media-embed img,
+div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img {
+    max-width: 100%;
+  }
   div.document main .inner .body .layout .media-container .media-embed.padded,
 div.document main .inner .body .layout .meta-container .media-embed.padded {
     padding: 5px 10px;
+  }
+  div.document main .inner .body .layout .media-container .media-embed.padded img,
+div.document main .inner .body .layout .meta-container .media-embed.padded img {
+    max-width: 100%;
   }
   div.document main .inner .body .layout .media-container .media-checklist,
 div.document main .inner .body .layout .media-container .media-radiolist,
@@ -19033,6 +19099,18 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner ul li input:focus {
     border-color: #FFF32A;
   }
+  .modal .inner ul li input[type=date] {
+    padding-bottom: 5px;
+    border: none;
+    border-bottom: 1px solid #969696;
+    outline: none;
+    font-size: 16px;
+    font-family: "Noto Sans", Helvetica, Arial, sans-serif;
+    color: #0A4C73;
+  }
+  .modal .inner ul li input[type=date]::before {
+    content: none;
+  }
   .modal .inner ul li .filter input[type=text] {
     width: calc(100% - 30px);
     height: 45px;
@@ -22020,6 +22098,27 @@ div.document main#mobilization .inner .body .layout .meta-container .media-embed
 div.document main#mobilization .inner .body .layout .meta-container .media-embed:empty:not(:focus):before {
     font-family: Lucida Console, monospace;
   }
+  div.document main .inner .body .layout .media-container .media-embed img,
+div.document main .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main .inner .body .layout .meta-container .media-embed img,
+div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img,
+div.document main#pad .inner .body .layout .media-container .media-embed img,
+div.document main#pad .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#pad .inner .body .layout .meta-container .media-embed img,
+div.document main#pad .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img, div.document main#reference .inner .body .layout .media-container .media-embed img,
+div.document main#reference .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#reference .inner .body .layout .meta-container .media-embed img,
+div.document main#reference .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img,
+div.document main#template .inner .body .layout .media-container .media-embed img,
+div.document main#template .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#template .inner .body .layout .meta-container .media-embed img,
+div.document main#template .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img,
+div.document main#mobilization .inner .body .layout .media-container .media-embed img,
+div.document main#mobilization .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#mobilization .inner .body .layout .meta-container .media-embed img,
+div.document main#mobilization .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img {
+    max-width: 100%;
+  }
   div.document main .inner .body .layout .media-container .media-embed.padded,
 div.document main .inner .body .layout .meta-container .media-embed.padded,
 div.document main#pad .inner .body .layout .media-container .media-embed.padded,
@@ -22030,6 +22129,17 @@ div.document main#template .inner .body .layout .meta-container .media-embed.pad
 div.document main#mobilization .inner .body .layout .media-container .media-embed.padded,
 div.document main#mobilization .inner .body .layout .meta-container .media-embed.padded {
     padding: 5px 10px;
+  }
+  div.document main .inner .body .layout .media-container .media-embed.padded img,
+div.document main .inner .body .layout .meta-container .media-embed.padded img,
+div.document main#pad .inner .body .layout .media-container .media-embed.padded img,
+div.document main#pad .inner .body .layout .meta-container .media-embed.padded img, div.document main#reference .inner .body .layout .media-container .media-embed.padded img,
+div.document main#reference .inner .body .layout .meta-container .media-embed.padded img,
+div.document main#template .inner .body .layout .media-container .media-embed.padded img,
+div.document main#template .inner .body .layout .meta-container .media-embed.padded img,
+div.document main#mobilization .inner .body .layout .media-container .media-embed.padded img,
+div.document main#mobilization .inner .body .layout .meta-container .media-embed.padded img {
+    max-width: 100%;
   }
   div.document main .inner .body .layout .media-container .media-checklist,
 div.document main .inner .body .layout .media-container .media-radiolist,
@@ -26659,17 +26769,17 @@ div.browse nav#search-and-filter form .filter:not(.add) img {
     position: relative;
     width: 300px;
     margin-right: 15px;
+    border-bottom: 1px dotted #969696;
   }
   div.browse nav#search-and-filter form .global-actions .add input[type=text] {
     position: relative;
-    width: 100%;
+    width: calc(100% - 30px);
     height: 30px;
     padding: 0;
     margin-top: 10px;
     border: none;
     outline: none;
     background-color: transparent;
-    border-bottom: 1px dotted #969696;
     font-size: 12px;
     color: #0A4C73;
   }
@@ -26685,16 +26795,17 @@ div.browse nav#search-and-filter form .filter:not(.add) img {
     transform: translateY(15px);
     transition: transform 0.25s, font-size 0.25s;
     pointer-events: none;
-    /*&::after {
-    	content: '';
-    	position: absolute;
-    	top: 4px;
-    	left: calc(100% + 5px);
-    	width: 15px;
-    	height: 15px;
-    	margin: auto;
-    	background: url('../imgs/icons/i-search-sm.svg');
-    }*/
+  }
+  div.browse nav#search-and-filter form .global-actions .add button {
+    display: none;
+    width: 30px;
+    height: 30px;
+    margin-top: 10px;
+    background: url("../imgs/icons/i-add.svg");
+    border: none;
+    outline: none;
+    float: right;
+    cursor: pointer;
   }
   div.browse nav#search-and-filter form .global-actions .add input[type=text]:focus + label,
 div.browse nav#search-and-filter form .global-actions .add input[type=text].has-value + label {
@@ -26702,12 +26813,16 @@ div.browse nav#search-and-filter form .global-actions .add input[type=text].has-
     line-height: 1.5em;
     transform: translateY(2.5px);
   }
+  div.browse nav#search-and-filter form .global-actions .add input[type=text]:focus ~ button,
+div.browse nav#search-and-filter form .global-actions .add input[type=text].has-value ~ button {
+    display: block;
+  }
   div.browse nav#search-and-filter form .global-actions .add .dropdown {
     position: absolute;
     width: 100%;
     max-height: 0;
     left: 0;
-    top: 100%;
+    top: calc(100% + 1px);
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
     overflow: scroll;
@@ -27538,7 +27653,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text] {
     position: relative;
-    width: 100%;
+    width: calc(100% - 20px);
     height: 30px;
     padding: 0;
     margin-top: 10px;
@@ -27561,22 +27676,27 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     transform: translateY(15px);
     transition: transform 0.25s, font-size 0.25s;
     pointer-events: none;
-    /*&::after {
-    	content: '';
-    	position: absolute;
-    	top: 4px;
-    	left: calc(100% + 5px);
-    	width: 15px;
-    	height: 15px;
-    	margin: auto;
-    	background: url('../imgs/icons/i-search-sm.svg');
-    }*/
+  }
+  div.browse main .inner section .layout article .inner .pinboard-group .add button {
+    display: none;
+    width: 20px;
+    height: 30px;
+    margin-top: 10px;
+    background: url("../imgs/icons/i-add-sm.svg") center no-repeat;
+    border: none;
+    outline: none;
+    float: right;
+    cursor: pointer;
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus + label,
 div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text].has-value + label {
     font-size: 10px;
     line-height: 1.5em;
     transform: translateY(2.5px);
+  }
+  div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus ~ button,
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text].has-value ~ button {
+    display: block;
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown {
     position: absolute;
@@ -29173,6 +29293,18 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner ul li input:focus {
     border-color: #FFF32A;
   }
+  .modal .inner ul li input[type=date] {
+    padding-bottom: 5px;
+    border: none;
+    border-bottom: 1px solid #969696;
+    outline: none;
+    font-size: 16px;
+    font-family: "Noto Sans", Helvetica, Arial, sans-serif;
+    color: #0A4C73;
+  }
+  .modal .inner ul li input[type=date]::before {
+    content: none;
+  }
   .modal .inner ul li .filter input[type=text] {
     width: calc(100% - 30px);
     height: 45px;
@@ -30570,6 +30702,27 @@ div.document main#mobilization .inner .body .layout .meta-container .media-embed
 div.document main#mobilization .inner .body .layout .meta-container .media-embed:empty:not(:focus):before {
     font-family: Lucida Console, monospace;
   }
+  div.document main .inner .body .layout .media-container .media-embed img,
+div.document main .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main .inner .body .layout .meta-container .media-embed img,
+div.document main .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img,
+div.document main#pad .inner .body .layout .media-container .media-embed img,
+div.document main#pad .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#pad .inner .body .layout .meta-container .media-embed img,
+div.document main#pad .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img, div.document main#reference .inner .body .layout .media-container .media-embed img,
+div.document main#reference .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#reference .inner .body .layout .meta-container .media-embed img,
+div.document main#reference .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img,
+div.document main#template .inner .body .layout .media-container .media-embed img,
+div.document main#template .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#template .inner .body .layout .meta-container .media-embed img,
+div.document main#template .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img,
+div.document main#mobilization .inner .body .layout .media-container .media-embed img,
+div.document main#mobilization .inner .body .layout .media-container .media-embed:empty:not(:focus):before img,
+div.document main#mobilization .inner .body .layout .meta-container .media-embed img,
+div.document main#mobilization .inner .body .layout .meta-container .media-embed:empty:not(:focus):before img {
+    max-width: 100%;
+  }
   div.document main .inner .body .layout .media-container .media-embed.padded,
 div.document main .inner .body .layout .meta-container .media-embed.padded,
 div.document main#pad .inner .body .layout .media-container .media-embed.padded,
@@ -30580,6 +30733,17 @@ div.document main#template .inner .body .layout .meta-container .media-embed.pad
 div.document main#mobilization .inner .body .layout .media-container .media-embed.padded,
 div.document main#mobilization .inner .body .layout .meta-container .media-embed.padded {
     padding: 5px 10px;
+  }
+  div.document main .inner .body .layout .media-container .media-embed.padded img,
+div.document main .inner .body .layout .meta-container .media-embed.padded img,
+div.document main#pad .inner .body .layout .media-container .media-embed.padded img,
+div.document main#pad .inner .body .layout .meta-container .media-embed.padded img, div.document main#reference .inner .body .layout .media-container .media-embed.padded img,
+div.document main#reference .inner .body .layout .meta-container .media-embed.padded img,
+div.document main#template .inner .body .layout .media-container .media-embed.padded img,
+div.document main#template .inner .body .layout .meta-container .media-embed.padded img,
+div.document main#mobilization .inner .body .layout .media-container .media-embed.padded img,
+div.document main#mobilization .inner .body .layout .meta-container .media-embed.padded img {
+    max-width: 100%;
   }
   div.document main .inner .body .layout .media-container .media-checklist,
 div.document main .inner .body .layout .media-container .media-radiolist,

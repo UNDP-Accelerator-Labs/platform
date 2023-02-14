@@ -133,6 +133,19 @@ html, body {
 				input:focus {
 					border-color: $c-light-yellow;
 				}
+				input[type=date] {
+					padding-bottom: 5px;
+					border: none;
+					border-bottom: 1px solid $c-light-grey;
+					outline: none;
+					font-size: $t-main;
+					font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
+					color: $c-dark-blue;
+
+					&::before {
+						content: none;
+					}
+				}
 				/*button.dropbtn {
 					border: none;
 					border-bottom: 1px solid $c-light-grey;

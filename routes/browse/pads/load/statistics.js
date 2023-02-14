@@ -48,6 +48,7 @@ exports.main = async kwargs => {
 		.catch(err => console.log(err)))
 		// GET PADS COUNT, ACCORDING TO FILTERS BUT WITHOUT STATUS
 		batch.push(t.any(`
+			-- LOOKING FOR PERSISTENT BREAKDOWN
 			SELECT COUNT (DISTINCT (p.id))::INT, p.status FROM pads p
 			LEFT JOIN mobilization_contributions mob
 				ON p.id = mob.pad
@@ -55,7 +56,7 @@ exports.main = async kwargs => {
 				$1:raw
 			GROUP BY p.status
 			ORDER BY p.status
-		;`, [ full_filters.replace(/AND p\.status IN \([\'\d\,\s]+\)/g, '') ]).then(d => { return { persistent: d } })
+		;`, [ full_filters.replace(/(AND\s)?p\.status IN \([\'\d\,\s]+\)(\sAND\s)?/g, '') ]).then(d => { return { persistent: d } })
 		.catch(err => console.log(err)))
 		// GET PRIVATE PADS COUNT
 		batch.push(t.one(`

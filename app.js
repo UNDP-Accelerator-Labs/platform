@@ -101,6 +101,9 @@ app.route('/:language/browse/:object/:space')
 	.get(routes.render.login, routes.dispatch.browse)
 	.post(routes.render.login, routes.dispatch.browse)
 
+app.route('/:language/preview/:object/:space')
+	.get(routes.render.login, routes.dispatch.browse)
+
 app.get('/:language/analyse/:object', routes.dispatch.analyse)
 
 app.post('/check/:object', routes.process.check)

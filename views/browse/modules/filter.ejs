@@ -1,7 +1,6 @@
 <%
 	
 	// CREATE ALIASES
-	const metafields = locals.metadata.site.metafields
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
@@ -54,7 +53,7 @@
 														<% }) %>
 													<% } %>
 													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this)'>
-													<label for='<%- key %>-<%- c.id %>'><%- (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
+													<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 												</li>
 											<% }) %>
 										</menu>
@@ -73,6 +72,7 @@
 			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
 				<div class='status'>
 					<menu>
+						<% console.log(locals.stats?.persistent_breakdown) %>
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
 								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>
@@ -93,6 +93,7 @@
 							<div class='add filter pinboards'>
 								<input type='text' id='pin-all'>
 								<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
+								<button id='new-pinboard' type='button'></button>
 								<div class='dropdown'>
 									<menu>
 										<% locals.pinboards_list?.forEach(d => { %>
@@ -138,77 +139,7 @@
 		parent.selectAll('input[type=hidden]')
 			.attr('disabled', node.checked ? null : true)
 	}
-	async function setDownloadOptions () {
-		const target_opts = [
-			{
-				label: '.csv',
-				value: 'csv',
-				type: 'radio',
-				required: true
-			},
-			{
-				label: '.xslx',
-				value: 'xlsx',
-				type: 'radio',
-				required: true
-			},
-			{
-				label: '.json',
-				value: 'json',
-				type: 'radio',
-				required: true
-			},
-			{
-				label: '.geojson',
-				value: 'geojson',
-				type: 'radio',
-				required: true
-			}
-		]
-
-		const formdata = { action: '/apis/download',  method: 'POST' }
-		const message = '<%- vocabulary["select download options"][language] %>'
-		const opts = []
-		
-		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts })
-		
-		opts.push({ node: 'input', type: 'checkbox', name: 'use_templates', value: true, placeholder: '<%- vocabulary["use templates"][language] %>', checked: true, default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_data', value: true, placeholder: '<%- vocabulary["include data"][language] %>', checked: true, default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_imgs', value: true, placeholder: '<%- vocabulary["include media"][language] %>', default: true })
-		
-		<% if (metafields.some(d => ['index', 'tag'].includes(d.type))) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_tags', value: true, placeholder: '<%- vocabulary["include tags"][language] %>', default: true })
-		<% } %>
-		<% if (metafields.some(d => d.type === 'location')) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_locations', value: true, placeholder: '<%- vocabulary["include locations"][language] %>', default: true })
-		<% } %>
-		<% if (metafields.some(d => !['tag', 'index', 'location'].includes(d.type))) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_metafields', value: true, placeholder: '<%- vocabulary["include metafields"][language] %>', default: true })
-		<% } %>
-		// TO DO: ADD OTHER POSSIBLE METAFIELDS HERE AND IN BACKEND
-
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_engagement', value: true, placeholder: '<%- vocabulary["include engagement"][language] %>', default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_comments', value: true, placeholder: '<%- vocabulary["include comments"][language] %>', default: true })
-
-		// IN CASE THIS IS A SINGLE DOWNLOAD
-		console.log(this)
-		if (this.name && this.value) opts.push({ node: 'input', type: 'hidden', name: this.name, value: this.value })
-		else { // ADD THE PAGE QUERY VARIABLES
-			<% Object.keys(query)?.forEach(d => {
-				if (Array.isArray(query[d])) { 
-					query[d].forEach(c => { %>
-						opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- c %>' })
-					<% })
-				} else { %>
-					opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- query[d] %>' })
-				<% } 
-			}) %>
-			opts.push({ node: 'input', type: 'hidden', name: 'space', value: '<%- space %>' })
-		}
-
-		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>' })
-		const new_constraint = await renderFormModal({ message, formdata, opts })
-	}
+	
 	// MAIN SEARCH BAR
 	d3.selectAll('.filter input[type=text]')
 	.on('keyup', function () {
@@ -246,7 +177,7 @@
 		}
 
 		d3.select('#pin-all')
-		.on('keydown', async function (d) { // EVERYWHERE ELSE THIS IS keyup BUT WE USE keydown HERE TO PREVENT THE FORM FROM FIRING WHEN THE Enter KEY IS PRESSED (TRIGGERED ON keydown)
+		.on('keydown', function (d) { // EVERYWHERE ELSE THIS IS keyup BUT WE USE keydown HERE TO PREVENT THE FORM FROM FIRING WHEN THE Enter KEY IS PRESSED (TRIGGERED ON keydown)
 			const evt = d3.event
 			const node = this
 			const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
@@ -258,6 +189,28 @@
 
 			if (evt.code === 'Enter' || evt.keyCode === 13) {
 				evt.preventDefault()
+				d3.select('#new-pinboard').node().click()
+			}
+		}).on('focus', function (d) {
+			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+
+			dropdown.selectAll('li').on('mousedown', function () { 
+				d3.event.preventDefault()
+			})
+		}).on('blur', function () {
+			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+			dropdown.node().style.maxHeight = null
+			fixLabel(this) // THIS IS NOT WORKING
+		})
+
+		d3.select('#new-pinboard')
+		.on('click', async function () {
+			const node = d3.select('#pin-all').node()
+			
+			if (node.value.trim().length) {
+				const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
+
 				const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
 					const match = [...this.childNodes].filter(function (d) { 
 						return d.nodeType === Node.TEXT_NODE
@@ -275,17 +228,6 @@
 				this.value = ''
 				dropdown.selectAll('menu li').classed('hide', false)
 			}
-		}).on('focus', function (d) {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
-
-			dropdown.selectAll('li').on('mousedown', function () { 
-				d3.event.preventDefault()
-			})
-		}).on('blur', function () {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = null
-			fixLabel(this) // THIS IS NOT WORKING
 		})
 	<% } %>
 </script>

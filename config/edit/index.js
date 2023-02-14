@@ -18,7 +18,6 @@ exports.modules = [
 	{ type: 'mobilizations', rights: { read: 2, write: 3 } }, 
 	{ type: 'contributors', rights: { read: 3, write: 3 } }, 
 	{ type: 'teams', rights: { read: 3, write: 3 } }
-	
 	// { type: 'analyses', rights: { read: 1, write: 2 } }
 ]
 

@@ -35,7 +35,7 @@ CREATE TABLE templates (
 	"update_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
-	published BOOLEAN DEFAULT FALSE,
+	-- published BOOLEAN DEFAULT FALSE,
 	source INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	slideshow BOOLEAN DEFAULT FALSE
 );
@@ -44,19 +44,19 @@ CREATE TABLE pads (
 	title VARCHAR(99),
 	sections JSONB,
 	full_text TEXT,
---	location JSONB,
-	sdgs JSONB,
-	tags JSONB,
---	impact SMALLINT,
---	personas JSONB,
+	-- location JSONB,
+	-- sdgs JSONB,
+	-- tags JSONB,
+	-- impact SMALLINT,
+	-- personas JSONB,
 	status INT DEFAULT 0,
 	"date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	"update_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
 	template INT REFERENCES templates(id) DEFAULT NULL,
-	published BOOLEAN DEFAULT FALSE,
-	source INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	-- published BOOLEAN DEFAULT FALSE,
+	source INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE
 	-- review_status INT DEFAULT 0
 );
 CREATE TABLE files (

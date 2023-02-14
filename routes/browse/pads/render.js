@@ -10,6 +10,8 @@ const filter = require('./filter.js').main
 exports.main = async (req, res) => { 
 	let { mscale, display, pinboard } = req.query || {}
 	const { object, instance } = req.params || {}
+	const path = req.path.substring(1).split('/')
+	const activity = path[1]
 	if (instance) pinboard = res.locals.instance_vars?.pinboard
 	
 	if (req.session.uuid) { // USER IS LOGGED IN
@@ -205,7 +207,7 @@ exports.main = async (req, res) => {
 				tags: statistics.tags
 			}
 
-			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && !pinboard?.editable ? 'slideshow' : display, mscale })
+			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && (!pinboard?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
 			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, stats, filters_menu })
 		}).catch(err => console.log(err))
 	}).then(data => res.render('browse/', data))

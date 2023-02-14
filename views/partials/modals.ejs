@@ -255,7 +255,7 @@
 				.attr('for', nodeid)
 				.html(d.placeholder)
 
-			if (!['checkbox', 'radio'].includes(d.type)) {
+			if (!['checkbox', 'radio', 'date', 'email'].includes(d.type)) {
 				_sel.addElems('button', 'input-submit')
 					.attr('type', 'button')
 				.on('click', d => {

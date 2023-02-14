@@ -77,7 +77,8 @@
 					if (space === 'ongoing') return "Ongoing campaigns"
 					if (space === 'past') return "Past campaigns"
 				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'invited') return "Contributors"
+					if (space === 'all') return "All contributors"
+					if (space === 'invited') return "My contributors"
 					if (space === 'pinned') return "My teams"
 				}
 			},
@@ -109,7 +110,8 @@
 					if (space === 'ongoing') return "Campagnes en cours"
 					if (space === 'past') return "Campagnes passées"
 				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'invited') return "Contributeurs"
+					if (space === 'all') return "Tou.te.s les contribut.rices.eurs"
+					if (space === 'invited') return "Mes contribut.rices.eurs"
 					if (space === 'pinned') return "Mes équipes"
 				}
 			},
@@ -141,7 +143,8 @@
 					if (space === 'ongoing') return "Campañas en curso"
 					if (space === 'past') return "Campañas pasadas"
 				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'invited') return "Colaborador.e.a.s"
+					if (space === 'all') return "Tod.a.o.s l.a.o.s contribuyentes"
+					if (space === 'invited') return "Mis contribuyentes"
 					if (space === 'pinned') return "Mis equipos"
 				}
 			},
@@ -173,7 +176,8 @@
 					if (space === 'ongoing') return "Campanhas em andamento"
 					if (space === 'past') return "Campanhas anteriores"
 				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'invited') return "Contribuidor.e.a.s"
+					if (space === 'all') return "Todos os ontribuidor.e.a.s"
+					if (space === 'invited') return "Meus contribuidor.e.a.s"
 					if (space === 'pinned') return "Minhas equipes"
 				}
 			}

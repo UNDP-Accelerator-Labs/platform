@@ -1,6 +1,5 @@
 <%
 	// CREATE ALIASES
-	
 	const modules = locals.metadata.site.modules
 	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
@@ -71,6 +70,13 @@
 				</div>
 			</li>
 		<% } %>
+		<li class='<% if (space === "all") { %>active<% } %>'>
+			<a href='./all'>
+				<button><%- vocabulary['space'][language](object, 'all') %>
+					<div class='count'><%- locals.stats?.all %></div>
+				</button>
+			</a>
+		</li>
 	<% } else { %>
 		<li class='<% if (space === "private") { %>active<% } %>'>
 			<a href='./private'>
@@ -160,7 +166,7 @@
 		if (!mediaSize) var mediaSize = getMediaSize()
 		const input = d3.select(`.${mediaSize} input[type=text]#pinboards`).node()
 		if (input) {
-			if (value.length > 12) value = `${value.slice(0, 12)}…`
+			if (value.length > 25) value = `${value.slice(0, 25)}…`
 			input.value = value
 			fixLabel(input)
 		}

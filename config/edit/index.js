@@ -28,10 +28,10 @@ exports.modules = [
 // TO DO: metafields SHOULD BE ANY KIND OF MEDIA, E.G. CHECKBOX WITH VALUES, TEXT, ETC
 	// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
 exports.metafields = [
-	// { type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
-	// { type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
-	// { type: 'tag', name: 'methods', required: true, opencode: false },
-	// { type: 'tag', name: 'datasources', required: true, opencode: true },
+	{ type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
+	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
+	{ type: 'tag', name: 'methods', required: true, opencode: false },
+	{ type: 'tag', name: 'datasources', required: true, opencode: true },
 	// { type: 'location', name: 'locations', required: true },
 
 	{ type: 'radiolist', name: 'experiment status', instruction: 'Current status of experimental activity',

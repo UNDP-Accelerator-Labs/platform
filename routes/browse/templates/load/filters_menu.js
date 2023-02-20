@@ -22,11 +22,13 @@ exports.main = async kwargs => {
 			const batch1 = []
 			if (space === 'private') {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (id))::INT, owner
-					FROM templates
-					WHERE owner IN ($1:csv)
+					SELECT COUNT (DISTINCT (t.id))::INT, t.owner
+					FROM templates t
+					-- WHERE owner IN ($1:csv)
+					WHERE TRUE
+						$1:raw
 					GROUP BY owner
-				;`, [ req.session.collaborators.map(d => d.uuid) ])
+				;`, [ full_filters ])//[ req.session.collaborators.map(d => d.uuid) ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -47,7 +49,7 @@ exports.main = async kwargs => {
 					FROM templates t
 					WHERE TRUE
 						$1:raw
-				;`, [ f_space ])
+				;`, [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
 					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })

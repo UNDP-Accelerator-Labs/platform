@@ -49,7 +49,7 @@ exports.main = async kwargs => {
 					FROM templates t
 					WHERE TRUE
 						$1:raw
-				;`, [ f_space ])
+				;`, [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
 					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })

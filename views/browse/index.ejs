@@ -852,7 +852,7 @@
 								is_followup: d.is_followup, 
 								is_review: d.is_review,
 								reviews: d.reviews,
-								txt: c.split(/\n/)[0] 
+								txt: c.split(/\n\n+/)[0] 
 							}
 						})
 					} else return []

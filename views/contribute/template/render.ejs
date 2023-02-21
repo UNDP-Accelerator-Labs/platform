@@ -520,11 +520,12 @@ function addDrawing (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
+	let { id, level, type, name, instruction, constraint, is_excerpt, required, editable } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'txt'
 	if (!instruction) instruction = ''
 	if (!name) name = null
+	if (!is_excerpt) is_excerpt = false
 	required = required ?? true
 	if ([null, undefined].includes(editable)) editable = editing
 
@@ -537,7 +538,7 @@ function addTxt (kwargs) {
 		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { id, level, type, name, instruction, constraint, required, editable },
+		datum: { id, level, type, name, instruction, constraint, is_excerpt, required, editable },
 		focus: focus || false,
 		lang
 	})
@@ -545,17 +546,33 @@ function addTxt (kwargs) {
 	if (media.opts) {
 		const opts = media.opts.addElems('div', 'opt-group', [
 			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
-			[{ key: 'constraint', label: 'block', value: constraint }]
+			[
+				{ key: 'excerpt', label: 'bookmark', value: is_excerpt },
+				{ key: 'constraint', label: 'block', value: constraint }
+			]
 		]).addElems('button', 'opt', d => d)
 		.classed('active', d => {
-			if (d.key === 'constraint') return constraint ? true : false
+			if (d.key === 'excerpt') return d.value
+			else if (d.key === 'constraint') return constraint ? true : false
 		}).attr('type', 'button')
-			.each(function (d) { d3.select(this).classed(d.value, true) })
+			.each(function (d) { 
+				d3.select(this).classed(d.key, true) 
+				d3.select(this).classed(d.value, true) 
+			})
 		.on('click', async function (d) {
 			const sel = d3.select(this)
 			const datum = media.container.datum()
 			
-			if (d.key === 'constraint') {
+			if (d.key === 'excerpt') {
+				if (!sel.classed('active')) {
+					d3.selectAll('.txt-container').each(c => { if (c) c.is_excerpt = false })
+						.selectAll('.opt.excerpt').classed('active', false)
+					datum.is_excerpt = true
+				} else {
+					datum.is_excerpt = false
+				}
+				sel.classed('active', datum.is_excerpt)
+			} else if (d.key === 'constraint') {
 				if (!sel.classed('active')) {
 					const message = Function(`"use strict";return (<%- vocabulary["limit input"][language] %>)`)()('characters', `<input type='number' name='length' value=${datum.constraint || 9999} min=1>`)
 					const opts = [{ node: 'button', type: 'button', label: '<%- vocabulary["limit length"][language] %>', resolve: _ => d3.select('.modal input[name="length"]').node().value }]
@@ -567,9 +584,10 @@ function addTxt (kwargs) {
 					datum.constraint = null
 					sel.select('span', 'constraint').remove()
 				}
-				toggleClass(this, 'active')
+				sel.classed('active', datum.constraint ? true : false)
 			}
 
+			// toggleClass(this, 'active')
 			if (editable) partialSave('media')
 		})
 		opts.addElems('i', 'material-icons')

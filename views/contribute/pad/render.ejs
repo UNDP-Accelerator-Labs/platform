@@ -1418,7 +1418,7 @@ function addDrawing (kwargs) {
 }
 function addTxt (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required } = data || {}
+	let { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, is_excerpt, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'txt'
 	if (!name) name = null
@@ -1427,6 +1427,7 @@ function addTxt (kwargs) {
 	if (!fontstyle) fontstyle = 'normal'
 	if (!textalign) textalign = 'left'
 	if (!txt) txt = ''
+	if (!is_excerpt) is_excerpt = false
 	required = required ?? false
 
 	if (!editing && txt?.trim().length === 0) return null
@@ -1440,15 +1441,25 @@ function addTxt (kwargs) {
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
 		sibling,
 		type, 
-		datum: { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, required },
+		datum: { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, is_excerpt, required },
 		focus: focus || false,
 		lang
 	})
 
 	if (media.opts) {
 		const opts = media.opts.addElems('div', 'opt-group', _ => {
-			const font_styles = [ { key: 'font-properties', label: 'add', value: 'scale-up' }, { key: 'font-properties', label: 'remove', value: 'scale-down' }, { key: 'font-properties', label: 'format_bold', value: 'bold' }, { key: 'font-properties', label: 'format_italic', value: 'italic' } ]
-			const para_styles = [ { key: 'h-align', label: 'format_align_left', value: 'left' }, { key: 'h-align', label: 'format_align_center', value: 'center' }, { key: 'h-align', label: 'format_align_right', value: 'right' } ]
+			const font_styles = [ 
+				{ key: 'font-properties', label: 'add', value: 'scale-up' }, 
+				{ key: 'font-properties', label: 'remove', value: 'scale-down' }, 
+				{ key: 'font-properties', label: 'format_bold', value: 'bold' }, 
+				{ key: 'font-properties', label: 'format_italic', value: 'italic' } 
+			]
+			const para_styles = [ 
+				{ key: 'h-align', label: 'format_align_left', value: 'left' }, 
+				{ key: 'h-align', label: 'format_align_center', value: 'center' }, 
+				{ key: 'h-align', label: 'format_align_right', value: 'right' },
+				{ key: 'excerpt', label: 'bookmark', value: is_excerpt },
+			]
 			if (constraint) para_styles.push({ key: 'constraint', label: 'block', value: constraint })
 			return [font_styles, para_styles]
 		}).addElems('button', 'opt', d => d)
@@ -1458,9 +1469,13 @@ function addTxt (kwargs) {
 					if (fontweight && d.value === fontweight) return true
 					if (fontstyle && d.value === fontstyle) return true
 				} else if (d.key === 'h-align') return textalign ? d.value === textalign : d.value === 'left'
+				else if (d.key === 'excerpt') return d.value
 				else if (d.key === 'constraint') return constraint ? true : false
 			}).attr('type', 'button')
-		.each(function (d) { d3.select(this).classed(d.value, true) })
+		.each(function (d) { 
+			d3.select(this).classed(d.key, true)
+			d3.select(this).classed(d.value, true)
+		})
 		.on('click', function (d) {
 			const sel = d3.select(this)
 			if (d.key === 'font-properties') {
@@ -1480,10 +1495,21 @@ function addTxt (kwargs) {
 					'text-align': c => c.textalign
 				}).node().focus()
 			} else if (d.key === 'h-align') {
-				sel.findAncestor('opt-group').selectAll('.opt').classed('active', function () { return this == sel.node() })
+				sel.findAncestor('opt-group').selectAll('.opt')
+					.classed('active', function () { return this == sel.node() })
 				media.media.style('text-align', c => c.textalign = d.value).node().focus()
+			} else if (d.key === 'excerpt' && !templated) {
+				const datum = media.container.datum()
+				if (!sel.classed('active')) {
+					d3.selectAll('.txt-container').each(c => { if (c) c.is_excerpt = false })
+						.selectAll('.opt.excerpt').classed('active', false)
+					datum.is_excerpt = true
+				} else {
+					datum.is_excerpt = false
+				}
+				sel.classed('active', datum.is_excerpt)
 			}
-			
+
 			if (editing && d.key !== 'constraint') {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)

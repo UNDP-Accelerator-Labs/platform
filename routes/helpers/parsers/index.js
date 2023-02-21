@@ -50,9 +50,9 @@ exports.getTags = function (_json = {}) {
 }
 exports.getTxt = function (_json = {}) {
 	if (_json?.sections) {
-		// const media = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
 		const media = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b)).flat(3)
-		const txt = media.find(c => c.type === 'txt' && c.txt?.length && c.txt?.trim().toLowerCase() !== _json?.title?.trim().toLowerCase())
+		let txt = media.find(c => c.type === 'txt' && c.is_excerpt && c.txt?.length)
+		if (!txt) txt = media.find(c => c.type === 'txt' && c.txt?.length && c.txt?.trim().toLowerCase() !== _json?.title?.trim().toLowerCase())
 		if (txt) return [txt.txt]
 		else return []
 	} else return []

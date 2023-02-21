@@ -10,7 +10,7 @@ exports.main = (req, res) => {
 
 	const module_rights = modules.find(d => d.type === 'mobilizations')?.rights
 	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [null]
+	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	DB.conn.tx(async t => {		
 		const batch = []

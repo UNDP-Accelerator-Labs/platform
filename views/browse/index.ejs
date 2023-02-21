@@ -875,8 +875,8 @@
 							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 						}//, 'target': '_blank'
 					}).html(d => {
-						if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[<%- vocabulary["read more"][language] %>]</span>`
-						else return d.txt
+						if (d.txt.length > 500) return `${d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ').slice(0, 500)}… <span class='read-more'>[<%- vocabulary["read more"][language] %>]</span>`
+						else return d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ')
 					})
 			}.bind(this),
 			tags: function (_sel) {

@@ -13,7 +13,7 @@ exports.main = (req, res) => {
 
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
 	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [null]
+	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
@@ -68,7 +68,7 @@ exports.main = (req, res) => {
 						})
 						return t1.batch(batch1)
 						.then(results => {
-							return flatObj.call(results)
+							if (results?.length) return flatObj.call(results)
 						}).catch(err => console.log(err))
 					})
 				)
@@ -230,7 +230,7 @@ function check_authorization (_kwargs) {
 
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
 	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [null]
+	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (!uuid || !modules.some(d => d.type === 'pads' && rights >= d.rights.write)) {
 		if (mobilization) {

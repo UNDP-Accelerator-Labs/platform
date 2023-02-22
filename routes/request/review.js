@@ -20,13 +20,13 @@ exports.main = (req, res) => {
 			// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
 			console.log('check reviewers')
 			console.log(d)
-			if (d.notifications) {
-				return sendemail({
-					to: 'myjyby@gmail.com',// TO DO: CHANGE TO email, 
-					subject: `Request for review`,
-					html: `You are invited to review the submission entitled ${title}.`
-				})
-			}
+			// if (d.notifications) {
+			// 	return sendemail({
+			// 		to: 'myjyby@gmail.com',// TO DO: CHANGE TO email, 
+			// 		subject: `Request for review`,
+			// 		html: `You are invited to review the submission entitled ${title}.`
+			// 	})
+			// }
 		})
 	})
 	c_process.on('exit', code => {

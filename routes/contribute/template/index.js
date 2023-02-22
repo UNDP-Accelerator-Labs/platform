@@ -13,7 +13,7 @@ exports.main = (req, res) => {
 	const activity = path[1]
 
 	const module_rights = modules.find(d => d.type === 'templates')?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	DB.conn.tx(t => {
@@ -190,7 +190,7 @@ function check_authorization (_kwargs) {
 	const { id, rights, collaborators } = _kwargs
 
 	const module_rights = modules.find(d => d.type === 'templates')?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (!modules.some(d => d.type === 'templates' && rights >= d.rights.write)) return new Promise(resolve => resolve({ authorized: true, redirect: 'view' }))

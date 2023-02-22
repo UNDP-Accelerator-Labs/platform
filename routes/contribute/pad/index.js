@@ -12,7 +12,7 @@ exports.main = (req, res) => {
 	const activity = path[1]
 
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	DB.conn.tx(t => {
@@ -229,7 +229,7 @@ function check_authorization (_kwargs) {
 	const { id, mobilization, source, uuid, rights, collaborators } = _kwargs
 
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (!uuid || !modules.some(d => d.type === 'pads' && rights >= d.rights.write)) {

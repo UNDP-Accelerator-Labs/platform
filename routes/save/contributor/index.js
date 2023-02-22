@@ -43,13 +43,14 @@ exports.main = (req, res) => {
 				}
 				return t.batch(batch)
 				.then(async _ => {
-					if (id !== uuid) {
+					if (result !== uuid) {
+						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						// return t.one(`SELECT email FROM users WHERE uuid = $1;`, [ uuid ], d => d.email)
 						// .then(async from => {
-							// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 							await sendemail({
-								to: 'myjyby@gmail.com',// TO DO: CHANGE TO email, 
-								subject: `You account has been created`,
+								to: email, 
+								bcc: 'myjyby@gmail.com',
+								subject: `[${app_title}] An account has been created for you`,
 								html: `${username} has created an account for you to access the ${app_title} application.`
 							})
 							return result
@@ -121,8 +122,9 @@ exports.main = (req, res) => {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						await sendemail({
 							// from, 
-							to: 'myjyby@gmail.com',// TO DO: CHANGE TO email, 
-							subject: `Account information update`,
+							to: email,
+							bcc: 'myjyby@gmail.com',
+							subject: `[${app_title}] Your account information has been modified`,
 							html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE 
 						})
 						return null

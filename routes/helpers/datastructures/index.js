@@ -8,6 +8,8 @@ if (!exports.legacy) exports.legacy = {}
 exports.sessiondata = _data => {
 	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
 
+	console.log(collaborators)
+
 	// GENERIC session INFO
 	const obj = {}
 	obj.uuid = uuid || null

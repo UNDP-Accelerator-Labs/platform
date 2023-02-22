@@ -14,7 +14,7 @@ exports.main = kwargs => {
 	const [ f_space, order, page, full_filters ] = filter(kwargs.req)
 
 	const module_rights = modules.find(d => d.type === object)?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	const engagement = engagementsummary({ doctype: 'mobilization', engagementtypes, uuid })

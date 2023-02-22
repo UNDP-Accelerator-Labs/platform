@@ -5,7 +5,7 @@ exports.pin = (req, res) => {
 	const { board_id, board_title, object_id } = req.body || {}
 	
 	const module_rights = modules.find(d => d.type === 'contributors')?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (!board_id) { // CREATE NEW TEAM
@@ -81,7 +81,7 @@ exports.unpin = (req, res) => {
 	const { board_id, object_id } = req.body || {}
 
 	const module_rights = modules.find(d => d.type === 'contributors')?.rights
-	let collaborators_ids = collaborators.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (object_id) {

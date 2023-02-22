@@ -1,7 +1,7 @@
 const { fork } = require('child_process')
 const path = require('path')
 
-const { modules, DB } = include('config/')
+const { app_title, modules, DB } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
 exports.main = (req, res) => {
@@ -18,15 +18,16 @@ exports.main = (req, res) => {
 	c_process.on('message', message => {
 		message.forEach(d => {
 			// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
-			console.log('check reviewers')
-			console.log(d)
-			// if (d.notifications) {
-			// 	return sendemail({
-			// 		to: 'myjyby@gmail.com',// TO DO: CHANGE TO email, 
-			// 		subject: `Request for review`,
-			// 		html: `You are invited to review the submission entitled ${title}.`
-			// 	})
-			// }
+			// console.log('check reviewers')
+			// console.log(d)
+			if (d.notifications) {
+				return sendemail({
+					to: d.email,
+					bcc: 'myjyby@gmail.com',
+					subject: `[${app_title}] Request for review`,
+					html: `You are invited to review the submission entitled ${title} on the ${app_title} platform. Please navigate <a href="https://acclabs-experimenters.azurewebsites.net/en/browse/reviews/pending">here</a> to accept of decline the review.`
+				})
+			}
 		})
 	})
 	c_process.on('exit', code => {

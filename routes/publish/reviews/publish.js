@@ -1,4 +1,4 @@
-const { app_suite, modules, DB } = include('config/')
+const { app_suite, app_title, modules, DB } = include('config/')
 const { checklanguage, parsers, email: sendemail } = include('routes/helpers/')
 
 exports.main = (req, res) => {
@@ -105,8 +105,9 @@ exports.main = (req, res) => {
 
 											return Promise.all(user_info.map(d => {
 												return sendemail({
-													to: d.email, //'myjyby@gmail.com', 
-													subject: `Reviews for "${title}" are in`,
+													to: d.email, 
+													bcc: 'myjyby@gmail.com', // TO DO: THIS IS TEMP
+													subject: `[${app_title}] Reviews for "${title}" are in`,
 													html
 												})
 											}))
@@ -132,8 +133,9 @@ exports.main = (req, res) => {
 
 											return Promise.all(user_info.map(d => {
 												return sendemail({
-													to: d.email, //'myjyby@gmail.com',
-													subject: `Your submission "${title}" has been reviewed`,
+													to: d.email, 
+													bcc: 'myjyby@gmail.com', // TO DO: THIS IS TEMP
+													subject: `[${app_title}] Your submission "${title}" has been reviewed`,
 													html
 												})
 											}))

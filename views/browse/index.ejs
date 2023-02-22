@@ -393,6 +393,7 @@
 				d.data.forEach(c => section.call(renderVignette, { data: c, display: 'columns' }))
 			} else {
 				section.classed('<%- pagedisplay %>', true)
+				console.log(d)
 				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay %>' }))
 			}
 		})
@@ -852,7 +853,7 @@
 								is_followup: d.is_followup, 
 								is_review: d.is_review,
 								reviews: d.reviews,
-								txt: c.split(/\n/)[0] 
+								txt: c.split(/\n\n+/)[0] 
 							}
 						})
 					} else return []
@@ -875,8 +876,8 @@
 							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 						}//, 'target': '_blank'
 					}).html(d => {
-						if (d.txt.length > 500) return `${d.txt.slice(0, 500)}… <span class='read-more'>[<%- vocabulary["read more"][language] %>]</span>`
-						else return d.txt
+						if (d.txt.length > 500) return `${d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ').slice(0, 500)}… <span class='read-more'>[<%- vocabulary["read more"][language] %>]</span>`
+						else return d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ')
 					})
 			}.bind(this),
 			tags: function (_sel) {

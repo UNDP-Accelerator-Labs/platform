@@ -680,7 +680,8 @@ function addChecklist (kwargs) {
 		.attrs({ 
 			'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 			'contenteditable': editing ? true : null 
-		}).html(d => d.instruction)
+		}).on('keydown', _ => { if (editing) switchButtons(lang) })
+		.html(d => d.instruction)
 
 	const list = media.media.addElem('ol')
 	list.call(addItem)	
@@ -805,7 +806,8 @@ function addRadiolist (kwargs) {
 		.attrs({ 
 			'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 			'contenteditable': editing ? true : null // NOTE HERE THE editing (INSTEAD OF editable) IS IMPORTANT: WE CAN SET A PREDEFINED INSTRUCTION, BUT THE INTENTION IS TO ALWAYS ALLOW THE EDITOR TO TAILOR WORDING TO THEIR LIKING
-		}).html(d => d.instruction)
+		}).on('keydown', _ => { if (editing) switchButtons(lang) })
+		.html(d => d.instruction)
 
 	const list = media.media.addElem('ol')
 	list.call(addItem)	
@@ -886,8 +888,7 @@ function addRadiolist (kwargs) {
 		// if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
 	}
 
-	if (!editable) media.placement?.remove()
-
+	// if (!editable) media.placement?.remove()
 	if (focus) media.media.select('.instruction').node().focus()
 }
 // META ELEMENTS

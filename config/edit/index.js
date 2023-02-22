@@ -31,7 +31,6 @@ exports.metafields = [
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'tag', name: 'methods', required: true, opencode: false },
 	{ type: 'tag', name: 'datasources', required: true, opencode: true }
-	
 	// { type: 'location', name: 'locations', required: true }
 ]
 // DESIRED ENGAGEMENT TYPES

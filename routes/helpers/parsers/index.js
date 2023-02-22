@@ -1,6 +1,6 @@
 exports.getImg = (_json = {}, _unique = true) => { 
 	if (_json?.sections) {
-		const media = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
+		const media = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
 		const img = media.filter(c => c.type === 'img' && c.src).map(d => {
 			if (this.isURL(d.src)) return d.src
 			else return `/${d.src.replace('uploads', 'uploads/sm')}`
@@ -32,7 +32,7 @@ exports.getImg = (_json = {}, _unique = true) => {
 }
 exports.getSDGs = function (_json = {}) {
 	if (_json?.sections) {
-		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b)).flat(3)
+		const meta = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
 		// const sdgs = meta.find(c => c.type === 'sdgs')
 		const sdgs = meta.find(c => c.type === 'index' && c.name === 'sdgs')
 		if (sdgs) return sdgs.tags // THIS IS LEGACY FOR THE ACTION PLANS PLATFORM
@@ -41,8 +41,8 @@ exports.getSDGs = function (_json = {}) {
 }
 exports.getTags = function (_json = {}) {
 	if (_json?.sections) {
-		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b)).flat(3)
-		const tags = meta.find(c => c.type === 'tag' && c.name === 'thematic_areas')
+		const meta = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
+		const tags = meta.find(c => c.type === 'tag' && c.name === 'thematic_areas' && c.tags?.length)
 		if (tags) return tags.tags?.filter(c => c.name)//.map(c => c.name)]
 		// if (tags) return [tags.tags.filter(c => c.name && c.name !== '').map(c => c.name)]
 		else return []
@@ -50,7 +50,7 @@ exports.getTags = function (_json = {}) {
 }
 exports.getTxt = function (_json = {}) {
 	if (_json?.sections) {
-		const media = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b)).flat(3)
+		const media = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
 		let txt = media.find(c => c.type === 'txt' && c.is_excerpt && c.txt?.length)
 		if (!txt) txt = media.find(c => c.type === 'txt' && c.txt?.length && c.txt?.trim().toLowerCase() !== _json?.title?.trim().toLowerCase())
 		if (txt) return [txt.txt]
@@ -59,14 +59,14 @@ exports.getTxt = function (_json = {}) {
 }
 exports.getReviewScore = function (_json = {}) {
 	if (_json?.sections) {
-		const media = _json.sections.map(d => d.items.map(c => c.type === 'group' ? c.items : c)).flat(3)
+		const media = _json.sections.map(d => d.items?.map(c => c.type === 'group' ? c.items : c)).flat(3)
 		const score = media.find(d => d.type === 'radiolist' && d.name === 'review_score')?.options.find(d => d.checked)?.value
 		return score ?? null
 	} else return null
 }
 exports.getAttachments = (_json = {}) => { 
 	if (_json?.sections) {
-		const meta = _json.sections.map(c => c.items.map(b => b.type === 'group' ? b.items : b)).flat(3)
+		const meta = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
 		const attachments = meta.filter(c => c.type === 'attachment' && c.srcs?.filter(b => b).length > 0)
 			.map(d => d.srcs).flat()
 			// .map(d => {

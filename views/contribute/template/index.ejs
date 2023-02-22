@@ -570,7 +570,7 @@
 	})
 
 	function retrieveItems (sel, datum, items) {
-		// MEDIA
+		// MEDIA OR META
 		if (datum.type === 'title') {
 			datum.instruction = (sel.select('.media-title').node() || sel.select('.meta-title').node()).innerHTML
 			items.push(datum)

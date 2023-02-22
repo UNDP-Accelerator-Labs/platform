@@ -111,10 +111,13 @@ exports.main = (req, res) => {
 							AND uuid <> $2
 							AND notifications = TRUE
 					;`, [ cohort, uuid ]).then(async results => {
+						const bcc = results.map(d => d.email)
+						bcc.push('myjyby@gmail.com') // TO DO: THIS IS TEMP
+						
 						await sendemail({
-							to: email, //'myjyby@gmail.com',// email IS A SESSION VARIABLE FOR THE CURRENT USER, 
-							bcc: results.map(d => d.email),
-							subject: `New ${app_title} mobilization`,
+							to: email, 
+							bcc,
+							subject: `[${app_title}] New campaign`,
 							html: `Dear contributor, you are invited to participate in a new documentation campaign on the ${app_title} platform. 
 								Here is some information about the campaign:
 								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE

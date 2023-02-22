@@ -633,7 +633,7 @@
 		if (title.length > 99) title = `${title.slice(0, 98)}…`
 			
 		const description = descriptionLayout.select('.media-container .media-txt').node().innerHTML
-		const slideshow = descriptionLayout.select('.input-slideshow #slideshow-status').node().checked || false
+		const slideshow = descriptionLayout.select('.input-slideshow #slideshow-status').node()?.checked || false
 
 		// MAYBE INCLUDE ALERT IF title IS EMPTY
 		// COLLECT ALL MEDIA

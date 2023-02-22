@@ -94,7 +94,7 @@ exports.main = (req, res) => {
 									return DB.general.task(gt => {
 										const gbatch = []
 										gbatch.push(gt.any(`
-											SELECT email, notifications FROM users
+											SELECT email FROM users
 											WHERE uuid IN ($1:csv)
 												AND notifications = TRUE
 										;`, [ reviewers.map(d => d.owner) ])
@@ -105,7 +105,7 @@ exports.main = (req, res) => {
 
 											return Promise.all(user_info.map(d => {
 												return sendemail({
-													to: 'myjyby@gmail.com',// TO DO: CHANGE TO d.email, 
+													to: d.email, //'myjyby@gmail.com', 
 													subject: `Reviews for "${title}" are in`,
 													html
 												})
@@ -113,7 +113,7 @@ exports.main = (req, res) => {
 										}).catch(err => console.log(err)))
 
 										gbatch.push(gt.any(`
-											SELECT email, notifications FROM users
+											SELECT email FROM users
 											WHERE uuid IN ($1:csv)
 												AND notifications = TRUE
 										;`, [ owner ])
@@ -132,7 +132,7 @@ exports.main = (req, res) => {
 
 											return Promise.all(user_info.map(d => {
 												return sendemail({
-													to: 'myjyby@gmail.com',// TO DO: CHANGE TO d.email, 
+													to: d.email, //'myjyby@gmail.com',
 													subject: `Your submission "${title}" has been reviewed`,
 													html
 												})

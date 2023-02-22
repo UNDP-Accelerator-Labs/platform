@@ -1,10 +1,10 @@
 const path = require('path')
 
 process.on('message', message => {
-	const { rootpath, id, language, uuid, sendemail } = message || {}
+	const { rootpath, id, language, uuid, sendemail } = message || {} // sendemail IS PROBABLY NOT NEEDED HERE
 	const tagfocus = 'thematic_areas'
 		
-	console.log(sendemail)
+	// console.log(sendemail)
 
 	const { modules, DB } = require(path.join(rootpath, '/config'))
 	

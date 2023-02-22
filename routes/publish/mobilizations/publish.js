@@ -1,4 +1,4 @@
-const { DB } = include('config/')
+const { app_title, DB } = include('config/')
 const { checklanguage, email: sendemail } = include('routes/helpers/')
 
 const cron = require('node-cron')
@@ -10,7 +10,7 @@ exports.main = (req, res) => {
 	if (start_date) start_date = new Date(start_date)
 	if (end_date) end_date = new Date(end_date)
 	
-	const { uuid } = req.session || {}
+	const { uuid, email } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	DB.conn.tx(t => { // INSERT THE NEW MOBILIZATION		
@@ -106,16 +106,17 @@ exports.main = (req, res) => {
 				if (!public) {
 					// SEND EMAILS TO THOSE WHO ACCEPT NOTIFICATIONS (IN bcc FOR ONLY ONE EMAIL)
 					batch.push(DB.general.any(`
-						SELECT email FROM users 
+						SELECT DISTINCT email FROM users 
 						WHERE uuid IN ($1:csv)
+							AND uuid <> $2
 							AND notifications = TRUE
-					;`, [ cohort ]).then(async results => {
+					;`, [ cohort, uuid ]).then(async results => {
 						await sendemail({
-							to: 'myjyby@gmail.com',// TO DO: CHANGE TO email, 
+							to: email, //'myjyby@gmail.com',// email IS A SESSION VARIABLE FOR THE CURRENT USER, 
 							bcc: results.map(d => d.email),
-							subject: `New mobilization`,
-							html: `Dear contributor, you are invited to participate in a new mobilization. 
-								Below you will find some information about the mobilziation.
+							subject: `New ${app_title} mobilization`,
+							html: `Dear contributor, you are invited to participate in a new documentation campaign on the ${app_title} platform. 
+								Here is some information about the campaign:
 								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE
 						})
 						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc

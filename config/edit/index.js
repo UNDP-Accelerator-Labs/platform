@@ -61,3 +61,5 @@ exports.followup_count = 1
 	// OPTIONS: 'columns', 'rows'
 exports.browse_display = 'rows'
 exports.view_display = 'page'
+	// OPTIONS: 'mosaic', 'carousel'
+exports.welcome_module = 'carousel'

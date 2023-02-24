@@ -230,8 +230,7 @@
 								</li>
 							</menu>
 							<div class='btn-group'>
-								<button type='button' onclick='openPreview()'>Preview</button>
-								<!-- TO DO: TRANSLATE -->
+								<button type='button' onclick='openPreview()'><%- vocabulary['preview'][language] %></button>
 								<% if (locals.pinboard.status === 1) { %><button type='submit' class='publish' name='status' value='3'><%- vocabulary['publish'][language] %></button>
 								<% } else { %><button type='submit' class='publish' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
@@ -519,7 +518,15 @@
 						if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)
 						else if (d.start_date) {
 							<% if (object === 'contributors') { %>
-								return `Joined on ${d.start_date}${d.end_date ? `, left on ${d.end_date}` : '' }` // TO DO: TRANSLATE
+								const start = Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()({ date: d.start_date })
+								let str = Function(`"use strict";return (<%- vocabulary["joined on"][language] %>)`)()(start)
+
+								if (d.end_date) {
+									const end = Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()({ date: d.end_date })
+									str += ', ' + Function(`"use strict";return (<%- vocabulary["left on"][language] %>)`)()(end).toLowerCase()
+								}
+								return str
+
 							<% } else { %>
 								if (d.end_date) {
 									return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date) + ' – ' + Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.end_date)
@@ -614,7 +621,7 @@
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
 						<% } else if (object === 'contributors') { %>
 							<% if (space === 'invited') { %>
-								opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'revoke', label: 'Revoke', name: 'contributor', value: d.id, disabled: [null, undefined].includes(d.left_at), fn: revoke }) // TO DO: TRANSLATE
+								opts.push({ node: 'button', type: 'button', classname: 'revoke', label: '<%- vocabulary["revoke"][language] %>', name: 'contributor', value: d.id, disabled: ![null, undefined].includes(d.end_date), fn: revoke })
 							<% } %>
 						<% } %>
 
@@ -715,7 +722,7 @@
 
 						// SET END DATE
 						const formdata = { action: '/delete/<%- object %>',  method: 'GET' }
-						const message = 'Set an end date for the user’s contributions.' // TO DO: TRANSLATE
+						const message = '<%- vocabulary["set user end date"][language] %>'
 						const opts = []
 
 						const today = new Date()
@@ -733,7 +740,7 @@
 						
 						opts.push({ node: 'input', type: 'hidden', name: 'id', value: value })
 
-						opts.push({ node: 'button', type: 'submit', label: 'Revoke' }) // TO DO: TRANSLATE
+						opts.push({ node: 'button', type: 'submit', label: '<%- vocabulary["revoke"][language] %>' })
 						const new_constraint = await renderFormModal({ message, formdata, opts })
 					}
 				<% } %>

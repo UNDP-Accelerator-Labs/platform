@@ -12,6 +12,7 @@
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
+	const pages = locals.metadata.page.count
 	
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -34,55 +35,94 @@
 <%- include ('../partials/menu-languages.ejs') %> 
 <%- include ('../partials/modals.ejs') %> 
 
+<%- include ('./modules/download.ejs') %> 
 
-<% if (publicpage && object === 'pads' && space !== 'pinned' && mapscale !== 'full-screen') { %>
-<% const slides = locals.sections[0].data.filter(d => d.img?.length).sort((a, b) => 0.5 - Math.random()).slice(0, 5) %>
+
+<% const welcome_module = locals.metadata.site.welcome_module %>
+
+<% if (publicpage && object === 'pads' && space !== 'pinned' && mapscale !== 'full-screen' && locals.metadata.page.id === 1) { %>
+
+<% let slides = locals.sample_images %>
 <div class='public-page-header'>
-	<div class='carousel'>
-		<div class='slides'>
-			<% slides.forEach(d => { %>
-				<div class='slide'>
-					<div class='media media-txt'>
-						<h1><span><%- d.title %></span></h1>
-						<p><span><% if (d.txt?.[0]?.length > 500) { %><%- d.txt?.[0].slice(0, 499).replace(/<\/?[^>]+(>|$)/ig, '').trim() %>…<% } else { %><%- d.txt?.[0].replace(/<\/?[^>]+(>|$)/ig, '').trim() %><% } %></span></p>
+	<div class='<%- welcome_module %>'>
+		<% if (welcome_module === 'mosaic') { %>
+			<div class='slides'>
+				<div class='blank-area'></div>
+				<% slides.forEach(d => { %>
+					<div class='slide'>
+						<a href='../../view/pad?id=<%- d.id %>'>
+							<div class='media media-txt'>
+								<p class='country'><%- d.country %></p>
+								<h1><% if (d.title?.length > 50) { %><%- d.title?.slice(0, 50).trim() %>…<% } else { %><%- d.title %><% } %></h1>
+							</div>
+							<img src='<%- d.img[0] %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
+						</a>
 					</div>
-					<img src='<%- d.img[0].replace("uploads/sm/", "uploads/") %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
-				</div>
-			<% }) %>
-		</div>
-		<div class='dots'>
-			<% for (let i = 0; i < slides.length; i ++) { %>
-				<div class='dot'></div>
-			<% } %>
-		</div>
+				<% }) %>
+			</div>
+		<% } else if (welcome_module === 'carousel') { %>
+			<div class='slides'>
+				<% slides.forEach(d => { %>
+					<div class='slide'>
+						<a href='../../view/pad?id=<%- d.id %>'>
+							<div class='media media-txt'>
+								<p class='country'><%- d.country %></p>
+								<h1><%- d.title %></h1>
+								<p><% if (d.txt?.[0]?.length > 500) { %><%- d.txt?.[0].slice(0, 500)?.replace(/<\/?[^>]+(>|$)/ig, '').trim() %>…<% } else { %><%- d.txt?.[0]?.replace(/<\/?[^>]+(>|$)/ig, '').trim() %><% } %></p>
+							</div>
+							<img src='<%- d.img[0]?.replace("uploads/sm/", "uploads/") %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
+						</a>
+					</div>
+				<% }) %>
+			</div>
+			<div class='dots'>
+				<% for (let i = 0; i < slides.length; i ++) { %>
+					<div class='dot'></div>
+				<% } %>
+			</div>
+			<script type='text/javascript'>
+
+				function animateCarousel (idx) {
+					const carousel = d3.select('.carousel')
+					const deck = carousel.select('.slides')
+					const slides = carousel.selectAll('.slide')
+					const delay = 3000
+
+					if (idx === slides.size()) idx = 0
+					deck.node().scrollTo({
+						top: 0,
+						left: idx * (slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth),
+						behavior: 'smooth'
+					})
+					slides.selectAll('.media-txt')
+					.on('mouseover', _ => clearTimeout(animation))
+					.on('mouseout', _ => animation = setTimeout(_ => animateCarousel(idx + 1), delay))
+					carousel.selectAll('.dot')
+					.classed('highlight', (d, i) => i === idx)
+					.on('click', function (d, i) {
+						idx = i
+						clearTimeout(animation)
+						animateCarousel(idx)
+					})
+
+					let animation = setTimeout(_ => animateCarousel(idx + 1), delay)
+				}
+				animateCarousel(0)
+			</script>
+		<% } %>
+		<button class='scroll-nav' onclick='scrollToPad(this)'><label class='rotate'>&rsaquo;</label></button>
 		<script type='text/javascript'>
-
-			function animateCarousel (idx) {
-				const carousel = d3.select('.carousel')
-				const deck = carousel.select('.slides')
-				const slides = carousel.selectAll('.slide')
-				const delay = 3000
-
-				if (idx === slides.size()) idx = 0
-				deck.node().scrollTo({
-					top: 0,
-					left: idx * (slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth),
+			function scrollToPad (node) {
+				let next = d3.select('div.public-page-header h1.site-title').node()
+				window.scrollTo({
+					top: next.offsetTop - 60,
+					left: 0,
 					behavior: 'smooth'
 				})
-				slides.selectAll('.media-txt')
-				.on('mouseover', _ => clearTimeout(animation))
-				.on('mouseout', _ => animation = setTimeout(_ => animateCarousel(idx + 1), delay))
-				carousel.selectAll('.dot')
-				.classed('highlight', (d, i) => i === idx)
-				.on('click', function (d, i) {
-					idx = i
-					clearTimeout(animation)
-					animateCarousel(idx)
-				})
-
-				let animation = setTimeout(_ => animateCarousel(idx + 1), delay)
 			}
-			animateCarousel(0)
+			window.addEventListener('scroll', function (e) {
+				d3.select('button.scroll-nav').classed('hide', document.documentElement.scrollTop > 60)
+			})
 		</script>
 	</div>
 	<h1 class='site-title'><%- locals.metadata.site.title %></h1>
@@ -106,8 +146,7 @@
 		<nav class='tabs <% if (mapscale === "full-screen") { %>no-bg<% } %>'>
 			<div class='inner'>
 				<div class='xs sm m'>
-					<button class='space'>Spaces</button>
-					<!-- TO DO: TRANSLATION -->
+					<button class='space'><%- vocabulary['spaces'][language] %></button>
 					<div class='dropdown'>
 						<%- include('./modules/tabs.ejs') %>
 					</div>
@@ -198,8 +237,7 @@
 								</li>
 							</menu>
 							<div class='btn-group'>
-								<button type='button' onclick='openPreview()'>Preview</button>
-								<!-- TO DO: TRANSLATE -->
+								<button type='button' onclick='openPreview()'><%- vocabulary['preview'][language] %></button>
 								<% if (locals.pinboard.status === 1) { %><button type='submit' class='publish' name='status' value='3'><%- vocabulary['publish'][language] %></button>
 								<% } else { %><button type='submit' class='publish' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
@@ -345,7 +383,11 @@
 				<!-- TO DO: STYLIZE -->
 			<% } %>
 		</div>
-		
+		<div class='outer'>
+			<% if (pages > 1) { %>
+				<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
+			<% } %>
+		</div>
 		<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 	</main>
 </div>
@@ -387,7 +429,6 @@
 		.each(function (d) {
 			const section = d3.select(this)
 			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
-			// console.log(d.data)
 			if (mediaSize === 'xs') {
 				section.classed('columns', true)
 				d.data.forEach(c => section.call(renderVignette, { data: c, display: 'columns' }))
@@ -486,7 +527,15 @@
 						if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)
 						else if (d.start_date) {
 							<% if (object === 'contributors') { %>
-								return `Joined on ${d.start_date}${d.end_date ? `, left on ${d.end_date}` : '' }` // TO DO: TRANSLATE
+								const start = Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()({ date: d.start_date })
+								let str = Function(`"use strict";return (<%- vocabulary["joined on"][language] %>)`)()(start)
+
+								if (d.end_date) {
+									const end = Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()({ date: d.end_date })
+									str += ', ' + Function(`"use strict";return (<%- vocabulary["left on"][language] %>)`)()(end).toLowerCase()
+								}
+								return str
+
 							<% } else { %>
 								if (d.end_date) {
 									return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date) + ' – ' + Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.end_date)
@@ -575,13 +624,13 @@
 							if (d.status === 1) {
 								opts.push({ node: 'button', type: 'button', classname: 'copy', label: '<%- vocabulary["copy link"][language] %>', value: d.id, inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }], fn: copyLink })
 							}
-							opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', name: 'mobilizations', value: d.id, fn: setDownloadOptions })
+							opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', name: 'mobilizations', value: d.id, fn: setDownloadOptions }) // TO DO: CHECK IF THIS WORKS
 							if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
 							if (d.status === 2) opts.push({ action: `../../mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
 						<% } else if (object === 'contributors') { %>
 							<% if (space === 'invited') { %>
-								opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'revoke', label: 'Revoke', name: 'contributor', value: d.id, disabled: [null, undefined].includes(d.left_at), fn: revoke }) // TO DO: TRANSLATE
+								opts.push({ node: 'button', type: 'button', classname: 'revoke', label: '<%- vocabulary["revoke"][language] %>', name: 'contributor', value: d.id, disabled: ![null, undefined].includes(d.end_date), fn: revoke })
 							<% } %>
 						<% } %>
 
@@ -682,7 +731,7 @@
 
 						// SET END DATE
 						const formdata = { action: '/delete/<%- object %>',  method: 'GET' }
-						const message = 'Set an end date for the user’s contributions.' // TO DO: TRANSLATE
+						const message = '<%- vocabulary["set user end date"][language] %>'
 						const opts = []
 
 						const today = new Date()
@@ -700,7 +749,7 @@
 						
 						opts.push({ node: 'input', type: 'hidden', name: 'id', value: value })
 
-						opts.push({ node: 'button', type: 'submit', label: 'Revoke' }) // TO DO: TRANSLATE
+						opts.push({ node: 'button', type: 'submit', label: '<%- vocabulary["revoke"][language] %>' })
 						const new_constraint = await renderFormModal({ message, formdata, opts })
 					}
 				<% } %>
@@ -1453,76 +1502,6 @@
 		}		
 	}
 
-	async function setDownloadOptions () {
-		const target_opts = [
-			{
-				label: '.csv',
-				value: 'csv',
-				type: 'radio',
-				required: true
-			},
-			{
-				label: '.xslx',
-				value: 'xlsx',
-				type: 'radio',
-				required: true
-			},
-			{
-				label: '.json',
-				value: 'json',
-				type: 'radio',
-				required: true
-			},
-			{
-				label: '.geojson',
-				value: 'geojson',
-				type: 'radio',
-				required: true
-			}
-		]
-
-		const formdata = { action: '/apis/download',  method: 'POST' }
-		const message = '<%- vocabulary["select download options"][language] %>'
-		const opts = []
-		
-		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts })
-		
-		opts.push({ node: 'input', type: 'checkbox', name: 'use_templates', value: true, placeholder: '<%- vocabulary["use templates"][language] %>', checked: true, default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_data', value: true, placeholder: '<%- vocabulary["include data"][language] %>', checked: true, default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_imgs', value: true, placeholder: '<%- vocabulary["include media"][language] %>', default: true })
-		
-		<% if (metafields.some(d => ['index', 'tag'].includes(d.type))) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_tags', value: true, placeholder: '<%- vocabulary["include tags"][language] %>', default: true })
-		<% } %>
-		<% if (metafields.some(d => d.type === 'location')) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_locations', value: true, placeholder: '<%- vocabulary["include locations"][language] %>', default: true })
-		<% } %>
-		<% if (metafields.some(d => !['tag', 'index', 'location'].includes(d.type))) { %>
-			opts.push({ node: 'input', type: 'checkbox', name: 'include_metafields', value: true, placeholder: '<%- vocabulary["include metafields"][language] %>', default: true })
-		<% } %>
-
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_engagement', value: true, placeholder: '<%- vocabulary["include engagement"][language] %>', default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_comments', value: true, placeholder: '<%- vocabulary["include comments"][language] %>', default: true })
-
-		// IN CASE THIS IS A SINGLE DOWNLOAD
-		if (this.name && this.value) opts.push({ node: 'input', type: 'hidden', name: this.name, value: this.value })
-		else { // ADD THE PAGE QUERY VARIABLES
-			<% Object.keys(query)?.forEach(d => {
-				if (Array.isArray(query[d])) { 
-					query[d].forEach(c => { %>
-						opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- c %>' })
-					<% })
-				} else { %>
-					opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- query[d] %>' })
-				<% } 
-			}) %>
-			opts.push({ node: 'input', type: 'hidden', name: 'space', value: '<%- space %>' })
-		}
-
-		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>' })
-		const new_constraint = await renderFormModal({ message, formdata, opts })
-	}
-
 	function initSlideshow () {
 		const slideshow = d3.select('div.layout.slideshow')
 		const slides = slideshow.selectAll('.slide')
@@ -1537,13 +1516,13 @@
 					if (d3.select(this).classed('slide-in-view')) focus_id = i
 				})
 				if (d.class === 'prev' && focus_id === 0) {
-					<% if (locals.metadata.page.count && locals.metadata.page.id === 1) { %>
+					<% if (pages && locals.metadata.page.id === 1) { %>
 						return true
 					<% } else { %>
 						return false
 					<% } %>
 				} else if (d.class === 'next' && focus_id === slides.size() - 1) {
-					<% if (locals.metadata.page.count && locals.metadata.page.id === locals.metadata.page.count) { %>
+					<% if (pages && locals.metadata.page.id === pages) { %>
 						return true
 					<% } else { %>
 						return false
@@ -1574,15 +1553,15 @@
 			})
 
 			if (i > slides.size() - 1) {
-				<% if (locals.metadata.page.count && locals.metadata.page.id < locals.metadata.page.count) { %>
+				<% if (pages && locals.metadata.page.id < pages) { %>
 					const url = new URL(window.location)
 					const queryparams = new URLSearchParams(url.search)
 					queryparams.set('page', page + 1)
 					window.location = `${url.pathname}?${queryparams.toString()}`
 				<% } %>
 			} else if (i < 0) {
-				<% if (locals.metadata.page.count && locals.metadata.page.id > 1) { %>
-					// WE KEEP THE locals.metadata.page.count AT THE BEGINNING TO MAKE SURE THE PAGINATION SCHEMA IS NUMERIC (FOR EXAMPLE, IN THE CASE OF CONTRIBUTORS, IT IS ALPHABETIC)
+				<% if (pages && locals.metadata.page.id > 1) { %>
+					// WE KEEP THE pages AT THE BEGINNING TO MAKE SURE THE PAGINATION SCHEMA IS NUMERIC (FOR EXAMPLE, IN THE CASE OF CONTRIBUTORS, IT IS ALPHABETIC)
 					const url = new URL(window.location)
 					const queryparams = new URLSearchParams(url.search)
 					queryparams.set('page', page - 1)
@@ -1599,13 +1578,13 @@
 				d3.selectAll('.dot').classed('highlight', (d, i) => i === idx)
 				d3.selectAll('button.slide-nav').classed('hide', d => {
 					if (d.class === 'prev' && idx === 0) {
-						<% if (locals.metadata.page.count && locals.metadata.page.id === 1) { %>
+						<% if (pages && locals.metadata.page.id === 1) { %>
 							return true
 						<% } else { %>
 							return false
 						<% } %>
 					} else if (d.class === 'next' && idx === slides.size() - 1) {
-						<% if (locals.metadata.page.count && locals.metadata.page.id === locals.metadata.page.count) { %>
+						<% if (pages && locals.metadata.page.id === pages) { %>
 							return true
 						<% } else { %>
 							return false

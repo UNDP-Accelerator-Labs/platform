@@ -7,15 +7,15 @@ exports.main = (req, res) => {
 	// THIS SOLUTION IS TAKEN FROM https://dba.stackexchange.com/questions/122120/duplicate-row-with-primary-key-in-postgresql
 	DB.conn.tx(t => {
 		return t.one(`
-			SELECT COUNT(p.id) FROM mobilization_contributions mc
+			SELECT COUNT(p.id)::INT FROM mobilization_contributions mc
 			INNER JOIN pads p
 				ON p.id = mc.pad
 			WHERE mc.mobilization = $1::INT
 			AND p.source = $2::INT
 		`, [ mobilization, id ], d => d.count)
-		.then(duplicates => {
+		.then(copies => {
 			// TO DO: MAYBE FEEDBACK HERE
-			if (duplicates >= followup_count) return null
+			if (copies >= followup_count) return null
 			else {
 				return t.one(`
 					INSERT INTO pads
@@ -35,7 +35,6 @@ exports.main = (req, res) => {
 						WHERE id = $2::INT
 					;`, [ id, result.id ]))
 					
-					// TO DO: MAKE SURE THIS WORKS
 					// FORWARD ALL THE TAGGING
 					if (metafields.some(d => ['tag', 'index'].includes(d.type))) {
 						batch.push(t.none(`
@@ -71,6 +70,6 @@ exports.main = (req, res) => {
 			}
 		})
 	})
-	.then(_ => res.redirect(referer))
+	.then(_ => res.redirect(referer)) // TO DO: OPEN NEW PAGE WITH THE PAD
 	.catch(err => console.log(err))	
 }

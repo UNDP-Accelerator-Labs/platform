@@ -30,6 +30,12 @@
 			"es": "Explorar",
 			"pt": "Explorar"
 		},
+		"preview": {
+			"en": "Preview",
+			"fr": "Aperçu",
+			"es": "Avance",
+			"pt": "Visualizar"
+		},
 		"cohort": {
 			"en": plural => { 
 				if (plural) return "Cohorts"
@@ -47,6 +53,12 @@
 				if (plural) return "Coortes"
 				else return "Coorte"
 			}
+		},
+		"spaces": {
+			"en": "Spaces",
+			"fr": "Espaces",
+			"es": "Espacios",
+			"pt": "Espaços"
 		},
 		"space": {
 			"en": (object, space) => {
@@ -881,6 +893,18 @@
 				else if (user) return "Lançado por " + user + "."
 				else if (date) return "Lançado em " + date + "."
 			}
+		},
+		"joined on": {
+			"en": date => "Joined on " + date,
+			"fr": date => "A rejoint le " + date,
+			"es": date => "Se unió a " + date,
+			"pt": date => "Juntou-se a " + date
+		},
+		"left on": {
+			"en": date => "Left on " + date,
+			"fr": date => "A quitté le " + date,
+			"es": date => "Dejado en " + date,
+			"pt": date => "Deixado em " + date
 		},
 		"untitled pad": {
 			"en": "Untitled pad",
@@ -3033,13 +3057,29 @@
 			"es": padnmame => "Solamente “<strong>" + padnmame + "</strong>”",
 			"pt": padnmame => "Só “<strong>" + padnmame + "</strong>”"
 		},
+		"navigate here": { // USED
+			"en": "Navigate here",
+			"fr": "Naviguer ici",
+			"es": "Navegar aquí",
+			"pt": "Navegue aqui"
+		},
+		"revoke": { // USED
+			"en": "Revoke",
+			"fr": "Révoquer",
+			"es": "Revocar",
+			"pt": "Revogar"
+		},
+		"set user end date": { // USED
+			"en": "Set an end date for this user’s contributions.",
+			"fr": "Définissez une date de fin pour les contributions de cet utilisateur.",
+			"es": "Establezca una fecha de finalización para las contribuciones de este usuario.",
+			"pt": "Defina uma data final para as contribuições deste usuário."
+		},
 		"": { // USED
 			"en": "",
 			"fr": "",
 			"es": "",
 			"pt": ""
-		},
-		
-
+		}
 	}
 %>

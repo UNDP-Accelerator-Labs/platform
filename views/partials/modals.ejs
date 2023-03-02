@@ -1,9 +1,10 @@
+<% 
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+%>
+
 <div class='screen hide'>
 </div>
-<!-- <div class='screen bis hide'>
-</div>
-<div class='screen ter hide'>
-</div> -->
 
 <script type='text/javascript'>
 	function renderModal (data) {
@@ -105,6 +106,72 @@
 
 		form.addElems('ul', 'opts', opts ? [opts] : [])
 			.addElems('li', 'opt link', d => d)
+			.classed('default', d => d.default || false)
+		.each(function (d) {
+			d3.select(this).call(addInputNode, { d })
+		})
+		
+		form.addElems('div', 'foot', foot ? [foot] : [])
+		.each(function (d) {
+			const sel = d3.select(this)
+			sel.addElems(d.node)
+				.attrs({ 
+					'type': d.type, 
+					'name': d.name, 
+					'value': d.value,
+					'required': d.required || null
+				})
+			.on('blur', function () { if (d.placeholder) fixLabel(this) })
+				.html(d => d.label)
+		})
+	}
+
+	function renderLonglistFormModal (data) {
+		const { headline, message, formdata, opts, foot } = data
+		d3.select('nav.filter').classed('open', false)
+		d3.selectAll('div.screen').classed('hide', true)
+		const screen = d3.select('div.screen').classed('hide', false)
+
+		const modal = screen.addElems('div', 'modal longlist')
+		modal.addElems('button', 'close')
+		.on('click', function () {
+			modal.remove()
+			screen.classed('hide', true)
+		}).html('Close')
+
+		const inner = modal.addElems('div', 'inner')
+		inner.addElems('h1', 'headline', headline ? [headline] : [])
+			.html(d => d)
+		
+		inner.addElems('div', 'message', message ? [message] : [])
+			.html(d => d)
+		.each(function () {
+			const input = d3.select(this).select('input[type=text]')
+			if (input.node()) input.node().focus()
+		})
+
+		const form = inner.addElems('form', 'modal-form dropdown', formdata ? [formdata] : [])
+			.attrs({ 
+				'action': d => d.action, 
+				'method': d => d.method || 'GET' 
+			})
+
+		const ul = form.addElems('ul', 'opts', opts ? [opts] : [])
+		
+		const filter = ul.addElems('li', 'filter')
+		filter.addElems('input')
+			.attrs({ 
+				'type': 'text',
+				'id': 'filter-longlist-modal',
+			}).on('blur', function () { fixLabel(this) })
+			.on('keyup', function () { filterDropdown(this) })
+		filter.addElems('label')
+			.attr('for', 'filter-longlist-modal')
+			.html('<%- vocabulary["filter"][language](true) %>')
+
+		ul.addElems('li', 'padding')
+
+		ul.addElems('li', 'opt link', d => d)
 			.classed('default', d => d.default || false)
 		.each(function (d) {
 			d3.select(this).call(addInputNode, { d })

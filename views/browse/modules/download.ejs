@@ -37,7 +37,8 @@
 		]
 
 	<% if (['pads', 'mobilizations'].includes(object)) { %>
-		const formdata = { action: '/apis/download',  method: 'POST' }
+		
+		const formdata = { action: '/apis/download/pads',  method: 'POST' }
 		const message = '<%- vocabulary["select download options"][language] %>'
 		const opts = []
 		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts })
@@ -75,26 +76,32 @@
 		}
 
 		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>' })
+	
 	<% } else if (object === 'contributors') { %>
-		const formdata = { action: '/apis/download',  method: 'POST' }
+		
+		const formdata = { action: '/apis/download/contributors',  method: 'POST' }
 		const message = '<%- vocabulary["select download options"][language] %>'
 		const opts = []
 		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts })
 
-		// name
-		// email
-		// job title
-		// country: name / latlng
-		// teams > team information
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_data', value: true, placeholder: '<%- vocabulary["include data"][language] %>', checked: true, default: true })
 
-		// preferred language > language information
-		// other languages > language information
-		
-		// pad count
-		// template count
-		// file count
-		// review count
-		// mobilization count
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_teams', value: true, placeholder: 'Include team information', checked: true, default: true }) // TO DO: TRANSLATE
+		opts.push({ node: 'input', type: 'checkbox', name: 'include_contributions', value: true, placeholder: 'Include contributions information', checked: true, default: true }) // TO DO: TRANSLATE
+
+		// ADD THE PAGE QUERY VARIABLES
+		<% Object.keys(query)?.forEach(d => {
+			if (Array.isArray(query[d])) { 
+				query[d].forEach(c => { %>
+					opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- c %>' })
+				<% })
+			} else { %>
+				opts.push({ node: 'input', type: 'hidden', name: '<%- d %>', value: '<%- query[d] %>' })
+			<% } 
+		}) %>
+		opts.push({ node: 'input', type: 'hidden', name: 'space', value: '<%- space %>' })
+
+		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>' })
 	<% } %>
 
 		const new_constraint = await renderFormModal({ message, formdata, opts })

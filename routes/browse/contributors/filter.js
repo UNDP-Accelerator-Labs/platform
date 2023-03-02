@@ -3,7 +3,10 @@ const { parsers } = include('routes/helpers/')
 
 exports.main = req => { 
 	const { uuid, rights } = req.session || {}
-	const { space } = req.params || {}
+	
+	let { space } = req.params || {}
+	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM DOWNLOAD)
+	const { limit } = req.body || {} // THIS IS IN THE CASE OF AJAX REQUESTS, TO LIMIT TO A CERTAIN LETTER OR NOT
 	
 	// TO DO: UPDATE BELOW BASED ON FILTERS PASSED
 	let { search, status, countries, positions, pinboard, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
@@ -27,6 +30,9 @@ exports.main = req => {
 	// CONTENT FILTERS
 	const content_filters = []
 	if (search) content_filters.push(DB.pgp.as.format(`AND (u.name::TEXT || ' ' || u.position::TEXT ~* $1)`, [ parsers.regexQuery(search) ]))
+	// BELOW IS FOR AJAX CALLS WITH POST
+	if (limit === null) content_filters.push(DB.pgp.as.format(`AND TRUE`))
+	else if (typeof limit === 'string' && limit.length === 1) page = limit.toUpperCase()
 
 	const filters = [ base_filters.join(' '), platform_filters.join(' '), content_filters.join(' ') ].filter(d => d)
 	if (!platform_filters.length && !content_filters.length) {

@@ -4,10 +4,9 @@ const fs = require('fs')
 // const rootpath = path.resolve(__dirname, '../..')
 // global.include = path => require(`${rootpath}/${path}`)
 
-const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 const turf = require('@turf/turf')
 
-const { metafields, DB } = include('config/')
+const { app_title_short, metafields, DB } = include('config/')
 const { checklanguage, array, join, parsers } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter').main
@@ -184,7 +183,7 @@ exports.main = async (req, res) => {
 				// RENDER THE FILES
 				if (render) {
 					if (use_templates) {
-						const template_dir = path.join(dir, `template-${pad_group.key}`)
+						const template_dir = path.join(dir, `${app_title_short}_template_${pad_group.key}`)
 						if (!fs.existsSync(template_dir)) fs.mkdirSync(template_dir)
 
 						if (include_imgs && imgs.length > 0) {
@@ -215,7 +214,7 @@ exports.main = async (req, res) => {
 							})
 						}
 
-						fs.writeFileSync(path.join(dir, 'data.json'), JSON.stringify(pad_group.values))
+						fs.writeFileSync(path.join(dir, `${app_title_short}_data.json`), JSON.stringify(pad_group.values))
 					}
 				}
 				resolve(pad_group)

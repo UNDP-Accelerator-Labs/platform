@@ -238,6 +238,10 @@
 							</menu>
 							<div class='btn-group'>
 								<button type='button' onclick='openPreview()'><%- vocabulary['preview'][language] %></button>
+								
+								<button type='button' onclick='setShareOptions()'>Share</button>
+								<!-- TO DO: TRANSLATE -->
+
 								<% if (locals.pinboard.status === 1) { %><button type='submit' class='publish' name='status' value='3'><%- vocabulary['publish'][language] %></button>
 								<% } else { %><button type='submit' class='publish' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
@@ -248,6 +252,22 @@
 									const url = new URL(window.location)
 									const href = url.href.replace('/browse/', '/preview/')
 									window.open(href, '_blank')
+								}
+
+								async function setShareOptions () {
+									const contributors = await POST('/<%- language %>/browse/contributors/invited', { limit: null })
+									
+									const formdata = { action: '/share/pinboard',  method: 'POST' }
+									const message = 'Share with contributors'
+									const opts = []
+									
+									contributors.data.forEach(d => {
+										opts.push({ node: 'input', type: 'checkbox', name: 'contributor', value: d.id, placeholder: d.name, checked: (<%- JSON.stringify(locals.pinboard.contributors) %>).includes(d.id), default: true })
+									})
+
+									const foot = { node: 'button', type: 'submit', name: 'pinboard', value: <%- locals.pinboard.id %>, label: 'Share' } // TO DO: TRANSLATE
+
+									const new_constraint = await renderLonglistFormModal({ message, formdata, opts, foot })
 								}
 
 								function toggleOptions (node) {
@@ -656,8 +676,10 @@
 								'value': c => c.value,
 								'disabled': c => c.disabled || null 
 							}).html(c => c.label)
-						.on('click', function (c) { c.fn?.call(this) || null })
-						.on('focus', _ => {
+						.on('click', function (c) { 
+							c.fn?.call(this) || null 
+							this.focus()
+						}).on('focus', _ => {
 							const dropdown = sel.select('.dropdown')
 							if (dropdown.node()) {
 								if (dropdown.node().style.maxHeight) dropdown.node().style.maxHeight = null
@@ -1027,6 +1049,7 @@
 						const btn = group.addElems('div', 'create follow-up')
 						btn.addElems('button')
 							.html('<%- vocabulary["follow up"][language](true) %>')
+						.on('click', function () { this.focus() })
 						.on('focus', _ => {
 							const dropdown = btn.select('.dropdown')
 							if (dropdown.node()) {
@@ -1059,6 +1082,7 @@
 						const btn = group.addElems('div', 'create forward')
 							btn.addElems('button')
 								.html('<%- vocabulary["forward"][language] %>')
+							.on('click', function () { this.focus() })
 							.on('focus', _ => {
 								const dropdown = btn.select('.dropdown')
 								if (dropdown.node()) {

@@ -333,6 +333,8 @@ exports.process.delete = require('./delete/').main
 exports.process.publish = require('./publish/').publish
 exports.process.unpublish = require('./publish/').unpublish
 
+exports.process.share = require('./share/').share
+
 exports.process.forward = require('./forward/').main
 
 exports.process.pin = require('./engage/').pin

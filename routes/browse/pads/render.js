@@ -161,15 +161,21 @@ exports.main = async (req, res) => {
 		// PINBOARD 
 		if (modules.some(d => d.type === 'pinboards') && pinboard) {
 			batch.push(t.one(`
-				SELECT *, 
-					CASE WHEN owner = $1
+				SELECT p.*, array_agg(pc.participant) AS contributors,
+					CASE WHEN p.owner = $1
+					OR $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = $3::INT)
 					OR $2 > 2
 						THEN TRUE
 						ELSE FALSE
 					END AS editable
 
-				FROM pinboards
-				WHERE id = $3::INT
+				FROM pinboards p
+
+				INNER JOIN pinboard_contributors pc
+					ON pc.pinboard = p.id
+
+				WHERE p.id = $3::INT
+				GROUP BY p.id
 			;`, [ uuid, rights, pinboard ])
 			.then(async result => {
 				const data = await join.users(result, [ language, 'owner' ])

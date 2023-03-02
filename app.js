@@ -119,6 +119,7 @@ app.route('/publish/:object')
 	.get(routes.process.publish)
 	.post(routes.process.publish)
 app.get('/unpublish/:object', routes.process.unpublish)
+app.post('/share/:object', routes.process.share)
 app.get('/forward/:object', routes.process.forward)
 app.get('/delete/:object', routes.process.delete)
 
@@ -153,7 +154,7 @@ app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forw
 
 
 // API
-app.route('/apis/:action')
+app.route('/apis/:action/:object')
 	.get(routes.dispatch.apis)
 	.post(routes.dispatch.apis)
 

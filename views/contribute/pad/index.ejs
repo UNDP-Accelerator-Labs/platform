@@ -301,6 +301,7 @@
 							<% } %>
 							<script type='text/javascript'>
 								d3.select('button.publish')
+								.on('click', function () { this.focus() })
 								.on('focus', function () {
 									const form = d3.select(this.form)
 									const dropdown = form.select('.dropdown')

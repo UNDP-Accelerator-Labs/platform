@@ -1,6 +1,6 @@
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, DB } = include('config/')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, DB } = include('config/')
 const header_data = include('routes/header/').data
-const { array, datastructures, checklanguage, join } = include('routes/helpers/')
+const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
 
@@ -161,20 +161,47 @@ exports.main = async (req, res) => {
 		// PINBOARD 
 		if (modules.some(d => d.type === 'pinboards') && pinboard) {
 			batch.push(t.one(`
-				SELECT *, 
-					CASE WHEN owner = $1
+				SELECT p.*, array_agg(pc.participant) AS contributors,
+					CASE WHEN p.owner = $1
+					OR $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = $3::INT)
 					OR $2 > 2
 						THEN TRUE
 						ELSE FALSE
 					END AS editable
 
-				FROM pinboards
-				WHERE id = $3::INT
+				FROM pinboards p
+
+				INNER JOIN pinboard_contributors pc
+					ON pc.pinboard = p.id
+
+				WHERE p.id = $3::INT
+				GROUP BY p.id
 			;`, [ uuid, rights, pinboard ])
 			.then(async result => {
 				const data = await join.users(result, [ language, 'owner' ])
 				return data
 			}).catch(err => console.log(err)))
+		} else batch.push(null)
+		if (public && !pinboard) {
+			batch.push(t.any(`
+				SELECT id, title, owner, sections FROM pads
+				WHERE status = 3
+				ORDER BY random()
+				LIMIT 72
+			;`).then(async results => {
+				const data = await join.users(results, [ language, 'owner' ])
+				data.forEach(d => {
+					d.img = parsers.getImg(d)
+					d.txt = parsers.getTxt(d)
+					delete d.sections
+					delete d.owner
+					delete d.ownername
+					delete d.position
+				})
+				let max = 10
+				if (welcome_module === 'mosaic') max = 46
+				return data.filter(d => d.img?.length).slice(0, max)
+			}))
 		} else batch.push(null)
 
 		return t.batch(batch)
@@ -186,6 +213,7 @@ exports.main = async (req, res) => {
 				clusters,
 				pinboards_list,
 				pinboard,
+				sample_images
 			] = results
 
 			// const { sections, pads } = data
@@ -208,7 +236,7 @@ exports.main = async (req, res) => {
 			}
 
 			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && (!pinboard?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
-			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, stats, filters_menu })
+			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, sample_images, stats, filters_menu })
 		}).catch(err => console.log(err))
 	}).then(data => res.render('browse/', data))
 	.catch(err => console.log(err))

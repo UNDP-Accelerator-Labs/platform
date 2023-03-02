@@ -13,7 +13,8 @@ let {
 	page_content_limit, 
 	followup_count,
 	browse_display,
-	view_display
+	view_display,
+	welcome_module
 } = require('./edit/')
 
 const { translations } = require('./edit/translations.js')
@@ -82,3 +83,4 @@ exports.page_content_limit = browse_display === 'columns' ? Math.floor(page_cont
 exports.followup_count = followup_count
 exports.browse_display = browse_display
 exports.view_display = view_display
+exports.welcome_module = welcome_module

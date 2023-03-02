@@ -34,6 +34,8 @@ exports.pin = (req, res) => {
 					batch.push(t.none(`
 						INSERT INTO pinboard_contributors (pinboard, participant)
 						VALUES ($1::INT, $2)
+						ON CONFLICT ON CONSTRAINT unique_pinboard_contributor
+							DO NOTHING
 					;`, [ id, uuid ]))
 					
 					batch.push(
@@ -47,7 +49,8 @@ exports.pin = (req, res) => {
 						const batch = []
 						batch.push(id)
 						batch.push(t.any(retrievepins(object_id)))
-						batch.push(t.any(retrievepinboards(collaborators_ids)))
+						// batch.push(t.any(retrievepinboards(collaborators_ids)))
+						batch.push(t.any(retrievepinboards([ uuid ])))
 						return t.batch(batch)
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
@@ -64,7 +67,8 @@ exports.pin = (req, res) => {
 				.then(_ => {
 					const batch = []
 					batch.push(t.any(retrievepins(object_id)))
-					batch.push(t.any(retrievepinboards(collaborators_ids)))
+					// batch.push(t.any(retrievepinboards(collaborators_ids)))
+					batch.push(t.any(retrievepinboards([ uuid ])))
 					return t.batch(batch)
 				})
 				.catch(err => console.log(err))
@@ -77,7 +81,7 @@ exports.pin = (req, res) => {
 }
 
 exports.unpin = (req, res) => {
-	const { collaborators } = req.session || {}
+	const { uuid, collaborators } = req.session || {}
 	const { board_id, object_id, mobilization } = req.body || {}
 
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
@@ -86,19 +90,21 @@ exports.unpin = (req, res) => {
 
 	if (object_id) {
 		return DB.conn.tx(t => {
-			return t.none(removepads(board_id, object_id, mobilization))
+			return t.none(removepads(board_id, object_id, mobilization, uuid))
 			.then(_ => t.none(updatestatus(board_id, object_id, mobilization)))
 			.then(_ => {
 				return t.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
 						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
-						AND owner IN ($2:csv)
-				;`, [ board_id, collaborators_ids ])
+						-- AND owner IN ($2:csv)
+						AND owner = $2
+				;`, [ board_id, uuid /* collaborators_ids */ ])
 			}).then(_ => {
 				const batch = []
 				batch.push(t.any(retrievepins(object_id)))
-				batch.push(t.any(retrievepinboards(collaborators_ids)))
+				// batch.push(t.any(retrievepinboards(collaborators_ids)))
+				batch.push(t.any(retrievepinboards([ uuid ])))
 				return t.batch(batch)
 			})
 		}).then(results => {
@@ -131,20 +137,25 @@ function insertpads (_id, _object_id, _mobilization) {
 		;`, [ _mobilization, _id ])
 	}
 }
-function removepads (_id, _object_id, _mobilization) {
+function removepads (_id, _object_id, _mobilization, _uuid) {
 	if (_object_id) {
 		if (!Array.isArray(_object_id)) _object_id = [_object_id]
 		return DB.pgp.as.format(`
 			DELETE FROM pinboard_contributions
 			WHERE pinboard = $1::INT
 				AND pad IN ($2:csv)
-		;`, [ _id, _object_id ])
+				AND pinboard IN (
+					SELECT id FROM pinboards 
+					WHERE owner = $3
+				)
+		;`, [ _id, _object_id, _uuid ])
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET mobilization = NULL
-			WHERE id = $2::INT
-		;`, [ _id ])
+			WHERE id = $1::INT
+				AND owner = $2
+		;`, [ _id, _uuid ])
 	}
 }
 function updatestatus (_id, _object_id, _mobilization) {

@@ -1,10 +1,10 @@
-const xlsx = require('./xlsx.js').main
-const json = require('./json.js').main
+const pads = require('./pads/')
+const contributors = require('./contributors/')
 const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
-	const { action } = req.params || {}
+	const { action, object } = req.params || {}
 	const { output, render } = req.body || {}
 
 	// TO DO: ADD Readme.md TO DOWNLOADS
@@ -18,10 +18,17 @@ module.exports = async (req, res) => {
 	}
 
 	if (render) {
-		if (['xlsx', 'csv'].includes(output)) xlsx(req, res)
-		else if (['json', 'geojson'].includes(output)) json(req, res)
-		else res.redirect('/module-error')
+		if (object === 'pads') {
+			if (['xlsx', 'csv'].includes(output)) pads.xlsx(req, res)
+			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
+			else res.redirect('/module-error')
+		} else if (object === 'contributors') {
+			if (['xlsx', 'csv'].includes(output)) contributors.xlsx(req, res)
+			else if (['json', 'geojson'].includes(output)) contributors.json(req, res)
+			else res.redirect('/module-error')
+		}
 	} else {
-		json(req, res)
+		if (object === 'pads') pads.json(req, res)
+		else if (object === 'contributors') contributors.json(req, res)
 	}
 }

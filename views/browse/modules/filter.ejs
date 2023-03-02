@@ -110,6 +110,11 @@
 
 					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
 				</div>
+			<% } else if (object === 'contributors') { %>
+				<div class='global-actions'>
+					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+					<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
+				</div>
 			<% } %>
 
 			<% if (locals.filters_menu?.length) { %>

@@ -21,7 +21,7 @@ exports.main = (req, res) => {
 				/* $4 */ password, 
 				/* $5 */ iso3, 
 				/* $6 */ language, 
-				/* $7 */ JSON.stringify(secondary_languages), 
+				/* $7 */ JSON.stringify(secondary_languages || []), 
 				/* $8 */ rights, 
 				/* $9 */ notifications || false, 
 				/* $10 */ reviewer || false 
@@ -86,7 +86,7 @@ exports.main = (req, res) => {
 				/* $4 */ update_pw, 
 				/* $5 */ iso3, 
 				/* $6 */ language, 
-				/* $7 */ JSON.stringify(secondary_languages), 
+				/* $7 */ JSON.stringify(secondary_languages || []), 
 				/* $8 */ rights, 
 				/* $9 */ notifications || false, 
 				/* $10 */ reviewer || false, 

@@ -36,8 +36,8 @@ module.exports = async (req, res) => {
 			if (object === 'templates') data = await templates.load({ req: req })
 			if (object === 'files') data = await files.load({ req: req })
 			if (object === 'reviews') data = await reviews.load({ req: req })
+			if (object === 'contributors') data = await contributors.load({ req: req })
 			// TO DO: FOR MOBILIZATIONS
-			// TO DO: FOR CONTRIBUTORS
 			res.status(200).json(data)
 		}
 	} else if (instance) {

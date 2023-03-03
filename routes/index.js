@@ -132,12 +132,6 @@ exports.dispatch.analyse = (req, res) => {
 	const { object } = req.params || {}
 	const language = helpers.checklanguage(req.params?.language || req.session.language)
 
-	// if (rights >= (modules.find(d => d.type === 'analyses')?.rights.write ?? Infinity)) {
-	// 	if (object === 'pad') createPad(req, res)
-	// 	else if (object === 'import') createImport(req, res)
-	// 	else if (object === 'template') createTemplate(req, res)
-	// } else res.redirect(`/${language}/browse/${object}s/public`)
-
 	if (object === 'mobilization') {
 		compileMobilization(req, res)
 	}
@@ -145,184 +139,49 @@ exports.dispatch.analyse = (req, res) => {
 function compileMobilization (req, res) {
 	const { id } =  req.query || {}
 
-	DB.conn.tx(t => {
-		const batch = []
-		batch.push(t.one(`
-			SELECT t.sections FROM mobilizations m
-			INNER JOIN templates t
-				ON m.template = t.id
-			WHERE m.id = $1
-		;`, [id]))
-		// batch.push(t.any(`
-		// 	SELECT p.id, p.title, p.sections FROM mobilization_contributions mc
-		// 	INNER JOIN pads p
-		// 		ON mc.pad = p.id
-		// 	WHERE mc.id = $1
-		// ;`, [id]))
-		batch.push(t.any(`
-			SELECT p.id, p.title, p.sections FROM pads p
-			WHERE p.id = 134
-		;`))
-		return t.batch(batch)
-	}).then(results => {
-		const [ template, pads ] = results
-		
-		console.log(template.sections)
-		pads.forEach(d => console.log(d.id, d.title, d.sections))
-		pads.forEach(d => console.log(d.id, d.title, d.sections.map(c => c.structure)))
-		pads.forEach(d => console.log(d.id, d.title, d.sections.map(c => c.items)))
-	}).catch(err => console.log(err))
+	Promise.all(DB.conns.map(conn => {
+		conn.tx(t => {
+			const batch = []
+			batch.push(t.one(`
+				SELECT t.sections FROM mobilizations m
+				INNER JOIN templates t
+					ON m.template = t.id
+				WHERE m.id = $1
+			;`, [id]))
+			// batch.push(t.any(`
+			// 	SELECT p.id, p.title, p.sections FROM mobilization_contributions mc
+			// 	INNER JOIN pads p
+			// 		ON mc.pad = p.id
+			// 	WHERE mc.id = $1
+			// ;`, [id]))
+			batch.push(t.any(`
+				SELECT p.id, p.title, p.sections FROM pads p
+				WHERE p.id = 134
+			;`))
+			return t.batch(batch)
+		}).then(results => {
+			const [ template, pads ] = results
+			
+			console.log(template.sections)
+			pads.forEach(d => console.log(d.id, d.title, d.sections))
+			pads.forEach(d => console.log(d.id, d.title, d.sections.map(c => c.structure)))
+			pads.forEach(d => console.log(d.id, d.title, d.sections.map(c => c.items)))
+		}).catch(err => console.log(err))
+	})).then(_ => console.log('returned all promises'))
+	.catch(err => console.log(err))
 }
 /* =============================================================== */
 /* ============================ PADS ============================= */
 /* =============================================================== */
-exports.dispatch.contribute = require('./contribute/').main
-
+exports.dispatch.contribute = require('./contribute/').main // THIS SHOULD NOT BE NEEDED
 exports.dispatch.edit = require('./edit/').main
-
 exports.dispatch.view = require('./view/').main
 
-exports.dispatch.import = require('./import/').create
-
-exports.dispatch.mobilize = require('./mobilize/').main
-
-/* =============================================================== */
-/* ========================== IMPORT ============================= */
-/* =============================================================== */
-// TO DO: CHANGE THIS TO THE GENERAL save/ MECHANISM
-exports.storeImport = require('./import/').save
 
 
 /* =============================================================== */
 /* ====================== SAVING MECHANISMS ====================== */
 /* =============================================================== */
-exports.process.upload = (req, res) => {
-	const { uuid } = req.session || {}
-	
-	const fls = req.files
-	console.log(fls)
-	const promises = fls.map(f => {
-		const basedir = path.join(__dirname, `../public/uploads/`)
-		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
-		const dir = path.join(basedir, uuid)
-		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
-		const source = path.join(__dirname, `../${f.path}`)
-
-		return new Promise(resolve => {
-			if (['image/png', 'image/jpg', 'image/jpeg', 'image/jfif', 'image/gif', 'application/octet-stream'].includes(f.mimetype)) { // octet-streram IS FOR IMAGE URLs				
-				const smdir = path.join(basedir, 'sm/')
-				if (!fs.existsSync(smdir)) fs.mkdirSync(smdir)
-				const targetdir = path.join(smdir, uuid)
-				if (!fs.existsSync(targetdir)) fs.mkdirSync(targetdir)
-
-				// const source = path.join(__dirname, `../${f.path}`)
-				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-				const smtarget = path.join(targetdir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-				
-				// CREATE THE SMALL IMAGE
-				Jimp.read(source, (err, image) => {
-					if (err) console.log(err)
-					const w = image.bitmap.width
-					const h = image.bitmap.height
-					// CHECK IMAGE ORIENTATION (EXIF)
-					// SEE https://www.impulseadventure.com/photo/exif-orientation.html
-					if (image._exif && image._exif.tags && image._exif.tags.Orientation) {
-						const o = image._exif.tags.Orientation
-						if (o === 8) image.rotate(270).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-						if (o === 6) image.rotate(90).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-						else image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-					} else {
-						image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-					}
-
-					image.quality(60)
-					image.writeAsync(smtarget)
-					.then(_ => {
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
-					}).catch(err => {
-						fs.copyFileSync(source, smtarget)
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
-					})
-				})
-			} else if (f.mimetype.includes('video/')) {
-				// TO DO: CHECK SIZE HERE AND IF TOO BIG DO NOTHING (IN FRONT END TELL USER TO GO THROUGH YOUTUBE OF MSSTREAM)
-				// const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-				const fftarget = path.join(dir, `./ff-${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-
-				execFile('ffmpeg', [
-					'-i', source,
-					// '-s', '640x480',
-					'-b:v', '512k',
-					'-c:v', 'libx264',
-					'-c:a', 'copy',
-					'-vf', 'scale=854:ih*854/iw', // 854 = 480p
-					fftarget
-				], function(err, stdout, stderr) {
-					if (err) console.log(err)
-
-					fs.unlinkSync(source)
-					resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
-				})
-			} else if (f.mimetype.includes('application/pdf')) {
-				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-
-				DB.conn.one(`
-					INSERT INTO files (name, path, contributor) 
-					SELECT $1, $2, id FROM contributors WHERE uuid = $3
-					RETURNING id
-				;`, [f.originalname, `/${target.split('public/')[1]}`, uuid])
-				.then(result => {
-					if (result) {
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
-					} else resolve({ status: 403, message: 'file was not properly stored' })
-				}).catch(err => console.log(err))
-			} else {
-				fs.unlinkSync(source)
-				resolve({ status: 403, ftype: f.mimetype, message: 'wrong file format' })
-			}
-		})
-	})
-	Promise.all(promises)
-	.then(results => res.json(results))
-	.catch(err => {
-		console.log(err)
-		res.json({ status: 500, message: 'Oops! Something went wrong.' })
-	})
-}
-// THIS IS NOT BEING USED NOW
-exports.process.screenshot = (req, res) => {
-	if (process.env.NODE_ENV !== 'production') {
-		const src = req.body.src
-		const target = src.simplify()
-
-		const basedir = path.join(__dirname, `../public/uploads/`)
-		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
-		
-		const dir = path.join(__dirname, `../public/uploads/${req.session.uuid}`)
-		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
-		
-		if (!fs.existsSync(path.join(dir, `${target}.png`))) {
-			new Pageres({ delay: 2, filename: target, format: 'png' })
-				.src(src, ['1280x1024'])
-				.dest(dir)
-				.run()
-			.then(result => res.json({ status: 200, src: path.join(dir, `${target}.png`).split('public/')[1], message: 'success' }))
-			.catch(err => {
-				console.log(err)
-				res.json({ status: 500, message: 'Oops! Something went wrong.' })
-			})
-		} else {
-			res.json({ status: 200, src: path.join(dir, `${target}.png`).split('public/')[1], message: 'image already exists' })
-		}
-	}
-	else res.json({ status: 200, src: null, message: 'cannot load image in production mode' })
-}
-
-
-
 exports.process.check = require('./check/').main
 exports.process.save = require('./save/').main
 exports.process.generate = require('./generate/').main
@@ -431,89 +290,6 @@ exports.process.download = (req, res) => {
 			archive.finalize()
 		}).catch(err => console.log(err))
 	}
-
-	// DB.conn.any(saveSQL).then(async results => {
-	// 	if (format === 'raw') {
-	// 		function getImg (d) {
-	// 			if (d && d.sections) {
-	// 				const img = d.sections.map(d => d.items).flat().filter(c => c.type === 'img' && c.src)
-	// 				const mosaic = d.sections.map(d => d.items).flat().filter(c => c.type === 'mosaic' && c.srcs)
-	// 				const embed = d.sections.map(d => d.items).flat().filter(c => c.type === 'embed' && c.src)
-	// 				if (img.length) return img.map(c => c.src)
-	// 				else if (mosaic.length) return mosaic.map(c => c.srcs).flat()
-	// 				else if (embed.length) return embed.map(c => c.src)
-	// 				else return [null]
-	// 			} else return [null]
-	// 		}
-
-	// 		results.forEach(d => d.imgs = getImg(d).flat())
-	// 		const imgs = results.map(d => d.imgs).flat()
-	// 		const max_imgs = results.sort((a, b) => b.imgs.length - a.imgs.length)[0].imgs.length
-
-	// 		const columns = [
-	// 			'id', 
-	// 			'title', 
-	// 			'contributor', 
-	// 			'contribution_date', 
-	// 			'full_text', 
-	// 			'location_JSON', 
-	// 			new Array(5).fill(null).map((d, i) => `SDG_tag_${i + 1}`),
-	// 			new Array(5).fill(null).map((d, i) => `thematic_area_tag_${i + 1}`),
-	// 			new Array(max_imgs).fill(null).map((d, i) => `image_${i + 1}`)
-	// 		].flat()
-
-	// 		let csv = `${columns.join('\t')}`
-	// 		results.forEach(d => {
-	// 			const imgIdx = getImg(d).map(c => `file: img-${imgs.flat().indexOf(c) + 1}`)
-
-	// 			csv += `\n${[
-	// 				d.id, 
-	// 				d.title, 
-	// 				d.contributor, 
-	// 				d.date, 
-	// 				`"${d.full_text.replace(/"/g, '""')}"`, 
-	// 				JSON.stringify(d.location.centerpoints || d.location.centerpoint), 
-	// 				new Array(5).fill(null).map((c, i) => d.sdgs[i] ? d.sdgs[i].toString() : ''), 
-	// 				new Array(5).fill(null).map((c, i) => d.tags[i] ? d.tags[i].toString() : ''),
-	// 				new Array(max_imgs).fill(null).map((c, i) => imgIdx[i] ? imgIdx[i].toString() : '')
-	// 			].flat().join('\t')}`
-	// 		})
-
-	// 		await fs.writeFileSync(path.join(__dirname, '../tmp/solutions_data.tsv'), csv, 'utf8')		
-	// 		// CODE FROM https://github.com/archiverjs/node-archiver
-	// 		const zippath = path.join(__dirname, '../tmp/grassroots_solutions.zip')
-	// 		const output = fs.createWriteStream(zippath)
-	// 		const archive = archiver('zip', {
-	// 			zlib: { level: 9 } // Sets the compression level. 6 is default, 9 is high compression
-	// 		})
-	// 		output.on('close', function() {
-	// 			res.download(path.join(__dirname, '../tmp/grassroots_solutions.zip'), 'grassroots_solutions.zip', err => {
-	// 				if (err) console.log(err)
-	// 				fs.unlinkSync(path.join(__dirname, '../tmp/solutions_data.tsv'))
-	// 				fs.unlinkSync(path.join(__dirname, '../tmp/grassroots_solutions.zip'))
-	// 			})
-	// 		})
-	// 		archive.on('warning', function(err) {
-	// 			if (err.code === 'ENOENT') {
-	// 				console.log('archive warning')
-	// 				console.log(err)
-	// 			} else {
-	// 				console.log('archive error')
-	// 				console.log(err)
-	// 			}
-	// 		})
-	// 		archive.on('error', err => console.log(err))
-			
-	// 		archive.pipe(output)
-	// 		archive.file(path.join(__dirname, '../tmp/solutions_data.tsv'), { name: 'solutions_data.tsv' })
-			
-	// 		imgs.forEach((d, i) => {
-	// 			const file = path.join(__dirname, `../public/${d}`)
-	// 			archive.file(file, { name: `img-${i + 1}${path.extname(file)}` })
-	// 		})
-	// 		archive.finalize()
-	// 	}
-	// })
 }
 
 // MIGRATE THE FOLLOWING TO helpers // THIS IS DEPRECATED

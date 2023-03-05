@@ -58,7 +58,7 @@ const sessionMiddleware = session({
 	name: `${app_suite}-session`,
 	// secret: 'acclabspadspass',
 	secret: `${app_suite}-${app_suite_secret}-pass`,
-	store: new pgSession({ pgPromise: DB.conn }),
+	store: new pgSession({ pgPromise: DB.general }),
 	resave: false,
 	saveUninitialized: false,
 	cookie: {

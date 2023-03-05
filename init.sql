@@ -178,10 +178,17 @@ ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNI
 
 CREATE TABLE pinboard_contributions (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	-- FOR MAIN PLATFORMS
 	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	-- FOR GLOBAL PLATFORM
+	-- pad INT,
+	-- platform VARCHAR(99),
+	--
 	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, pinboard);
+-- FOR GLOBAL PLATFORM
+-- ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, platform, pinboard);
 
 CREATE TABLE tagging (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

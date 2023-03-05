@@ -64,56 +64,64 @@ exports.main = kwargs => {
 			// })
 
 			if (users.length) {
-				return DB.conn.task(t => {
-					const batch = []
-					batch.push(t.any(`
-						SELECT mc.participant AS id, COALESCE(COUNT (mc.mobilization), 0)::INT AS ongoing_associated_mobilizations FROM mobilization_contributors mc
-						INNER JOIN mobilizations m
-							ON m.id = mc.mobilization
-						WHERE mc.participant IN ($1:csv)
-							AND m.status = 1
-						GROUP BY mc.participant
-					;`, [ users.map(d => d.id) ]))
+				return Promise.all(DB.conns.map(app_conn => {
+					return app_conn.task(t => {
+						const batch = []
+						batch.push(t.any(`
+							SELECT mc.participant AS id, COALESCE(COUNT (mc.mobilization), 0)::INT AS ongoing_associated_mobilizations FROM mobilization_contributors mc
+							INNER JOIN mobilizations m
+								ON m.id = mc.mobilization
+							WHERE mc.participant IN ($1:csv)
+								AND m.status = 1
+							GROUP BY mc.participant
+						;`, [ users.map(d => d.id) ]))
 
-					batch.push(t.any(`
-						SELECT mc.participant AS id, COALESCE(COUNT (mc.mobilization), 0)::INT AS past_associated_mobilizations FROM mobilization_contributors mc
-						INNER JOIN mobilizations m
-							ON m.id = mc.mobilization
-						WHERE mc.participant IN ($1:csv)
-							AND m.status = 2
-						GROUP BY mc.participant
-					;`, [ users.map(d => d.id) ]))
-					
-					batch.push(t.any(`
-						SELECT owner AS id, COALESCE(COUNT (id), 0)::INT AS private_associated_pads FROM pads
-						WHERE owner IN ($1:csv)
-							AND status < 2
-						GROUP BY owner
-					;`, [ users.map(d => d.id) ]))
+						batch.push(t.any(`
+							SELECT mc.participant AS id, COALESCE(COUNT (mc.mobilization), 0)::INT AS past_associated_mobilizations FROM mobilization_contributors mc
+							INNER JOIN mobilizations m
+								ON m.id = mc.mobilization
+							WHERE mc.participant IN ($1:csv)
+								AND m.status = 2
+							GROUP BY mc.participant
+						;`, [ users.map(d => d.id) ]))
+						
+						batch.push(t.any(`
+							SELECT owner AS id, COALESCE(COUNT (id), 0)::INT AS private_associated_pads FROM pads
+							WHERE owner IN ($1:csv)
+								AND status < 2
+							GROUP BY owner
+						;`, [ users.map(d => d.id) ]))
 
-					batch.push(t.any(`
-						SELECT owner AS id, COALESCE(COUNT (id), 0)::INT AS associated_pads FROM pads
-						WHERE owner IN ($1:csv)
-							AND status >= 2
-						GROUP BY owner
-					;`, [ users.map(d => d.id) ]))
-					
-					return t.batch(batch)
-					.then(results => {
-						const [ ongoing_associated_mobilizations, past_associated_mobilizations, private_associated_pads, associated_pads ] = results
+						batch.push(t.any(`
+							SELECT owner AS id, COALESCE(COUNT (id), 0)::INT AS associated_pads FROM pads
+							WHERE owner IN ($1:csv)
+								AND status >= 2
+							GROUP BY owner
+						;`, [ users.map(d => d.id) ]))
+						
+						return t.batch(batch)
+						.then(results => {
+							const [ ongoing_associated_mobilizations, past_associated_mobilizations, private_associated_pads, associated_pads ] = results
 
-						let data = join.multijoin.call(users, [ ongoing_associated_mobilizations, 'id' ])
-						data = join.multijoin.call(data, [ past_associated_mobilizations, 'id' ])
-						data = join.multijoin.call(data, [ private_associated_pads, 'id' ])
-						data = join.multijoin.call(data, [ associated_pads, 'id' ])
+							let data = join.multijoin.call(users, [ ongoing_associated_mobilizations, 'id' ])
+							data = join.multijoin.call(data, [ past_associated_mobilizations, 'id' ])
+							data = join.multijoin.call(data, [ private_associated_pads, 'id' ])
+							data = join.multijoin.call(data, [ associated_pads, 'id' ])
 
-						data.forEach(d => { // UPDATE STATUS BASED ON PADS
-							if (d.status === 1 && (d.associated_pads > 0 || d.private_associated_pads > 0)) d.status = 2
-						})
+							data.forEach(d => { // UPDATE STATUS BASED ON PADS
+								if (d.status === 1 && (d.associated_pads > 0 || d.private_associated_pads > 0)) d.status = 2
+							})
 
-						return data
+							return data
+						}).catch(err => console.log(err))
 					}).catch(err => console.log(err))
+				})).then(results => {
+					// TO DO: MULTIJOIN results (DIFFERENT REPRESENTATIONS OF users WWITH THE DIFFERENT CONTRIBUTION INFO FROM THE DIFFERENT PLATFORMS)
+					results.forEach(d => {
+						// return Object.assign({}, ...results)
+					})
 				}).catch(err => console.log(err))
+
 			} else return users
 		}).catch(err => console.log(err))
 	}).then(data => {

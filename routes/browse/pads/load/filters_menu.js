@@ -113,7 +113,6 @@ exports.main = async kwargs => {
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
 				;`, [ participations.map(d => d.id), full_filters ]).then(results => { 
-					// results.sort((a, b) => +b.start_date - +a.start_date)
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)

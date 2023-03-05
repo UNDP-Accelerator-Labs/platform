@@ -92,10 +92,10 @@ app.route('/:language/edit/:object')
 	.get(routes.render.login, routes.dispatch.edit)
 app.route('/:language/view/:object')
 	.get(routes.render.login, routes.dispatch.view)
-app.route('/:language/import/:object')
-	.get(routes.render.login, routes.dispatch.import)
-app.route('/:language/mobilize/:object')
-	.get(routes.render.login, routes.dispatch.mobilize)
+// app.route('/:language/import/:object')
+// 	.get(routes.render.login, routes.dispatch.import)
+// app.route('/:language/mobilize/:object')
+// 	.get(routes.render.login, routes.dispatch.mobilize)
 
 app.route('/:language/browse/:object/:space')
 	.get(routes.render.login, routes.dispatch.browse)
@@ -113,7 +113,6 @@ app.post('/generate/:format', routes.process.generate)
 app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
-app.post('/validate', routes.process.validate)
 
 app.route('/publish/:object')
 	.get(routes.process.publish)
@@ -122,8 +121,6 @@ app.get('/unpublish/:object', routes.process.unpublish)
 app.post('/share/:object', routes.process.share)
 app.get('/forward/:object', routes.process.forward)
 app.get('/delete/:object', routes.process.delete)
-
-app.post('/download/:object', routes.process.download)
 
 app.route('/request/:object')
 	.get(routes.process.request)
@@ -141,15 +138,15 @@ app.post('/call/api', routes.process.callapi)
 // app.post('/:language/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
 
 
-app.post('/upload/img', upload.array('img'), routes.process.upload)
-app.post('/upload/video', upload.array('video'), routes.process.upload)
-app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
+// app.post('/upload/img', upload.array('img'), routes.process.upload)
+// app.post('/upload/video', upload.array('video'), routes.process.upload)
+// app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
 
-app.post('/screenshot', routes.process.screenshot)
+// app.post('/screenshot', routes.process.screenshot)
 
 
 // TO DO: UPDATE SCHEMA BELOW
-app.post('/storeImport', routes.render.login, routes.storeImport) // UPDATE DO save/import
+// app.post('/storeImport', routes.render.login, routes.storeImport) // UPDATE DO save/import
 app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forward
 
 

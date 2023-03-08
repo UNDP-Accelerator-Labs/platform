@@ -4,12 +4,16 @@ if (['production', 'local-production'].includes(process.env.NODE_ENV)) {
 	console.log('in production environment')
 	exports.connections = apps_in_suite.map(d => {
 		return {
-			database: d, 
-			port: process.env.DB_PORT, 
-			host: process.env.DB_HOST,
-			user: process.env.DB_USERNAME,
-			password: process.env.DB_PASSWORD,
-			ssl: true
+			key: d.key,
+			baseurl: d.baseurl,
+			conn: {
+				database: d.key, 
+				port: process.env.DB_PORT, 
+				host: process.env.DB_HOST,
+				user: process.env.DB_USERNAME,
+				password: process.env.DB_PASSWORD,
+				ssl: true
+			}
 		}
 	})
 	exports.connection = {
@@ -23,12 +27,16 @@ if (['production', 'local-production'].includes(process.env.NODE_ENV)) {
 } else {
 	console.log('in local test envorinment')
 	exports.connections = apps_in_suite.map(d => {
-		return {
-			database: d, 
-			port: process.env.port, 
-			host: process.env.host,
-			user: process.env.user,
-			password: process.env.password
+		return { 
+			key: d.key,
+			baseurl: d.baseurl,
+			conn: {
+				database: d.key, 
+				port: process.env.port, 
+				host: process.env.host,
+				user: process.env.user,
+				password: process.env.password
+			}
 		}
 	})
 	exports.connection = {

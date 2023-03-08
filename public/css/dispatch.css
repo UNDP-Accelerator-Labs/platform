@@ -19419,11 +19419,38 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   nav.tabs .inner {
     width: 100%;
   }
+  nav.tabs .inner div.lg {
+    /*menu.sub {
+    	padding-bottom: 15px;
+
+    	li {
+    		margin: 0;
+    		background-color: #FFF;
+    		flex-grow: 1;
+    		text-align: center;
+
+    		button {
+    			padding-top: 0;
+    			height: 25px;
+
+    			&::after {
+    				content: none;
+    			}
+    		}
+    	}
+    	li.active {
+    		background-color: $c-dark-blue;
+
+    		button {
+    			color: #FFF;
+    		}
+    	}
+    }*/
+  }
   nav.tabs .inner div.lg menu,
 nav.tabs .inner div.lg ul {
     display: flex;
     width: 100%;
-    padding-bottom: 15px;
     scroll-snap-type: x mandatory;
     overflow: scroll;
   }
@@ -20032,6 +20059,9 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     width: 180px;
     height: auto;
   }
+  header .inner.center {
+    justify-content: space-around;
+  }
 
   .sidebar {
     position: sticky;
@@ -20076,6 +20106,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     font-size: 12px;
     line-height: 1.5em;
     color: #969696;
+    font-weight: normal;
   }
   .sidebar > .inner #statistics .statistic:first-child {
     width: 100%;
@@ -27105,6 +27136,62 @@ div#reviews .review:not(:last-child)::after {
     justify-content: space-between;
     align-items: center;
   }
+  div.browse nav#search-and-filter form .sources {
+    width: 100%;
+    border-bottom: 1px dotted #969696;
+    margin-top: -5px;
+  }
+  div.browse nav#search-and-filter form .sources menu li {
+    float: left;
+    position: relative;
+    margin: 0;
+    padding: 5px 15px;
+    border-right: 1px dotted #969696;
+    transition: background-color 0.25s;
+  }
+  div.browse nav#search-and-filter form .sources menu li input[type=radio] {
+    display: none;
+  }
+  div.browse nav#search-and-filter form .sources menu li label {
+    display: inline-block;
+    color: #969696;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  div.browse nav#search-and-filter form .sources menu li .count {
+    position: relative;
+    font-size: 12px;
+    padding: 0 0 0 15px;
+  }
+  div.browse nav#search-and-filter form .sources menu li .count::before {
+    content: "";
+    position: absolute;
+    height: 15px;
+    width: 0;
+    left: 4px;
+    top: 4px;
+    border-left: 1px dotted #969696;
+  }
+  div.browse nav#search-and-filter form .sources menu li.active input[type=radio] + label {
+    color: #0A4C73;
+    font-weight: bold;
+  }
+  div.browse nav#search-and-filter form .sources menu li.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    height: 2px;
+    background-color: #FFF;
+  }
+  div.browse nav#search-and-filter form .sources menu li:not(.active):not(.label):hover {
+    background-color: #F3F3F3;
+  }
+  div.browse nav#search-and-filter form .sources menu .label {
+    font-size: 12px;
+    color: #969696;
+  }
   div.browse nav#search-and-filter form .search,
 div.browse nav#search-and-filter form .filter:not(.add) {
     position: relative;
@@ -27460,6 +27547,9 @@ div.browse nav#search-and-filter form .filters section .filter input[type=text].
     font-size: 14px;
     line-height: 1.5em;
     cursor: pointer;
+  }
+  div.browse nav#search-and-filter.no-border {
+    border: none;
   }
   div.browse nav:not(.tabs) {
     width: 100%;
@@ -28710,6 +28800,11 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
 
   div.browse.public {
     padding-top: 90px;
+  }
+
+  div.browse.flex {
+    display: flex;
+    align-items: center;
   }
 
   div.browse.slideshow {

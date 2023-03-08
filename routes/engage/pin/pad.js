@@ -4,6 +4,8 @@ const { modules, DB } = include('config/')
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id, mobilization } = req.body || {}
+	// THE SOURCE IS PASSED IN THE object_id
+	
 	// const language = checklanguage(req.params?.language || req.session.language)
 	
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
@@ -121,11 +123,12 @@ function insertpads (_id, _object_id, _mobilization) {
 		const data = _object_id.map(d => {
 			const obj = {}
 			obj.pinboard = _id
-			obj.pad = d
+			obj.pad = d.id
+			obj.source = d.source
 			return obj
 		})
 
-		const insert = DB.pgp.helpers.insert(data, ['pinboard', 'pad'], 'pinboard_contributions')
+		const insert = DB.pgp.helpers.insert(data, ['pinboard', 'pad', 'source'], 'pinboard_contributions')
 		const constraint = DB.pgp.as.format(`ON CONFLICT ON CONSTRAINT unique_pad_pinboard DO NOTHING`)
 		return `${insert} ${constraint}`
 
@@ -140,15 +143,17 @@ function insertpads (_id, _object_id, _mobilization) {
 function removepads (_id, _object_id, _mobilization, _uuid) {
 	if (_object_id) {
 		if (!Array.isArray(_object_id)) _object_id = [_object_id]
+
+		const values = DB.pgp.helpers.values(_object_id, [ 'id', 'source' ])
 		return DB.pgp.as.format(`
 			DELETE FROM pinboard_contributions
 			WHERE pinboard = $1::INT
-				AND pad IN ($2:csv)
+				AND (pad, source) IN ($2:csv)
 				AND pinboard IN (
 					SELECT id FROM pinboards 
 					WHERE owner = $3
 				)
-		;`, [ _id, _object_id, _uuid ])
+		;`, [ _id, values, _uuid ])
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
@@ -162,13 +167,14 @@ function updatestatus (_id, _object_id, _mobilization) {
 	if (_object_id) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
-			SET status = (SELECT GREATEST (
-				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				WHERE pc.pinboard = $1::INT), 1)
-				, status)
-			)
+			-- SET status = (SELECT GREATEST (
+			-- 	LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
+			-- 	INNER JOIN pinboard_contributions pc
+			-- 		ON pc.pad = p.id
+			-- 	WHERE pc.pinboard = $1::INT), 1)
+			-- 	, status)
+			-- )
+			SET status = (SELECT GREATEST (1, status))
 			WHERE id = $1::INT
 		;`, [ _id ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS
@@ -188,14 +194,20 @@ function updatestatus (_id, _object_id, _mobilization) {
 }
 function retrievepins (_object_id) {
 	if (!Array.isArray(_object_id)) _object_id = [_object_id]
+
+	const values = DB.pgp.helpers.values(_object_id, [ 'id', 'source' ])
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title FROM pinboards pb
-		INNER JOIN pinboard_contributions pbc
-			ON pbc.pinboard = pb.id
-		INNER JOIN pads p
-			ON pbc.pad = p.id
-		WHERE p.id IN ($1:csv)
-	;`, [ _object_id ])
+		-- INNER JOIN pinboard_contributions pbc
+		-- 	ON pbc.pinboard = pb.id
+		-- INNER JOIN pads p
+		-- 	ON pbc.pad = p.id
+		-- WHERE p.id IN ($1:csv)
+		WHERE pb.id IN (
+			SELECT pinboard FROM pinboard_contributions
+			WHERE (pad, source) IN ($1:raw)
+		)
+	;`, [ values ])
 }
 function retrievepinboards (_owners) {
 	return DB.pgp.as.format(`

@@ -5,6 +5,7 @@ let {
 	app_suite_secret,
 	app_languages,
 	app_description,
+	apps_in_suite,
 	modules, 
 	metafields, 
 	engagementtypes, 
@@ -25,6 +26,7 @@ exports.app_title_short = app_title_short
 exports.app_suite = app_suite
 exports.app_suite_secret = app_suite_secret
 exports.app_description = app_description
+exports.apps_in_suite = apps_in_suite
 
 // DESIRED MODULES
 if (!modules) modules = []

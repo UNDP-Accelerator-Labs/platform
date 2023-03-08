@@ -13,6 +13,7 @@
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
 	const pages = locals.metadata.page.count
+	const source = locals.metadata.page.source
 	
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -20,6 +21,8 @@
 		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
 		else mapscale = 'contain'
 	}
+
+	const display_content = Object.keys(query)?.filter(key => !['status', 'source', 'mapscale'].includes(key)).length > 0
 %>
 <html lang='<%- language %>'>
 <head>
@@ -50,7 +53,7 @@
 				<div class='blank-area'></div>
 				<% slides.forEach(d => { %>
 					<div class='slide'>
-						<a href='../../view/pad?id=<%- d.id %>'>
+						<a href='<%- d.link %>' target='_blank'>
 							<div class='media media-txt'>
 								<p class='country'><%- d.country %></p>
 								<h1><% if (d.title?.length > 50) { %><%- d.title?.slice(0, 50).trim() %>…<% } else { %><%- d.title %><% } %></h1>
@@ -64,7 +67,7 @@
 			<div class='slides'>
 				<% slides.forEach(d => { %>
 					<div class='slide'>
-						<a href='../../view/pad?id=<%- d.id %>'>
+						<a href='<%- d.link %>' target='_blank'>
 							<div class='media media-txt'>
 								<p class='country'><%- d.country %></p>
 								<h1><%- d.title %></h1>
@@ -132,13 +135,14 @@
 <% } %>
 
 <header>
-	<div class='inner'>
+	<div class='inner<% if (!display_content) { %> center<% } %>'>
 		<%- include ('../partials/menu-logo.ejs') %> 
 	</div>
 </header>
 
-<div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %>'>
-	<% if (!publicpage
+<div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %><% if (!display_content) { %> flex<% } %>'>
+	<% if (display_content
+		&& !publicpage
 		&& rights >= (modules.find(d => d.type === object)?.rights.read ?? infinity)
 		&& pagedisplay !== 'slideshow'
 		&& !(locals.metadata.page.map && mapscale === 'full-screen')
@@ -373,8 +377,9 @@
 
 			<!-- MAP -->
 			<% if (
-				(locals.metadata.page.map 
-					&& locals.stats?.filtered > 0)
+				display_content 
+				&& (locals.metadata.page.map 
+					&& locals.stats.filtered > 0)
 				&& !(space === 'pinned' 
 					&& (!locals.pinboard?.editable || activity === 'preview')
 					&& !locals.pinboard?.display_map)
@@ -382,7 +387,7 @@
 			) { %>
 				<%- include ('./modules/map') %>
 			<% } else { %>
-				<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.pads?.length === 0) { %>
+				<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.global_info.pads?.length === 0) { %>
 					<small class='no-results lg'>
 						<%- vocabulary['pads to display'][language](0) %>
 					</small>
@@ -391,11 +396,11 @@
 			<% } %>
 
 			<!-- STATISTICS IN MOBILE VIEW -->
-			<% if (mapscale !== 'full-screen') { %>
+			<% if (display_content && mapscale !== 'full-screen') { %>
 				<div class='xs'>
 					<%- include ('./modules/statistics.ejs') %>
 				</div>
-				<% if (locals.stats?.filtered === 0) { %>
+				<% if (locals.stats.filtered === 0) { %>
 					<small class='no-results xs'>
 						<%- vocabulary['pads to display'][language](0) %>
 					</small>
@@ -404,7 +409,7 @@
 			<% } %>
 		</div>
 		<div class='outer'>
-			<% if (pages > 1) { %>
+			<% if (display_content && pages > 1) { %>
 				<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
 			<% } %>
 		</div>
@@ -412,7 +417,7 @@
 	</main>
 </div>
 
-<% if (pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
+<% if (display_content && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 	<div class='sidebar lg'>
 		<div class='inner'>
 			<%- include ('./modules/statistics.ejs') %>
@@ -793,9 +798,11 @@
 									return `../../view/pad?${queryparams.toString()}`
 								}
 							<% } %>
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						}//, 'target': '_blank'
+							// if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+							// else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+							
+							return d.link
+						}, 'target': '_blank'
 					})
 				.addElems('img', 'vignette')
 					.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })
@@ -893,9 +900,11 @@
 									return `../../view/pad?${queryparams.toString()}`
 								}
 							<% } %>
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						}//, 'target': '_blank'
+							// if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+							// else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+
+							return d.link
+						}, 'target': '_blank'
 					}).addElems('h1')
 				title.addElems('img')
 					.attr('src', d => {
@@ -943,9 +952,12 @@
 									return `../../view/pad?${queryparams.toString()}`
 								}
 							<% } %>
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-							else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						}//, 'target': '_blank'
+						
+							// if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+							// else return `../../view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+
+							return d.link
+						}, 'target': '_blank'
 					}).html(d => {
 						if (d.txt.length > 500) return `${d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ').slice(0, 500)}… <span class='read-more'>[<%- vocabulary["read more"][language] %>]</span>`
 						else return d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ')
@@ -1173,6 +1185,7 @@
 					)
 				) { %>
 					const pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>
+					const source = '<%- source %>'
 
 					function renderPins (_group, _data) {
 						const pin = _group.addElems('div', 'pin tag', d => {
@@ -1186,7 +1199,7 @@
 							})
 						pin.addElems('label', 'close')
 						.on('click', async function (d) {
-							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
+							const res = await POST('/pin', { board_id: d.id, object_id: { id: d.object_id, source }, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								<% if (space === 'pinned') { %>
 									location.reload()
@@ -1238,7 +1251,7 @@
 							const pins = sel.findAncestor('pinboard-group').select('.pins')
 
 							if (this.checked) {
-								const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+								const res = await POST('/pin', { board_id: d.id, object_id: { id: d.object_id, source }, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
 									pins.call(renderPins, res.pins)
 									
@@ -1254,7 +1267,7 @@
 									})
 								}
 							} else {
-								const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
+								const res = await POST('/pin', { board_id: d.id, object_id: { id: d.object_id, source }, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
 									pins.call(renderPins, res.pins)
 									d3.selectAll('.pinboard-group .dropdown')
@@ -1348,13 +1361,13 @@
 								})
 
 								if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
-									const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+									const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: { id: d.id, source }, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 									if (res.status === 200) pins.call(renderPins, res.pins)
 									d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')
 										.filter(c => c.id === d.id)
 										.html(c => c.count += 1)
 								} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
-									const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+									const res = await POST('/pin', { board_title: node.value.trim(), object_id: { id: d.id, source }, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 									if (res.status === 200) {
 										// d.pinboards = res.pins
 										// // ADD THE NEW PIN TO THE OBJECT
@@ -1737,7 +1750,7 @@
 	})
 
 	window.onload = function () {
-		<% if (!mapscale || mapscale === 'contain') { %>
+		<% if (display_content && (!mapscale || mapscale === 'contain')) { %>
 			renderSections(<%- JSON.stringify(locals.sections) %>)
 		<% } %>
 	}

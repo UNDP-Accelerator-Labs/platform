@@ -1,4 +1,4 @@
-const { app_title: title, app_description: description, app_languages, modules, metafields, media_value_keys, engagementtypes, lazyload, browse_display, welcome_module, page_content_limit, DB } = include('config/')
+const { app_title: title, app_description: description, app_languages, apps_in_suite, modules, metafields, media_value_keys, engagementtypes, lazyload, browse_display, welcome_module, page_content_limit, DB } = include('config/')
 const checklanguage = require('../language').main
 const join = require('../joins')
 const array = require('../array')
@@ -31,7 +31,9 @@ exports.sessiondata = _data => {
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
-	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
+	let { page, pagecount, map, display, mscale, source, req, res } = _kwargs || {}
+	if (!source || !apps_in_suite.some(d => d.key === source)) source = apps_in_suite[0].key
+
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 
@@ -152,6 +154,7 @@ exports.pagemetadata = (_kwargs) => {
 		const obj = {}
 		obj.metadata = {
 			site: {
+				apps_in_suite,
 				title,
 				description,
 				languages,
@@ -182,6 +185,7 @@ exports.pagemetadata = (_kwargs) => {
 				space,
 				query: parsedQuery,
 
+				source,
 				lazyload,
 				map: map || false,
 				mscale: mscale || 'contain',

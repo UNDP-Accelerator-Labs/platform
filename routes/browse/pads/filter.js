@@ -1,7 +1,7 @@
-const { app_title, DB, modules, engagementtypes, metafields } = include('config/')
+const { app_title, apps_in_suite, DB, modules, engagementtypes, metafields } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
-exports.main = async (req, res) => {
+exports.main = async (req, res, kwargs = {}) => {
 	if (req.session.uuid) { // USER IS LOGGED IN
 		var { uuid, country, rights, collaborators } = req.session || {}
 	} else { // PUBLIC/ NO SESSION
@@ -12,6 +12,9 @@ exports.main = async (req, res) => {
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM DOWNLOAD)
 	
 	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let source = kwargs.source || req.query.source || req.body.source
+	if (!source || !apps_in_suite.some(d => d.key === source)) source = apps_in_suite[0].key
+	
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -115,15 +118,20 @@ exports.main = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT member FROM team_members WHERE team IN ($1:csv)
 			;`, [ teams ])
-			.then(results =>  DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
 			.catch(err => console.log(err)))
 		}
 		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
-		if (pinboard) platform_filters.push(DB.pgp.as.format(`
-				(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
-				OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
-			`, [ pinboard ]))
+
+		if (pinboard) {
+			platform_filters.push(await DB.conn.any(`
+				SELECT pad FROM pinboard_contributions
+				WHERE pinboard = $1::INT
+					AND source = $2
+			;`, [ pinboard, source ]).then(results => DB.pgp.as.format(`(p.id IN ($1:csv))`, [ results.map(d => d.pad) ]))
+			.catch(err => console.log(err)))
+		}
 		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
 		// if (sources) platform_filters.push(DB.pgp.as.format(`AND p.source IS NULL`))
 

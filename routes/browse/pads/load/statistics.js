@@ -1,4 +1,4 @@
-const { modules, DB } = include('config/')
+const { apps_in_suite, modules, DB } = include('config/')
 const { datastructures, checklanguage, flatObj } = include('routes/helpers/')
 
 const filter = require('../filter').main
@@ -8,6 +8,8 @@ exports.main = async kwargs => {
 	// THIS NEEDS TO BE A TASK
 	const { req, res } = kwargs || {}
 	const { object } = req.params || {}
+	let source = kwargs.source || req.query.source || req.body.source
+	if (!source || !apps_in_suite.some(d => d.key === source)) source = apps_in_suite[0].key
 
 	if (req.session.uuid) { // USER IS LOGGED IN
 		var { uuid, rights, collaborators } = req.session || {}
@@ -18,7 +20,7 @@ exports.main = async kwargs => {
 
 	// const { uuid, rights, collaborators } = req.session || {}
 	// GET FILTERS
-	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	const [ f_space, order, page, full_filters ] = await filter(req, res, { source })
 	
 	const module_rights = modules.find(d => d.type === object)?.rights
 	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)

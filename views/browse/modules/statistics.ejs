@@ -9,7 +9,7 @@
 
 <div id='statistics'>
 	<div class='statistic'>
-		<h1><%- locals.stats?.filtered %></h1>
+		<h1><%- locals.stats?.filtered %><small> / <%- locals.global_info.filtered %></small></h1>
 		<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
 		
 		<% if (locals.metadata.page.count > 1) { %>

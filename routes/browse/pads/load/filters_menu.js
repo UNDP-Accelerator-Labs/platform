@@ -1,4 +1,4 @@
-const { modules, metafields, DB } = include('config/')
+const { apps_in_suite, modules, metafields, DB } = include('config/')
 const { array, datastructures, checklanguage, join, flatObj } = include('routes/helpers/')
 
 const filter = require('../filter').main
@@ -7,6 +7,8 @@ exports.main = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
 	const { req, res, participations } = kwargs || {}
+	let source = kwargs.source || req.query.source || req.body.source
+	if (!source || !apps_in_suite.some(d => d.key === source)) source = apps_in_suite[0].key
 	
 	if (req.session.uuid) { // USER IS LOGGED IN
 		var { uuid, rights, collaborators } = req.session || {}
@@ -17,7 +19,7 @@ exports.main = async kwargs => {
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
 	// GET FILTERS
-	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	const [ f_space, order, page, full_filters ] = await filter(req, res, { source })
 
 	return conn.task(t => {
 		const batch = []

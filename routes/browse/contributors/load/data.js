@@ -63,9 +63,11 @@ exports.main = kwargs => {
 			// 	d.pinboards = JSON.parse(d.pinboards)
 			// })
 
+			// TO DO: FINISH HERE
+
 			if (users.length) {
 				return Promise.all(DB.conns.map(app_conn => {
-					return app_conn.task(t => {
+					return app_conn.conn.task(t => {
 						const batch = []
 						batch.push(t.any(`
 							SELECT mc.participant AS id, COALESCE(COUNT (mc.mobilization), 0)::INT AS ongoing_associated_mobilizations FROM mobilization_contributors mc

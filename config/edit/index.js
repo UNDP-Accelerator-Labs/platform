@@ -8,7 +8,11 @@ exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 
 // apps_in_suite NEED TO BE THE NAMES OF THE DIFFERENT DBs
-exports.apps_in_suite = ['sm_test_02', 'ap_test_02', 'exp_test_02']
+exports.apps_in_suite = [
+	{ name: 'Action plans', key: 'ap_test_02', baseurl: 'https://acclabs-actionplans.azurewebsites.net/' }, 
+	{ name: 'Solutions mapping', key: 'sm_test_02', baseurl: 'https://undphqexoacclabsapp01.azurewebsites.net/' }, 
+	{ name: 'Experiments', key: 'exp_test_02', baseurl: 'https://acclabs-experimenters.azurewebsites.net/' }
+]
 
 // DESIRED MODULES
 exports.modules = [
@@ -32,7 +36,7 @@ exports.metafields = [
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'tag', name: 'methods', required: true, opencode: false },
 	{ type: 'tag', name: 'datasources', required: true, opencode: true }, 
-	{ type: 'location', name: 'locations', required: true }
+	// { type: 'location', name: 'locations', required: true }
 ]
 // DESIRED ENGAGEMENT TYPES
 	// OPTIONS: ['like', 'dislike', 'comment']

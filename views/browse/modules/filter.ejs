@@ -1,132 +1,150 @@
 <%
-	
 	// CREATE ALIASES
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
 
+	const display_content = Object.keys(query)?.filter(key => !['status', 'source', 'mapscale'].includes(key)).length > 0
 %>
 
-<% if (locals.stats?.total > 0) { %>
-	<nav id='search-and-filter' class='lg'>
-		<form autocomplete='off'>
-			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
-			<% 
-				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
-				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key)) 
 
-				view_params.forEach(d => {
-					query[d].forEach(c => {
-			%>
-				<input type='hidden' name='<%- d %>' value='<%- c %>'>
-			<% 
-					}) 
-				})
-			%>
+<nav id='search-and-filter' class='lg <% if (!display_content) { %>no-border<% } %>'>
+	<form autocomplete='off'>
+		<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
+		<% 
+			const menu_keys = locals.global_info.filters_menu.map(d => Object.keys(d)).flat()
+			const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status', 'source'].includes(key)) 
 
-			<div class='search'>
-				<% if (query?.search?.length) { %>
-					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
-				<% } else { %>
-					<input type='text' name='search' id='search-field' onblur='fixLabel(this)'>
-				<% } %>
-				<label for='search-field'><%- vocabulary['search'][language](object === 'contributors') %></label>
-				<button id='search' type='submit'><img src='/imgs/icons/i-search.svg'></button>
-			</div>
+			view_params.forEach(d => {
+				query[d].forEach(c => {
+		%>
+			<input type='hidden' name='<%- d %>' value='<%- c %>'>
+		<% 
+				}) 
+			})
+		%>
 
-			<% if (locals.filters_menu?.length) { %>
-				<div class='filters'>
-					<% locals.filters_menu?.forEach(d => { %>
-						<section>
-							<% for (let key in d) { %>
-								<div class='filter'>
-									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
-									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
-									<div class='dropdown'>
-										<menu>
-											<% d[key]?.forEach(c => { %>
-												<li>
-													<% if (c.equivalents?.length) { %>
-														<% c.equivalents.filter(b => b !== c.id).forEach(b => { %>
-															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id.toString())) { %>disabled<% } %>>
-														<% }) %>
-													<% } %>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this)'>
-													<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
-												</li>
-											<% }) %>
-										</menu>
-									</div>
-								</div>
-							<% } %>
-						</section>
+		<% if (display_content) { %>
+			<div class='sources'>
+				<menu>
+					<li class='label'>
+						Datasource: 
+						<!-- TO DO: TRANSLATE -->
+					</li>
+					<% locals.metadata.site.apps_in_suite.forEach(d => { %>
+						<li <% if (d.key === locals.metadata.page.source) { %>class='active'<% } %>>
+							<input type='radio' name='source' id='<%- d.key %>' value='<%- d.key %>' <% if (d.key === locals.metadata.page.source) { %>checked<% } %> onchange='this.form.submit()'>
+							<label for='<%- d.key %>'><%- d.name %></label>
+							<!-- TO DO: TRANSLATE -->
+							<label for='<%- d.key %>' class='count'><%- locals.global_info.statistics.find(c => c.key === d.key).stats.filtered %></label>
+						</li>
 					<% }) %>
-					<div class='break'></div>
-					<button type='submit' class='submit-filters'>
-						<%- vocabulary['apply filters'][language] %>
-					</button>
-				</div>
-			<% } %>
+				</menu>
+			</div>
+		<% } %>
 
-			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
-				<div class='status'>
-					<menu>
-						<% console.log(locals.stats?.persistent_breakdown) %>
-						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
-							<li>
-								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>
-								<label for='status-<%- d.status %>' data-content='<%- d.count %>'></label>
-								<p>
-									<%- vocabulary['status'][language](object, d.status, d.count) %>
-								</p>
-							</li>
-						<% }) %>
-					</menu>
-				</div>
+		<div class='search'>
+			<% if (query?.search?.length) { %>
+				<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
+			<% } else { %>
+				<input type='text' name='search' id='search-field' onblur='fixLabel(this)'>
 			<% } %>
+			<label for='search-field'><%- vocabulary['search'][language](object === 'contributors') %></label>
+			<button id='search' type='submit'><img src='/imgs/icons/i-search.svg'></button>
+		</div>
 
-			<% if (object === 'pads') { %>
-				<div class='global-actions'>
-					<% if (space !== 'pinned') { %>
-						<%# if (query.search?.length || Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
-							<div class='add filter pinboards'>
-								<input type='text' id='pin-all'>
-								<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
-								<button id='new-pinboard' type='button'></button>
+		<% if (locals.global_info.filters_menu?.length) { %>
+			<div class='filters'>
+				<% locals.global_info.filters_menu?.forEach(d => { %>
+					<section>
+						<% for (let key in d) { %>
+							<div class='filter'>
+								<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
+								<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 								<div class='dropdown'>
 									<menu>
-										<% locals.pinboards_list?.forEach(d => { %>
-											<li class='pinboard'>
-												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-												<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+										<% d[key]?.forEach(c => { %>
+											<li>
+												<% if (c.equivalents?.length) { %>
+													<% c.equivalents.filter(b => b !== c.id).forEach(b => { %>
+														<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id.toString())) { %>disabled<% } %>>
+													<% }) %>
+												<% } %>
+												<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this)'>
+												<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 											</li>
 										<% }) %>
 									</menu>
 								</div>
 							</div>
-						<%# } %>
-					<% } %>
-
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
-				</div>
-			<% } else if (object === 'contributors') { %>
-				<div class='global-actions'>
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
-					<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
-				</div>
-			<% } %>
-
-			<% if (locals.filters_menu?.length) { %>
-				<button type='button' class='expand-filters' onclick='expandfilters(this)'>
-					<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
+						<% } %>
+					</section>
+				<% }) %>
+				<div class='break'></div>
+				<button type='submit' class='submit-filters'>
+					<%- vocabulary['apply filters'][language] %>
 				</button>
-			<% } %>
-		</form>
-	</nav>
-<% } else { %>
-	<nav><p><%- vocabulary['no entries'][language] %></p></nav> 
-<% } %>
+			</div>
+		<% } %>
+
+		<% if (locals.stats.persistent_breakdown?.length > 1) { %>
+			<div class='status'>
+				<menu>
+					<% locals.stats.persistent_breakdown.forEach(d => { %>
+						<li>
+							<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>
+							<label for='status-<%- d.status %>' data-content='<%- d.count %>'></label>
+							<p>
+								<%- vocabulary['status'][language](object, d.status, d.count) %>
+							</p>
+						</li>
+					<% }) %>
+				</menu>
+			</div>
+		<% } %>
+
+		<% if (display_content && object === 'pads') { %>
+			<div class='global-actions'>
+				<% if (space !== 'pinned') { %>
+					<%# if (query.search?.length || Object.keys(query)?.filter(key => key in locals.global_info.filters_menu)?.length) { %>
+						<div class='add filter pinboards'>
+							<input type='text' id='pin-all'>
+							<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats.filtered ?? 0) %></label>
+							<button id='new-pinboard' type='button'></button>
+							<div class='dropdown'>
+								<menu>
+									<% locals.pinboards_list?.forEach(d => { %>
+										<li class='pinboard'>
+											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
+											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+										</li>
+									<% }) %>
+								</menu>
+							</div>
+						</div>
+					<%# } %>
+				<% } %>
+
+				<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+			</div>
+		<% } else if (object === 'contributors') { %>
+			<div class='global-actions'>
+				<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+				<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
+			</div>
+		<% } else { %>
+			<div class='global-actions'></div>
+		<% } %>
+
+		<% if (locals.global_info.filters_menu?.length) { %>
+			<button type='button' class='expand-filters' onclick='expandfilters(this)'>
+				<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
+			</button>
+		<% } %>
+	</form>
+</nav>
+
 
 <script type='text/javascript'>
 	function expandfilters (node) {
@@ -177,7 +195,7 @@
 			const id = node.value
 
 			// TO DO: THIS COULD BE IMPROVED HERE AND IN THE BACKEND TO USE full_filters INSTEAD OF PASSING BACK AND FORTH THE FULL LIST OF PAD IDs
-			await POST('/pin', { board_id: id, object_id: <%- JSON.stringify(locals.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+			await POST('/pin', { board_id: id, object_id: <%- JSON.stringify(locals.global_info.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 			location.reload()
 		}
 
@@ -226,7 +244,7 @@
 				if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
 					pinAll(existingBoard.node().previousElementSibling)							
 				} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
-					const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: <%- JSON.stringify(locals.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+					const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: <%- JSON.stringify(locals.global_info.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 					window.location = `./pinned?pinboard=${board_id}`
 				}
 				// RESET DROPDOWN

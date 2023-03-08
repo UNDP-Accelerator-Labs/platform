@@ -1,12 +1,14 @@
-const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, DB } = include('config/')
+const { apps_in_suite, page_content_limit, followup_count, metafields, modules, engagementtypes, map, DB } = include('config/')
 const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers/')
 
 const filter = require('../filter').main
 
 exports.main = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	const { req, res } = kwargs || {}
+	const { req, res, baseurl } = kwargs || {}
 	const { object } = req.params || {}
+	let { source } = req.query || {}
+	if (!source || !apps_in_suite.some(d => d.key === source)) source = apps_in_suite[0].key
 	
 	// const { uuid, rights, collaborators } = req.session || {}
 	if (req.session.uuid) { // USER IS LOGGED IN
@@ -133,11 +135,13 @@ exports.main = async kwargs => {
 					-- THESE ARE THE ENGAGEMENT COALESCE STATEMENTS
 					$3:raw, 
 					
-					CASE WHEN p.owner IN ($2:csv)
-						OR $4 > 2
-							THEN TRUE
-							ELSE FALSE
-						END AS editable,
+					-- CASE WHEN p.owner IN ($2:csv)
+					--	OR $4 > 2
+					--		THEN TRUE
+					--		ELSE FALSE
+					--	END AS editable,
+
+					FALSE AS editable,
 					
 					-- THESE ARE THE ENGAGEMENT CASE STATEMENTS
 					$5:raw,
@@ -152,9 +156,12 @@ exports.main = async kwargs => {
 							ON pbc.pinboard = pb.id
 						WHERE $1:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
 							AND pbc.pad = p.id
+							-- AND pbc.source = $14
 						GROUP BY p.id
 					)::TEXT, '[]')::JSONB
-					AS pinboards
+					AS pinboards,
+
+					$13 || p.id AS link
 				
 				FROM pads p
 				
@@ -203,7 +210,9 @@ exports.main = async kwargs => {
 				/* $9 */ order, 
 				/* $10 */ page_content_limit, 
 				/* $11 */ (page - 1) * page_content_limit, 
-				/* $12 */ followup_count 
+				/* $12 */ followup_count,
+				/* $13 */ `${baseurl}/${language}/view/pad?id=`,
+				/* $14 */ source // THIS IS NOT USED AND NEEDS TO BE TAKEN OUT SINCE THE PINBOARD INFO IS NOT IN THIS DB
 			]).then(results => {
 				// REMOVE THE follow_ups AND forwards FOR PADS THAT HAVE ALREADY BEEN FOLLOWED UP FOR A GIVEN MOBILIZATION
 				results.forEach(d => {

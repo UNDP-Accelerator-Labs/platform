@@ -88,7 +88,6 @@ nav.tabs {
 			ul {
 				display: flex;
 				width: 100%;
-				padding-bottom: 15px;
 				scroll-snap-type: x mandatory;
 				overflow: scroll;
 
@@ -285,6 +284,32 @@ nav.tabs {
 					}
 				}
 			}
+			/*menu.sub {
+				padding-bottom: 15px;
+
+				li {
+					margin: 0;
+					background-color: #FFF;
+					flex-grow: 1;
+					text-align: center;
+
+					button {
+						padding-top: 0;
+						height: 25px;
+
+						&::after {
+							content: none;
+						}
+					}
+				}
+				li.active {
+					background-color: $c-dark-blue;
+
+					button {
+						color: #FFF;
+					}
+				}
+			}*/
 		}
 	}
 }
@@ -724,6 +749,9 @@ header {
 			}
 		}
 	}
+	.inner.center {
+		justify-content: space-around;
+	}
 }
 
 .sidebar {
@@ -768,6 +796,7 @@ header {
 				font-size: $t-small;
 				line-height: 1.5em;
 				color: $c-light-grey;
+				font-weight: normal;
 			}
 		}
 		.statistic:first-child {

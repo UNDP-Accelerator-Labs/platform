@@ -78,14 +78,14 @@
 			</a>
 		</li>
 	<% } else { %>
-		<li class='<% if (space === "private") { %>active<% } %>'>
+		<!-- <li class='<% if (space === "private") { %>active<% } %>'>
 			<a href='./private'>
 				<button><%- vocabulary['space'][language](object, 'private') %>
 					<div class='count'><%- locals.stats?.private %></div>
 				</button>
-			</a>	
-		</li>
-		<% if (['pads', 'templates'].includes(object)
+			</a>
+		</li> -->
+		<!-- <% if (['pads', 'templates'].includes(object)
 			&& modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) 
 			&& locals.stats?.curated > 0
 		) { %>
@@ -96,7 +96,7 @@
 					</button>
 				</a>
 			</li>
-		<% } %>	
+		<% } %>	 -->
 		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read) 
 			&& locals.pinboards_list?.length) 
 		{ %>
@@ -119,9 +119,9 @@
 			</li>
 		<% } %>
 		<li class='<% if (space === "shared") { %>active<% } %>'>
-			<a href='./shared'>
+			<a onclick='redirect("./shared")'>
 				<button><%- vocabulary['space'][language](object, 'shared') %>
-					<div class='count'><%- locals.stats?.shared %></div>
+					<div class='count'><%- locals.global_info?.shared %></div>
 				</button>
 			</a>
 		</li>
@@ -138,9 +138,9 @@
 		<% } %>
 		<% if (!['reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
-				<a href='./public'>
+				<a onclick='redirect("./public")'>
 					<button><%- vocabulary['space'][language](object, 'public') %>
-						<div class='count'><%- locals.stats?.public %></div>
+						<div class='count'><%- locals.global_info?.public %></div>
 					</button>
 				</a>
 			</li>
@@ -174,3 +174,16 @@
 	updateTab('<%- locals.pinboard.title %>')
 </script>
 <% } %>
+<script type='text/javascript'>
+	function redirect (location) {
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		const filter_keys = Object.keys((<%- JSON.stringify(locals.global_info.filters_menu) %>).flatObj())
+		filter_keys.push('search')
+		filter_keys.push('source') // THIS IS SPECIFIC TO THE GLOBAL PLATFORM (OR TO A MULTI-SOURCE PLATFORM)
+		for (const key of queryparams.keys()) {
+			if (!filter_keys.includes(key)) queryparams.delete(key)
+		}		
+		return window.location = `${location}?${queryparams.toString()}`
+	}
+</script>

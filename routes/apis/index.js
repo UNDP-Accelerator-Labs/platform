@@ -1,4 +1,5 @@
 const pads = require('./pads/')
+const files = require('./files/')
 const contributors = require('./contributors/')
 const jwt = require('jsonwebtoken')
 
@@ -14,10 +15,10 @@ module.exports = async (req, res) => {
 		if (auth) {
 			const { email } = auth
 			req.session.email = email // PASS THIS TO SESSION FOR THE json PROCESSOR
-		} // IF NOT TOKEN IS SENT, THEN ONLY PUBLIC CONTENT CAN BE DOWNLOADED
+		} // IF NO TOKEN IS SENT, THEN ONLY PUBLIC CONTENT CAN BE DOWNLOADED
 	}
 
-	if (render) {
+	if (action === 'download' && render) {
 		if (object === 'pads') {
 			if (['xlsx', 'csv'].includes(output)) pads.xlsx(req, res)
 			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
@@ -27,8 +28,9 @@ module.exports = async (req, res) => {
 			else if (['json', 'geojson'].includes(output)) contributors.json(req, res)
 			else res.redirect('/module-error')
 		}
-	} else {
+	} else if (action === 'fetch') {
 		if (object === 'pads') pads.json(req, res)
+		else if (object === 'files') files.main(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
 	}
 }

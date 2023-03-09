@@ -72,7 +72,6 @@
 			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
 				<div class='status'>
 					<menu>
-						<% console.log(locals.stats?.persistent_breakdown) %>
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
 								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>

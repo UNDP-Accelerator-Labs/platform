@@ -749,8 +749,13 @@ header {
 			}
 		}
 	}
-	.inner.center {
+}
+header.center {
+	min-height: calc(100vh - 225px);
+
+	.inner {
 		justify-content: space-around;
+		height: calc(100vh - 225px);
 	}
 }
 

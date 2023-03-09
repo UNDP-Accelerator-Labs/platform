@@ -2,7 +2,7 @@ const { DB } = include('config/')
 
 exports.main = (req, res) => {
 	const { uuid } = req.session || {}
-	const { object, id, type, message, action } = req.body || {}
+	const { object, id, type, message, action, source } = req.body || {}
 
 	if (uuid) {
 		if (action === 'insert') { // INSERT
@@ -22,7 +22,10 @@ exports.main = (req, res) => {
 			;`, [ uuid, object, id, type ])
 		}
 
-		DB.conn.one(saveSQL)
+		let conn = DB.conn
+		if (source) conn = DB.conns.find(d => d.key === source).conn
+
+		conn.one(saveSQL)
 		.then(result => {
 			res.json({ status: 200, active: result.bool })
 		}).catch(err => console.log(err))

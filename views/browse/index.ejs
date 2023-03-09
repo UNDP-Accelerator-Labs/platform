@@ -134,15 +134,14 @@
 </div>
 <% } %>
 
-<header>
-	<div class='inner<% if (!display_content) { %> center<% } %>'>
+<header <% if (!display_content) { %>class='center'<% } %>>
+	<div class='inner'>
 		<%- include ('../partials/menu-logo.ejs') %> 
 	</div>
 </header>
 
 <div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %><% if (!display_content) { %> flex<% } %>'>
-	<% if (display_content
-		&& !publicpage
+	<% if (!publicpage
 		&& rights >= (modules.find(d => d.type === object)?.rights.read ?? infinity)
 		&& pagedisplay !== 'slideshow'
 		&& !(locals.metadata.page.map && mapscale === 'full-screen')
@@ -408,11 +407,6 @@
 				<!-- TO DO: STYLIZE -->
 			<% } %>
 		</div>
-		<div class='outer'>
-			<% if (display_content && pages > 1) { %>
-				<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
-			<% } %>
-		</div>
 		<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 	</main>
 </div>
@@ -433,6 +427,20 @@
 	<% if (pagedisplay === 'slideshow') { %>
 		<div class='inner'>
 			<div class='dots'></div>
+		</div>
+	<% } %>
+	<h4>Browse and contribute to:</h4>
+	<!-- TO DO: TRANSLATE -->
+	<menu>
+		<% locals.metadata.site.apps_in_suite.forEach(d => { %>
+			<a href='<%- d.baseurl %>' target='_blank'>
+				<li><h3><%- d.name %></h3></li>
+			</a>
+		<% }) %>
+	</menu>
+	<% if (display_content && pages > 1) { %>
+		<div class='outer'>
+				<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
 		</div>
 	<% } %>
 </footer>
@@ -1153,7 +1161,7 @@
 						}).on('click', async function (d) {
 							const sel = d3.select(this)
 
-							const res = await POST('/engage', { object: '<%- object.slice(0, -1) %>', id: d.id, type: '<%- e %>', action: !sel.classed('active') ? 'insert' : 'delete' })
+							const res = await POST('/engage', { object: '<%- object.slice(0, -1) %>', id: d.id, type: '<%- e %>', action: !sel.classed('active') ? 'insert' : 'delete', source: '<%- source %>' })
 
 							if (res.status === 200) {
 								sel.toggleClass('active')

@@ -105,25 +105,31 @@ exports.main = kwargs => {
 						.then(results => {
 							const [ ongoing_associated_mobilizations, past_associated_mobilizations, private_associated_pads, associated_pads ] = results
 
-							let data = join.multijoin.call(users, [ ongoing_associated_mobilizations, 'id' ])
-							data = join.multijoin.call(data, [ past_associated_mobilizations, 'id' ])
-							data = join.multijoin.call(data, [ private_associated_pads, 'id' ])
-							data = join.multijoin.call(data, [ associated_pads, 'id' ])
-
-							data.forEach(d => { // UPDATE STATUS BASED ON PADS
-								if (d.status === 1 && (d.associated_pads > 0 || d.private_associated_pads > 0)) d.status = 2
+							users.forEach(d => {
+								results.forEach(c => {
+									const values = c.find(b => b.id === d.id)
+									if (values) {
+										const { id, ...stat } = values
+										const key = Object.keys(stat)[0]
+										const value = Object.values(stat)[0]
+										if (!d[key]) d[key] = +value
+										else d[key] += +value
+									}
+								})
 							})
-
-							return data
+							// let data = join.multijoin.call(users, [ ongoing_associated_mobilizations, 'id' ])
+							// data = join.multijoin.call(data, [ past_associated_mobilizations, 'id' ])
+							// data = join.multijoin.call(data, [ private_associated_pads, 'id' ])
+							// data = join.multijoin.call(data, [ associated_pads, 'id' ])
+							return null	
 						}).catch(err => console.log(err))
 					}).catch(err => console.log(err))
-				})).then(results => {
-					// TO DO: MULTIJOIN results (DIFFERENT REPRESENTATIONS OF users WWITH THE DIFFERENT CONTRIBUTION INFO FROM THE DIFFERENT PLATFORMS)
-					results.forEach(d => {
-						// return Object.assign({}, ...results)
+				})).then(_ => {
+					users.forEach(d => { // UPDATE STATUS BASED ON PADS
+						if (d.status === 1 && (d.associated_pads > 0 || d.private_associated_pads > 0)) d.status = 2
 					})
+					return users
 				}).catch(err => console.log(err))
-
 			} else return users
 		}).catch(err => console.log(err))
 	}).then(data => {

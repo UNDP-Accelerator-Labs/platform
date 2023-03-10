@@ -70,8 +70,6 @@ exports.main = (req, res) => {
 					pinboard
 				] = results
 
-				console.log(filters_menu)
-
 				const { sections } = data
 				const stats = { 
 					total: array.sum.call(statistics.total, 'count'), 

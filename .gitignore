@@ -15,3 +15,5 @@ public/generated/
 presentations/
 dump/
 template.env
+*.uploads.zip
+_00_inspiration.png

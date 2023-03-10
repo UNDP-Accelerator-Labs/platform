@@ -345,6 +345,10 @@ header {
 				width: 100%;
 				height: auto;
 
+				img.logo {
+					height: 125px;
+				}
+
 				.create, 
 				.save {
 					position: relative;
@@ -672,7 +676,7 @@ header {
 			}
 		}
 		nav#site-title.public {
-			margin-top: 90px;
+			/*margin-top: 90px;*/
 		}
 		nav#modules {
 			margin-bottom: 120px;

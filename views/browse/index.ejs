@@ -429,7 +429,7 @@
 			<div class='dots'></div>
 		</div>
 	<% } %>
-	<h4>Browse and contribute to:</h4>
+	<h4>Contribute to:</h4>
 	<!-- TO DO: TRANSLATE -->
 	<menu>
 		<% locals.metadata.site.apps_in_suite.forEach(d => { %>
@@ -815,11 +815,30 @@
 				.addElems('img', 'vignette')
 					.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })
 				.each(function (d) {
+					// TO DO: ADD ROOT PATH TO GET IMAGES FROM THE RELEVANT PLATFORMS
+
 					const node = this
 					const img = new Image()
 					img.onload = function () { node.src = this.src }
 					if (display === 'slideshow') img.src = d.img[0].replace('uploads/sm/', 'uploads/')
 					else img.src = d.img[0]
+
+
+					// POST('/call/api', { uri: encodeURI(`https://undphqexoacclabsapp01.azurewebsites.net/api/file?filepath=${d}`), method: 'GET', key: 'SM_PLATFORM_TOKEN', expect: 'image' }, false)
+					// .then(res => res.blob())
+					// .then(data => {
+					// 	// const node = this
+					// 	// const imgdata = URL.createObjectURL(data)
+
+					// 	// const img = new Image()
+					// 	// img.onload = function () { 
+					// 	// 	node.src = this.src 
+					// 	// }
+					// 	// img.onerror = function (err) {
+					// 	// 	if (err) console.log(err)
+					// 	// }
+					// 	// img.src = imgdata
+					// }).catch(err => console.log(err))
 				})
 			}.bind(this),
 			stats: function (_sel) {

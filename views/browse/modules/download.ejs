@@ -45,7 +45,7 @@
 		
 		opts.push({ node: 'input', type: 'checkbox', name: 'use_templates', value: true, placeholder: '<%- vocabulary["use templates"][language] %>', checked: true, default: true })
 		opts.push({ node: 'input', type: 'checkbox', name: 'include_data', value: true, placeholder: '<%- vocabulary["include data"][language] %>', checked: true, default: true })
-		opts.push({ node: 'input', type: 'checkbox', name: 'include_imgs', value: true, placeholder: '<%- vocabulary["include media"][language] %>', default: true })
+		// opts.push({ node: 'input', type: 'checkbox', name: 'include_imgs', value: true, placeholder: '<%- vocabulary["include media"][language] %>', default: true })
 		
 		<% if (metafields.some(d => ['index', 'tag'].includes(d.type))) { %>
 			opts.push({ node: 'input', type: 'checkbox', name: 'include_tags', value: true, placeholder: '<%- vocabulary["include tags"][language] %>', default: true })

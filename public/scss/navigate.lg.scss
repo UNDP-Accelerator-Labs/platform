@@ -760,6 +760,11 @@ header.center {
 	.inner {
 		justify-content: space-around;
 		height: calc(100vh - 225px);
+
+		img.logo {
+			position: absolute;
+			top: 30px;
+		}
 	}
 }
 

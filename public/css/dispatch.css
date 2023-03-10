@@ -20071,6 +20071,10 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     justify-content: space-around;
     height: calc(100vh - 225px);
   }
+  header.center .inner img.logo {
+    position: absolute;
+    top: 30px;
+  }
 
   .sidebar {
     position: sticky;

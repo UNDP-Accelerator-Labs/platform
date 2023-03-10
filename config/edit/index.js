@@ -12,6 +12,12 @@ exports.apps_in_suite = [
 	{ name: 'Action plans', key: 'ap_test_02', baseurl: 'https://acclabs-actionplans.azurewebsites.net/' }, 
 	{ name: 'Solutions mapping', key: 'sm_test_02', baseurl: 'https://undphqexoacclabsapp01.azurewebsites.net/' }, 
 	{ name: 'Experiments', key: 'exp_test_02', baseurl: 'https://acclabs-experimenters.azurewebsites.net/' }
+	// { name: 'Blogs', key: 'exp_test_02', baseurl: 'https://acclabs-blogs.azurewebsites.net/' },
+	// { name: 'Consent archive', key: 'exp_test_02', baseurl: 'https://acclabs-consent-archive.azurewebsites.net/' },
+	// { name: 'Buzz', key: 'exp_test_02', baseurl: 'https://acclabs-buzz.azurewebsites.net/' },
+	// { name: 'Bootcamps', key: 'exp_test_02', baseurl: 'https://sites.google.com/view/acclab-bootcamp/home' },
+	// { name: 'Main wesite', key: 'exp_test_02', baseurl: 'https://www.undp.org/acceleratorlabs' },
+
 ]
 
 // DESIRED MODULES

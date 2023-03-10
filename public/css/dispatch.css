@@ -3,6 +3,7 @@
 /*@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');*/
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital@1&display=swap");
+/*$c-dark-blue: #0A4C73;*/
 /*$c-dark-1: $c-dark-blue;
 $c-mid-1: $c-dark-red;
 $c-mid-2: $c-light-green;
@@ -48,7 +49,7 @@ body {
 
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
   font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-  color: #0A4C73;
+  color: #005687;
 }
 
 ul {
@@ -96,12 +97,12 @@ input:-webkit-autofill:active {
   float: right;
   border: none;
   outline: none;
-  background-color: #0A4C73;
+  background-color: #005687;
   color: #FFF;
   cursor: pointer;
 }
 .screen .modal .inner {
-  border-top: 2px solid #0A4C73;
+  border-top: 2px solid #005687;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -202,8 +203,8 @@ input.toggle:checked + label[for=status-1]::after {
 
 input.toggle:checked + label::after {
   transform: translate(20px, 0);
-  background-color: #0A4C73;
-  border-color: #0A4C73;
+  background-color: #005687;
+  border-color: #005687;
   color: #FFF;
 }
 
@@ -343,7 +344,7 @@ input.toggle:disabled + label::after {
   .modal .inner ul li button {
     width: 100%;
     min-height: 45px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -391,13 +392,13 @@ input.toggle:disabled + label::after {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal .inner ul li input[type=date]::before {
     content: none;
   }
   .modal .inner ul li:hover button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .modal .inner .foot {
@@ -443,7 +444,7 @@ input.toggle:disabled + label::after {
     height: 45px;
     top: 0;
     font-size: 12px;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: center;
     z-index: 10000;
   }
@@ -558,7 +559,7 @@ input.toggle:disabled + label::after {
     width: 100%;
     height: 60px;
     margin-left: -15px;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     background-color: #FFF;
     z-index: 100;
   }
@@ -653,7 +654,7 @@ nav.tabs .inner .dropdown ul li input[type=text] {
     outline: none;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   nav.tabs .inner .dropdown menu li label,
@@ -767,7 +768,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
   nav.tabs .inner .dropdown menu li.active button,
 nav.tabs .inner .dropdown ul li.active button {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   nav.tabs .inner .dropdown menu li.active button .count,
 nav.tabs .inner .dropdown ul li.active button .count {
@@ -775,7 +776,7 @@ nav.tabs .inner .dropdown ul li.active button .count {
   }
   nav.tabs .inner .dropdown menu li.active input[type=text],
 nav.tabs .inner .dropdown ul li.active input[type=text] {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   nav.tabs .inner .btn-group {
     float: right;
@@ -795,8 +796,8 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     color: #969696;
   }
   nav.tabs .inner .btn-group a.active {
-    background-color: #0A4C73;
-    border-color: #0A4C73;
+    background-color: #005687;
+    border-color: #005687;
   }
   nav.tabs .inner .btn-group a.active i {
     color: #FFF;
@@ -849,7 +850,7 @@ header .inner nav#site-title .inner .save button {
     min-height: 45px;
     margin: 0;
     padding: 0 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -874,7 +875,7 @@ header .inner nav#site-title .inner .save .dropdown {
   header .inner nav#site-title .inner .create .dropdown ul,
 header .inner nav#site-title .inner .save .dropdown ul {
     width: 100%;
-    border-top: 2px solid #0A4C73;
+    border-top: 2px solid #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li,
 header .inner nav#site-title .inner .save .dropdown ul li {
@@ -941,7 +942,7 @@ header .inner nav#site-title .inner .save .dropdown ul li button.wrapable .sub {
 header .inner nav#site-title .inner .create .dropdown ul li a button:hover,
 header .inner nav#site-title .inner .save .dropdown ul li a button,
 header .inner nav#site-title .inner .save .dropdown ul li a button:hover {
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li a:hover,
 header .inner nav#site-title .inner .save .dropdown ul li a:hover {
@@ -1009,7 +1010,7 @@ header .inner nav#site-title .inner .save .dropdown ul li:hover > form {
   }
   header .inner nav#site-title .inner .create:hover button,
 header .inner nav#site-title .inner .create:focus button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   header .inner nav#site-title .inner h1 {
@@ -1060,7 +1061,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   header .inner nav#modules menu li.active a {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#modules menu li:not(:first-child)::before {
     content: "";
@@ -1104,14 +1105,14 @@ header .inner nav#site-title .inner .create:focus button {
   #statistics .statistic h1 {
     font-size: 16px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   #statistics .statistic p {
     margin: 0;
     font-style: normal;
     font-size: 12px;
     line-height: 1.2em;
-    color: #0A4C73;
+    color: #005687;
   }
   #statistics .statistic small {
     font-size: 12px;
@@ -1202,7 +1203,7 @@ header .inner nav#site-title .inner .create:focus button {
     /*width: calc(150px * 3 + 15px * 2 + 60px);*/
     margin: 60px auto 125px auto;
     background-color: #FFF;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     border-top-width: 5px;
     transition: transform 0.5s;
   }
@@ -1220,7 +1221,7 @@ header .inner nav#site-title .inner .create:focus button {
     border: none;
     outline: none;
     padding: 0 15px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .veil nav.browse-filters .handle button.close label {
@@ -1246,7 +1247,7 @@ header .inner nav#site-title .inner .create:focus button {
     outline: none;
     background-color: transparent;
     font-size: 24px;
-    color: #0A4C73;
+    color: #005687;
   }
   .veil nav.browse-filters form .query label[for=search-field] {
     position: absolute;
@@ -1267,7 +1268,7 @@ header .inner nav#site-title .inner .create:focus button {
 .veil nav.browse-filters form .query input:-webkit-autofill:focus,
 .veil nav.browse-filters form .query input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   .veil nav.browse-filters form .query button {
     float: left;
@@ -1277,7 +1278,7 @@ header .inner nav#site-title .inner .create:focus button {
     background-color: transparent;
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .veil nav.browse-filters form .filters p {
@@ -1548,7 +1549,7 @@ header .inner nav#site-title .inner .create:focus button {
   .veil nav.browse-filters form .submission button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     margin-right: 5px;
     outline: none;
     background-color: transparent;
@@ -1596,7 +1597,7 @@ header .inner nav#site-title .inner .create:focus button {
     line-height: 30px;
     background-color: #E5E5E5;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .map-container .btn-group.map-scale a.active {
@@ -1612,7 +1613,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   .map-container .btn-group.map-scale a {
     padding: 0 8px 2px 8px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .map-container .btn-group.map-scale a input[type=checkbox] {
@@ -1643,7 +1644,7 @@ header .inner nav#site-title .inner .create:focus button {
   .leaflet-popup .leaflet-popup-content-wrapper {
     border-radius: 0;
     font-family: "Overpass", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
     padding: 0;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
@@ -1687,7 +1688,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-title a {
     text-decoration: none;
-    color: #0A4C73;
+    color: #005687;
     font-weight: 700;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-txt {
@@ -1763,7 +1764,7 @@ header .inner nav#site-title .inner .create:focus button {
     height: 20px;
     top: 0;
     padding: 0 10px 0 0;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: right;
     line-height: 20px;
     color: #FFF;
@@ -1778,7 +1779,7 @@ header .inner nav#site-title .inner .create:focus button {
     left: -125%;
     top: -50%;
     font-size: 2rem;
-    color: #0A4C73;
+    color: #005687;
   }
 
   .single-pin.selected i {
@@ -1790,8 +1791,8 @@ header .inner nav#site-title .inner .create:focus button {
     justify-content: center;
     align-items: center;
     font-weight: 700;
-    border: 5px solid #0A4C73;
-    background-color: #0A4C73;
+    border: 5px solid #005687;
+    background-color: #005687;
     border-radius: 100%;
     text-align: center;
     color: #FFF;
@@ -2045,7 +2046,7 @@ div.document main .engagement-input-group .bookmark.active::after {
   div.document main .inner .meta-status .btn-group form button {
     min-height: 45px;
     padding: 0 15px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -2295,14 +2296,14 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt.bru
     width: 15px;
     height: 15px;
     border-radius: 30px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
@@ -2420,7 +2421,7 @@ div.document main .inner .body .layout .meta-container .media-lead.focus {
     font-size: 20px;
     line-height: 1.5em;
     border-top: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
@@ -2498,7 +2499,7 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
     font-size: 16px;
     line-height: 1.5em;
     /*line-height: 30px;*/
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts {
@@ -2733,7 +2734,7 @@ div.document main .inner .body .layout .meta-container .meta-checklist ol .opt.v
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .checkbox,
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .radio,
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
-    color: #0A4C73;
+    color: #005687;
     pointer-events: all;
   }
   div.document main .inner .body .layout .media-container .meta-location,
@@ -2835,7 +2836,7 @@ div.document main .inner .body .layout .meta-container .meta-tag .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-skills .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-methods .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-datasources .tag.selected {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .layout .media-container .meta-tag:empty:not(:focus):before,
@@ -2895,7 +2896,7 @@ div.document main .inner .body .layout .meta-container .media-repeat button {
     border: none;
     border-top: 1px solid #969696;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -2944,7 +2945,7 @@ div.document main .inner .body .layout .meta-container .inset .search input[type
     height: 50px;
     margin: 15px 0 0 10px;
     border: none;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 24px;
@@ -3025,7 +3026,7 @@ div.document main .inner .body .layout .meta-container .inset .inset-location .p
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt:not(.selected):hover,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt:not(.selected):hover {
     background-color: #E5E5E5;
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt.selected,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt.selected {
@@ -3284,7 +3285,7 @@ div.document main .inner .body .layout .meta-container .response.template {
     cursor: pointer;
   }
   div.document main .inner .body .layout .results-container .chart svg rect:hover {
-    fill: #0A4C73;
+    fill: #005687;
   }
   div.document main .inner .body .layout .results-container .chart svg .x.axis text {
     font-weight: bold;
@@ -3467,10 +3468,10 @@ div.document main .inner .body .description-layout .media-container .media.focus
     cursor: pointer;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow p {
     justify-self: start;
@@ -3516,7 +3517,7 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     z-index: 1001;
   }
   div.document main .inner .body .input-toolbox.highlight {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .media-input-group {
@@ -3948,7 +3949,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background-color: transparent;
     font-size: 36px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   .document.slideshow main#pad .inner .slide.meta-status .btn-group {
     width: 100%;
@@ -4061,7 +4062,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     height: 45px;
     padding: 0 15px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -4118,7 +4119,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -4177,7 +4178,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     padding: 15px 15px 0 15px;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid #969696;
   }
   .fact-sheet main#profile .inner .body form div.info ul li input[type=text] + label,
@@ -4504,7 +4505,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
   div.browse main .inner .meta-status form .btn-group button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -4565,7 +4566,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
     line-height: 1.5em;
     border-top: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
     white-space: pre-line;
   }
@@ -4709,7 +4710,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     margin-bottom: 0;
   }
   div.browse main .inner section .layout article .inner .body .media-title a {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .body .media-title a h1 {
     font-size: 20px;
@@ -4894,13 +4895,13 @@ div.browse main .inner section .layout article .inner .body .meta-child {
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -4917,7 +4918,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img a img {
     display: block;
@@ -4959,7 +4960,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     text-decoration: underline;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small {
     text-decoration: none !important;
@@ -4983,7 +4984,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     background-color: transparent;
     border-bottom: 1px dotted #969696;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add label {
     position: absolute;
@@ -5404,13 +5405,13 @@ div.browse main .inner section .layout.columns article .inner .head .btn-group f
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -5427,7 +5428,7 @@ div.browse main .inner section .layout.columns article .inner .head .media-img .
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img a img {
     display: block;
@@ -5504,7 +5505,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     text-decoration: underline;
   }
   div.browse main .inner section .layout.columns article .inner .foot .meta-group .meta-stats a.disabled {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .foot .meta-group .meta-stats a.disabled h1 small {
     text-decoration: none !important;
@@ -5614,7 +5615,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     height: 30px;
     padding: 0 10px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -5647,7 +5648,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
   main#mobilize-new form .modal .inner .head .btn-group .contributor-count {
     flex-grow: 1;
     text-align: center;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt {
     padding: 0 7px 0 5px;
@@ -5659,7 +5660,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     cursor: pointer;
     font-weight: 700;
     font-style: italic;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt:hover label {
     text-decoration: underline;
@@ -5720,7 +5721,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .body menu li .preview {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body menu li .preview i {
     vertical-align: middle;
@@ -5802,7 +5803,7 @@ main#mobilize-new form .modal .inner .body menu li.checked .country label {
     color: #969696;
   }
   main#mobilize-new form .modal .inner .body input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body input[type=text] + label {
     pointer-events: none;
@@ -5817,7 +5818,7 @@ main#mobilize-new form .modal .inner .body input:-webkit-autofill:hover,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:focus,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:active {
     /*-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;*/
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   main#mobilize-new form .modal .inner .body textarea {
     position: relative;
@@ -5871,7 +5872,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     font-size: 36px;
     font-weight: bold;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   main#mobilize-new form .modal .inner .body .cron-option {
@@ -5891,7 +5892,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body .cron-option input[type=date]::before {
     content: none;
@@ -5922,10 +5923,10 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot .contributor-count {
     margin: 15px 0;
@@ -5945,9 +5946,9 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     transition: none;
   }
   main#mobilize-new form .modal .inner .foot .global-opt.active button {
-    border-color: #0A4C73;
+    border-color: #005687;
     background-color: transparent;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot p {
     justify-self: start;
@@ -6376,7 +6377,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner ul li button {
     width: 100%;
     min-height: 45px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -6424,13 +6425,13 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal .inner ul li input[type=date]::before {
     content: none;
   }
   .modal .inner ul li:hover button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .modal .inner .foot {
@@ -6476,7 +6477,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     height: 45px;
     top: 0;
     font-size: 12px;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: center;
     z-index: 10000;
   }
@@ -6591,7 +6592,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     width: 100%;
     height: 60px;
     margin-left: -15px;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     background-color: #FFF;
     z-index: 100;
   }
@@ -6686,7 +6687,7 @@ nav.tabs .inner .dropdown ul li input[type=text] {
     outline: none;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   nav.tabs .inner .dropdown menu li label,
@@ -6800,7 +6801,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
   nav.tabs .inner .dropdown menu li.active button,
 nav.tabs .inner .dropdown ul li.active button {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   nav.tabs .inner .dropdown menu li.active button .count,
 nav.tabs .inner .dropdown ul li.active button .count {
@@ -6808,7 +6809,7 @@ nav.tabs .inner .dropdown ul li.active button .count {
   }
   nav.tabs .inner .dropdown menu li.active input[type=text],
 nav.tabs .inner .dropdown ul li.active input[type=text] {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   nav.tabs .inner .btn-group {
     float: right;
@@ -6828,8 +6829,8 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     color: #969696;
   }
   nav.tabs .inner .btn-group a.active {
-    background-color: #0A4C73;
-    border-color: #0A4C73;
+    background-color: #005687;
+    border-color: #005687;
   }
   nav.tabs .inner .btn-group a.active i {
     color: #FFF;
@@ -6882,7 +6883,7 @@ header .inner nav#site-title .inner .save button {
     min-height: 45px;
     margin: 0;
     padding: 0 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -6907,7 +6908,7 @@ header .inner nav#site-title .inner .save .dropdown {
   header .inner nav#site-title .inner .create .dropdown ul,
 header .inner nav#site-title .inner .save .dropdown ul {
     width: 100%;
-    border-top: 2px solid #0A4C73;
+    border-top: 2px solid #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li,
 header .inner nav#site-title .inner .save .dropdown ul li {
@@ -6974,7 +6975,7 @@ header .inner nav#site-title .inner .save .dropdown ul li button.wrapable .sub {
 header .inner nav#site-title .inner .create .dropdown ul li a button:hover,
 header .inner nav#site-title .inner .save .dropdown ul li a button,
 header .inner nav#site-title .inner .save .dropdown ul li a button:hover {
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li a:hover,
 header .inner nav#site-title .inner .save .dropdown ul li a:hover {
@@ -7042,7 +7043,7 @@ header .inner nav#site-title .inner .save .dropdown ul li:hover > form {
   }
   header .inner nav#site-title .inner .create:hover button,
 header .inner nav#site-title .inner .create:focus button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   header .inner nav#site-title .inner h1 {
@@ -7093,7 +7094,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   header .inner nav#modules menu li.active a {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#modules menu li:not(:first-child)::before {
     content: "";
@@ -7137,14 +7138,14 @@ header .inner nav#site-title .inner .create:focus button {
   #statistics .statistic h1 {
     font-size: 16px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   #statistics .statistic p {
     margin: 0;
     font-style: normal;
     font-size: 12px;
     line-height: 1.2em;
-    color: #0A4C73;
+    color: #005687;
   }
   #statistics .statistic small {
     font-size: 12px;
@@ -7235,7 +7236,7 @@ header .inner nav#site-title .inner .create:focus button {
     /*width: calc(150px * 3 + 15px * 2 + 60px);*/
     margin: 60px auto 125px auto;
     background-color: #FFF;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     border-top-width: 5px;
     transition: transform 0.5s;
   }
@@ -7253,7 +7254,7 @@ header .inner nav#site-title .inner .create:focus button {
     border: none;
     outline: none;
     padding: 0 15px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .veil nav.browse-filters .handle button.close label {
@@ -7279,7 +7280,7 @@ header .inner nav#site-title .inner .create:focus button {
     outline: none;
     background-color: transparent;
     font-size: 24px;
-    color: #0A4C73;
+    color: #005687;
   }
   .veil nav.browse-filters form .query label[for=search-field] {
     position: absolute;
@@ -7300,7 +7301,7 @@ header .inner nav#site-title .inner .create:focus button {
 .veil nav.browse-filters form .query input:-webkit-autofill:focus,
 .veil nav.browse-filters form .query input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   .veil nav.browse-filters form .query button {
     float: left;
@@ -7310,7 +7311,7 @@ header .inner nav#site-title .inner .create:focus button {
     background-color: transparent;
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .veil nav.browse-filters form .filters p {
@@ -7581,7 +7582,7 @@ header .inner nav#site-title .inner .create:focus button {
   .veil nav.browse-filters form .submission button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     margin-right: 5px;
     outline: none;
     background-color: transparent;
@@ -7629,7 +7630,7 @@ header .inner nav#site-title .inner .create:focus button {
     line-height: 30px;
     background-color: #E5E5E5;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .map-container .btn-group.map-scale a.active {
@@ -7645,7 +7646,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   .map-container .btn-group.map-scale a {
     padding: 0 8px 2px 8px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .map-container .btn-group.map-scale a input[type=checkbox] {
@@ -7676,7 +7677,7 @@ header .inner nav#site-title .inner .create:focus button {
   .leaflet-popup .leaflet-popup-content-wrapper {
     border-radius: 0;
     font-family: "Overpass", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
     padding: 0;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
@@ -7720,7 +7721,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-title a {
     text-decoration: none;
-    color: #0A4C73;
+    color: #005687;
     font-weight: 700;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-txt {
@@ -7796,7 +7797,7 @@ header .inner nav#site-title .inner .create:focus button {
     height: 20px;
     top: 0;
     padding: 0 10px 0 0;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: right;
     line-height: 20px;
     color: #FFF;
@@ -7811,7 +7812,7 @@ header .inner nav#site-title .inner .create:focus button {
     left: -125%;
     top: -50%;
     font-size: 2rem;
-    color: #0A4C73;
+    color: #005687;
   }
 
   .single-pin.selected i {
@@ -7823,8 +7824,8 @@ header .inner nav#site-title .inner .create:focus button {
     justify-content: center;
     align-items: center;
     font-weight: 700;
-    border: 5px solid #0A4C73;
-    background-color: #0A4C73;
+    border: 5px solid #005687;
+    background-color: #005687;
     border-radius: 100%;
     text-align: center;
     color: #FFF;
@@ -8078,7 +8079,7 @@ div.document main .engagement-input-group .bookmark.active::after {
   div.document main .inner .meta-status .btn-group form button {
     min-height: 45px;
     padding: 0 15px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -8328,14 +8329,14 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt.bru
     width: 15px;
     height: 15px;
     border-radius: 30px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
@@ -8453,7 +8454,7 @@ div.document main .inner .body .layout .meta-container .media-lead.focus {
     font-size: 20px;
     line-height: 1.5em;
     border-top: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
@@ -8531,7 +8532,7 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
     font-size: 16px;
     line-height: 1.5em;
     /*line-height: 30px;*/
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts {
@@ -8766,7 +8767,7 @@ div.document main .inner .body .layout .meta-container .meta-checklist ol .opt.v
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .checkbox,
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .radio,
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
-    color: #0A4C73;
+    color: #005687;
     pointer-events: all;
   }
   div.document main .inner .body .layout .media-container .meta-location,
@@ -8868,7 +8869,7 @@ div.document main .inner .body .layout .meta-container .meta-tag .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-skills .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-methods .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-datasources .tag.selected {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .layout .media-container .meta-tag:empty:not(:focus):before,
@@ -8928,7 +8929,7 @@ div.document main .inner .body .layout .meta-container .media-repeat button {
     border: none;
     border-top: 1px solid #969696;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -8977,7 +8978,7 @@ div.document main .inner .body .layout .meta-container .inset .search input[type
     height: 50px;
     margin: 15px 0 0 10px;
     border: none;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 24px;
@@ -9058,7 +9059,7 @@ div.document main .inner .body .layout .meta-container .inset .inset-location .p
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt:not(.selected):hover,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt:not(.selected):hover {
     background-color: #E5E5E5;
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt.selected,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt.selected {
@@ -9317,7 +9318,7 @@ div.document main .inner .body .layout .meta-container .response.template {
     cursor: pointer;
   }
   div.document main .inner .body .layout .results-container .chart svg rect:hover {
-    fill: #0A4C73;
+    fill: #005687;
   }
   div.document main .inner .body .layout .results-container .chart svg .x.axis text {
     font-weight: bold;
@@ -9500,10 +9501,10 @@ div.document main .inner .body .description-layout .media-container .media.focus
     cursor: pointer;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow p {
     justify-self: start;
@@ -9549,7 +9550,7 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     z-index: 1001;
   }
   div.document main .inner .body .input-toolbox.highlight {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .media-input-group {
@@ -9981,7 +9982,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background-color: transparent;
     font-size: 36px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   .document.slideshow main#pad .inner .slide.meta-status .btn-group {
     width: 100%;
@@ -10094,7 +10095,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     height: 45px;
     padding: 0 15px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -10151,7 +10152,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -10210,7 +10211,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     padding: 15px 15px 0 15px;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid #969696;
   }
   .fact-sheet main#profile .inner .body form div.info ul li input[type=text] + label,
@@ -10537,7 +10538,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
   div.browse main .inner .meta-status form .btn-group button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -10598,7 +10599,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
     line-height: 1.5em;
     border-top: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
     white-space: pre-line;
   }
@@ -10742,7 +10743,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     margin-bottom: 0;
   }
   div.browse main .inner section .layout article .inner .body .media-title a {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .body .media-title a h1 {
     font-size: 20px;
@@ -10927,13 +10928,13 @@ div.browse main .inner section .layout article .inner .body .meta-child {
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -10950,7 +10951,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img a img {
     display: block;
@@ -10992,7 +10993,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     text-decoration: underline;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small {
     text-decoration: none !important;
@@ -11016,7 +11017,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     background-color: transparent;
     border-bottom: 1px dotted #969696;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add label {
     position: absolute;
@@ -11437,13 +11438,13 @@ div.browse main .inner section .layout.columns article .inner .head .btn-group f
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -11460,7 +11461,7 @@ div.browse main .inner section .layout.columns article .inner .head .media-img .
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img a img {
     display: block;
@@ -11537,7 +11538,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     text-decoration: underline;
   }
   div.browse main .inner section .layout.columns article .inner .foot .meta-group .meta-stats a.disabled {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .foot .meta-group .meta-stats a.disabled h1 small {
     text-decoration: none !important;
@@ -11647,7 +11648,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     height: 30px;
     padding: 0 10px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -11680,7 +11681,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
   main#mobilize-new form .modal .inner .head .btn-group .contributor-count {
     flex-grow: 1;
     text-align: center;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt {
     padding: 0 7px 0 5px;
@@ -11692,7 +11693,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     cursor: pointer;
     font-weight: 700;
     font-style: italic;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt:hover label {
     text-decoration: underline;
@@ -11753,7 +11754,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-templa
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .body menu li .preview {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body menu li .preview i {
     vertical-align: middle;
@@ -11835,7 +11836,7 @@ main#mobilize-new form .modal .inner .body menu li.checked .country label {
     color: #969696;
   }
   main#mobilize-new form .modal .inner .body input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body input[type=text] + label {
     pointer-events: none;
@@ -11850,7 +11851,7 @@ main#mobilize-new form .modal .inner .body input:-webkit-autofill:hover,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:focus,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:active {
     /*-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;*/
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   main#mobilize-new form .modal .inner .body textarea {
     position: relative;
@@ -11904,7 +11905,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     font-size: 36px;
     font-weight: bold;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   main#mobilize-new form .modal .inner .body .cron-option {
@@ -11924,7 +11925,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body .cron-option input[type=date]::before {
     content: none;
@@ -11955,10 +11956,10 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot .contributor-count {
     margin: 15px 0;
@@ -11978,9 +11979,9 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     transition: none;
   }
   main#mobilize-new form .modal .inner .foot .global-opt.active button {
-    border-color: #0A4C73;
+    border-color: #005687;
     background-color: transparent;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot p {
     justify-self: start;
@@ -12409,7 +12410,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner ul li button {
     width: 100%;
     min-height: 45px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -12457,13 +12458,13 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal .inner ul li input[type=date]::before {
     content: none;
   }
   .modal .inner ul li:hover button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .modal .inner .foot {
@@ -12509,7 +12510,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     height: 45px;
     top: 0;
     font-size: 12px;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: center;
     z-index: 10000;
   }
@@ -12625,7 +12626,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     height: 60px;
     left: 0;
     margin-left: 0;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     background-color: #FFF;
     z-index: 100;
   }
@@ -12720,7 +12721,7 @@ nav.tabs .inner .dropdown ul li input[type=text] {
     outline: none;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   nav.tabs .inner .dropdown menu li label,
@@ -12834,7 +12835,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
   nav.tabs .inner .dropdown menu li.active button,
 nav.tabs .inner .dropdown ul li.active button {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   nav.tabs .inner .dropdown menu li.active button .count,
 nav.tabs .inner .dropdown ul li.active button .count {
@@ -12842,7 +12843,7 @@ nav.tabs .inner .dropdown ul li.active button .count {
   }
   nav.tabs .inner .dropdown menu li.active input[type=text],
 nav.tabs .inner .dropdown ul li.active input[type=text] {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   nav.tabs .inner .btn-group {
     float: right;
@@ -12862,8 +12863,8 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     color: #969696;
   }
   nav.tabs .inner .btn-group a.active {
-    background-color: #0A4C73;
-    border-color: #0A4C73;
+    background-color: #005687;
+    border-color: #005687;
   }
   nav.tabs .inner .btn-group a.active i {
     color: #FFF;
@@ -12916,7 +12917,7 @@ header .inner nav#site-title .inner .save button {
     min-height: 45px;
     margin: 0;
     padding: 0 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -12941,7 +12942,7 @@ header .inner nav#site-title .inner .save .dropdown {
   header .inner nav#site-title .inner .create .dropdown ul,
 header .inner nav#site-title .inner .save .dropdown ul {
     width: 100%;
-    border-top: 2px solid #0A4C73;
+    border-top: 2px solid #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li,
 header .inner nav#site-title .inner .save .dropdown ul li {
@@ -13008,7 +13009,7 @@ header .inner nav#site-title .inner .save .dropdown ul li button.wrapable .sub {
 header .inner nav#site-title .inner .create .dropdown ul li a button:hover,
 header .inner nav#site-title .inner .save .dropdown ul li a button,
 header .inner nav#site-title .inner .save .dropdown ul li a button:hover {
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li a:hover,
 header .inner nav#site-title .inner .save .dropdown ul li a:hover {
@@ -13076,7 +13077,7 @@ header .inner nav#site-title .inner .save .dropdown ul li:hover > form {
   }
   header .inner nav#site-title .inner .create:hover button,
 header .inner nav#site-title .inner .create:focus button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   header .inner nav#site-title .inner h1 {
@@ -13127,7 +13128,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   header .inner nav#modules menu li.active a {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#modules menu li:not(:first-child)::before {
     content: "";
@@ -13171,14 +13172,14 @@ header .inner nav#site-title .inner .create:focus button {
   #statistics .statistic h1 {
     font-size: 16px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   #statistics .statistic p {
     margin: 0;
     font-style: normal;
     font-size: 12px;
     line-height: 1.2em;
-    color: #0A4C73;
+    color: #005687;
   }
   #statistics .statistic small {
     font-size: 12px;
@@ -13269,7 +13270,7 @@ header .inner nav#site-title .inner .create:focus button {
     /*width: calc(150px * 3 + 15px * 2 + 60px);*/
     margin: 60px auto 125px auto;
     background-color: #FFF;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     border-top-width: 5px;
     transition: transform 0.5s;
   }
@@ -13287,7 +13288,7 @@ header .inner nav#site-title .inner .create:focus button {
     border: none;
     outline: none;
     padding: 0 15px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .veil nav.browse-filters .handle button.close label {
@@ -13313,7 +13314,7 @@ header .inner nav#site-title .inner .create:focus button {
     outline: none;
     background-color: transparent;
     font-size: 24px;
-    color: #0A4C73;
+    color: #005687;
   }
   .veil nav.browse-filters form .query label[for=search-field] {
     position: absolute;
@@ -13334,7 +13335,7 @@ header .inner nav#site-title .inner .create:focus button {
 .veil nav.browse-filters form .query input:-webkit-autofill:focus,
 .veil nav.browse-filters form .query input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   .veil nav.browse-filters form .query button {
     float: left;
@@ -13344,7 +13345,7 @@ header .inner nav#site-title .inner .create:focus button {
     background-color: transparent;
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .veil nav.browse-filters form .filters p {
@@ -13615,7 +13616,7 @@ header .inner nav#site-title .inner .create:focus button {
   .veil nav.browse-filters form .submission button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     margin-right: 5px;
     outline: none;
     background-color: transparent;
@@ -13663,7 +13664,7 @@ header .inner nav#site-title .inner .create:focus button {
     line-height: 30px;
     background-color: #E5E5E5;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .map-container .btn-group.map-scale a.active {
@@ -13679,7 +13680,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   .map-container .btn-group.map-scale a {
     padding: 0 8px 2px 8px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .map-container .btn-group.map-scale a input[type=checkbox] {
@@ -13710,7 +13711,7 @@ header .inner nav#site-title .inner .create:focus button {
   .leaflet-popup .leaflet-popup-content-wrapper {
     border-radius: 0;
     font-family: "Overpass", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
     padding: 0;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
@@ -13754,7 +13755,7 @@ header .inner nav#site-title .inner .create:focus button {
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-title a {
     text-decoration: none;
-    color: #0A4C73;
+    color: #005687;
     font-weight: 700;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-txt {
@@ -13830,7 +13831,7 @@ header .inner nav#site-title .inner .create:focus button {
     height: 20px;
     top: 0;
     padding: 0 10px 0 0;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: right;
     line-height: 20px;
     color: #FFF;
@@ -13845,7 +13846,7 @@ header .inner nav#site-title .inner .create:focus button {
     left: -125%;
     top: -50%;
     font-size: 2rem;
-    color: #0A4C73;
+    color: #005687;
   }
 
   .single-pin.selected i {
@@ -13857,8 +13858,8 @@ header .inner nav#site-title .inner .create:focus button {
     justify-content: center;
     align-items: center;
     font-weight: 700;
-    border: 5px solid #0A4C73;
-    background-color: #0A4C73;
+    border: 5px solid #005687;
+    background-color: #005687;
     border-radius: 100%;
     text-align: center;
     color: #FFF;
@@ -14112,7 +14113,7 @@ div.document main .engagement-input-group .bookmark.active::after {
   div.document main .inner .meta-status .btn-group form button {
     min-height: 45px;
     padding: 0 15px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -14362,14 +14363,14 @@ div.document main .inner .body .layout .meta-container .opts .opt-group .opt.bru
     width: 15px;
     height: 15px;
     border-radius: 30px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
 div.document main .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
@@ -14487,7 +14488,7 @@ div.document main .inner .body .layout .meta-container .media-lead.focus {
     font-size: 20px;
     line-height: 1.5em;
     border-top: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
@@ -14565,7 +14566,7 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
     font-size: 16px;
     line-height: 1.5em;
     /*line-height: 30px;*/
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts {
@@ -14800,7 +14801,7 @@ div.document main .inner .body .layout .meta-container .meta-checklist ol .opt.v
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .checkbox,
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .radio,
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
-    color: #0A4C73;
+    color: #005687;
     pointer-events: all;
   }
   div.document main .inner .body .layout .media-container .meta-location,
@@ -14902,7 +14903,7 @@ div.document main .inner .body .layout .meta-container .meta-tag .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-skills .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-methods .tag.selected,
 div.document main .inner .body .layout .meta-container .meta-datasources .tag.selected {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .layout .media-container .meta-tag:empty:not(:focus):before,
@@ -14962,7 +14963,7 @@ div.document main .inner .body .layout .meta-container .media-repeat button {
     border: none;
     border-top: 1px solid #969696;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -15011,7 +15012,7 @@ div.document main .inner .body .layout .meta-container .inset .search input[type
     height: 50px;
     margin: 15px 0 0 10px;
     border: none;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 24px;
@@ -15092,7 +15093,7 @@ div.document main .inner .body .layout .meta-container .inset .inset-location .p
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt:not(.selected):hover,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt:not(.selected):hover {
     background-color: #E5E5E5;
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt.selected,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt.selected {
@@ -15351,7 +15352,7 @@ div.document main .inner .body .layout .meta-container .response.template {
     cursor: pointer;
   }
   div.document main .inner .body .layout .results-container .chart svg rect:hover {
-    fill: #0A4C73;
+    fill: #005687;
   }
   div.document main .inner .body .layout .results-container .chart svg .x.axis text {
     font-weight: bold;
@@ -15534,10 +15535,10 @@ div.document main .inner .body .description-layout .media-container .media.focus
     cursor: pointer;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow p {
     justify-self: start;
@@ -15583,7 +15584,7 @@ div.document main .inner .body .layout.preview .meta-container .placement-opts {
     z-index: 1001;
   }
   div.document main .inner .body .input-toolbox.highlight {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .media-input-group {
@@ -16015,7 +16016,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background-color: transparent;
     font-size: 36px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   .document.slideshow main#pad .inner .slide.meta-status .btn-group {
     width: 100%;
@@ -16128,7 +16129,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     height: 45px;
     padding: 0 15px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -16185,7 +16186,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -16244,7 +16245,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     padding: 15px 15px 0 15px;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid #969696;
   }
   .fact-sheet main#profile .inner .body form div.info ul li input[type=text] + label,
@@ -16387,7 +16388,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     left: 120px;
     width: calc((100vw - (300px * 2 + 15px * 3)) / 2);
     bottom: 30px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.public-page-header div.carousel div.slides div.slide .media-txt span {
     background-color: #FFF;
@@ -16487,7 +16488,7 @@ div.browse nav#search-and-filter form .filter:not(.add) input[type=list] {
     background-color: transparent;
     font-size: 24px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse nav#search-and-filter form .search label,
 div.browse nav#search-and-filter form .filter:not(.add) label {
@@ -16521,7 +16522,7 @@ div.browse nav#search-and-filter form .filter:not(.add) input:-webkit-autofill:h
 div.browse nav#search-and-filter form .filter:not(.add) input:-webkit-autofill:focus,
 div.browse nav#search-and-filter form .filter:not(.add) input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   div.browse nav#search-and-filter form .search button,
 div.browse nav#search-and-filter form .filter:not(.add) button {
@@ -16532,7 +16533,7 @@ div.browse nav#search-and-filter form .filter:not(.add) button {
     background-color: transparent;
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   div.browse nav#search-and-filter form .search img,
@@ -16567,7 +16568,7 @@ div.browse nav#search-and-filter form .filter:not(.add) img {
     background-color: transparent;
     border-bottom: 1px dotted #969696;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse nav#search-and-filter form .global-actions .add input[type=text]:focus {
     border-bottom-color: #969696;
@@ -16810,7 +16811,7 @@ div.browse nav#search-and-filter form .filters section .filter input[type=text].
     height: 30px;
     padding: 0 10px;
     margin: 15px 0 15px 7.5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -16930,7 +16931,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
   div.browse main .inner .meta-status form .btn-group button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -16991,7 +16992,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
     line-height: 1.5em;
     border-top: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
     white-space: pre-line;
   }
@@ -17165,7 +17166,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     margin-bottom: 0;
   }
   div.browse main .inner section .layout article .inner .body .media-title a {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .body .media-title a h1 {
     font-size: 20px;
@@ -17350,13 +17351,13 @@ div.browse main .inner section .layout article .inner .body .meta-child {
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -17373,7 +17374,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img a img {
     display: block;
@@ -17418,7 +17419,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     text-decoration: underline;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small {
     text-decoration: none !important;
@@ -17443,7 +17444,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     background-color: transparent;
     border-bottom: 1px dotted #969696;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus {
     border-bottom-color: #969696;
@@ -17903,13 +17904,13 @@ div.browse main .inner section .layout.columns article .inner .head .btn-group f
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -17926,7 +17927,7 @@ div.browse main .inner section .layout.columns article .inner .head .media-img .
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img a img {
     display: block;
@@ -18132,7 +18133,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
     pointer-events: none;
   }
   div.browse.slideshow main .inner section .layout article .inner .head .media-img a img {
@@ -18267,7 +18268,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
     height: 30px;
     padding: 0 10px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -18300,7 +18301,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
   main#mobilize-new form .modal .inner .head .btn-group .contributor-count {
     flex-grow: 1;
     text-align: center;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt {
     padding: 0 7px 0 5px;
@@ -18312,7 +18313,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
     cursor: pointer;
     font-weight: 700;
     font-style: italic;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt:hover label {
     text-decoration: underline;
@@ -18373,7 +18374,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .body menu li .preview {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body menu li .preview i {
     vertical-align: middle;
@@ -18455,7 +18456,7 @@ main#mobilize-new form .modal .inner .body menu li.checked .country label {
     color: #969696;
   }
   main#mobilize-new form .modal .inner .body input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body input[type=text] + label {
     pointer-events: none;
@@ -18470,7 +18471,7 @@ main#mobilize-new form .modal .inner .body input:-webkit-autofill:hover,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:focus,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:active {
     /*-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;*/
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   main#mobilize-new form .modal .inner .body textarea {
     position: relative;
@@ -18524,7 +18525,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     font-size: 36px;
     font-weight: bold;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   main#mobilize-new form .modal .inner .body .cron-option {
@@ -18544,7 +18545,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body .cron-option input[type=date]::before {
     content: none;
@@ -18575,10 +18576,10 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot .contributor-count {
     margin: 15px 0;
@@ -18598,9 +18599,9 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     transition: none;
   }
   main#mobilize-new form .modal .inner .foot .global-opt.active button {
-    border-color: #0A4C73;
+    border-color: #005687;
     background-color: transparent;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot p {
     justify-self: start;
@@ -19041,7 +19042,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner ul li button {
     width: 100%;
     min-height: 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -19089,7 +19090,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     margin: 5px 0 15px 0;
     padding: 15px 0 15px 0;
     border: none;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     font-size: 16px;
   }
@@ -19106,7 +19107,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal .inner ul li input[type=date]::before {
     content: none;
@@ -19230,7 +19231,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner .foot button {
     width: 100%;
     min-height: 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -19272,7 +19273,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal.longlist .inner ul li.filter label {
     position: absolute;
@@ -19351,7 +19352,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     height: 30px;
     top: 0;
     font-size: 12px;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: center;
     z-index: 10000;
   }
@@ -19412,7 +19413,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     height: 75px;
     margin-left: -15px;
     padding: 0 15px;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     background-color: #FFF;
     z-index: 10000;
   }
@@ -19498,7 +19499,7 @@ nav.tabs .inner div.lg ul li .inner input[type=text] {
     background-color: transparent;
     border-bottom: 3px solid transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
   }
   nav.tabs .inner div.lg menu li .inner label,
 nav.tabs .inner div.lg ul li .inner label {
@@ -19569,7 +19570,7 @@ nav.tabs .inner div.lg ul li .dropdown {
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
     overflow: scroll;
-    border-top: 1px solid #0A4C73;
+    border-top: 1px solid #005687;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -19616,7 +19617,7 @@ nav.tabs .inner div.lg ul li.active input[type=text] {
   nav.tabs .inner div.lg menu li.active button,
 nav.tabs .inner div.lg ul li.active button {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   nav.tabs .inner div.lg menu li.active button .count,
 nav.tabs .inner div.lg ul li.active button .count {
@@ -19624,11 +19625,11 @@ nav.tabs .inner div.lg ul li.active button .count {
   }
   nav.tabs .inner div.lg menu li.active button::after,
 nav.tabs .inner div.lg ul li.active button::after {
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   nav.tabs .inner div.lg menu li.active input[type=text],
 nav.tabs .inner div.lg ul li.active input[type=text] {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
 
   header {
@@ -19663,6 +19664,9 @@ nav.tabs .inner div.lg ul li.active input[type=text] {
     width: 100%;
     height: auto;
   }
+  header .inner nav#site-title .inner img.logo {
+    height: 125px;
+  }
   header .inner nav#site-title .inner .create,
 header .inner nav#site-title .inner .save {
     position: relative;
@@ -19674,7 +19678,7 @@ header .inner nav#site-title .inner .save button {
     min-height: 45px;
     margin: 0;
     padding: 0 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -19689,7 +19693,7 @@ header .inner nav#site-title .inner .save .dropdown {
     background-color: #FFF;
     z-index: 1000;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
-    border-top: 2px solid #0A4C73;
+    border-top: 2px solid #005687;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -19728,7 +19732,7 @@ header .inner nav#site-title .inner .save .dropdown ul li.filter input[type=text
     outline: none;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#site-title .inner .create .dropdown ul li.filter label,
 header .inner nav#site-title .inner .save .dropdown ul li.filter label {
@@ -19905,7 +19909,7 @@ header .inner nav#site-title .inner .save .dropdown ul li.status-1 button {
   }
   header .inner nav#site-title .inner .create:hover button,
 header .inner nav#site-title .inner .create.open button {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   header .inner nav#site-title .inner .create:hover .dropdown,
@@ -19966,7 +19970,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     color: #FFF;
   }
   header .inner nav#site-title.public {
-    margin-top: 90px;
+    /*margin-top: 90px;*/
   }
   header .inner nav#modules {
     margin-bottom: 120px;
@@ -19992,7 +19996,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   }
   header .inner nav#modules menu li.active a {
     font-weight: bold;
-    color: #0A4C73;
+    color: #005687;
   }
   header .inner nav#modules menu li:not(:first-child)::before {
     content: "";
@@ -20063,14 +20067,14 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   .sidebar > .inner #statistics .statistic h1 {
     font-size: 24px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   .sidebar > .inner #statistics .statistic p {
     margin: 0;
     font-style: normal;
     font-size: 14px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   .sidebar > .inner #statistics .statistic small {
     font-size: 12px;
@@ -20337,7 +20341,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     /*width: calc(150px * 3 + 15px * 2 + 60px);*/
     margin: 60px auto 125px auto;
     background-color: #FFF;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     border-top-width: 5px;
     transition: transform 0.5s;
   }
@@ -20355,7 +20359,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     border: none;
     outline: none;
     padding: 0 15px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .veil nav.browse-filters .handle button.close label {
@@ -20381,7 +20385,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     outline: none;
     background-color: transparent;
     font-size: 24px;
-    color: #0A4C73;
+    color: #005687;
   }
   .veil nav.browse-filters form .query label[for=search-field] {
     position: absolute;
@@ -20402,7 +20406,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
 .veil nav.browse-filters form .query input:-webkit-autofill:focus,
 .veil nav.browse-filters form .query input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   .veil nav.browse-filters form .query button {
     float: left;
@@ -20412,7 +20416,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     background-color: transparent;
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .veil nav.browse-filters form .filters p {
@@ -20683,7 +20687,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   .veil nav.browse-filters form .submission button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     margin-right: 5px;
     outline: none;
     background-color: transparent;
@@ -20731,7 +20735,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     line-height: 30px;
     background-color: #E5E5E5;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   .map-container .btn-group.map-scale a.active {
@@ -20747,7 +20751,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   }
   .map-container .btn-group.map-scale a {
     padding: 0 8px 2px 8px;
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   .map-container .btn-group.map-scale a input[type=checkbox] {
@@ -20778,7 +20782,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   .leaflet-popup .leaflet-popup-content-wrapper {
     border-radius: 0;
     font-family: "Overpass", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
     padding: 0;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
@@ -20822,7 +20826,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-title a {
     text-decoration: none;
-    color: #0A4C73;
+    color: #005687;
     font-weight: 700;
   }
   .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body .media-txt {
@@ -20898,7 +20902,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     height: 20px;
     top: 0;
     padding: 0 10px 0 0;
-    background-color: #0A4C73;
+    background-color: #005687;
     text-align: right;
     line-height: 20px;
     color: #FFF;
@@ -20913,7 +20917,7 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     left: -125%;
     top: -50%;
     font-size: 2rem;
-    color: #0A4C73;
+    color: #005687;
   }
 
   .single-pin.selected i {
@@ -20925,8 +20929,8 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     justify-content: center;
     align-items: center;
     font-weight: 700;
-    border: 5px solid #0A4C73;
-    background-color: #0A4C73;
+    border: 5px solid #005687;
+    background-color: #005687;
     border-radius: 100%;
     text-align: center;
     color: #FFF;
@@ -21265,7 +21269,7 @@ div.document main#template .inner .meta-status .btn-group form button,
 div.document main#mobilization .inner .meta-status .btn-group form button {
     min-height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -21694,7 +21698,7 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     width: 15px;
     height: 15px;
     border-radius: 30px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
@@ -21708,7 +21712,7 @@ div.document main#mobilization .inner .body .layout .media-container .opts .opt-
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
@@ -21960,7 +21964,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-lead.
     font-size: 20px;
     line-height: 1.5em;
     border-top: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
@@ -22122,7 +22126,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-mosai
     font-size: 16px;
     line-height: 1.5em;
     /*line-height: 30px;*/
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts,
@@ -23031,7 +23035,7 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-checkl
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .checkbox,
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .radio,
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
-    color: #0A4C73;
+    color: #005687;
     pointer-events: all;
   }
   div.document main .inner .body .layout .media-container .meta-location,
@@ -23316,7 +23320,7 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-tag .t
 div.document main#mobilization .inner .body .layout .meta-container .meta-skills .tag.selected,
 div.document main#mobilization .inner .body .layout .meta-container .meta-methods .tag.selected,
 div.document main#mobilization .inner .body .layout .meta-container .meta-datasources .tag.selected {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .layout .media-container .meta-tag:empty:not(:focus):before,
@@ -23497,7 +23501,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-repea
     border: none;
     border-top: 1px solid #969696;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -23605,7 +23609,7 @@ div.document main#mobilization .inner .body .layout .meta-container .inset .sear
     margin: 15px 0 0 10px;
     border: none;
     /*border-bottom: 1px solid $c-dark-1;*/
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 24px;
@@ -23840,7 +23844,7 @@ div.document main#template .inner .body .layout .meta-container .inset .inset-lo
 div.document main#mobilization .inner .body .layout .media-container .inset .inset-location .panel .opt:not(.selected):hover,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-location .panel .opt:not(.selected):hover {
     background-color: #E5E5E5;
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt.selected,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt.selected,
@@ -24732,7 +24736,7 @@ div.document main#mobilization .inner .body .layout .results-container .chart sv
 div.document main#pad .inner .body .layout .results-container .chart svg rect:hover, div.document main#reference .inner .body .layout .results-container .chart svg rect:hover,
 div.document main#template .inner .body .layout .results-container .chart svg rect:hover,
 div.document main#mobilization .inner .body .layout .results-container .chart svg rect:hover {
-    fill: #0A4C73;
+    fill: #005687;
   }
   div.document main .inner .body .layout .results-container .chart svg .x.axis text,
 div.document main#pad .inner .body .layout .results-container .chart svg .x.axis text, div.document main#reference .inner .body .layout .results-container .chart svg .x.axis text,
@@ -25137,13 +25141,13 @@ div.document main#mobilization .inner .body .description-layout .input-slideshow
 div.document main#pad .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label, div.document main#reference .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label,
 div.document main#template .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label,
 div.document main#mobilization .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p,
 div.document main#pad .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p, div.document main#reference .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p,
 div.document main#template .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p,
 div.document main#mobilization .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow p,
 div.document main#pad .inner .body .description-layout .input-slideshow p, div.document main#reference .inner .body .description-layout .input-slideshow p,
@@ -26009,7 +26013,7 @@ div#reviews .review:not(:last-child)::after {
     height: 30px;
     padding: 0 10px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -26066,7 +26070,7 @@ div#reviews .review:not(:last-child)::after {
     background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -26200,7 +26204,7 @@ div#reviews .review:not(:last-child)::after {
     padding: 15px 15px 0 15px;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid #969696;
   }
   .fact-sheet main#profile .inner .body form div.info ul li input[type=text] + label,
@@ -26367,7 +26371,7 @@ div#reviews .review:not(:last-child)::after {
   div.table main .inner .head .btn-group form button {
     min-height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -26637,7 +26641,7 @@ div#reviews .review:not(:last-child)::after {
     height: 100%;
     background-color: rgba(100, 100, 100, 0.1);
     /*background-color: rgba(229,229,229,.75);*/
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     cursor: pointer;
   }
@@ -26715,7 +26719,7 @@ div#reviews .review:not(:last-child)::after {
     align-self: center;
     position: absolute;
     width: calc(300px * 2 + 15px);
-    color: #0A4C73;
+    color: #005687;
     z-index: 10;
     opacity: 0;
     transition: opacity 1s;
@@ -27126,7 +27130,7 @@ div.browse nav#search-and-filter form .filter:not(.add) input[type=list] {
     background-color: transparent;
     font-size: 24px;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse nav#search-and-filter form .search label,
 div.browse nav#search-and-filter form .filter:not(.add) label {
@@ -27160,7 +27164,7 @@ div.browse nav#search-and-filter form .filter:not(.add) input:-webkit-autofill:h
 div.browse nav#search-and-filter form .filter:not(.add) input:-webkit-autofill:focus,
 div.browse nav#search-and-filter form .filter:not(.add) input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   div.browse nav#search-and-filter form .search button,
 div.browse nav#search-and-filter form .filter:not(.add) button {
@@ -27171,7 +27175,7 @@ div.browse nav#search-and-filter form .filter:not(.add) button {
     background-color: transparent;
     border: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     cursor: pointer;
   }
   div.browse nav#search-and-filter form .search img,
@@ -27206,7 +27210,7 @@ div.browse nav#search-and-filter form .filter:not(.add) img {
     outline: none;
     background-color: transparent;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse nav#search-and-filter form .global-actions .add input[type=text]:focus {
     border-bottom-color: #969696;
@@ -27454,7 +27458,7 @@ div.browse nav#search-and-filter form .filters section .filter input[type=text].
     height: 30px;
     padding: 0 10px;
     margin: 15px 0 15px 7.5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -27574,7 +27578,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
   div.browse main .inner .meta-status form .btn-group button {
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -27635,7 +27639,7 @@ div.browse nav:not(.tabs) ul li.active a button .count {
     line-height: 1.5em;
     border-top: none;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
     white-space: pre-line;
   }
@@ -27809,7 +27813,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     margin-bottom: 0;
   }
   div.browse main .inner section .layout article .inner .body .media-title a {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .body .media-title a h1 {
     font-size: 20px;
@@ -27994,13 +27998,13 @@ div.browse main .inner section .layout article .inner .body .meta-child {
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
 div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -28017,7 +28021,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .media-img a img {
     display: block;
@@ -28062,7 +28066,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     text-decoration: underline;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled {
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small {
     text-decoration: none !important;
@@ -28087,7 +28091,7 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
     background-color: transparent;
     border-bottom: 1px dotted #969696;
     font-size: 12px;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus {
     border-bottom-color: #969696;
@@ -28552,13 +28556,13 @@ div.browse main .inner section .layout.columns article .inner .head .btn-group f
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     display: flex;
     transform: translateY(0);
-    background-color: #0A4C73;
+    background-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
 div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
-    border-top-color: #0A4C73;
+    border-top-color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
     transform: translateY(0) scaleY(0.5);
@@ -28575,7 +28579,7 @@ div.browse main .inner section .layout.columns article .inner .head .media-img .
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse main .inner section .layout.columns article .inner .head .media-img a img {
     display: block;
@@ -28823,7 +28827,7 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
     position: relative;
     width: 100%;
     height: 100%;
-    color: #0A4C73;
+    color: #005687;
     pointer-events: none;
   }
   div.browse.slideshow main .inner section .layout article .inner .head .media-img a img {
@@ -28872,7 +28876,7 @@ div.browse.slideshow main .inner section .layout article .inner .body .media-txt
   div.browse.slideshow main .inner section .layout article .inner .body .tag-group .meta-tags a .tag {
     margin: 0 5px;
     background-color: #FFF;
-    color: #0A4C73;
+    color: #005687;
   }
   div.browse.slideshow main .inner section .layout article .inner.centered {
     justify-content: center;
@@ -28988,7 +28992,7 @@ div.browse.slideshow main .inner section .layout article .inner .body .media-txt
     height: 30px;
     padding: 0 10px;
     margin: 0 5px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 16px;
@@ -29021,7 +29025,7 @@ div.browse.slideshow main .inner section .layout article .inner .body .media-txt
   main#mobilize-new form .modal .inner .head .btn-group .contributor-count {
     flex-grow: 1;
     text-align: center;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt {
     padding: 0 7px 0 5px;
@@ -29033,7 +29037,7 @@ div.browse.slideshow main .inner section .layout article .inner .body .media-txt
     cursor: pointer;
     font-weight: 700;
     font-style: italic;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .head .btn-group .global-opt:hover label {
     text-decoration: underline;
@@ -29094,7 +29098,7 @@ div.browse.slideshow main .inner section .layout article .inner .body .media-txt
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .body menu li .preview {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body menu li .preview i {
     vertical-align: middle;
@@ -29176,7 +29180,7 @@ main#mobilize-new form .modal .inner .body menu li.checked .country label {
     color: #969696;
   }
   main#mobilize-new form .modal .inner .body input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body input[type=text] + label {
     pointer-events: none;
@@ -29191,7 +29195,7 @@ main#mobilize-new form .modal .inner .body input:-webkit-autofill:hover,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:focus,
 main#mobilize-new form .modal .inner .body input:-webkit-autofill:active {
     /*-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;*/
-    -webkit-text-fill-color: #0A4C73 !important;
+    -webkit-text-fill-color: #005687 !important;
   }
   main#mobilize-new form .modal .inner .body textarea {
     position: relative;
@@ -29245,7 +29249,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     font-size: 36px;
     font-weight: bold;
     line-height: 1.5em;
-    color: #0A4C73;
+    color: #005687;
     text-align: center;
   }
   main#mobilize-new form .modal .inner .body .cron-option {
@@ -29265,7 +29269,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .body .cron-option input[type=date]::before {
     content: none;
@@ -29296,10 +29300,10 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     cursor: pointer;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   main#mobilize-new form .modal .inner .foot input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot .contributor-count {
     margin: 15px 0;
@@ -29319,9 +29323,9 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     transition: none;
   }
   main#mobilize-new form .modal .inner .foot .global-opt.active button {
-    border-color: #0A4C73;
+    border-color: #005687;
     background-color: transparent;
-    color: #0A4C73;
+    color: #005687;
   }
   main#mobilize-new form .modal .inner .foot p {
     justify-self: start;
@@ -29761,7 +29765,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner ul li button {
     width: 100%;
     min-height: 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -29809,7 +29813,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     margin: 5px 0 15px 0;
     padding: 15px 0 15px 0;
     border: none;
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     font-size: 16px;
   }
@@ -29826,7 +29830,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     font-size: 16px;
     font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal .inner ul li input[type=date]::before {
     content: none;
@@ -29950,7 +29954,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   .modal .inner .foot button {
     width: 100%;
     min-height: 30px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     padding: 0 30px;
@@ -29992,7 +29996,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     outline: none;
     background-color: transparent;
     font-size: 14px;
-    color: #0A4C73;
+    color: #005687;
   }
   .modal.longlist .inner ul li.filter label {
     position: absolute;
@@ -30391,7 +30395,7 @@ div.document main#template .inner .meta-status .btn-group form button,
 div.document main#mobilization .inner .meta-status .btn-group form button {
     min-height: 30px;
     padding: 0 10px;
-    border: 1px solid #0A4C73;
+    border: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 14px;
@@ -30820,7 +30824,7 @@ div.document main#mobilization .inner .body .layout .meta-container .opts .opt-g
     width: 15px;
     height: 15px;
     border-radius: 30px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size::-moz-range-thumb,
@@ -30834,7 +30838,7 @@ div.document main#mobilization .inner .body .layout .media-container .opts .opt-
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt.brush-size::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #0A4C73;
+    background: #005687;
     cursor: pointer;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt.brush-size + label,
@@ -31086,7 +31090,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-lead.
     font-size: 20px;
     line-height: 1.5em;
     border-top: none;
-    color: #0A4C73;
+    color: #005687;
     border-bottom: 1px solid transparent;
   }
   div.document main .inner .body .layout .media-container .media-lead:focus,
@@ -31248,7 +31252,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-mosai
     font-size: 16px;
     line-height: 1.5em;
     /*line-height: 30px;*/
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item:hover .index-opts,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item:hover .index-opts,
@@ -32157,7 +32161,7 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-checkl
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .checkbox,
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .radio,
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
-    color: #0A4C73;
+    color: #005687;
     pointer-events: all;
   }
   div.document main .inner .body .layout .media-container .meta-location,
@@ -32442,7 +32446,7 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-tag .t
 div.document main#mobilization .inner .body .layout .meta-container .meta-skills .tag.selected,
 div.document main#mobilization .inner .body .layout .meta-container .meta-methods .tag.selected,
 div.document main#mobilization .inner .body .layout .meta-container .meta-datasources .tag.selected {
-    background-color: #0A4C73;
+    background-color: #005687;
     color: #FFF;
   }
   div.document main .inner .body .layout .media-container .meta-tag:empty:not(:focus):before,
@@ -32623,7 +32627,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-repea
     border: none;
     border-top: 1px solid #969696;
     outline: none;
-    color: #0A4C73;
+    color: #005687;
     font-size: 16px;
     line-height: 1.5em;
     cursor: pointer;
@@ -32731,7 +32735,7 @@ div.document main#mobilization .inner .body .layout .meta-container .inset .sear
     margin: 15px 0 0 10px;
     border: none;
     /*border-bottom: 1px solid $c-dark-1;*/
-    border-bottom: 1px solid #0A4C73;
+    border-bottom: 1px solid #005687;
     outline: none;
     background-color: transparent;
     font-size: 24px;
@@ -32966,7 +32970,7 @@ div.document main#template .inner .body .layout .meta-container .inset .inset-lo
 div.document main#mobilization .inner .body .layout .media-container .inset .inset-location .panel .opt:not(.selected):hover,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-location .panel .opt:not(.selected):hover {
     background-color: #E5E5E5;
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel .opt.selected,
 div.document main .inner .body .layout .meta-container .inset .inset-location .panel .opt.selected,
@@ -33858,7 +33862,7 @@ div.document main#mobilization .inner .body .layout .results-container .chart sv
 div.document main#pad .inner .body .layout .results-container .chart svg rect:hover, div.document main#reference .inner .body .layout .results-container .chart svg rect:hover,
 div.document main#template .inner .body .layout .results-container .chart svg rect:hover,
 div.document main#mobilization .inner .body .layout .results-container .chart svg rect:hover {
-    fill: #0A4C73;
+    fill: #005687;
   }
   div.document main .inner .body .layout .results-container .chart svg .x.axis text,
 div.document main#pad .inner .body .layout .results-container .chart svg .x.axis text, div.document main#reference .inner .body .layout .results-container .chart svg .x.axis text,
@@ -34263,13 +34267,13 @@ div.document main#mobilization .inner .body .description-layout .input-slideshow
 div.document main#pad .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label, div.document main#reference .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label,
 div.document main#template .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label,
 div.document main#mobilization .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label {
-    border-color: #0A4C73;
+    border-color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p,
 div.document main#pad .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p, div.document main#reference .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p,
 div.document main#template .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p,
 div.document main#mobilization .inner .body .description-layout .input-slideshow input[type=checkbox]:checked + label + p {
-    color: #0A4C73;
+    color: #005687;
   }
   div.document main .inner .body .description-layout .input-slideshow p,
 div.document main#pad .inner .body .description-layout .input-slideshow p, div.document main#reference .inner .body .description-layout .input-slideshow p,

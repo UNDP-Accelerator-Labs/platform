@@ -14,3 +14,5 @@ routes/scripts/
 public/generated/
 presentations/
 dump/
+*.uploads.zip
+_00_inspiration.png

@@ -19,6 +19,8 @@
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
+		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
+
 		<% if (rights >= Math.min(...modules.filter(d => !['pinboards', 'teams'].includes(d.type)).map(d => d.rights.write))) { %>
 			<div class='create'>
 				<button><%- vocabulary['new'][language] %></button>

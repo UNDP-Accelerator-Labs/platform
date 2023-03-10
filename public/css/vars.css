@@ -1,6 +1,7 @@
 /*@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');*/
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital@1&display=swap");
+/*$c-dark-blue: #0A4C73;*/
 /*$c-dark-1: $c-dark-blue;
 $c-mid-1: $c-dark-red;
 $c-mid-2: $c-light-green;
@@ -46,7 +47,7 @@ body {
 
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
   font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-  color: #0A4C73;
+  color: #005687;
 }
 
 ul {
@@ -94,12 +95,12 @@ input:-webkit-autofill:active {
   float: right;
   border: none;
   outline: none;
-  background-color: #0A4C73;
+  background-color: #005687;
   color: #FFF;
   cursor: pointer;
 }
 .screen .modal .inner {
-  border-top: 2px solid #0A4C73;
+  border-top: 2px solid #005687;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -200,8 +201,8 @@ input.toggle:checked + label[for=status-1]::after {
 
 input.toggle:checked + label::after {
   transform: translate(20px, 0);
-  background-color: #0A4C73;
-  border-color: #0A4C73;
+  background-color: #005687;
+  border-color: #005687;
   color: #FFF;
 }
 

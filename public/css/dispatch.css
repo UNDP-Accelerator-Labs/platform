@@ -20068,12 +20068,12 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
     min-height: calc(100vh - 225px);
   }
   header.center .inner {
-    justify-content: space-around;
+    /*justify-content: space-around;*/
     height: calc(100vh - 225px);
-  }
-  header.center .inner img.logo {
-    position: absolute;
-    top: 30px;
+    /*img.logo {
+    	position: absolute;
+    	top: 30px;
+    }*/
   }
 
   .sidebar {

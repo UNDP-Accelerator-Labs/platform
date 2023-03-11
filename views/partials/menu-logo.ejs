@@ -20,7 +20,7 @@
 
 	const display_content = Object.keys(query)?.filter(key => !['status', 'source', 'mapscale'].includes(key)).length > 0
 %>
-<nav id='site-title' class='<% if (display_content) { %>public<% } %>'>
+<nav id='site-title'>
 	<div class='inner'>
 		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
 		<h1><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>

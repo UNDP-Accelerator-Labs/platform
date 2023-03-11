@@ -14,7 +14,8 @@
 	const pagedisplay = locals.metadata.page.display
 	const pages = locals.metadata.page.count
 	const source = locals.metadata.page.source
-	
+	const sourceurl = locals.metadata.site.apps_in_suite.find(d => d.key === locals.metadata.page.source)?.baseurl
+
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
 	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
@@ -22,7 +23,7 @@
 		else mapscale = 'contain'
 	}
 
-	const display_content = Object.keys(query)?.filter(key => !['status', 'source', 'mapscale'].includes(key)).length > 0
+	const display_content = Object.keys(query)?.filter(key => !['status', 'source', 'mapscale', 'display'].includes(key)).length > 0
 %>
 <html lang='<%- language %>'>
 <head>
@@ -43,10 +44,11 @@
 
 <% const welcome_module = locals.metadata.site.welcome_module %>
 
-<% if (publicpage && object === 'pads' && space !== 'pinned' && mapscale !== 'full-screen' && locals.metadata.page.id === 1) { %>
+<% if (publicpage && object === 'pads' && space !== 'pinned' && mapscale !== 'full-screen' && locals.metadata.page.id === 1 && !display_content) { %>
 
 <% let slides = locals.sample_images %>
 <div class='public-page-header'>
+	<% if (false) { %>
 	<div class='<%- welcome_module %>'>
 		<% if (welcome_module === 'mosaic') { %>
 			<div class='slides'>
@@ -113,21 +115,24 @@
 				animateCarousel(0)
 			</script>
 		<% } %>
-		<button class='scroll-nav' onclick='scrollToPad(this)'><label class='rotate'>&rsaquo;</label></button>
-		<script type='text/javascript'>
-			function scrollToPad (node) {
-				let next = d3.select('div.public-page-header h1.site-title').node()
-				window.scrollTo({
-					top: next.offsetTop - 60,
-					left: 0,
-					behavior: 'smooth'
-				})
-			}
-			window.addEventListener('scroll', function (e) {
-				d3.select('button.scroll-nav').classed('hide', document.documentElement.scrollTop > 60)
-			})
-		</script>
 	</div>
+	<% } %>
+
+	<button class='scroll-nav' onclick='scrollToPad(this)'><label class='rotate'>&rsaquo;</label></button>
+	<script type='text/javascript'>
+		function scrollToPad (node) {
+			let next = d3.select('div.public-page-header h1.site-title').node()
+			window.scrollTo({
+				top: next.offsetTop - 60,
+				left: 0,
+				behavior: 'smooth'
+			})
+		}
+		window.addEventListener('scroll', function (e) {
+			d3.select('button.scroll-nav').classed('hide', document.documentElement.scrollTop > 60)
+		})
+	</script>
+
 	<h1 class='site-title'><%- locals.metadata.site.title %></h1>
 	<% if (locals.metadata.page.instance_title) { %><h2><%- locals.metadata.page.instance_title %></h2><% } %>
 	<% if (locals.metadata.site.description?.[language]) { %><p class='lead'><%- locals.metadata.site.description[language] %></p><% } %>
@@ -815,15 +820,14 @@
 				.addElems('img', 'vignette')
 					.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })
 				.each(function (d) {
-					// TO DO: ADD ROOT PATH TO GET IMAGES FROM THE RELEVANT PLATFORMS
-
 					const node = this
 					const img = new Image()
 					img.onload = function () { node.src = this.src }
-					if (display === 'slideshow') img.src = d.img[0].replace('uploads/sm/', 'uploads/')
-					else img.src = d.img[0]
+					if (display === 'slideshow') img.src = `<%- sourceurl %>/${d.img[0].replace('uploads/sm/', 'uploads/')}`
+					else img.src = `<%- sourceurl %>/${d.img[0]}`
 
 
+					// BELOW IS IN CASE WE MAKE A CALL FOR THE IMAGES VIA API
 					// POST('/call/api', { uri: encodeURI(`https://undphqexoacclabsapp01.azurewebsites.net/api/file?filepath=${d}`), method: 'GET', key: 'SM_PLATFORM_TOKEN', expect: 'image' }, false)
 					// .then(res => res.blob())
 					// .then(data => {

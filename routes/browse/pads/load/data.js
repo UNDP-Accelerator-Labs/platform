@@ -240,26 +240,28 @@ exports.main = async kwargs => {
 					}
 				})
 
-				return DB.conn.any(`
-					SELECT p.pad AS id,
-						json_agg(json_build_object(
-							'id', pb.id,
-							'title', pb.title
-						)) AS pinboards
+				if (results.length) {
+					return DB.conn.any(`
+						SELECT p.pad AS id,
+							json_agg(json_build_object(
+								'id', pb.id,
+								'title', pb.title
+							)) AS pinboards
 
-					FROM pinboard_contributions p
-					INNER JOIN pinboards pb
-						ON pb.id = p.pinboard
+						FROM pinboard_contributions p
+						INNER JOIN pinboards pb
+							ON pb.id = p.pinboard
 
-					WHERE $1:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
-						AND p.pad IN ($2:csv)
-						AND p.source = $3
-					GROUP BY p.pad
-				;`, [ DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ]), results.map(d => d.id), source ])
-				.then(pins => {
-					const data = join.multijoin.call(results, [ pins, 'id' ])
-					return data
-				}).catch(err => console.log(err))
+						WHERE $1:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
+							AND p.pad IN ($2:csv)
+							AND p.source = $3
+						GROUP BY p.pad
+					;`, [ DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ]), results.map(d => d.id), source ])
+					.then(pins => {
+						const data = join.multijoin.call(results, [ pins, 'id' ])
+						return data
+					}).catch(err => console.log(err))
+				} else return results
 
 			}).catch(err => console.log(err))
 		}).then(results => {

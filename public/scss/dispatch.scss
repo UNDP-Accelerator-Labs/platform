@@ -133,7 +133,13 @@
 							}
 						}
 						ul.locations {
-							list-style: url("../imgs/icons/i-locations-btn.svg") !important;
+							margin-left: 0;
+							list-style: url("../imgs/icons/i-locations-btn.svg") inside !important;
+						}
+						p.caption {
+							font-size: $t-small;
+							line-height: 1.5em;
+							color: $c-light-grey;
 						}
 						img {
 							margin: 6pt auto;

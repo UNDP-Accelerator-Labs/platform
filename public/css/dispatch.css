@@ -25248,6 +25248,7 @@ div.document main#template .inner .body .media-input-group .inner,
 div.document main#mobilization .inner .body .media-input-group .inner {
     max-height: 80vh;
     overflow: hidden;
+    background-color: #FFF;
   }
   div.document main .inner .body .media-input-group .inner .btn-group,
 div.document main#pad .inner .body .media-input-group .inner .btn-group, div.document main#reference .inner .body .media-input-group .inner .btn-group,
@@ -29726,10 +29727,9 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     vertical-align: text-top;
   }
 
-  .pagedjs_page {
-    margin: auto;
-  }
-
+  /*.pagedjs_page {
+  	margin: auto;
+  }*/
   div.fixed-bg {
     position: fixed;
     top: 0;
@@ -34036,6 +34036,7 @@ div.document main#template .inner .body .media-input-group .inner,
 div.document main#mobilization .inner .body .media-input-group .inner {
     max-height: 80vh;
     overflow: hidden;
+    background-color: #FFF;
   }
   div.document main .inner .body .media-input-group .inner .btn-group,
 div.document main#pad .inner .body .media-input-group .inner .btn-group, div.document main#reference .inner .body .media-input-group .inner .btn-group,
@@ -34846,7 +34847,13 @@ div.document main#pad .inner .body section ol.indexes li.tag {
     font-size: 10pt;
   }
   div.document main#pad .inner .body section ul.locations {
-    list-style: url("../imgs/icons/i-locations-btn.svg") !important;
+    margin-left: 0;
+    list-style: url("../imgs/icons/i-locations-btn.svg") inside !important;
+  }
+  div.document main#pad .inner .body section p.caption {
+    font-size: 12px;
+    line-height: 1.5em;
+    color: #969696;
   }
   div.document main#pad .inner .body section img {
     margin: 6pt auto;

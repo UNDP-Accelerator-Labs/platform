@@ -560,23 +560,27 @@ function addLoader (sel) {
 
 function populateSection (data, lang = 'en', section) {
 	// MEDIA
-	if (data.type === 'title' && publicpage) addTitle({ data, lang, section })
-	if (data.type === 'img') addImg({ data, lang, section })
-	if (data.type === 'mosaic') addMosaic({ data, lang, section })
-	if (data.type === 'video') addVideo({ data, lang, section })
-	if (data.type === 'drawing') addDrawing({ data, lang, section })
-	if (data.type === 'txt') addTxt({ data, lang, section })
-	if (data.type === 'embed') addEmbed({ data, lang, section })
-	if (data.type === 'checklist') addChecklist({ data, lang, section })
-	if (data.type === 'radiolist') addRadiolist({ data, lang, section })
-	// META
-	if (data.type === 'location') addLocations({ data, lang, section })
-	if (data.type === 'index') addIndexes({ data, lang, section })
-	if (data.type === 'tag') addTags({ data, lang, section })
-	if (data.type === 'attachment') addAttachment({ data, lang, section })
-	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
-	// GROUP
-	if (data.type === 'group') addGroup({ data, lang, section })
+	return new Promise(async resolve => {
+		if (data.type === 'title' && publicpage) addTitle({ data, lang, section })
+		if (data.type === 'img') addImg({ data, lang, section })
+		if (data.type === 'mosaic') addMosaic({ data, lang, section })
+		if (data.type === 'video') addVideo({ data, lang, section })
+		if (data.type === 'drawing') addDrawing({ data, lang, section })
+		if (data.type === 'txt') addTxt({ data, lang, section })
+		if (data.type === 'embed') addEmbed({ data, lang, section })
+		if (data.type === 'checklist') addChecklist({ data, lang, section })
+		if (data.type === 'radiolist') addRadiolist({ data, lang, section })
+		// META
+		if (data.type === 'location') addLocations({ data, lang, section })
+		if (data.type === 'index') await addIndexes({ data, lang, section })
+		if (data.type === 'tag') addTags({ data, lang, section })
+		if (data.type === 'attachment') addAttachment({ data, lang, section })
+		// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+		// GROUP
+		if (data.type === 'group') addGroup({ data, lang, section })
+
+		resolve()
+	})
 }
 // THIS CAN PROBABLY BE MOVED TO upload.js
 function uploadImg (kwargs) {
@@ -710,156 +714,162 @@ function autofillTitle () {
 }
 
 function addSection (kwargs) {
-	const { data, lang, sibling, repeated, focus } = kwargs || {}
-	let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
-	if (!title) title = ''
-	if (!lead) lead = ''
-	if (!structure) structure = []
-	if (!items) items = []
+	return new Promise(async resolve => {
+		const { data, lang, sibling, repeated, focus } = kwargs || {}
+		let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
+		if (!title) title = ''
+		if (!lead) lead = ''
+		if (!structure) structure = []
+		if (!items) items = []
 
-	if (editing && templated && (!items.length || repeated)) items = JSON.parse(JSON.stringify(structure))
+		if (editing && templated && (!items.length || repeated)) items = JSON.parse(JSON.stringify(structure))
 
-	d3.selectAll('.media-layout').classed('focus', false)
+		d3.selectAll('.media-layout').classed('focus', false)
 
-	const section = d3.select('main#pad div.inner div.body')
-		.insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
-		// .insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
-		.classed('repeat', repeat || false)
-		.classed('focus', focus && !templated)
-		.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
-	// .on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
-	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
+		const section = d3.select('main#pad div.inner div.body')
+			.insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
+			// .insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
+			.classed('repeat', repeat || false)
+			.classed('focus', focus && !templated)
+			.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
+		// .on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
+		.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
-	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
-	const section_id = [].indexOf.call(d3.selectAll('section.media-layout').nodes(), section.node())
+		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+		const section_id = [].indexOf.call(d3.selectAll('section.media-layout').nodes(), section.node())
 
-	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
-	if (
-		((editing || activity === 'preview') && section_id !== 0 && !templated)
-		|| (templated 
-			&& repeat 
-			&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
-				.filter((d, i) => i === 0).node() !== section.node()
-		)
-	) {
-		const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
-		placement.addElems('div', 'opt', [
-			// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
-			{ label: 'close', value: 'delete', fn: _ => rmSection() }, 
-			// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
-		]).on('click', d => {
-			d3.event.stopPropagation()
-			d.fn()
+		// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
+		if (
+			((editing || activity === 'preview') && section_id !== 0 && !templated)
+			|| (templated 
+				&& repeat 
+				&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
+					.filter((d, i) => i === 0).node() !== section.node()
+			)
+		) {
+			const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
+			placement.addElems('div', 'opt', [
+				// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
+				{ label: 'close', value: 'delete', fn: _ => rmSection() }, 
+				// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+			]).on('click', d => {
+				d3.event.stopPropagation()
+				d.fn()
 
-			if (editing) {
-				if (!publicpage) switchButtons(lang)
-				else window.sessionStorage.setItem('changed-content', true)
-			}
-		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons')
-			.html(d => d.label)
-
-		function rmSection () {
-			// FOR META INPUT
-			section.selectAll('.media-container, .meta-container').data()
-			.forEach(d => {
-				if (d.name) {
-					const input = d3.select(`#input-meta-${d.name}`).node()
-					if (input) input.disabled = false
+				if (editing) {
+					if (!publicpage) switchButtons(lang)
+					else window.sessionStorage.setItem('changed-content', true)
 				}
+			}).on('mouseup', _ => d3.event.stopPropagation())
+				.addElems('i', 'material-icons')
+				.html(d => d.label)
+
+			function rmSection () {
+				// FOR META INPUT
+				section.selectAll('.media-container, .meta-container').data()
+				.forEach(d => {
+					if (d.name) {
+						const input = d3.select(`#input-meta-${d.name}`).node()
+						if (input) input.disabled = false
+					}
+				})
+
+				section.remove()
+				// MAKE SURE THE OPTION TO REPEAT IS DISPLAYED
+				const section_group = d3.selectAll('.layout.repeat').filter(d => d.group === group)
+				section_group.filter((d, i) => i === section_group.size() - 1)
+					.select('.repeat-container').classed('hide', false)
+
+				if (editing) {
+					if (!publicpage) partialSave('media')
+					else updateStatus()
+				}
+			}
+		}
+
+		const header = section.addElems('div', 'section-header', d => {
+			if (templated && d.title?.length === 0) return []
+			else if (!editing && d.title?.length === 0) return []
+			else return [d]
+		}).addElems('h1')
+			.attrs({ 
+				'data-placeholder': d => '<%- vocabulary["section header"][language] %>',
+				'contenteditable': editing && !templated ? true : null 
+			}).html(d => d.title)
+		.on('keydown', function () {
+			const evt = d3.event
+			if (evt.code === 'Enter' || evt.keyCode === 13) {
+				evt.preventDefault()
+				this.blur()
+			}
+		}).on('blur', _ => {
+			if (editing) {
+				if (!publicpage) partialSave('media')
+				else updateStatus()
+			}
+		})
+
+		if (templated && lead) {
+			const medialead = new Media({
+				parent: section.node(), 
+				type: 'lead', 
+				datum: { type: 'lead', level: 'media', lead: lead },
+				lang: lang
 			})
+			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+			if (medialead.opts) medialead.opts.remove()
 
-			section.remove()
-			// MAKE SURE THE OPTION TO REPEAT IS DISPLAYED
-			const section_group = d3.selectAll('.layout.repeat').filter(d => d.group === group)
-			section_group.filter((d, i) => i === section_group.size() - 1)
-				.select('.repeat-container').classed('hide', false)
+			medialead.media.attrs({ 
+				'data-placeholder': d => '<%- vocabulary["lead paragraph"][language] %>',
+				'contenteditable': editing && !templated ? true : null 
+			}).html(d => d.lead)
+		}
+		if (templated && repeat) { 
+			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
+			d3.selectAll('.layout.repeat').filter(d => d.group === group)
+				.select('.repeat-container').classed('hide', true)
 
-			if (editing) {
-				if (!publicpage) partialSave('media')
-				else updateStatus()
-			}
-		}
-	}
+			const mediarepeat = new Media({
+				parent: section.node(), 
+				type: 'repeat', 
+				datum: { type: 'repeat', level: 'media', instruction: instruction },
+				lang: lang
+			})
+			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+			if (mediarepeat.opts) mediarepeat.opts.remove()
+			if (mediarepeat.instruction) mediarepeat.instruction.remove()
 
-	const header = section.addElems('div', 'section-header', d => {
-		if (templated && d.title?.length === 0) return []
-		else if (!editing && d.title?.length === 0) return []
-		else return [d]
-	}).addElems('h1')
-		.attrs({ 
-			'data-placeholder': d => '<%- vocabulary["section header"][language] %>',
-			'contenteditable': editing && !templated ? true : null 
-		}).html(d => d.title)
-	.on('keydown', function () {
-		const evt = d3.event
-		if (evt.code === 'Enter' || evt.keyCode === 13) {
-			evt.preventDefault()
-			this.blur()
+			mediarepeat.media.addElems('button')
+			.on('click', async function () {
+				const sel = d3.select(this)
+				
+				kwargs.sibling = section.node().nextSibling
+				kwargs.repeated = true
+				kwargs.focus = true
+				
+				const new_section = await addSection(kwargs)
+				d3.select(new_section).classed('animate-in', true)
+				
+				if (editing) {
+					if (!publicpage) partialSave('media')
+					else updateStatus()
+				}
+
+			}).addElems('div').attrs({ 
+				'data-placeholder': d => '<%- vocabulary["repeat section"][language] %>'
+			}).html(d => d.instruction)
 		}
-	}).on('blur', _ => {
-		if (editing) {
-			if (!publicpage) partialSave('media')
-			else updateStatus()
+
+		if (items.length) {
+			const promises = []
+			section.each(function (d) {
+				promises.push(d.items.map(async c => await populateSection (c, lang, this)))
+			})
+			await Promise.all(promises.flat())
 		}
+
+		resolve(section.node())
 	})
-
-	if (templated && lead) {
-		const medialead = new Media({
-			parent: section.node(), 
-			type: 'lead', 
-			datum: { type: 'lead', level: 'media', lead: lead },
-			lang: lang
-		})
-		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		if (medialead.opts) medialead.opts.remove()
-
-		medialead.media.attrs({ 
-			'data-placeholder': d => '<%- vocabulary["lead paragraph"][language] %>',
-			'contenteditable': editing && !templated ? true : null 
-		}).html(d => d.lead)
-	}
-	if (templated && repeat) { 
-		// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
-		d3.selectAll('.layout.repeat').filter(d => d.group === group)
-			.select('.repeat-container').classed('hide', true)
-
-		const mediarepeat = new Media({
-			parent: section.node(), 
-			type: 'repeat', 
-			datum: { type: 'repeat', level: 'media', instruction: instruction },
-			lang: lang
-		})
-		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		if (mediarepeat.opts) mediarepeat.opts.remove()
-		if (mediarepeat.instruction) mediarepeat.instruction.remove()
-
-		mediarepeat.media.addElems('button')
-		.on('click', function () {
-			const sel = d3.select(this)
-			
-			kwargs.sibling = section.node().nextSibling
-			kwargs.repeated = true
-			kwargs.focus = true
-			
-			const new_section = addSection(kwargs)
-			d3.select(new_section).classed('animate-in', true)
-			
-			if (editing) {
-				if (!publicpage) partialSave('media')
-				else updateStatus()
-			}
-
-		}).addElems('div').attrs({ 
-			'data-placeholder': d => '<%- vocabulary["repeat section"][language] %>'
-		}).html(d => d.instruction)
-	}
-
-	if (items.length) section.each(function (d) {
-		d.items.forEach(c => populateSection (c, lang, this))	
-	})
-
-	return section.node()
 }
 
 function addTitle (kwargs) {
@@ -2275,51 +2285,54 @@ function addLocations (kwargs) {
 		}
 	}
 }
-async function addIndexes (kwargs) {
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
-	if (!level) level = 'meta'
-	if (!type) type = 'index'
-	if (!name) name = null
-	if (!tags) tags = [] 
-	// MAKE SURE THE SDGs ARE SORTED BY key
-	tags.sort((a, b) => a.key - b.key)
-	required = required ?? false
+function addIndexes (kwargs) {
+	return new Promise(async resolve => {
+		const { data, lang, section, sibling, focus } = kwargs || {}
+		let { id, level, type, name, instruction, tags, constraint, required } = data || {}
+		if (!level) level = 'meta'
+		if (!type) type = 'index'
+		if (!name) name = null
+		if (!tags) tags = [] 
+		// MAKE SURE THE SDGs ARE SORTED BY key
+		tags.sort((a, b) => a.key - b.key)
+		required = required ?? false
 
-	if (!editing && tags?.length === 0) return null
+		if (!editing && tags?.length === 0) return null
 
-	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-	if (input) input.disabled = true
+		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
+		if (input) input.disabled = true
 
-	const list = await new Taglist({ 
-		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, tags, instruction, constraint, required },
-		opencode: metafields.find(d => d.label === name)?.opencode || false,
-		focus: focus || false,
-		lang,
-		list: taglists[name].sort((a, b) => a.key - b.key),
-		imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
-		altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
-	})
+		const list = await new Taglist({ 
+			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
+			sibling,
+			type, 
+			datum: { id, level, type, name, tags, instruction, constraint, required },
+			opencode: metafields.find(d => d.label === name)?.opencode || false,
+			focus: focus || false,
+			lang,
+			list: taglists[name].sort((a, b) => a.key - b.key),
+			imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
+			altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
+		})
 
-	if (list.opts) {
-		list.opts.addElem('div', 'opt-group')
-			.datum('<%- vocabulary["click to see options"][language] %>')
-		.addElems('label', 'instruction')
-			.html(d => d)
+		if (list.opts) {
+			list.opts.addElem('div', 'opt-group')
+				.datum('<%- vocabulary["click to see options"][language] %>')
+			.addElems('label', 'instruction')
+				.html(d => d)
 
-		if (constraint) {
-			const opt = list.opts.addElem('div', 'opt-group')
-				.datum({ key: 'constraint', label: 'block', value: constraint })
-				.addElems('button', 'opt active')
-			opt.addElems('i', 'material-icons')
-				.html(d => d.label)
-			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
-				.html(d => d.value - tags.length)
+			if (constraint) {
+				const opt = list.opts.addElem('div', 'opt-group')
+					.datum({ key: 'constraint', label: 'block', value: constraint })
+					.addElems('button', 'opt active')
+				opt.addElems('i', 'material-icons')
+					.html(d => d.label)
+				opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+					.html(d => d.value - tags.length)
+			}
 		}
-	}
+		resolve()
+	})
 }
 async function addTags (kwargs) {
 	const { data, lang, section, sibling, focus } = kwargs || {}
@@ -2528,9 +2541,9 @@ function addGroup (kwargs) {
 	function addItems (sel) {
 		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
 		const groups = sel.insertElems('.media-group', 'div', 'media media-group-items', d => d.items)
-		.each(function (c) { 
+		.each(async function (c) { 
 			this.innerHTML = ''
-			c.forEach(b => populateSection(b, lang, this))
+			await Promise.all(c.map(async b => await populateSection(b, lang, this)))
 		})
 		groups.classed('animate-in', (d, i) => i === groups.size() - 1)
 		// THIS IS THE SAME AS IN MEDIA, BUT IN MEDIA WE PREVENT THESE OPTIONS WHEN TEMPLATED

@@ -151,6 +151,7 @@ app.post('/screenshot', routes.process.screenshot)
 // TO DO: UPDATE SCHEMA BELOW
 app.post('/storeImport', routes.render.login, routes.storeImport) // UPDATE DO save/import
 app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forward
+app.post('/reverseGeocoding', routes.reverseGeocoding) // UPDATE TO geocode/forward
 
 
 // API

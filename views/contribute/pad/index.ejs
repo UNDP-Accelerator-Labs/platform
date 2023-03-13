@@ -11,8 +11,10 @@
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
 	const anonymized = locals.metadata.page.query?.anonymize?.includes('true')
-	const editing = ['contribute', 'edit'].includes(activity)
+	const editing = ['contribute', 'edit'].includes(activity) && pagedisplay !== 'print'
 	const templated = locals.templated || locals.display_template !== null
+
+	const print = true
 %>
 <html lang='<%- language %>'>
 <head>
@@ -33,6 +35,20 @@
 <script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
 	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
 	crossorigin=''></script>
+
+<% if (pagedisplay === 'print') { %>
+	<!-- FOR PRINT/ PDF GENERATION -->
+	<script type='text/javascript'>
+		// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
+		window.PagedConfig = {
+			auto: false // disable automatic script execution on document load
+		}
+	</script>
+	<script type='text/javascript' src='/scripts/pagedjs/dist/paged.polyfill.js'></script>
+	<%- include('./print.ejs') %>
+	<!-- <script type='text/javascript' src='/scripts/html2pdf.js/dist/html2pdf.bundle.min.js'></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script> -->
+<% } %>
 
 <script type="text/javascript">
 	// INIT THE SOCKET
@@ -78,7 +94,7 @@
 		document.body.appendChild(iframe)
 	}
 </script>
-
+<!-- PRESUMAABLY THIS IS NOT NEEDED IF PRINT -->
 <%- include('./render.ejs') %>
 
 </head>
@@ -1138,7 +1154,6 @@
 			}).catch(err => console.log(err))
 		})
 	}
-
 	function updateStatus (_status) {
 		if (!_status) {
 			const completion = getStatus()
@@ -1155,7 +1170,6 @@
 		metastatus.select('div.btn-group form button.generate-pdf')
 			.attr('disabled', _status > 0 ? null : true)
 	}
-
 
 	let keyTrack = []
 	window.addEventListener('keydown', function (e) {
@@ -1347,14 +1361,46 @@
 		<% } %>
 
 		if (data.sections) {
-			data.sections.forEach(async d => {
-				console.log(d)
-				<% if (pagedisplay === 'slideshow') { %>
-					await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
-				<% } else { %>
-					addSection({ data: d, lang: '<%- language %>' })
-				<% } %>
-			})
+			<% if (pagedisplay !== 'print') { %>
+				data.sections.forEach(async d => {
+					<% if (pagedisplay === 'slideshow') { %>
+						await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
+					<% } else { %>
+						await addSection({ data: d, lang: '<%- language %>' })
+					<% } %>
+				})
+			<% } else { %>
+				Promise.all(data.sections.map(d => {
+					return new Promise(async resolve => {
+						await addPrintSection({ data: d, lang: '<%- language %>' })
+						// console.log(d)
+						resolve()
+					})
+				})).then(_ => {
+					window.PagedPolyfill.preview()
+				})
+
+				class MyHandler extends Paged.Handler { 
+					// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
+					constructor(chunker, polisher, caller) {
+						super(chunker, polisher, caller);
+					}
+
+					afterPreview () {
+						console.log('after preview')
+					}
+
+					async beforeParsed(content) {
+						// console.log(content)
+
+					}
+					afterParsed(parsed) {
+					}
+
+				}
+				Paged.registerHandlers(MyHandler);
+			<% } %>
+
 		} else { // THIS IS AN AUTO GENERATED PAD
 			if (templated) { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
 				const template = <%- JSON.stringify(locals.display_template || {}) %>;
@@ -1368,7 +1414,7 @@
 						<% if (pagedisplay === 'slideshow') { %>
 							await addSlides({ data: d, lang: '<%- language %>' })
 						<% } else { %> 
-							addSection({ data: d, lang: '<%- language %>' })
+							await addSection({ data: d, lang: '<%- language %>' })
 						<% } %>
 					})
 				}
@@ -1379,7 +1425,7 @@
 		<% } %>
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
-	} else addSection({ lang: '<%- language %>' })
+	} else (async _ => await addSection({ lang: '<%- language %>' }))()
 
 
 	let idx = 0
@@ -1478,8 +1524,8 @@
 			const displaypromises = []
 			if (items.length) {
 				section.each(function (d) {
-					d.items.forEach(c => displaypromises.push(new Promise(resolvedisplay => {
-						populateSection(c, lang, this)
+					d.items.forEach(c => displaypromises.push(new Promise(async resolvedisplay => {
+						await populateSection(c, lang, this)
 						resolvedisplay()
 					})))
 				})
@@ -1567,7 +1613,6 @@
 			}
 		})
 	}
-
 	function switchslide (i) {
 		const slidewidth = main.node().clientWidth || main.node().offsetWidth || main.node().scrollWidth
 		main.select('.inner').node().scrollTo({
@@ -1578,60 +1623,24 @@
 		return idx = i
 	}
 
-
 </script>
 
+<% if (pagedisplay === 'print') { %>
 <script type='text/javascript'>
-	// const paged_pdf = false
-	// if (paged_pdf) {
-	// 	class MyHandler extends Paged.Handler { 
-	// 		// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
-	// 		constructor(chunker, polisher, caller) {
-	// 			super(chunker, polisher, caller);
-	// 		}
+	// d3.select('body').append('button')
+	// 		.on('click', clicker)
+	// 		.html('download')
 
-	// 		beforeParsed(content) {
-	// 			console.log(content)
-	// 			const main = d3.select(content).select('main')
-	// 			// TO DO: FLATTEN EVERYTHING TO OPTIMIZE PAGE FLOW
-	// 			main.selectAll('.layout:not(.description-layout)')
-	// 			.each(function (d) {
-	// 				const items = []
-	// 				const sel = d3.select(this)
-	// 				console.log(d)
-					
-	// 				sel.selectAll('.media-container, .meta-container')
-	// 				.each(function (c) {
-	// 					const sel = d3.select(this)
-	// 					const ingroup = sel.findAncestor('group-container')	
-	// 					// GROUPS
-	// 					console.log(this, c)
-	// 					if (c.type === 'group') {
-	// 						// const groupitems = []
-	// 						sel.selectAll('.media-group-items')
-	// 							.each(function () { 
-	// 								const sel = d3.select(this)
-	// 								const subitems = []
-	// 								sel.selectAll('.media-container, .meta-container')
-	// 									.each(function (b) { 
-	// 										retrieveItems(d3.select(this), b, subitems) 
-	// 									})
-	// 								completion.push(subitems.map(checkCompletion).every(d => d === true))
-	// 							})
-	// 					} else {
-	// 						if (!ingroup) {
-	// 							console.log(sel.node())
-	// 							retrieveItems(sel, c, items)
-	// 						}
-	// 					}
-	// 				})
-	// 				if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
-	// 			})
-	// 		}
-	// 	}
-	// 	Paged.registerHandlers(MyHandler);
+	// // TO DO: POPULATE THE PAGE IN A MUCH SIMPLER LAYOUT
+	
+
+	// function clicker () {
+	// 	// window.print()
+	// 	// window.PagedPolyfill.preview();
 	// }
+
 </script>
+<% } %>
 
 </body>
 </html>

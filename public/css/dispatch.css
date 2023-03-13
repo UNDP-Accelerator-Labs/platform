@@ -29698,7 +29698,7 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
 @media print {
   /*@import 'vars';*/
   html, body {
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
   }
 
@@ -29712,348 +29712,6 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     background-color: transparent !important;
   }
 
-  .modal {
-    width: 300px;
-    margin-bottom: 75px;
-  }
-  .modal .close {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .modal .inner {
-    clear: both;
-    padding: 15px 15px 5px 15px;
-    background-color: #FFF;
-  }
-  .modal .inner .headline {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #C2B4D6;
-    font-size: 16px;
-    text-align: center;
-  }
-  .modal .inner .message {
-    margin-bottom: 15px;
-    font-size: 16px;
-  }
-  .modal .inner .message input[type=text],
-.modal .inner .message input[type=number] {
-    width: 65px;
-    border: none;
-    border-bottom: 1px solid #FFC10E;
-    outline: none;
-    text-align: center;
-    font-weight: 700;
-    color: #FFC10E;
-  }
-  .modal .inner .message small {
-    font-size: 12px;
-    color: #C2B4D6;
-  }
-  .modal .inner ul li {
-    position: relative;
-    margin-bottom: 10px;
-    text-align: center;
-    font-size: 16px;
-    /*button.dropbtn {
-    	border: none;
-    	border-bottom: 1px solid $c-light-grey;
-    	color: $c-light-grey;
-    	font-size: $t-mid-small;
-    }*/
-  }
-  .modal .inner ul li button {
-    width: 100%;
-    min-height: 30px;
-    border: 1px solid #005687;
-    outline: none;
-    background-color: transparent;
-    padding: 0 30px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.25s;
-  }
-  .modal .inner ul li button .sub {
-    font-size: 12px;
-    color: #969696;
-  }
-  .modal .inner ul li button.padded {
-    padding: 10px 30px;
-  }
-  .modal .inner ul li textarea {
-    width: 100%;
-    min-height: 300px;
-    border: none;
-    border-bottom: 1px solid #969696;
-    outline: none;
-    background-color: transparent;
-    font-size: 24px;
-    resize: none;
-    box-sizing: border-box;
-  }
-  .modal .inner ul li label {
-    position: absolute;
-    top: -15px;
-    left: 0;
-    font-size: 16px;
-    color: #969696;
-    transform: translateY(calc(16px));
-    transition: transform 0.25s, font-size 0.25s;
-    cursor: pointer;
-  }
-  .modal .inner ul li input:not([type=checkbox]):not([type=radio]):focus + label,
-.modal .inner ul li input.has-value:not([type=checkbox]):not([type=radio]) + label,
-.modal .inner ul li textarea:focus + label,
-.modal .inner ul li textarea.has-value + label {
-    font-size: 12px;
-    transform: translateY(-5px);
-  }
-  .modal .inner ul li input.full-width {
-    width: 100%;
-    margin: 5px 0 15px 0;
-    padding: 15px 0 15px 0;
-    border: none;
-    border-bottom: 1px solid #005687;
-    outline: none;
-    font-size: 16px;
-  }
-  .modal .inner ul li input + label {
-    top: 1px;
-  }
-  .modal .inner ul li input:focus {
-    border-color: #FFF32A;
-  }
-  .modal .inner ul li input[type=date] {
-    padding-bottom: 5px;
-    border: none;
-    border-bottom: 1px solid #969696;
-    outline: none;
-    font-size: 16px;
-    font-family: "Noto Sans", Helvetica, Arial, sans-serif;
-    color: #005687;
-  }
-  .modal .inner ul li input[type=date]::before {
-    content: none;
-  }
-  .modal .inner ul li .filter input[type=text] {
-    width: calc(100% - 30px);
-    height: 45px;
-    margin-left: 0;
-    padding: 0 15px;
-    border: none;
-    outline: none;
-    border-bottom: 1px solid #969696;
-    font-size: 16px;
-    line-height: 1.5em;
-  }
-  .modal .inner ul li .filter input[type=text] + label {
-    left: 15px;
-    font-size: 14px;
-    line-height: 1.5em;
-    transform: translateY(12px);
-  }
-  .modal .inner ul li .filter input[type=text]:focus + label,
-.modal .inner ul li .filter input[type=text].has-value + label {
-    font-size: 12px;
-    line-height: 1.5em;
-    transform: translateY(-10px);
-  }
-  .modal .inner ul li .filter .dropdown {
-    position: absolute;
-    width: 100%;
-    max-height: 0;
-    left: 0;
-    top: 100%;
-    background-color: #FFF;
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
-    z-index: 10;
-    transition: max-height 0.25s ease-out;
-  }
-  .modal .inner ul li .filter .dropdown menu {
-    width: 100%;
-  }
-  .modal .inner ul li .filter .dropdown menu li {
-    display: inline-block;
-    width: 100%;
-    margin: 0;
-    padding: 5px 15px 5px 15px;
-    list-style: none;
-    box-sizing: border-box;
-  }
-  .modal .inner ul li .filter .dropdown menu li input[type=checkbox],
-.modal .inner ul li .filter .dropdown menu li input[type=radio] {
-    display: none;
-  }
-  .modal .inner ul li .filter .dropdown menu li label {
-    display: block;
-    position: static;
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1.5em;
-    color: #000000;
-    transform: none;
-    pointer-events: all;
-    cursor: pointer;
-  }
-  .modal .inner ul li .filter .dropdown menu li label .count {
-    float: right;
-    color: #969696;
-  }
-  .modal .inner ul li .filter .dropdown menu li label.secondary {
-    padding: 0;
-    font-size: 12px;
-    color: #969696;
-    font-style: italic;
-  }
-  .modal .inner ul li .filter .dropdown menu li input:disabled + label {
-    color: #969696;
-  }
-  .modal .inner ul li .filter .dropdown menu li:hover {
-    background-color: #F3F3F3;
-  }
-  .modal .inner ul li .filter .dropdown menu li.active {
-    background-color: #32BEE1;
-  }
-  .modal .inner ul li.default {
-    text-align: left;
-  }
-  .modal .inner ul li.default label {
-    position: static;
-    margin-left: 10px;
-    color: #000000;
-    font-size: 14px;
-  }
-  .modal .inner ul li:hover {
-    /*button {
-    	background-color: $c-dark-blue;
-    	color: #FFF;
-    }*/
-  }
-  .modal .inner .foot {
-    margin: 10px 0;
-    text-align: center;
-    /*button {
-    	border: none;
-    	outline: none;
-    	height: 45px;
-    	width: 100%;
-    	border-radius: 5px;
-    	padding: 0 30px;
-    	font-size: $t-main;
-    	background-color: $c-light-2;
-    	color: $c-dark-1;
-    	cursor: pointer;
-    	transition: background-color .25s;
-    }
-    button:hover {
-    	background-color: $c-dark-1;
-    	color: #FFF;
-    }*/
-  }
-  .modal .inner .foot button {
-    width: 100%;
-    min-height: 30px;
-    border: 1px solid #005687;
-    outline: none;
-    background-color: transparent;
-    padding: 0 30px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.25s;
-  }
-  .modal .inner .foot button .sub {
-    font-size: 12px;
-    color: #969696;
-  }
-
-  .modal.longlist .inner {
-    padding: 0;
-  }
-  .modal.longlist .inner .message {
-    padding: 15px 15px 5px 15px;
-    margin: 0;
-  }
-  .modal.longlist .inner ul {
-    width: 100%;
-    max-height: 500px;
-    overflow: scroll;
-  }
-  .modal.longlist .inner ul li.filter {
-    position: fixed;
-    height: 45px;
-    width: 300px;
-    background-color: #FFF;
-    border-bottom: 1px solid #969696;
-    z-index: 100;
-  }
-  .modal.longlist .inner ul li.filter input[type=text] {
-    position: relative;
-    width: calc(100% - 30px);
-    height: 30px;
-    padding: 15px 15px 0 15px;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    font-size: 14px;
-    color: #005687;
-  }
-  .modal.longlist .inner ul li.filter label {
-    position: absolute;
-    left: 15px;
-    /*width: calc(100% - 30px);*/
-    font-size: 14px;
-    line-height: 1.5em;
-    color: #969696;
-    transform: translateY(13.5px);
-    transition: transform 0.25s, font-size 0.25s;
-  }
-  .modal.longlist .inner ul li.filter label::after {
-    content: "";
-    position: absolute;
-    top: 4px;
-    margin-left: 10px;
-    width: 15px;
-    height: 15px;
-    background: url("../imgs/icons/i-search-sm.svg");
-  }
-  .modal.longlist .inner ul li.filter input[type=text] + label {
-    pointer-events: none;
-  }
-  .modal.longlist .inner ul li.filter input[type=text]:focus + label,
-.modal.longlist .inner ul li.filter input[type=text].has-value + label {
-    font-size: 12px;
-    line-height: 1.5em;
-    transform: translateY(2px);
-  }
-  .modal.longlist .inner ul li.padding {
-    width: 100%;
-    height: 45px;
-    margin: 0;
-  }
-  .modal.longlist .inner ul li.opt {
-    margin: 0;
-  }
-  .modal.longlist .inner ul li.opt input[type=checkbox] {
-    display: none;
-  }
-  .modal.longlist .inner ul li.opt label {
-    display: block;
-    padding: 5px 15px;
-    margin: 0;
-    transform: none;
-  }
-  .modal.longlist .inner ul li.opt label:hover {
-    background-color: #F3F3F3;
-  }
-  .modal.longlist .inner ul li.opt input:checked + label {
-    background-color: #32BEE1;
-  }
-  .modal.longlist .inner .foot {
-    padding: 15px;
-    margin: 0;
-  }
-
   .add-circle {
     display: inline-block;
     width: 20px;
@@ -30062,10 +29720,14 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
     border-radius: 20px;
     background-color: #969696;
     color: #FFF;
-    font-size: 20px;
+    font-size: 14pt;
     line-height: 19px;
     text-align: center;
     vertical-align: text-top;
+  }
+
+  .pagedjs_page {
+    margin: auto;
   }
 
   div.fixed-bg {
@@ -30225,7 +29887,7 @@ div.document main#mobilization .engagement-input-group ul li button {
     margin: 0 0 0 10px;
     background-color: transparent;
     color: #C2B4D6;
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
     cursor: pointer;
     transition: border-color 0.25s, max-width 0.5s;
@@ -30248,7 +29910,7 @@ div.document main#mobilization .engagement-input-group ul li button i {
     flex-shrink: 0;
     width: 45px;
     display: inline-block;
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
     /*line-height: 45px;*/
     font-style: normal;
@@ -30314,14 +29976,14 @@ div.document main#pad .inner .meta-info h1, div.document main#reference .inner .
 div.document main#template .inner .meta-info h1,
 div.document main#mobilization .inner .meta-info h1 {
     /*margin-bottom: 30px;*/
-    font-size: 20px;
+    font-size: 14pt;
     line-height: 1.5em;
   }
   div.document main .inner .meta-info p,
 div.document main#pad .inner .meta-info p, div.document main#reference .inner .meta-info p,
 div.document main#template .inner .meta-info p,
 div.document main#mobilization .inner .meta-info p {
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
   }
   div.document main .inner button.scroll-nav,
@@ -30337,7 +29999,7 @@ div.document main#mobilization .inner button.scroll-nav {
     border: none;
     outline: none;
     color: #969696;
-    font-size: 60px;
+    font-size: 36pt;
     line-height: 1.5em;
     cursor: pointer;
     transition: background 0.25s;
@@ -30398,7 +30060,7 @@ div.document main#mobilization .inner .meta-status .btn-group form button {
     border: 1px solid #005687;
     outline: none;
     background-color: transparent;
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
     cursor: pointer;
   }
@@ -30511,7 +30173,7 @@ div.document main#template .inner .head .return,
 div.document main#mobilization .inner .head .return {
     display: block;
     margin-bottom: 15px;
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
   }
   div.document main .inner .head i,
@@ -30528,7 +30190,7 @@ div.document main#mobilization .inner .head .title {
     width: 100%;
     outline: none;
     border-bottom: 1px solid transparent;
-    font-size: 36px;
+    font-size: 24pt;
     line-height: 1.3em;
     font-weight: 700;
   }
@@ -30614,7 +30276,7 @@ div.document main#template .inner .body .layout .section-header h1,
 div.document main#mobilization .inner .body .layout .section-header h1 {
     padding: 5px 0;
     outline: none;
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
     color: #0468B1;
     font-weight: normal;
@@ -30633,7 +30295,7 @@ div.document main#template .inner .body .layout .placement-opts,
 div.document main#mobilization .inner .body .layout .placement-opts {
     position: absolute;
     display: none;
-    top: calc(-24px);
+    top: calc(-18pt);
     right: 100%;
     height: 100%;
     /*color: $c-mid-yellow;*/
@@ -30653,7 +30315,7 @@ div.document main#mobilization .inner .body .layout .placement-opts .opt {
 div.document main#pad .inner .body .layout .placement-opts .opt i, div.document main#reference .inner .body .layout .placement-opts .opt i,
 div.document main#template .inner .body .layout .placement-opts .opt i,
 div.document main#mobilization .inner .body .layout .placement-opts .opt i {
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
     /*line-height: 30px;*/
   }
@@ -30677,7 +30339,7 @@ div.document main#mobilization .inner .body .layout .required input {
 div.document main#pad .inner .body .layout .required label, div.document main#reference .inner .body .layout .required label,
 div.document main#template .inner .body .layout .required label,
 div.document main#mobilization .inner .body .layout .required label {
-    font-size: 20px;
+    font-size: 14pt;
     line-height: 1.5em;
     color: #969696;
     cursor: pointer;
@@ -30760,7 +30422,7 @@ div.document main#template .inner .body .layout .media-container .opts .opt-grou
 div.document main#template .inner .body .layout .meta-container .opts .opt-group .opt i,
 div.document main#mobilization .inner .body .layout .media-container .opts .opt-group .opt i,
 div.document main#mobilization .inner .body .layout .meta-container .opts .opt-group .opt i {
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .opts .opt-group .opt .constraint,
@@ -30974,7 +30636,7 @@ div.document main#template .inner .body .layout .media-container .placement-opts
 div.document main#template .inner .body .layout .meta-container .placement-opts .opt i,
 div.document main#mobilization .inner .body .layout .media-container .placement-opts .opt i,
 div.document main#mobilization .inner .body .layout .meta-container .placement-opts .opt i {
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .align-opts .opt i,
@@ -31027,7 +30689,7 @@ div.document main#mobilization .inner .body .layout .meta-container div.instruct
     margin-bottom: 5px;
     border-left: 1px dotted #969696;
     color: #969696;
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .media,
@@ -31063,7 +30725,7 @@ div.document main#template .inner .body .layout .media-container .media-title,
 div.document main#template .inner .body .layout .meta-container .media-title,
 div.document main#mobilization .inner .body .layout .media-container .media-title,
 div.document main#mobilization .inner .body .layout .meta-container .media-title {
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .media-lead,
@@ -31087,7 +30749,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-lead,
 div.document main#mobilization .inner .body .layout .meta-container .media-lead.focus {
     margin-top: 10px;
     padding-bottom: 5px;
-    font-size: 20px;
+    font-size: 14pt;
     line-height: 1.5em;
     border-top: none;
     color: #005687;
@@ -31249,7 +30911,7 @@ div.document main#template .inner .body .layout .media-container .media-mosaic .
 div.document main#template .inner .body .layout .meta-container .media-mosaic .mosaic-item .index-opts .opt i,
 div.document main#mobilization .inner .body .layout .media-container .media-mosaic .mosaic-item .index-opts .opt i,
 div.document main#mobilization .inner .body .layout .meta-container .media-mosaic .mosaic-item .index-opts .opt i {
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
     /*line-height: 30px;*/
     color: #005687;
@@ -31913,7 +31575,7 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-checkl
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt .checkbox i,
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt .radio i,
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt .rm i {
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
   }
   div.document main .inner .body .layout .media-container .media-checklist ol .opt .grow,
@@ -32361,8 +32023,8 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-dataso
     padding: 0 15px;
     margin: 0 5px 5px 0;
     background-color: #E5E5E5;
-    border-radius: calc(14px * 2);
-    font-size: 14px;
+    border-radius: calc(10pt * 2);
+    font-size: 10pt;
     line-height: 2em;
     color: #646464;
   }
@@ -32628,7 +32290,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-repea
     border-top: 1px solid #969696;
     outline: none;
     color: #005687;
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
     cursor: pointer;
   }
@@ -32738,7 +32400,7 @@ div.document main#mobilization .inner .body .layout .meta-container .inset .sear
     border-bottom: 1px solid #005687;
     outline: none;
     background-color: transparent;
-    font-size: 24px;
+    font-size: 18pt;
     line-height: 1.5em;
     /*color: #FFF;*/
   }
@@ -32889,10 +32551,10 @@ div.document main#mobilization .inner .body .layout .meta-container .inset .sear
     position: absolute;
     top: 5px;
     left: 10px;
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
     /*color: #FFF;*/
-    transform: translateY(calc(16px));
+    transform: translateY(calc(12pt));
     transition: transform 0.25s, font-size 0.25s;
   }
   div.document main .inner .body .layout .media-container .inset .filter-or-add button,
@@ -34247,7 +33909,7 @@ div.document main#mobilization .inner .body .description-layout .input-slideshow
     align-items: center;
     min-height: 30px;
     margin: 15px 0 0 0;
-    font-size: 14px;
+    font-size: 10pt;
   }
   div.document main .inner .body .description-layout .input-slideshow input[type=checkbox],
 div.document main#pad .inner .body .description-layout .input-slideshow input[type=checkbox], div.document main#reference .inner .body .description-layout .input-slideshow input[type=checkbox],
@@ -34410,7 +34072,7 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     border: none;
     border-radius: 45px;
     background-color: transparent;
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 45px;
     text-align: center;
     color: #646464;
@@ -34467,7 +34129,7 @@ div.document main#template .inner .body .media-input-group .inner .btn-group lab
 div.document main#template .inner .body .media-input-group .inner .btn-group button i,
 div.document main#mobilization .inner .body .media-input-group .inner .btn-group label i,
 div.document main#mobilization .inner .body .media-input-group .inner .btn-group button i {
-    font-size: 20px;
+    font-size: 14pt;
     line-height: 45px;
   }
   div.document main .inner .body .media-input-group .inner .btn-group label img,
@@ -34575,7 +34237,7 @@ div.document main#mobilization .inner .body .media-input-group button.scroll-dow
     margin: 0 0 0 15px;
     line-height: 26px;
     text-align: center;
-    font-size: 20px;
+    font-size: 14pt;
     transform-origin: center;
     cursor: pointer;
     color: #646464;
@@ -34678,7 +34340,7 @@ div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group
     border: none;
     outline: none;
     color: #969696;
-    font-size: 60px;
+    font-size: 36pt;
     line-height: 1.5em;
     cursor: pointer;
     transition: background 0.25s;
@@ -34800,7 +34462,7 @@ div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group
     /* BELOW IS FOR THE COMMENTS MODULE */
   }
   footer .inner h2 {
-    font-size: 16px;
+    font-size: 12pt;
     margin-bottom: 15px;
   }
   footer .inner form {
@@ -34812,13 +34474,13 @@ div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group
     display: block;
     width: calc(100% - 30px);
     /*min-height: $t-main;*/
-    min-height: calc(16px * 1.5);
+    min-height: calc(12pt * 1.5);
     height: 1px;
     padding: 10px 15px;
     border: none;
     outline: none;
     background-color: transparent;
-    font-size: 16px;
+    font-size: 12pt;
     text-align: left;
     overflow: hidden;
     resize: none;
@@ -34827,7 +34489,7 @@ div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group
     position: absolute;
     left: 30px;
     top: 11px;
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
     color: #646464;
     transform: translateY(0);
@@ -34885,13 +34547,13 @@ footer .inner form textarea.has-value + label + .btn-group button {
   footer .inner ul.comments li .head .meta .meta-contributor {
     display: inline-block;
     margin: 0 5px 0 0;
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
     color: #0468B1;
   }
   footer .inner ul.comments li .head .meta .meta-contributor::after {
     content: ", ";
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
     color: #32BEE1;
   }
@@ -34903,7 +34565,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     color: #0468B1;
   }
   footer .inner ul.comments li .body {
-    font-size: 14px;
+    font-size: 10pt;
     line-height: 1.5em;
   }
   footer .inner ul.comments li .foot button.expand-collapsed {
@@ -34953,7 +34615,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     outline: none;
     border-radius: 5px;
     padding: 0 30px;
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
     color: #FFF;
     cursor: pointer;
@@ -34970,7 +34632,7 @@ footer .inner form textarea.has-value + label + .btn-group button {
     color: #C2B4D6;
   }
   footer .inner .approval-message p {
-    font-size: 16px;
+    font-size: 12pt;
     line-height: 1.5em;
     color: #57648C;
   }
@@ -34986,15 +34648,15 @@ footer .inner form textarea.has-value + label + .btn-group button {
   footer .inner .approval-message::after {
     content: "“";
     position: absolute;
-    /*top: calc(16px / 4);*/
-    top: calc(10px + 16px);
+    /*top: calc(12pt / 4);*/
+    top: calc(10px + 12pt);
     left: -11px;
     width: 10px;
     vertical-align: middle;
     background-color: #F3F3F3;
     border-top: 1px solid #C2B4D6;
     /*border-bottom: 1px solid $c-light-1;*/
-    font-size: 36px;
+    font-size: 24pt;
     line-height: 1.5em;
     color: #C2B4D6;
     text-align: center;
@@ -35133,20 +34795,71 @@ div#reviews .review:not(:last-child)::after {
     display: none;
   }
 
-  .document {
+  div.document {
     border: none !important;
     width: 100% !important;
     min-height: unset !important;
+    padding: 0;
   }
-  .document *:empty,
-.document *:empty:before {
+  div.document *:not(img):empty,
+div.document *:empty:before {
     display: none;
   }
-
-  /*main {
-  	.inner {*/
-  .meta-status {
+  div.document main#pad .inner .head a.return {
     display: none;
+  }
+  div.document main#pad .inner .body section {
+    margin: 24pt 0;
+  }
+  div.document main#pad .inner .body section p {
+    margin: 12pt 0;
+    color: #000000;
+  }
+  div.document main#pad .inner .body section p.instruction {
+    color: #969696;
+    font-size: 10pt;
+    line-height: 1.5em;
+  }
+  div.document main#pad .inner .body section ol, div.document main#pad .inner .body section ul {
+    margin: 12pt 0 12pt 15mm;
+  }
+  div.document main#pad .inner .body section ol li.checked, div.document main#pad .inner .body section ul li.checked {
+    font-weight: bold;
+  }
+  div.document main#pad .inner .body section ul.tags,
+div.document main#pad .inner .body section ol.indexes {
+    margin: 12pt 0;
+    text-align: center;
+  }
+  div.document main#pad .inner .body section ul.tags li,
+div.document main#pad .inner .body section ol.indexes li {
+    display: inline;
+  }
+  div.document main#pad .inner .body section ul.tags li img,
+div.document main#pad .inner .body section ol.indexes li img {
+    width: 20mm;
+  }
+  div.document main#pad .inner .body section ul.tags li.tag,
+div.document main#pad .inner .body section ol.indexes li.tag {
+    padding: 1mm;
+    margin: 1mm;
+    font-size: 10pt;
+  }
+  div.document main#pad .inner .body section ul.locations {
+    list-style: url("../imgs/icons/i-locations-btn.svg") !important;
+  }
+  div.document main#pad .inner .body section img {
+    margin: 6pt auto;
+    max-width: 100%;
+  }
+  div.document main#pad .inner .body section div.mosaic {
+    display: grid;
+    grid-gap: 6pt;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+  }
+  div.document main#pad .inner .body section div.mosaic.x2 {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .meta-info.mobilization-info,
@@ -35158,23 +34871,14 @@ div#reviews .review:not(:last-child)::after {
     display: none;
   }
 
-  /*				.body {*/
   .input-toolbox {
     display: none;
   }
 
-  section .required {
-    display: none;
+  .opts {
+    display: none !important;
   }
 
-  /*				}*/
-  .inset {
-    display: none;
-  }
-
-  /*	}
-  	}
-  }*/
   footer {
     display: none;
   }

@@ -54,7 +54,7 @@
 }
 
 @media print {
-	@import 'vars.lg';
+	@import 'vars.print';
 	@import 'pad.lg';
 	@page {
 		size: A4 portrait;
@@ -76,49 +76,101 @@
 	header {
 		display: none;
 	}
-	.document {
+	div.document {
 		border: none !important;
 		width: 100% !important;
 		min-height: unset !important;
+		padding: 0;
 
-		*:empty,
+		*:not(img):empty,
 		*:empty:before {
 			display: none;
 		}
-	}
 
-		/*main {
-			.inner {*/
-				
-
-				.meta-status {
-					display: none;
-				}
-				.meta-info.mobilization-info,
-				.scroll-nav {
-					display: none !important;
-				}
+		main#pad {
+			.inner {
 				.head {
 					a.return {
 						display: none;
 					}
 				}
-/*				.body {*/
-					.input-toolbox {
-						display: none;
-					}
+				.body {
 					section {
-						.required {
-							display: none;
+						margin: 24pt 0;
+					
+						p {
+							margin: 12pt 0;
+							color: $c-dark-grey;
+						}
+						p.instruction {
+							color: $c-light-grey;
+							font-size: $t-mid-small;
+							line-height: 1.5em;
+						}
+						ol, ul {
+							margin: 12pt 0 12pt 15mm;
+
+							li.checked {
+								font-weight: bold;
+							}
+						}
+						ul.tags,
+						ol.indexes {
+							margin: 12pt 0;
+							text-align: center;
+							
+							li {
+								display: inline;
+
+								img {
+									width: 20mm;
+								}
+							}
+							li.tag {
+								padding: 1mm;
+								margin: 1mm;
+								font-size: $t-mid-small;
+							}
+						}
+						ul.locations {
+							list-style: url("../imgs/icons/i-locations-btn.svg") !important;
+						}
+						img {
+							margin: 6pt auto;
+							max-width: 100%;
+						}
+						div.mosaic {
+							display: grid;
+							grid-gap: 6pt;
+							grid-template-columns: repeat(3, 1fr);
+							align-items: center;
+						}
+						div.mosaic.x2 {
+							grid-template-columns: repeat(2, 1fr);
 						}
 					}
-/*				}*/
-				.inset {
-					display: none;
 				}
-		/*	}
+			}
 		}
-	}*/
+	}
+	
+	.meta-info.mobilization-info,
+	.scroll-nav {
+		display: none !important;
+	}
+	.head {
+		a.return {
+			display: none;
+		}
+	}
+
+	.input-toolbox {
+		display: none;
+	}
+	
+	.opts {
+		display: none !important;
+	}
 	footer {
 		display: none;
 	}

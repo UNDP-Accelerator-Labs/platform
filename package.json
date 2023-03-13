@@ -28,20 +28,22 @@
     "node-fetch": "^2.6.1",
     "node-sys": "^1.2.4",
     "node-xlsx": "^0.15.0",
+    "nodemailer": "^6.8.0",
     "pageres": "^5.2.0",
     "path": "^0.12.7",
-    "pdfkit": "^0.13.0",
     "pg-promise": "^10.4.3",
     "read-excel-file": "^4.0.6",
     "request": "^2.88.2",
     "topojson": "^3.0.2",
     "uuid": "^8.3.2",
-    "xlsx": "^0.16.4",
-    "nodemailer": "^6.8.0"
+    "xlsx": "^0.16.4"
   },
   "devDependencies": {
     "pagedjs": "^0.4.0",
     "pagedjs-cli": "^0.3.3",
-    "socket.io": "^4.5.4"
+    "socket.io": "^4.5.4",
+    "html-pdf-node": "^1.0.8",
+    "html2pdf.js": "^0.10.1",
+    "pdfkit": "^0.13.0"
   }
 }

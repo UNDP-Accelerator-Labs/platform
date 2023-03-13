@@ -155,16 +155,14 @@ CREATE TABLE pinboards (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	title VARCHAR(99),
 	description TEXT,
-	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
-	-- public BOOLEAN DEFAULT FALSE,
 	status INT DEFAULT 0,
 	display_filters BOOLEAN DEFAULT FALSE,
 	display_map BOOLEAN DEFAULT FALSE,
 	display_fullscreen BOOLEAN DEFAULT FALSE,
 	slideshow BOOLEAN DEFAULT FALSE,
-	"date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
+	"date" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	-- mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
 );
 ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
 
@@ -178,17 +176,11 @@ ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNI
 
 CREATE TABLE pinboard_contributions (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-	-- FOR MAIN PLATFORMS
-	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	-- FOR GLOBAL PLATFORM
-	-- pad INT,
-	-- source VARCHAR(99),
-	--
+	pad INT,
+	source VARCHAR(99),
 	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, pinboard);
--- FOR GLOBAL PLATFORM
--- ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, source, pinboard);
+ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, source, pinboard);
 
 CREATE TABLE tagging (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

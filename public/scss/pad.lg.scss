@@ -661,7 +661,7 @@ div.document {
 							border-bottom-color: $c-light-2;
 						}
 						.media-txt {
-							/*white-space: pre-line;*/
+							white-space: pre-line;
 						}
 						.media-img {
 							min-height: calc(65px + 30px * 2);
@@ -1454,7 +1454,7 @@ div.document {
 				.media-input-group {
 					position: fixed;
 					top: 0;
-					left: calc((100vw - (300px * 3 + 15px * 4)) / 2 + (300px * 3 + 15px * 2 - 30px));
+					left: calc((100vw - (300px * 3 + 15px * 4)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
 					max-height: 80vh;
 					transform: translateY(90px);
 					border-top: 1px solid $c-light-2;
@@ -1482,9 +1482,9 @@ div.document {
 								position: relative;
 								display: block;
 								float: left;
-								width: 45px;
+								width: 44px;
 								height: 45px;
-								margin: 0 7.5px;
+								margin: 0 7px;
 								outline: none;
 								border: none;
 								border-radius: 45px;
@@ -1552,7 +1552,7 @@ div.document {
 								}
 							}
 							.vertical-separator {
-								width: 60px;
+								width: 59px;
 								height: 0px;
 								/*border-top: 1px dotted $c-light-grey;*/
 								border-top: 1px solid $c-light-2;

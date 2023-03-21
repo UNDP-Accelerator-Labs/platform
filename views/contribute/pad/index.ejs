@@ -11,10 +11,8 @@
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
 	const anonymized = locals.metadata.page.query?.anonymize?.includes('true')
-	const editing = ['contribute', 'edit'].includes(activity) && pagedisplay !== 'print'
+	const editing = ['contribute', 'edit'].includes(activity)
 	const templated = locals.templated || locals.display_template !== null
-
-	const print = true
 %>
 <html lang='<%- language %>'>
 <head>
@@ -35,23 +33,6 @@
 <script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
 	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
 	crossorigin=''></script>
-
-<% if (pagedisplay === 'print') { %>
-	<!-- FOR PRINT/ PDF GENERATION -->
-	<script type='text/javascript'>
-		// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
-		window.PagedConfig = {
-			auto: false // disable automatic script execution on document load
-		}
-	</script>
-	<script type='text/javascript' src='/scripts/pagedjs/dist/paged.polyfill.js'></script>
-	<link rel='stylesheet' type='text/css' href='/css/pagedjs.interface.css'>
-	
-	<%- include('./print.ejs') %>
-	
-	<!-- <script type='text/javascript' src='/scripts/html2pdf.js/dist/html2pdf.bundle.min.js'></script> -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script> -->
-<% } %>
 
 <script type="text/javascript">
 	// INIT THE SOCKET
@@ -97,7 +78,6 @@
 		document.body.appendChild(iframe)
 	}
 </script>
-<!-- PRESUMAABLY THIS IS NOT NEEDED IF PRINT -->
 <%- include('./render.ejs') %>
 
 </head>
@@ -1364,46 +1344,13 @@
 		<% } %>
 
 		if (data.sections) {
-			<% if (pagedisplay !== 'print') { %>
-				data.sections.forEach(async d => {
-					<% if (pagedisplay === 'slideshow') { %>
-						await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
-					<% } else { %>
-						await addSection({ data: d, lang: '<%- language %>' })
-					<% } %>
-				})
-			<% } else { %>
-				Promise.all(data.sections.map(d => {
-					return new Promise(async resolve => {
-						await addPrintSection({ data: d, lang: '<%- language %>' })
-						// console.log(d)
-						resolve()
-					})
-				})).then(_ => {
-					window.PagedPolyfill.preview()
-				})
-
-				class MyHandler extends Paged.Handler { 
-					// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
-					constructor(chunker, polisher, caller) {
-						super(chunker, polisher, caller);
-					}
-
-					afterPreview () {
-						console.log('after preview')
-					}
-
-					async beforeParsed(content) {
-						// console.log(content)
-
-					}
-					afterParsed(parsed) {
-					}
-
-				}
-				Paged.registerHandlers(MyHandler);
-			<% } %>
-
+			data.sections.forEach(async d => {
+				<% if (pagedisplay === 'slideshow') { %>
+					await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
+				<% } else { %>
+					await addSection({ data: d, lang: '<%- language %>' })
+				<% } %>
+			})
 		} else { // THIS IS AN AUTO GENERATED PAD
 			if (templated) { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
 				const template = <%- JSON.stringify(locals.display_template || {}) %>;
@@ -1627,23 +1574,6 @@
 	}
 
 </script>
-
-<% if (pagedisplay === 'print') { %>
-<script type='text/javascript'>
-	// d3.select('body').append('button')
-	// 		.on('click', clicker)
-	// 		.html('download')
-
-	// // TO DO: POPULATE THE PAGE IN A MUCH SIMPLER LAYOUT
-	
-
-	// function clicker () {
-	// 	// window.print()
-	// 	// window.PagedPolyfill.preview();
-	// }
-
-</script>
-<% } %>
 
 </body>
 </html>

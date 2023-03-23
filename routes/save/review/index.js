@@ -39,7 +39,8 @@ exports.main = (req, res) => {
 					UPDATE reviews
 					SET status = $1
 					WHERE pad = $2
-				;`, [ status, source ]))
+						AND review = $3
+				;`, [ status, source, newID || id ]))
 			}
 			// UPDATE THE REVIEW REQUEST
 			batch.push(t.none(`

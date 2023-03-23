@@ -38,8 +38,9 @@ exports.main = async (req, res) => {
 							SELECT team FROM team_members
 							WHERE member = $1
 						)
+						OR $2 > 2
 					ORDER BY name
-				;`, [ uuid ]))
+				;`, [ uuid, rights ]))
 				// GET DATA
 				if (id) {
 					batch.push(t.one(`

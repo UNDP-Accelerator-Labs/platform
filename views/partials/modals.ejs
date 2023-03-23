@@ -242,6 +242,8 @@
 				.addElems('li', null, c => c.options)
 			.each(function (c) {
 				const sel = d3.select(this)
+				if (c.classname) sel.classed(c.classname, true)
+
 				sel.addElems('input')
 					.attrs({
 						'id': c.value.toString().simplify(),
@@ -259,12 +261,18 @@
 						if (this.checked) input.value = b.label
 						else input.value = ''
 						input.blur()
-					} else input.value = ''
-					sel.findAncestor('dropdown').selectAll('li').classed('hide active', false)
+						sel.findAncestor('dropdown').selectAll('li').classed('hide active', false)
+					// } else if (c.type === 'checkbox') {
+					// 	if (this.checked) input.value = `${input.value}, ${b.label}`
+					// 	else input.value = input.value.replace(b.label, '').replace(/,\s*,\s*/g, ', ')
+					} else {
+						input.value = ''
+						sel.findAncestor('dropdown').selectAll('li').classed('hide', false)
+					}
 					sel.findAncestor('li').classed('active', this.checked)
 
 					// IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
-					if (d.fn && typeof d.fn === 'function') d.fn(b)
+					if (d.fn && typeof d.fn === 'function') d.fn.call(this, b)
 				})
 
 				sel.addElems('label', 'primary')

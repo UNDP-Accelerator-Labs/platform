@@ -881,7 +881,7 @@ function addTitle (kwargs) {
 	if (!txt) txt = ''
 	required = true
 
-	if (!editing && txt?.trim().length === 0) return null
+	if (!editing && txt?.toString().trim().length === 0) return null
 
 	const media = new Media({
 		parent: section || d3.select('.group-container.focus').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
@@ -1440,7 +1440,7 @@ function addTxt (kwargs) {
 	if (!is_excerpt) is_excerpt = false
 	required = required ?? false
 
-	if (!editing && txt?.trim().length === 0) return null
+	if (!editing && txt?.toString().trim().length === 0) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()

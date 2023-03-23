@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
 		if (object === 'pads') {
 			if (['xlsx', 'csv'].includes(output)) pads.xlsx(req, res)
 			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
+			else if (output === 'docx') pads.docx(req, res)
 			else res.redirect('/module-error')
 		} else if (object === 'contributors') {
 			if (['xlsx', 'csv'].includes(output)) contributors.xlsx(req, res)

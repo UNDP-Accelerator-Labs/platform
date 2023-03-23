@@ -14,8 +14,8 @@ exports.main = (req, res) => {
 	const [ f_space, page, full_filters ] = filter(req)
 	
 	const module_rights = modules.find(d => d.type === object)?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	// let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	// if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (space === 'pinned' && page) res.redirect(`./invited?page=${page}`)
 	else {
@@ -35,14 +35,15 @@ exports.main = (req, res) => {
 					SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count FROM teams t
 					INNER JOIN team_members tm
 						ON tm.team = t.id
-					WHERE t.host IN ($1:csv)
+					WHERE t.host = $1
 						OR t.id IN (
 							SELECT team FROM team_members
-							WHERE member = $2
+							WHERE member = $1
 						)
+						OR $2 > 2
 					GROUP BY t.id
 					ORDER BY t.name
-				;`, [ collaborators_ids, uuid ])
+				;`, [ uuid, rights ])
 				.catch(err => console.log(err)))
 			} else batch.push(null)
 			// PINBOARD 
@@ -66,8 +67,8 @@ exports.main = (req, res) => {
 				let [ data,
 					filters_menu,
 					statistics,
-					pinboards_list,
-					pinboard
+					pinboards_list, // LIST OF AVAILABLE TEAMS 
+					pinboard // CURRENTLY DISLAYED TEAM (IF APPLICABLE)
 				] = results
 
 				const { sections } = data

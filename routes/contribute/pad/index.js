@@ -217,7 +217,12 @@ exports.main = (req, res) => {
 
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
-				}).then(data => res.render('contribute/pad/', data))
+				}).then(data => {
+					// IF DISPLAY FOR PRINT, RENDER PRINT
+					if (display === 'print') res.render('print/pads/', data)
+					// OTHERWISE RENDER CONTRIBUTE
+					else res.render('contribute/pad/', data)
+				})
 				.catch(err => console.log(err))
 			}
 		}).catch(err => console.log(err))

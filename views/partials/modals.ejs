@@ -201,12 +201,17 @@
 		if (d.node === 'select') {
 			// CREATE DROPDOWN
 			const filter = _sel.addElems('div', 'filter')
+			.each(function () {
+				if (d.classname) d3.select(this).classed(d.classname, true)
+			})
 			filter.addElems('input', 'dropbtn')
 				.attrs({
 					'id': nodeid,
 					'type': 'text'
 				})
-			.on('keyup', async function (d) {
+			.each(function () {
+				if (d.classname) d3.select(this).classed(d.classname, true)
+			}).on('keyup', async function (d) {
 				const evt = d3.event
 				const node = this
 				const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
@@ -228,7 +233,7 @@
 				fixLabel(this)
 			})
 			
-			filter.addElems('label')
+			filter.addElems('label', d.classname || null)
 				.attr('for', nodeid)
 			.html(c => c.label)
 			
@@ -237,6 +242,8 @@
 				.addElems('li', null, c => c.options)
 			.each(function (c) {
 				const sel = d3.select(this)
+				if (c.classname) sel.classed(c.classname, true)
+
 				sel.addElems('input')
 					.attrs({
 						'id': c.value.toString().simplify(),
@@ -254,9 +261,18 @@
 						if (this.checked) input.value = b.label
 						else input.value = ''
 						input.blur()
-					} else input.value = ''
-					sel.findAncestor('dropdown').selectAll('li').classed('hide active', false)
+						sel.findAncestor('dropdown').selectAll('li').classed('hide active', false)
+					// } else if (c.type === 'checkbox') {
+					// 	if (this.checked) input.value = `${input.value}, ${b.label}`
+					// 	else input.value = input.value.replace(b.label, '').replace(/,\s*,\s*/g, ', ')
+					} else {
+						input.value = ''
+						sel.findAncestor('dropdown').selectAll('li').classed('hide', false)
+					}
 					sel.findAncestor('li').classed('active', this.checked)
+
+					// IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
+					if (d.fn && typeof d.fn === 'function') d.fn.call(this, b)
 				})
 
 				sel.addElems('label', 'primary')
@@ -276,7 +292,7 @@
 			// 	.attr('value', d => d.value)
 			// 	.html(d => d.label)
 		} else {
-			_sel.addElems(d.node)
+			_sel.addElems(d.node, d.classname || null)
 				.each(function (c) {
 					if (c.class) d3.select(this).classed(c.class, true)
 				}).attrs({ 
@@ -285,7 +301,8 @@
 					'name': d.name,
 					'value': d.value,
 					'required': d.required || null,
-					'checked': d.checked || null
+					'checked': d.checked || null,
+					'disabled': d.disabled || null
 				}).html(d.label)
 			.on('click', async d => { // PROBABLY d DOES NOT NEED TO BE PASSED HERE (LIKE IN THE keyup BELOW)
 				if (['button', 'submit'].includes(d.type)) {
@@ -318,7 +335,7 @@
 		}
 
 		if (d.node === 'input' && d.type !== 'hidden') {
-			_sel.addElems('label')
+			_sel.addElems('label', d.classname || null)
 				.attr('for', nodeid)
 				.html(d.placeholder)
 

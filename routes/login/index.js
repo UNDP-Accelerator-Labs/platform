@@ -42,7 +42,11 @@ exports.render = (req, res, next) => {
 	} else if (object === 'pads' && !uuid) { // THIS SHOULD ALWAYS BE A PUBLIC VIEW
 		if (space === 'public') next() 
 		else if (space === 'pinned') {
-			const { pinboard } = req.query || {}
+			let { pinboard } = req.query
+			if (!pinboard) {
+				const referer = new URL(req.headers.referer)
+				pinboard = referer.searchParams.get('pinboard')
+			}
 			DB.conn.one(`SELECT status FROM pinboards WHERE id = $1;`, [ pinboard ], d => d?.status)
 			.then(result => {
 				if (result >= 2) next()

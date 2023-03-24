@@ -29,6 +29,7 @@ exports.modules = [
 	// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
 exports.metafields = [
 	{ type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
+
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'tag', name: 'methods', required: true, opencode: false },
 	{ type: 'tag', name: 'datasources', required: true, opencode: true },

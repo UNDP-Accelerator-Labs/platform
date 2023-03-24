@@ -11,7 +11,7 @@ const { checklanguage, datastructures, array, join, geo } = include('routes/help
 const { filter } = require('../../browse/pads/')
 
 exports.main = async (req, res) => {
-	const { output, render, include_data, include_toc, standardize_structure } = req.body || {}
+	const { output, render, include_data, include_toc, chapters, standardize_structure } = req.body || {}
 	const { object } = req.params || {}
 	const pw = req.session.email || null
 
@@ -37,11 +37,15 @@ exports.main = async (req, res) => {
 			m.id AS mobilization, m.title AS mobilization_title, 
 			t.title AS template_title,
 
-			CASE
-				WHEN AGE(now(), p.date) < '0 second'::interval
-					THEN jsonb_build_object('interval', 'positive', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(p.date, now())), 'hours', EXTRACT(hour FROM AGE(p.date, now())), 'days', EXTRACT(day FROM AGE(p.date, now())), 'months', EXTRACT(month FROM AGE(p.date, now())))
-				ELSE jsonb_build_object('interval', 'negative', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), p.date)), 'hours', EXTRACT(hour FROM AGE(now(), p.date)), 'days', EXTRACT(day FROM AGE(now(), p.date)), 'months', EXTRACT(month FROM AGE(now(), p.date)))
-			END AS date
+			-- CASE
+			-- 	WHEN AGE(now(), p.date) < '0 second'::interval
+			-- 		THEN jsonb_build_object('interval', 'positive', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(p.date, now())), 'hours', EXTRACT(hour FROM AGE(p.date, now())), 'days', EXTRACT(day FROM AGE(p.date, now())), 'months', EXTRACT(month FROM AGE(p.date, now())))
+			-- 	ELSE jsonb_build_object('interval', 'negative', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), p.date)), 'hours', EXTRACT(hour FROM AGE(now(), p.date)), 'days', EXTRACT(day FROM AGE(now(), p.date)), 'months', EXTRACT(month FROM AGE(now(), p.date)))
+			-- END AS date
+			
+			---- THIS DOES NOT NEED TO BE SO COMPLEX 
+			jsonb_build_object('date', to_char(p.date, 'DD Mon YYYY')) AS date,
+			to_char(p.date, 'YYYY') AS year
 			
 		FROM pads p
 		
@@ -76,50 +80,76 @@ exports.main = async (req, res) => {
 		const open = results.every(d => d.status > 2)
 		let data = await join.users(results, [ language, 'owner' ])
 
-		const sections = await Promise.all(data.map(async d => {
+		if (chapters && chapters !== 'none') {
+			data = array.nest.call(data, { key: chapters })
+		} else {
+			data = [{ key: null, values: data }]
+		}
+
+		// TO DO: PROBABLY ONLY USE ONE SECTION BECUSE IN WORD, NEW SECTIONS FORCE PAGE BREAKS THAT CANNOT BE REMOVED EASILY
+		let sections = await Promise.all(data.map(async d => {
 			return new Promise(async resolve => {
-				const obj = {}
-				obj.properties = { type: SectionType.NEXT_PAGE }
-				obj.children = []
-				// ADD THE TITLE
-				const title = new Paragraph({ 
-					text: d.title,
-					heading: HeadingLevel.HEADING_1
-				})
-				// TO DO: ADD THE AUTHOR INFO
-				obj.children.push(title)
-				
-				if (include_data) {
-					let repetition = 0 // THIS IS FOR REPEATED SECTIONS
-					const items = await Promise.all(d.sections.map(async c => {
-						const paragraphs = []
-						if (c.repeat) repetition ++
-						else repetition = 0
-
-						if (c.title || c.lead) {
-							if (c.title) paragraphs.push(new Paragraph({
-								text: repetition > 0 ? `${c.title} – ${repetition}` : c.title,
-								heading: HeadingLevel.HEADING_2
-							}))
-							if (c.lead) children.push(new Paragraph({ text: c.lead }))
-						}
-						if (c.items?.length) {					
-							const items = await Promise.all(c.items.map(b => populateSection(b)))
-
-							// paragraphs.push(...c.items.map(b => populateSection(b)).filter(b => b.length).flat())
-							paragraphs.push(...items.filter(b => b.length).flat())
-						}
-						return paragraphs
-					}))
-					obj.children.push(...items.flat())
+				const arr = []
+				if (d.key) {
+					const title_obj = {}
+					title_obj.properties = { type: SectionType.ODD_PAGE }
+					title_obj.children = [new Paragraph({ 
+						text: d.key.toUpperCase(), 
+						heading: HeadingLevel.HEADING_1,
+						alignment: AlignmentType.CENTER
+					})]
+					arr.push(title_obj)
 				}
 				
-				resolve(obj)
+				const pads = await Promise.all(d.values.map((c, j) => {
+					return new Promise(async resolve1 => {
+						const obj = {}
+						// if (j > 0) obj.properties = { type: SectionType.NEXT_PAGE }
+						obj.children = []
+						// ADD THE TITLE
+						const title = new Paragraph({ 
+							text: c.title,
+							heading: HeadingLevel.HEADING_2
+						})
+						// TO DO: ADD THE AUTHOR INFO
+						obj.children.push(title)
+						
+						if (include_data) {
+							let repetition = 0 // THIS IS FOR REPEATED SECTIONS
+							const items = await Promise.all(c.sections.map(async b => {
+								const paragraphs = []
+								if (b.repeat) repetition ++
+								else repetition = 0
+
+								if (b.title || b.lead) {
+									if (b.title) paragraphs.push(new Paragraph({
+										text: repetition > 0 ? `${b.title} – ${repetition}` : b.title,
+										heading: HeadingLevel.HEADING_3
+									}))
+									if (b.lead) children.push(new Paragraph({ text: b.lead }))
+								}
+								if (b.items?.length) {					
+									const items = await Promise.all(b.items.map(a => populateSection(a)))
+
+									// paragraphs.push(...b.items.map(a => populateSection(a)).filter(a => a.length).flat())
+									paragraphs.push(...items.filter(a => a.length).flat())
+								}
+								return paragraphs
+							}))
+							obj.children.push(...items.flat())
+						}
+
+						resolve1(obj)
+					})
+				}))
+			
+				arr.push(...pads)
+				resolve(arr)
 			})
-		})).catch(err => console.log(err))
+		})).then(results => results.flat())
+		.catch(err => console.log(err))
 
 		async function populateSection (data, repetition = 0) {
-			console.log(data)
 			return new Promise(async resolve => {
 				const { instruction, type, name, level } = data
 				const arr = []
@@ -127,13 +157,13 @@ exports.main = async (req, res) => {
 				if (instruction) {
 					arr.push(new Paragraph({ 
 						text: repetition > 0 ? `${instruction} – ${repetition}` : instruction,
-						heading: HeadingLevel.HEADING_3
+						heading: HeadingLevel.HEADING_4
 					}))
 				} else {
 					if (level === 'meta') {
 						arr.push(new Paragraph({ 
 							text: capitalize(metafields.find(c => c.label === name)?.name || name),
-							heading: HeadingLevel.HEADING_3
+							heading: HeadingLevel.HEADING_4
 						}))
 					}
 				}
@@ -186,7 +216,6 @@ exports.main = async (req, res) => {
 
 				if (type === 'txt') {
 					let { txt } = data
-					console.log(data.txt.trim())
 					txt = formatTxt(txt)
 					if (txt) {
 						const children = []
@@ -295,30 +324,6 @@ exports.main = async (req, res) => {
 						})
 						arr.push(new Paragraph({ children, style: 'hyperlink' })) 
 					}
-					// STRUCTURE
-					/*
-					{
-					  name: 'consent',
-					  srcs: [
-					    'https://acclabs-consent-archive.azurewebsites.net//generated/p-77.pdf'
-					  ],
-					  type: 'attachment',
-					  level: 'meta',
-					  required: true,
-					  has_content: true
-					}
-					look for locations
-					pay attention to geocode
-					is attachment
-					{
-					  name: 'consent',
-					  srcs: [ 'https://app-ear.com.ar/que-es-appear/' ],
-					  type: 'attachment',
-					  level: 'meta',
-					  required: true,
-					  has_content: true
-					}
-					*/
 				}
 				
 				// GROUP
@@ -380,7 +385,7 @@ exports.main = async (req, res) => {
 					heading1: {
 						run: {
 							font: 'Noto Sans',
-							size: 32,
+							size: 48,
 							bold: true,
 							color: colors['dark-blue']
 						},
@@ -395,6 +400,21 @@ exports.main = async (req, res) => {
 					heading2: {
 						run: {
 							font: 'Noto Sans',
+							size: 32,
+							bold: true,
+							color: colors['dark-blue']
+						},
+						paragraph: {
+							spacing: {
+								before: 120,
+								after: 240,
+								line: 36 * 6
+							}
+						}
+					},
+					heading3: {
+						run: {
+							font: 'Noto Sans',
 							size: 28,
 							color: colors['mid-blue']
 						},
@@ -406,7 +426,7 @@ exports.main = async (req, res) => {
 							}
 						}
 					},
-					heading3: {
+					heading4: {
 						run: {
 							font: 'Noto Sans',
 							size: 20,

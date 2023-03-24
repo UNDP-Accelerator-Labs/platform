@@ -9,6 +9,7 @@ let {
 	modules, 
 	metafields, 
 	engagementtypes, 
+	colors, 
 	map, 
 	lazyload, 
 	page_content_limit, 
@@ -27,6 +28,8 @@ exports.app_suite = app_suite
 exports.app_suite_secret = app_suite_secret
 exports.app_description = app_description
 exports.apps_in_suite = apps_in_suite
+exports.colors = colors
+
 
 // DESIRED MODULES
 if (!modules) modules = []

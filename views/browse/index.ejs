@@ -396,7 +396,6 @@
 						<%- vocabulary['pads to display'][language](0) %>
 					</small>
 				<% } %>
-				<!-- TO DO: STYLIZE -->
 			<% } %>
 
 			<!-- STATISTICS IN MOBILE VIEW -->
@@ -409,7 +408,6 @@
 						<%- vocabulary['pads to display'][language](0) %>
 					</small>
 				<% } %>
-				<!-- TO DO: STYLIZE -->
 			<% } %>
 		</div>
 		<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
@@ -732,15 +730,41 @@
 						// const target_opts = <%- JSON.stringify(languages.filter(d => locals.metadata.menu.review_templates?.some(c => c.language === d.language))?.map(d => { return { label: d.name, value: d.language, type: 'radio', required: true } })) %>
 						const target_opts = <%- JSON.stringify(locals.metadata.menu.review_templates.map(d => { return { label: d.name, value: d.language, count: d.count, disabled: { value: d.disabled, label: vocabulary["missing reviewers"][language] }, type: 'radio', required: true } })) %>
 
+						// TO DO: FILTER THIS BASED ON USER RIGHTS > review.rights.write
+						const reviewers = await POST('/<%- language %>/browse/contributors/all', { limit: null })
+						const reviewer_opts = reviewers.data.map(d => {
+							d.secondary_languages.push(d.language)
+							return { label: d.name, value: d.id, type: 'checkbox', classname: d.secondary_languages.join(' ') }
+						}) // TO DO: IMPROVE THIS
 						const formdata = { action: '/request/review',  method: 'POST' }
 						const message = '<%- vocabulary["select review language"][language] %>'
+						
 						const opts = []
-						opts.push({ node: 'select', name: 'language', label: '<%- vocabulary["select language"][language](false) %>', options: target_opts })
+						opts.push({ node: 'select', name: 'language', label: '<%- vocabulary["select language"][language](false) %>', options: target_opts, fn: updateReviewerList })
+						opts.push({ node: 'select', name: 'reviewers', label: 'Select specific reviewers', options: reviewer_opts, classname: 'reviewer-list' }) // TO DO: TRANSLATE
+						
 						inputs.forEach(d => {
 							opts.push({ node: 'input', type: 'hidden', name: d.name, value: d.value })
 						})
+
 						opts.push({ node: 'button', type: 'submit', name: name, value: value, label: '<%- vocabulary["submit for review"][language] %>' })
 						const new_constraint = await renderFormModal({ message, formdata, opts })
+					}
+
+					function updateReviewerList (d) {
+						const { value: language } = d
+						const menu = d3.select(this).findAncestor('opts')
+						const reviewer_list = menu.select('.reviewer-list .dropdown menu li')
+						reviewer_list
+						// .classed('hide', function () {
+						// 	return !d3.select(this).classed(language)
+						// }) // THIS CONFLICTS WITH THE SEARCH OPERATIONS (BECAUSE BOTH USE THE class='hide')
+						.select('input')
+						.each(function () { 
+							this.disabled = !d3.select(this.parentNode).classed(language) 
+						})
+
+
 					}
 
 					function copyLink (datum) {

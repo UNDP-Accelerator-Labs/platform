@@ -21,6 +21,7 @@ exports.main = kwargs => {
 		return gt.any(`
 			SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status, 
 			u.confirmed_at, u.left_at,
+			u.language, u.secondary_languages,
 			to_char(u.confirmed_at, 'DD Mon YYYY') AS start_date, to_char(u.left_at, 'DD Mon YYYY') AS end_date,
 			cn.name AS country,
 

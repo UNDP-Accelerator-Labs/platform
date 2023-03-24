@@ -1,10 +1,8 @@
 <%
-	
 	// CREATE ALIASES
 	const page = locals.metadata.page.id
 	const object = locals.metadata.page.object
 	const language = locals.metadata.page.language
-
 %>
 
 <div id='statistics'>
@@ -13,7 +11,7 @@
 		<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
 		
 		<% if (locals.metadata.page.count > 1) { %>
-			<small><%- vocabulary['showing range'][language](locals.stats?.displayed * (page - 1) + 1, Math.min(locals.stats?.displayed * page, locals.stats?.filtered) + 1) %></small>
+			<small><%- vocabulary['showing range'][language](locals.stats?.displayed * (page - 1) + 1, Math.min(locals.stats?.displayed * page, locals.stats?.filtered)) %></small>
 		<% } else if (typeof page === 'string') { %>
 			<small><%- vocabulary['showing letter'][language](locals.stats?.displayed, page) %></small>
 		<% } %>

@@ -24,7 +24,7 @@ exports.main = async (req, res, kwargs = {}) => {
 	const module_rights = modules.find(d => d.type === object)?.rights
 	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
-	
+
 	if (instance) {
 		const { instance_vars } = res.locals
 		if (!instance_vars) {
@@ -139,11 +139,11 @@ exports.main = async (req, res, kwargs = {}) => {
 		const content_filters = []
 		metafields.forEach(d => {
 			// TO DO: FINSIH THIS FOR OTHER METAFIELDS
-			if (Object.keys(req.query).includes(d.label)) {
+			if (Object.keys(req.query).includes(d.label) || Object.keys(req.body).includes(d.label)) {
 				if (['tag', 'index'].includes(d.type)) {
-					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, req.query[d.label] ]))
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, req.query[d.label] || req.body[d.label] ]))
 				} else if (!['tag', 'index', 'location', 'attachment'].includes(d.type)) {
-					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, req.query[d.label] ]))
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, req.query[d.label] || req.body[d.label] ]))
 				}
 			}
 		})

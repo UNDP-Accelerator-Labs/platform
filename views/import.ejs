@@ -776,7 +776,8 @@
 										else return a - b
 									}).join(', ')
 								} else item.txt = c.entries[i]
-								item.has_content = item.txt?.trim()?.length > 0
+								console.log(item)
+								item.has_content = item.txt?.toString().trim()?.length > 0
 							}
 							// item.type = c.type
 							item.type = metafields.find(b => b.label === c.type)?.type || c.type

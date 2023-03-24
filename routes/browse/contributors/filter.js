@@ -9,7 +9,7 @@ exports.main = req => {
 	const { limit } = req.body || {} // THIS IS IN THE CASE OF AJAX REQUESTS, TO LIMIT TO A CERTAIN LETTER OR NOT
 	
 	// TO DO: UPDATE BELOW BASED ON FILTERS PASSED
-	let { search, status, countries, positions, pinboard, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, countries, positions, rights: userrights, pinboard, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
 	// BASE FILTERS
 	const base_filters = []
@@ -24,6 +24,7 @@ exports.main = req => {
 	// PLATFORM FILTERS
 	const platform_filters = []
 	if (countries) platform_filters.push(DB.pgp.as.format(`AND u.iso3 IN ($1:csv)`, [ countries ]))
+	if (userrights) platform_filters.push(DB.pgp.as.format(`AND u.rights IN ($1:csv)`, [ userrights ]))
 	if (positions) platform_filters.push(DB.pgp.as.format(`AND u.position IN ($1:csv)`, [ positions ]))
 	if (pinboard) platform_filters.push(DB.pgp.as.format(`AND u.uuid IN (SELECT member FROM team_members WHERE team = $1::INT)`, [ pinboard ]))
 

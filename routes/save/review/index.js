@@ -7,7 +7,7 @@ exports.main = (req, res) => {
 	if (!id) { // INSERT OBJECT
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
-			.filter(key => !['id', 'deletion', 'mobilization', 'tagging', 'locations'].includes(key))
+			.filter(key => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(key))
 			.reduce((obj, key) => {
 				obj[key] = req.body[key]
 				return obj
@@ -20,7 +20,7 @@ exports.main = (req, res) => {
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
-		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations'].includes(d)), 'pads') + condition
+		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
 	}	
 
 	DB.conn.tx(t => { 
@@ -39,7 +39,8 @@ exports.main = (req, res) => {
 					UPDATE reviews
 					SET status = $1
 					WHERE pad = $2
-				;`, [ status, source ]))
+						AND review = $3
+				;`, [ status, source, newID || id ]))
 			}
 			// UPDATE THE REVIEW REQUEST
 			batch.push(t.none(`

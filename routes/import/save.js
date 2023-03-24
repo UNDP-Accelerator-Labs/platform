@@ -38,7 +38,7 @@ exports.main = (req, res) => { // TO DO
 							// STORE NEW TAGS 
 							d.tags.forEach(c => {
 								c.contributor = uuid
-								c.name = c.name.trim()
+								c.name = c.name?.trim()
 							})
 							const sql = DB.pgp.helpers.insert(d.tags, ['name', 'type', 'contributor'], 'tags')
 							batch1.push(DB.general.task(gt => {

@@ -29,11 +29,19 @@ exports.modules = [
 	// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
 exports.metafields = [
 	{ type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
+
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'tag', name: 'methods', required: true, opencode: false },
 	{ type: 'tag', name: 'datasources', required: true, opencode: true },
 	
 	{ type: 'location', name: 'locations', required: true },
+
+	// { type: 'tag', name: 'primary signature solution', required: false, opencode: true, limit: 1 }, 
+	// { type: 'tag', name: 'additional signature solution', required: false, opencode: true }, 
+	// { type: 'tag', name: 'signal themes', required: false, opencode: true }, 
+
+
+	
 	// { type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file' }, { uri: undefined } ] }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 	// { type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ], limit: 1 } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 	

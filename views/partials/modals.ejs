@@ -108,7 +108,9 @@
 			.addElems('li', 'opt link', d => d)
 			.classed('default', d => d.default || false)
 		.each(function (d) {
-			d3.select(this).call(addInputNode, { d })
+			const sel = d3.select(this)
+			if (d.classname) d3.select(this).classed(d.classname, true)
+			sel.call(addInputNode, { d })
 		})
 		
 		form.addElems('div', 'foot', foot ? [foot] : [])
@@ -201,17 +203,18 @@
 		if (d.node === 'select') {
 			// CREATE DROPDOWN
 			const filter = _sel.addElems('div', 'filter')
-			.each(function () {
-				if (d.classname) d3.select(this).classed(d.classname, true)
-			})
+			// .each(function () {
+			// 	if (d.classname) d3.select(this).classed(d.classname, true)
+			// })
 			filter.addElems('input', 'dropbtn')
 				.attrs({
 					'id': nodeid,
 					'type': 'text'
 				})
-			.each(function () {
-				if (d.classname) d3.select(this).classed(d.classname, true)
-			}).on('keyup', async function (d) {
+			// .each(function () {
+			// 	if (d.classname) d3.select(this).classed(d.classname, true)
+			// })
+			.on('keyup', async function (d) {
 				const evt = d3.event
 				const node = this
 				const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
@@ -233,7 +236,7 @@
 				fixLabel(this)
 			})
 			
-			filter.addElems('label', d.classname || null)
+			filter.addElems('label') //, d.classname || null)
 				.attr('for', nodeid)
 			.html(c => c.label)
 			
@@ -242,7 +245,7 @@
 				.addElems('li', null, c => c.options)
 			.each(function (c) {
 				const sel = d3.select(this)
-				if (c.classname) sel.classed(c.classname, true)
+				// if (c.classname) sel.classed(c.classname, true)
 
 				sel.addElems('input')
 					.attrs({
@@ -292,9 +295,9 @@
 			// 	.attr('value', d => d.value)
 			// 	.html(d => d.label)
 		} else {
-			_sel.addElems(d.node, d.classname || null)
+			_sel.addElems(d.node) //, d.classname || null)
 				.each(function (c) {
-					if (c.class) d3.select(this).classed(c.class, true)
+					if (c.class) d3.select(this).classed(c.class, true) // THIS MIGHT NEED TO BE UPDATED TO classname
 				}).attrs({ 
 					'id': nodeid,
 					'type': d.type,
@@ -335,7 +338,7 @@
 		}
 
 		if (d.node === 'input' && d.type !== 'hidden') {
-			_sel.addElems('label', d.classname || null)
+			_sel.addElems('label') //, d.classname || null)
 				.attr('for', nodeid)
 				.html(d.placeholder)
 

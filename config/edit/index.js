@@ -28,6 +28,7 @@ exports.modules = [
 	// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
 exports.metafields = [
 	{ type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
+
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'tag', name: 'methods', required: true, opencode: false },
 	{ type: 'tag', name: 'datasources', required: true, opencode: true }
@@ -36,6 +37,30 @@ exports.metafields = [
 // DESIRED ENGAGEMENT TYPES
 	// OPTIONS: ['like', 'dislike', 'comment']
 exports.engagementtypes = ['like', 'dislike', 'comment']
+
+// COLORS
+exports.colors = {
+	'dark-blue': '#005687',
+	'mid-blue': '#0468B1',
+	'mid-blue-semi': 'rgba(4,104,177,.75)',
+	'light-blue': '#32BEE1',
+
+	'dark-red': '#A51E41',
+	'mid-red': '#FA1C26',
+	'light-red': '#F03C8C',
+
+	'dark-green': '#418246',
+	'mid-green': '#61B233',
+	'light-green': '#B4DC28',
+
+	'dark-yellow': '#FA7814',
+	'mid-yellow': '#FFC10E',
+	'light-yellow': '#FFF32A',
+
+	'dark-grey': '#000000',
+	'mid-grey': '#646464',
+	'light-grey': '#969696'
+}
 
 // DISPLAY VARIABLES
 exports.map = true

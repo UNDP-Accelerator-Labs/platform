@@ -103,7 +103,7 @@ exports.main = async (req, res) => {
 						return d.media?.map(c => {
 							const obj = {}
 							obj.pad_id = d.pad_id
-							obj.image = c
+							obj.image = c // TO DO: ABS PATH
 							return obj
 						})
 					}).flat().filter(d => d)

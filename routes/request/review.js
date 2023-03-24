@@ -6,20 +6,19 @@ const { email: sendemail } = include('routes/helpers/')
 
 exports.main = (req, res) => {
 	const { referer } = req.headers || {}
-	const { id, title, language } = req.body || {}
+	let { id, title, language, reviewers } = req.body || {}
+	if (!Array.isArray(reviewers)) reviewers = [reviewers]
 	const { uuid } = req.session || {}
-	const tagfocus = 'thematic_areas'
+	const tagfocus = 'thematic_areas' // TO DO: EDIT THIS
 
 	// SEND THE REVIEW ASSIGNMENT TO A CHILD PROCESS
 	const c_process = fork(path.join(__dirname, 'assign-review.js'))
-	c_process.send({ rootpath, id, language, uuid, sendemail })
+	c_process.send({ rootpath, id, language, reviewers, tagfocus, uuid, sendemail })
 
 	// THE FOLLOWING IS TECHNICALLY NOT NEEDED
 	c_process.on('message', message => {
 		message.forEach(d => {
 			// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
-			// console.log('check reviewers')
-			// console.log(d)
 			if (d.notifications) {
 				return sendemail({
 					to: d.email,

@@ -48,6 +48,13 @@ String.prototype.isURL = function () {
 		return !!url.test(encodeURI(this.valueOf().trim()))
 	} else return false
 }
+String.prototype.convertHTMLtoTXT = function () {
+	// CREDIT TO https://stackoverflow.com/questions/5002111/how-to-strip-html-tags-from-string-in-javascript
+	const html = this.valueOf().trim()
+	const div = document.createElement('div')
+	div.innerHTML = html
+	return div.textContent || div.innerText || ''
+}
 RegExp.escape = function(string) {
 	// FROM https://makandracards.com/makandra/15879-javascript-how-to-generate-a-regular-expression-from-a-string
 	return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')

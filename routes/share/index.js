@@ -9,7 +9,10 @@ exports.share = (req, res) => {
 
 	if (['pinboard', 'pinboards'].includes(object)) {
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) pinboards.share(req, res)
-		else res.redirect(referer)
+		else {
+			if (referer) res.redirect(referer)
+			else res.redirect('/login')
+		}
 	}
 }
 

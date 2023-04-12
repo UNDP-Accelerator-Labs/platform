@@ -1,10 +1,8 @@
 const { modules, DB } = include('config/')
-// const { checklanguage } = include('routes/helpers/')
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id, mobilization } = req.body || {}
-	// const language = checklanguage(req.params?.language || req.session.language)
 	
 	const module_rights = modules.find(d => d.type === 'pads')?.rights
 	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)

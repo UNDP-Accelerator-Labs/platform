@@ -4,7 +4,7 @@ const path = require('path')
 const { app_title, modules, DB } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	let { id, title, language, reviewers } = req.body || {}
 	if (!Array.isArray(reviewers)) reviewers = [reviewers]
@@ -32,6 +32,7 @@ exports.main = (req, res) => {
 	c_process.on('exit', code => {
 		console.log('child process done')
 		console.log(code)
-		res.redirect(referer)
+		if (referer) res.redirect(referer)
+		else res.redirect('/login')
 	})
 }

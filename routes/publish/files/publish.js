@@ -1,3 +1,3 @@
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	// TO DO
 }

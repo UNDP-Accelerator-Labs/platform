@@ -1,8 +1,7 @@
 const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
-const header_data = include('routes/header/').data
 const { checklanguage, engagementsummary, join, flatObj, datastructures } = include('routes/helpers/')
 
-exports.main = (req, res) => {	
+module.exports = (req, res) => {	
 	const { referer } = req.headers || {}
 	const { object } = req.params || {}
 	const { id, template, source, mobilization, display } = req.query || {}
@@ -17,11 +16,14 @@ exports.main = (req, res) => {
 
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
-		return check_authorization({ connection: t, id, mobilization, source, uuid, rights, collaborators })
+		return check_authorization({ connection: t, id, mobilization, source, uuid, rights, collaborators, public })
 		.then(result => {
 			const { authorized, redirect } = result
-			if (!authorized) return res.redirect(referer)
-			else if (authorized && redirect && redirect !== activity) {
+
+			if (!authorized) {
+				if (referer) return res.redirect(referer)
+				else res.redirect('/login')
+			} else if (authorized && redirect && redirect !== activity) {
 				const query = []
 				for (key in req.query) {
 					query.push(`${key}=${req.query[key]}`)
@@ -231,75 +233,87 @@ exports.main = (req, res) => {
 
 function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { id, mobilization, source, uuid, rights, collaborators } = _kwargs
+	const { id, mobilization, source, uuid, rights, collaborators, public } = _kwargs
 
-	const module_rights = modules.find(d => d.type === 'pads')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	const { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
+	
+	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
-	if (!uuid || !modules.some(d => d.type === 'pads' && rights >= d.rights.write)) {
+	// if (!uuid || !modules.some(d => d.type === 'pads' && rights >= d.rights.write)) {
+	if (public || rights < write) {
+		// if public and status < 3 then not authorized
 		if (mobilization) {
-			return conn.one(`SELECT public FROM mobilizations WHERE id = $1`, [ mobilization ], d => d.public)
+			return conn.one(`SELECT public FROM mobilizations WHERE id = $1::INT;`, [ mobilization ], d => d.public)
 			// TO DO: EDIT HERE FOR mobilization LANGUAGE
 			.then(result => {
 				if (result === true) return { authorized: true }
-				else return { authorized: true, redirect: 'view' }
+				else return { authorized: rights >= read, redirect: 'view' } // THIS IMPLIES A USER NOT LOGGED IN (PUBLIC VIEW) CAN SEE AN UNUBLISHED PAD SIMPLY BECAUSE IT WAS CONTRIBUTED TO AN OPEN MOBILIZATION
 			}).catch(err => console.log(err))
 		}
-		return new Promise(resolve => resolve({ authorized: true, redirect: 'view' }))
-	}
-	if (id) return conn.oneOrNone(`
-			SELECT TRUE AS bool FROM pads
-			WHERE id = $1::INT
-				AND (
-					owner IN ($2:csv) 
-					OR owner IN ( 
-						-- THIS IS FOR CURATING PADS CONTRIBUTED TO MOBILIZATIONS
-						SELECT m.owner FROM mobilizations m
-						INNER JOIN mobilization_contributions mc
-							ON mc.mobilization = m.id
-						WHERE mc.pad = $1::INT
-					)
-					OR $3 > 2
-				)
-		;`, [ id, collaborators_ids, rights ])
-		.then(result => {
-			if (result) return { authorized: true, redirect: 'edit' }
-			else return { authorized: true, redirect: 'view' }
-		}).catch(err => console.log(err))
-	else return conn.task(t => {
-		const batch = []
-		if (mobilization) {
-			// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE TO THE MOBILIZATION
-			// OTHREWISE REDIRECT
-			batch.push(t.oneOrNone(`
-				SELECT CASE WHEN
-					(SELECT DISTINCT (participant) FROM mobilization_contributors WHERE mobilization = $1::INT AND participant = $2) IS NOT NULL
-					THEN TRUE
-					ELSE (SELECT public FROM mobilizations WHERE id = $1::INT)
-				END AS bool
-			;`, [ mobilization, uuid ], d => d.bool))
-
-			if (source) {
-				// INTERCEPT IF THERE ARE ALREADY FOLLOW UPS IN THIS MOBILIZATION
-				// FIRST, CHECK IF THERE IS A SOURCE AND THIS IS IN A MOBILIZATION 
-				// AND WHETHER THE PAD HAS ALREADY BEEN FOLLOWED UP IN THIS MOBILIZATION
-				batch.push(t.one(`
-					SELECT COUNT (mc.pad) FROM mobilization_contributions mc
-					INNER JOIN pads p
-						ON p.id = mc.pad
-					WHERE mc.mobilization = $1::INT
-					AND p.source = $2::INT
-				`, [ mobilization, source ], d => d.count))
-			} else batch.push(0)
-		} else {
-			batch.push(true)
-			batch.push(0)
+		else {
+			if (id) return conn.one(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => d.status > 2)
+				.then(result => {
+					if (result === true) return { authorized: rights >= read, redirect: 'view' }
+					else return { authorized: false }
+				}).catch(err => console.log(err))
+			else return new Promise(resolve => resolve({ authorized: false })) // THIS IS A NEW PAD, BUT THE USER IS IN PUBLIC VIEW OR DOES NOT HAVE THE RIGHTS TO WRITE
 		}
-		return t.batch(batch)
-	}).then(results => {
-		const [ authorization, count ] = results
-		if (authorization !== true || count >= followup_count) return { authorized: false }
-		else return { authorized: true, redirect: 'contribute' }
-	}).catch(err => console.log(err))
+	} else {
+		if (id) return conn.oneOrNone(`
+				SELECT TRUE AS bool FROM pads
+				WHERE id = $1::INT
+					AND (
+						owner IN ($2:csv) 
+						OR owner IN ( 
+							-- THIS IS FOR CURATING PADS CONTRIBUTED TO MOBILIZATIONS
+							SELECT m.owner FROM mobilizations m
+							INNER JOIN mobilization_contributions mc
+								ON mc.mobilization = m.id
+							WHERE mc.pad = $1::INT
+						)
+						OR $3 > 2
+					)
+			;`, [ id, collaborators_ids, rights ])
+			.then(result => {
+				if (result) return { authorized: true, redirect: 'edit' }
+				else return { authorized: rights >= read, redirect: 'view' }
+			}).catch(err => console.log(err))
+		else return conn.task(t => {
+			const batch = []
+			if (mobilization) {
+				// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE TO THE MOBILIZATION
+				// OTHREWISE REDIRECT
+				batch.push(t.oneOrNone(`
+					SELECT CASE WHEN
+						(SELECT DISTINCT (participant) FROM mobilization_contributors WHERE mobilization = $1::INT AND participant = $2) IS NOT NULL
+						THEN TRUE
+						ELSE (SELECT public FROM mobilizations WHERE id = $1::INT)
+					END AS bool
+				;`, [ mobilization, uuid ], d => d.bool))
+
+				if (source) {
+					// INTERCEPT IF THERE ARE ALREADY FOLLOW UPS IN THIS MOBILIZATION
+					// FIRST, CHECK IF THERE IS A SOURCE AND THIS IS IN A MOBILIZATION 
+					// AND WHETHER THE PAD HAS ALREADY BEEN FOLLOWED UP IN THIS MOBILIZATION
+					batch.push(t.one(`
+						SELECT COUNT (mc.pad) FROM mobilization_contributions mc
+						INNER JOIN pads p
+							ON p.id = mc.pad
+						WHERE mc.mobilization = $1::INT
+						AND p.source = $2::INT
+					`, [ mobilization, source ], d => d.count))
+				} else batch.push(0)
+			} else {
+				batch.push(true)
+				batch.push(0)
+			}
+			return t.batch(batch)
+			.catch(err => console.log(err))
+		}).then(results => {
+			const [ authorization, count ] = results
+			if (authorization !== true || count >= followup_count) return { authorized: false }
+			else return { authorized: true, redirect: 'contribute' }
+		}).catch(err => console.log(err))
+	}
 }

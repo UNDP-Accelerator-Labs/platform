@@ -1,4 +1,4 @@
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { filepath } = req.query || {}
 	if (filepath) res.sendFile(filepath)
 	else res.status(400).json({ message: 'Missing file path.' })

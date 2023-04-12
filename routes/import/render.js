@@ -1,8 +1,7 @@
 const { modules, metafields, DB } = include('config/')
-const header_data = include('routes/header/').data
 const { checklanguage, flatObj, datastructures } = include('routes/helpers/')
 
-exports.main = async (req, res) => {
+module.exports = async (req, res) => {
 	const { object } = req.params || {}
 	let { uuid, rights } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)

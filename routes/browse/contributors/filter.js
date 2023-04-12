@@ -1,7 +1,7 @@
 const { modules, DB } = include('config/')
 const { parsers } = include('routes/helpers/')
 
-exports.main = req => { 
+module.exports = req => { 
 	const { uuid, rights } = req.session || {}
 	
 	let { space } = req.params || {}

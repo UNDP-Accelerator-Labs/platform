@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+
+<% 
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+%>
+
 <head>
-<meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <%- include ('partials/head.ejs') %> 
 
@@ -11,27 +13,86 @@
 
 </head>
 
+
 <body>
 
-<button id='global-login'>
+<!-- <button id='global-login'>
 	<a>Use global login</a>
-</button>
+</button> -->
 
-<form action='/login' method='POST'>
-	<input type='text' name='username' placeholder='User name'>
-	<input type='password' name='password' placeholder='Password'>
-	<input type='hidden' name='originalUrl' value='<%- locals.originalUrl %>'>
-	<button type='submit'>Log in</button>
-</form>
+<%- include ('partials/translations.ejs') %> 
+<%- include ('partials/menu-languages.ejs') %> 
 
-<p>Find your username and password on <a href="https://undp.sharepoint.com/:x:/r/sites/AcceleratorLabsNetwork/Shared%20Documents/100%20Day%20Action%20Plans/AA_platform/credentials%20-%20Editable.xlsx?d=wa7d7cc5c41e74a258f6cea45b0bfcea5&csf=1&web=1&e=KX4Bc0" target='_blank' style='color: blue; text-decoration: underline;'>Teams</a>, under:</p>
-<p>Accelerator Labs Network > Action Plans > Files > AA_platform > credentials.xlsx</p>
+
+<header>
+	<div class='inner'>
+		<%- include ('partials/menu-logo.ejs') %> 
+	</div>
+</header>
+
+<main>
+<div class='screen <% if (locals.errormessage) { %>error<% } else { %>blue<% } %>'>
+	<div class='modal login-module'>
+		<form action='/login' method='POST'>
+			<input type='hidden' name='originalUrl' value='<%- locals.originalUrl %>'>
+			<ul>
+				<% if (locals.errormessage) { %>
+					<li>
+						<p class='errormessage'><%- locals.errormessage %></p>
+					</li>
+				<% } %>
+				<li>
+					<div class='required'>
+						<label class='active'>*</label>
+					</div>
+					<!-- <label class='instruction'>Username or email</label> -->
+					<!-- TO DO: TRANSLATE -->
+					<div class='input-group'>
+						<input type='text' id='username' name='username' required>
+						<label for='username'>First and last name, or email</label>
+						<!-- TO DO: TRANSLATE -->
+					</div>
+				</li>
+				<li>
+					<div class='required'>
+						<label class='active'>*</label>
+					</div>
+					<!-- <label class='instruction'><%- vocabulary['password'][language] %></label> -->
+					<div class='input-group'>
+						<input type='password' id='password' name='password' required>
+						<label for='password'><%- vocabulary['password'][language] %></label>
+					</div>
+				</li>
+				<li>
+					<button type='submit'><%- vocabulary['log in'][language] %></button>
+				</li>
+			</ul>
+
+
+		
+			<!-- <input type='text' name='username' placeholder='User name'>
+			<input type='password' name='password' placeholder='Password'>
+			<input type='hidden' name='originalUrl' value='<%- locals.originalUrl %>'> -->
+			
+			<!-- TO DO: TRANSLATE -->
+		</form>
+
+		<!-- <p>Find your username and password on <a href="https://undp.sharepoint.com/:x:/r/sites/AcceleratorLabsNetwork/Shared%20Documents/100%20Day%20Action%20Plans/AA_platform/credentials%20-%20Editable.xlsx?d=wa7d7cc5c41e74a258f6cea45b0bfcea5&csf=1&web=1&e=KX4Bc0" target='_blank' style='color: blue; text-decoration: underline;'>Teams</a>, under:</p> -->
+		<!-- <p>Accelerator Labs Network > Action Plans > Files > AA_platform > credentials.xlsx</p> -->
+	</div>
+</div>
 
 <script type='text/javascript'>
-	d3.select('#global-login a')
-		// .attr('href', `http://localhost:4000?origin=${encodeURIComponent(window.location)}&platform=${encodeURIComponent('action plans')}`)
-		.attr('href', `https://acclabs-global.azurewebsites.net/?origin=${encodeURIComponent(window.location)}`)
+	// d3.select('#global-login a')
+		// .attr('href', `https://acclabs-global.azurewebsites.net/?origin=${encodeURIComponent(window.location)}`)
+
+	// GENERIC BLUR FUNCTION
+	d3.selectAll('input[type=text], input[type=password]')
+	.on('blur.fixlabel', function () { 
+		fixLabel(this)
+	}).each(function () { fixLabel(this) })
 </script>
+</main>
 
 </body>
 </html>

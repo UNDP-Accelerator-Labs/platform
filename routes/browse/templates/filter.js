@@ -1,7 +1,7 @@
 const { modules, DB, engagementtypes } = include('config/')
 const { parsers } = include('routes/helpers/')
 
-exports.main = req => {
+module.exports = req => {
 	const { uuid, rights, collaborators } = req.session || {}
 	const { object, space } = req.params || {}
 	let { search, status, contributors, countries, templates, mobilizations, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}

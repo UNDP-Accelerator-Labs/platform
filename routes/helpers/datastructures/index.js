@@ -1,5 +1,5 @@
 const { app_title: title, app_description: description, app_languages, modules, metafields, media_value_keys, engagementtypes, lazyload, browse_display, welcome_module, page_content_limit, DB } = include('config/')
-const checklanguage = require('../language').main
+const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
 
@@ -7,8 +7,6 @@ if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
 	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
-
-	console.log(collaborators)
 
 	// GENERIC session INFO
 	const obj = {}
@@ -94,7 +92,9 @@ exports.pagemetadata = (_kwargs) => {
 				SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child,
 					to_char(m.start_date, 'DD Mon YYYY') AS start_date 
 				FROM mobilizations m
-				WHERE m.id IN (SELECT mobilization FROM mobilization_contributors WHERE participant = $1)
+				WHERE (m.id IN (SELECT mobilization FROM mobilization_contributors WHERE participant = $1)
+					OR m.owner = $1
+				)
 					OR m.public = TRUE
 					AND m.status = 1
 				ORDER BY m.start_date DESC

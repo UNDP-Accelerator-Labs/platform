@@ -1,33 +1,25 @@
 const { modules } = include('config/')
-const { checklanguage } = include('routes/helpers/')
 
 const pad = require('./pad/')
 const template = require('./template/')
 const contributor = require('./contributor/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
-	const { uuid, rights } = req.session || {}
+	const { rights } = req.session || {}
 	const { object } = req.params || {}
-	const language = checklanguage(req.params?.language || req.session.language)
 
+	if (modules.some(d => d.type === object)) {
+		const { read, write } = modules.find(d => d.type === object).rights
 
-	if (object === 'pads') {
-		if (modules.some(d => d.type === 'pads')) {
-			if (rights >= modules.find(d => d.type === 'pads').rights.write) pad.main(req, res)
-			else res.redirect(referer)
-		} else res.redirect('/module-error')
-	}
-	if (object === 'templates') {
-		if (modules.some(d => d.type === 'templates')) {
-			if (rights >= modules.find(d => d.type === 'templates').rights.write) template.main(req, res)
-			else res.redirect(referer)
-		} else res.redirect('/module-error')
-	}
-	if (object === 'contributors') {
-		if (modules.some(d => d.type === 'contributors')) {
-			if (rights >= modules.find(d => d.type === 'contributors').rights.write) contributor.main(req, res)
-			else res.redirect(referer)
-		} else res.redirect('/module-error')
-	}
+		if (object === 'pads' && rights >= write) return pad(req, res)
+		else if (object === 'templates' && rights >= write) return template(req, res)
+		// CANNOT DELETE REVIEWS AT THIS STAGE
+		else if (object === 'contributors' && rights >= write) return contributor(req, res)
+
+		else {
+			if (referer) res.redirect(referer)
+			else res.redirect('/login')
+		}
+	} else res.redirect('/module-error')
 }

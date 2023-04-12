@@ -1,15 +1,15 @@
 const { app_title, DB, modules, engagementtypes, metafields } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
-exports.main = async (req, res) => {
-	if (req.session.uuid) { // USER IS LOGGED IN
-		var { uuid, country, rights, collaborators } = req.session || {}
-	} else { // PUBLIC/ NO SESSION
-		var { uuid, country, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	}
+module.exports = async (req, res) => {
+	// if (req.session.uuid) { // USER IS LOGGED IN
+	const { uuid, country, rights, collaborators, public } = req.session || {}
+	// } else { // PUBLIC/ NO SESSION
+	// 	var { uuid, country, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
+	// }
 
 	let { space, object, instance } = req.params || {}
-	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM DOWNLOAD)
+	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 	
 	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
@@ -28,7 +28,7 @@ exports.main = async (req, res) => {
 			const vars = await DB.general.tx(t => {
 				return t.oneOrNone(`
 					SELECT iso3, name FROM country_names
-					WHERE (iso3 = $1
+					WHERE (iso3 ILIKE $1
 						OR LOWER(name) = LOWER($1))
 						AND language = $2
 					LIMIT 1
@@ -82,20 +82,34 @@ exports.main = async (req, res) => {
 
 		let f_space = null
 		if (space === 'private') f_space = DB.pgp.as.format(`p.owner IN ($1:csv)`, [ collaborators_ids ])
-		engagementtypes.forEach(e => {
-			if (space === `${e}s`) f_space = DB.pgp.as.format(`p.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'pad' AND type = $2)`, [ uuid, e ])
-		})
-		if (space === 'curated') f_space = DB.pgp.as.format(`(p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
-		if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
-		if (space === 'reviewing') f_space = DB.pgp.as.format(`
+		else if (space === 'curated') f_space = DB.pgp.as.format(`(p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
+		else if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
+		else if (space === 'reviewing') f_space = DB.pgp.as.format(`
 			((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) 
 				OR (p.owner IN ($1:csv)))
 			AND p.id IN (SELECT pad FROM review_requests)
 		`, [ collaborators_ids, rights ])
-		if (space === 'public' || !uuid) f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
-		if (space === 'pinned') {
-			if (uuid) f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
-			else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
+		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		else if (space === 'pinned') {
+			if (public) {
+				if (pinboard) f_space = DB.pgp.as.format(`
+						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
+						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT))))
+					`, [ pinboard ])
+				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
+			} else { // THE USER IS LOGGED IN
+				if (pinboard) f_space = DB.pgp.as.format(`
+						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
+						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $3::INT) 
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $3::INT))))
+					`, [ collaborators_ids, rights, pinboard ])
+				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
+			}
+		}
+		else if (engagementtypes.some(d => space === `${d}s`)) {
+			const type = engagementtypes.find(d => space === `${d}s`)
+			f_space = DB.pgp.as.format(`p.id IN (SELECT docid FROM engagement WHERE contributor = $1 AND doctype = 'pad' AND type = $2)`, [ uuid, type ])
 		}
 		base_filters.push(f_space)
 
@@ -115,15 +129,15 @@ exports.main = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT member FROM team_members WHERE team IN ($1:csv)
 			;`, [ teams ])
-			.then(results =>  DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
 			.catch(err => console.log(err)))
 		}
 		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
-		if (pinboard) platform_filters.push(DB.pgp.as.format(`
-				(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
-				OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
-			`, [ pinboard ]))
+		// if (pinboard) platform_filters.push(DB.pgp.as.format(`
+		// 		(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
+		// 		OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
+		// 	`, [ pinboard ]))
 		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
 		// if (sources) platform_filters.push(DB.pgp.as.format(`AND p.source IS NULL`))
 

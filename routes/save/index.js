@@ -6,15 +6,15 @@ const template = require('./template/')
 const review = require('./review/')
 const file = require('./file/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { object } = req.params || {}
 
-	if (object === 'tag') tag.main(req, res)
-	else if (object === 'pinboard') pinboard.main(req, res)
-	else if (object === 'contributor') contributor.main(req, res)
-	else if (object === 'pad') pad.main(req, res)
-	else if (object === 'template') template.main(req, res)
-	else if (object === 'review') review.main(req, res)
-	else if (object === 'file') file.main(req, res)
+	if (object === 'tag') tag(req, res)
+	else if (object === 'pinboard') pinboard(req, res)
+	else if (object === 'contributor') contributor(req, res)
+	else if (object === 'pad') pad(req, res)
+	else if (object === 'template') template(req, res)
+	else if (object === 'review') review(req, res)
+	else if (object === 'file') file(req, res)
 	else res.redirect('/module-error')
 }

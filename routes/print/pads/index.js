@@ -4,14 +4,14 @@ const { checklanguage, datastructures, array, join } = include('routes/helpers/'
 
 const { filter } = require('../../browse/pads/')
 
-exports.render = async (req, res) => {
+module.exports = async (req, res) => {
 	const { object } = req.params || {}
-	
-	if (req.session.uuid) { // USER IS LOGGED IN
-		var { uuid, rights, collaborators } = req.session || {}
-	} else { // PUBLIC/ NO SESSION
-		var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	}
+	const { uuid, rights, collaborators } = req.session || {}
+	// if (req.session.uuid) { // USER IS LOGGED IN
+	// 	var { uuid, rights, collaborators } = req.session || {}
+	// } else { // PUBLIC/ NO SESSION
+	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
+	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS

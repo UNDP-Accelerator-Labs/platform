@@ -2,7 +2,7 @@ const { DB } = include('config/')
 const fs = require('fs')
 const path = require('path')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { id, tagging, locations, metadata, deletion, mobilization } = req.body || {}
 	const { uuid } = req.session || {}
 

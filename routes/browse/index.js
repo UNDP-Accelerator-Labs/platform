@@ -9,7 +9,8 @@ const contributors = require('./contributors/')
 
 module.exports = async (req, res) => {
 	const { xhr } = req
-	let { object, space, instance } = req.params || {}
+	const { object, space, instance } = req.params || {}
+	const { public } = req.session || {}
 
 	// if (req.session.uuid) { // USER IS LOGGED IN
 	// 	var { rights } = req.session || {}
@@ -25,18 +26,18 @@ module.exports = async (req, res) => {
 	if (modules.some(d => d.type === object)) {
 		if (!xhr) {
 			if (object === 'pads') pads.render(req, res)
-			if (object === 'templates') templates.render(req, res)
-			if (object === 'files') files.render(req, res)
-			if (object === 'reviews') reviews.render(req, res)
-			if (object === 'mobilizations') mobilizations.render(req, res)
-			if (object === 'contributors') contributors.render(req, res)
+			else if (object === 'templates') templates.render(req, res)
+			else if (object === 'files') files.render(req, res)
+			else if (object === 'reviews') reviews.render(req, res)
+			else if (object === 'mobilizations') mobilizations.render(req, res)
+			else if (object === 'contributors') contributors.render(req, res)
 		} else { // AJAX CALL
 			let data 
 			if (object === 'pads') data = await pads.load({ req: req })
-			if (object === 'templates') data = await templates.load({ req: req })
-			if (object === 'files') data = await files.load({ req: req })
-			if (object === 'reviews') data = await reviews.load({ req: req })
-			if (object === 'contributors') data = await contributors.load({ req: req })
+			else if (object === 'templates') data = await templates.load({ req: req })
+			else if (object === 'files') data = await files.load({ req: req })
+			else if (object === 'reviews') data = await reviews.load({ req: req })
+			else if (object === 'contributors') data = await contributors.load({ req: req })
 			// TO DO: FOR MOBILIZATIONS
 			res.status(200).json(data)
 		}

@@ -87,6 +87,7 @@
 
 			<% if (object === 'pads') { %>
 				<div class='global-actions'>
+					<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
 					<% if (space !== 'pinned') { %>
 						<%# if (query.search?.length || Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
 							<div class='add filter pinboards'>

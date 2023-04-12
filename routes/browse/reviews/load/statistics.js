@@ -1,9 +1,9 @@
 const { modules, DB } = include('config/')
 const { datastructures, checklanguage, flatObj } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = async kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
 	const { req } = kwargs || {}

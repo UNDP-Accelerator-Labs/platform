@@ -1,6 +1,6 @@
 const { DB } = include('config/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { id } = req.body || {}
 
 	if (!id) { // INSERT OBJECT

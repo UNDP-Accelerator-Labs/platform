@@ -1,19 +1,19 @@
 const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, DB } = include('config/')
 const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = async kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
 	const { object } = req.params || {}
 	
-	// const { uuid, rights, collaborators } = req.session || {}
-	if (req.session.uuid) { // USER IS LOGGED IN
-		var { uuid, rights, collaborators } = req.session || {}
-	} else { // PUBLIC/ NO SESSION
-		var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	}
+	const { uuid, rights, collaborators } = req.session || {}
+	// if (req.session.uuid) { // USER IS LOGGED IN
+	// 	var { uuid, rights, collaborators } = req.session || {}
+	// } else { // PUBLIC/ NO SESSION
+	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
+	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS

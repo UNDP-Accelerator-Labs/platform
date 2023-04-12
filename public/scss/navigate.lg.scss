@@ -514,6 +514,8 @@ header {
 										li.open {
 											.dropdown {
 												display: block;
+												min-height: 45px;
+												width: 100%;
 											}
 										}
 									}

@@ -9,9 +9,9 @@ const turf = require('@turf/turf')
 const { app_title_short, DB } = include('config/')
 const { checklanguage, array } = include('routes/helpers/')
 
-const filter = include('routes/browse/contributors/filter').main
+const filter = include('routes/browse/contributors/filter')
 
-exports.main = async (req, res) => {
+module.exports = async (req, res) => {
 	let { output, render, include_data, include_teams, include_contributions } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body || {}
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.body.language || req.session.language)

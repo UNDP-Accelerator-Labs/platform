@@ -1,2 +1,2 @@
-exports.accept = require('./accept.js').main
-exports.decline = require('./decline.js').main
+exports.accept = require('./accept.js')
+exports.decline = require('./decline.js')

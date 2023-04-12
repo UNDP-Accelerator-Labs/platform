@@ -1,7 +1,7 @@
 const { app_title, DB } = include('config/')
 const { checklanguage, email: sendemail } = include('routes/helpers/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	let { contributor, pinboard } = req.body || {}
 	const { uuid, email: from, username } = req.session || {}
@@ -48,8 +48,10 @@ exports.main = (req, res) => {
 								<br><br><strong>${title}</strong>
 								<br><br>Please click <a href='${referer}'>this link</a> to view the collection.` // TO DO: TRANSLATE AND STYLIZE
 						})
-					})).then(_ => res.redirect(referer))
-					.catch(err => console.log(err))
+					})).then(_ => {
+						if (referer) res.redirect(referer)
+						else res.redirect('/login')
+					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))

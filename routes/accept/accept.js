@@ -1,6 +1,6 @@
 const { modules, DB } = include('config/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	const { id, template } = req.query || {}
 	const { uuid } = req.session || {}
@@ -50,7 +50,8 @@ exports.main = (req, res) => {
 				})
 			}).catch(err => console.log(err))
 		}).then(_ => {
-			res.redirect(referer)
+			if (referer) res.redirect(referer)
+			else res.redirect('/login')
 		}).catch(err => console.log(err))
 	}
 }

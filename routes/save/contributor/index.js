@@ -1,7 +1,7 @@
 const { app_title, app_suite, DB } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req?.headers || {}
 	const { uuid, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
@@ -132,7 +132,9 @@ exports.main = (req, res) => {
 				} else return null
 			}).catch(err => console.log(err))
 			.catch(err => console.log(err))
-		}).then(_ => res.redirect(referer))
-		.catch(err => console.log(err))
+		}).then(_ => {
+			if (referer) res.redirect(referer)
+			else res.redirect('/login')
+		}).catch(err => console.log(err))
 	}
 }

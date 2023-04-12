@@ -1,1 +1,1 @@
-exports.publish = require('./publish.js').main
+exports.publish = require('./publish.js')

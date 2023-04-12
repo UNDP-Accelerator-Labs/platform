@@ -1,2 +1,2 @@
-exports.xlsx = require('./xlsx.js').main
-exports.json = require('./json.js').main
+exports.xlsx = require('./xlsx.js')
+exports.json = require('./json.js')

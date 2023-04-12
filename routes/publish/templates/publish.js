@@ -1,6 +1,6 @@
 const { modules, DB } = include('config/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	const { id, limit, status } = req.query || {}
 	const { uuid, rights, collaborators } = req.session || {}
@@ -40,7 +40,9 @@ exports.main = (req, res) => {
 		}
 
 		return t.batch(batch)
-		.then(_ => res.redirect(referer))
-		.catch(err => console.log(err))
+		.then(_ => {
+			if (referer) res.redirect(referer)
+			else res.redirect('/login')
+		}).catch(err => console.log(err))
 	})
 }

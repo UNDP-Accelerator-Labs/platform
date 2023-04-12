@@ -402,7 +402,7 @@
 			<% } %>
 		</div>
 		<div class='outer'>
-			<% if (pages > 1) { %>
+			<% if (pages > 1 && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 				<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
 			<% } %>
 		</div>
@@ -712,7 +712,7 @@
 						// const target_opts = <%- JSON.stringify(languages.filter(d => locals.metadata.menu.review_templates?.some(c => c.language === d.language))?.map(d => { return { label: d.name, value: d.language, type: 'radio', required: true } })) %>
 						const target_opts = <%- JSON.stringify(locals.metadata.menu.review_templates.map(d => { return { label: d.name, value: d.language, count: d.count, disabled: { value: d.disabled, label: vocabulary["missing reviewers"][language] }, type: 'radio', required: true } })) %>
 
-						// TO DO: FILTER THIS BASED ON USER RIGHTS > review.rights.write
+						// TO DO: FILTER THIS BASED ON USER RIGHTS >= review.rights.write
 						const reviewers = await POST('/<%- language %>/browse/contributors/all', { limit: null })
 						const reviewer_opts = reviewers.data.map(d => {
 							d.secondary_languages.push(d.language)

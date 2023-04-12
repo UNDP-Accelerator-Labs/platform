@@ -1,6 +1,6 @@
 const { DB } = include('config/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { uuid } = req.session || {}
 	const { object, id, type, message, action } = req.body || {}
 

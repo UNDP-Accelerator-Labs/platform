@@ -3,7 +3,7 @@ const { checklanguage, email: sendemail } = include('routes/helpers/')
 
 const cron = require('node-cron')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	let { title, description, cohort, template, public, start_date, end_date } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]

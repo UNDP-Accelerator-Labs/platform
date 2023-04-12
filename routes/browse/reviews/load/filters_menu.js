@@ -1,12 +1,12 @@
 const { modules, metafields, DB } = include('config/')
 const { array, datastructures, checklanguage, join, flatObj } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = async kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
-	const { req, participations } = kwargs || {}
+	const { req } = kwargs || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
@@ -94,20 +94,23 @@ exports.main = async kwargs => {
 			// GET MOBILIZATIONS BREAKDOWN
 			// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
 			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
-			// if (modules.includes('mobilizations') && participations.length) {
-			if (modules.some(d => d.type === 'mobilizations') && participations.length) {
+			// if (modules.some(d => d.type === 'mobilizations') && participations.length) {
+			if (modules.some(d => d.type === 'mobilizations')) {
 				batch1.push(t1.any(`
 					SELECT COUNT (DISTINCT (p.id))::INT, m.id, m.title AS name, start_date FROM pads p 
 					INNER JOIN mobilization_contributions mc 
 						ON mc.pad = p.id
 					INNER JOIN mobilizations m
 						ON m.id = mc.mobilization
-					WHERE m.id IN ($1:csv)
+					WHERE (m.id IN (
+						SELECT mobilization
+						FROM mobilization_contributors 
+							WHERE participant = $1
+					) OR m.owner = $1)
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
-				;`, [ participations.map(d => d.id), full_filters ]).then(results => { 
-					// results.sort((a, b) => +b.start_date - +a.start_date)
+				;`, [ uuid, full_filters ]).then(results => { 
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)

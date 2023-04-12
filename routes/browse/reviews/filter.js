@@ -2,7 +2,7 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
-exports.main = req => {
+module.exports = req => {
 	const { object, space } = req.params || {}
 	const { uuid, country, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)

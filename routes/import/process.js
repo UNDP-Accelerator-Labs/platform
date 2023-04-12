@@ -1,8 +1,7 @@
 const { modules, DB } = include('config/')
-// const header_data = include('routes/header').data
 const helpers = include('routes/helpers/')
 
-exports.main = (req, res) => { // TO DO
+module.exports = (req, res) => { // TO DO
 	// 1 CREATE AND STORE THE TEMPLATE
 	// 2 CREATE AND STORE THE PADS
 	const { pads, template, tags, mobilization } = req.body || {}
@@ -105,16 +104,15 @@ exports.main = (req, res) => { // TO DO
 								SELECT $1::INT, m.id FROM mobilizations m 
 									WHERE m.id IN ($2::INT, (SELECT source FROM mobilizations WHERE id = $2::INT AND child = TRUE))
 							;`, [ pad_id, mobilization ]))
-
-
 						}
 
 						return t1.batch(batch1)
 						.then(_ => pad_id)
+						.catch(err => console.log(err))
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
-			}))
-		})
+			})).catch(err => console.log(err))
+		}).catch(err => console.log(err))
 	}).then(results => res.json({ pads: results }))
 	.catch(err => console.log(err))
 }

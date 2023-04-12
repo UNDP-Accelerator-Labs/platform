@@ -9,9 +9,9 @@ const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 const { app_title_short, metafields, media_value_keys, DB } = include('config/')
 const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers/')
 
-const filter = include('routes/browse/pads/filter').main
+const filter = include('routes/browse/pads/filter')
 
-exports.main = async (req, res) => {
+module.exports = async (req, res) => {
 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = req.body || {}
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.body.language || req.session.language)

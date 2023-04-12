@@ -1,14 +1,14 @@
 const { modules, metafields, DB } = include('config/')
 const { datastructures, checklanguage, count, flatObj } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
 // TO DO: FIX THIS (SEE ISSUES IN PUBLIC VIEW)
 
-exports.main = async kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
-	const { req, participations } = kwargs || {}
+	const { req } = kwargs || {}
 	const { space } = req.params || {}
 	const { uuid, rights } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)

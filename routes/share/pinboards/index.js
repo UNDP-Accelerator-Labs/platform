@@ -1,1 +1,1 @@
-exports.share = require('./share.js').main
+exports.share = require('./share.js')

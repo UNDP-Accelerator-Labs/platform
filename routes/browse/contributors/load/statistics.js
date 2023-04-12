@@ -1,9 +1,9 @@
 const { modules, DB } = include('config/')
 const helpers = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = kwargs => {
+module.exports = kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
 	const { req } = kwargs || {}
 	const { uuid, rights, collaborators } = req.session || {}

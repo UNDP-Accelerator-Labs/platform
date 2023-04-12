@@ -1,8 +1,7 @@
 const { modules, DB } = include('config/')
-const header_data = include('routes/header/').data
 const { checklanguage, join, datastructures } = include('routes/helpers/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { object } = req.params || {}
 	const { public, id: source, copy, child } = req.query || {} 
 	const { uuid, rights, collaborators } = req.session || {}

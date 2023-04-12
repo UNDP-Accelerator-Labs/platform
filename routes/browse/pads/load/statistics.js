@@ -1,22 +1,22 @@
 const { modules, DB } = include('config/')
 const { datastructures, checklanguage, flatObj } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = async kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
 	const { req, res } = kwargs || {}
 	const { object } = req.params || {}
 
-	if (req.session.uuid) { // USER IS LOGGED IN
-		var { uuid, rights, collaborators } = req.session || {}
-	} else { // PUBLIC/ NO SESSION
-		var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	}
+	const { uuid, rights, collaborators } = req.session || {}
+	// if (req.session.uuid) { // USER IS LOGGED IN
+	// 	var { uuid, rights, collaborators } = req.session || {}
+	// } else { // PUBLIC/ NO SESSION
+	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
+	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 
-	// const { uuid, rights, collaborators } = req.session || {}
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 	

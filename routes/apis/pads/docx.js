@@ -10,16 +10,16 @@ const { checklanguage, datastructures, array, join, geo } = include('routes/help
 
 const { filter } = require('../../browse/pads/')
 
-exports.main = async (req, res) => {
+module.exports = async (req, res) => {
 	const { output, render, include_data, include_toc, chapters, standardize_structure } = req.body || {}
 	const { object } = req.params || {}
 	const pw = req.session.email || null
 
-	if (req.session.uuid) { // USER IS LOGGED IN
-		var { uuid, rights, username, collaborators } = req.session || {}
-	} else { // PUBLIC/ NO SESSION
-		var { uuid, rights, username, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	}
+	// if (req.session.uuid) { // USER IS LOGGED IN
+	const { uuid, rights, username } = req.session || {}
+	// } else { // PUBLIC/ NO SESSION
+		// var { uuid, rights, username, collaborators } = datastructures.sessiondata({ public: true }) || {}
+	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS

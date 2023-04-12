@@ -1,6 +1,7 @@
 const pads = require('./pads/')
 const files = require('./files/')
 const contributors = require('./contributors/')
+const tokens = require('./tokens/')
 const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
@@ -10,6 +11,8 @@ module.exports = async (req, res) => {
 
 	// TO DO: ADD Readme.md TO DOWNLOADS
 
+
+	// THE token SHOULD BE HANDLED IN THE check.login MIDDLEWARE
 	if (token) { // IF THERE IS A TOKEN, THIS IS AN CORS CALL, SO WE NEED TO SET UP SOME BASIC session INFORMATION
 		const auth = jwt.verify(token, process.env.GLOBAL_LOGIN_KEY)
 		if (auth) {
@@ -18,20 +21,24 @@ module.exports = async (req, res) => {
 		} // IF NO TOKEN IS SENT, THEN ONLY PUBLIC CONTENT CAN BE DOWNLOADED
 	}
 
-	if (action === 'download' && render) {
-		if (object === 'pads') {
-			if (['xlsx', 'csv'].includes(output)) pads.xlsx(req, res)
-			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
-			else if (output === 'docx') pads.docx(req, res)
-			else res.redirect('/module-error')
-		} else if (object === 'contributors') {
-			if (['xlsx', 'csv'].includes(output)) contributors.xlsx(req, res)
-			else if (['json', 'geojson'].includes(output)) contributors.json(req, res)
-			else res.redirect('/module-error')
-		}
+	if (action === 'download') {
+		if (render) {
+			if (object === 'pads') {
+				if (['xlsx', 'csv'].includes(output)) pads.xlsx(req, res)
+				else if (['json', 'geojson'].includes(output)) pads.json(req, res)
+				else if (output === 'docx') pads.docx(req, res)
+				else res.redirect('/module-error')
+			} else if (object === 'contributors') {
+				if (['xlsx', 'csv'].includes(output)) contributors.xlsx(req, res)
+				else if (['json', 'geojson'].includes(output)) contributors.json(req, res)
+				else res.redirect('/module-error')
+			}
+		} else res.redirect('/module-error')
 	} else if (action === 'fetch') {
 		if (object === 'pads') pads.json(req, res)
-		else if (object === 'files') files.main(req, res)
+		else if (object === 'files') files(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
+	} else if (action === 'request') {
+		if (object === 'token') tokens.generate(req, res)
 	}
 }

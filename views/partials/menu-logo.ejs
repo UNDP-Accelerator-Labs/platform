@@ -263,7 +263,7 @@
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'contributors')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'contributors')?.rights.write ?? Infinity)) { %>
 								<li>
-									<a href='/<%- language %>/mobilize/contributor'>
+									<a href='/<%- language %>/contribute/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
 											<label><%- vocabulary['contributor'][language](false).capitalize() %></label>

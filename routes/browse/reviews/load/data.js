@@ -1,9 +1,9 @@
 const { page_content_limit, modules, DB } = include('config/')
 const { checklanguage, datastructures, parsers, join } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = async kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req } = kwargs || {}
 	const { object, space } = req.params || {}

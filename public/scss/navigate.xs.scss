@@ -400,7 +400,7 @@ header { /* LEFT COlUMN */
 
 		nav#site-title {
 			display: block;
-			margin-top: 60px;
+			margin-top: 45px;
 
 			.inner {
 				position: static;
@@ -411,6 +411,10 @@ header { /* LEFT COlUMN */
 				left: 0;
 				width: 100%;
 				height: auto;
+
+				img.logo {
+					height: 125px;
+				}
 
 				.create, 
 				.save {

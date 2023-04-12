@@ -397,10 +397,12 @@
 						<% } %>
 						<!-- TO DO: FIX THIS: FOR SOME REASON NOTHING WORKS HERE WHEN IN REVIEW MODE -->
 						<% if (!anonymized) { %>
-							<% if (activity === 'edit') { %>
-								<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
-							<% } else { %>
-								<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
+							<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
+								<% if (activity === 'edit') { %>
+									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
+								<% } else { %>
+									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
+								<% } %>
 							<% } %>
 						<% } %>
 					<% } else { %><!-- IF THE PAD IS A REVIEW, SO THE TITLE ONLY NEEDS TO BE THE REVIEWER ID -->
@@ -1173,7 +1175,7 @@
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
+				![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -1205,7 +1207,7 @@
 		e = e || event
 		if (editing) {
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
+				![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())

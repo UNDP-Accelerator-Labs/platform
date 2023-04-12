@@ -4,8 +4,8 @@ exports.array = require('./array/')
 exports.join = require('./joins/')
 exports.parsers = require('./parsers/')
 exports.datastructures = require('./datastructures/')
-exports.checklanguage = require('./language/').main
-exports.email = require('./email/').main
+exports.checklanguage = require('./language/')
+exports.email = require('./email/')
 exports.geo = require('./geo/')
 
 exports.flatObj = function () {

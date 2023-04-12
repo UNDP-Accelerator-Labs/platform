@@ -1,21 +1,26 @@
 const { DB } = include('config/')
 
-exports.main = (req, res) => {	
+module.exports = (req, res) => {	
 	const { referer } = req.headers || {}
 	let { id } = req.query || {}
-	const { uuid, rights } = req.session || {}
+	const { uuid, rights, public } = req.session || {}
 	// CONVERT id TO ARRAY
 	if (!Array.isArray(id)) id = [id]
-	id = id.map(d => +d)
+	id = id.map(d => +d).filter(d => !isNaN(d))
 	
-	if (id.length) {
+	if (id.length && !public) {
 		DB.conn.none(`
 			DELETE FROM pads
 			WHERE id IN ($1:csv)
 				AND (owner = $2
 					OR $3 > 2)
 		;`, [ id, uuid, rights ])
-		.then(_ => res.redirect(referer))
-		.catch(err => console.log(err))
-	} else res.redirect(referer)
+		.then(_ => {
+			if (referer) res.redirect(referer)
+			else res.redirect('/login')
+		}).catch(err => console.log(err))
+	} else {
+		if (referer) res.redirect(referer)
+		else res.redirect('/login')
+	}
 }

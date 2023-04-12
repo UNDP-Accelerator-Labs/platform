@@ -1,7 +1,7 @@
 const { app_title } = include('config/')
 const nodeMailer = require('nodemailer')
 
-exports.main = (kwargs) => {
+module.exports = (kwargs) => {
 	let { from, to, subject, html } = kwargs
 	if (!from) from = `"${app_title}" <myjyby@gmail.com>`
 	if (!to) return { status: 500, message: 'The message has no recipient.' }

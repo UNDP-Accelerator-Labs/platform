@@ -1,7 +1,7 @@
 const password = require('./password.js')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { object } = req.params || {}
 
-	if (object === 'password') password.main(req, res)
+	if (object === 'password') password(req, res)
 }

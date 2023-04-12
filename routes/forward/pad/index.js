@@ -1,6 +1,6 @@
 const { followup_count, metafields, DB } = include('config/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	const { id, mobilization } = req.query || {}
 
@@ -70,6 +70,9 @@ exports.main = (req, res) => {
 			}
 		})
 	})
-	.then(_ => res.redirect(referer)) // TO DO: OPEN NEW PAGE WITH THE PAD
+	.then(_ => {
+		if (referer) res.redirect(referer)
+		else res.redirect('/login')
+	}) // TO DO: OPEN NEW PAGE WITH THE PAD
 	.catch(err => console.log(err))	
 }

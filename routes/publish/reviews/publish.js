@@ -1,7 +1,7 @@
 const { app_suite, app_title, modules, DB } = include('config/')
 const { checklanguage, parsers, email: sendemail } = include('routes/helpers/')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { host, referer } = req.headers || {}
 	const { id, source, status } = req.query || {}
 	const { uuid, rights } = req.session || {}
@@ -167,6 +167,8 @@ exports.main = (req, res) => {
 				}).catch(err => console.log(err))
 			}
 		}).catch(err => console.log(err))
-	}).then(_ => res.redirect(referer))
-	.catch(err => console.log(err))
+	}).then(_ => {
+		if (referer) res.redirect(referer)
+		else res.redirect('/login')
+	}).catch(err => console.log(err))
 }

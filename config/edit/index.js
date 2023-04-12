@@ -27,6 +27,7 @@ exports.modules = [
 // DESIRED METADATA
 // TO DO: metafields SHOULD BE ANY KIND OF MEDIA, E.G. CHECKBOX WITH VALUES, TEXT, ETC
 	// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
+
 exports.metafields = [
 	{ type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 }, 
 

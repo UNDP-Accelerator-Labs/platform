@@ -102,10 +102,12 @@
 				<% } else { %>
 					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>'></div>
 				<% } %>
-				<% if (activity === 'edit') { %>
-					<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
-				<% } else { %>
-					<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
+				<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
+					<% if (activity === 'edit') { %>
+						<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
+					<% } else { %>
+						<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
+					<% } %>
 				<% } %>
 			</div>
 			<div class='body'>
@@ -119,7 +121,7 @@
 					</div>
 					<% if (!review_template) { %>
 						<div class='input-slideshow'>
-							<input id='slideshow-status' type='checkbox' class='toggle' name='slideshow' value='true' <% if (locals.data?.slideshow) { %>checked<% } %>>
+							<input id='slideshow-status' type='checkbox' class='toggle' name='slideshow' value='true' <% if (locals.data?.slideshow) { %>checked<% } %> onchange='partialSave()'>
 							<label for='slideshow-status'></label>
 							<p><%- vocabulary['show template as slideshow'][language] %></p>
 						</div>
@@ -462,7 +464,7 @@
 			}
 			// PROVIDE HIGHLIGHT FEEDBACK
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
+				![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
@@ -482,7 +484,7 @@
 
 		if (editing) {
 			if (
-				![head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
+				![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
 				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())

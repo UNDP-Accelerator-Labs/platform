@@ -325,8 +325,41 @@
 				</form>
 			</div>
 			<div class='foot'>
+				<% if (editable && locals.data?.uuid) { %>
+					<div class='api-token'>
+						<form>
+							<!-- TO DO: TRANSLATE -->
+							<button class='request-token' type='button' onclick='requestToken(this.form)'>Request an API token</button>
+							<div class='input-group'>
+								<input type='text' name='api-token' class='hide' onclick='this.select()' readonly>
+								<button type='button' class='copy hide' onclick='copyToken(this.form)'>Copy</button>
+								<!-- TO DO: TRANSLATE -->
+							</div>
+						</form>
+					</div>
+					<script type='text/javascript'>
+						async function requestToken (node) {
+							const token = await POST('/apis/request/token')
+							if (token) {
+								const inputgroup = d3.select(node)
+								inputgroup.selectAll('.hide')
+									.classed('hide', false)
+								const input = inputgroup.select('input[type=text]')
+									.attr('value', token)
+								input.node().select()
+							}
+						}
+						function copyToken (node) {
+							const inputgroup = d3.select(node)
+							const token = inputgroup.select('input[type=text]').node().value
+							navigator.clipboard.writeText(token)
+						}
+					</script>
+				<% } %>
 				<% if (locals.data?.pads > 0) { %>
-					<a href='../browse/pads/public?contributors=<%- locals.data?.uuid %>' target='_blank'><%- vocabulary['browse publications'][language] %></a>
+					<div class='user-content'>
+						<a href='../browse/pads/public?contributors=<%- locals.data?.uuid %>' target='_blank'><%- vocabulary['browse publications'][language] %></a>
+					</div>
 				<% } %>
 			</div>
 		</div>

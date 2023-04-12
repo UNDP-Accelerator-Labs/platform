@@ -1,2 +1,2 @@
-exports.create = require('./create.js').main
-exports.save = require('./save.js').main
+exports.render = require('./render.js')
+exports.process = require('./process.js')

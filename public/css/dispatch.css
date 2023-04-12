@@ -106,6 +106,18 @@ input:-webkit-autofill:active {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
+.screen.transparent {
+  background: transparent;
+}
+
+.screen.blue {
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(50, 190, 225, 0.1) 3px, rgba(50, 190, 225, 0.1) 6px);
+}
+
+.screen.error {
+  background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
+}
+
 .screen.bis {
   /*background-color: $c-mid-1;*/
 }
@@ -827,7 +839,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
   }
   header .inner nav#site-title {
     display: block;
-    margin-top: 60px;
+    margin-top: 45px;
   }
   header .inner nav#site-title .inner {
     position: static;
@@ -838,6 +850,9 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     left: 0;
     width: 100%;
     height: auto;
+  }
+  header .inner nav#site-title .inner img.logo {
+    height: 125px;
   }
   header .inner nav#site-title .inner .create,
 header .inner nav#site-title .inner .save {
@@ -1802,6 +1817,102 @@ header .inner nav#site-title .inner .create:focus button {
   .cluster-pin.selected {
     background-color: #0468B1;
     border-color: #0468B1;
+  }
+
+  .login-module {
+    padding: 30px 30px 15px 30px;
+    border-top: 2px solid #005687;
+    background-color: #FFF;
+  }
+  .login-module ul li {
+    position: relative;
+    min-height: 45px;
+    margin: 5px 0;
+  }
+  .login-module ul li .required {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -30px;
+    width: 30px;
+    top: -5px;
+    height: 100%;
+    margin: 5px 0;
+    text-align: center;
+  }
+  .login-module ul li .required input {
+    display: none;
+  }
+  .login-module ul li .required label {
+    font-size: 20px;
+    line-height: 1.5em;
+    color: #969696;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .login-module ul li .required input:checked + label,
+.login-module ul li .required label.active {
+    color: #A51E41;
+  }
+  .login-module ul li .input-group {
+    position: relative;
+    flex-grow: 1;
+  }
+  .login-module ul li .input-group input.toggle + label {
+    margin: 0;
+  }
+  .login-module ul li input[type=text],
+.login-module ul li input[type=password] {
+    position: relative;
+    width: calc(100% - 30px);
+    height: 30px;
+    border: none;
+    outline: none;
+    padding: 15px 15px 0 15px;
+    background-color: #FFF;
+    font-size: 14px;
+    color: #005687;
+    border-bottom: 1px solid #969696;
+  }
+  .login-module ul li input[type=text] + label,
+.login-module ul li input[type=password] + label {
+    position: absolute;
+    left: 15px;
+    top: 5px;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #969696;
+    transform: translateY(13.5px);
+    transition: transform 0.25s, font-size 0.25s;
+    pointer-events: none;
+  }
+  .login-module ul li input[type=text]:focus + label,
+.login-module ul li input[type=text].has-value + label,
+.login-module ul li input[type=password]:focus + label,
+.login-module ul li input[type=password].has-value + label {
+    font-size: 12px;
+    line-height: 1.5em;
+    transform: translateY(-2px);
+  }
+  .login-module ul li input[type=email]:invalid,
+.login-module ul li input[type=password].error {
+    background: repeating-linear-gradient(45deg, #FFF, #FFF 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
+  }
+  .login-module ul li button {
+    width: 100%;
+    min-height: 30px;
+    border: 1px solid #005687;
+    outline: none;
+    background-color: transparent;
+    margin-top: 15px;
+    padding: 0 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  .login-module ul li p.errormessage {
+    color: #A51E41;
   }
 
   div.fixed-bg {
@@ -6860,7 +6971,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
   }
   header .inner nav#site-title {
     display: block;
-    margin-top: 60px;
+    margin-top: 45px;
   }
   header .inner nav#site-title .inner {
     position: static;
@@ -6871,6 +6982,9 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     left: 0;
     width: 100%;
     height: auto;
+  }
+  header .inner nav#site-title .inner img.logo {
+    height: 125px;
   }
   header .inner nav#site-title .inner .create,
 header .inner nav#site-title .inner .save {
@@ -7835,6 +7949,102 @@ header .inner nav#site-title .inner .create:focus button {
   .cluster-pin.selected {
     background-color: #0468B1;
     border-color: #0468B1;
+  }
+
+  .login-module {
+    padding: 30px 30px 15px 30px;
+    border-top: 2px solid #005687;
+    background-color: #FFF;
+  }
+  .login-module ul li {
+    position: relative;
+    min-height: 45px;
+    margin: 5px 0;
+  }
+  .login-module ul li .required {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -30px;
+    width: 30px;
+    top: -5px;
+    height: 100%;
+    margin: 5px 0;
+    text-align: center;
+  }
+  .login-module ul li .required input {
+    display: none;
+  }
+  .login-module ul li .required label {
+    font-size: 20px;
+    line-height: 1.5em;
+    color: #969696;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .login-module ul li .required input:checked + label,
+.login-module ul li .required label.active {
+    color: #A51E41;
+  }
+  .login-module ul li .input-group {
+    position: relative;
+    flex-grow: 1;
+  }
+  .login-module ul li .input-group input.toggle + label {
+    margin: 0;
+  }
+  .login-module ul li input[type=text],
+.login-module ul li input[type=password] {
+    position: relative;
+    width: calc(100% - 30px);
+    height: 30px;
+    border: none;
+    outline: none;
+    padding: 15px 15px 0 15px;
+    background-color: #FFF;
+    font-size: 14px;
+    color: #005687;
+    border-bottom: 1px solid #969696;
+  }
+  .login-module ul li input[type=text] + label,
+.login-module ul li input[type=password] + label {
+    position: absolute;
+    left: 15px;
+    top: 5px;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #969696;
+    transform: translateY(13.5px);
+    transition: transform 0.25s, font-size 0.25s;
+    pointer-events: none;
+  }
+  .login-module ul li input[type=text]:focus + label,
+.login-module ul li input[type=text].has-value + label,
+.login-module ul li input[type=password]:focus + label,
+.login-module ul li input[type=password].has-value + label {
+    font-size: 12px;
+    line-height: 1.5em;
+    transform: translateY(-2px);
+  }
+  .login-module ul li input[type=email]:invalid,
+.login-module ul li input[type=password].error {
+    background: repeating-linear-gradient(45deg, #FFF, #FFF 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
+  }
+  .login-module ul li button {
+    width: 100%;
+    min-height: 30px;
+    border: 1px solid #005687;
+    outline: none;
+    background-color: transparent;
+    margin-top: 15px;
+    padding: 0 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  .login-module ul li p.errormessage {
+    color: #A51E41;
   }
 
   div.fixed-bg {
@@ -13871,6 +14081,102 @@ header .inner nav#site-title .inner .create:focus button {
     border-color: #0468B1;
   }
 
+  .login-module {
+    padding: 30px 30px 15px 30px;
+    border-top: 2px solid #005687;
+    background-color: #FFF;
+  }
+  .login-module ul li {
+    position: relative;
+    min-height: 45px;
+    margin: 5px 0;
+  }
+  .login-module ul li .required {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -30px;
+    width: 30px;
+    top: -5px;
+    height: 100%;
+    margin: 5px 0;
+    text-align: center;
+  }
+  .login-module ul li .required input {
+    display: none;
+  }
+  .login-module ul li .required label {
+    font-size: 20px;
+    line-height: 1.5em;
+    color: #969696;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .login-module ul li .required input:checked + label,
+.login-module ul li .required label.active {
+    color: #A51E41;
+  }
+  .login-module ul li .input-group {
+    position: relative;
+    flex-grow: 1;
+  }
+  .login-module ul li .input-group input.toggle + label {
+    margin: 0;
+  }
+  .login-module ul li input[type=text],
+.login-module ul li input[type=password] {
+    position: relative;
+    width: calc(100% - 30px);
+    height: 30px;
+    border: none;
+    outline: none;
+    padding: 15px 15px 0 15px;
+    background-color: #FFF;
+    font-size: 14px;
+    color: #005687;
+    border-bottom: 1px solid #969696;
+  }
+  .login-module ul li input[type=text] + label,
+.login-module ul li input[type=password] + label {
+    position: absolute;
+    left: 15px;
+    top: 5px;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #969696;
+    transform: translateY(13.5px);
+    transition: transform 0.25s, font-size 0.25s;
+    pointer-events: none;
+  }
+  .login-module ul li input[type=text]:focus + label,
+.login-module ul li input[type=text].has-value + label,
+.login-module ul li input[type=password]:focus + label,
+.login-module ul li input[type=password].has-value + label {
+    font-size: 12px;
+    line-height: 1.5em;
+    transform: translateY(-2px);
+  }
+  .login-module ul li input[type=email]:invalid,
+.login-module ul li input[type=password].error {
+    background: repeating-linear-gradient(45deg, #FFF, #FFF 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
+  }
+  .login-module ul li button {
+    width: 100%;
+    min-height: 30px;
+    border: 1px solid #005687;
+    outline: none;
+    background-color: transparent;
+    margin-top: 15px;
+    padding: 0 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  .login-module ul li p.errormessage {
+    color: #A51E41;
+  }
+
   div.fixed-bg {
     position: fixed;
     top: 0;
@@ -19884,6 +20190,8 @@ header .inner nav#site-title .inner .save .dropdown ul li .dropdown ul li .dropd
   header .inner nav#site-title .inner .create .dropdown ul li .dropdown ul li.open .dropdown,
 header .inner nav#site-title .inner .save .dropdown ul li .dropdown ul li.open .dropdown {
     display: block;
+    min-height: 45px;
+    width: 100%;
   }
   header .inner nav#site-title .inner .create .dropdown ul li.open .dropdown,
 header .inner nav#site-title .inner .save .dropdown ul li.open .dropdown {
@@ -20940,6 +21248,102 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   .cluster-pin.selected {
     background-color: #0468B1;
     border-color: #0468B1;
+  }
+
+  .login-module {
+    padding: 30px 30px 15px 30px;
+    border-top: 2px solid #005687;
+    background-color: #FFF;
+  }
+  .login-module ul li {
+    position: relative;
+    min-height: 45px;
+    margin: 5px 0;
+  }
+  .login-module ul li .required {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -30px;
+    width: 30px;
+    top: -5px;
+    height: 100%;
+    margin: 5px 0;
+    text-align: center;
+  }
+  .login-module ul li .required input {
+    display: none;
+  }
+  .login-module ul li .required label {
+    font-size: 20px;
+    line-height: 1.5em;
+    color: #969696;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .login-module ul li .required input:checked + label,
+.login-module ul li .required label.active {
+    color: #A51E41;
+  }
+  .login-module ul li .input-group {
+    position: relative;
+    flex-grow: 1;
+  }
+  .login-module ul li .input-group input.toggle + label {
+    margin: 0;
+  }
+  .login-module ul li input[type=text],
+.login-module ul li input[type=password] {
+    position: relative;
+    width: calc(100% - 30px);
+    height: 30px;
+    border: none;
+    outline: none;
+    padding: 15px 15px 0 15px;
+    background-color: #FFF;
+    font-size: 14px;
+    color: #005687;
+    border-bottom: 1px solid #969696;
+  }
+  .login-module ul li input[type=text] + label,
+.login-module ul li input[type=password] + label {
+    position: absolute;
+    left: 15px;
+    top: 5px;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #969696;
+    transform: translateY(13.5px);
+    transition: transform 0.25s, font-size 0.25s;
+    pointer-events: none;
+  }
+  .login-module ul li input[type=text]:focus + label,
+.login-module ul li input[type=text].has-value + label,
+.login-module ul li input[type=password]:focus + label,
+.login-module ul li input[type=password].has-value + label {
+    font-size: 12px;
+    line-height: 1.5em;
+    transform: translateY(-2px);
+  }
+  .login-module ul li input[type=email]:invalid,
+.login-module ul li input[type=password].error {
+    background: repeating-linear-gradient(45deg, #FFF, #FFF 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
+  }
+  .login-module ul li button {
+    width: 100%;
+    min-height: 30px;
+    border: 1px solid #005687;
+    outline: none;
+    background-color: transparent;
+    margin-top: 15px;
+    padding: 0 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  .login-module ul li p.errormessage {
+    color: #A51E41;
   }
 
   div.fixed-bg {
@@ -26198,7 +26602,7 @@ div#reviews .review:not(:last-child)::after {
 .fact-sheet main#profile .inner .body form div.info ul li input[type=email],
 .fact-sheet main#profile .inner .body form div.info ul li input[type=password] {
     position: relative;
-    width: 100%;
+    width: calc(100% - 30px);
     height: 30px;
     border: none;
     outline: none;
@@ -26326,6 +26730,47 @@ div#reviews .review:not(:last-child)::after {
   }
   .fact-sheet main#profile .inner .body form div.info.collapsed button.expand-collapsed {
     margin-top: 15px;
+  }
+  .fact-sheet main#profile .inner div.foot {
+    padding-bottom: 60px;
+  }
+  .fact-sheet main#profile .inner div.foot .api-token form {
+    display: flex;
+  }
+  .fact-sheet main#profile .inner div.foot .api-token form button.request-token {
+    width: 30%;
+    color: #969696;
+    padding: 5px 0 5px 10px;
+    border: 1px solid #969696;
+    /*border-left: 1px dotted $c-light-grey;*/
+    outline: none;
+    background-color: transparent;
+    font-size: 14px;
+    line-height: 1.5em;
+    cursor: pointer;
+  }
+  .fact-sheet main#profile .inner div.foot .api-token form .input-group {
+    display: flex;
+    position: relative;
+    width: 50%;
+  }
+  .fact-sheet main#profile .inner div.foot .api-token form .input-group input[type=text] {
+    flex-grow: 1;
+    padding: 5px 0 5px 15px;
+    border: 1px solid #969696;
+    border-left: 0;
+    border-right: 0;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.5em;
+    cursor: copy;
+  }
+  .fact-sheet main#profile .inner div.foot .api-token form .input-group button.copy {
+    width: 60px;
+    background-color: #32BEE1;
+    border: none;
+    color: #FFF;
+    cursor: pointer;
   }
 
   div.table {
@@ -28083,7 +28528,8 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text] {
     position: relative;
-    width: calc(100% - 20px);
+    /*width: calc(100% - 20px);*/
+    width: 100%;
     height: 30px;
     padding: 0;
     margin-top: 10px;
@@ -28109,6 +28555,9 @@ div.browse main .inner section .layout article .inner .foot .media-img .bookmark
   }
   div.browse main .inner section .layout article .inner .pinboard-group .add button {
     display: none;
+    position: absolute;
+    right: 0;
+    top: 0;
     width: 20px;
     height: 30px;
     margin-top: 10px;
@@ -28241,7 +28690,7 @@ div.browse main .inner section .layout article .inner .pinboard-group .add input
     z-index: 1;
     width: 0;
     height: calc(100% + 15px);
-    padding: 15px 0 0 0;
+    /*padding: 15px 0 0 0;*/
     margin-top: -15px;
     /*border-bottom: 1px dotted $c-light-grey;*/
     transition: width 0.25s;
@@ -28682,7 +29131,8 @@ div.browse main .inner section .layout.columns article .inner .body .meta-child 
     height: calc(55px * 2 + 15px * 2);
   }
   div.browse main .outer {
-    margin-top: 30px;
+    /* margin-top: 30px;*/
+    margin-top: 0px;
     color: #969696;
     font-size: 14px;
   }

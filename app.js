@@ -73,7 +73,6 @@ app.use(sessionMiddleware)
 
 const routes = require('./routes/')
 
-// app.get('/', routes.redirect.home, routes.render.login)
 
 app.get('/', routes.redirect.home, routes.redirect.public)
 
@@ -81,38 +80,37 @@ app.get('/', routes.redirect.home, routes.redirect.public)
 app.get('/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
 app.get('/:language/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
 
-app.route('/login')
+app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
 	.get(routes.redirect.home, routes.render.login)
 	.post(routes.process.login)
 app.get('/logout', routes.process.logout)
 
 app.route('/:language/contribute/:object')
-	.get(routes.render.login, routes.dispatch.contribute)
+	.get(routes.check.login, routes.dispatch.contribute)
 app.route('/:language/edit/:object')
-	.get(routes.render.login, routes.dispatch.edit)
+	.get(routes.check.login, routes.dispatch.contribute)
 app.route('/:language/view/:object')
-	.get(routes.render.login, routes.dispatch.view)
+	.get(routes.check.login, routes.dispatch.contribute)
 app.route('/:language/import/:object')
-	.get(routes.render.login, routes.dispatch.import)
+	.get(routes.check.login, routes.render.import)
 app.route('/:language/mobilize/:object')
-	.get(routes.render.login, routes.dispatch.mobilize)
+	.get(routes.check.login, routes.dispatch.mobilize)
 
 app.route('/:language/browse/:object/:space')
-	.get(routes.render.login, routes.dispatch.browse)
-	.post(routes.render.login, routes.dispatch.browse)
+	.get(routes.check.login, routes.dispatch.browse)
+	.post(routes.check.login, routes.dispatch.browse)
 
 app.route('/:language/preview/:object/:space')
-	.get(routes.render.login, routes.dispatch.browse)
+	.get(routes.check.login, routes.dispatch.browse)
 
 app.route('/:language/print/:object/:space')
-	.get(routes.render.login, routes.dispatch.print)
+	.get(routes.check.login, routes.dispatch.print)
 
 app.get('/:language/analyse/:object', routes.dispatch.analyse) // TO DO
 
 app.post('/check/:object', routes.process.check)
 
 app.post('/save/:object', routes.process.save)
-app.post('/generate/:format', routes.process.generate)
 app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
@@ -139,28 +137,27 @@ app.get('/decline/:object', routes.process.decline)
 // app.get('/demobilize', routes.process.demobilize)
 
 // app.post('/intercept/:method', routes.process.intercept)
+
 app.post('/call/api', routes.process.callapi)
-
-// app.post('/:language/:activity/:object/save', routes.process.save) // THIS PATH SHOULD NOT BE SO COMPLEX
-
 
 app.post('/upload/img', upload.array('img'), routes.process.upload)
 app.post('/upload/video', upload.array('video'), routes.process.upload)
 app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
+app.post('/upload/xlsx', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA 
 
 app.post('/screenshot', routes.process.screenshot)
 
 
 // TO DO: UPDATE SCHEMA BELOW
-app.post('/storeImport', routes.render.login, routes.storeImport) // UPDATE DO save/import
+// app.post('/storeImport', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA 
 app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forward
 app.post('/reverseGeocoding', routes.reverseGeocoding) // UPDATE TO geocode/forward
 
 
 // API
 app.route('/apis/:action/:object')
-	.get(routes.dispatch.apis)
-	.post(routes.dispatch.apis)
+	.get(routes.check.login, routes.dispatch.apis)
+	.post(routes.check.login, routes.dispatch.apis)
 
 app.get('/api/skills', routes.api.skills) // TO DO: THIS SHOULD BE DEPRECATED
 app.get('/api/methods', routes.api.methods) // TO DO: THIS SHOULD BE DEPRECATED
@@ -220,7 +217,7 @@ app.get('/api/file', cors(corsOpts), routes.api.file)
 
 // INSTANCES
 app.route('/:language/:instance')
-	.get(routes.render.login, routes.dispatch.browse)
+	.get(routes.check.login, routes.dispatch.browse)
 
 app.get('*', routes.notfound)
 

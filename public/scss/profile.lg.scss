@@ -254,7 +254,7 @@
 								input[type=email],
 								input[type=password] {
 									position: relative;
-									width: 100%;
+									width: calc(100% - 30px);
 									height: 30px;
 									border: none;
 									outline: none;
@@ -402,6 +402,52 @@
 						}
 					}
 				}
+			}
+			div.foot {
+				padding-bottom: 60px;
+
+				.api-token {
+					form {
+						display: flex;
+						
+						button.request-token {
+							width: 30%;
+							color: $c-light-grey;
+							padding: 5px 0 5px 10px;
+							border: 1px solid $c-light-grey;
+							/*border-left: 1px dotted $c-light-grey;*/
+							outline: none;
+							background-color: transparent;
+							font-size: $t-mid-small;
+							line-height: 1.5em;
+							cursor: pointer;
+						}
+						.input-group {
+							display: flex;
+							position: relative;
+							width: 50%;
+
+							input[type=text] {
+								flex-grow: 1;
+								padding: 5px 0 5px 15px;
+								border: 1px solid $c-light-grey;
+								border-left: 0;
+								border-right: 0;
+								outline: none;
+								font-size: $t-mid-small;
+								line-height: 1.5em;
+								cursor: copy;
+							}
+							button.copy {
+								width: 60px;
+								background-color: $c-light-blue;
+								border: none;
+								color: #FFF;
+								cursor: pointer;
+							}
+						}
+					}
+				}	
 			}
 		}
 	}

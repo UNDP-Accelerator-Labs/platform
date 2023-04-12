@@ -1,7 +1,7 @@
 const { metafields, app_suite, DB } = include('config/')
 const jwt = require('jsonwebtoken')
 
-exports.main = (req, res) => {
+module.exports = (req, res) => {
 	const { method } = req
 	if (method === 'GET') GET(req, res)
 	else if (method === 'POST') POST(req, res)

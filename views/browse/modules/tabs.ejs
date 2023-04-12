@@ -78,13 +78,15 @@
 			</a>
 		</li>
 	<% } else { %>
-		<li class='<% if (space === "private") { %>active<% } %>'>
-			<a href='./private'>
-				<button><%- vocabulary['space'][language](object, 'private') %>
-					<div class='count'><%- locals.stats?.private %></div>
-				</button>
-			</a>	
-		</li>
+		<% if (modules.some(d => d.type === object && rights >= d.rights.write)) { %>
+			<li class='<% if (space === "private") { %>active<% } %>'>
+				<a href='./private'>
+					<button><%- vocabulary['space'][language](object, 'private') %>
+						<div class='count'><%- locals.stats?.private %></div>
+					</button>
+				</a>	
+			</li>
+		<% } %>
 		<% if (['pads', 'templates'].includes(object)
 			&& modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) 
 			&& locals.stats?.curated > 0

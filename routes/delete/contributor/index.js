@@ -1,14 +1,14 @@
 const { DB } = include('config/')
 const cron = require('node-cron')
 
-exports.main = (req, res) => {	
+module.exports = (req, res) => {	
 	const { referer } = req.headers || {}
 	let { id, type, date } = req.query || {}
-	const { uuid, rights } = req.session || {}
+	const { uuid, rights, public } = req.session || {}
 	// CONVERT id TO ARRAY
 	if (!Array.isArray(id)) id = [id]
 
-	if (id.length) {
+	if (id.length && !public) {
 		const now = new Date()
 		const end_date = new Date(date)
 		
@@ -42,8 +42,10 @@ exports.main = (req, res) => {
 						return t.none(teamsql)
 						.catch(err => console.log(err))
 					}).catch(err => console.log(err))
-				}).then(_ => res.redirect(referer))
-				.catch(err => console.log(err))
+				}).then(_ => {
+					if (referer) res.redirect(referer)
+					else res.redirect('/login')
+				}).catch(err => console.log(err))
 			})
 		} else {
 			DB.general.tx(t => {
@@ -52,8 +54,10 @@ exports.main = (req, res) => {
 					return t.none(teamsql)
 					.catch(err => console.log(err))
 				}).catch(err => console.log(err))
-			}).then(_ => res.redirect(referer))
-			.catch(err => console.log(err))
+			}).then(_ => {
+				if (referer) res.redirect(referer)
+				else res.redirect('/login')
+			}).catch(err => console.log(err))
 		}
 
 		// THIS IS IN CASE WE WANT TO HAVE THE OPTION TO FULLY REMOVE A USER
@@ -84,5 +88,8 @@ exports.main = (req, res) => {
 			.then(_ => res.redirect(referer))
 			.catch(err => console.log(err))
 		} else res.redirect(referer)*/
-	} else res.redirect(referer)
+	} else {
+		if (referer) res.redirect(referer)
+		else res.redirect('/login')
+	}
 }

@@ -1294,7 +1294,8 @@
 
 		// 3) SAVE PADS
 		pads.forEach(d => d.sections = JSON.stringify(d.sections))
-		const results = await POST('/storeImport', { pads, template, mobilization })
+		// const results = await POST('/storeImport', { pads, template, mobilization })
+		const results = await POST('/upload/xlsx', { pads, template, mobilization })
 		window.location.href = `/<%- locals.metadata.page.language %>/browse/pads/private`
 
 		return false

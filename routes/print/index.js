@@ -6,6 +6,6 @@ module.exports = async (req, res) => {
 	let { object } = req.params || {}
 
 	if (modules.some(d => d.type === object)) {
-		if (object === 'pads') pads.render(req, res)
+		if (object === 'pads') pads(req, res)
 	} else res.redirect('/module-error')
 }

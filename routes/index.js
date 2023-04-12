@@ -1,7 +1,7 @@
 const { app_title, DB } = include('config/')
 const { checklanguage, stripHTML, join, parsers, array } = include('routes/helpers/')
 // const request = require('request')
-const format = require('./formatting.js')
+// const format = require('./formatting.js')
 const path = require('path')
 const fs = require('fs')
 // const mime = require('mime')
@@ -16,6 +16,7 @@ const jwt = require('jsonwebtoken')
 
 
 if (!exports.redirect) { exports.redirect = {} }
+if (!exports.check) { exports.check = {} }
 if (!exports.render) { exports.render = {} }
 if (!exports.process) { exports.process = {} }
 if (!exports.public) { exports.public = {} }
@@ -163,6 +164,7 @@ exports.process.callapi = (req, res) => {
 /* =============================================================== */
 /* =========================== LOGIN ============================= */
 /* =============================================================== */
+exports.check.login = require('./login/').check
 exports.render.login = require('./login/').render
 exports.process.login = require('./login/').process
 exports.process.logout = require('./login/').logout
@@ -232,21 +234,20 @@ function compileMobilization (req, res) {
 /* =============================================================== */
 /* ============================ PADS ============================= */
 /* =============================================================== */
-exports.dispatch.contribute = require('./contribute/').main
 
-exports.dispatch.edit = require('./edit/').main
+exports.dispatch.contribute = require('./contribute/')
+// exports.dispatch.edit = require('./edit/')
+// exports.dispatch.view = require('./view/')
 
-exports.dispatch.view = require('./view/').main
+exports.render.import = require('./import/').render
 
-exports.dispatch.import = require('./import/').create
-
-exports.dispatch.mobilize = require('./mobilize/').main
+exports.dispatch.mobilize = require('./mobilize/')
 
 /* =============================================================== */
 /* ========================== IMPORT ============================= */
 /* =============================================================== */
 // TO DO: CHANGE THIS TO THE GENERAL save/ MECHANISM
-exports.storeImport = require('./import/').save
+exports.process.import = require('./import/').process
 
 
 /* =============================================================== */
@@ -379,17 +380,16 @@ exports.process.screenshot = (req, res) => {
 
 
 
-exports.process.check = require('./check/').main
-exports.process.save = require('./save/').main
-exports.process.generate = require('./generate/').main
-exports.process.delete = require('./delete/').main
+exports.process.check = require('./check/')
+exports.process.save = require('./save/')
+exports.process.delete = require('./delete/')
 
 exports.process.publish = require('./publish/').publish
 exports.process.unpublish = require('./publish/').unpublish
 
 exports.process.share = require('./share/').share
 
-exports.process.forward = require('./forward/').main
+exports.process.forward = require('./forward/')
 
 exports.process.pin = require('./engage/').pin
 // exports.process.unpin = require('./engage/').unpin
@@ -397,7 +397,7 @@ exports.process.pin = require('./engage/').pin
 exports.process.engage = require('./engage/').engage
 exports.process.comment = require('./engage/').comment
 
-exports.process.request = require('./request/').main
+exports.process.request = require('./request/')
 exports.process.accept = require('./accept/').accept
 exports.process.decline = require('./accept/').decline
 

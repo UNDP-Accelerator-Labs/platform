@@ -1,9 +1,9 @@
 const { page_content_limit, modules, engagementtypes, DB } = include('config/')
 const { array, join, checklanguage } = include('routes/helpers/')
 
-const filter = require('../filter').main
+const filter = require('../filter')
 
-exports.main = kwargs => {
+module.exports = kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
 	const { req } = kwargs || {}
 	const { object } = req.params || {}

@@ -718,7 +718,7 @@
 							d.secondary_languages.push(d.language)
 							return { label: d.name, value: d.id, type: 'checkbox', classname: d.secondary_languages.join(' ') }
 						}) // TO DO: IMPROVE THIS
-						const formdata = { action: '/request/review',  method: 'POST' }
+						const formdata = { action: '/request/review', method: 'POST' }
 						const message = '<%- vocabulary["select review language"][language] %>'
 						
 						const opts = []
@@ -736,11 +736,12 @@
 					function updateReviewerList (d) {
 						const { value: language } = d
 						const menu = d3.select(this).findAncestor('opts')
-						const reviewer_list = menu.select('.reviewer-list .dropdown menu li')
+						const reviewer_list = menu.selectAll('.reviewer-list .dropdown menu li')
+						
 						reviewer_list
-						// .classed('hide', function () {
-						// 	return !d3.select(this).classed(language)
-						// }) // THIS CONFLICTS WITH THE SEARCH OPERATIONS (BECAUSE BOTH USE THE class='hide')
+						.classed('persistent-hide', function () {
+							return !d3.select(this).classed(language)
+						}) // THIS CANNOT BE A SIMPLE hide CALSS AS IT CONFLICTS WITH THE SEARCH OPERATIONS (BECAUSE IT ALSO USES THE class='hide')
 						.select('input')
 						.each(function () { 
 							this.disabled = !d3.select(this.parentNode).classed(language) 

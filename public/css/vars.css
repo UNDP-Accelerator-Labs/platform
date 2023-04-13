@@ -64,7 +64,8 @@ a:hover {
   text-decoration: underline;
 }
 
-.hide {
+.hide,
+.persistent-hide {
   display: none !important;
 }
 

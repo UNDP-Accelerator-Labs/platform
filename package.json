@@ -41,6 +41,7 @@
     "xlsx": "^0.16.4"
   },
   "devDependencies": {
+    "cookie-parser": "^1.4.6",
     "html-pdf-node": "^1.0.8",
     "html2pdf.js": "^0.10.1",
     "pagedjs": "^0.4.0",

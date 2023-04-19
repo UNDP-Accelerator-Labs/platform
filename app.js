@@ -60,7 +60,7 @@ const sessionMiddleware = session({
 	secret: `${app_suite}-${app_suite_secret}-pass`,
 	store: new pgSession({ pgPromise: DB.general }),
 	resave: false,
-	saveUninitialized: false,
+	saveUninitialized: true,
 	cookie: {
 		httpOnly: true, // THIS IS ACTUALLY DEFAULT
 		secure: process.env.NODE_ENV === 'production',

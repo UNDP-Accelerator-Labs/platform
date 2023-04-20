@@ -139,7 +139,7 @@
 
 <div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %>'>
 	<% if (!publicpage
-		&& rights >= (modules.find(d => d.type === object)?.rights.read ?? infinity)
+		&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
 		&& pagedisplay !== 'slideshow'
 		&& !(locals.metadata.page.map && mapscale === 'full-screen')
 	) { %>

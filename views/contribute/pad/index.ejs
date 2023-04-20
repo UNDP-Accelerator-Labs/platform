@@ -814,6 +814,7 @@
 		}
 		else if (datum.type === 'txt') {
 			datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
+			// div.textContent || div.innerText || ''
 			datum.has_content = datum.txt?.trim()?.length > 0
 			items.push(datum)
 		}

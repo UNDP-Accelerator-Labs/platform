@@ -245,7 +245,7 @@
 				.addElems('li', null, c => c.options)
 			.each(function (c) {
 				const sel = d3.select(this)
-				// if (c.classname) sel.classed(c.classname, true)
+				if (c.classname) sel.classed(c.classname, true)
 
 				sel.addElems('input')
 					.attrs({

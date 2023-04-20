@@ -79,7 +79,8 @@ a {
 a:hover {
 	text-decoration: underline;
 }
-.hide {
+.hide,
+.persistent-hide {
 	display: none !important;
 }
 /* https://stackoverflow.com/questions/2781549/removing-input-background-colour-for-chrome-autocomplete */

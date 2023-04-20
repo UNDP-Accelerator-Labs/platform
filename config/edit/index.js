@@ -50,7 +50,8 @@ exports.metafields = [
 	options: [
 		{ name: 'Pre experimental (trial and error, prototype, a/b testing)' },
 		{ name: 'Quasi experimental (Analytical, observations, etc)' },
-		{ name: 'Fully randomised (RCTs, etc.)' }
+		{ name: 'Experimental (RCTs, etc.)' }
+		// { name: 'Fully randomised (RCTs, etc.)' }
 	] },
 	{ type: 'checklist', name: 'partnering sector', required: true,
 	instruction: 'Which sector are you partnering with for this activity? Please select all that apply',

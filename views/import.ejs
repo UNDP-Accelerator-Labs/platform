@@ -491,7 +491,7 @@
 			.addElems('i', 'material-icons')
 			.html('list')
 		.on('click', async function (d) {
-			const message = `Split the string data in this column into a list using <input type='text' name='separator' value=',' minlength=1 maxlength=1> separators.`
+			const message = `Split the string data in this column into a list using <input type='text' name='separator' value=',' minlength=1 maxlength=1> separators.` // TO DO: TRANSLATE
 			const opts = [{ node: 'button', type: 'button', label: 'Split strings', resolve: _ => d3.select('.modal input[name="separator"]').node().value }]
 			const separator = await renderPromiseModal({ message: message, opts: opts })
 			splitValues(d.key, separator)

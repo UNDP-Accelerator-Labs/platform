@@ -153,7 +153,7 @@
 		function limitSelection (data) {
 			const { name, type, form: formnode } = this
 			const node = this
-			console.log(name, type)
+
 			// .dropdown menu li
 			const form = d3.select(formnode)
 			form.selectAll(`input[name=${name}]`)
@@ -189,7 +189,7 @@
 		}) %>
 		opts.push({ node: 'input', type: 'hidden', name: 'space', value: '<%- space %>' })
 
-		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>', disabled: true })
+		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>' })
 	<% } %>
 
 		const new_constraint = await renderFormModal({ message, formdata, opts })

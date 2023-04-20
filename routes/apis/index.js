@@ -5,22 +5,10 @@ const tokens = require('./tokens/')
 const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
-	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { action, object } = req.params || {}
 	const { output, render } = req.body || {}
 
 	// TO DO: ADD Readme.md TO DOWNLOADS
-
-
-	// THE token SHOULD BE HANDLED IN THE check.login MIDDLEWARE
-	if (token) { // IF THERE IS A TOKEN, THIS IS AN CORS CALL, SO WE NEED TO SET UP SOME BASIC session INFORMATION
-		const auth = jwt.verify(token, process.env.GLOBAL_LOGIN_KEY)
-		if (auth) {
-			const { email } = auth
-			req.session.email = email // PASS THIS TO SESSION FOR THE json PROCESSOR
-		} // IF NO TOKEN IS SENT, THEN ONLY PUBLIC CONTENT CAN BE DOWNLOADED
-	}
-
 	if (action === 'download') {
 		if (render) {
 			if (object === 'pads') {

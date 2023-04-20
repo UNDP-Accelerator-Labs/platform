@@ -41,7 +41,7 @@
 			<div class='meta-status status-<%- locals.data?.uuid ? 2 : 0 %>'>
 				<div class='btn-group'>
 					<% if (editable) { %>
-						<button type='submit' class='save' form='profile-form' disabled='true'>Save</button>
+						<button type='submit' class='save' form='profile-form' disabled='true'><%- vocabulary['save'][language] %></button>
 					<% } %>
 				</div>
 			</div>
@@ -332,8 +332,7 @@
 							<button class='request-token' type='button' onclick='requestToken(this.form)'>Request an API token</button>
 							<div class='input-group'>
 								<input type='text' name='api-token' class='hide' onclick='this.select()' readonly>
-								<button type='button' class='copy hide' onclick='copyToken(this.form)'>Copy</button>
-								<!-- TO DO: TRANSLATE -->
+								<button type='button' class='copy hide' onclick='copyToken(this.form)'><%- vocabulary['copy'][language](true) %></button>
 							</div>
 						</form>
 					</div>
@@ -470,7 +469,7 @@
 		})
 
 		// GENERIC BLUR FUNCTION
-		d3.selectAll('input[type=text], input[type=email], input[type=password]')
+		d3.selectAll('input[type=text]:not([name="api-token"]), input[type=email], input[type=password]')
 		.on('blur.fixlabel', function () { 
 			fixLabel(this)
 			partialSave()

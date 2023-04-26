@@ -1,8 +1,6 @@
 @charset "UTF-8";
 /* https://www.freecodecamp.org/news/css-media-queries-breakpoints-media-types-standard-resolutions-and-more/ */
-/*@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');*/
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital@1&display=swap");
 /*$c-dark-blue: #0A4C73;*/
 /*$c-dark-1: $c-dark-blue;
 $c-mid-1: $c-dark-red;
@@ -823,7 +821,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     top: 0;
     left: 0;
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
     background-color: #FFF;
     z-index: 1000;
     transform: translateX(calc(-100% - 10px));
@@ -835,7 +833,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     top: 0;
   }
   header .inner nav#site-title {
@@ -850,7 +848,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     align-items: center;
     left: 0;
     width: 100%;
-    height: auto;
+    min-height: auto;
   }
   header .inner nav#site-title .inner img.logo {
     height: 125px;
@@ -1036,7 +1034,6 @@ header .inner nav#site-title .inner .create:focus button {
   }
   header .inner nav#site-title .inner h2 {
     margin: 5px 0;
-    /*font-family: 'Noto Serif', serif;*/
     font-weight: 300;
     color: #B4DC28;
     font-size: 16px;
@@ -2508,6 +2505,11 @@ div.document main .inner .body .layout .meta-container div.instruction {
     color: #969696;
     font-size: 14px;
     line-height: 1.5em;
+    white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main .inner .body .layout .meta-container div.instruction p:not(:last-child) {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media,
 div.document main .inner .body .layout .media-container .meta,
@@ -2544,6 +2546,10 @@ div.document main .inner .body .layout .meta-container .media-lead:focus {
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt {
     white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container .media-txt p,
+div.document main .inner .body .layout .meta-container .media-txt p {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media-img,
 div.document main .inner .body .layout .meta-container .media-img {
@@ -2848,6 +2854,17 @@ div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.v
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
     color: #005687;
     pointer-events: all;
+  }
+  div.document main .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-radiolist.template .instruction {
+    color: #000000;
+    font-size: 16px;
   }
   div.document main .inner .body .layout .media-container .meta-location,
 div.document main .inner .body .layout .meta-container .meta-location {
@@ -6955,7 +6972,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     top: 0;
     left: 0;
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
     background-color: #FFF;
     z-index: 1000;
     transform: translateX(calc(-100% - 10px));
@@ -6967,7 +6984,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     top: 0;
   }
   header .inner nav#site-title {
@@ -6982,7 +6999,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     align-items: center;
     left: 0;
     width: 100%;
-    height: auto;
+    min-height: auto;
   }
   header .inner nav#site-title .inner img.logo {
     height: 125px;
@@ -7168,7 +7185,6 @@ header .inner nav#site-title .inner .create:focus button {
   }
   header .inner nav#site-title .inner h2 {
     margin: 5px 0;
-    /*font-family: 'Noto Serif', serif;*/
     font-weight: 300;
     color: #B4DC28;
     font-size: 16px;
@@ -8640,6 +8656,11 @@ div.document main .inner .body .layout .meta-container div.instruction {
     color: #969696;
     font-size: 14px;
     line-height: 1.5em;
+    white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main .inner .body .layout .meta-container div.instruction p:not(:last-child) {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media,
 div.document main .inner .body .layout .media-container .meta,
@@ -8676,6 +8697,10 @@ div.document main .inner .body .layout .meta-container .media-lead:focus {
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt {
     white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container .media-txt p,
+div.document main .inner .body .layout .meta-container .media-txt p {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media-img,
 div.document main .inner .body .layout .meta-container .media-img {
@@ -8980,6 +9005,17 @@ div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.v
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
     color: #005687;
     pointer-events: all;
+  }
+  div.document main .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-radiolist.template .instruction {
+    color: #000000;
+    font-size: 16px;
   }
   div.document main .inner .body .layout .media-container .meta-location,
 div.document main .inner .body .layout .meta-container .meta-location {
@@ -13100,12 +13136,12 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     top: 0;
   }
   header .inner nav#site-title {
     display: block;
-    margin-top: 60px;
+    margin-top: 45px;
   }
   header .inner nav#site-title .inner {
     position: static;
@@ -13115,7 +13151,7 @@ nav.tabs .inner .dropdown ul li.active input[type=text] {
     align-items: center;
     left: 0;
     width: 100%;
-    height: auto;
+    min-height: auto;
   }
   header .inner nav#site-title .inner .create,
 header .inner nav#site-title .inner .save {
@@ -13298,7 +13334,6 @@ header .inner nav#site-title .inner .create:focus button {
   }
   header .inner nav#site-title .inner h2 {
     margin: 5px 0;
-    /*font-family: 'Noto Serif', serif;*/
     font-weight: 300;
     color: #B4DC28;
     font-size: 16px;
@@ -14770,6 +14805,11 @@ div.document main .inner .body .layout .meta-container div.instruction {
     color: #969696;
     font-size: 14px;
     line-height: 1.5em;
+    white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main .inner .body .layout .meta-container div.instruction p:not(:last-child) {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media,
 div.document main .inner .body .layout .media-container .meta,
@@ -14806,6 +14846,10 @@ div.document main .inner .body .layout .meta-container .media-lead:focus {
   div.document main .inner .body .layout .media-container .media-txt,
 div.document main .inner .body .layout .meta-container .media-txt {
     white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container .media-txt p,
+div.document main .inner .body .layout .meta-container .media-txt p {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media-img,
 div.document main .inner .body .layout .meta-container .media-img {
@@ -15110,6 +15154,17 @@ div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.v
 div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
     color: #005687;
     pointer-events: all;
+  }
+  div.document main .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-radiolist.template .instruction {
+    color: #000000;
+    font-size: 16px;
   }
   div.document main .inner .body .layout .media-container .meta-location,
 div.document main .inner .body .layout .meta-container .meta-location {
@@ -20249,7 +20304,6 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   }
   header .inner nav#site-title .inner h2 {
     margin: 5px 0;
-    /*font-family: 'Noto Serif', serif;*/
     font-weight: 300;
     color: #B4DC28;
     font-size: 16px;
@@ -22308,6 +22362,18 @@ div.document main#mobilization .inner .body .layout .meta-container div.instruct
     color: #969696;
     font-size: 14px;
     line-height: 1.5em;
+    white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main .inner .body .layout .meta-container div.instruction p:not(:last-child),
+div.document main#pad .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main#pad .inner .body .layout .meta-container div.instruction p:not(:last-child), div.document main#reference .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main#reference .inner .body .layout .meta-container div.instruction p:not(:last-child),
+div.document main#template .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main#template .inner .body .layout .meta-container div.instruction p:not(:last-child),
+div.document main#mobilization .inner .body .layout .media-container div.instruction p:not(:last-child),
+div.document main#mobilization .inner .body .layout .meta-container div.instruction p:not(:last-child) {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media,
 div.document main .inner .body .layout .media-container .meta,
@@ -22394,6 +22460,17 @@ div.document main#template .inner .body .layout .meta-container .media-txt,
 div.document main#mobilization .inner .body .layout .media-container .media-txt,
 div.document main#mobilization .inner .body .layout .meta-container .media-txt {
     white-space: pre-line;
+  }
+  div.document main .inner .body .layout .media-container .media-txt p,
+div.document main .inner .body .layout .meta-container .media-txt p,
+div.document main#pad .inner .body .layout .media-container .media-txt p,
+div.document main#pad .inner .body .layout .meta-container .media-txt p, div.document main#reference .inner .body .layout .media-container .media-txt p,
+div.document main#reference .inner .body .layout .meta-container .media-txt p,
+div.document main#template .inner .body .layout .media-container .media-txt p,
+div.document main#template .inner .body .layout .meta-container .media-txt p,
+div.document main#mobilization .inner .body .layout .media-container .media-txt p,
+div.document main#mobilization .inner .body .layout .meta-container .media-txt p {
+    margin-bottom: 1em;
   }
   div.document main .inner .body .layout .media-container .media-img,
 div.document main .inner .body .layout .meta-container .media-img,
@@ -23442,6 +23519,48 @@ div.document main#mobilization .inner .body .layout .meta-container .meta-radiol
 div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt.valid .rm {
     color: #005687;
     pointer-events: all;
+  }
+  div.document main .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main .inner .body .layout .meta-container .meta-radiolist.template .instruction,
+div.document main#pad .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main#pad .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main#pad .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main#pad .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main#pad .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main#pad .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main#pad .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main#pad .inner .body .layout .meta-container .meta-radiolist.template .instruction, div.document main#reference .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main#reference .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main#reference .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main#reference .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main#reference .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main#reference .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main#reference .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main#reference .inner .body .layout .meta-container .meta-radiolist.template .instruction,
+div.document main#template .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main#template .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main#template .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main#template .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main#template .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main#template .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main#template .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main#template .inner .body .layout .meta-container .meta-radiolist.template .instruction,
+div.document main#mobilization .inner .body .layout .media-container .media-checklist.template .instruction,
+div.document main#mobilization .inner .body .layout .media-container .media-radiolist.template .instruction,
+div.document main#mobilization .inner .body .layout .media-container .meta-checklist.template .instruction,
+div.document main#mobilization .inner .body .layout .media-container .meta-radiolist.template .instruction,
+div.document main#mobilization .inner .body .layout .meta-container .media-checklist.template .instruction,
+div.document main#mobilization .inner .body .layout .meta-container .media-radiolist.template .instruction,
+div.document main#mobilization .inner .body .layout .meta-container .meta-checklist.template .instruction,
+div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist.template .instruction {
+    color: #000000;
+    font-size: 16px;
   }
   div.document main .inner .body .layout .media-container .meta-location,
 div.document main .inner .body .layout .meta-container .meta-location,

@@ -396,12 +396,12 @@ header { /* LEFT COlUMN */
 		flex-direction: column;
 		justify-content: space-between;
 		width: 100%;
-		height: 100vh;
+		min-height: 100vh;
 		top: 0;
 
 		nav#site-title {
 			display: block;
-			margin-top: 60px;
+			margin-top: 45px;
 
 			.inner {
 				position: static;
@@ -411,7 +411,7 @@ header { /* LEFT COlUMN */
 				align-items: center;
 				left: 0;
 				width: 100%;
-				height: auto;
+				min-height: auto;
 
 				.create, 
 				.save {
@@ -588,7 +588,6 @@ header { /* LEFT COlUMN */
 				}
 				h2 {
 					margin: 5px 0;
-					/*font-family: 'Noto Serif', serif;*/
 					font-weight: 300;
 					color: $c-light-green;
 					font-size: $t-main;

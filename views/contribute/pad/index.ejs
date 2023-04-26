@@ -813,9 +813,11 @@
 			items.push(datum)
 		}
 		else if (datum.type === 'txt') {
-			datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
-			// div.textContent || div.innerText || ''
+			// datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
+			datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
 			datum.has_content = datum.txt?.trim()?.length > 0
+			console.log(JSON.stringify(datum.txt))
+			console.log(JSON.stringify(datum.txt).trim())
 			items.push(datum)
 		}
 		else if (datum.type === 'embed') {
@@ -947,8 +949,8 @@
 			})
 
 			d.title = (sel.select('.section-header h1').node() || {}).innerText
-			d.lead = (sel.select('.media-lead').node() || {}).innerHTML
-			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerHTML
+			d.lead = (sel.select('.media-lead').node() || {})['outerText' || 'textContent' || 'innerText']
+			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
 			d.items = items
 			sections.push(d)
 		})

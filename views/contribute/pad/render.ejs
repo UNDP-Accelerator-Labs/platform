@@ -64,11 +64,15 @@ const Media = function (kwargs) {
 		sel.classed('focus', editing)
 	})
 
-	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-	if (templated && datum.instruction) this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
-		.attr('data-placeholder', d => d.instruction)
-		.html(d => d.instruction)
+	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
+	if (templated && datum.instruction) {
+		this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
+			.attr('data-placeholder', d => d.instruction)
+		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+			.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+			.html(d => d)
+	}
 	this.media = this.container.addElems('div', level, d => [d], d => d.type)
 		.classed(`${level}-${type}`, true)
 	.each(function (d) {
@@ -976,8 +980,6 @@ function addImg (kwargs) {
 		}
 		img.onerror = function (err) {
 			if (err) console.log(err)
-			// if (img.src !== src) img.src = src
-			// else console.log(err)
 		}
 
 		if (src.isURL()) img.src = src
@@ -1541,8 +1543,7 @@ function addTxt (kwargs) {
 		'font-weight': d => d.fontweight,
 		'font-style': d => d.fontstyle,
 		'text-align': d => d.textalign 
-	}).html(d => d.txt)
-	.on('keydown', function (d) {
+	}).on('keydown', function (d) {
 		const evt = d3.event
 		if ((d.constraint && this.innerText.length >= d.constraint) && !(evt.key === 'Backspace' || evt.keycode === 8)) {
 			d3.event.preventDefault()
@@ -1553,6 +1554,10 @@ function addTxt (kwargs) {
 				return d.value - this.innerText.length
 			})
 		}
+	}).addElems('p', null, d => d.txt.split('\n').filter(c => c))
+	.html(d => {
+		// return d.txt.replace(/\r?\n/g, '<br/>')
+		return d
 	})
 
 	if (focus) media.media.node().focus()

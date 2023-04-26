@@ -1,3 +1,12 @@
+if ('serviceWorker' in navigator) {
+	window.addEventListener('load', function () {
+		navigator.serviceWorker
+			.register('/app.serviceWorker.js')
+			.then((res) => console.log('service worker registered'))
+			.catch((err) => console.log('service worker not registered', err))
+	})
+}
+
 function getMediaSize () {
 	// https://www.w3schools.com/howto/howto_js_media_queries.asp
 	return [{ label: 'xs', size: 480 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }]

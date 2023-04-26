@@ -634,6 +634,12 @@ div.document {
 							color: $c-light-grey;
 							font-size: $t-mid-small;
 							line-height: 1.5em;
+
+							white-space: pre-line;
+
+							p:not(:last-child) {
+								margin-bottom: 1em;
+							}
 						}
 						.media,
 						.meta {
@@ -662,6 +668,10 @@ div.document {
 						}
 						.media-txt {
 							white-space: pre-line;
+
+							p {
+								margin-bottom: 1em;
+							}
 						}
 						.media-img {
 							min-height: calc(65px + 30px * 2);
@@ -828,6 +838,15 @@ div.document {
 										pointer-events: all;
 									}
 								}
+							}
+						}
+						.media-checklist.template,
+						.media-radiolist.template,
+						.meta-checklist.template,
+						.meta-radiolist.template {
+							.instruction {
+								color: $c-dark-grey;
+								font-size: $t-main;
 							}
 						}
 						.meta-location {

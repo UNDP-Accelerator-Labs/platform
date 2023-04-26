@@ -574,33 +574,33 @@
 	function retrieveItems (sel, datum, items) {
 		// MEDIA OR META
 		if (datum.type === 'title') {
-			datum.instruction = (sel.select('.media-title').node() || sel.select('.meta-title').node()).innerHTML
+			datum.instruction = (sel.select('.media-title').node() || sel.select('.meta-title').node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 		else if (datum.type === 'img') {
-			datum.instruction = (sel.select('.media-img').node() || sel.select('.meta-img').node()).innerHTML
+			datum.instruction = (sel.select('.media-img').node() || sel.select('.meta-img').node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 		else if (datum.type === 'drawing') {
-			datum.instruction = (sel.select('.media-drawing').node() || sel.select('.meta-drawing').node()).innerHTML
+			datum.instruction = (sel.select('.media-drawing').node() || sel.select('.meta-drawing').node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 		else if (datum.type === 'txt') {
-			datum.instruction = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
+			datum.instruction = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 		else if (datum.type === 'embed') {
-			datum.instruction = (sel.select('.media-embed').node() || sel.select('.meta-embed').node()).innerHTML
+			datum.instruction = (sel.select('.media-embed').node() || sel.select('.meta-embed').node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 		else if (datum.type === 'checklist') {
-			datum.instruction = (sel.select('.media-checklist .instruction').node() || sel.select('.meta-checklist .instruction').node()).innerHTML
+			datum.instruction = (sel.select('.media-checklist .instruction').node() || sel.select('.meta-checklist .instruction').node())['outerText' || 'textContent' || 'innerText']
 			const clone = JSON.parse(JSON.stringify(datum))
 			clone.options = clone.options.filter(b => b.name?.length)
 			items.push(clone)
 		}
 		else if (datum.type === 'radiolist') {
-			datum.instruction = (sel.select('.media-radiolist .instruction').node() || sel.select('.meta-radiolist .instruction').node()).innerHTML
+			datum.instruction = (sel.select('.media-radiolist .instruction').node() || sel.select('.meta-radiolist .instruction').node())['outerText' || 'textContent' || 'innerText']
 			const clone = JSON.parse(JSON.stringify(datum))
 			clone.options = clone.options.filter(b => b.name?.length)
 			console.log(clone)
@@ -608,22 +608,22 @@
 		}
 		// META
 		else if (datum.type === 'location') {
-			datum.instruction = sel.select('.meta-location').node().innerHTML
+			datum.instruction = sel.select('.meta-location').node()['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 		else if (metafields.some(d => ['tag', 'index'].includes(d.type) && [datum.type, datum.name].includes(d.label))) {
-			datum.instruction = (sel.select(`.meta-${datum.type}`).node() || sel.select(`.meta-${datum.name}`).node()).innerHTML
+			datum.instruction = (sel.select(`.meta-${datum.type}`).node() || sel.select(`.meta-${datum.name}`).node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 			// items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
 		// skills SHOULD BE DEPRECATED
 		else if (!metafields.some(d => d.label.toLowerCase() === 'skills') && (datum.type === 'skills' || datum.name === 'skills')) { // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
-			datum.instruction = (sel.select('.meta-methods').node() || sel.select('.meta-skills').node())?.innerHTML
+			datum.instruction = (sel.select('.meta-methods').node() || sel.select('.meta-skills').node())['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 			// items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
 		}
 		else if (datum.type === 'attachment') {
-			datum.instruction = sel.select('.meta-attachment').node().innerHTML
+			datum.instruction = sel.select('.meta-attachment').node()['outerText' || 'textContent' || 'innerText']
 			items.push(datum)
 		}
 	}
@@ -634,7 +634,7 @@
 		const title = head.select('.title').node().innerText
 		if (title.length > 99) title = `${title.slice(0, 98)}…`
 			
-		const description = descriptionLayout.select('.media-container .media-txt').node().innerHTML
+		const description = descriptionLayout.select('.media-container .media-txt').node()['outerText' || 'textContent' || 'innerText']
 		const slideshow = descriptionLayout.select('.input-slideshow #slideshow-status').node()?.checked || false
 
 		// MAYBE INCLUDE ALERT IF title IS EMPTY
@@ -655,7 +655,7 @@
 					.each(function (b) { 
 						retrieveItems(d3.select(this), b, groupitems) 
 					})
-					c.instruction = sel.select('.media-group').node().innerHTML
+					c.instruction = sel.select('.media-group').node()['outerText' || 'textContent' || 'innerText']
 					c.structure = groupitems
 					items.push(c)
 				} else {
@@ -664,8 +664,8 @@
 			})
 
 			d.title = sel.select('.section-header h1').node().innerText
-			d.lead = (sel.select('.media-lead').node() || {}).innerHTML
-			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerHTML
+			d.lead = (sel.select('.media-lead').node() || {})['outerText' || 'textContent' || 'innerText']
+			d.instruction = (sel.select('.media-repeat button div').node() || {})['outerText' || 'textContent' || 'innerText']
 			d.structure = items
 			sections.push(d)
 		})

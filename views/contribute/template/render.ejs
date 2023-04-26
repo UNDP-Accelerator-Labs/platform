@@ -62,13 +62,13 @@ const Media = function (kwargs) {
 		sel.classed('focus', editing)
 		// sel.findAncestor('layout').classed('focus', editing)
 	})
-	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	if (editing) {
 		this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
 		this.opts.addElems('div', 'opt-group', ['<%- vocabulary["write instruction"][language] %>'])
 			.addElems('label')
 				.html(d => d)
 	}
+	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	this.media = this.container.addElems('div', `${level} template`, d => [d], d => d.type)
 		.classed(`${level}-${type}`, true)
 	.each(function (d) {
@@ -261,7 +261,11 @@ const Taglist = function (kwargs) {
 	meta.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
+	
 	// POPULATE THE INSET
 	if (meta.inset) {
 		console.log(list)
@@ -452,7 +456,10 @@ function addTitle (kwargs) {
 	media.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) media.media.node().focus()
 }
@@ -483,7 +490,10 @@ function addImg (kwargs) {
 	media.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) media.media.node().focus()
 }
@@ -514,7 +524,10 @@ function addDrawing (kwargs) {
 	media.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) media.media.node().focus()
 }
@@ -599,7 +612,10 @@ function addTxt (kwargs) {
 	media.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) media.media.node().focus()
 }
@@ -631,7 +647,9 @@ function addEmbed (kwargs) {
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
 	}).classed('padded', true)
-	.html(d => d.instruction)
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) media.media.node().focus()
 }
@@ -681,7 +699,9 @@ function addChecklist (kwargs) {
 			'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 			'contenteditable': editing ? true : null 
 		}).on('keydown', _ => { if (editing) switchButtons(lang) })
-		.html(d => d.instruction)
+		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+		.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+		.html(d => d)
 
 	const list = media.media.addElem('ol')
 	list.call(addItem)	
@@ -807,7 +827,9 @@ function addRadiolist (kwargs) {
 			'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 			'contenteditable': editing ? true : null // NOTE HERE THE editing (INSTEAD OF editable) IS IMPORTANT: WE CAN SET A PREDEFINED INSTRUCTION, BUT THE INTENTION IS TO ALWAYS ALLOW THE EDITOR TO TAILOR WORDING TO THEIR LIKING
 		}).on('keydown', _ => { if (editing) switchButtons(lang) })
-		.html(d => d.instruction)
+		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+		.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+		.html(d => d)
 
 	const list = media.media.addElem('ol')
 	list.call(addItem)	
@@ -954,7 +976,10 @@ function addLocations (kwargs) {
 	meta.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (meta.inset) {
 		meta.inset.addElems('div', `inset-${type}`)
@@ -1041,7 +1066,9 @@ function addAttachment (kwargs) {
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
 	}).classed('padded', true)
-	.html(d => d.instruction)
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) meta.media.node().focus()
 }
@@ -1107,7 +1134,10 @@ function addGroup (kwargs) {
 	media.media.attrs({ 
 		'data-placeholder': d => Function(`"use strict";return (<%- vocabulary["request"][language] %>)`)()(type),
 		'contenteditable': editing ? true : null 
-	}).html(d => d.instruction)
+	})
+	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
+	.html(d => d)
 
 	if (focus) media.media.node().focus()
 

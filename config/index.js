@@ -1,3 +1,4 @@
+const path = require('path')
 let { 
 	app_title, 
 	app_title_short, 
@@ -5,6 +6,7 @@ let {
 	app_suite_secret,
 	app_languages,
 	app_description,
+	app_storage,
 	modules, 
 	metafields, 
 	engagementtypes, 
@@ -26,6 +28,8 @@ exports.app_title_short = app_title_short
 exports.app_suite = app_suite
 exports.app_suite_secret = app_suite_secret
 exports.app_description = app_description
+exports.app_storage = process.env.AZURE_STORAGE_CONNECTION_STRING ? new URL(app_title_short, app_storage).href : undefined // TO DO: UPDATE THIS WITH THE CORRECT CONTAINER
+
 exports.colors = colors
 
 // DESIRED MODULES

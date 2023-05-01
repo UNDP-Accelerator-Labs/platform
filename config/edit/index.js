@@ -7,6 +7,7 @@ exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 
+exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/'
 
 // DESIRED MODULES
 exports.modules = [
@@ -35,7 +36,7 @@ exports.metafields = [
 	{ type: 'tag', name: 'methods', required: true, opencode: false },
 	{ type: 'tag', name: 'datasources', required: true, opencode: true },
 	
-	{ type: 'location', name: 'locations', required: true },
+	// { type: 'location', name: 'locations', required: true },
 
 	// { type: 'tag', name: 'primary signature solution', required: false, opencode: true, limit: 1 }, 
 	// { type: 'tag', name: 'additional signature solution', required: false, opencode: true }, 

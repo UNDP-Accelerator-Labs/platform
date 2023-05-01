@@ -5,8 +5,9 @@ const fs = require('fs')
 // global.include = path => require(`${rootpath}/${path}`)
 
 const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
+const { BlobServiceClient } = require('@azure/storage-blob')
 
-const { app_title_short, metafields, media_value_keys, DB } = include('config/')
+const { app_title_short, app_storage, metafields, media_value_keys, DB } = include('config/')
 const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter')
@@ -129,7 +130,7 @@ module.exports = async (req, res) => {
 						;`, [ ids ]))
 					} else batch1.push(null)
 					return t1.batch(batch1)
-					.then(results => {
+					.then(async results => {
 						const [ tags, locations, metadata, engagement, comments ] = results
 
 						const wb = XLSX.utils.book_new()
@@ -457,17 +458,33 @@ module.exports = async (req, res) => {
 									const img_dir = path.join(template_dir, 'images')
 									if (!fs.existsSync(img_dir)) fs.mkdirSync(img_dir)
 
-									imgs.forEach((d, i) => {
-										const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
-										if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-										try { 
-											fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
-										} catch(err) { console.log(err) }
-										// fs.copyFile(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), err => {
-										// 	if (err) console.log(err)
-										// 	else console.log('file copied')
-										// })
-									})
+									if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+										// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
+										// ESTABLISH THE CONNECTION TO AZURE
+										const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+										const containerClient = blobServiceClient.getContainerClient(app_title_short)
+
+										await Promise.all(imgs.map((d, i) => {
+											return new Promise(async resolve1 => {
+												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+												
+												try {
+													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
+													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
+												} catch(err) { console.log(err) }
+												resolve1()
+											})
+										}))
+									} else {
+										imgs.forEach((d, i) => {
+											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+											try { 
+												fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
+											} catch(err) { console.log(err) }
+										})
+									}
 								}
 
 								if (single_sheet) XLSX.writeFile(wb, path.join(template_dir, 'data.csv'), {})
@@ -477,17 +494,33 @@ module.exports = async (req, res) => {
 									const img_dir = path.join(dir, 'images')
 									if (!fs.existsSync(img_dir)) fs.mkdirSync(img_dir)
 
-									imgs.forEach((d, i) => {
-										const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
-										if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-										try {
-											fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
-										} catch(err) { console.log(err) }
-										// fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), err => {
-										// 	if (err) console.log(err)
-										// 	else console.log('file copied')
-										// })
-									})
+									if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+										// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
+										// ESTABLISH THE CONNECTION TO AZURE
+										const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+										const containerClient = blobServiceClient.getContainerClient(app_title_short)
+
+										await Promise.all(imgs.map((d, i) => {
+											return new Promise(async resolve1 => {
+												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+												
+												try {
+													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
+													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
+												} catch(err) { console.log(err) }
+												resolve1()
+											})
+										}))
+									} else {
+										imgs.forEach((d, i) => {
+											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+											try {
+												fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
+											} catch(err) { console.log(err) }
+										})
+									}
 								}
 
 								if (single_sheet) XLSX.writeFile(wb, path.join(dir, `${app_title_short}_data.csv`), {})

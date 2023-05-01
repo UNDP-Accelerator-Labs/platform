@@ -65,7 +65,6 @@ const Media = function (kwargs) {
 	})
 
 	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	if (templated && datum.instruction) {
 		this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
 			.attr('data-placeholder', d => d.instruction)
@@ -73,6 +72,7 @@ const Media = function (kwargs) {
 			.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
 			.html(d => d)
 	}
+	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	this.media = this.container.addElems('div', level, d => [d], d => d.type)
 		.classed(`${level}-${type}`, true)
 	.each(function (d) {
@@ -983,7 +983,13 @@ function addImg (kwargs) {
 		}
 
 		if (src.isURL()) img.src = src
-		else img.src = `/${src}`
+		else {
+			<% if (locals.metadata.site.app_storage) { %>
+				img.src = new URL(`<%- locals.metadata.site.app_storage %>/${src}`).href
+			<% } else { %>
+				img.src = `/${src}`
+			<% } %>
+		}
 	}
 
 	// WE NEED THE ICON IF

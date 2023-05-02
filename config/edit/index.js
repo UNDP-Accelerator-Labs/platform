@@ -35,7 +35,14 @@ exports.metafields = [
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'location', name: 'locations', required: true },
 	{ type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file' }, { uri: undefined } ], limit: 1 }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
-	{ type: 'radio', name: 'gender', required: false }
+
+	{ type: 'radiolist', name: 'gender', required: false, instruction: 'Innovator gender',
+	options: [
+		{ name: 'Female' },
+		{ name: 'Male' },
+		{ name: 'Other' },
+		{ name: 'Undisclosed' }
+	] }
 
 	// { type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ], limit: 1 } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 ]

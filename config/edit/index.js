@@ -1,12 +1,13 @@
 //// EDIT THIS
 // GENERAL APP INFO
 exports.app_title = 'UNDP AccLabs Pads, Action Plans' 
-exports.app_title_short = 'alps'
+exports.app_title_short = 'action-plans'
 exports.app_suite = 'acclab_platform'
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 
+exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/'
 
 // DESIRED MODULES
 exports.modules = [

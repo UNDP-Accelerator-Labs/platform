@@ -7,6 +7,7 @@ exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret'
 exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 
+exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/'
 
 // DESIRED MODULES
 exports.modules = [
@@ -34,6 +35,8 @@ exports.metafields = [
 	{ type: 'tag', name: 'thematic areas', required: true, opencode: true, limit: 5 }, 
 	{ type: 'location', name: 'locations', required: true },
 	{ type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file' }, { uri: undefined } ], limit: 1 }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
+	{ type: 'radio', name: 'gender', required: false }
+
 	// { type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ], limit: 1 } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 ]
 // DESIRED ENGAGEMENT TYPES

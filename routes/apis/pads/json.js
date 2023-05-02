@@ -5,8 +5,9 @@ const fs = require('fs')
 // global.include = path => require(`${rootpath}/${path}`)
 
 const turf = require('@turf/turf')
+const { BlobServiceClient } = require('@azure/storage-blob')
 
-const { app_title_short, metafields, DB } = include('config/')
+const { app_title_short, app_storage, metafields, DB } = include('config/')
 const { checklanguage, array, join, parsers } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter')
@@ -190,13 +191,33 @@ module.exports = async (req, res) => {
 							const img_dir = path.join(template_dir, 'images')
 							if (!fs.existsSync(img_dir)) fs.mkdirSync(img_dir)
 
-							imgs.forEach((d, i) => {
-								const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
-								if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-								try {
-									fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
-								} catch(err) { console.log(err) }
-							})
+							if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+								// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
+								// ESTABLISH THE CONNECTION TO AZURE
+								const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+								const containerClient = blobServiceClient.getContainerClient(app_title_short)
+
+								await Promise.all(imgs.map((d, i) => {
+									return new Promise(async resolve1 => {
+										const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+										if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+										
+										try {
+											const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
+											await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
+										} catch(err) { console.log(err) }
+										resolve1()
+									})
+								}))
+							} else {
+								imgs.forEach((d, i) => {
+									const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+									if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+									try {
+										fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
+									} catch(err) { console.log(err) }
+								})
+							}
 						}
 
 						fs.writeFileSync(path.join(template_dir, 'data.json'), JSON.stringify(pad_group.values))
@@ -205,13 +226,33 @@ module.exports = async (req, res) => {
 							const img_dir = path.join(dir, 'images')
 							if (!fs.existsSync(img_dir)) fs.mkdirSync(img_dir)
 
-							imgs.forEach((d, i) => {
-								const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
-								if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-								try {
-									fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
-								} catch(err) { console.log(err) }
-							})
+							if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+								// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
+								// ESTABLISH THE CONNECTION TO AZURE
+								const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+								const containerClient = blobServiceClient.getContainerClient(app_title_short)
+
+								await Promise.all(imgs.map((d, i) => {
+									return new Promise(async resolve1 => {
+										const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+										if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+										
+										try {
+											const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
+											await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
+										} catch(err) { console.log(err) }
+										resolve1()
+									})
+								}))
+							} else {
+								imgs.forEach((d, i) => {
+									const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
+									if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
+									try {
+										fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
+									} catch(err) { console.log(err) }
+								})
+							}
 						}
 
 						fs.writeFileSync(path.join(dir, `${app_title_short}_data.json`), JSON.stringify(pad_group.values))

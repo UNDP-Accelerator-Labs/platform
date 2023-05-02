@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
 
 	// CREATE A tmp FOLDER TO STORE EVERYTHING
 	if (render) {
+		// TO DO: UPDATE HERE FOR AZURE
 		// const basedir = path.join(__dirname, `../public/uploads/`)
 		var basedir = path.join(rootpath, '/tmp')
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)

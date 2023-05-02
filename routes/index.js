@@ -1,5 +1,6 @@
-const { app_title, DB } = include('config/')
+const { app_title, app_title_short, app_storage, DB } = include('config/')
 const { checklanguage, stripHTML, join, parsers, array } = include('routes/helpers/')
+
 // const request = require('request')
 // const format = require('./formatting.js')
 const path = require('path')
@@ -11,6 +12,7 @@ const fetch = require('node-fetch')
 const Pageres = require('pageres') // THIS IS FOR SCREENSHOTS
 const turf = require('@turf/turf')
 const archiver = require('archiver')
+const { BlobServiceClient } = require('@azure/storage-blob')
 
 const jwt = require('jsonwebtoken')
 
@@ -265,44 +267,103 @@ exports.process.upload = (req, res) => {
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 		const source = path.join(__dirname, `../${f.path}`)
 
-		return new Promise(resolve => {
+		return new Promise(async resolve => {
 			if (['image/png', 'image/jpg', 'image/jpeg', 'image/jfif', 'image/gif', 'application/octet-stream'].includes(f.mimetype)) { // octet-streram IS FOR IMAGE URLs				
-				const smdir = path.join(basedir, 'sm/')
-				if (!fs.existsSync(smdir)) fs.mkdirSync(smdir)
-				const targetdir = path.join(smdir, uuid)
-				if (!fs.existsSync(targetdir)) fs.mkdirSync(targetdir)
-
-				// const source = path.join(__dirname, `../${f.path}`)
-				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-				const smtarget = path.join(targetdir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
 				
-				// CREATE THE SMALL IMAGE
-				Jimp.read(source, (err, image) => {
-					if (err) console.log(err)
-					const w = image.bitmap.width
-					const h = image.bitmap.height
-					// CHECK IMAGE ORIENTATION (EXIF)
-					// SEE https://www.impulseadventure.com/photo/exif-orientation.html
-					if (image._exif && image._exif.tags && image._exif.tags.Orientation) {
-						const o = image._exif.tags.Orientation
-						if (o === 8) image.rotate(270).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-						if (o === 6) image.rotate(90).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-						else image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-					} else {
-						image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
-					}
+				if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+					// USEFUL GUIDE: https://spin.atomicobject.com/2022/03/25/azure-storage-node-js/
+					const targetdir = path.join('uploads/', uuid)
+					const targetsmdir = path.join('uploads/sm/', uuid)
 
-					image.quality(60)
-					image.writeAsync(smtarget)
-					.then(_ => {
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
-					}).catch(err => {
-						fs.copyFileSync(source, smtarget)
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
+					// ESTABLISH THE CONNECTION TO AZURE
+					const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+					// FIND OR CREATE THE CONTAINER
+					const containerClient = await createContainer(blobServiceClient)
+					// SET UP BLOB OPTIONS
+					Jimp.read(source, async (err, image) => {
+						if (err) console.log(err)
+						const w = image.bitmap.width
+
+						// SET MAX WIDTH (AND THEREBY SIZE) FOR UPLOADED IMAGES
+						if (w > 1080) {
+							const r = 1080 / w
+							image.scale(r)
+						}
+						await image.getBufferAsync(Jimp.MIME_PNG)
+						.then(async buffer => {
+							if (err) console.log(err)
+							const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, `${f.filename}.png`))
+							const options = { blobHTTPHeaders: { blobContentType: Jimp.MIME_PNG } }
+
+							// const buffer = await fs.readFileSync(source)
+							await blobClient.uploadData(buffer, options)
+							console.log('should have written main file')
+						}).catch(err => console.log(err))
+
+						// SET EVERYTHING UP FOR VIGNETTES
+						// CHECK IMAGE ORIENTATION (EXIF)
+						// SEE https://www.impulseadventure.com/photo/exif-orientation.html
+						if (image._exif && image._exif.tags && image._exif.tags.Orientation) {
+							const o = image._exif.tags.Orientation
+							if (o === 8) image.rotate(270).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+							if (o === 6) image.rotate(90).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+							else image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+						} else {
+							image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+						}
+						await image.getBufferAsync(Jimp.MIME_PNG)
+						.then(async buffer => {
+							if (err) console.log(err)
+							const blobClient = containerClient.getBlockBlobClient(path.join(targetsmdir, `${f.filename}.png`))
+							const options = { blobHTTPHeaders: { blobContentType: Jimp.MIME_PNG } }
+
+							// const buffer = await fs.readFileSync(source)
+							await blobClient.uploadData(buffer, options)
+							console.log('should have written small file')
+						}).catch(err => console.log(err))
+
+						console.log('should resolve now')
+						resolve({ status: 200, src: path.join(targetdir, `${f.filename}.png`), originalname: f.originalname, message: 'success' })
+						console.log('failed resolve')
 					})
-				})
+
+				} else { // THIS IS SERVER FILE SYSTEM BASED
+					const smdir = path.join(basedir, 'sm/')
+					if (!fs.existsSync(smdir)) fs.mkdirSync(smdir)
+					const targetdir = path.join(smdir, uuid)
+					if (!fs.existsSync(targetdir)) fs.mkdirSync(targetdir)
+
+					const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+					const smtarget = path.join(targetdir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+					
+					// CREATE THE SMALL IMAGE
+					Jimp.read(source, (err, image) => {
+						if (err) console.log(err)
+						const w = image.bitmap.width
+						const h = image.bitmap.height
+						// CHECK IMAGE ORIENTATION (EXIF)
+						// SEE https://www.impulseadventure.com/photo/exif-orientation.html
+						if (image._exif && image._exif.tags && image._exif.tags.Orientation) {
+							const o = image._exif.tags.Orientation
+							if (o === 8) image.rotate(270).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+							if (o === 6) image.rotate(90).cover(200, 300, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+							else image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+						} else {
+							image.cover(300, 200, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE).normalize().brightness(-.05)
+						}
+
+						image.quality(60)
+						image.writeAsync(smtarget)
+						.then(_ => {
+							fs.renameSync(source, target)
+							resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
+						}).catch(err => {
+							fs.copyFileSync(source, smtarget)
+							fs.renameSync(source, target)
+							resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
+						})
+					})
+				}
 			} else if (f.mimetype.includes('video/')) {
 				// TO DO: CHECK SIZE HERE AND IF TOO BIG DO NOTHING (IN FRONT END TELL USER TO GO THROUGH YOUTUBE OF MSSTREAM)
 				// const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
@@ -349,6 +410,15 @@ exports.process.upload = (req, res) => {
 		res.json({ status: 500, message: 'Oops! Something went wrong.' })
 	})
 }
+// CREATE CONTAINER: TO DO: FINISH THIS INTEGRATION
+async function createContainer (blobServiceClient, uuid) {
+	const containerClient = blobServiceClient.getContainerClient(app_title_short)
+	const createContainerResponse = await containerClient.createIfNotExists({ access: 'blob' })
+	return containerClient
+}
+
+
+
 // THIS IS NOT BEING USED NOW
 exports.process.screenshot = (req, res) => {
 	if (process.env.NODE_ENV !== 'production') {

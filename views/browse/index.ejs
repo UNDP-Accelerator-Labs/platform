@@ -55,6 +55,7 @@
 								<p class='country'><%- d.country %></p>
 								<h1><% if (d.title?.length > 50) { %><%- d.title?.slice(0, 50).trim() %>…<% } else { %><%- d.title %><% } %></h1>
 							</div>
+							<!-- TO DO: UPDATE HERE -->
 							<img src='<%- d.img[0] %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
 						</a>
 					</div>
@@ -70,6 +71,7 @@
 								<h1><%- d.title %></h1>
 								<p><% if (d.txt?.[0]?.length > 500) { %><%- d.txt?.[0].slice(0, 500)?.replace(/<\/?[^>]+(>|$)/ig, '').trim() %>…<% } else { %><%- d.txt?.[0]?.replace(/<\/?[^>]+(>|$)/ig, '').trim() %><% } %></p>
 							</div>
+							<!-- TO DO: UPDATE HERE -->
 							<img src='<%- d.img[0]?.replace("uploads/sm/", "uploads/") %>' onerror='this.src = "/uploads/04c18fce-225c-4912-a43e-561c9fa29ddd/1dbf34121b04849e7d5526b29b15292b.jpeg"'>
 						</a>
 					</div>
@@ -828,8 +830,15 @@
 					const node = this
 					const img = new Image()
 					img.onload = function () { node.src = this.src }
-					if (display === 'slideshow') img.src = d.img[0].replace('uploads/sm/', 'uploads/')
-					else img.src = d.img[0]
+					
+					<% if (locals.metadata.site.app_storage) { %>
+						const source = new URL(`<%- locals.metadata.site.app_storage %>${d.img[0]}`).href
+					<% } else { %>
+						const source = d.img[0]
+					<% } %>
+
+					if (display === 'slideshow') img.src = source.replace('uploads/sm/', 'uploads/')
+					else img.src = source
 				})
 			}.bind(this),
 			stats: function (_sel) {

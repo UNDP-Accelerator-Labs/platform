@@ -1,11 +1,14 @@
 const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
+const request = require('request').defaults({ encoding: null })
 const imgsize = require('image-size')
+
+const { BlobServiceClient } = require('@azure/storage-blob')
 
 const { Document, SectionType, AlignmentType, UnderlineType, HeadingLevel, StyleLevel, Packer, Paragraph, TextRun, ImageRun, TableOfContents } = require('docx')
 
-const { app_title_short, colors, metafields, DB } = include('config/')
+const { app_title_short, app_storage, colors, metafields, DB } = include('config/')
 const { checklanguage, datastructures, array, join, geo } = include('routes/helpers/')
 
 const { filter } = require('../../browse/pads/')
@@ -170,44 +173,88 @@ module.exports = async (req, res) => {
 
 				if (type === 'img') {
 					const { src } = data
-					const p = path.join(rootpath, `public/${src}`)
-					if (fs.existsSync(p)) {
-						const { width, height } = resizeImg(p)
-						arr.push(new Paragraph({
-							children: [
-								new ImageRun({
-									// TO DO: FILTER IF URL
-									data: fs.readFileSync(p),
-									transformation: {
-										width,
-										height
-									}
-								})
-							],
-							alignment: AlignmentType.CENTER,
-							style: 'images'
-						}))
+					
+					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+						// TO DO: FILTER IF URL
+						await new Promise(resolve1 => {
+							request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
+								const { width, height } = resizeImg(buffer)
+								resolve1(arr.push(new Paragraph({
+									children: [
+										new ImageRun({
+											data: buffer,
+											transformation: {
+												width,
+												height
+											}
+										})
+									],
+									alignment: AlignmentType.CENTER,
+									style: 'images'
+								})))
+							})
+						})
+					} else {
+						const p = path.join(rootpath, `public/${src}`)
+						if (fs.existsSync(p)) {
+							const { width, height } = resizeImg(p)
+							arr.push(new Paragraph({
+								children: [
+									new ImageRun({
+										// TO DO: FILTER IF URL
+										data: fs.readFileSync(p),
+										transformation: {
+											width,
+											height
+										}
+									})
+								],
+								alignment: AlignmentType.CENTER,
+								style: 'images'
+							}))
+						}
 					}
 				}
 				if (type === 'mosaic') {
 					const { srcs } = data
 					const children = []
 					const maxwidth = srcs.length === 2 ? 600 / 2 : 600 / 3
-					srcs.forEach(d => {
-						const p = path.join(rootpath, `public/${d}`)
-						if (fs.existsSync(p)) {
-							const { width, height } = resizeImg(p, maxwidth)
+					
+					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+						// TO DO: FILTER IF URL
+						// src.isURL()
+						await Promise.all(srcs.map(d => {
+							return new Promise(resolve1 => {
+								request.get(new URL(path.join(new URL(app_storage).pathname, d), app_storage).href, function (err, res, buffer) {
+									const { width, height } = resizeImg(buffer, maxwidth)
 
-							children.push(new ImageRun({
-								// TO DO: FILTER IF URL
-								data: fs.readFileSync(p),
-								transformation: {
-									width,
-									height
-								}
-							}))
-						}
-					})
+									resolve1(children.push(new ImageRun({
+										data: buffer,
+										transformation: {
+											width,
+											height
+										}
+									})))
+								})
+							})
+						}))
+					} else {
+						srcs.forEach(d => {
+							const p = path.join(rootpath, `public/${d}`)
+							if (fs.existsSync(p)) {
+								const { width, height } = resizeImg(p, maxwidth)
+
+								children.push(new ImageRun({
+									// TO DO: FILTER IF URL
+									data: fs.readFileSync(p),
+									transformation: {
+										width,
+										height
+									}
+								}))
+							}
+						})
+					}
 					arr.push(new Paragraph({ children, alignment: AlignmentType.CENTER, style: 'images' }))
 				}
 				// if (type === 'video') addVideo({ data, lang, section }) // CANNOT DISPLAY VIDEOS IN PRINT

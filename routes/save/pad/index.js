@@ -1,6 +1,7 @@
-const { DB } = include('config/')
+const { app_title_short, app_storage, DB } = include('config/')
 const fs = require('fs')
 const path = require('path')
+const { BlobServiceClient } = require('@azure/storage-blob')
 
 module.exports = (req, res) => {
 	const { id, tagging, locations, metadata, deletion, mobilization } = req.body || {}
@@ -126,11 +127,26 @@ module.exports = (req, res) => {
 		})
 	}).then(newID => {
 		if (deletion) {
+			// TO DO: THIS DOES NOT WORK (GUESSING NO deletion IS BEING SENT)
 			const promises = deletion.map(f => {
-				if (fs.existsSync(path.join(__dirname, `../public/${f}`))) {
-					return new Promise(resolve => {
-						resolve(fs.unlinkSync(path.join(__dirname, `../public/${f}`)))
+				if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+					// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-delete-javascript
+					return new Promise(async resolve => {
+						const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+						const containerClient = blobServiceClient.getContainerClient(app_title_short)
+
+						const options = { deleteSnapshots: 'include' }
+						const blockBlobClient = await containerClient.getBlockBlobClient(f)
+						await blockBlobClient.delete(options)
+						console.log('file', f, 'deleted')
+						resolve()
 					})
+				} else {
+					if (fs.existsSync(path.join(__dirname, `../public/${f}`))) {
+						return new Promise(resolve => {
+							resolve(fs.unlinkSync(path.join(__dirname, `../public/${f}`)))
+						})
+					}
 				}
 			})
 			Promise.all(promises).then(_ => res.json({ status: 200, message: 'Successfully saved.', object: newID }))

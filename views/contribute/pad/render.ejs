@@ -1897,8 +1897,6 @@ function addRadiolist (kwargs) {
 	}
 	required = required ?? false
 
-	console.log(instruction)
-
 	if (!editing && options?.length === 0) return null
 
 	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })

@@ -261,6 +261,8 @@ exports.process.upload = (req, res) => {
 	const fls = req.files
 	console.log(fls)
 	const promises = fls.map(f => {
+		
+		// TO DO: MOVE THIS DOWN TO THE if NO app_storage
 		const basedir = path.join(__dirname, `../public/uploads/`)
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
 		const dir = path.join(basedir, uuid)

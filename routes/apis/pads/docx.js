@@ -9,7 +9,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 const { Document, SectionType, AlignmentType, UnderlineType, HeadingLevel, StyleLevel, Packer, Paragraph, TextRun, ImageRun, TableOfContents } = require('docx')
 
 const { app_title_short, app_storage, colors, metafields, DB } = include('config/')
-const { checklanguage, datastructures, array, join, geo } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, array, join, geo } = include('routes/helpers/')
 
 const { filter } = require('../../browse/pads/')
 
@@ -129,7 +129,8 @@ module.exports = async (req, res) => {
 										text: repetition > 0 ? `${b.title} – ${repetition}` : b.title,
 										heading: HeadingLevel.HEADING_3
 									}))
-									if (b.lead) children.push(new Paragraph({ text: b.lead }))
+									// if (b.lead) children.push(new Paragraph({ text: b.lead }))
+									if (b.lead) paragraphs.push(new Paragraph({ text: b.lead }))
 								}
 								if (b.items?.length) {					
 									const items = await Promise.all(b.items.map(a => populateSection(a)))
@@ -175,25 +176,28 @@ module.exports = async (req, res) => {
 					const { src } = data
 					
 					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
-						// TO DO: FILTER IF URL
-						await new Promise(resolve1 => {
-							request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
-								const { width, height } = resizeImg(buffer)
-								resolve1(arr.push(new Paragraph({
-									children: [
-										new ImageRun({
-											data: buffer,
-											transformation: {
-												width,
-												height
-											}
-										})
-									],
-									alignment: AlignmentType.CENTER,
-									style: 'images'
-								})))
+						if (src) {
+							// TO DO: FILTER IF URL							
+							await new Promise(resolve1 => {
+								request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
+									// TO DO: MIGHT NEED resizeImgBuffer AFTER ALL
+									const { width, height } = resizeImg(buffer)
+									resolve1(arr.push(new Paragraph({
+										children: [
+											new ImageRun({
+												data: buffer,
+												transformation: {
+													width,
+													height
+												}
+											})
+										],
+										alignment: AlignmentType.CENTER,
+										style: 'images'
+									})))
+								})
 							})
-						})
+						}
 					} else {
 						const p = path.join(rootpath, `public/${src}`)
 						if (fs.existsSync(p)) {

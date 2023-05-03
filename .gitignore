@@ -17,3 +17,7 @@ dump/
 template.env
 *.uploads.zip
 _00_inspiration.png
+<<<<<<< HEAD
+=======
+feedback/
+>>>>>>> origin/master

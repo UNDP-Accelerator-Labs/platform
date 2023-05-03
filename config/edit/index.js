@@ -58,6 +58,14 @@ exports.metafields = [
 	// 	{ name: 'Implementation stage' },
 	// 	{ name: 'Completed' }
 	// ] }
+
+	{ type: 'radiolist', name: 'gender', required: false, instruction: 'Innovator gender',
+	options: [
+		{ name: 'Female' },
+		{ name: 'Male' },
+		{ name: 'Other' },
+		{ name: 'Undisclosed' }
+	] }
 ]
 // DESIRED ENGAGEMENT TYPES
 	// OPTIONS: ['like', 'dislike', 'comment']

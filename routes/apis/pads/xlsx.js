@@ -13,11 +13,17 @@ const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers
 const filter = include('routes/browse/pads/filter')
 
 module.exports = async (req, res) => {
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = req.body || {}
+	const { action } = req.params || {}
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
+	if (action === 'fetch') include_data = true
+	
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.body.language || req.session.language)
 
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	let cors_filter = ''
+	if (!pw) cors_filter = DB.pgp.as.format(`AND p.status > 2`)
 
 	if (output === 'csv') {
 		var single_sheet = true
@@ -49,10 +55,11 @@ module.exports = async (req, res) => {
 			
 			WHERE TRUE
 				$1:raw
+				$2:raw
 				AND p.id NOT IN (SELECT review FROM reviews)
 			
 			ORDER BY id DESC
-		;`, [ full_filters ]).then(async pads => {
+		;`, [ full_filters, cors_filter ]).then(async pads => {
 			// JOIN THE USER INFOR FOR COUNTRY NAMES
 			pads = await join.users(pads, [ language, 'contributor_id' ])
 			// AND DELETE ALL THE PERSONAL INFORMATION
@@ -386,7 +393,6 @@ module.exports = async (req, res) => {
 								delete d.img
 							})
 
-							
 							const data_sheet = XLSX.utils.json_to_sheet(pad_group.values)
 							XLSX.utils.book_append_sheet(wb, data_sheet, 'data-main')
 
@@ -527,17 +533,20 @@ module.exports = async (req, res) => {
 								else XLSX.writeFile(wb, path.join(dir, `${app_title_short}_data.xlsx`), {})
 							}
 						}
-						return null
+						if (include_data) return pad_group.values
+						else return null
 					}).catch(err => console.log(err))	
 				})
 			})
 
 			return t.batch(batch)
 			.then(results => {
-				return open
+				return [ open, results ]
+				// return open
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
-	}).then(open => {
+	}).then(results => {
+		const [ open, data ] = results
 		console.log(`is open: ${open}`)
 		if (render) {
 			if (open) var zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
@@ -556,6 +565,19 @@ module.exports = async (req, res) => {
 					fs.rmSync(path.join(basedir, '/archive.zip'))
 				})
 			})
+		} else {
+			req.session.destroy() // THIS IS TO PREVENT EXTERNAL CALLS TO THE API FROM LOGGING IN
+
+			const structure = array.unique.call(data.flat().filter(d => d).map(d => Object.keys(d)).flat(), { onkey: true })
+			const entries = data.flat().filter(d => d).map(d => {
+				return structure.map(c => {
+					return d[c] ? JSON.stringify(d[c]) : null
+				})
+			})
+			const csv = `${structure.map(d => JSON.stringify(d)).join(',')}<br/>${entries.join('<br/>')}`
+
+			if (data.length) res.send(csv)
+			else res.send('Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.')
 		}
 	}).catch(err => console.log(err))
 }

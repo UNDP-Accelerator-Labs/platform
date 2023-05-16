@@ -615,7 +615,7 @@ function addTxt (kwargs) {
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
 	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+	.html(d => d.URLsToLinks())
 
 	if (focus) media.media.node().focus()
 }

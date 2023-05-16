@@ -52,17 +52,17 @@ String.prototype.URLsToLinks = function () {
 	// INSPIRED BY https://stackoverflow.com/questions/49634850/convert-plain-text-links-to-clickable-links
 	//URLs starting with http://, https://, or ftp://
 	const replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim
-	this.valueOf() = this.valueOf().replace(replacePattern1, '<a href="$1" target="_blank">$1</a>')
+	let str = this.valueOf().replace(replacePattern1, '<a href="$1" target="_blank">$1</a>')
 
 	//URLs starting with "www." (without // before it, or it'd re-link the ones done above).
 	const replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim
-	this.valueOf() = this.valueOf().replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>')
+	str = str.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>')
 
 	//Change email addresses to mailto:: links.
 	const replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim
-	this.valueOf() = this.valueOf().replace(replacePattern3, '<a href="mailto:$1">$1</a>')
+	str = str.replace(replacePattern3, '<a href="mailto:$1">$1</a>')
 
-	return this.valueOf()
+	return str
 }
 String.prototype.convertHTMLtoTXT = function () {
 	// CREDIT TO https://stackoverflow.com/questions/5002111/how-to-strip-html-tags-from-string-in-javascript

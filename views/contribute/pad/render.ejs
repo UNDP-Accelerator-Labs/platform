@@ -827,7 +827,7 @@ function addSection (kwargs) {
 				'contenteditable': editing && !templated ? true : null 
 			}).html(d => d.lead)
 		}
-		if (templated && repeat) { 
+		if (editing && templated && repeat) {
 			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
 			d3.selectAll('.layout.repeat').filter(d => d.group === group)
 				.select('.repeat-container').classed('hide', true)
@@ -1562,7 +1562,7 @@ function addTxt (kwargs) {
 	}).addElems('p', null, d => d.txt.split('\n').filter(c => c))
 	.html(d => {
 		// return d.txt.replace(/\r?\n/g, '<br/>')
-		return d
+		return d.URLsToLinks()
 	})
 
 	if (focus) media.media.node().focus()

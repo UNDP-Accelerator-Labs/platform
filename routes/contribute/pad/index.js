@@ -252,7 +252,7 @@ function check_authorization (_kwargs) {
 			}).catch(err => console.log(err))
 		}
 		else {
-			if (id) return conn.one(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => d.status > 2)
+			if (id) return conn.one(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => public ? d.status > 2 : d.status >= read)
 				.then(result => {
 					if (result === true) return { authorized: rights >= read, redirect: 'view' }
 					else return { authorized: false }

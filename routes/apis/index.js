@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
 	const { action, object } = req.params || {}
-	const { output, render } = req.body || {}
+	const { output, render } = Object.keys(req.body)?.length ? req.body : Object.keys(req.query)?.length ? req.query : {}
 
 	// TO DO: ADD Readme.md TO DOWNLOADS
 	if (action === 'download') {
@@ -23,10 +23,15 @@ module.exports = async (req, res) => {
 			}
 		} else res.redirect('/module-error')
 	} else if (action === 'fetch') {
-		if (object === 'pads') pads.json(req, res)
-		else if (object === 'files') files(req, res)
+		if (object === 'pads') {
+			if (output === 'csv') pads.xlsx(req, res)
+			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
+			else res.redirect('/module-error')
+		} else if (object === 'files') files(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
+		else res.redirect('/module-error')
 	} else if (action === 'request') {
 		if (object === 'token') tokens.generate(req, res)
+		else res.redirect('/module-error')
 	}
 }

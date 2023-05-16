@@ -827,7 +827,7 @@ function addSection (kwargs) {
 				'contenteditable': editing && !templated ? true : null 
 			}).html(d => d.lead)
 		}
-		if (templated && repeat) { 
+		if (editing && templated && repeat) {
 			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
 			d3.selectAll('.layout.repeat').filter(d => d.group === group)
 				.select('.repeat-container').classed('hide', true)

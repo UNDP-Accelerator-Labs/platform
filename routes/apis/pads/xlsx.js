@@ -16,6 +16,7 @@ module.exports = async (req, res) => {
 	const { action } = req.params || {}
 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
+	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
 	if (action === 'fetch') include_data = true
 	
 	const pw = req.session.email || null
@@ -391,6 +392,16 @@ module.exports = async (req, res) => {
 									}
 								}
 								delete d.img
+								if (single_sheet && include_locations) {
+									const pad_locations = locations.filter(c => c.pad_id === d.pad_id)
+									for (let i = 0; i < max_locations; i ++) {
+										if (pad_locations[i]) {
+											const { lat, lng } = pad_locations[i]
+											d[`location-${i + 1}-lat`] = lat
+											d[`location-${i + 1}-lng`] = lng
+										}
+									}
+								}
 							})
 
 							const data_sheet = XLSX.utils.json_to_sheet(pad_group.values)

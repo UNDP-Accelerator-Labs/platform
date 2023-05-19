@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err))
 					} else return { object: 'pads', space: 'public', countries: [result?.iso3], title: result?.name }
 				}).catch(err => console.log(err))
-			}).catch(err => console.log(err)) || {};
+			}).catch(err => console.log(err)) || {}; // avoiding server crash by setting vars to empty object -- this will still crash somewhere below but it will not bring down the whole server
 
 			space = vars.space
 			pinboard = vars.pinboard

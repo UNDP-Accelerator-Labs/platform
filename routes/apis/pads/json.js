@@ -13,7 +13,12 @@ const { checklanguage, array, join, parsers } = include('routes/helpers/')
 const filter = include('routes/browse/pads/filter')
 
 module.exports = async (req, res) => {
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	const { host } = req.headers || {}
+ 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
+	if (typeof include_imgs === 'string') include_imgs = JSON.parse(include_imgs)
+	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
+
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.session.language)
 
@@ -104,7 +109,7 @@ module.exports = async (req, res) => {
 						return d.media?.map(c => {
 							const obj = {}
 							obj.pad_id = d.pad_id
-							obj.image = c // TO DO: ABS PATH
+							obj.image = c
 							return obj
 						})
 					}).flat().filter(d => d)
@@ -138,10 +143,17 @@ module.exports = async (req, res) => {
 						// SET IMAGES
 						if (include_imgs) {
 							d.media = d.media?.map(c => {
-								const idx = imgs.findIndex(b => b.image === c)
-								if (render && fs.existsSync(path.join(rootpath, `/public${c.replace('uploads/sm', 'uploads')}`))) {
-									return `images/pad-${d.pad_id}/image-${idx + 1}${path.extname(c)}`
-								} else return c
+								if (parsers.isURL(c)) return c
+								else {
+									const idx = imgs.findIndex(b => b.image === c)
+									if (render) { // && fs.existsSync(path.join(rootpath, `/public${c.replace('uploads/sm', 'uploads')}`))) {
+										return `images/pad-${d.pad_id}/image-${idx + 1}${path.extname(c)}`
+									} else {
+										if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+											return path.join(app_storage, c)
+										} else return path.join(host, c)
+									}
+								}
 							})
 
 						}

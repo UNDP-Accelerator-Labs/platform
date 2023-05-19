@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === 'production') {
 	install_dependencies()
 }
 
-const sessionMiddleware = session({ 
+const sessionMiddleware = session({
 	name: `${app_suite}-session`,
 	// secret: 'acclabspadspass',
 	secret: `${app_suite}-${app_suite_secret}-pass`,
@@ -113,6 +113,7 @@ app.post('/check/:object', routes.process.check)
 app.post('/save/:object', routes.process.save)
 app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
+app.post('/feedback/:action', routes.process.feedback)
 app.post('/comment', routes.process.comment)
 app.post('/validate', routes.process.validate)
 
@@ -143,13 +144,13 @@ app.post('/call/api', routes.process.callapi)
 app.post('/upload/img', upload.array('img'), routes.process.upload)
 app.post('/upload/video', upload.array('video'), routes.process.upload)
 app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
-app.post('/upload/xlsx', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA 
+app.post('/upload/xlsx', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA
 
 app.post('/screenshot', routes.process.screenshot)
 
 
 // TO DO: UPDATE SCHEMA BELOW
-// app.post('/storeImport', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA 
+// app.post('/storeImport', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA
 app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forward
 app.post('/reverseGeocoding', routes.reverseGeocoding) // UPDATE TO geocode/forward
 
@@ -179,7 +180,7 @@ const server = app.listen(process.env.PORT || 2000, _ => console.log(`the app is
 const cron = require('node-cron')
 DB.conn.tx(t => {
 	return t.none(`
-		UPDATE mobilizations 
+		UPDATE mobilizations
 		SET status = status + 1
 		WHERE (start_date <= NOW() AND status = 0)
 			OR (end_date <= NOW() AND status = 1)
@@ -246,7 +247,7 @@ DB.conn.tx(t => {
 // 	})
 
 // 	// socket.on('move-up', data => {
-		
+
 // 	// })
 
 // 	socket.on('disconnect', _ => {

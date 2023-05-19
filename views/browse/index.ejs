@@ -507,14 +507,7 @@
 				&& d.past_associated_mobilizations === undefined)
 			})
 		this.prefoot = this.inner.addElems('div', 'prefoot', d => {
-			if (display === 'columns'
-				|| d.img?.length > 0
-				|| d.items !== undefined
-				|| d.contributors !== undefined
-				|| d.private_associated_pads !== undefined
-				|| d.associated_pads !== undefined
-				|| d.ongoing_associated_mobilizations !== undefined
-				|| d.past_associated_mobilizations !== undefined) {
+			if (display !== 'slideshow') {
 				return [d];
 			} else {
 				return [];
@@ -1591,6 +1584,7 @@
 			render.pin(entry.inner)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
+			render.feedback(entry.prefoot)
 		}
 	}
 

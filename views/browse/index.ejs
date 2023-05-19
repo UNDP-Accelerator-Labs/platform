@@ -506,6 +506,20 @@
 				&& d.ongoing_associated_mobilizations === undefined
 				&& d.past_associated_mobilizations === undefined)
 			})
+		this.prefoot = this.inner.addElems('div', 'prefoot', d => {
+			if (display === 'columns'
+				|| d.img?.length > 0
+				|| d.items !== undefined
+				|| d.contributors !== undefined
+				|| d.private_associated_pads !== undefined
+				|| d.associated_pads !== undefined
+				|| d.ongoing_associated_mobilizations !== undefined
+				|| d.past_associated_mobilizations !== undefined) {
+				return [d];
+			} else {
+				return [];
+			}
+		});
 		this.foot = this.inner.addElems('div', 'foot', d => {
 			if (display === 'columns'
 				|| d.img?.length > 0
@@ -1504,7 +1518,20 @@
 
 				_sel.addElems('div', 'meta meta-country')
 				.html(d => d.countryname)
-			}.bind(this)
+			}.bind(this),
+			feedback: (_sel) => {
+				_sel.addElems('span', 'feedback feedback-approve')
+				.text('👍')
+				.attrs({
+					title: 'Like!',
+				});
+				_sel.addElems('span', 'feedback feedback-dislike')
+				.text('👎')
+				.attrs({
+					title: 'Dislike!',
+				});
+				_sel.addElems('div', 'feedback feedback-popout')
+			},
 		}
 	}
 
@@ -1540,6 +1567,7 @@
 			render.pin(entry.foot)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
+			render.feedback(entry.prefoot)
 		} else if (display === 'slideshow') {
 			render.img(entry.head)
 			render.owner(entry.metagroup)

@@ -29,6 +29,7 @@ module.exports = async (req, res) => {
 			else res.redirect('/module-error')
 		} else if (object === 'files') files(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
+		else if (object === 'tags') tags(req, res)
 		else res.redirect('/module-error')
 	} else if (action === 'request') {
 		if (object === 'token') tokens.generate(req, res)

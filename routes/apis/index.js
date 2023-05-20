@@ -1,10 +1,11 @@
 const pads = require('./pads/')
 const files = require('./files/')
 const contributors = require('./contributors/')
+const tags = require('./tags/')
 const tokens = require('./tokens/')
 const jwt = require('jsonwebtoken')
 
-module.exports = async (req, res) => {
+module.exports = (req, res) => {
 	const { action, object } = req.params || {}
 	const { output, render } = Object.keys(req.body)?.length ? req.body : Object.keys(req.query)?.length ? req.query : {}
 

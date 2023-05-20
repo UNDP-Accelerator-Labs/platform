@@ -121,6 +121,8 @@ module.exports = async (req, res) => {
 						// NOTE THIS id IS DISSOCIATED FROM COMMENTS
 						d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
 
+						// GET SNIPPET
+						d.snippet = parsers.getTxt(d, false)
 						// SET TAGS WITH NAMES
 						if (include_tags) {
 							const nest = array.nest.call(d.tags, { key: 'type' })

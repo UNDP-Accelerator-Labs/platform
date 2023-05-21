@@ -46,11 +46,10 @@
 			required: true
 		})
 		// TO DO: IMPROVE THIS SINCE FOR NOW IT IS LIMITED TO THE 25 SHOWN ON THE CURRENT PAGE
-		const templates = <%- JSON.stringify(locals.sections.map(d => d.data.map(c => c.template)).flat()) %>
-		const notemplates = templates.every(d => [null, undefined].includes(d))
+		const templates = <%- JSON.stringify(locals?.sections?.map(d => d?.data?.map(c => c.template))?.flat()) %>
+		const notemplates = templates?.every(d => [null, undefined].includes(d))
 
-		// const countries = (<%- JSON.stringify(locals.sections.map(d => d.data.map(c => c.country)).flat()) %>).unique()
-		const years = (<%- JSON.stringify(locals.sections.map(d => d.data).flat()) %>).unique()
+		const years = (<%- JSON.stringify(locals?.sections?.map(d => d.data)?.flat()) %>).unique()
 		console.log(years)
 
 		const formdata = { action: '/apis/download/pads',  method: 'POST' }

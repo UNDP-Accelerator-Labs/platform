@@ -6,6 +6,7 @@ const files = require('./files/')
 const reviews = require('./reviews/')
 const mobilizations = require('./mobilizations/')
 const contributors = require('./contributors/')
+const blog = require('./blog/')
 
 module.exports = async (req, res) => {
 	const { xhr } = req
@@ -30,6 +31,8 @@ module.exports = async (req, res) => {
 			if (object === 'reviews') reviews.render(req, res)
 			if (object === 'mobilizations') mobilizations.render(req, res)
 			if (object === 'contributors') contributors.render(req, res)
+			if(object === 'blog') blog.render(req, res)
+
 		} else { // AJAX CALL
 			let data 
 			if (object === 'pads') data = await pads.load({ req: req })

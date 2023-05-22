@@ -112,18 +112,39 @@
             var footerHeight = document.querySelector(".org-footer").offsetHeight;
             var footerOffset = document.querySelector(".org-footer").offsetTop;
             var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    
+            
+            
+            let pad_sidebar, home_sidebar
+
+            //hide the fixed sidebar input editor in pads
+            try{
+                pad_sidebar = document.querySelector("div.media-input-group.input-group.overflowing")
+            }catch{()=>  pad_sidebar = null };
+
+            //hide the home statistics sidebar
+            try{
+                home_sidebar = document.querySelector(".sidebar > .inner")
+            }catch{()=>{}}
+
+
             if (
               scrollPosition >
               footerOffset - windowHeight + footerHeight / 2
             ) {
               // Footer is 50% in view, hide the element
               document.querySelector(".inner").style.display = "none";
-              document.querySelector(".sidebar > .inner").style.display = "none";
+              
+              if(home_sidebar) home_sidebar.style.display = "none";
+
+              if(pad_sidebar != null) pad_sidebar.style.display = "none";
+              
+              
             } else {
               // Footer is not 50% in view, show the element
               document.querySelector(".inner").style.display = "flex";
-              document.querySelector(".sidebar > .inner").style.display = "flex";
+              if(home_sidebar) home_sidebar.style.display = "flex";
+
+              if(pad_sidebar != null) pad_sidebar.style.display = "block";
             }
           });
         });

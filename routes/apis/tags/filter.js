@@ -1,7 +1,7 @@
 const { DB } = include('config/')
 
 module.exports = async (req, res) => {
-	let { tags, type, pads, mobilizations, countries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { tags, type, pads, mobilizations, countries, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (tags && !Array.isArray(tags)) tags = [tags]
 	if (pads && !Array.isArray(pads)) pads = [pads]
 	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations]
@@ -13,7 +13,10 @@ module.exports = async (req, res) => {
 		let general_filters = []
 		let platform_filters = []
 		
-		if (tags) general_filters.push(DB.pgp.as.format(`t.id IN ($1:csv)`, [ tags ]))
+		if (tags) {
+			general_filters.push(DB.pgp.as.format(`t.id IN ($1:csv)`, [ tags ]))
+			if (timeseries) platform_filters.push(DB.pgp.as.format(`t.tag_id IN ($1:csv)`, [ tags ]))
+		}
 		if (pads) platform_filters.push(DB.pgp.as.format(`t.pad IN ($1:csv)`, [ pads ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
 		if (countries) {

@@ -1,0 +1,128 @@
+<div class="org-footer" style="padding-top:5em;">
+    <style>
+      /* Footer */
+    .org-footer {
+    background-color: #005687;;
+    color: #fff;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 0.8rem;
+  }
+  
+  .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-column {
+    flex-basis: 30%;
+  }
+  
+  .footer-img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    background-color: transparent !important;
+  }
+  
+  h3 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  ul li {
+    margin-bottom: 0.5rem;
+  }
+  
+  li {
+    list-style: none;
+    margin-bottom: 0.5rem;
+  }
+  
+  a {
+    color: #fff;
+    font-weight: 1.5rem;
+    text-decoration: none;
+  }
+  
+  .social-media-links li {
+    display: inline-block;
+    margin-right: 1rem;
+    color: #fff;
+  }
+  
+    </style>
+  
+    <hr />
+    <div class="footer-row">
+      <div class="footer-column">
+        <img class="footer-img" src="/imgs/branding/UNDP_logo_white.png"  width="200" alt="undp accelerator labs logo">
+        <p>UNDP Accelerator Labs</p>
+      </div>
+      <div class="footer-column">
+        <h3>Links</h3>
+        <!-- <ul> -->
+          <li><a target="_blank" href="https://www.undp.org/acceleratorlabs">About Us</a></li>
+          <li><a target="_blank" href="https://www.undp.org/accountability/audit/investigations">Report fraud, abuse, misconduct</a></li>
+          <li><a target="_blank" href="https://www.undp.org/scam-alert">Scam Alert</a></li>
+          <li><a target="_blank" href="https://www.undp.org/copyright-terms-use">Terms of Use</a></li>
+        <!-- </ul> -->
+      </div>
+      <div class="footer-column">
+        <h3>Our Partners</h3>
+        <img class="footer-img" src="/imgs/branding/UNDP_Acc_Labs_All_Partners_horiz.jpg"  alt="undp accelerator Partnerslogo">
+      </div>
+    </div>
+    <div class="footer-row">
+      <div class="footer-column">
+        <p>&copy; 2023 United Nations Development Programme</p>
+      </div>
+      <div class="footer-column">
+        <h3>Follow Us</h3>
+        <div class="social-media-links">
+          <li><a target="_blank" href="https://www.linkedin.com/company/undp-accelerator-labs"><i class="fa fa-linkedin" > </i></a></li>
+          <li><a target="_blank" href="https://twitter.com/UNDPAccLabs"><i class="fa fa-twitter"> </i></a></li>
+          <li><a target="_blank" href="https://www.instagram.com/acceleratorlabs/"><i class="fa fa-instagram"> </i></a></li>
+        </div>
+      </div>
+      <div class="footer-column"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          // Check if the footer is 50% in view when scrolling
+          window.addEventListener("scroll", function() {
+            var windowHeight = window.innerHeight;
+            var footerHeight = document.querySelector(".org-footer").offsetHeight;
+            var footerOffset = document.querySelector(".org-footer").offsetTop;
+            var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+            if (
+              scrollPosition >
+              footerOffset - windowHeight + footerHeight / 2
+            ) {
+              // Footer is 50% in view, hide the element
+              document.querySelector(".inner h1").style.display = "none";
+            //   document.querySelector(".inner h2").style.display = "none";
+            } else {
+              // Footer is not 50% in view, show the element
+              document.querySelector(".inner h1").style.display = "block";
+            //   document.querySelector(".inner h2").style.display = "none";
+            }
+          });
+        });
+      </script>
+</div>
+  

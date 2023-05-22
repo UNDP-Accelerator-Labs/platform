@@ -78,6 +78,7 @@
           <li><a target="_blank" href="https://www.undp.org/accountability/audit/investigations">Report fraud, abuse, misconduct</a></li>
           <li><a target="_blank" href="https://www.undp.org/scam-alert">Scam Alert</a></li>
           <li><a target="_blank" href="https://www.undp.org/copyright-terms-use">Terms of Use</a></li>
+          <li><a target="_blank" href="https://forms.office.com/Pages/ResponsePage.aspx?id=Xtvls0QpN0iZ9XSIrOVDGbiZROH1lsFMla8_BsgmZ6lUOU1SNkVFWkRCVkFaTzBVWExSNkwyNkJGNi4u">Submit a request about our platforms</a></li>
         <!-- </ul> -->
       </div>
       <div class="footer-column">
@@ -97,7 +98,10 @@
           <li><a target="_blank" href="https://www.instagram.com/acceleratorlabs/"><i class="fa fa-instagram"> </i></a></li>
         </div>
       </div>
-      <div class="footer-column"></div>
+      <div class="footer-column">
+        <!-- <h3>Submit a request</h3> -->
+        
+      </div>
     </div>
 
     <script>
@@ -114,12 +118,12 @@
               footerOffset - windowHeight + footerHeight / 2
             ) {
               // Footer is 50% in view, hide the element
-              document.querySelector(".inner h1").style.display = "none";
-            //   document.querySelector(".inner h2").style.display = "none";
+              document.querySelector(".inner").style.display = "none";
+              document.querySelector(".sidebar > .inner").style.display = "none";
             } else {
               // Footer is not 50% in view, show the element
-              document.querySelector(".inner h1").style.display = "block";
-            //   document.querySelector(".inner h2").style.display = "none";
+              document.querySelector(".inner").style.display = "flex";
+              document.querySelector(".sidebar > .inner").style.display = "flex";
             }
           });
         });

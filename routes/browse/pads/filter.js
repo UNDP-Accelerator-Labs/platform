@@ -121,7 +121,7 @@ module.exports = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
 			;`, [ countries ])
-			.then(results =>  DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
 			.catch(err => console.log(err)))
 			// platform_filters.push(f_countries)
 		}

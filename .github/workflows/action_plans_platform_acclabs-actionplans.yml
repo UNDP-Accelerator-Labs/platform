@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: npm install, build, and test
         run: |
@@ -55,5 +55,5 @@ jobs:
         with:
           app-name: 'acclabs-actionplans'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C6D14B7F45744EBF8BD22CAB0B3D2B2C }}
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_a71e20f303234390b4eab75390366499 }}
           package: node-app.zip

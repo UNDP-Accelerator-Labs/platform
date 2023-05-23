@@ -63,8 +63,16 @@ jobs:
     needs: deploy
 
     steps:
+      - name: Get artifact ID
+        id: get-artifact
+        run: |
+          echo "::set-output name=artifact_id::$(curl -s -H \"Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}\" \
+            -H \"Accept: application/vnd.github.v3+json\" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts | \
+            jq -r '.artifacts[] | select(.name == \"node-app\") | .id')"
+
       - name: Delete old artifacts
-        uses: actions/delete-artifact@v2
-        with:
-          name: node-app
-          retention-days: 7 
+        run: |
+          curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ steps.get-artifact.outputs.artifact_id }}"

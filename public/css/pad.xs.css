@@ -3,7 +3,7 @@
  * 45 |                 background-color: $c-light-1;
  *    |                                   ^^^^^^^^^^
  *    '
- *   scss/pad.xs.scss 45:23  root stylesheet */
+ *   public/scss/pad.xs.scss 45:23  root stylesheet */
 
 body::before {
   font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
@@ -13,5 +13,5 @@ body::before {
   padding: 1em;
   margin-bottom: 1em;
   border-bottom: 2px solid black;
-  content: "Error: Undefined variable.\a    \2577 \a 45 \2502                  background-color: $c-light-1;\a    \2502                                    ^^^^^^^^^^\a    \2575 \a   scss/pad.xs.scss 45:23  root stylesheet";
+  content: "Error: Undefined variable.\a    \2577 \a 45 \2502                  background-color: $c-light-1;\a    \2502                                    ^^^^^^^^^^\a    \2575 \a   public/scss/pad.xs.scss 45:23  root stylesheet";
 }

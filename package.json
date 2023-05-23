@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"All is good\" && exit 0",
-    "start": "node app.js"
+    "start": "node app.js",
+    "sass": "sass --watch public/scss:public/css"
   },
   "author": "",
   "license": "ISC",
@@ -50,6 +51,7 @@
     "pagedjs": "^0.4.0",
     "pagedjs-cli": "^0.3.3",
     "pdfkit": "^0.13.0",
+    "sass": "^1.62.1",
     "socket.io": "^4.5.4"
   }
 }

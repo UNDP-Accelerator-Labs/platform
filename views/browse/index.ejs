@@ -1513,17 +1513,52 @@
 				.html(d => d.countryname)
 			}.bind(this),
 			feedback: (_sel) => {
-				_sel.addElems('span', 'feedback feedback-approve')
-				.text('👍')
+				_sel.addElems('span', 'feedback feedback-button')
+				.text('Journey')
 				.attrs({
-					title: 'Like!',
+					title: 'Record this article in your journey.',
+				}).on('click', () => {
+					const isOpen = popout.style('display') !== 'none';
+					d3.selectAll('.feedback-popout').styles({
+						'display': 'none',
+					});
+					if (!isOpen) {
+						popout.styles({
+							'display': null,
+						});
+					}
 				});
-				_sel.addElems('span', 'feedback feedback-dislike')
-				.text('👎')
-				.attrs({
-					title: 'Dislike!',
+				const popout = _sel.addElems('div', 'feedback feedback-popout');
+				const hide = () => {
+					popout.styles({
+						'display': 'none',
+					});
+				};
+				hide();
+				popout.addElems('span', 'feedback-quit')
+				.text('x')
+				.on('click', () => {
+					hide();
 				});
-				_sel.addElems('div', 'feedback feedback-popout')
+				popout.addElems('p', 'feedback-hint')
+				.text('Please give a short description of your journey.');
+				popout.addElems('input', 'feedback-prompt').attrs({
+					'type': 'text',
+				});
+				popout.addElems('button', 'feedback-approve')
+				.text('Relevant')
+				.on('click', (d) => {
+					// TODO
+					console.log('relevant', d);
+					hide();
+				});
+				popout.addElems('button', 'feedback-dislike')
+				.text('Unrelated')
+				.on('click', (d) => {
+					// TODO
+					console.log('unrelated', d);
+					hide();
+				});
 			},
 		}
 	}

@@ -97,7 +97,7 @@ html, body {
 					border-bottom: 1px solid $c-light-grey;
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					resize: none;
 					box-sizing: border-box;
 				}
@@ -190,7 +190,7 @@ html, body {
 
 						menu {
 							width: 100%;
-							
+
 							li {
 								display: inline-block;
 								width: 100%;
@@ -213,7 +213,7 @@ html, body {
 									transform: none;
 									pointer-events: all;
 									cursor: pointer;
-									
+
 									.count {
 										float: right;
 										color: $c-light-grey;
@@ -404,4 +404,20 @@ html, body {
 	line-height: 19px;
 	text-align: center;
 	vertical-align: text-top;
+}
+
+.feedback-button {
+	display: inline-block;
+	cursor: pointer;
+	padding: 0.5em;
+	border: 1px solid cornflowerblue;
+	background-color: none;
+}
+
+.feedback-button:hover {
+	background-color: #eee;
+}
+
+.feedback-button:active {
+	background-color: #ddd;
 }

@@ -1,4 +1,4 @@
-<% 
+<%
 	// CREATE ALIASES
 	const activity = locals.metadata.page.activity
 	const publicpage = locals.metadata.page.public || activity === 'preview'
@@ -25,7 +25,7 @@
 		</div>
 	<% } %> -->
 	<% if (
-		!(space === 'pinned' 
+		!(space === 'pinned'
 		&& (!locals.pinboard?.editable || activity === 'preview'))
 	) { %>
 		<div class='btn-group map-scale lg'>
@@ -60,9 +60,13 @@ if (drawMap) {
 		maxZoom: 19,
 	}).addTo(map)
 
+	clusters.filterInPlace((cur) => cur !== null);
 	if (!clusters.length) {
-		if (!centerpoint) map.fitWorld()
-		else map.setView([centerpoint.lat, centerpoint.lng], 2)
+		if (!centerpoint) {
+			map.fitWorld();
+		} else {
+			map.setView([centerpoint.lat, centerpoint.lng], 2);
+		}
 	} else {
 		d3.select('.map-container').classed('hide', false)
 
@@ -78,7 +82,7 @@ if (drawMap) {
 			const markerScale = d3.scaleLinear()
 				.domain([1, d3.max(d, c => c.properties.count)])
 				.range([10, 50])
-			
+
 			d.markers = d.map(c => {
 				const clusterpin = L.divIcon({
 					className: 'cluster-pin',
@@ -109,8 +113,8 @@ if (drawMap) {
 				const section = d3.select(this)
 
 				d.forEach(c => {
-					const entry = new Entry({ 
-						parent: section, 
+					const entry = new Entry({
+						parent: section,
 						data: c,
 						display: 'columns',
 						language: '<%- language %>'
@@ -188,17 +192,20 @@ if (drawMap) {
 		let group
 		let bounds = L.featureGroup(clusters.last().markers)
 
-		if (Math.max(...clusters.map(d => d.length)) > 1) map.fitBounds(bounds.getBounds(), { padding: [15, 15] })
-		else map.setView([centerpoint.lat, centerpoint.lng], 2)
-		
+		if (Math.max(...clusters.map(d => d.length)) > 1) {
+			map.fitBounds(bounds.getBounds(), { padding: [15, 15] });
+		} else {
+			map.setView([centerpoint.lat, centerpoint.lng], 2);
+		}
+
 		function setZoomLayer (map, group, clusters) {
 			const currentZoom = map.getZoom()
 			if (group) map.removeLayer(group)
-			
+
 			if (currentZoom < 4) group = L.featureGroup(clusters[0].markers)
 			// else if (currentZoom < 6) group = L.featureGroup(clusters[1].markers)
 			else group = L.featureGroup(clusters.last().markers)
-			
+
 			group.addTo(map)
 
 			return group
@@ -209,7 +216,7 @@ if (drawMap) {
 		if (clusters.length > 1) {
 			map.on('zoomend', _ => { group = setZoomLayer(map, group, clusters) })
 		}
-		
+
 		d3.select('.map-container')
 			.call(multiSelection, { class: '.leaflet-marker-icon', constraint: evt => evt.ctrlKey || evt.metaKey })
 		.on('mousedown', _ => {

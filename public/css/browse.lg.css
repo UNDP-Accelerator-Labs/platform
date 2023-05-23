@@ -3,7 +3,7 @@
  * 38 |                         color: $c-dark-blue;
  *    |                                ^^^^^^^^^^^^
  *    '
- *   scss/browse.lg.scss 38:14  root stylesheet */
+ *   public/scss/browse.lg.scss 38:14  root stylesheet */
 
 body::before {
   font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
@@ -13,5 +13,5 @@ body::before {
   padding: 1em;
   margin-bottom: 1em;
   border-bottom: 2px solid black;
-  content: "Error: Undefined variable.\a    \2577 \a 38 \2502                          color: $c-dark-blue;\a    \2502                                 ^^^^^^^^^^^^\a    \2575 \a   scss/browse.lg.scss 38:14  root stylesheet";
+  content: "Error: Undefined variable.\a    \2577 \a 38 \2502                          color: $c-dark-blue;\a    \2502                                 ^^^^^^^^^^^^\a    \2575 \a   public/scss/browse.lg.scss 38:14  root stylesheet";
 }

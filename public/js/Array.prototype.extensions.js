@@ -1,3 +1,16 @@
+Array.prototype.filterInPlace = function (condition, thisArg) {
+	let jx = 0;
+	this.forEach((el, ix) => {
+		if (condition.call(thisArg, el, ix, this)) {
+			if (ix !== jx) {
+				this[jx] = el;
+			}
+			jx += 1;
+		}
+	});
+	this.length = jx;
+	return this;
+}
 Array.prototype.flat = function () {
 	return [].concat.apply([], this)
 }
@@ -65,7 +78,7 @@ Array.prototype.nest = function (key, keep) { // THIS IS NOT QUITE THE SAME FUNC
 				else obj[keep] = d[keep]
 				arr.push(obj)
 			} else arr.push({ key: groupby, values: [d], count: 1 })
-		} else { 
+		} else {
 			arr.find(c => c.key === groupby).values.push(d)
 			arr.find(c => c.key === groupby).count ++
 		}
@@ -116,7 +129,7 @@ Array.prototype.unique = function (key, onkey) {
 		}
 		else {
 			if (onkey) { if (arr.map(c => c).indexOf(d[key]) === -1) arr.push(d[key]) }
-			else { 
+			else {
 				if (typeof key === 'function') { if (arr.map(c => key(c)).indexOf(key(d)) === -1) arr.push(d) }
 				else { if (arr.map(c => c[key]).indexOf(d[key]) === -1) arr.push(d) }
 			}
@@ -203,13 +216,13 @@ Array.prototype.duplicates = function (key, onkey) {
 			else if (arr.indexOf(d) !== -1) arr.push(d)
 		}
 		else {
-			if (onkey) { 
-				if (i === 0) arr.push(d[key]) 
-				else if (arr.map(c => c).indexOf(d[key]) !== -1) arr.push(d[key]) 
+			if (onkey) {
+				if (i === 0) arr.push(d[key])
+				else if (arr.map(c => c).indexOf(d[key]) !== -1) arr.push(d[key])
 			}
-			else { 
+			else {
 				if (i === 0) arr.push(d)
-				if (arr.map(c => c[key]).indexOf(d[key]) !== -1) arr.push(d) 
+				if (arr.map(c => c[key]).indexOf(d[key]) !== -1) arr.push(d)
 			}
 		}
 	})

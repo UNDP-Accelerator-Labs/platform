@@ -3,7 +3,7 @@
  * 3 |     border-top: 2px solid $c-dark-blue;
  *   |                           ^^^^^^^^^^^^
  *   '
- *   scss/login.lg.scss 3:24  root stylesheet */
+ *   public/scss/login.lg.scss 3:24  root stylesheet */
 
 body::before {
   font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
@@ -13,5 +13,5 @@ body::before {
   padding: 1em;
   margin-bottom: 1em;
   border-bottom: 2px solid black;
-  content: "Error: Undefined variable.\a   \2577 \a 3 \2502      border-top: 2px solid $c-dark-blue;\a   \2502                            ^^^^^^^^^^^^\a   \2575 \a   scss/login.lg.scss 3:24  root stylesheet";
+  content: "Error: Undefined variable.\a   \2577 \a 3 \2502      border-top: 2px solid $c-dark-blue;\a   \2502                            ^^^^^^^^^^^^\a   \2575 \a   public/scss/login.lg.scss 3:24  root stylesheet";
 }

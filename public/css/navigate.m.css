@@ -3,7 +3,7 @@
  * 7 |     font-size: $t-small;
  *   |                ^^^^^^^^
  *   '
- *   scss/navigate.m.scss 7:13  root stylesheet */
+ *   public/scss/navigate.m.scss 7:13  root stylesheet */
 
 body::before {
   font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
@@ -13,5 +13,5 @@ body::before {
   padding: 1em;
   margin-bottom: 1em;
   border-bottom: 2px solid black;
-  content: "Error: Undefined variable.\a   \2577 \a 7 \2502      font-size: $t-small;\a   \2502                 ^^^^^^^^\a   \2575 \a   scss/navigate.m.scss 7:13  root stylesheet";
+  content: "Error: Undefined variable.\a   \2577 \a 7 \2502      font-size: $t-small;\a   \2502                 ^^^^^^^^\a   \2575 \a   public/scss/navigate.m.scss 7:13  root stylesheet";
 }

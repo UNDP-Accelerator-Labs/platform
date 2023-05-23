@@ -70,7 +70,7 @@ const sessionMiddleware = session({
 		secure: process.env.NODE_ENV === 'production',
 		maxAge: 1000 * 60 * 60 * 24 * 1, // 1 DAY
 		sameSite: 'lax',
-		domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost'
+		// domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost'
 	}
 })
 

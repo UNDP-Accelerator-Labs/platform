@@ -138,7 +138,7 @@ module.exports = (req, res, next) => {
 										Object.assign(req.session, datastructures.sessiondata(result))
 
 										//Explicitly set the domain attribute to the common domain all applications share
-										res.cookie(app_suite, req.session.uuid, { domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost' });
+										res.cookie(app_suite, 'value', { domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost' });
 
 										if (!originalUrl || originalUrl === path) {
 											const { read, write } = modules.find(d => d.type === 'pads')?.rights

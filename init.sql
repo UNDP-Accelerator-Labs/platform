@@ -129,7 +129,7 @@ CREATE TABLE mobilizations (
 	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
 	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	status INT DEFAULT 1, 
+	status INT DEFAULT 1,
 	public BOOLEAN DEFAULT FALSE,
 	start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	end_date TIMESTAMPTZ,
@@ -173,7 +173,7 @@ CREATE TABLE pinboard_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	participant uuid,
-	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE	
+	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
 
@@ -268,3 +268,33 @@ CREATE TABLE "session" (
 WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
+-- journey tables
+CREATE SEQUENCE IF NOT EXISTS public.journey_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1
+    OWNED BY journey.id;
+CREATE TABLE IF NOT EXISTS public.journey
+(
+    id integer NOT NULL DEFAULT nextval('journey_id_seq'::regclass),
+    uuid uuid NOT NULL,
+    prompt text COLLATE pg_catalog."default" NOT NULL,
+    last_access timestamp with time zone,
+    CONSTRAINT journey_pkey PRIMARY KEY (uuid, prompt, id),
+    CONSTRAINT id_key UNIQUE (id)
+)
+CREATE TABLE IF NOT EXISTS public.journey_docs
+(
+    journey_id integer NOT NULL,
+    db character varying(40) COLLATE pg_catalog."default" NOT NULL,
+    doc_id integer NOT NULL,
+    is_relevant boolean NOT NULL,
+    CONSTRAINT journey_docs_pkey PRIMARY KEY (journey_id, db, doc_id),
+    CONSTRAINT journey_id_fkey FOREIGN KEY (journey_id)
+        REFERENCES public.journey (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)

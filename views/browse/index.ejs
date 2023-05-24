@@ -453,6 +453,27 @@
 	<% } %>
 </footer>
 
+<script type="text/javascript" >
+	function extractRelevantText(largeText){
+		var searchText = "waste market";
+
+		// Escape any special characters in the search text
+		var escapedSearchText = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+		// Create a regular expression pattern to find the sentences containing the search text
+		var pattern = new RegExp(`[^.!?]*${escapedSearchText}[^.!?]*[.!?]`, 'g');
+
+		// Find all matches
+		var matches = largeText.match(pattern);
+
+		// Extract the first and last sentences containing the search text
+		var firstSentence = matches[0];
+		var lastSentence = matches[matches.length - 1];
+
+		return `${firstSentence || ''} ${lastSentence || ''}` 
+
+	}
+</script>
 
 <script type='text/javascript'>
 	if (!mediaSize) var mediaSize = getMediaSize()

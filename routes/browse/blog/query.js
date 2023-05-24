@@ -4,6 +4,7 @@ const { page_content_limit } = include('config/')
 exports.blogAggQuery =`
     SELECT COUNT(*) AS totalBlogs
     FROM articles
+    WHERE has_lab IS TRUE
 ;`;
 
 exports.totalArticleTyle = `
@@ -13,7 +14,7 @@ exports.totalArticleTyle = `
 
 exports. totalCountries = `
     SELECT COUNT(DISTINCT country) AS totalCountries
-    FROM articles;
+    FROM articles WHERE has_lab IS TRUE;
 `
 
 exports.totalUnknownCountries = `
@@ -46,6 +47,7 @@ exports.searchBlogQuery = (searchText, page, country, type) => {
               SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, language, created_at
               FROM articles
               WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
+              AND has_lab IS TRUE
                 ${whereClause}
               LIMIT $1 OFFSET $2
           ),
@@ -53,6 +55,7 @@ exports.searchBlogQuery = (searchText, page, country, type) => {
               SELECT COUNT(*) AS total_records
               FROM articles
               WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
+              AND has_lab IS TRUE
                 ${whereClause}
           )
           SELECT sr.*, tc.total_records, (CEIL(tc.total_records::numeric / $1)) AS total_pages, $4 AS current_page
@@ -73,9 +76,10 @@ exports.countryGroup = (searchText) => ({
     text: `
         SELECT country, COUNT(*) AS recordCount
         FROM articles
-        WHERE title LIKE '%' || $1 || '%'
+        WHERE has_lab IS TRUE
+          AND (title LIKE '%' || $1 || '%'
             OR content LIKE '%' || $1 || '%'
-            OR all_html_content LIKE '%' || $1 || '%'
+            OR all_html_content LIKE '%' || $1 || '%')
         GROUP BY country;
     `,
     values: [
@@ -90,6 +94,7 @@ exports.articleGroup = (searchText) => ({
         WHERE title LIKE '%' || $1 || '%'
             OR content LIKE '%' || $1 || '%'
             OR all_html_content LIKE '%' || $1 || '%'
+            AND has_lab IS TRUE
         GROUP BY article_type;
     `,
     values: [
@@ -120,21 +125,22 @@ exports.statsQuery = (searchText, country, type) => {
     return {
       text: `
           WITH search_results AS (
-              SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, created_at
+              SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, created_at, has_lab, iso3
               FROM articles
-              WHERE (title LIKE '%' || $1 || '%' OR content LIKE '%' || $1 || '%' OR all_html_content LIKE '%' || $1 || '%' OR country LIKE '%' || $1 || '%')
+              WHERE (title LIKE '%' || $1 || '%' OR content LIKE '%' || $1 || '%' OR all_html_content LIKE '%' || $1 || '%' OR country LIKE '%' || $1 || '%' AND has_lab IS TRUE)
                 ${whereClause}
           ),
           total_country_count AS (
               SELECT country, COUNT(*) AS count
               FROM search_results
-              WHERE country IS NOT NULL
+              WHERE country IS NOT NULL AND has_lab IS TRUE
               GROUP BY country
           ),
           total_null_country_count AS (
               SELECT COUNT(*) AS count
               FROM search_results
               WHERE country IS NULL
+              AND has_lab IS TRUE
           ),
           total_article_type_count AS (
               SELECT article_type, COUNT(*) AS count
@@ -144,6 +150,7 @@ exports.statsQuery = (searchText, country, type) => {
           total_count AS (
               SELECT COUNT(*) AS total_records
               FROM search_results
+              WHERE has_lab IS TRUE
           )
           SELECT 
               (SELECT COUNT(DISTINCT country) FROM total_country_count) AS distinct_country_count,
@@ -170,10 +177,10 @@ exports.statsQuery = (searchText, country, type) => {
       )::jsonb
     ) AS json
   FROM (
-    SELECT c.iso3 AS cid, ST_Point(c.lng, c.lat) AS geo
+    SELECT c.iso3 AS cid, c.has_lab, ST_Point(c.lng, c.lat) AS geo
     FROM countries c
     INNER JOIN country_names cn ON cn.iso3 = c.iso3
-    WHERE cn.name IN (${countries.map((_, i) => `$${i + 1}`).join(',')})
+    WHERE cn.name IN (${countries.map((_, i) => `$${i + 1}`).join(',')}) AND c.has_lab IS TRUE
   ) AS clusters
   GROUP BY clusters.cid
   ORDER BY clusters.cid;

@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
 
 	let { space, object, instance } = req.params || {}
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
-	
+
 	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err))
 					} else return { object: 'pads', space: 'public', countries: [result?.iso3], title: result?.name }
 				}).catch(err => console.log(err))
-			}).catch(err => console.log(err))
+			}).catch(err => console.log(err)) || {}; // avoiding server crash by setting vars to empty object -- this will still crash somewhere below but it will not bring down the whole server
 
 			space = vars.space
 			pinboard = vars.pinboard
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
 		else if (space === 'curated') f_space = DB.pgp.as.format(`(p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
 		else if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
 		else if (space === 'reviewing') f_space = DB.pgp.as.format(`
-			((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) 
+			((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2)
 				OR (p.owner IN ($1:csv)))
 			AND p.id IN (SELECT pad FROM review_requests)
 		`, [ collaborators_ids, rights ])
@@ -94,14 +94,14 @@ module.exports = async (req, res) => {
 			if (public) {
 				if (pinboard) f_space = DB.pgp.as.format(`
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
-						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
+						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
 						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT))))
 					`, [ pinboard ])
 				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
 			} else { // THE USER IS LOGGED IN
 				if (pinboard) f_space = DB.pgp.as.format(`
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
-						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $3::INT) 
+						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $3::INT)
 						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $3::INT))))
 					`, [ collaborators_ids, rights, pinboard ])
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
@@ -135,7 +135,7 @@ module.exports = async (req, res) => {
 		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
 		// if (pinboard) platform_filters.push(DB.pgp.as.format(`
-		// 		(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT) 
+		// 		(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
 		// 		OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
 		// 	`, [ pinboard ]))
 		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY

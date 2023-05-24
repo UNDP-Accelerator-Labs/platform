@@ -4,8 +4,7 @@ const validActions = ['approve', 'dislike', 'neutral'];
 module.exports = (req, res) => {
     const { action } = req.params || {};
 	if (!validActions.includes(action)) {
-        return res.json({
-            status: 422,
+        return res.status(422).json({
             message: `unknown action: ${action}`,
         });
     }

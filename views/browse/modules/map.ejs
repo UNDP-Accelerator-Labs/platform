@@ -45,7 +45,7 @@
 <script type='text/javascript'>
 
 const centerpoint = <%- JSON.stringify(locals.metadata.user?.country?.lnglat || null) %>;
-const clusters = <%- JSON.stringify(locals.clusters || []) %>;
+const clusters = <%- JSON.stringify(locals.clusters || []) %>.filter((cur) => cur !== null);
 
 // THE LEAFLET CODE
 // const drawMap = window.matchMedia("(min-width: 576px)").matches || clusters.length || data.map(d => d.location).filter(d => d).length
@@ -60,7 +60,6 @@ if (drawMap) {
 		maxZoom: 19,
 	}).addTo(map)
 
-	clusters.filterInPlace((cur) => cur !== null);
 	if (!clusters.length) {
 		if (!centerpoint) {
 			map.fitWorld();

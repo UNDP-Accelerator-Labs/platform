@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"All is good\" && exit 0",
     "start": "node app.js",
-    "sass": "sass --watch public/scss:public/css"
+    "sass": "sass --watch public/scss:public/css",
+    "dev": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "@turf/turf": "^5.1.6",
     "archiver": "^5.1.0",
     "connect-pg-simple": "^6.1.0",
+    "cors": "^2.8.5",
     "d3": "^5.15.0",
     "d3-selection-multi": "^1.0.1",
     "docx": "^7.8.2",
@@ -33,6 +35,7 @@
     "node-sys": "^1.2.4",
     "node-xlsx": "^0.15.0",
     "nodemailer": "^6.8.0",
+    "nodemon": "^2.0.22",
     "pageres": "^5.2.0",
     "path": "^0.12.7",
     "pg-promise": "^10.4.3",

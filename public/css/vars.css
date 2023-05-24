@@ -293,5 +293,20 @@ input.toggle:disabled + label::after {
     transform: translate(24px, 0);
   }
 }
+.feedback-button {
+  display: inline-block;
+  cursor: pointer;
+  padding: 0.5em;
+  border: 1px solid cornflowerblue;
+  background-color: none;
+}
+
+.feedback-button:hover {
+  background-color: #eee;
+}
+
+.feedback-button:active {
+  background-color: #ddd;
+}
 
 /*# sourceMappingURL=vars.css.map */

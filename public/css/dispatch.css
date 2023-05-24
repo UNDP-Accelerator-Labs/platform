@@ -295,6 +295,22 @@ input.toggle:disabled + label::after {
     transform: translate(24px, 0);
   }
 }
+.feedback-button {
+  display: inline-block;
+  cursor: pointer;
+  padding: 0.5em;
+  border: 1px solid cornflowerblue;
+  background-color: none;
+}
+
+.feedback-button:hover {
+  background-color: #eee;
+}
+
+.feedback-button:active {
+  background-color: #ddd;
+}
+
 /* Small devices (landscape phones, 480px and up) */
 @media (max-width: 480px) {
   /*@media (max-width: 480px) and (orientation: portrait) {*/
@@ -443,19 +459,6 @@ input.toggle:disabled + label::after {
     line-height: 19px;
     text-align: center;
     vertical-align: text-top;
-  }
-  .feedback-button {
-    display: inline-block;
-    cursor: pointer;
-    padding: 0.5em;
-    border: 1px solid cornflowerblue;
-    background-color: none;
-  }
-  .feedback-button:hover {
-    background-color: #eee;
-  }
-  .feedback-button:active {
-    background-color: #ddd;
   }
   nav#languages {
     position: fixed;
@@ -6566,19 +6569,6 @@ input.toggle:disabled + label::after {
     text-align: center;
     vertical-align: text-top;
   }
-  .feedback-button {
-    display: inline-block;
-    cursor: pointer;
-    padding: 0.5em;
-    border: 1px solid cornflowerblue;
-    background-color: none;
-  }
-  .feedback-button:hover {
-    background-color: #eee;
-  }
-  .feedback-button:active {
-    background-color: #ddd;
-  }
   nav#languages {
     position: fixed;
     display: flex;
@@ -12687,19 +12677,6 @@ input.toggle:disabled + label::after {
     line-height: 19px;
     text-align: center;
     vertical-align: text-top;
-  }
-  .feedback-button {
-    display: inline-block;
-    cursor: pointer;
-    padding: 0.5em;
-    border: 1px solid cornflowerblue;
-    background-color: none;
-  }
-  .feedback-button:hover {
-    background-color: #eee;
-  }
-  .feedback-button:active {
-    background-color: #ddd;
   }
   nav#languages {
     position: fixed;
@@ -19611,19 +19588,6 @@ input.toggle:disabled + label::after {
     line-height: 19px;
     text-align: center;
     vertical-align: text-top;
-  }
-  .feedback-button {
-    display: inline-block;
-    cursor: pointer;
-    padding: 0.5em;
-    border: 1px solid cornflowerblue;
-    background-color: none;
-  }
-  .feedback-button:hover {
-    background-color: #eee;
-  }
-  .feedback-button:active {
-    background-color: #ddd;
   }
   nav#languages {
     position: fixed;

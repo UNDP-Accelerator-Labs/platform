@@ -270,22 +270,17 @@ ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFE
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 
 -- journey tables
-CREATE SEQUENCE IF NOT EXISTS public.journey_id_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 2147483647
-    CACHE 1
-    OWNED BY journey.id;
 CREATE TABLE IF NOT EXISTS public.journey
 (
-    id integer NOT NULL DEFAULT nextval('journey_id_seq'::regclass),
+    id SERIAL UNIQUE NOT NULL,
     uuid uuid NOT NULL,
     prompt text COLLATE pg_catalog."default" NOT NULL,
-    last_access timestamp with time zone,
+    last_access timestamp with time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     CONSTRAINT journey_pkey PRIMARY KEY (uuid, prompt, id),
-    CONSTRAINT id_key UNIQUE (id)
-)
+    CONSTRAINT id_key UNIQUE (id),
+	CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)
+);
 CREATE TABLE IF NOT EXISTS public.journey_docs
 (
     journey_id integer NOT NULL,
@@ -297,4 +292,4 @@ CREATE TABLE IF NOT EXISTS public.journey_docs
         REFERENCES public.journey (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
+);

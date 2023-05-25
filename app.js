@@ -118,9 +118,13 @@ app.post('/check/:object', routes.process.check)
 app.post('/save/:object', routes.process.save)
 app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
-app.post('/feedback/:action', routes.process.feedback)
 app.post('/comment', routes.process.comment)
 app.post('/validate', routes.process.validate)
+
+app.put('/journey/create', routes.process.journeyCreate);
+app.get('/journey/list', routes.process.journeyList);
+app.put('/journey/doc', routes.process.journeyDoc);
+app.get('/journey/collection', routes.process.journeyCollection);
 
 app.route('/publish/:object')
 	.get(routes.process.publish)

@@ -70,7 +70,6 @@ exports.metafields = [
 // DESIRED ENGAGEMENT TYPES
 	// OPTIONS: ['like', 'dislike', 'comment']
 exports.engagementtypes = ['like', 'dislike', 'comment'];
-exports.feedbackRequiresLogin = false;
 
 // COLORS
 exports.colors = {

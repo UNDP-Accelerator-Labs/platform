@@ -9,7 +9,7 @@ exports.main = async kwargs => {
 
 	return conn.task(t => {
 		if(searchText.length){
-			return t.any(searchBlogQuery(searchText, page, country, type)).then(async (results) => {
+			return t.any(searchBlogQuery(searchText?.trim(), page, country, type)).then(async (results) => {
 				// console.log('resultsresults ', results)
 				return {
 					searchResults : results,

@@ -9,7 +9,7 @@ exports.main = async kwargs => {
 	return conn.task(t => {
         const batch = []
 
-        batch.push(t.any(countryGroup(search))
+        batch.push(t.any(countryGroup(search?.trim()))
         .then(async (results) => {
             const countries = await results?.map(row => row?.country);
 // console.log('results ', results)

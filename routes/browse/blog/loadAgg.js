@@ -26,7 +26,7 @@ exports.main = async kwargs => {
         // batch.push(t.any(totalUnknownCountries).then(async (results) => results)
         // .catch(err => console.log(err)))
 
-        batch.push(t.any(statsQuery(search, country, type)).then(async (results) => results)
+        batch.push(t.any(statsQuery(search?.trim(), country, type)).then(async (results) => results)
         .catch(err => console.log(err)))
 
         return t.batch(batch)

@@ -1,18 +1,17 @@
-const { app_title_short, DB } = include('config/');
+const { app_title_short, fixed_uuid, DB } = include('config/');
 const actionApprove = 'approve';
 const actionDislike = 'dislike';
 const actionNeutral = 'neutral';
 const validActions = [actionApprove, actionDislike, actionNeutral];
 
 module.exports = (req, res) => {
-    // const { uuid } = req.session || {};
-    // if (!uuid) {
-    //     return res.json({
-    //         status: 401,
-    //         message: 'must be logged in',
-    //     });
-    // }
-    const uuid = '45e18bc3-8805-45e1-8c54-b356bcee4912';
+    const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
+    if (!uuid) {
+        return res.json({
+            status: 401,
+            message: 'must be logged in',
+        });
+    }
     const { journey_id: journey_id_in, action, doc_id: doc_id_in } = req.body || {};
 	if (!validActions.includes(action)) {
         return res.status(422).json({

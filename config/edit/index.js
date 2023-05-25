@@ -71,6 +71,8 @@ exports.metafields = [
 	// OPTIONS: ['like', 'dislike', 'comment']
 exports.engagementtypes = ['like', 'dislike', 'comment'];
 
+exports.fixed_uuid = '45e18bc3-8805-45e1-8c54-b356bcee4912';
+
 // COLORS
 exports.colors = {
 	'dark-blue': '#005687',

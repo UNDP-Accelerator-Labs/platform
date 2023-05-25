@@ -1,0 +1,39 @@
+<%
+    const language = locals.metadata.page.language;
+%>
+<script type='text/javascript'>
+    function addJourneyMain(sel) {
+        sel.addElem('input').attrs({
+            'type': 'text',
+            'name': 'journey-main-input',
+            'id': `journey-main`,
+            'list': 'journey-past',
+        });
+        sel.addElem('label')
+        .attrs({
+            'for': `journey-main`,
+        })
+        .text("<%- vocabulary['journey-intro'][language] %>");
+        const datalist = sel.addElem('datalist').attrs({
+            'id': 'journey-past',
+        });
+        const journeyInfo = {
+            past: [],
+        };
+
+        function updateDatalist() {
+            const lang = '<%- language %>';
+            GET(`/journey/list?lang=${lang}`).then((result) => {
+                const journeys = result['journeys'];
+                journeyInfo.past = journeys;
+                datalist.addElems('option', 'journey-past-elem', journeys)
+                .attrs({
+                    'value': (d) => d['prompt'],
+                    'label': (d) => `${d['last_access_ago']}`,
+                });
+            }).catch((err) => console.error(err));
+        }
+
+        updateDatalist();
+    }
+</script>

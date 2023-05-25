@@ -9,6 +9,7 @@
 %>
 
 <% if (locals.stats?.total > 0) { %>
+	<%- include ('../../partials/journey.ejs') %>
 	<nav id='search-and-filter' class='lg'>
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
@@ -25,6 +26,7 @@
 				})
 			%>
 
+			<div class='journey'></div>
 			<div class='search'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
@@ -235,4 +237,6 @@
 			}
 		})
 	<% } %>
+
+	addJourneyMain(d3.select('div.journey'));
 </script>

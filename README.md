@@ -2,6 +2,7 @@
 
 ## Getting started
 
+Make sure that all required postgres extensions are installed on your DB.
 Run all the sql files on the postgres-DB.
 
 Install using: `npm install`

@@ -1,13 +1,12 @@
-const { DB } = include('config/');
+const { DB, fixed_uuid } = include('config/');
 
 module.exports = (req, res) => {
-    // const { uuid } = req.session || {};
-    // if (!uuid) {
-    //     return res.status(401).json({
-    //         message: 'must be logged in',
-    //     });
-    // }
-    const uuid = '45e18bc3-8805-45e1-8c54-b356bcee4912';
+    const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
+    if (!uuid) {
+        return res.status(401).json({
+            message: 'must be logged in',
+        });
+    }
     const { journey_id: journey_id_in } = req.query || {};
     const journey_id = +journey_id_in;
     if (!Number.isFinite(journey_id)) {

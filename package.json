@@ -26,6 +26,7 @@
     "express-session": "^1.17.0",
     "file-saver": "^2.0.5",
     "image-size": "^1.0.2",
+    "javascript-time-ago": "^2.5.9",
     "jimp": "^0.16.1",
     "jsonwebtoken": "^8.5.1",
     "mime": "^2.4.5",

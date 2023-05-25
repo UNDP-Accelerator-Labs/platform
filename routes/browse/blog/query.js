@@ -44,7 +44,7 @@ exports.searchBlogQuery = (searchText, page, country, type) => {
     return {
       text: `
           WITH search_results AS (
-              SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, language, created_at
+              SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, language, created_at, all_html_content
               FROM articles
               WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
               AND has_lab IS TRUE
@@ -74,18 +74,19 @@ exports.searchBlogQuery = (searchText, page, country, type) => {
 
 exports.countryGroup = (searchText) => ({
     text: `
-        SELECT country, COUNT(*) AS recordCount
+        SELECT country, iso3, COUNT(*) AS recordCount
         FROM articles
         WHERE has_lab IS TRUE
           AND (title LIKE '%' || $1 || '%'
             OR content LIKE '%' || $1 || '%'
             OR all_html_content LIKE '%' || $1 || '%')
-        GROUP BY country;
+        GROUP BY country, iso3;
     `,
     values: [
         searchText
     ],
 });
+
 
 exports.articleGroup = (searchText) => ({
     text: `
@@ -165,25 +166,38 @@ exports.statsQuery = (searchText, country, type) => {
   };
   
 
-  exports.extractGeoQuery = countries => `
-  SELECT
-    jsonb_build_object(
-      'type', 'Feature',
-      'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
-      'properties', json_build_object(
-        'pads', json_agg(clusters.cid),
-        'count', COUNT(clusters.cid),
-        'cid', clusters.cid
-      )::jsonb
-    ) AS json
-  FROM (
-    SELECT c.iso3 AS cid, c.has_lab, ST_Point(c.lng, c.lat) AS geo
-    FROM countries c
-    INNER JOIN country_names cn ON cn.iso3 = c.iso3
-    WHERE cn.name IN (${countries.map((_, i) => `$${i + 1}`).join(',')}) AND c.has_lab IS TRUE
-  ) AS clusters
-  GROUP BY clusters.cid
-  ORDER BY clusters.cid;
-`;
+  exports.extractGeoQuery = countries => {
+    const iso3Values = countries.map(country => country.iso3);
+    const recordCountValues = countries.map(country => country.recordcount);
+  
+    const placeholders = iso3Values.map((_, index) => `$${index + 1}`).join(',');
+  
+    return {
+      text: `
+      SELECT
+      jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
+        'properties', json_build_object(
+          'pads', json_agg(clusters.cid),
+          'count', COUNT(clusters.cid),
+          'cid', clusters.cid
+        )::jsonb
+      ) AS json
+    FROM (
+      SELECT c.iso3 AS cid, c.has_lab, ST_Point(c.lng, c.lat) AS geo
+      FROM countries c
+      INNER JOIN country_names cn ON cn.iso3 = c.iso3
+      WHERE cn.name IN (${countries.map((_, i) => `$${i + 1}`).join(',')}) AND c.has_lab IS TRUE
+    ) AS clusters
+    GROUP BY clusters.cid
+    ORDER BY clusters.cid;
+      `,
+    };
+  };
+  
+  
+  
+  
 
 

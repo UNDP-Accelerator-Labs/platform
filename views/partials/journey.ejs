@@ -115,12 +115,12 @@
             }).catch((err) => console.error(err));
         }
 
-        updateJourneyDocs() {
+        updateJourneyDocs(cb = null) {
             const curId = this.currentId;
             if (!curId) {
                 this.docs = [];
                 this.docLookup = {};
-                this.updateDocs();
+                this.updateDocs(null);
                 return;
             }
             GET(`/journey/collection?journey_id=${curId}`).then((result) => {
@@ -135,7 +135,7 @@
                 });
                 this.docs = docs;
                 this.docLookup = newLookup;
-                this.updateDocs();
+                this.updateDocs(cb);
             })
             .catch((err) => console.error(err));
         }
@@ -159,7 +159,7 @@
                 const [curId, curPrompt] = this.getJourneyByPrompt(userPrompt);
                 if (curId !== null && curId === currentId) {
                     if (allowReport) {
-                        console.log('REPORT!');
+                        this.updateJourneyDocs(this.showReport);
                     }
                 } else if (curId !== null) {
                     this.updateCurrentJourney(curId, curPrompt);
@@ -174,6 +174,28 @@
                     this.updateCurrentJourney(null, '');
                 }
             });
+        }
+
+        showReport = () => {
+            // FIXME: this whole report mechanism is a hack for now!
+            function escape(text) {
+                return text.replace(
+                    /[^0-9A-Za-z\s]/g,
+                    (chr) => `&#${chr.charCodeAt(0)};`
+                );
+            }
+
+            const prompt = escape(this.currentPrompt);
+            const links = this.docs.length ? this.docs.map((doc) => {
+                const lang = '<%- language %>';
+                const end = `/${lang}/view/pad?id=${doc.doc_id}`;
+                const link = `http://localhost:2000${end}`;
+                return `<a href="${link}">${end}</a>`; // FIXME
+            }).join('</li><li>') : "<%- vocab['doc-help'] %>";
+            const message = `<h2>${prompt}</h2><ul><li>${links}</li></ul>`;
+            renderPromiseModal({ message, opts: [] })
+            .then(() => {})
+            .catch((err) => console.error(err));
         }
 
         addJourneyMain(sel) {
@@ -213,7 +235,7 @@
             this.updateJourneyDatalist();
         }
 
-        updateDocs() {
+        updateDocs(cb = null) {
             const hasJourney = !!this.currentId;
             d3.selectAll('div.journey-doc').styles({
                 'display': hasJourney ? null : 'none',
@@ -233,6 +255,7 @@
             d3.selectAll('article.pad').classed('journey-article-inactive', (d) => {
                 return this.isDocDislike(d.id);
             });
+            cb && cb();
         }
 
         setDocAction(docId, isApprove) {

@@ -189,8 +189,8 @@
             const links = this.docs.length ? this.docs.map((doc) => {
                 const lang = '<%- language %>';
                 const end = `/${lang}/view/pad?id=${doc.doc_id}`;
-                const link = `http://localhost:2000${end}`;
-                return `<a href="${link}">${end}</a>`; // FIXME
+                const link = `${location.origin}${end}`;
+                return `<a href="${link}">${link}</a>`; // FIXME
             }).join('</li><li>') : "<%- vocab['doc-help'] %>";
             const message = `<h2>${prompt}</h2><ul><li>${links}</li></ul>`;
             renderPromiseModal({ message, opts: [] })

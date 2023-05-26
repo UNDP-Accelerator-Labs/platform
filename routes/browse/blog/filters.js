@@ -9,19 +9,17 @@ exports.main = async kwargs => {
 	return conn.task(t => {
         const batch = []
 
-        batch.push(t.any(countryGroup(search?.trim()))
+        batch.push(t.any(countryGroup(search?.trim(), country, type))
         .then(async (results) => {
-            const countries = await results?.map(row => row?.country);
-// console.log('results ', results)
-            const geoData = await DB.general.any(extractGeoQuery(results), countries).then(results => results);
-            // console.log('geoData ', geoData[0]['properties'])
+            const geoData = await DB.blog.any(extractGeoQuery(country, type), search?.trim()).then(results => results);
+            
             results.geoData = geoData?.map(p => p?.json );
             
             return results
         })
         .catch(err => console.log(err)))
 
-        batch.push(t.any(articleGroup(search)).then(async (results) => results)
+        batch.push(t.any(articleGroup(search?.trim(), country, type)).then(async (results) => results)
         .catch(err => console.log(err)))
 
         return t.batch(batch)

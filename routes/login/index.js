@@ -104,6 +104,10 @@ exports.render = (req, res, next) => {
 		}).catch(err => console.log(err))
 	}
 
+	else if (object === 'blog') {
+		next()
+	}
+
 	else res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
 }
 exports.process = (req, res) => { // REROUTE

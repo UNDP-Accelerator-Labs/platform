@@ -143,12 +143,11 @@
 <header <% if (!display_content) { %>class='center'<% } %>>
 	<div class='inner'>
 		<%- include ('../../partials/menu-logo.ejs') %> 
-	</div>
+	</div>	
 </header>
 
 <div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %><% if (!display_content) { %> flex<% } %>'>
 	
-
 	<main>
 		<div class='inner'>
 			
@@ -220,8 +219,9 @@
 									  
 											if (matches && matches.length > 0) {
 											  var firstSentence = matches[0];
+											  var secondSentence = matches[1];
 											  var lastSentence = matches[matches.length - 1];
-											  return firstSentence + " " + lastSentence;
+											  return firstSentence + " " + `${secondSentence || ''}`;
 											} else {
 											  return largeText?.split(' ')?.slice(0, 100)?.join(' ') || null;
 											}

@@ -23,7 +23,7 @@
             if (!prompt) {
                 return '';
             }
-            return prompt.replace(/[\s\n\r]+/, ' ').trim();
+            return prompt.replace(/[\s\n\r]+/g, ' ').trim();
         }
 
         updateCurrentJourney(curId, curPrompt) {
@@ -75,6 +75,11 @@
                     : journeyId !== currentId
                     ? "<%- vocab['continue'] %>"
                     : "<%- vocab['finish'] %>");
+            }
+            if (this.mainInput !== null) {
+                const value = this.mainInput.node().value;
+                const normPrompt = this.normalizeJourneyPrompt(value);
+                this.mainInput.classed('has-value', !!normPrompt);
             }
         }
 
@@ -133,7 +138,8 @@
                 'list': 'journey-past',
             })
             .on('change', () => {
-                const normPrompt = this.normalizeJourneyPrompt(mainInput.node().value);
+                const value = mainInput.node().value;
+                const normPrompt = this.normalizeJourneyPrompt(value);
                 this.updateJourneyMainButton(
                     this.getJourneyByPrompt(normPrompt)[0],
                     this.currentId);

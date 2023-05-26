@@ -295,6 +295,66 @@ input.toggle:disabled + label::after {
     transform: translate(24px, 0);
   }
 }
+div.journey {
+  position: relative;
+  width: 100%;
+  height: 65px;
+  border-bottom: 2px solid #32BEE1;
+}
+div.journey input[type=text] {
+  float: left;
+  position: relative;
+  width: calc(100% - 30px - 65px);
+  height: 50px;
+  margin: 15px 0 0 15px;
+  border: none;
+  /*border-bottom: 1px solid #FFF;*/
+  outline: none;
+  background-color: transparent;
+  font-size: 24px;
+  color: #005687;
+}
+div.journey label[for=journey-main] {
+  position: absolute;
+  top: 5px;
+  left: 15px;
+  font-size: 16px;
+  color: #969696;
+  transform: translateY(16px);
+  transition: transform 0.25s, font-size 0.25s;
+  pointer-events: none;
+}
+div.journey input[type=text]:focus + label,
+div.journey input[type=text]:active + label,
+div.journey input[type=text].has-value + label {
+  font-size: 12px;
+  transform: translateY(5px);
+}
+div.journey input:-webkit-autofill,
+div.journey input:-webkit-autofill:hover,
+div.journey input:-webkit-autofill:focus,
+div.journey input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 40px #FFF inset !important;
+  -webkit-text-fill-color: #005687 !important;
+}
+div.journey button {
+  float: left;
+  width: 65px;
+  height: 60px;
+  margin-top: 5px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: #005687;
+  cursor: pointer;
+}
+div.journey button:hover, div.journey button:focus {
+  color: rgba(4, 104, 177, 0.75);
+}
+div.journey button:active {
+  color: #0468B1;
+}
+
 .feedback-button {
   display: inline-block;
   cursor: pointer;

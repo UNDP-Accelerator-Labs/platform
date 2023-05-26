@@ -12,7 +12,7 @@ const MAX_LENGTH = 40;
 const ELLIPSIS = '…';
 
 function limitPrompt(prompt) {
-    const norm = prompt.replace(/[\s\n\r]+/, ' ').trim();
+    const norm = prompt.replace(/[\s\n\r]+/g, ' ').trim();
     if (norm.length < MAX_LENGTH) {
         return norm;
     }

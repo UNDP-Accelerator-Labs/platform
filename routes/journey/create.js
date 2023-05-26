@@ -1,7 +1,7 @@
 const { DB, fixed_uuid } = include('config/');
 
 function normalize(prompt) {
-    return prompt.replace(/[\s\n\r]+/, ' ').trim();
+    return prompt.replace(/[\s\n\r]+/g, ' ').trim();
 }
 
 module.exports = (req, res) => {

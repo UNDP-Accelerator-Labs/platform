@@ -17,15 +17,6 @@ exports.main = async kwargs => {
 		batch.push(t.any(blogAggQuery).then(async (results) => results)
         .catch(err => console.log(err)))
 
-        // batch.push(t.any(totalArticleTyle).then(async (results) => results)
-        // .catch(err => console.log(err)))
-
-        // batch.push(t.any(totalCountries).then(async (results) => results)
-        // .catch(err => console.log(err)))
-
-        // batch.push(t.any(totalUnknownCountries).then(async (results) => results)
-        // .catch(err => console.log(err)))
-
         batch.push(t.any(statsQuery(search?.trim(), country, type)).then(async (results) => results)
         .catch(err => console.log(err)))
 

@@ -50,7 +50,6 @@
                 this.getJourneyByPrompt(normPrompt)[0],
                 curId);
             this.updateJourneyDocs();
-            console.log('current journey_id', curId, 'prompt', normPrompt);
         }
 
         getJourneyById(journeyId) {
@@ -216,7 +215,6 @@
 
         updateDocs() {
             const hasJourney = !!this.currentId;
-            console.log('update docs', hasJourney);
             d3.selectAll('div.journey-doc').styles({
                 'display': hasJourney ? null : 'none',
             });
@@ -224,8 +222,8 @@
                 return;
             }
             const shortPrompt = this.getShortPrompt(this.currentId);
-            d3.selectAll('div.journey-doc span')
-            .text(`For the journey '${shortPrompt}' the document is:`);
+            d3.selectAll('div.journey-doc span span.journey-short')
+            .text(`${shortPrompt}`);
             d3.selectAll('button.journey-btn-approve').classed('journey-btn-active', (d) => {
                 return this.isDocApprove(d.id);
             });
@@ -256,16 +254,19 @@
 
         addDocButtons(sel) {
             const doc = sel.addElems('div', 'journey-doc');
-            doc.addElem('span');
+            const docSpan = doc.addElem('span');
+            docSpan.addElem('span').text("<%- vocab['doc-begin'] %> '");
+            docSpan.addElem('span').classed('journey-short', true);
+            docSpan.addElem('span').text("': ");
             doc.addElem('button')
             .classed('journey-btn-approve', true)
-            .text('approve')
+            .text("<%- vocab['doc-approve'] %>")
             .on('click', (d) => {
                 this.setDocAction(d.id, true);
             });
             doc.addElem('button')
             .classed('journey-btn-dislike', true)
-            .text('dislike')
+            .text("<%- vocab['doc-dislike'] %>")
             .on('click', (d) => {
                 this.setDocAction(d.id, false);
             });

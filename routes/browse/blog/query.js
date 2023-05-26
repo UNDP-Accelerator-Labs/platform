@@ -46,37 +46,38 @@ exports.totalUnknownCountries = `
     WHERE country IS NULL;
 `
 exports.searchBlogQuery = (searchText, page, country, type) => {
-    let whereClause = theWhereClause(country, type);
+  let whereClause = theWhereClause(country, type);
  
-    return {
-      text: `
-          WITH search_results AS (
-              SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, language, created_at, all_html_content
-              FROM articles
-              WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
-              AND has_lab IS TRUE
-                ${whereClause}
-              LIMIT $1 OFFSET $2
-          ),
-          total_count AS (
-              SELECT COUNT(*) AS total_records
-              FROM articles
-              WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
-              AND has_lab IS TRUE
-                ${whereClause}
-          )
-          SELECT sr.*, tc.total_records, (CEIL(tc.total_records::numeric / $1)) AS total_pages, $4 AS current_page
-          FROM search_results sr
-          CROSS JOIN total_count tc;
-      `,
-      values: [
-        page_content_limit,
-        (page - 1) * page_content_limit,
-        searchText,
-        page,
-      ],
-    };
-  };  
+  return {
+    text: `
+      WITH search_results AS (
+        SELECT id, url, content, country, article_type, title, posted_date, posted_date_str, language, created_at, all_html_content
+        FROM articles
+        WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
+        AND has_lab IS TRUE
+        ${whereClause}
+        ORDER BY posted_date DESC
+        LIMIT $1 OFFSET $2
+      ),
+      total_count AS (
+        SELECT COUNT(*) AS total_records
+        FROM articles
+        WHERE (title LIKE '%' || $3 || '%' OR content LIKE '%' || $3 || '%' OR all_html_content LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%' OR country LIKE '%' || $3 || '%')
+        AND has_lab IS TRUE
+        ${whereClause}
+      )
+      SELECT sr.*, tc.total_records, (CEIL(tc.total_records::numeric / $1)) AS total_pages, $4 AS current_page
+      FROM search_results sr
+      CROSS JOIN total_count tc;
+    `,
+    values: [
+      page_content_limit,
+      (page - 1) * page_content_limit,
+      searchText,
+      page,
+    ],
+  };
+};
 
 
   exports.articleGroup = (searchText, country, type) => {

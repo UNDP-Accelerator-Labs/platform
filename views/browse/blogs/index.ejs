@@ -205,12 +205,13 @@
 									  </h1>
 									</a>
 								  </div>
-								  <div class="media media-txt" style="margin-top: -40px;">
-									<a class="pad-link" target="_blank" style="width: 100% !important;">
+								  <div class="media media-txt" style="margin-top: 20px; white-space: inherit !important;">
+									<a class="pad-link" target="_blank" style="width: 100% !important; ">
 										<% 
 										  function findMatchingText(largeText) {
 											
 											largeText.trim().replace(/^\n+|\n+$/g, '');
+											console.log('largeText ', largeText)
 											var searchText = locals?.metadata?.page?.query?.['search'] || ""
 											
 											var escapedSearchText = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -223,7 +224,7 @@
 											  var lastSentence = matches[matches.length - 1];
 											  return firstSentence + " " + `${secondSentence || ''}`;
 											} else {
-											  return largeText?.split(' ')?.slice(0, 100)?.join(' ') || null;
+											  return largeText?.split(' ')?.slice(0, 100)?.join(' ') || null; 
 											}
 										  }
 										  

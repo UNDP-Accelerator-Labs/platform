@@ -3,155 +3,164 @@
     const vocab = vocabulary['journey'][language];
 %>
 <script type='text/javascript'>
-    const journeyInfo = {
-        past: [],
-        currentId: null,
-        currentPrompt: '',
-        mainInput: null,
-        mainButton: null,
-        datalist: null,
-    };
+    class Journey {
+        constructor() {
+            this.past = [];
+            this.currentId = null;
+            this.currentPrompt = '';
+            this.mainInput = null;
+            this.mainButton = null;
+            this.datalist = null;
+            if (sessionStorage.journeyId) {
+                this.currentId = +sessionStorage.journeyId || null;
+            }
+            if (sessionStorage.journeyPrompt) {
+                this.currentPrompt = this.normalizeJourneyPrompt(sessionStorage.journeyPrompt);
+            }
+        };
 
-    function normalizeJourneyPrompt(prompt) {
-        if (!prompt) {
-            return '';
+        normalizeJourneyPrompt(prompt) {
+            if (!prompt) {
+                return '';
+            }
+            return prompt.replace(/[\s\n\r]+/, ' ').trim();
         }
-        return prompt.replace(/[\s\n\r]+/, ' ').trim();
-    }
 
-    if (sessionStorage.journeyId) {
-        journeyInfo.currentId = +sessionStorage.journeyId || null;
-    }
-    if (sessionStorage.journeyPrompt) {
-        journeyInfo.currentPrompt = normalizeJourneyPrompt(sessionStorage.journeyPrompt);
-    }
+        updateCurrentJourney(curId, curPrompt) {
+            this.currentId = curId;
+            if (curId !== sessionStorage.journeyId) {
+                sessionStorage.journeyId = +curId || 0;
+            }
+            const normPrompt = this.normalizeJourneyPrompt(curPrompt);
+            this.currentPrompt = normPrompt;
+            if (normPrompt !== sessionStorage.journeyPrompt) {
+                sessionStorage.journeyPrompt = normPrompt;
+            }
+            if (this.mainInput !== null) {
+                const mainInput = this.mainInput.node();
+                if (mainInput.value !== normPrompt) {
+                    mainInput.value = normPrompt;
+                }
+            }
+            this.updateJourneyMainButton(
+                this.getJourneyByPrompt(normPrompt)[0],
+                curId);
+            console.log('current journey_id', curId, 'prompt', normPrompt);
+        }
 
-    function updateCurrentJourney(curId, curPrompt) {
-        journeyInfo.currentId = curId;
-        if (curId !== sessionStorage.journeyId) {
-            sessionStorage.journeyId = +curId || 0;
+        getJourneyById(journeyId) {
+            return this.past.reduce((prev, d) => {
+                if (d['id'] === journeyId) {
+                    return [d['id'], d['prompt']];
+                }
+                return prev;
+            }, [null, '']);
         }
-        const normPrompt = normalizeJourneyPrompt(curPrompt);
-        journeyInfo.currentPrompt = normPrompt;
-        if (normPrompt !== sessionStorage.journeyPrompt) {
-            sessionStorage.journeyPrompt = normPrompt;
+
+        getJourneyByPrompt(journeyPrompt) {
+            const prompt = this.normalizeJourneyPrompt(journeyPrompt);
+            return this.past.reduce((prev, d) => {
+                if (d['prompt'] === prompt) {
+                    return [d['id'], d['prompt']];
+                }
+                return prev;
+            }, [null, prompt]);
         }
-        if (journeyInfo.mainInput !== null) {
-            const mainInput = journeyInfo.mainInput.node();
-            if (mainInput.value !== normPrompt) {
-                mainInput.value = normPrompt;
+
+        updateJourneyMainButton(journeyId, currentId) {
+            if (this.mainButton !== null) {
+                this.mainButton.text(
+                    journeyId === null
+                    ? "<%- vocab['start'] %>"
+                    : journeyId !== currentId
+                    ? "<%- vocab['continue'] %>"
+                    : "<%- vocab['finish'] %>");
             }
         }
-        updateJourneyMainButton(getJourneyByPrompt(normPrompt)[0], curId);
-        console.log('current journey_id', curId, 'prompt', normPrompt);
-    }
 
-    function getJourneyById(journeyId) {
-        return journeyInfo.past.reduce((prev, d) => {
-            if (d['id'] === journeyId) {
-                return [d['id'], d['prompt']];
+        updateJourneyDatalist(cb = null) {
+            if (!this.datalist) {
+                return;
             }
-            return prev;
-        }, [null, '']);
-    }
+            const datalist = this.datalist;
+            GET('/journey/list?lang=<%- language %>').then((result) => {
+                const journeys = result['journeys'];
+                this.past = journeys;
+                const [curId, curPrompt] = this.getJourneyById(this.currentId);
+                this.updateCurrentJourney(curId, curPrompt);
+                datalist.addElems('option', 'journey-past-elem', journeys)
+                .attrs({
+                    'value': (d) => this.normalizeJourneyPrompt(d['prompt']),
+                    'label': (d) => `<%- vocab['last_access'] %> ${d['last_access_ago']}`,
+                });
+                cb && cb();
+            }).catch((err) => console.error(err));
+        }
 
-    function getJourneyByPrompt(journeyPrompt) {
-        const prompt = normalizeJourneyPrompt(journeyPrompt);
-        return journeyInfo.past.reduce((prev, d) => {
-            if (d['prompt'] === prompt) {
-                return [d['id'], d['prompt']];
+        confirmJourneyPrompt(allowReport) {
+            const mainInput = this.mainInput;
+            if (mainInput === null) {
+                return;
             }
-            return prev;
-        }, [null, prompt]);
-    }
-
-    function updateJourneyMainButton(journeyId, currentId) {
-        if (journeyInfo.mainButton !== null) {
-            journeyInfo.mainButton.text(
-                journeyId === null
-                ? "<%- vocab['start'] %>"
-                : journeyId !== currentId
-                ? "<%- vocab['continue'] %>"
-                : "<%- vocab['finish'] %>");
-        }
-    }
-
-    function updateJourneyDatalist(cb = null) {
-        if (!journeyInfo.datalist) {
-            return;
-        }
-        const datalist = journeyInfo.datalist;
-        GET('/journey/list?lang=<%- language %>').then((result) => {
-            const journeys = result['journeys'];
-            journeyInfo.past = journeys;
-            const [curId, curPrompt] = getJourneyById(journeyInfo.currentId);
-            updateCurrentJourney(curId, curPrompt);
-            datalist.addElems('option', 'journey-past-elem', journeys)
-            .attrs({
-                'value': (d) => normalizeJourneyPrompt(d['prompt']),
-                'label': (d) => `<%- vocab['last_access'] %> ${d['last_access_ago']}`,
+            const userPrompt = mainInput.node().value;
+            const currentId = this.currentId;
+            this.updateJourneyDatalist(() => {
+                const [curId, curPrompt] = this.getJourneyByPrompt(userPrompt);
+                if (curId !== null && curId === currentId) {
+                    if (allowReport) {
+                        console.log('REPORT!');
+                    }
+                } else if (curId !== null) {
+                    this.updateCurrentJourney(curId, curPrompt);
+                } else if (curPrompt) {
+                    PUT(`/journey/create`, {
+                        'prompt': curPrompt,
+                    }).then((result) => {
+                        this.updateCurrentJourney(result["journey"], result["prompt"]);
+                        this.updateJourneyDatalist();
+                    }).catch((err) => console.error(err));
+                } else {
+                    this.updateCurrentJourney(null, '');
+                }
             });
-            cb && cb();
-        }).catch((err) => console.error(err));
-    }
-
-    function confirmJourneyPrompt() {
-        const mainInput = journeyInfo.mainInput;
-        if (mainInput === null) {
-            return;
         }
-        const userPrompt = mainInput.node().value;
-        const currentId = journeyInfo.currentId;
-        updateJourneyDatalist(() => {
-            const [curId, curPrompt] = getJourneyByPrompt(userPrompt);
-            if (curId !== null && curId === currentId) {
-                console.log('REPORT!');
-            } else if (curId !== null) {
-                updateCurrentJourney(curId, curPrompt);
-            } else if (curPrompt) {
-                PUT(`/journey/create`, {
-                    'prompt': curPrompt,
-                }).then((result) => {
-                    updateCurrentJourney(result["journey"], result["prompt"]);
-                    updateJourneyDatalist();
-                }).catch((err) => console.error(err));
-            } else {
-                updateCurrentJourney(null, '');
-            }
-        });
-    }
 
-    function addJourneyMain(sel) {
-        const mainInput = sel.addElem('input')
-        .attrs({
-            'type': 'text',
-            'id': `journey-main`,
-            'list': 'journey-past',
-        })
-        .on('change', () => {
-            const normPrompt = normalizeJourneyPrompt(mainInput.node().value);
-            updateJourneyMainButton(getJourneyByPrompt(normPrompt)[0], journeyInfo.currentId);
-        })
-        .on('blur', confirmJourneyPrompt);
-        journeyInfo.mainInput = mainInput;
-        updateCurrentJourney(journeyInfo.currentId, journeyInfo.currentPrompt);
+        addJourneyMain(sel) {
+            const mainInput = sel.addElem('input')
+            .attrs({
+                'type': 'text',
+                'id': `journey-main`,
+                'list': 'journey-past',
+            })
+            .on('change', () => {
+                const normPrompt = this.normalizeJourneyPrompt(mainInput.node().value);
+                this.updateJourneyMainButton(
+                    this.getJourneyByPrompt(normPrompt)[0],
+                    this.currentId);
+            })
+            .on('blur', () => this.confirmJourneyPrompt(false));
+            this.mainInput = mainInput;
+            this.updateCurrentJourney(this.currentId, this.currentPrompt);
 
-        sel.addElem('label')
-        .attrs({
-            'for': `journey-main`,
-        })
-        .text("<%- vocab['intro'] %>");
-        const datalist = sel.addElem('datalist').attrs({
-            'id': 'journey-past',
-        });
-        journeyInfo.datalist = datalist;
-        const mainButton = sel.addElem('button')
-        .attrs({
-            'type': 'button',
-        })
-        .on('click', confirmJourneyPrompt);
-        journeyInfo.mainButton = mainButton;
+            sel.addElem('label')
+            .attrs({
+                'for': `journey-main`,
+            })
+            .text("<%- vocab['intro'] %>");
+            const datalist = sel.addElem('datalist').attrs({
+                'id': 'journey-past',
+            });
+            this.datalist = datalist;
+            const mainButton = sel.addElem('button')
+            .attrs({
+                'type': 'button',
+            })
+            .on('click', () => this.confirmJourneyPrompt(true));
+            this.mainButton = mainButton;
 
-        updateJourneyDatalist();
-    }
+            this.updateJourneyDatalist();
+        }
+    } // Journey
+
+    const journey = new Journey();
 </script>

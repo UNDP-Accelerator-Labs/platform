@@ -110,7 +110,7 @@ exports.main = async (req, res) => {
 						const columns = Object.keys(results[0])
 						const values = DB.pgp.helpers.values(results, columns)
 						const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
-						
+			
 						return DB.general.any(`
 							SELECT 
 							jsonb_build_object(

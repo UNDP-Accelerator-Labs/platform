@@ -27,7 +27,8 @@ exports.modules = [
 	// { type: 'templates', rights: { read: 2, write: 2 } },
 	// { type: 'files', rights: { read: 0, write: 1 } }, 
 	{ type: 'contributors', rights: { read: 2, write: 2 } }, 
-	{ type: 'teams', rights: { read: 2, write: 2 } }
+	{ type: 'teams', rights: { read: 2, write: 2 } },
+	{ type: 'blog', rights: { read: 0, write: 0 } }
 	
 	// { type: 'analyses', rights: { read: 1, write: 2 } }
 ]

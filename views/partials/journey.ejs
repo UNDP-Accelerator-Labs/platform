@@ -1,39 +1,157 @@
 <%
     const language = locals.metadata.page.language;
+    const vocab = vocabulary['journey'][language];
 %>
 <script type='text/javascript'>
+    const journeyInfo = {
+        past: [],
+        currentId: null,
+        currentPrompt: '',
+        mainInput: null,
+        mainButton: null,
+        datalist: null,
+    };
+
+    function normalizeJourneyPrompt(prompt) {
+        if (!prompt) {
+            return '';
+        }
+        return prompt.replace(/[\s\n\r]+/, ' ').trim();
+    }
+
+    if (sessionStorage.journeyId) {
+        journeyInfo.currentId = +sessionStorage.journeyId || null;
+    }
+    if (sessionStorage.journeyPrompt) {
+        journeyInfo.currentPrompt = normalizeJourneyPrompt(sessionStorage.journeyPrompt);
+    }
+
+    function updateCurrentJourney(curId, curPrompt) {
+        journeyInfo.currentId = curId;
+        if (curId !== sessionStorage.journeyId) {
+            sessionStorage.journeyId = +curId || 0;
+        }
+        const normPrompt = normalizeJourneyPrompt(curPrompt);
+        journeyInfo.currentPrompt = normPrompt;
+        if (normPrompt !== sessionStorage.journeyPrompt) {
+            sessionStorage.journeyPrompt = normPrompt;
+        }
+        if (journeyInfo.mainInput !== null) {
+            const mainInput = journeyInfo.mainInput.node();
+            if (mainInput.value !== normPrompt) {
+                mainInput.value = normPrompt;
+            }
+        }
+        updateJourneyMainButton(getJourneyByPrompt(normPrompt)[0], curId);
+        console.log('current journey_id', curId, 'prompt', normPrompt);
+    }
+
+    function getJourneyById(journeyId) {
+        return journeyInfo.past.reduce((prev, d) => {
+            if (d['id'] === journeyId) {
+                return [d['id'], d['prompt']];
+            }
+            return prev;
+        }, [null, '']);
+    }
+
+    function getJourneyByPrompt(journeyPrompt) {
+        const prompt = normalizeJourneyPrompt(journeyPrompt);
+        return journeyInfo.past.reduce((prev, d) => {
+            if (d['prompt'] === prompt) {
+                return [d['id'], d['prompt']];
+            }
+            return prev;
+        }, [null, prompt]);
+    }
+
+    function updateJourneyMainButton(journeyId, currentId) {
+        if (journeyInfo.mainButton !== null) {
+            journeyInfo.mainButton.text(
+                journeyId === null
+                ? "<%- vocab['start'] %>"
+                : journeyId !== currentId
+                ? "<%- vocab['continue'] %>"
+                : "<%- vocab['finish'] %>");
+        }
+    }
+
+    function updateJourneyDatalist(cb = null) {
+        if (!journeyInfo.datalist) {
+            return;
+        }
+        const datalist = journeyInfo.datalist;
+        GET('/journey/list?lang=<%- language %>').then((result) => {
+            const journeys = result['journeys'];
+            journeyInfo.past = journeys;
+            const [curId, curPrompt] = getJourneyById(journeyInfo.currentId);
+            updateCurrentJourney(curId, curPrompt);
+            datalist.addElems('option', 'journey-past-elem', journeys)
+            .attrs({
+                'value': (d) => normalizeJourneyPrompt(d['prompt']),
+                'label': (d) => `<%- vocab['last_access'] %> ${d['last_access_ago']}`,
+            });
+            cb && cb();
+        }).catch((err) => console.error(err));
+    }
+
+    function confirmJourneyPrompt() {
+        const mainInput = journeyInfo.mainInput;
+        if (mainInput === null) {
+            return;
+        }
+        const userPrompt = mainInput.node().value;
+        const currentId = journeyInfo.currentId;
+        updateJourneyDatalist(() => {
+            const [curId, curPrompt] = getJourneyByPrompt(userPrompt);
+            if (curId !== null && curId === currentId) {
+                console.log('REPORT!');
+            } else if (curId !== null) {
+                updateCurrentJourney(curId, curPrompt);
+            } else if (curPrompt) {
+                PUT(`/journey/create`, {
+                    'prompt': curPrompt,
+                }).then((result) => {
+                    updateCurrentJourney(result["journey"], result["prompt"]);
+                    updateJourneyDatalist();
+                }).catch((err) => console.error(err));
+            } else {
+                updateCurrentJourney(null, '');
+            }
+        });
+    }
+
     function addJourneyMain(sel) {
-        sel.addElem('input').attrs({
+        const mainInput = sel.addElem('input')
+        .attrs({
             'type': 'text',
-            'name': 'journey-main-input',
             'id': `journey-main`,
             'list': 'journey-past',
-        });
+        })
+        .on('change', () => {
+            const normPrompt = normalizeJourneyPrompt(mainInput.node().value);
+            updateJourneyMainButton(getJourneyByPrompt(normPrompt)[0], journeyInfo.currentId);
+        })
+        .on('blur', confirmJourneyPrompt);
+        journeyInfo.mainInput = mainInput;
+        updateCurrentJourney(journeyInfo.currentId, journeyInfo.currentPrompt);
+
         sel.addElem('label')
         .attrs({
             'for': `journey-main`,
         })
-        .text("<%- vocabulary['journey-intro'][language] %>");
+        .text("<%- vocab['intro'] %>");
         const datalist = sel.addElem('datalist').attrs({
             'id': 'journey-past',
         });
-        const journeyInfo = {
-            past: [],
-        };
+        journeyInfo.datalist = datalist;
+        const mainButton = sel.addElem('button')
+        .attrs({
+            'type': 'button',
+        })
+        .on('click', confirmJourneyPrompt);
+        journeyInfo.mainButton = mainButton;
 
-        function updateDatalist() {
-            const lang = '<%- language %>';
-            GET(`/journey/list?lang=${lang}`).then((result) => {
-                const journeys = result['journeys'];
-                journeyInfo.past = journeys;
-                datalist.addElems('option', 'journey-past-elem', journeys)
-                .attrs({
-                    'value': (d) => d['prompt'],
-                    'label': (d) => `${d['last_access_ago']}`,
-                });
-            }).catch((err) => console.error(err));
-        }
-
-        updateDatalist();
+        updateJourneyDatalist();
     }
 </script>

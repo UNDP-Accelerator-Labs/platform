@@ -1,5 +1,9 @@
 const { DB, fixed_uuid } = include('config/');
 
+function normalize(prompt) {
+    return prompt.replace(/[\s\n\r]+/, ' ').trim();
+}
+
 module.exports = (req, res) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
@@ -7,7 +11,13 @@ module.exports = (req, res) => {
             message: 'must be logged in',
         });
     }
-    const { prompt } = req.body || {};
+    const { prompt: prompt_in } = req.body || {};
+    const prompt = normalize(prompt_in);
+    if (!prompt) {
+        return res.status(422).json({
+            message: 'prompt must not be empty',
+        });
+    }
     const upsert = DB.pgp.as.format(`
         INSERT INTO journey (uuid, prompt, created_at, last_access)
         VALUES ($1, $2, NOW(), NOW())
@@ -18,6 +28,7 @@ module.exports = (req, res) => {
     .then((result) => {
         res.json({
             journey: result.id,
+            prompt,
             message: `success! id[${result.id}] uuid[${uuid}] prompt[${prompt}]`,
         });
     }).catch((err) => {

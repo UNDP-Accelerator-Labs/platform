@@ -1,16 +1,20 @@
 <%
     const language = locals.metadata.page.language;
     const vocab = vocabulary['journey'][language];
+    const app_db = locals.metadata.site.app_db;
 %>
 <script type='text/javascript'>
     class Journey {
         constructor() {
             this.past = [];
+            this.docs = [];
+            this.docLookup = {};
             this.currentId = null;
             this.currentPrompt = '';
             this.mainInput = null;
             this.mainButton = null;
             this.datalist = null;
+            this.appDb = '<%- app_db %>';
             if (sessionStorage.journeyId) {
                 this.currentId = +sessionStorage.journeyId || null;
             }
@@ -45,6 +49,7 @@
             this.updateJourneyMainButton(
                 this.getJourneyByPrompt(normPrompt)[0],
                 curId);
+            this.updateJourneyDocs();
             console.log('current journey_id', curId, 'prompt', normPrompt);
         }
 
@@ -65,6 +70,15 @@
                 }
                 return prev;
             }, [null, prompt]);
+        }
+
+        getShortPrompt(journeyId) {
+            return this.past.reduce((prev, d) => {
+                if (d['id'] === journeyId) {
+                    return d['short'];
+                }
+                return prev;
+            }, '');
         }
 
         updateJourneyMainButton(journeyId, currentId) {
@@ -100,6 +114,39 @@
                 });
                 cb && cb();
             }).catch((err) => console.error(err));
+        }
+
+        updateJourneyDocs() {
+            const curId = this.currentId;
+            if (!curId) {
+                this.docs = [];
+                this.docLookup = {};
+                this.updateDocs();
+                return;
+            }
+            GET(`/journey/collection?journey_id=${curId}`).then((result) => {
+                const docs = result['docs'];
+                const newLookup = {};
+                const appDb = this.appDb;
+                docs.forEach((doc) => {
+                    if (doc['db'] !== appDb) {
+                        return;
+                    }
+                    newLookup[`${doc['doc_id']}`] = doc['is_relevant'];
+                });
+                this.docs = docs;
+                this.docLookup = newLookup;
+                this.updateDocs();
+            })
+            .catch((err) => console.error(err));
+        }
+
+        isDocApprove(docId) {
+            return this.docLookup[`${docId}`] === true;
+        }
+
+        isDocDislike(docId) {
+            return this.docLookup[`${docId}`] === false;
         }
 
         confirmJourneyPrompt(allowReport) {
@@ -165,6 +212,64 @@
             this.mainButton = mainButton;
 
             this.updateJourneyDatalist();
+        }
+
+        updateDocs() {
+            const hasJourney = !!this.currentId;
+            console.log('update docs', hasJourney);
+            d3.selectAll('div.journey-doc').styles({
+                'display': hasJourney ? null : 'none',
+            });
+            if (!hasJourney) {
+                return;
+            }
+            const shortPrompt = this.getShortPrompt(this.currentId);
+            d3.selectAll('div.journey-doc span')
+            .text(`For the journey '${shortPrompt}' the document is:`);
+            d3.selectAll('button.journey-btn-approve').classed('journey-btn-active', (d) => {
+                return this.isDocApprove(d.id);
+            });
+            d3.selectAll('button.journey-btn-dislike').classed('journey-btn-active', (d) => {
+                return this.isDocDislike(d.id);
+            });
+            d3.selectAll('article.pad').classed('journey-article-inactive', (d) => {
+                return this.isDocDislike(d.id);
+            });
+        }
+
+        setDocAction(docId, isApprove) {
+            const journeyId = this.currentId;
+            if (!journeyId) {
+                return;
+            }
+            const action = isApprove ? (
+                this.isDocApprove(docId) ? 'neutral' : 'approve') : (
+                this.isDocDislike(docId) ? 'neutral' : 'dislike');
+            PUT('/journey/doc', {
+                'doc_id': docId,
+                'action': action,
+                'journey_id': journeyId,
+            }).then((result) => {
+                this.updateJourneyDocs();
+            }).catch((err) => console.error(err));
+        }
+
+        addDocButtons(sel) {
+            const doc = sel.addElems('div', 'journey-doc');
+            doc.addElem('span');
+            doc.addElem('button')
+            .classed('journey-btn-approve', true)
+            .text('approve')
+            .on('click', (d) => {
+                this.setDocAction(d.id, true);
+            });
+            doc.addElem('button')
+            .classed('journey-btn-dislike', true)
+            .text('dislike')
+            .on('click', (d) => {
+                this.setDocAction(d.id, false);
+            });
+            this.updateJourneyDocs();
         }
     } // Journey
 

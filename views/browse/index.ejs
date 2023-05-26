@@ -34,6 +34,7 @@
 
 <%- include ('../partials/menu-languages.ejs') %>
 <%- include ('../partials/modals.ejs') %>
+<%- include ('../partials/journey.ejs') %>
 
 <%- include ('./modules/download.ejs') %>
 
@@ -1512,53 +1513,8 @@
 				_sel.addElems('div', 'meta meta-country')
 				.html(d => d.countryname)
 			}.bind(this),
-			feedback: (_sel) => {
-				_sel.addElems('span', 'feedback feedback-button')
-				.text('Journey')
-				.attrs({
-					title: 'Record this article in your journey.',
-				}).on('click', () => {
-					const isOpen = popout.style('display') !== 'none';
-					d3.selectAll('.feedback-popout').styles({
-						'display': 'none',
-					});
-					if (!isOpen) {
-						popout.styles({
-							'display': null,
-						});
-					}
-				});
-				const popout = _sel.addElems('div', 'feedback feedback-popout');
-				const hide = () => {
-					popout.styles({
-						'display': 'none',
-					});
-				};
-				hide();
-				popout.addElems('span', 'feedback-quit')
-				.text('x')
-				.on('click', () => {
-					hide();
-				});
-				popout.addElems('p', 'feedback-hint')
-				.text('Please give a short description of your journey.');
-				popout.addElems('input', 'feedback-prompt').attrs({
-					'type': 'text',
-				});
-				popout.addElems('button', 'feedback-approve')
-				.text('Relevant')
-				.on('click', (d) => {
-					// TODO
-					console.log('relevant', d);
-					hide();
-				});
-				popout.addElems('button', 'feedback-dislike')
-				.text('Unrelated')
-				.on('click', (d) => {
-					// TODO
-					console.log('unrelated', d);
-					hide();
-				});
+			journey: (_sel) => {
+				journey.addDocButtons(_sel);
 			},
 		}
 	}
@@ -1595,7 +1551,7 @@
 			render.pin(entry.foot)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
-			render.feedback(entry.prefoot)
+			render.journey(entry.prefoot)
 		} else if (display === 'slideshow') {
 			render.img(entry.head)
 			render.owner(entry.metagroup)
@@ -1619,7 +1575,7 @@
 			render.pin(entry.inner)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
-			render.feedback(entry.prefoot)
+			render.journey(entry.prefoot)
 		}
 	}
 

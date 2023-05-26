@@ -346,27 +346,41 @@ div.journey button {
   color: #005687;
   cursor: pointer;
 }
-div.journey button:hover, div.journey button:focus {
+div.journey button:hover {
   color: rgba(4, 104, 177, 0.75);
 }
 div.journey button:active {
   color: #0468B1;
 }
 
-.feedback-button {
+.journey-article-inactive {
+  filter: opacity(0.4) !important;
+}
+
+.journey-btn-active {
+  background-color: #32BEE1 !important;
+}
+
+.journey-btn-active:hover {
+  background-color: rgba(4, 104, 177, 0.75) !important;
+}
+
+.journey-btn-active:active {
+  background-color: #0468B1 !important;
+}
+
+.journey-doc button {
   display: inline-block;
   cursor: pointer;
   padding: 0.5em;
-  border: 1px solid cornflowerblue;
-  background-color: none;
+  border: 1px solid #32BEE1;
+  background-color: transparent;
 }
-
-.feedback-button:hover {
-  background-color: #eee;
-}
-
-.feedback-button:active {
+.journey-doc button:hover {
   background-color: #ddd;
+}
+.journey-doc button:active {
+  background-color: #ccc;
 }
 
 /*# sourceMappingURL=vars.css.map */

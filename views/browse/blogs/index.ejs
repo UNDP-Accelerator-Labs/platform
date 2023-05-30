@@ -211,7 +211,7 @@
 										  function findMatchingText(largeText) {
 											
 											largeText.trim().replace(/^\n+|\n+$/g, '');
-											console.log('largeText ', largeText)
+											
 											var searchText = locals?.metadata?.page?.query?.['search'] || ""
 											
 											var escapedSearchText = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

@@ -11,7 +11,7 @@ exports.main = async kwargs => {
 
         batch.push(t.any(countryGroup(search?.trim(), country, type))
         .then(async (results) => {
-            const geoData = await DB.blog.any(extractGeoQuery(country, type), search?.trim()).then(results => results);
+            const geoData = await DB.blog.any(extractGeoQuery(search?.trim(), country, type)).then(results => results);
             
             results.geoData = geoData?.map(p => p?.json );
             

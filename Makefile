@@ -1,5 +1,6 @@
 help:
 	@echo "The following make targets are available:"
+	@echo "create-user	interactively inserts a new user into the login db"
 	@echo "name	generate a unique permanent name for the current commit"
 	@echo "current-version	computes the current version"
 	@echo "next-version	computes the next version"
@@ -8,6 +9,9 @@ help:
 
 export LC_ALL=C
 export LANG=C
+
+create-user:
+	./sh/newuser.sh
 
 name:
 	git describe --abbrev=10 --tags HEAD

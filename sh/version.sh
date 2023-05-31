@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../" &> /dev/null
+
 FLAG=$1
 
 CUR_VERSION=$(git describe --tags --abbrev=0)
 
-if [ "${FLAG}" = '--current' ]; then
+if [ "${FLAG}" == '--current' ]; then
     echo "${CUR_VERSION}"
     exit 0
 fi

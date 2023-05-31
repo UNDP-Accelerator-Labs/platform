@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../" &> /dev/null
+
 if output=$(git status --porcelain) && ! [ -z "$output" ]; then
     echo "working copy is not clean" >&2
     exit 1

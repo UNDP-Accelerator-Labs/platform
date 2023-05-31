@@ -11,7 +11,7 @@ export LC_ALL=C
 export LANG=C
 
 create-user:
-	./sh/newuser.sh
+	./sh/create_user.sh
 
 name:
 	git describe --abbrev=10 --tags HEAD

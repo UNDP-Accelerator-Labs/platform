@@ -29,9 +29,10 @@ read_var () {  # <variable> <prompt> <default> <is_secure>
         else
             read -s -p "${PROMPT}" OUT
             echo ""
-            if [ -z "${DEFAULT}" ]; then
-                break
-            fi
+            # NOTE: uncomment to allow empty secrets
+            # if [ -z "${DEFAULT}" ]; then
+            #     break
+            # fi
         fi
         if [ -z "${OUT}" ]; then
             if [ -z "${DEFAULT}" ]; then

@@ -8,15 +8,32 @@ TimeAgo.addLocale(fr);
 TimeAgo.addLocale(es);
 TimeAgo.addLocale(pt);
 TimeAgo.addDefaultLocale(en);
-const MAX_LENGTH = 30;
+const MAX_LENGTH = 40;
 const ELLIPSIS = '…';
+const REPLACE = [
+    'is',
+    'are',
+    'i',
+    'you',
+    'we',
+    'do',
+    'for',
+    'to',
+];
 
 function limitPrompt(prompt) {
-    const norm = prompt.replace(/[\s\n\r]+/g, ' ').trim();
+    const spe = `[\\s${ELLIPSIS}]`;
+    const norm = REPLACE.reduce((prev, replace) => {
+        return prev.replace(new RegExp(`(^|${spe})${spe}*${replace}${spe}+`, 'gi'), ELLIPSIS);
+    }, prompt.replace(/[\s\n\r]+/g, ' ').trim())
+    .replace(new RegExp(`\\s*${ELLIPSIS}${spe}*`, 'g'), ELLIPSIS);
+
     if (norm.length < MAX_LENGTH) {
         return norm;
     }
-    const breakIx = norm.indexOf(' ', MAX_LENGTH - 1);
+    const breakIx = Math.max(
+        norm.lastIndexOf(' ', MAX_LENGTH - 1),
+        norm.lastIndexOf(ELLIPSIS, MAX_LENGTH));
     if (breakIx < 0) {
         return `${norm.slice(0, MAX_LENGTH - 1)}${ELLIPSIS}`;
     }

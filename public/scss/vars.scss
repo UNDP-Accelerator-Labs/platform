@@ -406,7 +406,8 @@ div.journey {
 	button {
 		display: inline-block;
 		cursor: pointer;
-		padding: 0.5em;
+		padding: 0.25em 10px;
+		margin: 0 2px 0 0;
 		border: 1px solid $c-light-blue;
 		background-color: transparent;
 	}

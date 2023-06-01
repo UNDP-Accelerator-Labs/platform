@@ -402,6 +402,7 @@
                     that.updateById(+curId);
                 }
             });
+            docSpan.addElem('span').text(": ");
             doc.addElem('button')
             .classed('journey-btn-approve', true)
             .text("<%- vocab['doc-approve'] %>")

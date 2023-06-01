@@ -16,49 +16,45 @@ function getMediaSize () {
 	})?.label
 }
 const jsonQueryHeader = { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-function GET (_uri, _expectJSON = true) {
-	return new Promise(async resolve => {
-		fetch(_uri, { method: 'GET', headers: jsonQueryHeader })
-			.then(response => {
-				if (_expectJSON) return response.json()
-				else return response
-			})
-			.then(results => resolve(results))
-			.catch(err => { if (err) throw (err) })
-	})
+function _fetch(_method, _uri, _q, _expectJSON, _cookies) {
+	return new Promise((resolve, reject) => {
+		const args = { method: _method, headers: jsonQueryHeader };
+		if (_q) {
+			args['body'] = JSON.stringify(_q);
+		}
+		if (_cookies) {
+			args['credentials'] = 'include';
+		}
+		fetch(_uri, args)
+		.then(response => {
+			if (!response.ok) {
+				reject(response);
+				return;
+			}
+			if (_expectJSON) {
+				return response.json();
+			}
+			return response;
+		})
+		.then(results => resolve(results))
+		.catch(err => {
+			if (err) {
+				reject(err);
+			}
+		});
+	});
 }
-function POST (_uri, _q, _expectJSON = true) {
-	return new Promise(resolve => 
-		fetch(_uri, { method: 'POST', headers: jsonQueryHeader, body: JSON.stringify(_q) })
-			.then(response => {
-				if (_expectJSON) return response.json()
-				else return response
-			})
-			.then(results => resolve(results))
-			.catch(err => { if (err) throw (err) })
-	)
+function GET (_uri, _expectJSON = true, _cookies = false) {
+	return _fetch('GET', _uri, null, _expectJSON, _cookies);
 }
-function PUT (_uri, _q, _expectJSON = true) {
-	return new Promise(resolve => 
-		fetch(_uri, { method: 'PUT', headers: jsonQueryHeader, body: JSON.stringify(_q) })
-			.then(response => {
-				if (_expectJSON) return response.json()
-				else return response
-			})
-			.then(results => resolve(results))
-			.catch(err => { if (err) throw (err) })
-	)
+function POST (_uri, _q, _expectJSON = true, _cookies = false) {
+	return _fetch('POST', _uri, _q || {}, _expectJSON, _cookies);
 }
-function DELETE (_uri, _q, _expectJSON = true) {
-	return new Promise(resolve => 
-		fetch(_uri, { method: 'DELETE', headers: jsonQueryHeader, body: JSON.stringify(_q) })
-			.then(response => {
-				if (_expectJSON) return response.json()
-				else return response
-			})
-			.then(results => resolve(results))
-			.catch(err => { if (err) throw (err) })
-	)
+function PUT (_uri, _q, _expectJSON = true, _cookies = false) {
+	return _fetch('PUT', _uri, _q || {}, _expectJSON, _cookies);
+}
+function DELETE (_uri, _q, _expectJSON = true, _cookies = false) {
+	return _fetch('DELETE', _uri, _q || {}, _expectJSON, _cookies);
 }
 function toggleClass (node, classname) {
 	d3.select(node).classed(classname, function () { return !d3.select(this).classed(classname) })
@@ -106,7 +102,7 @@ function multiSelection (sel, targets) {
 		ox = x
 		oy = y
 
-		selection.styles({ 
+		selection.styles({
 			'transform': d => {
 				if (d.w < 0) d.x = x
 				if (d.h < 0) d.y = y
@@ -129,7 +125,7 @@ function multiSelection (sel, targets) {
 		if (targets.class) {
 			sels = d3.selectAll(targets.class)
 			if (targets.filter) sels = sels.filter(d => targets.filter(d))
-			sels.classed('selecting', function (d) { 
+			sels.classed('selecting', function (d) {
 				const rect = this.getBoundingClientRect()
 
 				if (
@@ -138,7 +134,7 @@ function multiSelection (sel, targets) {
 					|| (rect.left <= bbox.x && rect.right >= bbox.x + bbox.w)
 					|| (rect.left <= bbox.x && rect.right >= bbox.x && rect.right <= bbox.x + bbox.w)
 					) && (
-					(rect.top >= bbox.y && rect.top <= bbox.y + bbox.h) 
+					(rect.top >= bbox.y && rect.top <= bbox.y + bbox.h)
 					|| (rect.bottom >= bbox.y && rect.bottom <= bbox.y + bbox.h)
 					|| (rect.top <= bbox.y && rect.bottom >= bbox.y + bbox.h)
 					)

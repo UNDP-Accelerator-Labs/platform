@@ -34,7 +34,10 @@
 
 <%- include ('../partials/menu-languages.ejs') %>
 <%- include ('../partials/modals.ejs') %>
-<%- include ('../partials/journey.ejs') %>
+
+<% if (locals.metadata?.user?.uuid) { %>
+	<%- include ('../partials/journey.ejs') %>
+<% } %>
 
 <%- include ('./modules/download.ejs') %>
 

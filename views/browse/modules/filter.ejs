@@ -25,7 +25,9 @@
 				})
 			%>
 
+			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='journey'></div>
+			<% } %>
 			<div class='search'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
@@ -237,5 +239,7 @@
 		})
 	<% } %>
 
-	journey.addJourneyMain(d3.select('div.journey'));
+	<% if (locals.metadata?.user?.uuid) { %>
+		journey.addJourneyMain(d3.select('div.journey'));
+	<% } %>
 </script>

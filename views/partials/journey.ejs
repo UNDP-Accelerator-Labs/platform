@@ -14,6 +14,13 @@
             this.mainInput = null;
             this.mainButton = null;
             this.datalist = null;
+            this.useFullPromptForSelect = false;
+
+            this.listUpdateActive = false;
+            this.listUpdateCbs = [];
+            this.collectionId = null;
+            this.collectionUpdateCbs = [];
+
             this.appDb = '<%- app_db %>';
             if (sessionStorage.journeyId) {
                 this.currentId = +sessionStorage.journeyId || null;
@@ -23,6 +30,21 @@
             }
         };
 
+        setUseFullPromptForSelect(isUseFull) {
+            this.useFullPromptForSelect = isUseFull;
+        }
+
+        getInputValue() {
+            if (!this.mainInput) {
+                return null;
+            }
+            const node = this.mainInput.node();
+            if (!node) {
+                return null;
+            }
+            return node.value;
+        }
+
         normalizeJourneyPrompt(prompt) {
             if (!prompt) {
                 return '';
@@ -31,19 +53,24 @@
         }
 
         updateCurrentJourney(curId, curPrompt) {
-            this.currentId = curId;
-            if (curId !== sessionStorage.journeyId) {
-                sessionStorage.journeyId = +curId || 0;
-            }
             const normPrompt = this.normalizeJourneyPrompt(curPrompt);
             this.currentPrompt = normPrompt;
             if (normPrompt !== sessionStorage.journeyPrompt) {
                 sessionStorage.journeyPrompt = normPrompt;
+                if (!normPrompt) {
+                    curId = null;
+                }
+            }
+            this.currentId = curId;
+            if (curId !== sessionStorage.journeyId) {
+                sessionStorage.journeyId = +curId || 0;
             }
             if (this.mainInput !== null) {
                 const mainInput = this.mainInput.node();
-                if (mainInput.value !== normPrompt) {
-                    mainInput.value = normPrompt;
+                if (mainInput) {
+                    if (mainInput.value !== normPrompt) {
+                        mainInput.value = normPrompt;
+                    }
                 }
             }
             this.updateJourneyMainButton(
@@ -59,6 +86,11 @@
                 }
                 return prev;
             }, [null, '']);
+        }
+
+        updateById(newId) {
+            const [nextId, nextPrompt] = this.getJourneyById(+newId);
+            this.updateCurrentJourney(nextId, nextPrompt);
         }
 
         getJourneyByPrompt(journeyPrompt) {
@@ -90,40 +122,79 @@
                     : "<%- vocab['finish'] %>");
             }
             if (this.mainInput !== null) {
-                const value = this.mainInput.node().value;
+                const value = this.getInputValue();
                 const normPrompt = this.normalizeJourneyPrompt(value);
                 this.mainInput.classed('has-value', !!normPrompt);
             }
         }
 
-        updateJourneyDatalist(cb = null) {
-            if (!this.datalist) {
+        updateJourneyList(cb = null) {
+            if (cb) {
+                this.listUpdateCbs.push(cb);
+            }
+            if (this.listUpdateActive) {
                 return;
             }
-            const datalist = this.datalist;
-            GET('/journey/list?lang=<%- language %>').then((result) => {
+            this.listUpdateActive = true;
+            GET('/journey/list?lang=<%- language %>', true, true).then((result) => {
+                this.listUpdateActive = false;
                 const journeys = result['journeys'];
                 this.past = journeys;
                 const [curId, curPrompt] = this.getJourneyById(this.currentId);
                 this.updateCurrentJourney(curId, curPrompt);
-                datalist.addElems('option', 'journey-past-elem', journeys)
+                const cbs = this.listUpdateCbs;
+                this.listUpdateCbs = [];
+                cbs.forEach((curCb) => curCb());
+            }).catch((err) => {
+                this.listUpdateActive = false;
+                if (err && err.status === 401) {
+                    this.past = [];
+                    const cbs = this.listUpdateCbs;
+                    this.listUpdateCbs = [];
+                    cbs.forEach((curCb) => curCb());
+                    this.updateCurrentJourney(null, '');
+                }
+                console.error(err);
+            });
+        }
+
+        updateJourneyDatalist(cb = null) {
+            const datalist = this.datalist;
+            if (!datalist) {
+                return;
+            }
+            this.updateJourneyList(() => {
+                datalist.addElems('option', 'journey-past-elem', this.past)
                 .attrs({
                     'value': (d) => this.normalizeJourneyPrompt(d['prompt']),
                     'label': (d) => `<%- vocab['last_access'] %> ${d['last_access_ago']}`,
                 });
                 cb && cb();
-            }).catch((err) => console.error(err));
+            });
         }
 
         updateJourneyDocs(cb = null) {
+            if (cb) {
+                this.collectionUpdateCbs.push(cb);
+            }
             const curId = this.currentId;
             if (!curId) {
                 this.docs = [];
                 this.docLookup = {};
-                this.updateDocs(null);
+                const cbs = this.collectionUpdateCbs;
+                this.collectionUpdateCbs = [];
+                this.updateDocs(cbs);
                 return;
             }
-            GET(`/journey/collection?journey_id=${curId}`).then((result) => {
+            if (this.collectionId === curId) {
+                return;
+            }
+            this.collectionId = curId;
+            GET(`/journey/collection?journey_id=${curId}`, true, true).then((result) => {
+                if (this.collectionId !== null && this.collectionId !== curId) {
+                    return;
+                }
+                this.collectionId = null;
                 const docs = result['docs'];
                 const newLookup = {};
                 const appDb = this.appDb;
@@ -135,9 +206,22 @@
                 });
                 this.docs = docs;
                 this.docLookup = newLookup;
-                this.updateDocs(cb);
+                const cbs = this.collectionUpdateCbs;
+                this.collectionUpdateCbs = [];
+                this.updateDocs(cbs);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                this.collectionId = null;
+                if (err && err.status === 401) {
+                    this.docs = [];
+                    this.docLookup = {};
+                    const cbs = this.collectionUpdateCbs;
+                    this.collectionUpdateCbs = [];
+                    this.updateDocs(cbs);
+                    this.updateCurrentJourney(null, '');
+                }
+                console.error(err);
+            });
         }
 
         isDocApprove(docId) {
@@ -148,12 +232,7 @@
             return this.docLookup[`${docId}`] === false;
         }
 
-        confirmJourneyPrompt(allowReport) {
-            const mainInput = this.mainInput;
-            if (mainInput === null) {
-                return;
-            }
-            const userPrompt = mainInput.node().value;
+        updatePrompt(userPrompt, allowReport) {
             const currentId = this.currentId;
             this.updateJourneyDatalist(() => {
                 const [curId, curPrompt] = this.getJourneyByPrompt(userPrompt);
@@ -166,14 +245,23 @@
                 } else if (curPrompt) {
                     PUT(`/journey/create`, {
                         'prompt': curPrompt,
-                    }).then((result) => {
-                        this.updateCurrentJourney(result["journey"], result["prompt"]);
+                    }, true, true).then((result) => {
+                        this.updateCurrentJourney(result['journey'], result['prompt']);
                         this.updateJourneyDatalist();
                     }).catch((err) => console.error(err));
                 } else {
                     this.updateCurrentJourney(null, '');
                 }
             });
+        }
+
+        confirmJourneyPrompt(allowReport) {
+            const mainInput = this.mainInput;
+            if (mainInput === null) {
+                return;
+            }
+            const userPrompt = this.getInputValue();
+            this.updatePrompt(userPrompt, allowReport);
         }
 
         showReport = () => {
@@ -198,6 +286,16 @@
             .catch((err) => console.error(err));
         }
 
+        maybeAddDatalist(sel) {
+            if (this.datalist !== null) {
+                return;
+            }
+            const datalist = sel.addElem('datalist').attrs({
+                'id': 'journey-past',
+            });
+            this.datalist = datalist;
+        }
+
         addJourneyMain(sel) {
             const mainInput = sel.addElem('input')
             .attrs({
@@ -205,8 +303,15 @@
                 'id': `journey-main`,
                 'list': 'journey-past',
             })
+            .on('keydown', () => {
+                const evt = d3.event;
+                if (evt.code === 'Enter' || evt.keyCode === 13) {
+                    this.confirmJourneyPrompt(false);
+                    evt.preventDefault();
+                }
+            })
             .on('change', () => {
-                const value = mainInput.node().value;
+                const value = this.getInputValue();
                 const normPrompt = this.normalizeJourneyPrompt(value);
                 this.updateJourneyMainButton(
                     this.getJourneyByPrompt(normPrompt)[0],
@@ -221,10 +326,7 @@
                 'for': `journey-main`,
             })
             .text("<%- vocab['intro'] %>");
-            const datalist = sel.addElem('datalist').attrs({
-                'id': 'journey-past',
-            });
-            this.datalist = datalist;
+            this.maybeAddDatalist(sel);
             const mainButton = sel.addElem('button')
             .attrs({
                 'type': 'button',
@@ -235,17 +337,30 @@
             this.updateJourneyDatalist();
         }
 
-        updateDocs(cb = null) {
-            const hasJourney = !!this.currentId;
+        hasJourney() {
+            return !!this.currentId && !!this.currentPrompt;
+        }
+
+        updateDocs(cbs) {
+            const hasJourney = this.hasJourney();
             d3.selectAll('div.journey-doc').styles({
                 'display': hasJourney ? null : 'none',
             });
             if (!hasJourney) {
                 return;
             }
-            const shortPrompt = this.getShortPrompt(this.currentId);
-            d3.selectAll('div.journey-doc span span.journey-short')
-            .text(`${shortPrompt}`);
+            const useFull = this.useFullPromptForSelect;
+            d3.selectAll('div.journey-doc span select.journey-short')
+            .addElems('option', 'journey-short-list', this.past)
+            .attrs({
+                'value': (d) => d['id'],
+            })
+            .text((d) => useFull ? d['prompt'] : d['short']);
+            const currentId = this.currentId;
+            d3.selectAll('div.journey-doc span select.journey-short')
+            .each(function () {
+                d3.select(this).node().value = currentId;
+            })
             d3.selectAll('button.journey-btn-approve').classed('journey-btn-active', (d) => {
                 return this.isDocApprove(d.id);
             });
@@ -255,7 +370,7 @@
             d3.selectAll('article.pad').classed('journey-article-inactive', (d) => {
                 return this.isDocDislike(d.id);
             });
-            cb && cb();
+            cbs.forEach((curCb) => curCb());
         }
 
         setDocAction(docId, isApprove) {
@@ -270,7 +385,7 @@
                 'doc_id': docId,
                 'action': action,
                 'journey_id': journeyId,
-            }).then((result) => {
+            }, true, true).then((result) => {
                 this.updateJourneyDocs();
             }).catch((err) => console.error(err));
         }
@@ -278,9 +393,15 @@
         addDocButtons(sel) {
             const doc = sel.addElems('div', 'journey-doc');
             const docSpan = doc.addElem('span');
-            docSpan.addElem('span').text("<%- vocab['doc-begin'] %> '");
-            docSpan.addElem('span').classed('journey-short', true);
-            docSpan.addElem('span').text("': ");
+            docSpan.addElem('span').text("<%- vocab['doc-begin'] %> ");
+            const that = this;
+            docSpan.addElem('select').classed('journey-short', true)
+            .on('change', function() {
+                const curId = d3.select(this)?.node()?.value;
+                if (curId !== null) {
+                    that.updateById(+curId);
+                }
+            });
             doc.addElem('button')
             .classed('journey-btn-approve', true)
             .text("<%- vocab['doc-approve'] %>")

@@ -8,7 +8,7 @@ TimeAgo.addLocale(fr);
 TimeAgo.addLocale(es);
 TimeAgo.addLocale(pt);
 TimeAgo.addDefaultLocale(en);
-const MAX_LENGTH = 40;
+const MAX_LENGTH = 30;
 const ELLIPSIS = '…';
 
 function limitPrompt(prompt) {

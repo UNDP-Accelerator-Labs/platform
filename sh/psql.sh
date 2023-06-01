@@ -2,27 +2,18 @@
 
 cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../" &> /dev/null
 
-SQL=$1
-
-if [ -z "${SQL}" ]; then
-    echo "$0 <sql>"
-    echo "executes the given sql command on the login db from the env file"
-    echo "if the command starts with 'file:' it is interpreted as sql file location"
+if [ \( "$#" == 0 \) -o \( "$1" == "-h" \) -o \( "$1" == "--help" \) ]; then
+    echo "$0 <sql> [...]"
+    echo "executes the given sql query on the login db from the env file"
+    echo "all other arguments are forwarded to psql"
     echo "the password must be typed manually"
     exit 1
 fi
 
+SQL="$1"; shift
+
 source ./sh/env.sh
 
-SQL_FILE="${SQL#file:}"
-
-if [ "${SQL}" == "${SQL_FILE}" ]; then
-    psql \
-        -d "host=${LOGIN_DB_HOST} port=${LOGIN_DB_PORT} dbname=${LOGIN_DB_NAME} user=${LOGIN_DB_USERNAME}" \
-        -c "${SQL}"
-else
-    cat "${SQL_FILE}"
-    psql \
-        -d "host=${LOGIN_DB_HOST} port=${LOGIN_DB_PORT} dbname=${LOGIN_DB_NAME} user=${LOGIN_DB_USERNAME}" \
-        -f "${SQL_FILE}"
-fi
+echo "${SQL}" | psql \
+    -d "host=${LOGIN_DB_HOST} port=${LOGIN_DB_PORT} dbname=${LOGIN_DB_NAME} user=${LOGIN_DB_USERNAME}" \
+    "$@"

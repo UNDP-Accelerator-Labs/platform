@@ -54,21 +54,22 @@ read_var USER_ISO "ISO3 Country" "NUL" 0
 read_var USER_PERM "Permissions" 3 0
 read_var USER_PW "Password" "" 1
 
-PWD=$(pwd)
-TMP_FILE=$(mktemp "${PWD}/tmp.XXXXXX")
-echo "${TMP_FILE}"
-
-cat <<EOF > "${TMP_FILE}"
+SQL=$(cat <<EOF
 INSERT INTO users (iso3, position, name, email, password, rights)
 VALUES (
-    $(quote "${USER_ISO}"),
-    $(quote "${USER_POS}"),
-    $(quote "${USER_NAME}"),
-    $(quote "${USER_EMAIL}"),
-    crypt($(quote "${USER_PW}"), GEN_SALT('bf', 8)),
-    $(quote "${USER_PERM}"));
-EOF
+    :'user_iso',
+    :'user_pos',
+    :'user_name',
+    :'user_email',
+    crypt(:'user_pw', GEN_SALT('bf', 8)),
+    :'user_perm');
+EOF)
 
-./sh/psql.sh "file:${TMP_FILE}"
-
-rm "${TMP_FILE}"
+./sh/psql.sh \
+    "${SQL}" \
+    -v "user_iso=${USER_ISO}" \
+    -v "user_pos=${USER_POS}" \
+    -v "user_name=${USER_NAME}" \
+    -v "user_email=${USER_EMAIL}" \
+    -v "user_pw=${USER_PW}" \
+    -v "user_perm=${USER_PERM}"

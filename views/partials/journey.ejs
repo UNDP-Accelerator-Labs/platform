@@ -2,6 +2,9 @@
     const language = locals.metadata.page.language;
     const vocab = vocabulary['journey'][language];
     const app_db = locals.metadata.site.app_db;
+
+    //const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: <%- JSON.stringify(locals.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
+    //window.location = `./pinned?pinboard=${board_id}`
 %>
 <script type='text/javascript'>
     class Journey {

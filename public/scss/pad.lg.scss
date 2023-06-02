@@ -1063,7 +1063,7 @@ div.document {
 							.inset-location {
 								max-height: calc(300px - 75px - 20px);
 								padding: 0 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-mid-yellow;*/

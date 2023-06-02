@@ -222,7 +222,7 @@ nav.tabs {
 						top: calc(100%);
 						background-color: #FFF;
 						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-						overflow: scroll;
+						overflow: auto;
 						border-top: 1px solid $c-dark-blue;
 						z-index: 100;
 						transition: max-height 0.25s ease-out;
@@ -502,7 +502,7 @@ header {
 											.dropdown {
 												display: none;
 												max-height: 300px;
-												overflow: scroll;
+												overflow: auto;
 
 												button {
 													font-size: $t-mid-small;
@@ -800,7 +800,7 @@ header {
 	}
 
 	#filters {
-		overflow: scroll;
+		overflow: auto;
 
 		.inner {
 			padding: 30px;

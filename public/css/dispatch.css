@@ -820,7 +820,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -1486,7 +1486,7 @@ div.journey button:active {
     border-top: none;
     /*border-top-width: 5px;*/
     z-index: 1000;
-    overflow: scroll;
+    overflow: auto;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .dropdown ul,
   .veil nav.browse-filters form .filters .content-filters .filter .dropdown ul {
@@ -4420,7 +4420,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -4981,7 +4981,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -5202,7 +5202,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -5874,10 +5874,9 @@ div.journey button:active {
   }
   main#mobilize-new form .modal .inner .body menu {
     max-height: 300px;
-    overflow: scroll;
+    overflow: auto;
     box-shadow: inset 0 5px 5px rgba(100, 100, 100, 0.1);
     border-top: 1px solid #969696;
-    overflow: scroll;
   }
   main#mobilize-new form .modal .inner .body menu li {
     display: flex;
@@ -6928,7 +6927,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -7594,7 +7593,7 @@ div.journey button:active {
     border-top: none;
     /*border-top-width: 5px;*/
     z-index: 1000;
-    overflow: scroll;
+    overflow: auto;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .dropdown ul,
   .veil nav.browse-filters form .filters .content-filters .filter .dropdown ul {
@@ -10528,7 +10527,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -11089,7 +11088,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -11310,7 +11309,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -11982,10 +11981,9 @@ div.journey button:active {
   }
   main#mobilize-new form .modal .inner .body menu {
     max-height: 300px;
-    overflow: scroll;
+    overflow: auto;
     box-shadow: inset 0 5px 5px rgba(100, 100, 100, 0.1);
     border-top: 1px solid #969696;
-    overflow: scroll;
   }
   main#mobilize-new form .modal .inner .body menu li {
     display: flex;
@@ -13037,7 +13035,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -13700,7 +13698,7 @@ div.journey button:active {
     border-top: none;
     /*border-top-width: 5px;*/
     z-index: 1000;
-    overflow: scroll;
+    overflow: auto;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .dropdown ul,
   .veil nav.browse-filters form .filters .content-filters .filter .dropdown ul {
@@ -16634,7 +16632,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -16936,7 +16934,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -17091,7 +17089,7 @@ div.journey button:active {
     top: calc(100% + 1px);
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -17584,7 +17582,7 @@ div.journey button:active {
     margin-top: -2px;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -17812,7 +17810,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -18671,10 +18669,9 @@ div.journey button:active {
   }
   main#mobilize-new form .modal .inner .body menu {
     max-height: 300px;
-    overflow: scroll;
+    overflow: auto;
     box-shadow: inset 0 5px 5px rgba(100, 100, 100, 0.1);
     border-top: 1px solid #969696;
-    overflow: scroll;
   }
   main#mobilize-new form .modal .inner .body menu li {
     display: flex;
@@ -19461,7 +19458,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -19571,7 +19568,7 @@ div.journey button:active {
   .modal.longlist .inner ul {
     width: 100%;
     max-height: 500px;
-    overflow: scroll;
+    overflow: auto;
   }
   .modal.longlist .inner ul li.filter {
     position: fixed;
@@ -19882,7 +19879,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     border-top: 1px solid #005687;
     z-index: 100;
     transition: max-height 0.25s ease-out;
@@ -20186,7 +20183,7 @@ div.journey button:active {
   header .inner nav#site-title .inner .save .dropdown ul li .dropdown ul li .dropdown {
     display: none;
     max-height: 300px;
-    overflow: scroll;
+    overflow: auto;
   }
   header .inner nav#site-title .inner .create .dropdown ul li .dropdown ul li .dropdown button,
   header .inner nav#site-title .inner .save .dropdown ul li .dropdown ul li .dropdown button {
@@ -20413,7 +20410,7 @@ div.journey button:active {
     border-right: 1px dotted #969696;
   }
   .sidebar > .inner #filters {
-    overflow: scroll;
+    overflow: auto;
   }
   .sidebar > .inner #filters .inner {
     padding: 30px;
@@ -20843,7 +20840,7 @@ div.journey button:active {
     border-top: none;
     /*border-top-width: 5px;*/
     z-index: 1000;
-    overflow: scroll;
+    overflow: auto;
   }
   .veil nav.browse-filters form .filters .meta-filters .filter .dropdown ul,
   .veil nav.browse-filters form .filters .content-filters .filter .dropdown ul {
@@ -24264,7 +24261,7 @@ div.journey button:active {
   div.document main#mobilization .inner .body .layout .meta-container .inset .inset-location {
     max-height: 205px;
     padding: 0 10px 10px 10px;
-    overflow: scroll;
+    overflow: auto;
   }
   div.document main .inner .body .layout .media-container .inset .inset-location .panel,
   div.document main .inner .body .layout .meta-container .inset .inset-location .panel,
@@ -26705,7 +26702,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -27734,7 +27731,7 @@ div.journey button:active {
     top: calc(100% + 1px);
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -27889,7 +27886,7 @@ div.journey button:active {
     top: calc(100% + 1px);
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 100;
     transition: max-height 0.25s ease-out;
   }
@@ -28382,7 +28379,7 @@ div.journey button:active {
     margin-top: -2px;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -28619,7 +28616,7 @@ div.journey button:active {
     top: 100%;
     background-color: #FFF;
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
+    overflow: auto;
     z-index: 10;
     transition: max-height 0.25s ease-out;
   }
@@ -29551,10 +29548,9 @@ div.journey button:active {
   }
   main#mobilize-new form .modal .inner .body menu {
     max-height: 300px;
-    overflow: scroll;
+    overflow: auto;
     box-shadow: inset 0 5px 5px rgba(100, 100, 100, 0.1);
     border-top: 1px solid #969696;
-    overflow: scroll;
   }
   main#mobilize-new form .modal .inner .body menu li {
     display: flex;

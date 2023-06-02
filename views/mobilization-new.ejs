@@ -37,6 +37,12 @@
 		<!-- THE NEW MOBILIZATION IS A CHILD -->
 			<input type='hidden' name='child' value='true'>
 		<% } %>
+		<% if (locals.metadata.page.query?.pinboard.length > 0) { %>
+		<!-- THE NEW MOBILIZATION IS A DEPTH MOBILIZATION -->
+			<% locals.metadata.page.query?.pinboard.forEach(d => { %>
+				<input type='hidden' name='collection' value='<%- d %>'>
+			<% }) %>
+		<% } %>
 
 		<div class='modal m-1'>
 			<div class='inner'>
@@ -58,15 +64,16 @@
 					</div>
 				</div>
 				<div class='foot'>
-					<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
-					<label for='public-status'></label>
-					<p><%- vocabulary['public mobilization'][language] %></p>
+					<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
+						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+						<label for='public-status'></label>
+						<p><%- vocabulary['public mobilization'][language] %></p>
+					<% } %>
 				</div>
 			</div>
 		</div>
 		<!-- SECOND MODAL: LANGUAGE -->
 		<div class='modal m-2 hide'>
-			<!-- DROPDOWN FOR LANGUAGE: TO DO: ONLY FOR PUBLIC MOBILIZATIONS -->
 			<div class='inner'>
 				<div class='head meta-status <% if (!locals.sourceinfo?.language) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
@@ -204,7 +211,7 @@
 			</div>
 		</div>
 		<!-- TEMPLATE -->
-		<% if (!locals.metadata.page?.query?.copy?.some(d => d === "true")) { %>
+		<% if (!locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
 			<div class='modal m-5 hide'>
 				<div class='inner'>
 					<div class='head meta-status status-0'>
@@ -254,17 +261,23 @@
 				</div>
 			</div>
 		<% } %>
-		<!-- THIRD MODAL: COHORT -->
+		<!-- COHORT -->
 		<div class='modal m-6 hide'>
 			<div class='inner'>
-				<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true"))) { %>status-0<% } else { %>status-1<% } %>'>
+				<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true"))) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back' onclick='prev(this)'>
 							<label><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== 'true'))) { %>disabled<% } %>>
-							<label><%- vocabulary['next'][language] %></label>
-						</button>
+						<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
+							<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true'))) { %>disabled<% } %>>
+								<label><%- vocabulary['next'][language] %></label>
+							</button>
+						<% } else { %> 
+							<button type='submit' class='next'>
+								<label><%- vocabulary['launch'][language] %></label>
+							</button>
+						<% } %>
 					</div>
 				</div>
 
@@ -278,7 +291,7 @@
 							<% locals.cohort.forEach(c => { %>
 								<li class='<% if (locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true")) { %>checked<% } %>'>
 									<div class='hide'>
-										<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== 'true')) { %>checked<% } %>>
+										<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) { %>checked<% } %>>
 									</div>
 									<div class='main'>
 										<label for='c-<%- c.id %>'><%- c.ownername %></label>
@@ -298,7 +311,7 @@
 				</div>
 			</div>
 		</div>
-		<!-- LAST MODAL -->
+		<!-- LAST MODAL: LIMIT CONTRIBUTIONS -->
 		<div class='modal m-7 hide'>
 			<div class='inner'>
 				<div class='head meta-status status-1'>
@@ -314,7 +327,8 @@
 
 				<div class='body center'>
 					<label for='pad-limit' class='inline'><%- vocabulary['limit to'][language] %></label>
-					<input id='pad-limit' type='number' name='pad_limit' value=3 min=1 placeholder='Number of pads.'>
+					<input id='pad-limit' type='number' name='pad_limit' value=1 min=1 placeholder='Number of pads.'>
+					<!-- TO DO: TRANSLATE -->
 					<label for='pad-limit' class='inline small'><%- vocabulary['submissions per contributor'][language] %></label>
 				</div>
 				<div class='foot'>
@@ -452,6 +466,11 @@
 			toggleChecked(this) 
 		})
 	}
+
+	<% if (locals.metadata.page.query.pinboard?.length > 0) { %>
+		// IF THIS IS A DEPTH CAMPAIGN, THEN AUTO-SELECT ALL CONTRIBUTORS
+		d3.select('.m-6 .foot .global-opt button').node().click()
+	<% } %>
 
 </script>
 

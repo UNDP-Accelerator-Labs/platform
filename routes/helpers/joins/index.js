@@ -16,7 +16,7 @@ exports.users = (data, args = []) => {
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		return DB.general.any(`
-			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, cn.name AS country FROM users u 
+			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, cn.name AS country FROM users u 
 			INNER JOIN country_names cn
 				ON u.iso3 = cn.iso3
 			WHERE u.uuid IN ($2:csv)

@@ -138,7 +138,8 @@ CREATE TABLE mobilizations (
 	child BOOLEAN DEFAULT FALSE,
 	pad_limit INT DEFAULT 1,
 	description TEXT,
-	language VARCHAR(9)
+	language VARCHAR(9),
+	collection INT REFERENCES pinboards(id)
 );
 CREATE TABLE mobilization_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

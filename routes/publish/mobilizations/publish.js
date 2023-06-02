@@ -34,7 +34,7 @@ module.exports = (req, res) => {
 			const batch = []
 
 			// TO DO: TO OPTIMIZE THE CRON JOBS, KEEP TRACK OF THE UNIQUE mobilization-job(s) IN CASE THE MOBILIZATION IS ENDED PREMATURELY OR DELETED
-			// IF THE MOBILIZATION IS SCHEDULED FOR A LATER DATE, SO SET UP A CRON JOB
+			// IF THE MOBILIZATION IS SCHEDULED FOR A LATER DATE, SET UP A CRON JOB
 			const now = new Date()
 			if (start_date && start_date >= now) {
 				const min = start_date.getMinutes()
@@ -105,6 +105,7 @@ module.exports = (req, res) => {
 			.then(_ => {
 				const batch = []
 
+				/*
 				if (!public) {
 					// SEND EMAILS TO THOSE WHO ACCEPT NOTIFICATIONS (IN bcc FOR ONLY ONE EMAIL)
 					batch.push(DB.general.any(`
@@ -127,6 +128,8 @@ module.exports = (req, res) => {
 						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))
 				}
+				*/
+				
 				// PUBLISH THE TEMPLATE USED
 				batch.push(t.none(`
 					UPDATE templates 

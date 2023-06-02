@@ -497,34 +497,21 @@ header {
 								.dropdown {
 									display: none;
 									margin-top: -2px;
+								}
+								.dropdown.leaf {
+									overflow: scroll;
+									max-height: 300px;
 
-									ul {
-										li {
-											.dropdown {
-												display: none;
-												max-height: 300px;
-												overflow: scroll;
-
-												button {
-													font-size: $t-mid-small;
-													line-height: 1.5em;
-												}
-											}
-										}
-										li.open {
-											.dropdown {
-												display: block;
-												min-height: 45px;
-												width: 100%;
-											}
-										}
+									button {
+										font-size: $t-mid-small;
+										line-height: 1.5em;
 									}
 								}
 							}
-							li.open {
-								.dropdown {
-									display: block;
-								}
+							li.open > .dropdown {
+								display: block;
+								min-height: 45px;
+								width: 100%;
 							}
 							li:hover > button,
 							li.open > button,
@@ -579,7 +566,7 @@ header {
 					}
 				}
 				.create:not(.open) {
-					li {
+					/*li {
 						.dropdown {
 							ul {
 								li:hover {
@@ -589,11 +576,9 @@ header {
 								}
 							}
 						}
-					}
-					li:hover {
-						.dropdown {
-							display: block;
-						}
+					}*/
+					li:hover > .dropdown {
+						display: block;
 					}
 					li:hover > button,
 					li:hover > form {

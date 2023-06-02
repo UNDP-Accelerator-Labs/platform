@@ -96,7 +96,7 @@ input:-webkit-autofill:active  {
 	left: 0;
 	width: 100vw;
 	height: calc(100vh - 30px);
-	overflow: scroll;
+	overflow: auto;
 	/*background-color: rgba(255,255,255,.75);*/
 	background: repeating-linear-gradient(
 		-45deg,

@@ -12,7 +12,7 @@ div.public-page-header {
 			height: 75vh;
 			width: 100%;
 			margin-top: 30px;
-			overflow: scroll;
+			overflow: auto;
 
 			div.slide {
 				position: relative;
@@ -250,7 +250,7 @@ div.browse {
 						top: 100%;
 						background-color: #FFF;
 						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-						overflow: scroll;
+						overflow: auto;
 						z-index: 10;
 						transition: max-height 0.25s ease-out;
 
@@ -418,7 +418,7 @@ div.browse {
 							top: calc(100% + 1px);
 							background-color: #FFF;
 							box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-							overflow: scroll;
+							overflow: auto;
 							z-index: 100;
 							transition: max-height 0.25s ease-out;
 
@@ -962,7 +962,7 @@ div.browse {
 										margin-top: -2px;
 										background-color: #FFF;
 										box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-										overflow: scroll;
+										overflow: auto;
 										z-index: 10;
 										transition: max-height 0.25s ease-out;
 
@@ -1217,7 +1217,7 @@ div.browse {
 										top: 100%;
 										background-color: #FFF;
 										box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-										overflow: scroll;
+										overflow: auto;
 										z-index: 10;
 										transition: max-height 0.25s ease-out;
 
@@ -1951,7 +1951,7 @@ div.browse.slideshow {
 					flex-flow: row nowrap;
 					height: 100%;
 					scroll-snap-type: x mandatory;
-					overflow: scroll;
+					overflow: auto;
 					margin-top: 0;
 
 					article {

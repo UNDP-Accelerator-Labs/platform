@@ -277,6 +277,8 @@ CREATE TABLE IF NOT EXISTS public.journey
     prompt text COLLATE pg_catalog."default" NOT NULL,
     last_access timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
+    linked_collection_db character varying(40) COLLATE pg_catalog."default",
+    linked_collection_id integer,
     CONSTRAINT journey_pkey PRIMARY KEY (uuid, prompt, id),
     CONSTRAINT id_key UNIQUE (id),
 	CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)

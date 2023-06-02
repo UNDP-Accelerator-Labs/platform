@@ -4491,7 +4491,6 @@ div.journey button:active {
     height: 75vh;
     width: 100%;
     margin-top: 30px;
-    overflow: scroll;
   }
   div.public-page-header div.carousel div.slides div.slide {
     position: relative;
@@ -10600,7 +10599,6 @@ div.journey button:active {
     height: 75vh;
     width: 100%;
     margin-top: 30px;
-    overflow: scroll;
   }
   div.public-page-header div.carousel div.slides div.slide {
     position: relative;
@@ -16707,7 +16705,6 @@ div.journey button:active {
     height: 75vh;
     width: 100%;
     margin-top: 30px;
-    overflow: scroll;
   }
   div.public-page-header div.carousel div.slides div.slide {
     position: relative;
@@ -18418,7 +18415,6 @@ div.journey button:active {
     flex-flow: row nowrap;
     height: 100%;
     scroll-snap-type: x mandatory;
-    overflow: scroll;
     margin-top: 0;
   }
   div.browse.slideshow main .inner section .layout article {
@@ -19744,7 +19740,6 @@ div.journey button:active {
     width: 100%;
     padding-bottom: 15px;
     scroll-snap-type: x mandatory;
-    overflow: scroll;
   }
   nav.tabs .inner div.lg menu li,
   nav.tabs .inner div.lg ul li {
@@ -25998,7 +25993,6 @@ div.journey button:active {
     flex-flow: row nowrap;
     height: 100%;
     scroll-snap-type: x mandatory;
-    overflow: scroll;
   }
   div.document.slideshow main#pad > .inner .meta-info {
     margin-bottom: 0;
@@ -27185,7 +27179,6 @@ div.journey button:active {
     height: 100vh;
     width: 100%;
     padding: 60px 0 120px 0;
-    overflow: scroll;
     box-sizing: border-box;
   }
   div.public-page-header div.carousel div.slides div.slide {
@@ -29261,7 +29254,6 @@ div.journey button:active {
     flex-flow: row nowrap;
     height: 100%;
     scroll-snap-type: x mandatory;
-    overflow: scroll;
     margin-top: 0;
   }
   div.browse.slideshow main .inner section .layout article {

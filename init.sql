@@ -293,3 +293,5 @@ CREATE TABLE IF NOT EXISTS public.journey_docs
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE IF EXISTS public.users
+    ADD COLUMN confirmed_feature_journey timestamp with time zone;

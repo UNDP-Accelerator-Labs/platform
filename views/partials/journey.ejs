@@ -136,7 +136,7 @@
                 return;
             }
             this.listUpdateActive = true;
-            GET('/journey/list?lang=<%- language %>', true, true).then((result) => {
+            GET('/journey/list?lang=<%- language %>', true, true, true).then((result) => {
                 this.listUpdateActive = false;
                 const journeys = result['journeys'];
                 this.past = journeys;
@@ -190,7 +190,7 @@
                 return;
             }
             this.collectionId = curId;
-            GET(`/journey/collection?journey_id=${curId}`, true, true).then((result) => {
+            GET(`/journey/collection?journey_id=${curId}`, true, true, true).then((result) => {
                 if (this.collectionId !== null && this.collectionId !== curId) {
                     return;
                 }
@@ -245,7 +245,7 @@
                 } else if (curPrompt) {
                     PUT(`/journey/create`, {
                         'prompt': curPrompt,
-                    }, true, true).then((result) => {
+                    }, true, true, true).then((result) => {
                         this.updateCurrentJourney(result['journey'], result['prompt']);
                         this.updateJourneyDatalist();
                     }).catch((err) => console.error(err));
@@ -385,7 +385,7 @@
                 'doc_id': docId,
                 'action': action,
                 'journey_id': journeyId,
-            }, true, true).then((result) => {
+            }, true, true, true).then((result) => {
                 this.updateJourneyDocs();
             }).catch((err) => console.error(err));
         }

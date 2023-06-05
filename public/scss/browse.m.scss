@@ -913,6 +913,20 @@ div.browse {
 									line-height: 1.5em;
 									margin-bottom: 10px;
 								}
+								.meta-tree {
+									display: flex;
+									align-items: center;
+
+									.meta-versiontree {
+										a {
+											img {
+												width: 30px;
+												height: 30px;
+												cursor: pointer;
+											}
+										}
+									}
+								}
 								.meta-mobilization,
 								.meta-template,
 								.meta-followup,

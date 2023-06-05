@@ -4,6 +4,7 @@ CREATE EXTENSION IF NOT EXISTS "citext";
 CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE EXTENSION IF NOT EXISTS dblink;
 CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS ltree;
 
 -- CREATE TABLE contributors (
 -- 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
@@ -57,9 +58,12 @@ CREATE TABLE pads (
 	owner uuid,
 	template INT REFERENCES templates(id) DEFAULT NULL,
 	-- published BOOLEAN DEFAULT FALSE,
-	source INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE
+	source INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	version ltree
 	-- review_status INT DEFAULT 0
 );
+CREATE INDEX version_idx ON pads USING GIST (version);
+
 CREATE TABLE files (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	name VARCHAR(99),
@@ -139,8 +143,11 @@ CREATE TABLE mobilizations (
 	pad_limit INT DEFAULT 1,
 	description TEXT,
 	language VARCHAR(9),
-	collection INT REFERENCES pinboards(id)
+	collection INT REFERENCES pinboards(id),
+	version ltree
 );
+CREATE INDEX version_idx ON mobilizations USING GIST (version);
+
 CREATE TABLE mobilization_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,

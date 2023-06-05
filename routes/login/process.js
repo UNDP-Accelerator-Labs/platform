@@ -1,4 +1,4 @@
-const { app_languages, modules, DB } = include('config/')
+const { app_languages, modules, app_suite, DB } = include('config/')
 const { datastructures } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { referer, host } = req.headers || {}
 	const { path } = req || {}
-
+	
 	if (token) {
 		// VERIFY TOKEN
 		const { uuid, rights } = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })

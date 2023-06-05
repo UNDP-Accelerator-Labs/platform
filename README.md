@@ -18,10 +18,6 @@ The deployment actions are defined in the `.github/workflows` folder of each dep
 
 ## Getting started
 
-Create a `.env` file from the `template.env` with the appropriate credentials.
-(If the env file is other than `.env` you can specify the path via
-`ENV=<pathtoenv> make <command>` on all make commands)
-
 To set up the code locally, follow these steps:
 
 1. Clone the repository.
@@ -31,7 +27,9 @@ To set up the code locally, follow these steps:
 5. Make sure you have Node.js installed. Use the `node --version` command to check your version.
 6. Install the required dependencies using either `npm install` or `yarn install`.
 7. Initialize the `init.sql` file or create your database from a dump file if available.
-8. Copy `template.env` to `.env` and set the environment variables.
+8. Copy `template.env` to `.env` and set the environment variables and the appropriate credentials.
+    (If the env file is other than `.env` you can specify the path via
+    `ENV=<pathtoenv> make <command>` on all make commands)
 9. Update the configuration in `config/edit/index.js` if needed.
 
 ## Run the servers

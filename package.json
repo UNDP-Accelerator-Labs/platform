@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"All is good\" && exit 0",
     "start": "node app.js",
+    "sass": "sass --watch public/scss:public/css",
     "dev": "nodemon app.js"
   },
   "author": "",
@@ -25,6 +26,7 @@
     "express-session": "^1.17.0",
     "file-saver": "^2.0.5",
     "image-size": "^1.0.2",
+    "javascript-time-ago": "^2.5.9",
     "jimp": "^0.16.1",
     "jsonwebtoken": "^8.5.1",
     "mime": "^2.4.5",
@@ -53,6 +55,7 @@
     "pagedjs": "^0.4.0",
     "pagedjs-cli": "^0.3.3",
     "pdfkit": "^0.13.0",
+    "sass": "^1.62.1",
     "socket.io": "^4.5.4"
   }
 }

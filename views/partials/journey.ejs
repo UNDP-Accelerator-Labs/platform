@@ -5,6 +5,17 @@
 
     //const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: < %- JSON.stringify(locals.pads) % >, action: 'insert', object: '< %- object.slice(0, -1) % >' })
     //window.location = `./pinned?pinboard=${board_id}`
+
+    // TODO
+    // - move pinboard to login/global
+    // - use API to fetch globally (
+    //    https://undphqexoacclabsapp01.azurewebsites.net/apis/fetch/pads?output=json&token=<token>
+    //    https://undphqexoacclabsapp01.azurewebsites.net/apis/fetch/pads?output=json&pads=6002&pads=5950
+    //)
+    // - add columns to pinboard and rename to collections
+    // - have a dialog to inform user how to use journey before first time (with ok/consent button)
+    // - link journey to collection
+    //
 %>
 <script type='text/javascript'>
     class Journey {

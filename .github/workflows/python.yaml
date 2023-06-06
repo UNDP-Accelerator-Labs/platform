@@ -36,7 +36,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        make pyinstall PYTHON=python
+        make install-python PYTHON=python
 
     - name: Lint Code (use uppercase TODO, XXX, FIXME, NOTE and explain nopep8)
       run: |

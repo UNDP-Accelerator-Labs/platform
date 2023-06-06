@@ -99,7 +99,7 @@ class DBConnector:
         return [
             clz
             for _, clz in
-            inspect.getmembers(sys.modules["system.db.base"], inspect.isclass)
+            inspect.getmembers(sys.modules["py.db.base"], inspect.isclass)
             if clz is not Base and issubclass(clz, Base)
         ]
 

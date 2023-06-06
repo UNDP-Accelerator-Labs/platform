@@ -3,13 +3,16 @@ from typing import Literal
 
 
 EnvPath = Literal[
-    "CONFIG_PATH",
+    "INVALID",
 ]
 EnvStr = Literal[
-    "API_SERVER_HOST",
+    "LOGIN_DB_NAME",
+    "LOGIN_DB_HOST",
+    "LOGIN_DB_USERNAME",
+    "LOGIN_DB_PASSWORD",
 ]
 EnvInt = Literal[
-    "API_SERVER_PORT",
+    "LOGIN_DB_PORT",
 ]
 
 

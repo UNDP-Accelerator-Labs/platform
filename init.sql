@@ -129,7 +129,7 @@ CREATE TABLE mobilizations (
 	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
 	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	status INT DEFAULT 1, 
+	status INT DEFAULT 1,
 	public BOOLEAN DEFAULT FALSE,
 	start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	end_date TIMESTAMPTZ,
@@ -173,7 +173,7 @@ CREATE TABLE pinboard_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	participant uuid,
-	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE	
+	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
 
@@ -268,3 +268,12 @@ CREATE TABLE "session" (
 WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+-- location cache
+CREATE TABLE IF NOT EXISTS public.location_cache
+(
+    query character varying(40) COLLATE pg_catalog."default" NOT NULL,
+    lat double precision,
+    lon double precision,
+    normalized character varying(40) COLLATE pg_catalog."default",
+    CONSTRAINT location_cache_pkey PRIMARY KEY (query)
+)

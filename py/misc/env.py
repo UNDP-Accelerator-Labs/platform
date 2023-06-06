@@ -6,10 +6,11 @@ EnvPath = Literal[
     "INVALID",
 ]
 EnvStr = Literal[
-    "LOGIN_DB_NAME",
     "LOGIN_DB_HOST",
-    "LOGIN_DB_USERNAME",
+    "LOGIN_DB_NAME",
     "LOGIN_DB_PASSWORD",
+    "LOGIN_DB_USERNAME",
+    "OPENCAGE_API",
 ]
 EnvInt = Literal[
     "LOGIN_DB_PORT",

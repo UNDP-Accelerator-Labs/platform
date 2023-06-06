@@ -52,7 +52,7 @@ read_var USER_NAME "Full Name" "" 0
 read_var USER_EMAIL "Email" "" 0
 read_var USER_POS "Position" "" 0
 read_var USER_ISO "ISO3 Country" "NUL" 0
-read_var USER_PERM "Permissions" 3 0
+read_var USER_PERM "Permissions" 0 0
 read_var USER_PW "Password" "" 1
 
 SQL=$(cat <<EOF

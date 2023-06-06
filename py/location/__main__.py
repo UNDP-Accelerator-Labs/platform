@@ -1,8 +1,8 @@
 import argparse
 import sys
 
-from py.location.spacy import get_locations
-from py.misc.util import python_module
+from py.location.pipeline import extract_locations
+from py.misc.util import json_dump, python_module
 
 
 def parse_args() -> argparse.Namespace:
@@ -21,7 +21,8 @@ def run() -> None:
         text = sys.stdin.read()
     else:
         text = args.text
-    print(list(get_locations(text)))
+    res = extract_locations(text)
+    json_dump(res, sys.stdout)
 
 
 if __name__ == "__main__":

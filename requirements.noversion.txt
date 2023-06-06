@@ -1,8 +1,10 @@
+backoff
 flake8
 flake8-commas
 flake8-isort
 mypy
 numpy
+opencage
 pandas
 pre-commit
 psycopg2

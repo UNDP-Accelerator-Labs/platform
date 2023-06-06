@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 Config = TypedDict('Config', {
     "db": 'DBConfig',
+    "opencage": str,
 })
 
 
@@ -31,6 +32,7 @@ def get_config() -> Config:
             "passwd": envload_str("LOGIN_DB_PASSWORD"),
             "schema": "public",
         },
+        "opencage": envload_str("OPENCAGE_API"),
     }
     CONFIG = config
     return CONFIG

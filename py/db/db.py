@@ -8,6 +8,8 @@ from typing import Any, Iterator, Type, TYPE_CHECKING, TypedDict
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
+from py.config import get_config
+
 
 if TYPE_CHECKING:
     from py.db.base import Base
@@ -135,3 +137,15 @@ class DBConnector:
 
     def upsert(self, table: Type['Base']) -> Any:
         return pg_insert(table)
+
+
+DB_MAIN: DBConnector | None = None
+
+
+def get_db() -> DBConnector:
+    global DB_MAIN
+
+    if DB_MAIN is None:
+        config = get_config()
+        DB_MAIN = DBConnector(config["db"])
+    return DB_MAIN

@@ -66,7 +66,7 @@
 					/*border-bottom: 1px solid #FFF;*/
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					color: $c-dark-blue;
 				}
 				label[for=search-field] {
@@ -84,8 +84,8 @@
 					transform: translateY(5px);
 				}
 				input:-webkit-autofill,
-				input:-webkit-autofill:hover, 
-				input:-webkit-autofill:focus, 
+				input:-webkit-autofill:hover,
+				input:-webkit-autofill:focus,
 				input:-webkit-autofill:active  {
 					-webkit-box-shadow: 0 0 0 40px #FFF inset !important;
 					-webkit-text-fill-color: $c-dark-blue !important;
@@ -209,7 +209,7 @@
 							ul {
 								width: 100%;
 								/*padding-bottom: 5px;*/
-								
+
 								li {
 									position: relative;
 									display: flex;
@@ -240,7 +240,7 @@
 								}
 								li.active {
 									background-color: $c-light-blue;
-									
+
 									label {
 										color: #FFF;
 									}
@@ -285,7 +285,7 @@
 						}
 					}
 
-					
+
 
 
 
@@ -304,7 +304,7 @@
 						}
 						.active {
 							margin-bottom: 10px;
-							
+
 							.tag {
 								display: inline-block;
 								margin: 5px 5px 0 0;
@@ -393,7 +393,7 @@
 
 		.handle {
 			cursor: w-resize;
-			
+
 			div {
 				cursor: w-resize;
 			}

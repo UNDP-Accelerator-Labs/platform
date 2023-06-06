@@ -69,7 +69,9 @@ exports.metafields = [
 ]
 // DESIRED ENGAGEMENT TYPES
 	// OPTIONS: ['like', 'dislike', 'comment']
-exports.engagementtypes = ['like', 'dislike', 'comment']
+exports.engagementtypes = ['like', 'dislike', 'comment'];
+
+exports.fixed_uuid = null;
 
 // COLORS
 exports.colors = {

@@ -2,7 +2,7 @@
 	position: relative;
 	display: block;
 	float: left;
-	
+
 	width: calc(100vw - 60px);
 	padding: 45px 30px 0 30px;
 	background-color: #FFF;
@@ -23,7 +23,7 @@
 					margin: 0 0 0 auto;
 					text-align: center;
 					z-index: 100;
-	
+
 					button {
 						height: 45px;
 						padding: 0 15px;
@@ -81,7 +81,7 @@
 				position: relative;
 				width: 100%;
 				margin-bottom: 30px;
-				
+
 				.return {
 					display: block;
 					margin-bottom: 15px;
@@ -106,7 +106,7 @@
 						width: 100%;
 						min-height: 65px;
 						padding: 10px;
-						
+
 						background: repeating-linear-gradient(
 							45deg,
 							transparent,
@@ -222,7 +222,7 @@
 									display: inline-block;
 									vertical-align: middle;
 									width: 33%;
-									
+
 									input[type=text] + label {
 										width: 100%;
 
@@ -252,7 +252,7 @@
 
 										menu {
 											width: 100%;
-											
+
 											li {
 												width: 100%;
 												margin: 0;

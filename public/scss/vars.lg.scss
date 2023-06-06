@@ -97,7 +97,7 @@ html, body {
 					border-bottom: 1px solid $c-light-grey;
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					resize: none;
 					box-sizing: border-box;
 				}
@@ -190,7 +190,7 @@ html, body {
 
 						menu {
 							width: 100%;
-							
+
 							li {
 								display: inline-block;
 								width: 100%;
@@ -213,7 +213,7 @@ html, body {
 									transform: none;
 									pointer-events: all;
 									cursor: pointer;
-									
+
 									.count {
 										float: right;
 										color: $c-light-grey;

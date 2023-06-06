@@ -24,6 +24,7 @@ help:
 	@echo "git-check	ensures no git visible files have been altered"
 	@echo "run-web	runs the webserver"
 	@echo "run-sass	runs the sass compiler"
+	@echo "all-python-apps	list all python entry points"
 
 export LC_ALL=C
 export LANG=C
@@ -124,3 +125,9 @@ run-web:
 
 run-sass:
 	CMD=sass ./sh/run.sh
+
+all-python-apps:
+	./sh/findpy.sh \
+	| xargs grep '__name__ == "__main__"' \
+	| cut -d: -f1 \
+	| sed -e 's/^.\///' -e 's/\/__main__.py$$//' -e 's/.py$$//'

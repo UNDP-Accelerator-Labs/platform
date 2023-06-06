@@ -61,7 +61,9 @@ To interactively insert a user into the login db.
 
 ## Setup Python
 
-In order to setup python run:
+In order to setup python install `python >= 3.10` and `conda`.
+Create a new environment and activate it.
+Then run:
 ```
 make install-python
 ```

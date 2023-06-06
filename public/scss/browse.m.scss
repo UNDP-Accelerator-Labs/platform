@@ -130,7 +130,7 @@ div.browse {
 					border: none;
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					line-height: 1.5em;
 					color: $c-dark-blue;
 				}
@@ -154,8 +154,8 @@ div.browse {
 					transform: translateY(0);
 				}
 				input:-webkit-autofill,
-				input:-webkit-autofill:hover, 
-				input:-webkit-autofill:focus, 
+				input:-webkit-autofill:hover,
+				input:-webkit-autofill:focus,
 				input:-webkit-autofill:active  {
 					-webkit-box-shadow: 0 0 0 40px #FFF inset !important;
 					-webkit-text-fill-color: $c-dark-blue !important;
@@ -191,7 +191,7 @@ div.browse {
 
 			.global-actions {
 				min-width: 50%;
-				
+
 				.add {
 					display: inline-block;
 					position: relative;
@@ -256,7 +256,7 @@ div.browse {
 
 						menu {
 							width: 100%;
-							
+
 							li {
 								display: inline-block;
 								width: 100%;
@@ -278,7 +278,7 @@ div.browse {
 									transform: none;
 									pointer-events: all;
 									cursor: pointer;
-									
+
 									.count {
 										margin-left: auto;
 										padding-left: 10px;
@@ -359,7 +359,7 @@ div.browse {
 				.l3 {
 					width: 25px;
 					transform: translate(2.5px, 15px)rotate(45deg);
-					transform-origin: center;	
+					transform-origin: center;
 				}
 			}
 			.filters {
@@ -424,7 +424,7 @@ div.browse {
 
 							menu {
 								width: 100%;
-								
+
 								li {
 									width: 100%;
 									margin: 0;
@@ -491,7 +491,7 @@ div.browse {
 	nav:not(.tabs) {
 		width: 100%;
 		margin: 0 0 30px -15px;
-		
+
 		menu,
 		ul  {
 			li {
@@ -551,7 +551,7 @@ div.browse {
 		}
 	}
 
-	main {	
+	main {
 		padding-bottom: 90px;
 
 		.inner {
@@ -612,7 +612,7 @@ div.browse {
 						padding: 15px 0;
 						margin: 0 0 0 auto;
 						text-align: right;
-						
+
 						button {
 							height: 30px;
 							padding: 0 10px;
@@ -669,7 +669,7 @@ div.browse {
 				position: relative;
 				width: 100%;
 				margin: 25px 0 15px 0;
-				
+
 				.return {
 					display: block;
 					margin-bottom: 15px;
@@ -805,7 +805,7 @@ div.browse {
 												menu {
 													width: 100%;
 													border-top: 1px solid $c-light-grey;
-													
+
 													li {
 														width: 100%;
 														margin: 0;
@@ -986,7 +986,7 @@ div.browse {
 										menu {
 											width: 100%;
 											border-top: 1px solid $c-light-grey;
-											
+
 											li {
 												display: inline-block;
 												width: 100%;
@@ -1154,7 +1154,7 @@ div.browse {
 										}
 										a:hover {
 											text-decoration: none;
-											
+
 											h1 {
 												small {
 													text-decoration: underline;
@@ -1177,7 +1177,7 @@ div.browse {
 							.pinboard-group {
 								width: 100%;
 								margin-top: 5px;
-								
+
 								.add {
 									position: relative;
 									width: 100%;
@@ -1240,7 +1240,7 @@ div.browse {
 
 										menu {
 											width: 100%;
-											
+
 											li {
 												display: inline-block;
 												width: 100%;
@@ -1262,7 +1262,7 @@ div.browse {
 													transform: none;
 													pointer-events: all;
 													cursor: pointer;
-													
+
 													.count {
 														margin-left: auto;
 														padding-left: 10px;
@@ -1354,7 +1354,7 @@ div.browse {
 								/*border-bottom: 1px dotted $c-light-grey;*/
 								transition: width .25s;
 								overflow: hidden;
-								
+
 								background: repeating-linear-gradient(
 									45deg,
 									#FFF,
@@ -1626,7 +1626,7 @@ div.browse {
 											pointer-events: none;
 											cursor: default;
 										}
-									
+
 										.dropdown {
 											position: absolute;
 											min-width: 100%;
@@ -1643,7 +1643,7 @@ div.browse {
 											menu {
 												width: 100%;
 												border-top: 1px solid $c-light-grey;
-												
+
 												li {
 													width: 100%;
 													margin: 0;
@@ -2094,7 +2094,7 @@ footer {
 		.inner {
 			display: initial;
 			position: static;
-			
+
 			ul {
 				padding: 0 15px;
 				text-align: center;

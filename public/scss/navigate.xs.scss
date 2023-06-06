@@ -13,7 +13,7 @@ nav#languages {
 		display: flex;
 		justify-content: space-between;
 		width: 100%;
-		
+
 		li {
 			display: inline-block;
 			min-width: 30px;
@@ -121,7 +121,7 @@ button#expand-nav.close {
 	.l3 {
 		width: 25px;
 		transform: translate(17.5px, 27.5px)rotate(45deg);
-		transform-origin: center;	
+		transform-origin: center;
 	}
 }
 nav.tabs {
@@ -200,7 +200,7 @@ nav.tabs {
 					a {
 						display: block;
 					}
-					
+
 					button {
 						position: relative;
 						width: 100%;
@@ -296,7 +296,7 @@ nav.tabs {
 						menu {
 							width: 100%;
 							border-top: 1px solid $c-light-grey;
-							
+
 							li {
 								display: flex;
 								justify-content: center;
@@ -348,7 +348,7 @@ nav.tabs {
 
 		.btn-group {
 			float: right;
-			
+
 			a {
 				display: block;
 				width: 30px;
@@ -416,7 +416,7 @@ header { /* LEFT COlUMN */
 					height: 125px;
 				}
 
-				.create, 
+				.create,
 				.save {
 					position: relative;
 					margin-top: 31px;
@@ -450,7 +450,7 @@ header { /* LEFT COlUMN */
 						ul {
 							width: 100%;
 							border-top: 2px solid $c-dark-blue;
-							
+
 							li {
 								position: relative;
 								background-color: #FFF;
@@ -614,7 +614,7 @@ header { /* LEFT COlUMN */
 		}
 		nav#modules {
 			margin-bottom: 120px;
-			
+
 			menu {
 				list-style: none;
 
@@ -670,7 +670,7 @@ header.open {
 		width: 25%;
 		margin: 5px 0;
 		text-align: center;
-		
+
 		h1 {
 			font-size: $t-main;
 			line-height: 1.5em;
@@ -718,7 +718,7 @@ nav#filters {
 	display: inline-block;
 	vertical-align: top;
 	margin-top: calc(30px + 15px);
-	
+
 	.inner {
 		position: fixed;
 		padding: 15px 30px 15px 5px;

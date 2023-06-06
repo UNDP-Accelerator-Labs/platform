@@ -67,7 +67,7 @@ main#mobilize-new {
 							pointer-events: none;
 							cursor: default;
 						}
-					
+
 						.title {
 							font-weight: 700;
 
@@ -83,7 +83,7 @@ main#mobilize-new {
 						}
 						.global-opt {
 							padding: 0 7px 0 5px;
-							
+
 							input {
 								display: none;
 							}
@@ -169,7 +169,7 @@ main#mobilize-new {
 								padding: 0 5px;
 								text-align: left;
 								cursor: pointer;
-								
+
 								label {
 									/* THE FOLLOWING IS TO COMPENSATE FOR var.lg.css */
 									position: static;
@@ -234,7 +234,7 @@ main#mobilize-new {
 						}
 						li.checked {
 							background-color: $c-light-blue;
-							
+
 							.preview {
 								i {
 									color: #FFF;
@@ -295,8 +295,8 @@ main#mobilize-new {
 						transform: translateY(0px);
 					}
 					input:-webkit-autofill,
-					input:-webkit-autofill:hover, 
-					input:-webkit-autofill:focus, 
+					input:-webkit-autofill:hover,
+					input:-webkit-autofill:focus,
 					input:-webkit-autofill:active  {
 						/*-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;*/
 						-webkit-text-fill-color: $c-dark-blue !important;
@@ -397,7 +397,7 @@ main#mobilize-new {
 					min-height: 30px;
 					margin: 10px 0 0 0;
 					font-size: $t-mid-small;
-					
+
 					input[type=checkbox] {
 						display: none;
 					}
@@ -476,7 +476,7 @@ main#mobilize-existing {
 	width: calc(300px * 4 + 3 * 15px);
 	margin: 125px auto 0 auto;
 	padding:  60px 0 0 0;
-	
+
 	.inner {
 		position: relative;
 		.new {

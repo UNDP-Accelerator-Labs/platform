@@ -4,7 +4,7 @@ const { checklanguage, email: sendemail } = include('routes/helpers/')
 const cron = require('node-cron')
 
 module.exports = (req, res) => {
-	let { title, description, cohort, template, public, start_date, end_date } = req.body || {}
+	let { title, description, source, cohort, template, public, start_date, end_date } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]
 	if (start_date) start_date = new Date(start_date)
@@ -12,6 +12,9 @@ module.exports = (req, res) => {
 	
 	const { uuid, email } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
+
+	// TO DO: SET VERSION OF MOBILIZATION
+
 
 	DB.conn.tx(t => { // INSERT THE NEW MOBILIZATION		
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
@@ -84,6 +87,14 @@ module.exports = (req, res) => {
 						VALUES ($1, $2::INT)
 					;`, [ uuid, id ]))
 				}
+				// SAVE VERSION TREE
+				batch.push(t.none(`
+					UPDATE mobilizations 
+					SET version = source.version || $1::TEXT 
+					FROM (SELECT id, version FROM mobilizations) AS source
+					WHERE mobilizations.id = $1
+						AND source.id = mobilizations.source
+				;`, [ id ]))
 			} else {
 				// AUTOMATICALLY CREATE A PUBLIC PINBOARD FOR THIS MOBILIZATION
 				batch.push(t.one(`

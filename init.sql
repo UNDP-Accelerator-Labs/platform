@@ -39,8 +39,11 @@ CREATE TABLE templates (
 	-- published BOOLEAN DEFAULT FALSE,
 	source INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	slideshow BOOLEAN DEFAULT FALSE,
-	imported BOOLEAN DEFAULT FALSE
+	imported BOOLEAN DEFAULT FALSE,
+	version ltree
 );
+CREATE INDEX version_idx ON templates USING GIST (version);
+
 CREATE TABLE pads (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	title VARCHAR(99),

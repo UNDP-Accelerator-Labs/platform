@@ -943,6 +943,7 @@
 					.attr('src', d => {
 						if (d.is_followup) return '/imgs/icons/i-followup-<%- object.slice(0, -1) %>.svg'
 						else if (d.is_forward) return '/imgs/icons/i-forward-<%- object.slice(0, -1) %>.svg'
+						else if (d.is_copy) return '/imgs/icons/i-copy-<%- object.slice(0, -1) %>.svg'
 						else {
 							<% if (object === 'reviews') { %>return '/imgs/icons/i-pad.svg'
 							<% } else { %>return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'<% } %>
@@ -1012,7 +1013,19 @@
 			metainfo: function (_sel) {
 				const { source, is_followup, is_forward, is_copy, is_child, version_depth } = _sel.datum()
 
-				if (source) var treeinfo = _sel.addElems('div', 'meta meta-tree')
+				if (source) {
+					var treeinfo = _sel.addElems('div', 'meta meta-tree')
+
+					if (version_depth > 1) {
+						const versiontree = treeinfo.addElems('div', 'meta meta-versiontree')
+							.addElems('a')
+							.attr('href', d => `versiontree?nodes=${d.id}`)
+						versiontree.addElems('img')
+							.attr('src', '/imgs/icons/i-versiontree.svg')
+						versiontree.addElems('small')
+							.html(d => d.version_depth)
+					}
+				}
 				if (source && is_followup) {
 					const followup = treeinfo.addElems('div', 'meta meta-followup')
 						.attr('title', d => d.source_title)
@@ -1064,15 +1077,6 @@
 								else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
 							}//, 'target': '_blank'
 						}).html(d => d.source_title)
-				}
-				if (treeinfo && version_depth > 1) {
-					const versiontree = treeinfo.addElems('div', 'meta meta-versiontree')
-						.addElems('a')
-						.attr('href', d => `versiontree?nodes=${d.id}`)
-					versiontree.addElems('img')
-						.attr('src', '/imgs/icons/i-versiontree.svg')
-					versiontree.addElems('small')
-						.html(d => d.version_depth)
 				}
 
 				_sel.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
@@ -1513,6 +1517,7 @@
 					.attr('src', d => {
 						if (d.is_followup) return '/imgs/icons/i-followup-<%- object.slice(0, -1) %>.svg'
 						else if (d.is_forward) return '/imgs/icons/i-forward-<%- object.slice(0, -1) %>.svg'
+						else if (d.is_copy) return '/imgs/icons/i-copy-<%- object.slice(0, -1) %>.svg'
 						else return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'
 					})
 				name.addElems('span')

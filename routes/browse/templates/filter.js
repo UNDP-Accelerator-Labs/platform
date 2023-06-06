@@ -4,7 +4,7 @@ const { parsers } = include('routes/helpers/')
 module.exports = req => {
 	const { uuid, rights, collaborators } = req.session || {}
 	const { object, space } = req.params || {}
-	let { search, status, contributors, countries, templates, mobilizations, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, templates, mobilizations, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
@@ -24,7 +24,7 @@ module.exports = req => {
 
 		let f_space = ''
 		if (space === 'private') f_space = DB.pgp.as.format(`(t.owner IN ($1:csv) AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
-		if (space === 'curated') f_space = DB.pgp.as.format(`
+		else if (space === 'curated') f_space = DB.pgp.as.format(`
 			(t.id IN (
 					SELECT template FROM mobilizations 
 					WHERE child = TRUE 
@@ -34,6 +34,13 @@ module.exports = req => {
 					) 
 				OR $2 > 2) 
 			AND (t.owner NOT IN ($1:csv) OR t.owner IS NULL) AND t.status < 2`, [ collaborators_ids, rights ])
+		else if (space === 'versiontree') {
+			f_space = DB.pgp.as.format(`
+				(t.version @> (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2))) 
+				OR t.version <@ (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2))))
+			`, [ nodes, collaborators_ids, rights ])
+		}
+
 		engagementtypes.forEach(e => {
 			if (space === `${e}s`) f_space = DB.pgp.as.format(`t.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'template' AND type = $2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ uuid, e ])
 		})

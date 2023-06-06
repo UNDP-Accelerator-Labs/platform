@@ -888,7 +888,7 @@ div.browse {
 									display: block;
 									margin-bottom: 10px;
 									font-size: $t-mid-small;
-									line-height: 1.5em;
+									line-height: 1.3em;
 									white-space: pre-line;
 
 									a {
@@ -918,6 +918,8 @@ div.browse {
 									align-items: center;
 
 									.meta-versiontree {
+										margin-right: 10px;
+
 										a {
 											img {
 												width: 30px;
@@ -949,7 +951,8 @@ div.browse {
 								.meta-copy,
 								.meta-child {
 									width: 100%;
-									margin: 10px 0 0 0;
+									/*margin: 10px 0 0 0;*/
+									margin: 0;
 								}
 								.create {
 									position: relative;

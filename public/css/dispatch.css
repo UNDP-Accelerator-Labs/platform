@@ -4857,7 +4857,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     display: block;
     margin-bottom: 10px;
     font-size: 14px;
-    line-height: 1.5em;
+    line-height: 1.3em;
     white-space: pre-line;
   }
   div.browse main .inner section .layout article .inner .body .media-txt a {
@@ -4882,6 +4882,9 @@ div.browse main .inner section .layout article .inner .body .meta-template {
   div.browse main .inner section .layout article .inner .body .meta-tree {
     display: flex;
     align-items: center;
+  }
+  div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree {
+    margin-right: 10px;
   }
   div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a img {
     width: 30px;
@@ -11017,7 +11020,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     display: block;
     margin-bottom: 10px;
     font-size: 14px;
-    line-height: 1.5em;
+    line-height: 1.3em;
     white-space: pre-line;
   }
   div.browse main .inner section .layout article .inner .body .media-txt a {
@@ -11042,6 +11045,9 @@ div.browse main .inner section .layout article .inner .body .meta-template {
   div.browse main .inner section .layout article .inner .body .meta-tree {
     display: flex;
     align-items: center;
+  }
+  div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree {
+    margin-right: 10px;
   }
   div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a img {
     width: 30px;
@@ -17564,7 +17570,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     display: block;
     margin-bottom: 10px;
     font-size: 14px;
-    line-height: 1.5em;
+    line-height: 1.3em;
     white-space: pre-line;
   }
   div.browse main .inner section .layout article .inner .body .media-txt a {
@@ -17589,6 +17595,9 @@ div.browse main .inner section .layout article .inner .body .meta-template {
   div.browse main .inner section .layout article .inner .body .meta-tree {
     display: flex;
     align-items: center;
+  }
+  div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree {
+    margin-right: 10px;
   }
   div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a img {
     width: 30px;
@@ -17617,7 +17626,8 @@ div.browse main .inner section .layout article .inner .body .meta-public,
 div.browse main .inner section .layout article .inner .body .meta-copy,
 div.browse main .inner section .layout article .inner .body .meta-child {
     width: 100%;
-    margin: 10px 0 0 0;
+    /*margin: 10px 0 0 0;*/
+    margin: 0;
   }
   div.browse main .inner section .layout article .inner .body .create {
     position: relative;
@@ -28433,7 +28443,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
     display: block;
     margin-bottom: 10px;
     font-size: 14px;
-    line-height: 1.5em;
+    line-height: 1.3em;
     white-space: pre-line;
   }
   div.browse main .inner section .layout article .inner .body .media-txt a {
@@ -28460,7 +28470,7 @@ div.browse main .inner section .layout article .inner .body .meta-template {
     align-items: center;
   }
   div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree {
-    margin-left: 5px;
+    margin-right: 10px;
   }
   div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a {
     display: flex;
@@ -28502,7 +28512,8 @@ div.browse main .inner section .layout article .inner .body .meta-public,
 div.browse main .inner section .layout article .inner .body .meta-copy,
 div.browse main .inner section .layout article .inner .body .meta-child {
     width: 100%;
-    margin: 10px 0 0 0;
+    /*margin: 10px 0 0 0;*/
+    margin: 0;
   }
   div.browse main .inner section .layout article .inner .body .create {
     position: relative;

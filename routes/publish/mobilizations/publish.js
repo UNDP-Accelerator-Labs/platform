@@ -116,7 +116,7 @@ module.exports = (req, res) => {
 			.then(_ => {
 				const batch = []
 
-				/*
+				
 				if (!public) {
 					// SEND EMAILS TO THOSE WHO ACCEPT NOTIFICATIONS (IN bcc FOR ONLY ONE EMAIL)
 					batch.push(DB.general.any(`
@@ -139,7 +139,7 @@ module.exports = (req, res) => {
 						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))
 				}
-				*/
+				
 				
 				// PUBLISH THE TEMPLATE USED
 				batch.push(t.none(`

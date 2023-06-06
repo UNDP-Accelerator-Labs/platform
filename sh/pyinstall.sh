@@ -46,3 +46,6 @@ else
     echo "installed pytorch. it's probably better if you install it yourself"
     echo "for MacOS follow these instructions: https://developer.apple.com/metal/pytorch/"
 fi
+
+echo "initializing spacy"
+${PYTHON} -m spacy download en_core_web_sm

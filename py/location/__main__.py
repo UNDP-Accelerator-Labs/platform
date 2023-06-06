@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+from py.location.spacy import get_locations
 from py.misc.util import python_module
 
 
@@ -20,7 +21,7 @@ def run() -> None:
         text = sys.stdin.read()
     else:
         text = args.text
-    print(text)
+    print(list(get_locations(text)))
 
 
 if __name__ == "__main__":

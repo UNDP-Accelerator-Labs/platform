@@ -30,7 +30,7 @@ def get_config() -> Config:
             "user": envload_str("LOGIN_DB_USERNAME"),
             "passwd": envload_str("LOGIN_DB_PASSWORD"),
             "schema": "public",
-        }
+        },
     }
     CONFIG = config
     return CONFIG

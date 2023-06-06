@@ -28,7 +28,7 @@ exports.forwardGeocoding = require('./helpers/geo/').forwardcode.render
 // (req, res) => {
 // 	const { locations, list } = req.body || {}
 // 	const { country } = req.session || {}
-	
+
 // 	const promises = geocode(locations, country.lnglat, list, 'forward')
 // 	Promise.all(promises)
 // 	.then(data => res.json(data))
@@ -42,7 +42,7 @@ exports.reverseGeocoding = require('./helpers/geo/').reversecode.render
 // (req, res) => {
 // 	const { locations, list } = req.body || {}
 // 	const { country } = req.session || {}
-	
+
 // 	const promises = geocode(locations, country.lnglat, list, 'reverse')
 // 	Promise.all(promises)
 // 	.then(data => res.json(data))
@@ -135,13 +135,13 @@ exports.reverseGeocoding = require('./helpers/geo/').reversecode.render
 
 exports.process.callapi = (req, res) => {
 	const { uri, method, key, expect } = req.body || {}
-	const headers = { 
-		'Accept': 'application/*', 
-		'Content-Type': 'application/*', 
+	const headers = {
+		'Accept': 'application/*',
+		'Content-Type': 'application/*',
 		'X-Requested-With': 'XMLHttpRequest',
 		'x-access-token': process.env[key]
 	}
-	
+
 	fetch(uri, { method: method, headers: headers })
 		.then(response => {
 			if (expect === 'json') return response.json()
@@ -223,7 +223,7 @@ function compileMobilization (req, res) {
 		return t.batch(batch)
 	}).then(results => {
 		const [ template, pads ] = results
-		
+
 		console.log(template.sections)
 		pads.forEach(d => console.log(d.id, d.title, d.sections))
 		pads.forEach(d => console.log(d.id, d.title, d.sections.map(c => c.structure)))
@@ -254,11 +254,11 @@ exports.process.import = require('./import/').process
 /* =============================================================== */
 exports.process.upload = (req, res) => {
 	const { uuid } = req.session || {}
-	
+
 	const fls = req.files
 	console.log(fls)
 	const promises = fls.map(f => {
-		
+
 		// TO DO: MOVE THIS DOWN TO THE if NO app_storage
 		const basedir = path.join(__dirname, `../public/uploads/`)
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
@@ -267,8 +267,8 @@ exports.process.upload = (req, res) => {
 		const source = path.join(__dirname, `../${f.path}`)
 
 		return new Promise(async resolve => {
-			if (['image/png', 'image/jpg', 'image/jpeg', 'image/jfif', 'image/gif', 'application/octet-stream'].includes(f.mimetype)) { // octet-streram IS FOR IMAGE URLs				
-				
+			if (['image/png', 'image/jpg', 'image/jpeg', 'image/jfif', 'image/gif', 'application/octet-stream'].includes(f.mimetype)) { // octet-streram IS FOR IMAGE URLs
+
 				if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 					// USEFUL GUIDE: https://spin.atomicobject.com/2022/03/25/azure-storage-node-js/
 					const targetdir = path.join('uploads/', uuid)
@@ -334,7 +334,7 @@ exports.process.upload = (req, res) => {
 
 					const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
 					const smtarget = path.join(targetdir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
-					
+
 					// CREATE THE SMALL IMAGE
 					Jimp.read(source, (err, image) => {
 						if (err) console.log(err)
@@ -386,7 +386,7 @@ exports.process.upload = (req, res) => {
 				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
 
 				DB.conn.one(`
-					INSERT INTO files (name, path, contributor) 
+					INSERT INTO files (name, path, contributor)
 					SELECT $1, $2, id FROM contributors WHERE uuid = $3
 					RETURNING id
 				;`, [f.originalname, `/${target.split('public/')[1]}`, uuid])
@@ -426,10 +426,10 @@ exports.process.screenshot = (req, res) => {
 
 		const basedir = path.join(__dirname, `../public/uploads/`)
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
-		
+
 		const dir = path.join(__dirname, `../public/uploads/${req.session.uuid}`)
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
-		
+
 		if (!fs.existsSync(path.join(dir, `${target}.png`))) {
 			new Pageres({ delay: 2, filename: target, format: 'png' })
 				.src(src, ['1280x1024'])
@@ -499,7 +499,7 @@ exports.process.download = (req, res) => {
 			return t.batch(batch)
 		}).then(async results => {
 			const [ template, pads ] = results
-			
+
 
 			function getImg (d) {
 				if (d?.sections) {
@@ -517,10 +517,10 @@ exports.process.download = (req, res) => {
 			const imgs = pads.map(d => getImg(d)).flat().filter(d => d !== null)
 			console.log(imgs)
 
-			const [ structure, entries ] = compileTable(template, pads)			
+			const [ structure, entries ] = compileTable(template, pads)
 			const csv = dumpCSV(structure, entries)
 
-			await fs.writeFileSync(path.join(__dirname, `../tmp/mobilization_${id}_data.csv`), csv, 'utf8')		
+			await fs.writeFileSync(path.join(__dirname, `../tmp/mobilization_${id}_data.csv`), csv, 'utf8')
 			// CODE FROM https://github.com/archiverjs/node-archiver
 			const zippath = path.join(__dirname, `../tmp/mobilization_${id}.zip`)
 			const output = fs.createWriteStream(zippath)
@@ -544,10 +544,10 @@ exports.process.download = (req, res) => {
 				}
 			})
 			archive.on('error', err => console.log(err))
-			
+
 			archive.pipe(output)
 			archive.file(path.join(__dirname, `../tmp/mobilization_${id}_data.csv`), { name: `mobilization_${id}_data.csv` })
-			
+
 			imgs.forEach((d, i) => {
 				console.log(d)
 				// const file = path.join(__dirname, `../public/${d}`)
@@ -576,12 +576,12 @@ exports.process.download = (req, res) => {
 	// 		const max_imgs = results.sort((a, b) => b.imgs.length - a.imgs.length)[0].imgs.length
 
 	// 		const columns = [
-	// 			'id', 
-	// 			'title', 
-	// 			'contributor', 
-	// 			'contribution_date', 
-	// 			'full_text', 
-	// 			'location_JSON', 
+	// 			'id',
+	// 			'title',
+	// 			'contributor',
+	// 			'contribution_date',
+	// 			'full_text',
+	// 			'location_JSON',
 	// 			new Array(5).fill(null).map((d, i) => `SDG_tag_${i + 1}`),
 	// 			new Array(5).fill(null).map((d, i) => `thematic_area_tag_${i + 1}`),
 	// 			new Array(max_imgs).fill(null).map((d, i) => `image_${i + 1}`)
@@ -592,19 +592,19 @@ exports.process.download = (req, res) => {
 	// 			const imgIdx = getImg(d).map(c => `file: img-${imgs.flat().indexOf(c) + 1}`)
 
 	// 			csv += `\n${[
-	// 				d.id, 
-	// 				d.title, 
-	// 				d.contributor, 
-	// 				d.date, 
-	// 				`"${d.full_text.replace(/"/g, '""')}"`, 
-	// 				JSON.stringify(d.location.centerpoints || d.location.centerpoint), 
-	// 				new Array(5).fill(null).map((c, i) => d.sdgs[i] ? d.sdgs[i].toString() : ''), 
+	// 				d.id,
+	// 				d.title,
+	// 				d.contributor,
+	// 				d.date,
+	// 				`"${d.full_text.replace(/"/g, '""')}"`,
+	// 				JSON.stringify(d.location.centerpoints || d.location.centerpoint),
+	// 				new Array(5).fill(null).map((c, i) => d.sdgs[i] ? d.sdgs[i].toString() : ''),
 	// 				new Array(5).fill(null).map((c, i) => d.tags[i] ? d.tags[i].toString() : ''),
 	// 				new Array(max_imgs).fill(null).map((c, i) => imgIdx[i] ? imgIdx[i].toString() : '')
 	// 			].flat().join('\t')}`
 	// 		})
 
-	// 		await fs.writeFileSync(path.join(__dirname, '../tmp/solutions_data.tsv'), csv, 'utf8')		
+	// 		await fs.writeFileSync(path.join(__dirname, '../tmp/solutions_data.tsv'), csv, 'utf8')
 	// 		// CODE FROM https://github.com/archiverjs/node-archiver
 	// 		const zippath = path.join(__dirname, '../tmp/grassroots_solutions.zip')
 	// 		const output = fs.createWriteStream(zippath)
@@ -628,10 +628,10 @@ exports.process.download = (req, res) => {
 	// 			}
 	// 		})
 	// 		archive.on('error', err => console.log(err))
-			
+
 	// 		archive.pipe(output)
 	// 		archive.file(path.join(__dirname, '../tmp/solutions_data.tsv'), { name: 'solutions_data.tsv' })
-			
+
 	// 		imgs.forEach((d, i) => {
 	// 			const file = path.join(__dirname, `../public/${d}`)
 	// 			archive.file(file, { name: `img-${i + 1}${path.extname(file)}` })
@@ -651,13 +651,13 @@ function extractItem (d = {}, section = null, group = null) {
 	if (d.type === 'embed') return { key: d.instruction, value: d.html && d.html !== '' ? d.html : null, section: section, group: group }
 	if (d.type === 'checklist') return d.options.map(c => { return { key: `${d.instruction}: ${c.name}`, value: c.checked ? 1 : 0, section: section, group: group } })
 	if (d.type === 'radiolist') return { key: d.instruction, value: d.options && d.options.find(c => c.checked) ? d.options.find(c => c.checked).name : null, section: section, group: group }
-	
+
 	if (d.type === 'sdgs') return { key: d.instruction, value: d.sdgs.length ? d.sdgs.join(', ') : null, section: section, group: group }
 	if (d.type === 'tags') return { key: d.instruction, value: d.tags.length ? d.tags.map(c => c.name).join(', ') : null, section: section, group: group }
 	if (['skills', 'methods'].includes(d.type)) return { key: d.instruction, value: d.tags.length ? d.tags.map(c => c.name).join(', ') : null, section: section, group: group }
 	if (d.type === 'datasources') return { key: d.instruction, value: d.tags.length ? d.tags.map(c => c.name).join(', ') : null, section: section, group: group }
 
-	if (d.type === 'group') { 
+	if (d.type === 'group') {
 		if (d.repeat) { // THIS IS A REPEAT GROUP
 			const grouped_items = []
 			for (let i = 0; i < d.repeat; i ++) {
@@ -676,7 +676,7 @@ function extractItem (d = {}, section = null, group = null) {
 						}
 						return obj
 					})
-				}				
+				}
 				grouped_items.push(items.map(c => { // THESE ARE THE ITEMS IN EACH REPEAT GROUP
 					return extractItem(c, section, `${d.instruction} #${i + 1}`)
 				}).flat())
@@ -700,9 +700,9 @@ function compileEntries (sections = [], id = null, title = null, country = null,
 	sections.unshift({ section: null, group: null, key: 'title', value: title })
 	sections.unshift({ section: null, group: null, key: 'id', value: id })
 
-	return { 
+	return {
 		id: id,
-		title: title, 
+		title: title,
 		contributor: `AccLab ${country}`,
 		submitted: submitted,
 		updated: updated,
@@ -729,7 +729,7 @@ function compileTable (template = {}, pads = []) { // TO DO: ISSUE IS HERE
 				entries.push(compileEntries(d.sections.filter((c, j) => !c.repeat || (c.group === repeat_sections_counts[0].group && i + offset_index === j)), d.id, d.title, d.country, d.date, d.update))
 			}
 		})
-	} // else TO DO: IF THERE ARE MULTIPLE REPEAT SECTIONS, THEN WE DO NOT TREAT EACH AS A NEW ENTRY, BUT RATHER AS ADDITIONAL DIMENSIONS 
+	} // else TO DO: IF THERE ARE MULTIPLE REPEAT SECTIONS, THEN WE DO NOT TREAT EACH AS A NEW ENTRY, BUT RATHER AS ADDITIONAL DIMENSIONS
 		// pads.forEach(d => {
 		// 	for (let i = 0; i < repeat_sections_counts[0].count; i ++) {
 		// 		entries.push(compileEntries(d.sections.filter((c, j) => !c.repeat || (c.group === repeat_sections_counts[0].group && i + offset_index === j)), d.id, d.title, d.country, d.date, d.update))
@@ -760,7 +760,7 @@ function dumpCSV (structure, entries) {
 	entries.forEach(d => {
 		csv += `\n${d.sections.map(c => {
 			if (typeof c.value === 'string') {
-				if (c.value.includes(',')) return `"${helpers.stripHTML.call(c.value.replace(/\"/g, '""'))}"` 
+				if (c.value.includes(',')) return `"${helpers.stripHTML.call(c.value.replace(/\"/g, '""'))}"`
 				else if (c.value.match(/\n/)) return `"${helpers.stripHTML.call(c.value.replace(/\"/g, '""'))}"`
 				else return c.value
 			} else return c.value
@@ -776,7 +776,7 @@ exports.process.validate = (req, res) => {
 	const { pad, active, type, message, path } = req.body || {}
 
 	DB.conn.none(`
-		INSERT INTO engagement (contributor, doctype, docid, type, message) 
+		INSERT INTO engagement (contributor, doctype, docid, type, message)
 		VALUES ($1, $2, $3, $4, $5)
 	;`, [ uuid, 'pad', +pad, type, message])
 	.then(result => {

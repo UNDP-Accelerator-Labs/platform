@@ -1,3 +1,4 @@
+=======
 # AccLab Platform
 
 This is a Node.js application that uses Express.js for routing and EJS as the view engine. It interacts with two Postgres databases, where one stores shared information like user sessions and credentials, and the other stores information on pads.
@@ -15,47 +16,48 @@ The deployment actions are defined in the `.github/workflows` folder of each dep
 
 ## Local Setup
 
+## Getting started
+
 To set up the code locally, follow these steps:
 
 1. Clone the repository.
-2. Make sure you have Node.js installed. Use the `node --version` command to check your version.
-3. Install the required dependencies using either `npm install` or `yarn install`.
-4. Install SASS globally using `npm install -g sass`. You will need it to build your SASS files.
-5. Create the two required databases with your preferred names. Note the names and use them accordingly in your environment file.
-6. Initialize the `init.sql` file or create your database from a dump file if available.
-7. Create or update the `template.env` file for your environment variables. Set the appropriate values for the variables listed, including database connection details, API keys, SMTP credentials, and more.
+2. Make sure that all required postgres extensions are installed on your DB.
+3. Create the two required databases with your preferred names. Note the names and use them accordingly in your environment file.
+4. Run the sql files against the postgres databases.
+5. Make sure you have Node.js installed. Use the `node --version` command to check your version.
+6. Install the required dependencies using either `npm install` or `yarn install`.
+7. Initialize the `init.sql` file or create your database from a dump file if available.
+8. Copy `template.env` to `.env` and set the environment variables and the appropriate credentials.
+    (If the env file is other than `.env` you can specify the path via
+    `ENV=<pathtoenv> make <command>` on all make commands)
+9. Update the configuration in `config/edit/index.js` if needed.
 
-```bash
-export database=''
-export port=''
-export host=''
-export user=''
-export password='     '
-export OPENCAGE_API=''
-export ACCLAB_PLATFORM_KEY=''
-export SMTPuser=''
-export SMTPpassword=''
-export GLOBAL_LOGIN_KEY=''
-export APP_SUITE_SECRET=''
-export APP_SECRET=''
-export BACKDOORPW='' 
-export LOGIN_DB_NAME=''
-export LOGIN_DB_PORT=''
-export LOGIN_DB_HOST=''
-export LOGIN_DB_USERNAME=''
-export LOGIN_DB_PASSWORD='     '
-export LOGIN_DB_STRING=''
+## Run the servers
 
-export BLOG_DB_HOST=""
-export BLOG_DB_NAME=""
-export BLOG_DB_PASSWORD=""
-export BLOG_DB_USERNAME=""
+Run:
+```
+source .env
+npm start
+```
+or
+```
+make run-web
 ```
 
+And in another tab (to compile sass):
+```
+npm run sass
+```
 
-8. Run `source template.env` to load all your environment variables.
-9. Run `npm start` to start the application.
-10. Open your browser and navigate to [http://localhost:2000](http://localhost:2000) to access the application.
+Open your browser and navigate to [http://localhost:2000](http://localhost:2000) to access the application.
+
+## Add User
+
+Run:
+```
+make create-user
+```
+To interactively insert a user into the login db.
 
 ## File Structure
 
@@ -67,5 +69,3 @@ The file structure of this project is organized as follows:
 - **config**: Contains platform configuration files.
   - **config/db**: Contains database settings.
   - **config/edit**: Contains platform configurable settings.
-
-Feel free to modify this README file to include any additional information or instructions.

@@ -12,7 +12,6 @@ div.public-page-header {
 			height: 75vh;
 			width: 100%;
 			margin-top: 30px;
-			overflow: scroll;
 
 			div.slide {
 				position: relative;
@@ -104,7 +103,7 @@ div.browse {
 	nav:not(.tabs) {
 		width: 100%;
 		margin: 0 0 30px 0;
-		
+
 		menu,
 		ul  {
 			li {
@@ -164,7 +163,7 @@ div.browse {
 		}
 	}
 
-	main {	
+	main {
 		padding-bottom: 15px;
 
 		.inner {
@@ -228,7 +227,7 @@ div.browse {
 						padding: 15px 0;
 						margin: 0 0 0 auto;
 						text-align: right;
-						
+
 						button {
 							height: 30px;
 							padding: 0 10px;
@@ -285,7 +284,7 @@ div.browse {
 				position: relative;
 				width: 100%;
 				margin: 0 0 15px 0;
-				
+
 				.return {
 					display: block;
 					margin-bottom: 15px;
@@ -416,7 +415,7 @@ div.browse {
 												menu {
 													width: 100%;
 													border-top: 1px solid $c-light-grey;
-													
+
 													li {
 														width: 100%;
 														margin: 0;
@@ -550,14 +549,14 @@ div.browse {
 										top: 100%;
 										background-color: #FFF;
 										box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-										overflow: scroll;
+										overflow: auto;
 										z-index: 10;
 										transition: max-height 0.25s ease-out;
 
 										menu {
 											width: 100%;
 											border-top: 1px solid $c-light-grey;
-											
+
 											li {
 												display: inline-block;
 												width: 100%;
@@ -722,7 +721,7 @@ div.browse {
 										}
 										a:hover {
 											text-decoration: none;
-											
+
 											h1 {
 												small {
 													text-decoration: underline;
@@ -744,7 +743,7 @@ div.browse {
 							.pinboard-group {
 								width: 100%;
 								margin-top: 10px;
-								
+
 								.add {
 									position: relative;
 									width: 100%;
@@ -798,13 +797,13 @@ div.browse {
 										top: 100%;
 										background-color: #FFF;
 										box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-										overflow: scroll;
+										overflow: auto;
 										z-index: 10;
 										transition: max-height 0.25s ease-out;
 
 										menu {
 											width: 100%;
-											
+
 											li {
 												display: inline-block;
 												width: 100%;
@@ -825,7 +824,7 @@ div.browse {
 													transform: none;
 													pointer-events: all;
 													cursor: pointer;
-													
+
 													.count {
 														float: right;
 														color: $c-light-grey;
@@ -897,7 +896,7 @@ div.browse {
 								border-bottom: 1px dotted $c-light-grey;
 								transition: width .25s;
 								overflow: hidden;
-								
+
 								background: repeating-linear-gradient(
 									45deg,
 									#FFF,
@@ -1052,7 +1051,7 @@ div.browse {
 						.meta-sdgs {
 							font-size: $t-small;
 							line-height: 1.5em;
-							
+
 							span {
 								margin-right: 5px;
 								color: $c-light-grey;
@@ -1169,7 +1168,7 @@ div.browse {
 											menu {
 												width: 100%;
 												border-top: 1px solid $c-light-grey;
-												
+
 												li {
 													width: 100%;
 													margin: 0;
@@ -1365,7 +1364,7 @@ div.browse {
 										}
 										a:hover {
 											text-decoration: none;
-											
+
 											h1 {
 												small {
 													text-decoration: underline;
@@ -1430,7 +1429,7 @@ nav.pagination {
 	.inner {
 		display: initial;
 		position: static;
-		
+
 		ul {
 			padding: 0 15px;
 			text-align: center;

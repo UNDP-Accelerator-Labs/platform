@@ -15,7 +15,11 @@ def extract_locations(text: str) -> GeoOutput:
     cache_res = read_geo_cache(set(queries))
     cache_out = []
     worst_state: GeoState = "ok"
-    states = {}
+    states: dict[str, GeoState] = {
+        geo_loc["query"]: geo_state
+        for geo_loc, geo_state in cache_res.values()
+        if geo_loc is not None and geo_state == "cache_hit"
+    }
     for query in get_remain_geo_queries(cache_res.items()):
         geo_res = geo_result(query)
         _, geo_state = geo_res

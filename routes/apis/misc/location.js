@@ -29,6 +29,7 @@ module.exports = (req, res) => {
             if (errs) {
                 console.log(`error in py.location despite success stdout: ${resp} stderr: ${errs}`);
             }
+            res.set('Content-Type', 'application/json');
             res.status(200).send(resp);
         }
     })

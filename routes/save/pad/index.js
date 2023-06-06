@@ -4,7 +4,7 @@ const path = require('path')
 const { BlobServiceClient } = require('@azure/storage-blob')
 
 module.exports = (req, res) => {
-	const { id, tagging, locations, metadata, deletion, mobilization } = req.body || {}
+	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
 	const { uuid } = req.session || {}
 
 	if (!id) { // INSERT OBJECT
@@ -114,6 +114,16 @@ module.exports = (req, res) => {
 					SELECT $1::INT, m.id FROM mobilizations m 
 						WHERE m.id IN ($2::INT, (SELECT source FROM mobilizations WHERE id = $2::INT AND child = TRUE))
 				;`, [ newID, mobilization ]))
+			}
+			// SAVE VERSION TREE
+			if (source && newID) {
+				batch.push(t.none(`
+					UPDATE pads 
+					SET version = source.version || $1::TEXT 
+					FROM (SELECT id, version FROM pads) AS source
+					WHERE pads.id = $1
+						AND source.id = pads.source
+				;`, [ newID ]))
 			}
 			
 			// UPDATE THE TIMESTAMP

@@ -90,6 +90,7 @@ nav.tabs {
 				width: 100%;
 				padding-bottom: 15px;
 				scroll-snap-type: x mandatory;
+				overflow: auto;
 
 				li {
 					position: static;
@@ -496,34 +497,21 @@ header {
 								.dropdown {
 									display: none;
 									margin-top: -2px;
+								}
+								.dropdown.leaf {
+									overflow: auto;
+									max-height: 300px;
 
-									ul {
-										li {
-											.dropdown {
-												display: none;
-												max-height: 300px;
-												overflow: auto;
-
-												button {
-													font-size: $t-mid-small;
-													line-height: 1.5em;
-												}
-											}
-										}
-										li.open {
-											.dropdown {
-												display: block;
-												min-height: 45px;
-												width: 100%;
-											}
-										}
+									button {
+										font-size: $t-mid-small;
+										line-height: 1.5em;
 									}
 								}
 							}
-							li.open {
-								.dropdown {
-									display: block;
-								}
+							li.open > .dropdown {
+								display: block;
+								min-height: 45px;
+								width: 100%;
 							}
 							li:hover > button,
 							li.open > button,
@@ -578,7 +566,7 @@ header {
 					}
 				}
 				.create:not(.open) {
-					li {
+					/*li {
 						.dropdown {
 							ul {
 								li:hover {
@@ -588,11 +576,9 @@ header {
 								}
 							}
 						}
-					}
-					li:hover {
-						.dropdown {
-							display: block;
-						}
+					}*/
+					li:hover > .dropdown {
+						display: block;
 					}
 					li:hover > button,
 					li:hover > form {

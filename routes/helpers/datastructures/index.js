@@ -60,6 +60,7 @@ exports.pagemetadata = (_kwargs) => {
 	// ADD A CALL FOR ALL TEMPLATES (NAME + ID)
 	return conn.tx(t => {
 		const batch = []
+		// TEMPLATE LIST
 		if (modules.some(d => d.type === 'templates' && rights >= d.rights.read)) {
 			batch.push(t.any(`
 				SELECT id, title, owner, status FROM templates
@@ -73,6 +74,7 @@ exports.pagemetadata = (_kwargs) => {
 				return data
 			}).catch(err => console.log(err)))
 		} else batch.push(null)
+		// MOBILIZATIONS LIST (CREATOR)
 		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
 			batch.push(t.any(`
 				SELECT m.id, m.title, m.owner, m.child, m.status,
@@ -88,6 +90,7 @@ exports.pagemetadata = (_kwargs) => {
 				return data
 			}).catch(err => console.log(err)))
 		} else batch.push(null)
+		// MOBILIZATION LIST (PARTICIPANT)
 		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
 			batch.push(t.any(`
 				SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child,
@@ -105,6 +108,7 @@ exports.pagemetadata = (_kwargs) => {
 				return data
 			}).catch(err => console.log(err)))
 		} else batch.push(null)
+		// INFO FROM THE GENERAL DB
 		batch.push(DB.general.task(gt => {
 			const gbatch = []
 			gbatch.push(gt.any(`
@@ -124,13 +128,30 @@ exports.pagemetadata = (_kwargs) => {
 		if (modules.some(d => d.type === 'reviews' && rights >= d.rights.read)) {
 			batch.push(t.any(`
 				SELECT template, language FROM review_templates
-			;`).then())
+			;`))//.then())
+		} else batch.push(null)
+		// PINBOARD LIST
+		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
+			batch.push(t.any(`
+				SELECT pb.id, pb.title, pb.status, 
+					COUNT (pc.pad) AS size,
+					COUNT (DISTINCT (p.owner)) AS contributors
+
+				FROM pinboards pb
+				INNER JOIN pinboard_contributions pc
+					ON pc.pinboard = pb.id
+				INNER JOIN pads p
+					ON pc.pad = p.id
+
+				WHERE pb.owner = $1
+				GROUP BY pb.id
+			;`, [ uuid ]))
 		} else batch.push(null)
 
 		return t.batch(batch)
 		.catch(err => console.log(err))
 	}).then(results => {
-		let [ templates, mobilizations, participations, languagedata, review_templates ] = results
+		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards ] = results
 		let [ languages, speakers ] = languagedata
 
 		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
@@ -195,7 +216,8 @@ exports.pagemetadata = (_kwargs) => {
 				templates,
 				mobilizations,
 				participations,
-				review_templates
+				review_templates,
+				pinboards
 			}
 		}
 		return obj

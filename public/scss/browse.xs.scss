@@ -12,6 +12,7 @@ div.public-page-header {
 			height: 75vh;
 			width: 100%;
 			margin-top: 30px;
+			overflow: auto;
 
 			div.slide {
 				position: relative;
@@ -475,7 +476,7 @@ div.browse {
 									display: block;
 									margin-bottom: 10px;
 									font-size: $t-mid-small;
-									line-height: 1.5em;
+									line-height: 1.3em;
 									white-space: pre-line;
 
 									a {
@@ -499,6 +500,22 @@ div.browse {
 									font-size: $t-small;
 									line-height: 1.5em;
 									margin-bottom: 10px;
+								}
+								.meta-tree {
+									display: flex;
+									align-items: center;
+
+									.meta-versiontree {
+										margin-right: 10px;
+										
+										a {
+											img {
+												width: 30px;
+												height: 30px;
+												cursor: pointer;
+											}
+										}
+									}
 								}
 								.meta-mobilization,
 								.meta-template,

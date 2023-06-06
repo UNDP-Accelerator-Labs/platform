@@ -82,7 +82,7 @@
 			max-height: 400px;
 			margin: 0;
 			padding-top: 20px;
-			overflow: scroll;
+			overflow: auto;
 
 			.container {
 				
@@ -91,7 +91,7 @@
 					position: relative;
 					flex-flow: row nowrap;
 					scroll-snap-type: x mandatory;
-					overflow: scroll;
+					overflow: auto;
 					margin-top: 0;
 					padding-bottom: 75px;
 					grid-gap: 0;

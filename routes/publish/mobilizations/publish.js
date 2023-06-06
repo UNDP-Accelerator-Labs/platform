@@ -4,7 +4,7 @@ const { checklanguage, email: sendemail } = include('routes/helpers/')
 const cron = require('node-cron')
 
 module.exports = (req, res) => {
-	let { title, description, cohort, template, public, start_date, end_date } = req.body || {}
+	let { title, description, source, cohort, template, public, start_date, end_date } = req.body || {}
 	if (title.length > 99) title = `${title.slice(0, 96)}…`
 	if (!Array.isArray(cohort)) cohort = [cohort]
 	if (start_date) start_date = new Date(start_date)
@@ -12,6 +12,9 @@ module.exports = (req, res) => {
 	
 	const { uuid, email } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
+
+	// TO DO: SET VERSION OF MOBILIZATION
+
 
 	DB.conn.tx(t => { // INSERT THE NEW MOBILIZATION		
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
@@ -34,7 +37,7 @@ module.exports = (req, res) => {
 			const batch = []
 
 			// TO DO: TO OPTIMIZE THE CRON JOBS, KEEP TRACK OF THE UNIQUE mobilization-job(s) IN CASE THE MOBILIZATION IS ENDED PREMATURELY OR DELETED
-			// IF THE MOBILIZATION IS SCHEDULED FOR A LATER DATE, SO SET UP A CRON JOB
+			// IF THE MOBILIZATION IS SCHEDULED FOR A LATER DATE, SET UP A CRON JOB
 			const now = new Date()
 			if (start_date && start_date >= now) {
 				const min = start_date.getMinutes()
@@ -84,6 +87,14 @@ module.exports = (req, res) => {
 						VALUES ($1, $2::INT)
 					;`, [ uuid, id ]))
 				}
+				// SAVE VERSION TREE
+				batch.push(t.none(`
+					UPDATE mobilizations 
+					SET version = source.version || $1::TEXT 
+					FROM (SELECT id, version FROM mobilizations) AS source
+					WHERE mobilizations.id = $1
+						AND source.id = mobilizations.source
+				;`, [ id ]))
 			} else {
 				// AUTOMATICALLY CREATE A PUBLIC PINBOARD FOR THIS MOBILIZATION
 				batch.push(t.one(`
@@ -105,6 +116,7 @@ module.exports = (req, res) => {
 			.then(_ => {
 				const batch = []
 
+				
 				if (!public) {
 					// SEND EMAILS TO THOSE WHO ACCEPT NOTIFICATIONS (IN bcc FOR ONLY ONE EMAIL)
 					batch.push(DB.general.any(`
@@ -127,6 +139,8 @@ module.exports = (req, res) => {
 						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))
 				}
+				
+				
 				// PUBLISH THE TEMPLATE USED
 				batch.push(t.none(`
 					UPDATE templates 

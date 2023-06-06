@@ -1118,7 +1118,7 @@ div.document {
 								max-height: calc(300px - 75px - 20px);
 								/*padding: 0 0 10px 10px;*/
 								padding: 5px 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.tag {
 									display: inline-block;
@@ -1151,7 +1151,7 @@ div.document {
 						.inset.template {	/* THIS IS FOR TEMPLATES */
 							div {
 								padding: 0 0 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-light-1;*/
@@ -1688,6 +1688,7 @@ div.document.slideshow {
 		flex-flow: row nowrap;
 		height: 100%;
 		scroll-snap-type: x mandatory;
+		overflow: auto;
 
 		.meta-info {
 			margin-bottom: 0;

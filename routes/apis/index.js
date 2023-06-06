@@ -3,6 +3,7 @@ const files = require('./files/')
 const contributors = require('./contributors/')
 const tags = require('./tags/')
 const tokens = require('./tokens/')
+const misc = require('./misc/')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
@@ -31,6 +32,7 @@ module.exports = (req, res) => {
 		} else if (object === 'files') files(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
 		else if (object === 'tags') tags(req, res)
+		else if (object === 'location') misc.location(req, res)
 		else res.redirect('/module-error')
 	} else if (action === 'request') {
 		if (object === 'token') tokens.generate(req, res)

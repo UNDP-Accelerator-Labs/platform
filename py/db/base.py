@@ -5,9 +5,7 @@ from sqlalchemy.orm import registry
 from sqlalchemy.orm.decl_api import DeclarativeMeta
 
 
-QUERY_MAX_LEN = 40
-RESPONSE_MAX_LEN = 40
-COUNTRY_MAX_LEN = 4
+COUNTRY_MAX_LEN = 5
 
 
 def adapt_numpy_float64(numpy_float64: np.float64) -> AsIs:
@@ -40,11 +38,11 @@ class LocationCache(Base):  # pylint: disable=too-few-public-methods
     __tablename__ = "location_cache"
 
     query = sa.Column(
-        sa.String(QUERY_MAX_LEN),
+        sa.Text(),
         primary_key=True,
         nullable=False,
         unique=True)
     lat = sa.Column(sa.Double)
     lon = sa.Column(sa.Double)
-    normalized = sa.Column(sa.String(RESPONSE_MAX_LEN))
+    normalized = sa.Column(sa.Text())
     country = sa.Column(sa.String(COUNTRY_MAX_LEN))

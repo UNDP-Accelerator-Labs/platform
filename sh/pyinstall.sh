@@ -33,8 +33,8 @@ def get_device() -> torch.device:
 print(f"backend is (cpu|cuda|mps): {get_device()}")
 EOF
 
-if python -c 'import torch;assert torch.__version__.startswith("2.")' &>/dev/null 2>&1; then
-    PYTORCH=$(python -c 'import torch;print(torch.__version__)')
+if ${PYTHON} -c 'import torch;assert torch.__version__.startswith("2.")' &>/dev/null 2>&1; then
+    PYTORCH=$(${PYTHON} -c 'import torch;print(torch.__version__)')
     echo "pytorch available: ${PYTORCH}"
     ${PYTHON} -c "${PY_TORCH_VERIFY}"
 else

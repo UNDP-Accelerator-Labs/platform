@@ -25,12 +25,16 @@ def geo_result(query: str) -> GeoResult:
         results = get_geo().geocode(query)
         if results and len(results):
             result = results[0]
+            comp = result["components"]
+            country = comp.get(
+                "ISO_3166-1_alpha-3",
+                comp.get("county_code", "NUL"))
             res: GeoResponse = {
                 "query": query,
                 "lat": float(result["geometry"]["lat"]),
                 "lon": float(result["geometry"]["lng"]),
                 "normalized": result["formatted"],
-                "country": result["ISO_3166-1_alpha-3"],
+                "country": country,
             }
             return res, "ok"
         return None, "invalid"

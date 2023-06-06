@@ -4,7 +4,7 @@ cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../" &> /dev/null
 
 ARG=$1
 
-if [ ! -z "$ARG" ]; then
+if [ ! -z "${ARG}" ]; then
     echo "$0"
     echo "interactively creates a new user in the login db (as specified in the env file)"
     exit 1

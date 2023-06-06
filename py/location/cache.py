@@ -20,16 +20,21 @@ def read_geo_cache(queries: set[str]) -> dict[str, GeoResult]:
         stmt.where(LocationCache.query.in_(qins))
         for row in conn.execute(stmt):
             qres = row.query.strip()
+            # if (all) values are None the row indicates
+            # that we should *not* use the cache
             if row.normalized is None:
                 res[qres] = (None, "cache_never")
             else:
+                country = f"{row.country}"
+                if len(country) > 4:
+                    country = f"{country[:4]}?"
                 res[qres] = (
                     {
                         "query": qres,
                         "lat": float(row.lat),
                         "lon": float(row.lon),
                         "normalized": f"{row.normalized}",
-                        "country": f"{row.country}",
+                        "country": country,
                     },
                     "cache_hit",
                 )

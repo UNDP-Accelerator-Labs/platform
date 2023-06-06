@@ -14,7 +14,7 @@ def read_geo_cache(queries: set[str]) -> dict[str, GeoResult]:
         stmt = sa.select(
             LocationCache.query,
             LocationCache.lat,  # type: ignore  # FIXME mypy bug?
-            LocationCache.lon,  # type: ignore  # FIXME mypy bug?
+            LocationCache.lng,  # type: ignore  # FIXME mypy bug?
             LocationCache.normalized,
             LocationCache.country)
         stmt.where(LocationCache.query.in_(qins))
@@ -32,7 +32,7 @@ def read_geo_cache(queries: set[str]) -> dict[str, GeoResult]:
                     {
                         "query": qres,
                         "lat": float(row.lat),
-                        "lon": float(row.lon),
+                        "lng": float(row.lng),
                         "normalized": f"{row.normalized}",
                         "country": country,
                     },
@@ -58,7 +58,7 @@ def write_geo_cache(items: Iterable[GeoResult]) -> None:
             stmt = db.upsert(LocationCache).values(
                 query=res["query"],
                 lat=res["lat"],
-                lon=res["lon"],
+                lng=res["lng"],
                 normalized=res["normalized"],
                 country=res["country"])
             stmt = stmt.on_conflict_do_nothing()

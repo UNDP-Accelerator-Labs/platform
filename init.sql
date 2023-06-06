@@ -273,7 +273,7 @@ CREATE TABLE IF NOT EXISTS public.location_cache
 (
     query text COLLATE pg_catalog."default" NOT NULL,
     lat double precision,
-    lon double precision,
+    lng double precision,
     normalized text COLLATE pg_catalog."default",
     country character varying(5) COLLATE pg_catalog."default",
     CONSTRAINT location_cache_pkey PRIMARY KEY (query)

@@ -43,6 +43,6 @@ class LocationCache(Base):  # pylint: disable=too-few-public-methods
         nullable=False,
         unique=True)
     lat = sa.Column(sa.Double)
-    lon = sa.Column(sa.Double)
+    lng = sa.Column(sa.Double)
     normalized = sa.Column(sa.Text())
     country = sa.Column(sa.String(COUNTRY_MAX_LEN))

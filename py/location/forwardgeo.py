@@ -32,7 +32,7 @@ def geo_result(query: str) -> GeoResult:
             res: GeoResponse = {
                 "query": query,
                 "lat": float(result["geometry"]["lat"]),
-                "lon": float(result["geometry"]["lng"]),
+                "lng": float(result["geometry"]["lng"]),
                 "normalized": result["formatted"],
                 "country": country,
             }

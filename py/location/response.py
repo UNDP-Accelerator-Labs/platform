@@ -24,7 +24,7 @@ STATE_ORDER: list[GeoState] = [
 GeoResponse = TypedDict('GeoResponse', {
     "query": str,
     "lat": float,
-    "lon": float,
+    "lng": float,
     "normalized": str,
     "country": str,
 })

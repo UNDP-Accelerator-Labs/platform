@@ -15,6 +15,7 @@
 	@import 'profile.xs';
 	@import 'browse.xs';
 	@import 'mobilize.lg';
+	@import 'orgfooter.lg';
 }
 /* Medium devices (tablets, 768px and up) */
 @media (max-width: 768px) {
@@ -28,6 +29,7 @@
 	@import 'profile.xs';
 	@import 'browse.xs';
 	@import 'mobilize.lg';
+	@import 'orgfooter.lg';
 }
 /* Large devices (desktops, 1024px and up) */
 @media (max-width: 1024px) {
@@ -41,6 +43,7 @@
 	@import 'profile.xs';
 	@import 'browse.m';
 	@import 'mobilize.lg';
+	@import 'orgfooter.lg';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -55,6 +58,7 @@
 	@import 'import.lg';
 	@import 'browse.lg';
 	@import 'mobilize.lg';
+	@import 'orgfooter.lg';
 }
 
 

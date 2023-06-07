@@ -34,7 +34,7 @@ module.exports = async kwargs => {
 		;`, [ full_filters, order, page_content_limit, (page - 1) * page_content_limit ])
 		.then(async pads => {
 			pads = pads.map(d => d.id)
-			padlist = DB.pgp.as.format(pads.length === 0 ? 'NULL' : '($1:csv)', [ pads ])
+			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 			
 			const batch = []
 

@@ -9,11 +9,6 @@ module.exports = async kwargs => {
 	const { object } = req.params || {}
 	
 	const { uuid, rights, collaborators } = req.session || {}
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { uuid, rights, collaborators } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
@@ -24,213 +19,284 @@ module.exports = async kwargs => {
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	const engagement = engagementsummary({ doctype: 'pad', engagementtypes, uuid })
- 
+ 	const current_user = DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ])
+
 	// CONSTRUCT FOLLOW-UPS GRAPH
 	return conn.task(t => {
 		// THE ORDER HERE IS IMPORTANT, THIS IS WHAT ENSURE THE TREE CONSTRUCTION LOOP WORKS
 		return t.any(`
-			SELECT id, source FROM pads 
-			WHERE id IN (SELECT source FROM pads) 
-				OR source IS NOT NULL
-			ORDER BY date ASC
-		;`).then(async results => {
-			const groups = results.filter(d => !d.source).map(d => { return [d.id] })
-			results.filter(d => d.source).forEach(d => {
-				groups.find(c => c.includes(d.source)).push(d.id)
-			})
-			// console.log('check here')
-			// console.log(results.length)
-			// console.log(results)
-			// console.log(groups.length)
-			// console.log(groups)			
-
-			// FOLLOW UP json_agg INSPIRED BY:
-			// https://stackoverflow.com/questions/54637699/how-to-group-multiple-columns-into-a-single-array-or-similar/54638050
-			// https://stackoverflow.com/questions/24155190/postgresql-left-join-json-agg-ignore-remove-null
+			SELECT id FROM pads p
+			WHERE TRUE 
+				$1:raw 
+				AND p.id NOT IN (SELECT review FROM reviews)
+			$2:raw
+			LIMIT $3 OFFSET $4
+		;`, [ full_filters, order, page_content_limit, (page - 1) * page_content_limit ])
+		.then(async pads => {
+			pads = pads.map(d => d.id)
+			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 			
-			return t.any(`
-				SELECT p.id, p.owner, p.title, p.sections, p.template, p.status, p.source,
-					m.id AS mobilization, 
-					m.title AS mobilization_title, m.pad_limit, 
-					t.title AS template_title,
+			const batch = []
 
-					CASE WHEN p.id IN (SELECT pad FROM review_requests)
-						THEN 1
-						ELSE 0
-					END AS review_status,
+			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
 
+			// GET BASIC PAD INFO
+			batch.push(t.any(`
+				SELECT p.id, p.owner, p.title, p.sections, p.template, p.status, p.source, nlevel(p.version) AS version_depth,
 					CASE
 						WHEN AGE(now(), p.date) < '0 second'::interval
 							THEN jsonb_build_object('interval', 'positive', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(p.date, now())), 'hours', EXTRACT(hour FROM AGE(p.date, now())), 'days', EXTRACT(day FROM AGE(p.date, now())), 'months', EXTRACT(month FROM AGE(p.date, now())))
 						ELSE jsonb_build_object('interval', 'negative', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), p.date)), 'hours', EXTRACT(hour FROM AGE(now(), p.date)), 'days', EXTRACT(day FROM AGE(now(), p.date)), 'months', EXTRACT(month FROM AGE(now(), p.date)))
 					END AS date,
 
-					-- CASE WHEN AGE(now(), p.date) < '1 hour'::interval
-					-- 		THEN EXTRACT(minute FROM AGE(now(), p.date))::text || ' minutes ago'
-					-- 	WHEN AGE(now(), p.date) < '1 day'::interval
-					-- 		THEN EXTRACT(hour FROM AGE(now(), p.date))::text || ' hours ago'
-					-- 	WHEN AGE(now(), p.date) < '1 month'::interval
-					-- 		THEN EXTRACT(day FROM AGE(now(), p.date))::text || ' days ago'
-					-- 	ELSE to_char(p.date, 'DD Mon YYYY')
-					-- END AS date,
-
-					CASE WHEN p.source IS NOT NULL
-						THEN (SELECT p2.title FROM pads p2 WHERE p2.id = p.source) 
-						ELSE NULL
-					END AS source_title,
-
-					CASE WHEN p.source IS NOT NULL
-						AND m.id IS NOT NULL
-						AND (SELECT copy FROM mobilizations WHERE id = m.id) = FALSE
-							THEN TRUE
-							ELSE FALSE
-						END AS is_followup,
-
-					CASE WHEN p.source IS NOT NULL
-						AND m.id IS NOT NULL
-						AND (SELECT copy FROM mobilizations WHERE id = m.id) = TRUE
-							THEN TRUE
-							ELSE FALSE
-						END AS is_forward,
-
-					COALESCE(json_agg(json_build_object(
-						'id', fmob.id, 
-						'title', fmob.title, 
-						'source', p.id, 
-						'template', fmob.template,
-						'count', (SELECT COUNT(p2.id) FROM pads p2 
-							INNER JOIN mobilization_contributions mc2 
-								ON p2.id = mc2.pad 
-							WHERE p2.source = p.id 
-							AND mc2.mobilization = fmob.id),
-						'max', $12::INT
-					)) FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = FALSE AND p.status >= 2), '[]') 
-					AS followups,
-
-					COALESCE(json_agg(json_build_object(
-						'id', fmob.id, 
-						'title', fmob.title, 
-						'source', p.id, 
-						'template', fmob.template,
-						'count', (SELECT COUNT(p2.id) FROM pads p2 
-							INNER JOIN mobilization_contributions mc2 
-								ON p2.id = mc2.pad 
-							WHERE p2.source = p.id 
-							AND mc2.mobilization = fmob.id),
-						'max', $12::INT
-					)) FILTER (WHERE fmob.id IS NOT NULL AND fmob.copy = TRUE AND p.status >= 2), '[]') 
-					AS forwards,
-
-					COALESCE(
-						(SELECT m.pad_limit - COUNT (id) FROM pads pp 
-							WHERE pp.owner IN ($2:csv)
-							AND pp.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization = m.id)
-							AND pp.status >= 2  
-						), 1)::INT AS available_publications,
-
-					COALESCE(p.source, p.id) AS group_id,
-
-					-- THESE ARE THE ENGAGEMENT COALESCE STATEMENTS
-					$3:raw, 
-					
 					CASE WHEN p.owner IN ($2:csv)
-						OR $4 > 2
-							THEN TRUE
-							ELSE FALSE
-						END AS editable,
-					
-					-- THESE ARE THE ENGAGEMENT CASE STATEMENTS
-					$5:raw,
+					OR $3 > 2
+						THEN TRUE
+						ELSE FALSE
+					END AS editable
 
-					-- THIS IS THE PINBOARD CASE STATEMENT
-					COALESCE(
-					(SELECT json_agg(json_build_object(
-							'id', pb.id, 
-							'title', pb.title
-						)) FROM pinboards pb
-						INNER JOIN pinboard_contributions pbc
-							ON pbc.pinboard = pb.id
-						WHERE $1:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
-							AND pbc.pad = p.id
-						GROUP BY p.id
-					)::TEXT, '[]')::JSONB
-					AS pinboards
-				
 				FROM pads p
-				
-				LEFT JOIN templates t
-					ON t.id = p.template
-				
-				LEFT JOIN ($6:raw) ce ON ce.docid = p.id
-				
-				LEFT JOIN mobilization_contributions mc
-					ON mc.pad = p.id
-				
-				LEFT JOIN mobilizations m
-					ON m.id = mc.mobilization
-				
-				LEFT JOIN (
-					SELECT id, title, source, template, copy FROM mobilizations
-					WHERE status = 1
-				) fmob
-					ON fmob.source = m.id
-				
-				WHERE TRUE 
-					$7:raw 
-					AND (m.id = (SELECT MAX(mc2.mobilization) FROM mobilization_contributions mc2 WHERE mc2.pad = p.id)
-						OR m.id IS NULL) -- THIS IS IN CASE A PAD IS CONTRIBUTED TO TWO MOBILIZATIONS
-					AND p.id NOT IN (SELECT review FROM reviews)
-				
-				GROUP BY (
-					p.id, 
-					m.id, 
-					m.title, 
-					m.pad_limit,
-					t.title,
-					$8:raw
-				)
-				$9:raw
-				LIMIT $10 OFFSET $11
-			;`, [ 
-				/* $1 */ DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ]),
-				/* $2 */ collaborators_ids, 
-				/* $3 */ engagement.coalesce, 
-				/* $4 */ rights, 
-				/* $5 */ engagement.cases, 
-				/* $6 */ engagement.query, 
-				/* $7 */ full_filters, 
-				/* $8 */ engagement.list, 
-				/* $9 */ order, 
-				/* $10 */ page_content_limit, 
-				/* $11 */ (page - 1) * page_content_limit, 
-				/* $12 */ followup_count 
-			]).then(results => {
-				// REMOVE THE follow_ups AND forwards FOR PADS THAT HAVE ALREADY BEEN FOLLOWED UP FOR A GIVEN MOBILIZATION
+				WHERE p.id IN $1:raw
+			;`, [ padlist, collaborators_ids, rights ])
+			.then(results => {
 				results.forEach(d => {
-					d.followups = d.followups?.filter(c => c.count < followup_count)
-					d.forwards = d.forwards?.filter(c => c.count < followup_count)
-
 					d.img = parsers.getImg(d)
 					d.sdgs = parsers.getSDGs(d)
 					d.tags = parsers.getTags(d)
 					d.txt = parsers.getTxt(d)
 					delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
-
-					// d.publishable = d.status >= 1
 				})
-
-				// IF ALL PADS ARE ALREADY RETRIEVED, THEN GROUP THEM
-				// IF A FOLLOW UP IS RETRIEVED BUT NOT THE SOURCE, LOOK FOR THE SOURCES AND RETRIEVE THEM
-				results.forEach(d => {
-					if (d.source) {
-						const group = groups.find(c => c.includes(d.id))
-						// console.log(`${d.id} is associated with ${group.filter(c => c !== d.id)}`)
-						// console.log(`missing ${group.filter(c => !results.map(b => b.id).includes(c))}`)
-					}
-				})
-
 				return results
+			}).catch(err => console.log(err)))
+			// SOURCE INFORMATION
+			batch.push(t.any(`
+				SELECT p.id, pp.title AS source_title
+				FROM pads p
+				INNER JOIN pads pp
+					ON p.source = pp.id
+				WHERE p.id IN $1:raw
+			;`, [ padlist ]).catch(err => console.log(err)))
+			// REVIEW STATUS
+			batch.push(t.any(`
+				SELECT p.id, 
+					CASE WHEN rr.pad IS NOT NULL
+						THEN 1
+						ELSE 0
+					END AS review_status
+				FROM pads p
+				LEFT JOIN review_requests rr
+					ON p.id = rr.pad
+				WHERE p.id IN $1:raw
+			;`, [ padlist ]).catch(err => console.log(err)))
+			// TEMPLATE INFORMATION
+			batch.push(t.any(`
+				SELECT p.id, t.title AS template_title 
+				FROM templates t
+				INNER JOIN pads p
+					ON p.template = t.id
+				WHERE p.id IN $1:raw
+			;`, [ padlist ]).catch(err => console.log(err)))
+			// MOBILIZATION INFORMATION
+			batch.push(t.any(`
+				SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit 
+				FROM mobilizations m
+				INNER JOIN mobilization_contributions mc
+					ON mc.mobilization = m.id
+				WHERE mc.pad IN $1:raw
+				GROUP BY (mc.pad, m.title, m.pad_limit)
+			;`, [ padlist ]).catch(err => console.log(err)))
+			// PINBOARD INFORMATION
+			batch.push(t.any(`
+				SELECT p.id, json_agg(json_build_object('id', pb.id, 'title', pb.title)) AS pinboards
+				FROM pads p
+				INNER JOIN pinboard_contributions pc
+					ON pc.pad = p.id
+				INNER JOIN pinboards pb
+					ON pb.id = pc.pinboard
+				WHERE p.id IN $1:raw
+					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
+				GROUP BY (p.id)
+			;`, [ padlist, current_user ]).catch(err => console.log(err)))
+			// FOLLOW UP STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
+			batch.push(t.any(`
+				SELECT p.id, 
+					COALESCE((nlevel(p.version) > 1 
+						AND index(p.version, text2ltree(p.id::text)) > 0
+						AND m.copy = FALSE
+					), FALSE) AS is_followup
+				FROM pads p
+				INNER JOIN mobilization_contributions mc
+					ON mc.pad = p.id
+				INNER JOIN mobilizations m
+					ON m.id = mc.mobilization
+				WHERE p.id IN $1:raw
+					-- AND p.source IS NOT NULL
+			;`, [ padlist ]).catch(err => console.log(err)))
+			// FOLLOW UP OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
+			// THE SOURCE OF THE FOLLOW UP MOBILIZATION IS THE MOBILIZATION THAT THE PAD WAS CONTRIBUTED TO
+			batch.push(t.task(t1 => {
+				const batch1 = []
+
+				batch1.push(t1.any(`
+					SELECT p.id AS id, 
+						json_agg(json_build_object(
+							'id', m.id, 
+							'title', m.title, 
+							'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
+							'template', m.template,
+							'count', (
+								SELECT COUNT (pp.id) FROM pads pp
+								INNER JOIN mobilization_contributions mm_cc
+									ON mm_cc.pad = pp.id
+								WHERE p.version @> pp.version
+								AND mm_cc.mobilization = m.id
+							),
+							'max', $2::INT
+						)) AS followups
+					FROM pads p
+					INNER JOIN mobilization_contributions mc
+						ON mc.pad = p.id
+					INNER JOIN mobilizations m
+						ON subpath(m.version, -2, -1)::TEXT = mc.mobilization::TEXT
+					WHERE m.status = 1
+						AND m.copy = FALSE
+						AND p.status >= 2
+						AND p.id IN $1:raw
+					GROUP BY p.id
+				;`, [ padlist, followup_count ]))
+				batch1.push(t1.any(`
+					SELECT p.id AS id, 
+						json_agg(json_build_object(
+							'id', m.id, 
+							'title', m.title, 
+							'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
+							'template', m.template,
+							'count', (
+								SELECT COUNT (pp.id) FROM pads pp
+								INNER JOIN mobilization_contributions mm_cc
+									ON mm_cc.pad = pp.id
+								WHERE p.version @> pp.version
+								AND mm_cc.mobilization = m.id
+							),
+							'max', $2::INT
+						)) AS followups
+					FROM pads p
+					INNER JOIN pinboard_contributions pc
+						ON pc.pad = p.id
+					INNER JOIN pinboards pb
+						ON pb.id = pc.pinboard
+					INNER JOIN mobilizations m
+						ON m.collection = pb.id
+					WHERE m.status = 1
+						AND m.version IS NULL
+						AND p.status >= 2
+						AND p.id IN $1:raw
+					GROUP BY p.id
+				;`, [ padlist, followup_count ]))
+				return t1.batch(batch1)
+				.then(results => {
+					const [ followups, depths ] = results
+					return pads.map(d => {
+						const followup = followups.find(c => c.id === d)?.followups || []
+						const depth = depths.find(c => c.id === d)?.followups || []
+						const obj = {}
+						obj.id = d
+						obj.followups = followup.concat(depth).filter(c => c.count < followup_count)
+						return obj
+					}).filter(d => d.followups.length > 0)
+				}).catch(err => console.log(err))
+			}).catch(err => console.log(err)))
+			// FORWARD STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
+			batch.push(t.any(`
+				SELECT p.id, 
+					COALESCE((nlevel(p.version) > 1 
+						AND index(p.version, text2ltree(p.id::text)) > 0
+						AND m.copy = TRUE
+					), FALSE) AS is_forward
+				FROM pads p
+				INNER JOIN mobilization_contributions mc
+					ON mc.pad = p.id
+				INNER JOIN mobilizations m
+					ON m.id = mc.mobilization
+				WHERE p.id IN $1:raw
+					-- AND p.source IS NOT NULL
+			;`, [ padlist ]).catch(err => console.log(err)))
+			// FORWARD OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
+			batch.push(t.any(`
+				SELECT p.id AS id, 
+					json_agg(json_build_object(
+						'id', m.id, 
+						'title', m.title, 
+						'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
+						'template', m.template,
+						'count', (
+							SELECT COUNT (pp.id) FROM pads pp
+							INNER JOIN mobilization_contributions mm_cc
+								ON mm_cc.pad = pp.id
+							WHERE p.version @> pp.version
+							AND mm_cc.mobilization = m.id
+						),
+						'max', $2::INT
+					)) AS forwards
+				FROM pads p
+				INNER JOIN mobilization_contributions mc
+					ON mc.pad = p.id
+				INNER JOIN mobilizations m
+					ON subpath(m.version, -2, -1)::TEXT = mc.mobilization::TEXT
+				WHERE m.status = 1
+					AND m.copy = TRUE
+					AND p.status >= 2
+					AND p.id IN $1:raw
+				GROUP BY p.id
+			;`, [ padlist, followup_count ])
+			.then(results => {
+				results.forEach(d => {
+					d.forwards = d.forwards.filter(c => c.count < followup_count)
+				})
+				return results
+			}).catch(err => console.log(err)))
+			// DETECT PUBLICATION LIMIT TO DETERMINE WHETHER OR NOT THE PAD CAN BE PUBLISHED
+			batch.push(t.any(`
+				SELECT p.id, COALESCE(m.pad_limit - COUNT(contributed.id), 1)::INT AS available_publications 
+				FROM pads p
+				INNER JOIN mobilization_contributions mc
+					ON mc.pad = p.id
+				INNER JOIN mobilizations m
+					ON m.id = mc.mobilization
+				LEFT JOIN (
+					SELECT pp.id, mm_cc.mobilization FROM pads pp
+					INNER JOIN mobilization_contributions mm_cc
+						ON mm_cc.pad = pp.id
+					WHERE pp.status >= 2
+						AND pp.owner IN ($2:csv)
+				) AS contributed
+					ON contributed.mobilization = m.id
+				WHERE p.id IN $1:raw
+				GROUP BY (p.id, m.pad_limit)
+			;`, [ padlist, collaborators_ids ]).catch(err => console.log(err)))
+			// CURRENT USER ENGAGMENT WITH PADS
+			batch.push(t.any(`
+				SELECT p.id, $2:raw
+				FROM pads p
+				WHERE p.id IN $1:raw
+			;`, [ padlist, engagement.cases ]).catch(err => console.log(err)))
+			// ENGAGEMENT STATS
+			batch.push(t.any(`
+				SELECT p.id, $2:raw
+				FROM pads p
+				LEFT JOIN ($3:raw) ce ON ce.docid = p.id
+				WHERE p.id IN $1:raw
+			;`, [ padlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
+			
+			return t.batch(batch)
+			.then(results => {
+				let data = pads.map(d => { return { id: d } })
+				results.forEach(d => {
+					data = join.multijoin.call(data, [ d, 'id' ])
+				})
+				return data
 			}).catch(err => console.log(err))
+			
 		}).then(results => {
 			// THIS IS A LEGACY FIX FOR THE SOLUTIONS MAPPING PLATFORM
 			// NEED TO CHECK WHETHER THERE IS A CONSENT FORM ATTACHED FOR SOLUTIONS THAT ARE NOT PUBLIC (status = 2)

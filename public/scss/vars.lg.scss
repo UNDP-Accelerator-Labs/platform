@@ -1,4 +1,4 @@
-/*@import 'vars';*/
+@import 'vars';
 
 $t-xxsmall: 8px;
 $t-xsmall: 10px;
@@ -13,7 +13,7 @@ $t-xxxlarge: 90px;
 
 html, body {
 	font-size: $t-main;
-	line-height: 1.5em;
+	line-height: 1.3em;
 }
 .xs,
 .sm,

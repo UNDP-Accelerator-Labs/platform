@@ -1,3 +1,5 @@
+@import 'vars.lg';
+
 div.fixed-bg {
 	position: fixed;
 	top: 0;
@@ -1118,7 +1120,7 @@ div.document {
 								max-height: calc(300px - 75px - 20px);
 								/*padding: 0 0 10px 10px;*/
 								padding: 5px 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.tag {
 									display: inline-block;
@@ -1151,7 +1153,7 @@ div.document {
 						.inset.template {	/* THIS IS FOR TEMPLATES */
 							div {
 								padding: 0 0 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-light-1;*/
@@ -1470,197 +1472,197 @@ div.document {
 				.layout.animate-in {
 					animation: slide-down 1s;
 				}
-				.media-input-group {
-					position: fixed;
-					top: 0;
-					left: calc((100vw - (300px * 3 + 15px * 4)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
-					max-height: 80vh;
-					transform: translateY(90px);
-					border-top: 1px solid $c-light-2;
-					border-left: 1px solid $c-light-2;
-					border-bottom: 1px solid $c-light-2;
-					z-index: 1000;
-
-					.inner {
-						max-height: 80vh;
-						overflow: hidden;
-						background-color: #FFF;
-
-						.btn-group {
-							display: flex;
-							flex-direction: column;
-							outline: none;
-							margin: 10px 0;
-							background-color: #FFF;
-
-							input {
-								display: none;
-							}
-							label,
-							button {
-								position: relative;
-								display: block;
-								float: left;
-								width: 44px;
-								height: 45px;
-								margin: 0 7px;
-								outline: none;
-								border: none;
-								border-radius: 45px;
-								background-color: transparent;
-								font-size: $t-main;
-								line-height: 45px;
-								text-align: center;
-								color: $c-mid-grey;
-								-webkit-touch-callout: none;
-								-webkit-user-select: none;
-								-khtml-user-select: none;
-								-moz-user-select: none;
-								-ms-user-select: none;
-								user-select: none;
-								transition: background-color .25s;
-								cursor: pointer;
-
-								label {
-									content: attr(title);
-									position: absolute;
-									top: 0;
-									left: 100%;
-									min-height: 45px;
-									width: 0;
-									margin: 0 0 0 7.5px;
-									background-color: $c-light-2;
-									border-radius: 0;
-									font-size: $t-small;
-									text-align: left;
-									overflow: hidden;
-									white-space: nowrap;
-									transition: padding .25s, width .25s;
-
-									span {
-										padding: 0 10px;
-									}
-								}
-
-								i {
-									font-size: $t-mid;
-									line-height: 45px;
-								}
-
-								img {
-									width: 20px;
-									vertical-align: middle;
-								}
-							}
-							label:hover,
-							button:hover {
-								background-color: $c-light-2;
-							}
-							label.highlight,
-							button.highlight {
-								background-color: $c-dark-1;
-								color: #FFF;
-							}
-							input:disabled,
-							button:disabled {
-								pointer-events: none;
-								color: $c-light-2;
-
-								img {
-									filter: brightness(2);
-								}
-							}
-							.vertical-separator {
-								width: 59px;
-								height: 0px;
-								/*border-top: 1px dotted $c-light-grey;*/
-								border-top: 1px solid $c-light-2;
-								margin: 10px 0;
-							}
-						}
-					}
-					button.scroll-up,
-					button.scroll-down {
-						position: absolute;
-						display: block;
-						height: 30px;
-						width: 100%;
-						border-radius: 0;
-						margin: 0;
-						background-color: $c-light-2;
-						outline: none;
-						border: none;
-						line-height: 30px;
-						z-index: 1000;
-						cursor: pointer;
-
-						label {
-							display: block;
-							width: 30px;
-							height: 30px;
-							margin: 0 0 0 15px;
-							line-height: 26px;
-							text-align: center;
-							font-size: $t-mid;
-							transform-origin: center;
-							cursor: pointer;
-							color: $c-mid-grey;
-						}
-					}
-					button.scroll-up {
-						top: 0px;
-
-						label {
-							transform: rotate(-90deg);
-						}
-					}
-					button.scroll-down {
-						bottom: 0px;
-
-						label {
-							transform: rotate(90deg);
-						}
-					}
-				}
-				.input-group.overflowing {
-					.inner {
-						.btn-group {
-							margin: 40px 0;
-						}
-					}
-				}
-				.input-group.inline {
-					.inner {
-						.btn-group {
-							position: static;
-							margin-top: 10px;
-							padding-bottom: 0;
-
-							.vertical-separator {
-								margin: 5px 15px;
-							}
-						}
-					}
-				}
-				.input-group.fixed {
-					.inner {
-						.btn-group {
-							display: flex;
-							align-items: center;
-							position: absolute;
-							height: 100%;
-							padding-bottom: 0;
-							pointer-events: none;
-							z-index: 100;
-
-							label {
-								pointer-events: all;
-							}
-						}
-					}
-				}
 			}
 			.foot {
+			}
+		}
+	}
+	.media-input-group {
+		position: fixed;
+		top: 0;
+		left: calc((100vw - (300px * 3 + 15px * 5)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
+		max-height: 80vh;
+		transform: translateY(90px);
+		border-top: 1px solid $c-light-2;
+		border-left: 1px solid $c-light-2;
+		border-bottom: 1px solid $c-light-2;
+		z-index: 1000;
+
+		.inner {
+			max-height: 80vh;
+			overflow: hidden;
+			background-color: #FFF;
+
+			.btn-group {
+				display: flex;
+				flex-direction: column;
+				outline: none;
+				margin: 10px 0;
+				background-color: #FFF;
+
+				input {
+					display: none;
+				}
+				label,
+				button {
+					position: relative;
+					display: block;
+					float: left;
+					width: 44px;
+					height: 45px;
+					margin: 0 7px;
+					outline: none;
+					border: none;
+					border-radius: 45px;
+					background-color: transparent;
+					font-size: $t-main;
+					line-height: 45px;
+					text-align: center;
+					color: $c-mid-grey;
+					-webkit-touch-callout: none;
+					-webkit-user-select: none;
+					-khtml-user-select: none;
+					-moz-user-select: none;
+					-ms-user-select: none;
+					user-select: none;
+					transition: background-color .25s;
+					cursor: pointer;
+
+					label {
+						content: attr(title);
+						position: absolute;
+						top: 0;
+						left: 100%;
+						min-height: 45px;
+						width: 0;
+						margin: 0 0 0 7.5px;
+						background-color: $c-light-2;
+						border-radius: 0;
+						font-size: $t-small;
+						text-align: left;
+						overflow: hidden;
+						white-space: nowrap;
+						transition: padding .25s, width .25s;
+
+						span {
+							padding: 0 10px;
+						}
+					}
+
+					i {
+						font-size: $t-mid;
+						line-height: 45px;
+					}
+
+					img {
+						width: 20px;
+						vertical-align: middle;
+					}
+				}
+				label:hover,
+				button:hover {
+					background-color: $c-light-2;
+				}
+				label.highlight,
+				button.highlight {
+					background-color: $c-dark-1;
+					color: #FFF;
+				}
+				input:disabled,
+				button:disabled {
+					pointer-events: none;
+					color: $c-light-2;
+
+					img {
+						filter: brightness(2);
+					}
+				}
+				.vertical-separator {
+					width: 59px;
+					height: 0px;
+					/*border-top: 1px dotted $c-light-grey;*/
+					border-top: 1px solid $c-light-2;
+					margin: 10px 0;
+				}
+			}
+		}
+		button.scroll-up,
+		button.scroll-down {
+			position: absolute;
+			display: block;
+			height: 30px;
+			width: 100%;
+			border-radius: 0;
+			margin: 0;
+			background-color: $c-light-2;
+			outline: none;
+			border: none;
+			line-height: 30px;
+			z-index: 1000;
+			cursor: pointer;
+
+			label {
+				display: block;
+				width: 30px;
+				height: 30px;
+				margin: 0 0 0 15px;
+				line-height: 26px;
+				text-align: center;
+				font-size: $t-mid;
+				transform-origin: center;
+				cursor: pointer;
+				color: $c-mid-grey;
+			}
+		}
+		button.scroll-up {
+			top: 0px;
+
+			label {
+				transform: rotate(-90deg);
+			}
+		}
+		button.scroll-down {
+			bottom: 0px;
+
+			label {
+				transform: rotate(90deg);
+			}
+		}
+	}
+	.input-group.overflowing {
+		.inner {
+			.btn-group {
+				margin: 40px 0;
+			}
+		}
+	}
+	.input-group.inline {
+		.inner {
+			.btn-group {
+				position: static;
+				margin-top: 10px;
+				padding-bottom: 0;
+
+				.vertical-separator {
+					margin: 5px 15px;
+				}
+			}
+		}
+	}
+	.input-group.fixed {
+		.inner {
+			.btn-group {
+				display: flex;
+				align-items: center;
+				position: absolute;
+				height: 100%;
+				padding-bottom: 0;
+				pointer-events: none;
+				z-index: 100;
+
+				label {
+					pointer-events: all;
+				}
 			}
 		}
 	}
@@ -1688,6 +1690,7 @@ div.document.slideshow {
 		flex-flow: row nowrap;
 		height: 100%;
 		scroll-snap-type: x mandatory;
+		overflow: auto;
 
 		.meta-info {
 			margin-bottom: 0;
@@ -1840,6 +1843,7 @@ footer {
 	clear: both;
 	background-color: $c-light-3;
 	border-top: 1px solid $c-light-2;
+	z-index: 1000;
 
 	.inner {
 		position: relative;

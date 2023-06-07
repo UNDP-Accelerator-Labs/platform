@@ -3,7 +3,7 @@ const { checklanguage, join, datastructures } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { object } = req.params || {}
-	const { public, id: source, copy, child } = req.query || {} 
+	const { public, id: source, copy, child, pinboard } = req.query || {} 
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
@@ -17,6 +17,7 @@ module.exports = (req, res) => {
 		if (public) { // NO NEED FOR A COHORT
 			batch.push(null)
 		} else { // DETERMINE WHAT TYPE OF COHORT IS NEEDED
+			// child IS FOR CHAINING MOBILIZATIONS (IF A GLOBAL CALL IS MADE, MAPPERS CAN MAKE THEIR OWN CALLS AND TIE IT TO THE MAIN CALL)
 			if (source && copy !== 'true' && child !== 'true') { // THIS IS A FOLLOW UP OF A PERVIOUS MOBILIZATION
 				// SO WE WANT TO KEEP AT MOST THE SAME participants
 				batch.push(t.task(t1 => {
@@ -35,9 +36,21 @@ module.exports = (req, res) => {
 								const data = await join.users(results, [ language, 'id' ])
 								data.sort((a, b) => a.country?.localeCompare(b.country))
 								return data
-							})
+							}).catch(err => console.log(err))
 						}
 					})
+				}).catch(err => console.log(err)))
+			} else if (pinboard) {
+				batch.push(t.any(`
+					SELECT DISTINCT (p.owner) AS id FROM pinboard_contributions pc
+					INNER JOIN pads p
+						ON pc.pad = p.id
+					WHERE pc.pinboard = $1
+				;`, [ pinboard ])
+				.then(async results => {
+					const data = await join.users(results, [ language, 'id' ])
+					data.sort((a, b) => a.country?.localeCompare(b.country))
+					return data.filter(d => d.rights >= modules.find(d => d.type === 'pads')?.rights.write)
 				}).catch(err => console.log(err)))
 			} else {
 				if (rights < 3) { // IF THE USER/ HOST IS NOT A sudo ADMIN
@@ -59,7 +72,7 @@ module.exports = (req, res) => {
 						const data = await join.users(results, [ language, 'id' ])
 						data.sort((a, b) => a.country?.localeCompare(b.country))
 						return data
-					}))
+					}).catch(err => console.log(err)))
 				}
 			}
 		}

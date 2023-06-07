@@ -2,16 +2,12 @@ const { app_title, DB, modules, engagementtypes, metafields } = include('config/
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	// if (req.session.uuid) { // USER IS LOGGED IN
 	const { uuid, country, rights, collaborators, public } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, country, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
 
 	let { space, object, instance } = req.params || {}
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
-	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -106,6 +102,12 @@ module.exports = async (req, res) => {
 					`, [ collaborators_ids, rights, pinboard ])
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
 			}
+		}
+		else if (space === 'versiontree') {
+			f_space = DB.pgp.as.format(`
+				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))) 
+				OR p.version <@ (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))))
+			`, [ nodes, collaborators_ids, rights ])
 		}
 		else if (engagementtypes.some(d => space === `${d}s`)) {
 			const type = engagementtypes.find(d => space === `${d}s`)

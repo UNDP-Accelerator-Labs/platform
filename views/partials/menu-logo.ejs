@@ -52,7 +52,7 @@
 															<label><%- vocabulary['templated pad'][language] %></label>
 															<span class='expandable'>></span>
 														</button>
-														<div class='dropdown'>
+														<div class='dropdown leaf'>
 															<ul>
 																<% if (locals.metadata.menu.templates.length > 2) { %>
 																	<li class='filter lg'>
@@ -97,7 +97,7 @@
 														<label><%- vocabulary['campaign pad'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
-													<div class='dropdown'>
+													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.participations
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1).length > 2) { %>
@@ -167,7 +167,7 @@
 														<label><%- vocabulary['copy template'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
-													<div class='dropdown'>
+													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.templates.length > 2) { %>
 																<li class='filter lg'>
@@ -213,7 +213,7 @@
 														<label><%- vocabulary['review template'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
-													<div class='dropdown'>
+													<div class='dropdown leaf'>
 														<ul>
 															<!-- TO DO: FINISH THIS WITH A FILTER MENU -->
 															<!-- <% if (locals.metadata.menu.templates.length > 2) { %>
@@ -286,25 +286,55 @@
 											<li>
 												<a href='/<%- language %>/mobilize/cohort'>
 													<button>
-														<label><%- vocabulary['call for contributions'][language] %></label>
+														<label>
+															<%- vocabulary['call for contributions'][language] %>
+														</label>
 													</button>
 												</a>
 											</li>
-											<li>
-												<a href='/<%- language %>/mobilize/cohort'>
+											<% if (locals.metadata.menu.pinboards.length > 0) { %>
+												<li>
 													<button>
-														<label>Deep dive</label>
+														<label>Depth campaign</label>
 														<!-- TO DO: TRANSLATE -->
+														<span class='expandable'>></span>
 													</button>
-												</a>
-											</li>
+
+													<div class='dropdown leaf'>
+														<ul>
+															<% if (locals.metadata.menu.pinboards.length > 2) { %>
+																<li class='filter lg'>
+																	<input type='text' id='filter-deep-dive-pinbords' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<label for='filter-deep-dive-pinbords'><%- vocabulary['filter'][language](true) %></label>
+																</li>
+																<li class='padding'></li>
+															<% } %>
+															<% locals.metadata.menu.pinboards.forEach(d => { %>
+																<li class='status-<%- d.status %>'>
+																	<!-- TO DO: REROUTE THIS -->
+																	<a href='/<%- language %>/mobilize/cohort?pinboard=<%- d.id %>'>
+																		<button class='wrapable'>
+																			<label><%- d.title %></label>
+																			<div class='sub'>
+																				<%- d.size %> pads from <%- d.contributors %> contributors
+																				<!-- TO DO: TRANSLATE -->
+																			</div>
+																		</button>
+																	</a>
+																</li>
+															<% }) %>
+														</ul>
+													</div>
+												</li>
+											<% } %>
+											
 											<% if (locals.metadata.menu.mobilizations?.filter(d => !d.target_id).length > 0) { %>
 												<li>
 													<button>
 														<label><%- vocabulary['followup mobilization'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
-													<div class='dropdown'>
+													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.filter(d => !d.target_id).length > 2) { %>
 																<li class='filter lg'>
@@ -338,7 +368,7 @@
 														<label><%- vocabulary['copy mobilization'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
-													<div class='dropdown'>
+													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.length > 2) { %>
 																<li class='filter lg'>
@@ -372,7 +402,7 @@
 														<label><%- vocabulary['expand mobilization'][language] %></label>
 														<span class='expandable'>></span>
 													</button>
-													<div class='dropdown'>
+													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.participations
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child).length > 2) { %>
@@ -404,6 +434,7 @@
 													</div>
 												</li>
 											<% } %>
+											
 										</ul>
 									</div>
 								</li>
@@ -418,13 +449,6 @@
 									</button>
 								</li>
 
-								<!-- TO DO: FINISH THIS -->
-								<li>
-									<button>
-										<label>Crowdsource annotations</label>
-										<!-- TO DO: TRANSLATE -->
-									</button>
-								</li>
 							<% } %>
 						<% } %>
 					</ul>

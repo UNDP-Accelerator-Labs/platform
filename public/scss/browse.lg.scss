@@ -1,3 +1,5 @@
+@import 'vars.lg';
+
 div.public-page-header {
 	min-height: 100vh;
 
@@ -13,6 +15,7 @@ div.public-page-header {
 			height: 100vh;
 			width: 100%;
 			padding: 60px 0 120px 0;
+			overflow: auto;
 			box-sizing: border-box;
 
 			div.slide {
@@ -300,9 +303,13 @@ div.public-page-header {
 	}
 }
 
+div.main-content {
+	display: flex;
+}
+
 div.browse {
 	display: block;
-	float: left;
+	/*float: left;*/
 	width: calc(300px * 3 + 15px * 2);
 	padding: 120px 15px 0 15px;
 	background-color: #FFF;
@@ -1097,7 +1104,7 @@ div.browse {
 									display: block;
 									margin-bottom: 10px;
 									font-size: $t-mid-small;
-									line-height: 1.5em;
+									line-height: 1.3em;
 									white-space: pre-line;
 
 									a {
@@ -1122,6 +1129,34 @@ div.browse {
 									line-height: 1.5em;
 									margin-bottom: 10px;
 								}
+								.meta-tree {
+									display: flex;
+									align-items: center;
+
+									.meta-versiontree {
+										margin-right: 10px;
+
+										a {
+											display: flex;
+											align-items: center;
+											text-decoration: none;
+
+											img {
+												display: inline-block;
+												width: 30px;
+												height: 30px;
+												cursor: pointer;
+											}
+											small {
+												display: inline-block;
+												font-size: $t-small;
+												line-height: 1em;
+												color: $c-light-grey;
+												text-align: center;
+											}
+										}
+									}
+								}
 								.meta-mobilization,
 								.meta-template,
 								.meta-followup,
@@ -1144,7 +1179,8 @@ div.browse {
 								.meta-copy,
 								.meta-child {
 									width: 100%;
-									margin: 10px 0 0 0;
+									/*margin: 10px 0 0 0;*/
+									margin: 0;
 								}
 								.create {
 									position: relative;
@@ -2187,6 +2223,7 @@ div.browse.slideshow {
 					flex-flow: row nowrap;
 					height: 100%;
 					scroll-snap-type: x mandatory;
+					overflow: auto;
 					margin-top: 0;
 
 					article {

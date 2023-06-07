@@ -89,6 +89,7 @@
 <%- include ('../../partials/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
+<div class='main-content'>
 <% if (!pagedisplay.includes('adjacent')) { %>
 	<header>
 		<div class='inner'>
@@ -531,6 +532,8 @@
 		</div>
 	</main>
 </div>
+<div class='sidebar lg'></div>
+</div>
 
 <footer>
 	<% if (locals.metadata.site.engagementtypes.includes('comment')
@@ -659,6 +662,7 @@
 	<% } %>
 </footer>
 
+<%- include ('../../partials/footer.ejs') %> 
 
 <script type='text/javascript'>
 	const metafields = <%- JSON.stringify(metafields || {}) %>
@@ -1579,6 +1583,5 @@
 	}
 
 </script>
-<%- include ('../../partials/footer.ejs') %> 
 </body>
 </html>

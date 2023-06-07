@@ -18,6 +18,7 @@
 <%- include ('partials/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
+<div class='main-content'>
 <header>
 	<div class='inner'>
 		<%- include ('partials/menu-logo.ejs') %> 
@@ -37,7 +38,7 @@
 		<!-- THE NEW MOBILIZATION IS A CHILD -->
 			<input type='hidden' name='child' value='true'>
 		<% } %>
-		<% if (locals.metadata.page.query?.pinboard.length > 0) { %>
+		<% if (locals.metadata.page.query?.pinboard?.length > 0) { %>
 		<!-- THE NEW MOBILIZATION IS A DEPTH MOBILIZATION -->
 			<% locals.metadata.page.query?.pinboard.forEach(d => { %>
 				<input type='hidden' name='collection' value='<%- d %>'>
@@ -338,10 +339,13 @@
 	</form>
 	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
 </main>
-
+<div class='sidebar lg'></div>
+</div>
 
 <footer>
 </footer>
+
+<%- include ('./partials/footer.ejs') %> 
 
 <script type='text/javascript'>
 	const activity = '<%- locals.metadata.page.activity %>';

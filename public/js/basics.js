@@ -23,7 +23,7 @@ function _fetch(_method, _uri, _q, _expectJSON, _cookies, _checkStatus) {
 			args['body'] = JSON.stringify(_q);
 		}
 		if (_cookies) {
-			args['credentials'] = 'include';
+			args['credentials'] = 'include';  // FIXME: investigate whether this is actually necessary
 		}
 		fetch(_uri, args)
 		.then(response => {

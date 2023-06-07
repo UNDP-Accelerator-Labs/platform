@@ -1,7 +1,7 @@
 const { DB } = include('config/')
 
 module.exports = (req, res) => {
-	const { id, review_template, review_language } = req.body || {}
+	const { id, review_template, review_language, source } = req.body || {}
 	const { uuid } = req.session || {}
 
 	if (!id) { // INSERT OBJECT
@@ -37,6 +37,16 @@ module.exports = (req, res) => {
 						DO UPDATE
 						SET template = EXCLUDED.template
 				;`, [ newID || id, review_language ]))
+			}
+			// SAVE VERSION TREE
+			if (source && newID) {
+				batch.push(t.none(`
+					UPDATE templates 
+					SET version = source.version || $1::TEXT 
+					FROM (SELECT id, version FROM templates) AS source
+					WHERE templates.id = $1
+						AND source.id = templates.source
+				;`, [ newID ]))
 			}
 			// UPDATE THE TIMESTAMP
 			batch.push(t.none(`

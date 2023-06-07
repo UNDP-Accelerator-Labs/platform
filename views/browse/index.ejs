@@ -139,6 +139,7 @@
 </div>
 <% } %>
 
+<div class='main-content'>
 <header>
 	<div class='inner'>
 		<%- include ('../partials/menu-logo.ejs') %> 
@@ -426,6 +427,7 @@
 		</div>
 	</div>
 <% } %>
+</div>
 
 <footer>
 	<nav class='pagination xs sm m'>
@@ -943,6 +945,7 @@
 					.attr('src', d => {
 						if (d.is_followup) return '/imgs/icons/i-followup-<%- object.slice(0, -1) %>.svg'
 						else if (d.is_forward) return '/imgs/icons/i-forward-<%- object.slice(0, -1) %>.svg'
+						else if (d.is_copy) return '/imgs/icons/i-copy-<%- object.slice(0, -1) %>.svg'
 						else {
 							<% if (object === 'reviews') { %>return '/imgs/icons/i-pad.svg'
 							<% } else { %>return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'<% } %>
@@ -1010,49 +1013,73 @@
 					.html(d => d.name.capitalize())
 			}.bind(this),
 			metainfo: function (_sel) {
-				_sel.addElems('div', 'meta meta-followup', d => d.source && d.is_followup ? [d] : [])
-					.attr('title', d => d.source_title)
-					.html('<i><%- vocabulary["follow up"][language]() %>:</i> ')
-				.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
-							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
+				const { source, is_followup, is_forward, is_copy, is_child, version_depth } = _sel.datum()
 
-				_sel.addElems('div', 'meta meta-forward', d => d.source && d.is_forward ? [d] : [])
-					.attr('title', d => d.source_title)
-					.html('<i><%- vocabulary["forwarded from"][language] %>:</i> ')
-				.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
-							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
+				if (source) {
+					var treeinfo = _sel.addElems('div', 'meta meta-tree')
 
-				_sel.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
-					.attr('title', d => d.source_title)
-					.html('<i><%- vocabulary["copy"][language](false, true) %>:</i> ')
-				.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
-							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
-
-				_sel.addElems('div', 'meta meta-child', d => d.source && d.is_child ? [d] : [])
-					.attr('title', d => d.source_title)
-					.html('<i><%- vocabulary["expansion"][language] %>:</i> ')
-				.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
-							else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
+					if (version_depth > 1) {
+						const versiontree = treeinfo.addElems('div', 'meta meta-versiontree')
+							.addElems('a')
+							.attr('href', d => `versiontree?nodes=${d.id}`)
+						versiontree.addElems('img')
+							.attr('src', '/imgs/icons/i-versiontree.svg')
+						versiontree.addElems('small')
+							.html(d => d.version_depth)
+					}
+				}
+				if (source && is_followup) {
+					const followup = treeinfo.addElems('div', 'meta meta-followup')
+						.attr('title', d => d.source_title)
+					followup.addElems('i')
+						.html('<%- vocabulary["follow up"][language]() %>: ')
+					followup.addElems('a')
+						.attrs({
+							'href': d => {
+								if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
+								else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
+							}//, 'target': '_blank'
+						}).html(d => d.source_title)
+				}
+				if (source && is_forward) {
+					const forward = treeinfo.addElems('div', 'meta meta-forward')
+						.attr('title', d => d.source_title)
+					forward.addElems('i')
+						.html('<%- vocabulary["forwarded from"][language] %>: ')
+					forward.addElems('a')
+						.attrs({
+							'href': d => {
+								if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
+								else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
+							}//, 'target': '_blank'
+						}).html(d => d.source_title)
+				}
+				if (source && is_copy) {
+					const copy = treeinfo.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
+						.attr('title', d => d.source_title)
+					copy.addElems('i')
+						.html('<%- vocabulary["copy"][language](false, true) %>: ')
+					copy.addElems('a')
+						.attrs({
+							'href': d => {
+								if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
+								else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
+							}//, 'target': '_blank'
+						}).html(d => d.source_title)
+				}
+				if (source && is_child) {
+					const child = treeinfo.addElems('div', 'meta meta-child', d => d.source && d.is_child ? [d] : [])
+						.attr('title', d => d.source_title)
+					child.addElems('i')
+						.html('<%- vocabulary["expansion"][language] %>: ')
+					child.addElems('a')
+						.attrs({
+							'href': d => {
+								if (d.editable) return `../../edit/<%- object.slice(0, -1) %>?id=${d.source}`
+								else return `../../view/<%- object.slice(0, -1) %>?id=${d.source}`
+							}//, 'target': '_blank'
+						}).html(d => d.source_title)
+				}
 
 				_sel.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
 					.attr('title', d => d.mobilization_title)
@@ -1218,7 +1245,7 @@
 
 					function renderPins (_group, _data) {
 						const pin = _group.addElems('div', 'pin tag', d => {
-							return _data.map(c => Object.assign(Object.assign({}, c), { object_id: d.id }))
+							return _data?.map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
 						})
 						pin.addElems('label', 'name')
 							.attr('title', d => d.title)
@@ -1492,6 +1519,7 @@
 					.attr('src', d => {
 						if (d.is_followup) return '/imgs/icons/i-followup-<%- object.slice(0, -1) %>.svg'
 						else if (d.is_forward) return '/imgs/icons/i-forward-<%- object.slice(0, -1) %>.svg'
+						else if (d.is_copy) return '/imgs/icons/i-copy-<%- object.slice(0, -1) %>.svg'
 						else return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'
 					})
 				name.addElems('span')

@@ -30,7 +30,7 @@ div.document {
 	main#pad, main#reference,
 	main#template,
 	main#mobilization {
-		
+
 		.engagement-input-group {
 			position: fixed;
 			width: 225px;
@@ -256,7 +256,7 @@ div.document {
 						position: relative;
 						display: inline-block;
 						margin: 0 5px 0 5px;
-						
+
 						button {
 							min-height: 30px;
 							padding: 0 10px;
@@ -295,7 +295,7 @@ div.document {
 							menu {
 								width: 100%;
 								border-top: 1px solid $c-light-grey;
-								
+
 								li {
 									width: 100%;
 									margin: 0;
@@ -354,7 +354,7 @@ div.document {
 				position: relative;
 				width: 100%;
 				margin: 30px 0;
-				
+
 				.return {
 					display: block;
 					margin-bottom: 15px;
@@ -443,7 +443,7 @@ div.document {
 
 						.opt {
 							display: inline-block;
-							width: 30px; 
+							width: 30px;
 							height: 30px;
 							text-align: center;
 							cursor: pointer;
@@ -495,7 +495,7 @@ div.document {
 
 								.opt {
 									position: relative;
-									width: 30px; 
+									width: 30px;
 									height: 30px;
 									border: none;
 									outline: none;
@@ -738,7 +738,7 @@ div.document {
 							.mosaic-item:hover {
 								.index-opts {
 									display: flex;
-									
+
 									.opt {
 										/*background-color: $c-light-yellow;*/
 										background-color: $c-light-2;
@@ -796,7 +796,7 @@ div.document {
 									div {
 										padding: 0 5px;
 										cursor: pointer;
-										
+
 										label {
 											cursor: pointer;
 										}
@@ -819,7 +819,7 @@ div.document {
 									.grow {
 										flex-grow: 1;
 										align-self: center;
-										
+
 										.list-item {
 											display: block;
 											width: 100%;
@@ -962,7 +962,7 @@ div.document {
 								min-height: 65px;
 								padding: 10px;
 								margin-top: 30px;
-								
+
 								background: repeating-linear-gradient(
 									45deg,
 									transparent,
@@ -1024,7 +1024,7 @@ div.document {
 									border-bottom: 1px solid $c-dark-blue;
 									outline: none;
 									background-color: transparent;
-									font-size: $t-large; 
+									font-size: $t-large;
 									line-height: 1.5em;
 									/*color: #FFF;*/
 								}
@@ -1035,8 +1035,8 @@ div.document {
 									transform: translateY(0px);
 								}
 								input[type=text]:-webkit-autofill,
-								input[type=text]:-webkit-autofill:hover, 
-								input[type=text]:-webkit-autofill:focus, 
+								input[type=text]:-webkit-autofill:hover,
+								input[type=text]:-webkit-autofill:focus,
 								input[type=text]:-webkit-autofill:active	{
 									-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;
 									-webkit-text-fill-color: $c-dark-1 !important;
@@ -1063,7 +1063,7 @@ div.document {
 							.inset-location {
 								max-height: calc(300px - 75px - 20px);
 								padding: 0 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-mid-yellow;*/
@@ -1118,7 +1118,7 @@ div.document {
 								max-height: calc(300px - 75px - 20px);
 								/*padding: 0 0 10px 10px;*/
 								padding: 5px 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.tag {
 									display: inline-block;
@@ -1151,7 +1151,7 @@ div.document {
 						.inset.template {	/* THIS IS FOR TEMPLATES */
 							div {
 								padding: 0 0 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-light-1;*/
@@ -1163,7 +1163,7 @@ div.document {
 										margin: 0;
 										/*color: $c-light-1;*/
 										color: $c-light-grey;
-										cursor: initial;									
+										cursor: initial;
 									}
 								}
 							}
@@ -1203,7 +1203,7 @@ div.document {
 							.inset-methods,
 							.inset-datasources {
 								max-height: calc(300px);
-							}	
+							}
 						}
 						figcaption {
 							font-size: $t-small;
@@ -1392,7 +1392,7 @@ div.document {
 					/*border-top-color: $c-light-yellow;*/
 					border-top-color: $c-light-2;
 					border-bottom: 1px dotted $c-light-grey;
-					
+
 					.media-container {
 						.media,
 						.media.focus {
@@ -1480,8 +1480,8 @@ div.document {
 					border-left: 1px solid $c-light-2;
 					border-bottom: 1px solid $c-light-2;
 					z-index: 1000;
-					
-					.inner {						
+
+					.inner {
 						max-height: 80vh;
 						overflow: hidden;
 						background-color: #FFF;
@@ -1609,7 +1609,7 @@ div.document {
 					}
 					button.scroll-up {
 						top: 0px;
-						
+
 						label {
 							transform: rotate(-90deg);
 						}
@@ -1688,7 +1688,7 @@ div.document.slideshow {
 		flex-flow: row nowrap;
 		height: 100%;
 		scroll-snap-type: x mandatory;
-		overflow: scroll;
+		overflow: auto;
 
 		.meta-info {
 			margin-bottom: 0;
@@ -1909,7 +1909,7 @@ footer {
 			}
 			.btn-group {
 				border-top: 1px solid $c-mid-grey;
-				
+
 				button {
 					display: none;
 					height: 30px;
@@ -1987,7 +1987,7 @@ footer {
 						width: 100%;
 						height: 30px;
 						margin: 10px 0 0 0;
-						
+
 						background: repeating-linear-gradient(
 							45deg,
 							transparent,
@@ -2002,7 +2002,7 @@ footer {
 						padding-left: 30px;
 						overflow: hidden;
 						transition: max-height 0.25s ease-out;
-					
+
 						ul.replies {
 
 							li {
@@ -2045,7 +2045,7 @@ footer {
 			width: 875px;
 			margin: 0 auto;
 			padding: 10px;
-			
+
 			small {
 				font-size: $t-small;
 				line-height: 1.5em;

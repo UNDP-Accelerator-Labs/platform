@@ -1,6 +1,6 @@
 div.public-page-header {
 	min-height: 100vh;
-	
+
 	div.carousel {
 		position: relative;
 
@@ -13,7 +13,7 @@ div.public-page-header {
 			height: 100vh;
 			width: 100%;
 			padding: 60px 0 120px 0;
-			overflow: scroll;
+			overflow: auto;
 			box-sizing: border-box;
 
 			div.slide {
@@ -115,7 +115,7 @@ div.public-page-header {
 		position: static;
 		width: 100%;
 		min-height: 100vh;
-		
+
 		/* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 		div.slides {
 			/*display: flex;
@@ -301,6 +301,10 @@ div.public-page-header {
 	}
 }
 
+div.main-content {
+	display: flex;
+}
+
 div.browse {
 	display: block;
 	float: left;
@@ -336,7 +340,7 @@ div.browse {
 					border: none;
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					line-height: 1.5em;
 					color: $c-dark-blue;
 				}
@@ -360,8 +364,8 @@ div.browse {
 					transform: translateY(0);
 				}
 				input:-webkit-autofill,
-				input:-webkit-autofill:hover, 
-				input:-webkit-autofill:focus, 
+				input:-webkit-autofill:hover,
+				input:-webkit-autofill:focus,
 				input:-webkit-autofill:active  {
 					-webkit-box-shadow: 0 0 0 40px #FFF inset !important;
 					-webkit-text-fill-color: $c-dark-blue !important;
@@ -397,7 +401,7 @@ div.browse {
 
 			.global-actions {
 				min-width: 50%;
-				
+
 				.add {
 					display: inline-block;
 					position: relative;
@@ -460,13 +464,13 @@ div.browse {
 						top: calc(100% + 1px);
 						background-color: #FFF;
 						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-						overflow: scroll;
+						overflow: auto;
 						z-index: 10;
 						transition: max-height 0.25s ease-out;
 
 						menu {
 							width: 100%;
-							
+
 							li {
 								display: inline-block;
 								width: 100%;
@@ -488,7 +492,7 @@ div.browse {
 									transform: none;
 									pointer-events: all;
 									cursor: pointer;
-									
+
 									.count {
 										margin-left: auto;
 										padding-left: 10px;
@@ -569,7 +573,7 @@ div.browse {
 				.l3 {
 					width: 25px;
 					transform: translate(2.5px, 15px)rotate(45deg);
-					transform-origin: center;	
+					transform-origin: center;
 				}
 			}
 			.filters {
@@ -628,13 +632,13 @@ div.browse {
 							top: calc(100% + 1px);
 							background-color: #FFF;
 							box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-							overflow: scroll;
+							overflow: auto;
 							z-index: 100;
 							transition: max-height 0.25s ease-out;
 
 							menu {
 								width: 100%;
-								
+
 								li {
 									width: 100%;
 									margin: 0;
@@ -701,7 +705,7 @@ div.browse {
 	nav:not(.tabs) {
 		width: 100%;
 		margin: 0 0 30px -15px;
-		
+
 		menu,
 		ul  {
 			li {
@@ -761,7 +765,7 @@ div.browse {
 		}
 	}
 
-	main {	
+	main {
 		padding-bottom: 60px;
 
 		.inner {
@@ -822,7 +826,7 @@ div.browse {
 						padding: 15px 0;
 						margin: 0 0 0 auto;
 						text-align: right;
-						
+
 						button {
 							height: 30px;
 							padding: 0 10px;
@@ -879,7 +883,7 @@ div.browse {
 				position: relative;
 				width: 100%;
 				margin: 25px 0 15px 0;
-				
+
 				.return {
 					display: block;
 					margin-bottom: 15px;
@@ -1015,7 +1019,7 @@ div.browse {
 												menu {
 													width: 100%;
 													border-top: 1px solid $c-light-grey;
-													
+
 													li {
 														width: 100%;
 														margin: 0;
@@ -1098,7 +1102,7 @@ div.browse {
 									display: block;
 									margin-bottom: 10px;
 									font-size: $t-mid-small;
-									line-height: 1.5em;
+									line-height: 1.3em;
 									white-space: pre-line;
 
 									a {
@@ -1123,6 +1127,34 @@ div.browse {
 									line-height: 1.5em;
 									margin-bottom: 10px;
 								}
+								.meta-tree {
+									display: flex;
+									align-items: center;
+
+									.meta-versiontree {
+										margin-right: 10px;
+
+										a {
+											display: flex;
+											align-items: center;
+											text-decoration: none;
+
+											img {
+												display: inline-block;
+												width: 30px;
+												height: 30px;
+												cursor: pointer;
+											}
+											small {
+												display: inline-block;
+												font-size: $t-small;
+												line-height: 1em;
+												color: $c-light-grey;
+												text-align: center;
+											}
+										}
+									}
+								}
 								.meta-mobilization,
 								.meta-template,
 								.meta-followup,
@@ -1145,7 +1177,8 @@ div.browse {
 								.meta-copy,
 								.meta-child {
 									width: 100%;
-									margin: 10px 0 0 0;
+									/*margin: 10px 0 0 0;*/
+									margin: 0;
 								}
 								.create {
 									position: relative;
@@ -1172,14 +1205,14 @@ div.browse {
 										margin-top: -2px;
 										background-color: #FFF;
 										box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-										overflow: scroll;
+										overflow: auto;
 										z-index: 10;
 										transition: max-height 0.25s ease-out;
 
 										menu {
 											width: 100%;
 											border-top: 1px solid $c-light-grey;
-											
+
 											li {
 												display: inline-block;
 												width: 100%;
@@ -1347,7 +1380,7 @@ div.browse {
 										}
 										a:hover {
 											text-decoration: none;
-											
+
 											h1 {
 												small {
 													text-decoration: underline;
@@ -1370,7 +1403,7 @@ div.browse {
 							.pinboard-group {
 								width: 100%;
 								margin-top: 5px;
-								
+
 								.add {
 									position: relative;
 									width: 100%;
@@ -1435,13 +1468,13 @@ div.browse {
 										top: 100%;
 										background-color: #FFF;
 										box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-										overflow: scroll;
+										overflow: auto;
 										z-index: 10;
 										transition: max-height 0.25s ease-out;
 
 										menu {
 											width: 100%;
-											
+
 											li {
 												display: inline-block;
 												width: 100%;
@@ -1463,7 +1496,7 @@ div.browse {
 													transform: none;
 													pointer-events: all;
 													cursor: pointer;
-													
+
 													.count {
 														margin-left: auto;
 														padding-left: 10px;
@@ -1555,7 +1588,7 @@ div.browse {
 								/*border-bottom: 1px dotted $c-light-grey;*/
 								transition: width .25s;
 								overflow: hidden;
-								
+
 								background: repeating-linear-gradient(
 									45deg,
 									#FFF,
@@ -1827,7 +1860,7 @@ div.browse {
 											pointer-events: none;
 											cursor: default;
 										}
-									
+
 										.dropdown {
 											position: absolute;
 											min-width: 100%;
@@ -1844,7 +1877,7 @@ div.browse {
 											menu {
 												width: 100%;
 												border-top: 1px solid $c-light-grey;
-												
+
 												li {
 													width: 100%;
 													margin: 0;
@@ -2188,7 +2221,7 @@ div.browse.slideshow {
 					flex-flow: row nowrap;
 					height: 100%;
 					scroll-snap-type: x mandatory;
-					overflow: scroll;
+					overflow: auto;
 					margin-top: 0;
 
 					article {

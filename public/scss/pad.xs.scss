@@ -1057,7 +1057,7 @@ div.document {
 							.inset-location {
 								max-height: calc(300px - 75px - 20px);
 								padding: 0 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-mid-yellow;*/
@@ -1112,7 +1112,7 @@ div.document {
 								max-height: calc(300px - 75px - 20px);
 								/*padding: 0 0 10px 10px;*/
 								padding: 5px 10px 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.tag {
 									display: inline-block;
@@ -1145,7 +1145,7 @@ div.document {
 						.inset.template {	/* THIS IS FOR TEMPLATES */
 							div {
 								padding: 0 0 10px 10px;
-								overflow: scroll;
+								overflow: auto;
 
 								.panel {
 									/*border-left: 1px solid $c-light-1;*/
@@ -1493,7 +1493,7 @@ div.document {
 					transition: max-height .25s;
 					box-shadow: 0 0 10px rgba(0,0,0,.1);
 					background-color: #FFF;
-					overflow: scroll;
+					overflow: auto;
 
 					.inner {
 

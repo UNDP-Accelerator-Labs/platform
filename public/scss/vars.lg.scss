@@ -13,7 +13,7 @@ $t-xxxlarge: 90px;
 
 html, body {
 	font-size: $t-main;
-	line-height: 1.5em;
+	line-height: 1.3em;
 }
 .xs,
 .sm,
@@ -97,7 +97,7 @@ html, body {
 					border-bottom: 1px solid $c-light-grey;
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					resize: none;
 					box-sizing: border-box;
 				}
@@ -184,13 +184,13 @@ html, body {
 						top: 100%;
 						background-color: #FFF;
 						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-						overflow: scroll;
+						overflow: auto;
 						z-index: 10;
 						transition: max-height 0.25s ease-out;
 
 						menu {
 							width: 100%;
-							
+
 							li {
 								display: inline-block;
 								width: 100%;
@@ -213,7 +213,7 @@ html, body {
 									transform: none;
 									pointer-events: all;
 									cursor: pointer;
-									
+
 									.count {
 										float: right;
 										color: $c-light-grey;
@@ -309,7 +309,7 @@ html, body {
 		ul {
 			width: 100%;
 			max-height: 500px;
-			overflow: scroll;
+			overflow: auto;
 
 			li.filter {
 				position: fixed;

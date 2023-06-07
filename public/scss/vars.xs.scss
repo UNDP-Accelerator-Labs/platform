@@ -13,7 +13,7 @@ $t-xxxlarge: 90px;
 
 html, body {
 	font-size: $t-main;
-	line-height: 1.5em;
+	line-height: 1.3em;
 }
 
 .lg {
@@ -93,7 +93,7 @@ html, body {
 					border-bottom: 1px solid $c-light-grey;
 					outline: none;
 					background-color: transparent;
-					font-size: $t-large; 
+					font-size: $t-large;
 					resize: none;
 					box-sizing: border-box;
 				}

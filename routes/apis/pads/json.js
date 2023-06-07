@@ -130,7 +130,7 @@ module.exports = async (req, res) => {
 								return new Promise(async resolve1 => {
 									const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
 									tags?.forEach(d => {
-										delete d.tag_id
+										// delete d.tag_id
 										delete d.equivalents
 									})
 									resolve1(tags)

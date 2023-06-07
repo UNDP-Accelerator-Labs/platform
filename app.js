@@ -12,10 +12,14 @@ const pgSession = require('connect-pg-simple')(session)
 const multer = require('multer')
 const upload = multer({ dest: './tmp' })
 const fs = require('fs')
+const cors = require('cors');
 
 const { spawn } = require('child_process')
 
 const app = express()
+
+// Enable CORS for all routes
+app.use(cors());
 
 app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, './public')))
@@ -65,7 +69,8 @@ const sessionMiddleware = session({
 		httpOnly: true, // THIS IS ACTUALLY DEFAULT
 		secure: process.env.NODE_ENV === 'production',
 		maxAge: 1000 * 60 * 60 * 24 * 1, // 1 DAY
-		sameSite: 'lax'
+		sameSite: 'lax',
+		domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost'
 	}
 })
 
@@ -246,7 +251,7 @@ DB.conn.tx(t => {
 // 	})
 
 // 	// socket.on('move-up', data => {
-		
+
 // 	// })
 
 // 	socket.on('disconnect', _ => {

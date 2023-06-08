@@ -6458,6 +6458,84 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   main#mobilize-existing .inner .mobilizations-container .mobilization-layout.publishable .mobilization {
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(163, 198, 196, 0.15) 10px, rgba(163, 198, 196, 0.15) 20px);
   }
+
+  .org-footer {
+    position: relative;
+    background-color: #0468B1;
+    background: linear-gradient(180deg, #005687 0%, #0468B1 30%, #E5E5E5 100%);
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 0.8rem;
+    z-index: 10000;
+  }
+  .org-footer .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .org-footer .footer-row .footer-column .footer-img {
+    max-width: 100%;
+    height: auto;
+  }
+  .org-footer .footer-row .footer-column h3 {
+    font-weight: bold;
+    font-size: 14px;
+    margin: calc(67px - 45px) 0 0 0;
+    text-transform: uppercase;
+  }
+  .org-footer .footer-row .footer-column .outer .logo {
+    display: block;
+    height: 125px;
+    margin: 0 auto 15px auto;
+  }
+  .org-footer .footer-row .footer-column .outer small {
+    display: block;
+    font-size: 12px;
+    text-align: center;
+  }
+  .org-footer .footer-row .footer-column .inner {
+    padding: 45px 45px 0px 45px;
+  }
+  .org-footer .footer-row .footer-column .inner ul {
+    margin: 15px 0 0 0;
+    padding: 0;
+  }
+  .org-footer .footer-row .footer-column .inner ul li {
+    font-size: 14px;
+    list-style: none;
+    margin-bottom: 0.5em;
+  }
+  .org-footer .footer-row .footer-column .inner a {
+    color: #fff;
+    font-weight: normal;
+  }
+  .org-footer .footer-row .footer-column .inner .social-media-links li {
+    display: inline-block;
+    font-size: 20px;
+    margin: 0 10px 0 0;
+    color: #fff;
+  }
+  .org-footer .footer-row .footer-column:not(.center) {
+    flex: 1 1 0;
+  }
+  .org-footer .footer-row .footer-column.left .inner {
+    padding-top: 30px;
+  }
+  .org-footer .footer-row .footer-column.center {
+    width: calc(300px * 3 + 15px * 2);
+    padding: 0 15px;
+  }
+  .org-footer .footer-row.signature {
+    padding: 0 45px;
+  }
+  .org-footer .footer-row.signature .inner p {
+    color: #005687;
+  }
 }
 /* Medium devices (tablets, 768px and up) */
 @media (max-width: 768px) {
@@ -12620,6 +12698,84 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   }
   main#mobilize-existing .inner .mobilizations-container .mobilization-layout.publishable .mobilization {
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(163, 198, 196, 0.15) 10px, rgba(163, 198, 196, 0.15) 20px);
+  }
+
+  .org-footer {
+    position: relative;
+    background-color: #0468B1;
+    background: linear-gradient(180deg, #005687 0%, #0468B1 30%, #E5E5E5 100%);
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 0.8rem;
+    z-index: 10000;
+  }
+  .org-footer .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .org-footer .footer-row .footer-column .footer-img {
+    max-width: 100%;
+    height: auto;
+  }
+  .org-footer .footer-row .footer-column h3 {
+    font-weight: bold;
+    font-size: 14px;
+    margin: calc(67px - 45px) 0 0 0;
+    text-transform: uppercase;
+  }
+  .org-footer .footer-row .footer-column .outer .logo {
+    display: block;
+    height: 125px;
+    margin: 0 auto 15px auto;
+  }
+  .org-footer .footer-row .footer-column .outer small {
+    display: block;
+    font-size: 12px;
+    text-align: center;
+  }
+  .org-footer .footer-row .footer-column .inner {
+    padding: 45px 45px 0px 45px;
+  }
+  .org-footer .footer-row .footer-column .inner ul {
+    margin: 15px 0 0 0;
+    padding: 0;
+  }
+  .org-footer .footer-row .footer-column .inner ul li {
+    font-size: 14px;
+    list-style: none;
+    margin-bottom: 0.5em;
+  }
+  .org-footer .footer-row .footer-column .inner a {
+    color: #fff;
+    font-weight: normal;
+  }
+  .org-footer .footer-row .footer-column .inner .social-media-links li {
+    display: inline-block;
+    font-size: 20px;
+    margin: 0 10px 0 0;
+    color: #fff;
+  }
+  .org-footer .footer-row .footer-column:not(.center) {
+    flex: 1 1 0;
+  }
+  .org-footer .footer-row .footer-column.left .inner {
+    padding-top: 30px;
+  }
+  .org-footer .footer-row .footer-column.center {
+    width: calc(300px * 3 + 15px * 2);
+    padding: 0 15px;
+  }
+  .org-footer .footer-row.signature {
+    padding: 0 45px;
+  }
+  .org-footer .footer-row.signature .inner p {
+    color: #005687;
   }
 }
 /* Large devices (desktops, 1024px and up) */
@@ -19369,6 +19525,84 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   main#mobilize-existing .inner .mobilizations-container .mobilization-layout.publishable .mobilization {
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(163, 198, 196, 0.15) 10px, rgba(163, 198, 196, 0.15) 20px);
   }
+
+  .org-footer {
+    position: relative;
+    background-color: #0468B1;
+    background: linear-gradient(180deg, #005687 0%, #0468B1 30%, #E5E5E5 100%);
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 0.8rem;
+    z-index: 10000;
+  }
+  .org-footer .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .org-footer .footer-row .footer-column .footer-img {
+    max-width: 100%;
+    height: auto;
+  }
+  .org-footer .footer-row .footer-column h3 {
+    font-weight: bold;
+    font-size: 14px;
+    margin: calc(67px - 45px) 0 0 0;
+    text-transform: uppercase;
+  }
+  .org-footer .footer-row .footer-column .outer .logo {
+    display: block;
+    height: 125px;
+    margin: 0 auto 15px auto;
+  }
+  .org-footer .footer-row .footer-column .outer small {
+    display: block;
+    font-size: 12px;
+    text-align: center;
+  }
+  .org-footer .footer-row .footer-column .inner {
+    padding: 45px 45px 0px 45px;
+  }
+  .org-footer .footer-row .footer-column .inner ul {
+    margin: 15px 0 0 0;
+    padding: 0;
+  }
+  .org-footer .footer-row .footer-column .inner ul li {
+    font-size: 14px;
+    list-style: none;
+    margin-bottom: 0.5em;
+  }
+  .org-footer .footer-row .footer-column .inner a {
+    color: #fff;
+    font-weight: normal;
+  }
+  .org-footer .footer-row .footer-column .inner .social-media-links li {
+    display: inline-block;
+    font-size: 20px;
+    margin: 0 10px 0 0;
+    color: #fff;
+  }
+  .org-footer .footer-row .footer-column:not(.center) {
+    flex: 1 1 0;
+  }
+  .org-footer .footer-row .footer-column.left .inner {
+    padding-top: 30px;
+  }
+  .org-footer .footer-row .footer-column.center {
+    width: calc(300px * 3 + 15px * 2);
+    padding: 0 15px;
+  }
+  .org-footer .footer-row.signature {
+    padding: 0 45px;
+  }
+  .org-footer .footer-row.signature .inner p {
+    color: #005687;
+  }
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -20032,21 +20266,22 @@ nav.tabs .inner div.lg ul li.active input[type=text] {
   }
 
   header {
-    width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
+    /*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
     display: block;
+    flex: 1 1 0;
     min-height: 100vh;
-    float: left;
+    /*float: left;*/
     pointer-events: none;
   }
   header .inner {
-    position: fixed;
+    position: sticky;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100vh;
-    width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
+    /* width: calc((100vw - (300px * 3 + 15px * 4)) / 2); */
     top: 0;
-    z-index: 10001;
+    z-index: 9999;
   }
   header .inner nav#site-title {
     display: block;
@@ -20445,16 +20680,17 @@ header .inner nav#site-title .inner .create:not(.open) li:hover > form {
   .sidebar {
     position: sticky;
     display: block;
-    float: right;
+    flex: 1 1 0;
+    /*float: right;*/
     top: 0;
     vertical-align: top;
-    width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
+    /*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
     min-height: 100vh;
   }
 
   .sidebar > .inner {
     position: relative;
-    width: calc((100vw - (300px * 3 + 15px * 4)) / 2);
+    /*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
     height: 100vh;
   }
   .sidebar > .inner #statistics {
@@ -25794,13 +26030,10 @@ div.document main#template .inner .body .layout.animate-in,
 div.document main#mobilization .inner .body .layout.animate-in {
     animation: slide-down 1s;
   }
-  div.document main .inner .body .media-input-group,
-div.document main#pad .inner .body .media-input-group, div.document main#reference .inner .body .media-input-group,
-div.document main#template .inner .body .media-input-group,
-div.document main#mobilization .inner .body .media-input-group {
+  div.document .media-input-group {
     position: fixed;
     top: 0;
-    left: calc((100vw - (300px * 3 + 15px * 4)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
+    left: calc((100vw - (300px * 3 + 15px * 5)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
     max-height: 80vh;
     transform: translateY(90px);
     border-top: 1px solid #E5E5E5;
@@ -25808,39 +26041,23 @@ div.document main#mobilization .inner .body .media-input-group {
     border-bottom: 1px solid #E5E5E5;
     z-index: 1000;
   }
-  div.document main .inner .body .media-input-group .inner,
-div.document main#pad .inner .body .media-input-group .inner, div.document main#reference .inner .body .media-input-group .inner,
-div.document main#template .inner .body .media-input-group .inner,
-div.document main#mobilization .inner .body .media-input-group .inner {
+  div.document .media-input-group .inner {
     max-height: 80vh;
     overflow: hidden;
     background-color: #FFF;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group,
-div.document main#pad .inner .body .media-input-group .inner .btn-group, div.document main#reference .inner .body .media-input-group .inner .btn-group,
-div.document main#template .inner .body .media-input-group .inner .btn-group,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group {
+  div.document .media-input-group .inner .btn-group {
     display: flex;
     flex-direction: column;
     outline: none;
     margin: 10px 0;
     background-color: #FFF;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group input,
-div.document main#pad .inner .body .media-input-group .inner .btn-group input, div.document main#reference .inner .body .media-input-group .inner .btn-group input,
-div.document main#template .inner .body .media-input-group .inner .btn-group input,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group input {
+  div.document .media-input-group .inner .btn-group input {
     display: none;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label,
-div.document main .inner .body .media-input-group .inner .btn-group button,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button, div.document main#reference .inner .body .media-input-group .inner .btn-group label,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button,
-div.document main#template .inner .body .media-input-group .inner .btn-group label,
-div.document main#template .inner .body .media-input-group .inner .btn-group button,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button {
+  div.document .media-input-group .inner .btn-group label,
+div.document .media-input-group .inner .btn-group button {
     position: relative;
     display: block;
     float: left;
@@ -25864,15 +26081,8 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     transition: background-color 0.25s;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label label,
-div.document main .inner .body .media-input-group .inner .btn-group button label,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label label,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button label, div.document main#reference .inner .body .media-input-group .inner .btn-group label label,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button label,
-div.document main#template .inner .body .media-input-group .inner .btn-group label label,
-div.document main#template .inner .body .media-input-group .inner .btn-group button label,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label label,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button label {
+  div.document .media-input-group .inner .btn-group label label,
+div.document .media-input-group .inner .btn-group button label {
     content: attr(title);
     position: absolute;
     top: 0;
@@ -25888,106 +26098,47 @@ div.document main#mobilization .inner .body .media-input-group .inner .btn-group
     white-space: nowrap;
     transition: padding 0.25s, width 0.25s;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label label span,
-div.document main .inner .body .media-input-group .inner .btn-group button label span,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label label span,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button label span, div.document main#reference .inner .body .media-input-group .inner .btn-group label label span,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button label span,
-div.document main#template .inner .body .media-input-group .inner .btn-group label label span,
-div.document main#template .inner .body .media-input-group .inner .btn-group button label span,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label label span,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button label span {
+  div.document .media-input-group .inner .btn-group label label span,
+div.document .media-input-group .inner .btn-group button label span {
     padding: 0 10px;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label i,
-div.document main .inner .body .media-input-group .inner .btn-group button i,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label i,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button i, div.document main#reference .inner .body .media-input-group .inner .btn-group label i,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button i,
-div.document main#template .inner .body .media-input-group .inner .btn-group label i,
-div.document main#template .inner .body .media-input-group .inner .btn-group button i,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label i,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button i {
+  div.document .media-input-group .inner .btn-group label i,
+div.document .media-input-group .inner .btn-group button i {
     font-size: 20px;
     line-height: 45px;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label img,
-div.document main .inner .body .media-input-group .inner .btn-group button img,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label img,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button img, div.document main#reference .inner .body .media-input-group .inner .btn-group label img,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button img,
-div.document main#template .inner .body .media-input-group .inner .btn-group label img,
-div.document main#template .inner .body .media-input-group .inner .btn-group button img,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label img,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button img {
+  div.document .media-input-group .inner .btn-group label img,
+div.document .media-input-group .inner .btn-group button img {
     width: 20px;
     vertical-align: middle;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label:hover,
-div.document main .inner .body .media-input-group .inner .btn-group button:hover,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label:hover,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button:hover, div.document main#reference .inner .body .media-input-group .inner .btn-group label:hover,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button:hover,
-div.document main#template .inner .body .media-input-group .inner .btn-group label:hover,
-div.document main#template .inner .body .media-input-group .inner .btn-group button:hover,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label:hover,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:hover {
+  div.document .media-input-group .inner .btn-group label:hover,
+div.document .media-input-group .inner .btn-group button:hover {
     background-color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group label.highlight,
-div.document main .inner .body .media-input-group .inner .btn-group button.highlight,
-div.document main#pad .inner .body .media-input-group .inner .btn-group label.highlight,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button.highlight, div.document main#reference .inner .body .media-input-group .inner .btn-group label.highlight,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button.highlight,
-div.document main#template .inner .body .media-input-group .inner .btn-group label.highlight,
-div.document main#template .inner .body .media-input-group .inner .btn-group button.highlight,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group label.highlight,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button.highlight {
+  div.document .media-input-group .inner .btn-group label.highlight,
+div.document .media-input-group .inner .btn-group button.highlight {
     background-color: #333D51;
     color: #FFF;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group input:disabled,
-div.document main .inner .body .media-input-group .inner .btn-group button:disabled,
-div.document main#pad .inner .body .media-input-group .inner .btn-group input:disabled,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button:disabled, div.document main#reference .inner .body .media-input-group .inner .btn-group input:disabled,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button:disabled,
-div.document main#template .inner .body .media-input-group .inner .btn-group input:disabled,
-div.document main#template .inner .body .media-input-group .inner .btn-group button:disabled,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group input:disabled,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:disabled {
+  div.document .media-input-group .inner .btn-group input:disabled,
+div.document .media-input-group .inner .btn-group button:disabled {
     pointer-events: none;
     color: #E5E5E5;
   }
-  div.document main .inner .body .media-input-group .inner .btn-group input:disabled img,
-div.document main .inner .body .media-input-group .inner .btn-group button:disabled img,
-div.document main#pad .inner .body .media-input-group .inner .btn-group input:disabled img,
-div.document main#pad .inner .body .media-input-group .inner .btn-group button:disabled img, div.document main#reference .inner .body .media-input-group .inner .btn-group input:disabled img,
-div.document main#reference .inner .body .media-input-group .inner .btn-group button:disabled img,
-div.document main#template .inner .body .media-input-group .inner .btn-group input:disabled img,
-div.document main#template .inner .body .media-input-group .inner .btn-group button:disabled img,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group input:disabled img,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group button:disabled img {
+  div.document .media-input-group .inner .btn-group input:disabled img,
+div.document .media-input-group .inner .btn-group button:disabled img {
     filter: brightness(2);
   }
-  div.document main .inner .body .media-input-group .inner .btn-group .vertical-separator,
-div.document main#pad .inner .body .media-input-group .inner .btn-group .vertical-separator, div.document main#reference .inner .body .media-input-group .inner .btn-group .vertical-separator,
-div.document main#template .inner .body .media-input-group .inner .btn-group .vertical-separator,
-div.document main#mobilization .inner .body .media-input-group .inner .btn-group .vertical-separator {
+  div.document .media-input-group .inner .btn-group .vertical-separator {
     width: 59px;
     height: 0px;
     /*border-top: 1px dotted $c-light-grey;*/
     border-top: 1px solid #E5E5E5;
     margin: 10px 0;
   }
-  div.document main .inner .body .media-input-group button.scroll-up,
-div.document main .inner .body .media-input-group button.scroll-down,
-div.document main#pad .inner .body .media-input-group button.scroll-up,
-div.document main#pad .inner .body .media-input-group button.scroll-down, div.document main#reference .inner .body .media-input-group button.scroll-up,
-div.document main#reference .inner .body .media-input-group button.scroll-down,
-div.document main#template .inner .body .media-input-group button.scroll-up,
-div.document main#template .inner .body .media-input-group button.scroll-down,
-div.document main#mobilization .inner .body .media-input-group button.scroll-up,
-div.document main#mobilization .inner .body .media-input-group button.scroll-down {
+  div.document .media-input-group button.scroll-up,
+div.document .media-input-group button.scroll-down {
     position: absolute;
     display: block;
     height: 30px;
@@ -26001,15 +26152,8 @@ div.document main#mobilization .inner .body .media-input-group button.scroll-dow
     z-index: 1000;
     cursor: pointer;
   }
-  div.document main .inner .body .media-input-group button.scroll-up label,
-div.document main .inner .body .media-input-group button.scroll-down label,
-div.document main#pad .inner .body .media-input-group button.scroll-up label,
-div.document main#pad .inner .body .media-input-group button.scroll-down label, div.document main#reference .inner .body .media-input-group button.scroll-up label,
-div.document main#reference .inner .body .media-input-group button.scroll-down label,
-div.document main#template .inner .body .media-input-group button.scroll-up label,
-div.document main#template .inner .body .media-input-group button.scroll-down label,
-div.document main#mobilization .inner .body .media-input-group button.scroll-up label,
-div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
+  div.document .media-input-group button.scroll-up label,
+div.document .media-input-group button.scroll-down label {
     display: block;
     width: 30px;
     height: 30px;
@@ -26021,54 +26165,30 @@ div.document main#mobilization .inner .body .media-input-group button.scroll-dow
     cursor: pointer;
     color: #646464;
   }
-  div.document main .inner .body .media-input-group button.scroll-up,
-div.document main#pad .inner .body .media-input-group button.scroll-up, div.document main#reference .inner .body .media-input-group button.scroll-up,
-div.document main#template .inner .body .media-input-group button.scroll-up,
-div.document main#mobilization .inner .body .media-input-group button.scroll-up {
+  div.document .media-input-group button.scroll-up {
     top: 0px;
   }
-  div.document main .inner .body .media-input-group button.scroll-up label,
-div.document main#pad .inner .body .media-input-group button.scroll-up label, div.document main#reference .inner .body .media-input-group button.scroll-up label,
-div.document main#template .inner .body .media-input-group button.scroll-up label,
-div.document main#mobilization .inner .body .media-input-group button.scroll-up label {
+  div.document .media-input-group button.scroll-up label {
     transform: rotate(-90deg);
   }
-  div.document main .inner .body .media-input-group button.scroll-down,
-div.document main#pad .inner .body .media-input-group button.scroll-down, div.document main#reference .inner .body .media-input-group button.scroll-down,
-div.document main#template .inner .body .media-input-group button.scroll-down,
-div.document main#mobilization .inner .body .media-input-group button.scroll-down {
+  div.document .media-input-group button.scroll-down {
     bottom: 0px;
   }
-  div.document main .inner .body .media-input-group button.scroll-down label,
-div.document main#pad .inner .body .media-input-group button.scroll-down label, div.document main#reference .inner .body .media-input-group button.scroll-down label,
-div.document main#template .inner .body .media-input-group button.scroll-down label,
-div.document main#mobilization .inner .body .media-input-group button.scroll-down label {
+  div.document .media-input-group button.scroll-down label {
     transform: rotate(90deg);
   }
-  div.document main .inner .body .input-group.overflowing .inner .btn-group,
-div.document main#pad .inner .body .input-group.overflowing .inner .btn-group, div.document main#reference .inner .body .input-group.overflowing .inner .btn-group,
-div.document main#template .inner .body .input-group.overflowing .inner .btn-group,
-div.document main#mobilization .inner .body .input-group.overflowing .inner .btn-group {
+  div.document .input-group.overflowing .inner .btn-group {
     margin: 40px 0;
   }
-  div.document main .inner .body .input-group.inline .inner .btn-group,
-div.document main#pad .inner .body .input-group.inline .inner .btn-group, div.document main#reference .inner .body .input-group.inline .inner .btn-group,
-div.document main#template .inner .body .input-group.inline .inner .btn-group,
-div.document main#mobilization .inner .body .input-group.inline .inner .btn-group {
+  div.document .input-group.inline .inner .btn-group {
     position: static;
     margin-top: 10px;
     padding-bottom: 0;
   }
-  div.document main .inner .body .input-group.inline .inner .btn-group .vertical-separator,
-div.document main#pad .inner .body .input-group.inline .inner .btn-group .vertical-separator, div.document main#reference .inner .body .input-group.inline .inner .btn-group .vertical-separator,
-div.document main#template .inner .body .input-group.inline .inner .btn-group .vertical-separator,
-div.document main#mobilization .inner .body .input-group.inline .inner .btn-group .vertical-separator {
+  div.document .input-group.inline .inner .btn-group .vertical-separator {
     margin: 5px 15px;
   }
-  div.document main .inner .body .input-group.fixed .inner .btn-group,
-div.document main#pad .inner .body .input-group.fixed .inner .btn-group, div.document main#reference .inner .body .input-group.fixed .inner .btn-group,
-div.document main#template .inner .body .input-group.fixed .inner .btn-group,
-div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group {
+  div.document .input-group.fixed .inner .btn-group {
     display: flex;
     align-items: center;
     position: absolute;
@@ -26077,12 +26197,10 @@ div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group
     pointer-events: none;
     z-index: 100;
   }
-  div.document main .inner .body .input-group.fixed .inner .btn-group label,
-div.document main#pad .inner .body .input-group.fixed .inner .btn-group label, div.document main#reference .inner .body .input-group.fixed .inner .btn-group label,
-div.document main#template .inner .body .input-group.fixed .inner .btn-group label,
-div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group label {
+  div.document .input-group.fixed .inner .btn-group label {
     pointer-events: all;
   }
+
   div.document.slideshow {
     position: absolute;
     top: 30px;
@@ -26228,6 +26346,7 @@ div.document main#mobilization .inner .body .input-group.fixed .inner .btn-group
     clear: both;
     background-color: #F3F3F3;
     border-top: 1px solid #E5E5E5;
+    z-index: 1000;
   }
   footer .inner {
     position: relative;
@@ -27707,7 +27826,7 @@ div#reviews .review:not(:last-child)::after {
 
   div.browse {
     display: block;
-    float: left;
+    /*float: left;*/
     width: calc(300px * 3 + 15px * 2);
     padding: 120px 15px 0 15px;
     background-color: #FFF;
@@ -30338,6 +30457,84 @@ main#mobilize-new form .modal .inner .body textarea.has-value + label {
   }
   main#mobilize-existing .inner .mobilizations-container .mobilization-layout.publishable .mobilization {
     background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(163, 198, 196, 0.15) 10px, rgba(163, 198, 196, 0.15) 20px);
+  }
+
+  .org-footer {
+    position: relative;
+    background-color: #0468B1;
+    background: linear-gradient(180deg, #005687 0%, #0468B1 30%, #E5E5E5 100%);
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 0.8rem;
+    z-index: 10000;
+  }
+  .org-footer .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .org-footer .footer-row .footer-column .footer-img {
+    max-width: 100%;
+    height: auto;
+  }
+  .org-footer .footer-row .footer-column h3 {
+    font-weight: bold;
+    font-size: 14px;
+    margin: calc(67px - 45px) 0 0 0;
+    text-transform: uppercase;
+  }
+  .org-footer .footer-row .footer-column .outer .logo {
+    display: block;
+    height: 125px;
+    margin: 0 auto 15px auto;
+  }
+  .org-footer .footer-row .footer-column .outer small {
+    display: block;
+    font-size: 12px;
+    text-align: center;
+  }
+  .org-footer .footer-row .footer-column .inner {
+    padding: 45px 45px 0px 45px;
+  }
+  .org-footer .footer-row .footer-column .inner ul {
+    margin: 15px 0 0 0;
+    padding: 0;
+  }
+  .org-footer .footer-row .footer-column .inner ul li {
+    font-size: 14px;
+    list-style: none;
+    margin-bottom: 0.5em;
+  }
+  .org-footer .footer-row .footer-column .inner a {
+    color: #fff;
+    font-weight: normal;
+  }
+  .org-footer .footer-row .footer-column .inner .social-media-links li {
+    display: inline-block;
+    font-size: 20px;
+    margin: 0 10px 0 0;
+    color: #fff;
+  }
+  .org-footer .footer-row .footer-column:not(.center) {
+    flex: 1 1 0;
+  }
+  .org-footer .footer-row .footer-column.left .inner {
+    padding-top: 30px;
+  }
+  .org-footer .footer-row .footer-column.center {
+    width: calc(300px * 3 + 15px * 2);
+    padding: 0 15px;
+  }
+  .org-footer .footer-row.signature {
+    padding: 0 45px;
+  }
+  .org-footer .footer-row.signature .inner p {
+    color: #005687;
   }
 }
 @media print {

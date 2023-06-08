@@ -302,7 +302,9 @@ div.public-page-header {
 }
 
 div.main-content {
+	position: sticky;
 	display: flex;
+	top: 0;
 }
 
 div.browse {

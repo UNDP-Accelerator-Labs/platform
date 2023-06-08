@@ -27700,7 +27700,9 @@ div#reviews .review:not(:last-child)::after {
   }
 
   div.main-content {
+    position: sticky;
     display: flex;
+    top: 0;
   }
 
   div.browse {

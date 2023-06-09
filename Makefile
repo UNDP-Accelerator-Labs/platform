@@ -17,6 +17,9 @@ create-user:
 name:
 	git describe --abbrev=10 --tags HEAD
 
+commit:
+	git describe --match NOTATAG --always --abbrev=40 --dirty='*'
+
 current-version:
 	./sh/version.sh --current
 

@@ -11,7 +11,6 @@ module.exports = (req, res) => {
 
 	if (modules.some(d => d.type === `${object}s`)) {
 		const { read, write } = modules.find(d => d.type === `${object}s`).rights
-
 		
 		if (object === 'pad') return pad(req, res) // THE || uuid IS FOR PUBLIC ACCESS DURING MOBILIZATIONS
 		else if (object === 'template') return template(req, res)

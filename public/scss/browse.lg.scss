@@ -2,7 +2,11 @@ div.public-page-header {
 	min-height: 100vh;
 
 	div.carousel {
-		position: relative;
+		/*position: relative;*/
+		position: absolute;
+		width: 100%;
+		min-height: 100vh;
+		left: 0;
 
 		div.slides {
 			display: flex;
@@ -97,7 +101,7 @@ div.public-page-header {
 			.dot {
 				height: 15px;
 				width: 15px;
-				margin: 0 2.5px;
+				margin: 0 5px;
 				background-color: rgba(0,0,0,.1);
 				border-radius: 50%;
 				display: inline-block;
@@ -105,23 +109,20 @@ div.public-page-header {
 				cursor: pointer;
 			}
 			.highlight {
-				background-color: $c-mid-blue;
+				background-color: $c-mid-green;
 			}
 		}
 	}
 
 
 	div.mosaic {
-		position: static;
+		position: absolute;
 		width: 100%;
 		min-height: 100vh;
+		left: 0;
 
 		/* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 		div.slides {
-			/*display: flex;
-			flex-wrap: wrap;
-			justify-content: center;*/
-
 			display: grid;
 			grid-template-columns: repeat(auto-fit, 150px);
 			grid-auto-rows: 1fr;
@@ -151,7 +152,6 @@ div.public-page-header {
 				position: relative;
 				width: 150px;
 				height: 150px;
-				/* margin: 5px 5px 0 0;*/
 				transition: transform .5s;
 				overflow: hidden;
 				aspect-ratio: 1;
@@ -206,8 +206,7 @@ div.public-page-header {
 					width: 100%;
 					height: 100%;
 					background-color: $c-mid-blue;
-					/*mix-blend-mode: hard-light;*/
-					opacity: .75;
+					opacity: .9;
 					transform: translateY(100%);
 					transition: transform .25s;
 					pointer-events: none;
@@ -220,8 +219,8 @@ div.public-page-header {
 			}
 			div.slide:hover {
 				img {
-					filter: grayscale(1) blur(5px);
-					transform: scale(1.25);
+					/*filter: grayscale(1) blur(5px);*/
+					/*transform: scale(1.25);*/
 				}
 
 				.media-txt,
@@ -300,20 +299,52 @@ div.public-page-header {
 		line-height: 1.5em;
 	}
 }
+div.public-page-panel {
+	width: 100%;
+	padding: 90px 0;
+
+	.inner {
+		width: calc(300px * 3 + 15px * 2);
+		margin: auto;
+
+
+		h1 {
+			font-size: $t-xlarge;
+			line-height: 1.2em;
+			margin-bottom: 1em;
+		}
+		.lead {
+			font-size: $t-large;
+			line-height: 1.3em;
+			margin-bottom: 1em;
+		}
+		blockquote {
+			font-size: $t-xlarge;
+			line-height: 1.3em;
+		}
+	}
+
+	&.blue {
+		background-color: $c-dark-blue;
+		color: #FFF;
+	}
+}
 
 div.main-content {
-	position: sticky;
 	display: flex;
-	top: 0;
+	min-height: 100vh;
 }
 
 div.browse {
 	display: block;
-	/*float: left;*/
 	width: calc(300px * 3 + 15px * 2);
-	padding: 120px 15px 0 15px;
+	padding: 0 15px;
 	background-color: #FFF;
 	min-height: calc(100vh - 120px);
+
+	&:not(.home) {
+		padding-top: 120px;
+	}
 
 	nav#search-and-filter {
 		padding: 5px 14px 15px 14px;
@@ -2155,11 +2186,11 @@ div.browse.public {
 	padding-top: 90px;
 }
 div.browse.slideshow {
-	position: absolute;
+	/*position: absolute;
 	top: 30px;
 	left: 0;
-	width: 100vw;
-	padding: 0;
+	width: 100vw;*/
+	padding: 0 15px;
 	margin: 0;
 	border: none;
 	min-height: 0;
@@ -2207,8 +2238,10 @@ div.browse.slideshow {
 	}
 
 	main {
-		position: relative;
+		position: absolute;
+		width: 100%;
 		height: 100%;
+		left: 0;
 		padding-bottom: 0;
 
 		.inner {
@@ -2396,7 +2429,7 @@ div.browse.slideshow {
 		}
 	}
 }
-div.browse.slideshow + footer {
+footer.slideshow {
 	position: fixed;
 	bottom: 0;
 	background-color: transparent;
@@ -2422,7 +2455,7 @@ div.browse.slideshow + footer {
 				cursor: pointer;
 			}
 			.highlight {
-				background-color: $c-mid-blue;
+				background-color: $c-mid-green;
 			}
 		}
 	}

@@ -38,7 +38,7 @@ $c-mid-2-light: rgba(87,100,140,.25);
 $c-mid-3: #F4ED6E;
 $c-light-1: #C2B4D6;
 $c-light-2: #E5E5E5;
-$c-light-3: #F3F3F3;
+$c-light-3: rgb(239,239,239);
 
 @keyframes fade-in {
 	from { opacity: 0 }
@@ -327,4 +327,11 @@ input.toggle:disabled + label::after {
 		transform: translate(24px, 0);
 	}
 }
-
+.sticky {
+	position: sticky !important;
+	top: 0;
+	left: 0;
+}
+/*.fixed {
+	position: fixed !important;
+}*/

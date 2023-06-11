@@ -48,6 +48,12 @@ String.prototype.isURL = function () {
 		return !!url.test(encodeURI(this.valueOf().trim()))
 	} else return false
 }
+String.prototype.isBlob = function () {
+	const blob = new RegExp('^blob\:')
+	if (this.valueOf().trim().match(blob)?.length <= 1) {
+		return !!blob.test(encodeURI(this.valueOf().trim()))
+	} else return false
+}
 String.prototype.URLsToLinks = function () {
 	// INSPIRED BY https://stackoverflow.com/questions/49634850/convert-plain-text-links-to-clickable-links
 	//URLs starting with http://, https://, or ftp://

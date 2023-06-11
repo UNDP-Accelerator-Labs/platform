@@ -292,7 +292,7 @@ header {
 	/*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
 	display: block;
 	flex: 1 1 0;
-	min-height: 100vh;
+	/* min-height: 100vh; */
 	/*float: left;*/
 	pointer-events: none;
 
@@ -718,18 +718,18 @@ header {
 }
 
 .sidebar {
-	position: sticky;
 	display: block;
 	flex: 1 1 0;
 	/*float: right;*/
 	top: 0;
 	vertical-align: top;
 	/*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
-	min-height: 100vh;
+	/* min-height: 100vh; */
 }
 .sidebar > .inner {
-	position: relative;
+	position: sticky;
 	/*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
+	top: 0;
 	height: 100vh;
 
 	#statistics {

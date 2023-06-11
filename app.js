@@ -78,15 +78,15 @@ app.use(sessionMiddleware)
 
 const routes = require('./routes/')
 
-
-app.get('/', routes.redirect.home, routes.redirect.public)
-
 // PUBLIC VIEWS
-app.get('/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
-app.get('/:language/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
+// app.get('/', routes.redirect.home, routes.dispatch.public)
+app.get('/', routes.redirect.home, routes.dispatch.public)
+app.get('/:language/home', routes.dispatch.public)
+
 
 app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
-	.get(routes.redirect.home, routes.render.login)
+	// .get(routes.redirect.home, routes.render.login)
+	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.login)
 app.get('/logout', routes.process.logout)
 

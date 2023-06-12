@@ -1,10 +1,33 @@
+<%
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+	const title = locals.metadata?.page?.title
+	const description = locals.metadata?.site?.description[language]
+	let ogp_locale = 'en_GB' 
+
+	if(language == 'fr'){
+		ogp_locale = 'fr-FR'
+	}
+	else if (language == 'es'){
+		ogp_locale = 'es_ES'
+	}
+	else if(language == 'pt'){
+		ogp_locale = 'pt_PT'
+	}
+%>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
 <meta name='apple-mobile-web-app-capable' content='yes'>
 <meta names='apple-mobile-web-app-status-bar-style' content='black-translucent'>
 <meta name="theme-color" content="#16a0d6e7"/>
 
-<title><%- locals.metadata?.page?.title %></title>
+<!-- OGP tags -->
+<meta property="og:title" content="<%= title %>">
+<meta property="og:description" content="<%= description %>">
+<meta property="og:locale" content="<%= ogp_locale %>">
+<meta property="og:site_name" content="<%= title %>">
+
+<title><%- title %></title>
 
 <script type='text/javascript' src='/scripts/d3/dist/d3.min.js'></script>
 <script type='text/javascript' src='/scripts/d3-selection-multi/build/d3-selection-multi.min.js'></script>

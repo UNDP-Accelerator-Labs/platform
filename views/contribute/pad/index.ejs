@@ -27,6 +27,10 @@
 
 <%- include ('../../partials/head.ejs') %> 
 
+<!-- OGP tags -->
+<meta property="og:title" content="<%= locals?.display_template?.title || '' %>">
+<meta property="og:description" content="<%= locals?.display_template?.description || ''  %>">
+
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
 	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
 	crossorigin=''/>

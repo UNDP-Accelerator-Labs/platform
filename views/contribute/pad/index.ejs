@@ -652,17 +652,6 @@
 			// chead.addElems('div', 'meta meta-date').html(new Date(Date.now()).toString())
 
 			// comments.addElems('div', 'body').html(d => d)
-			<% if (locals.metadata?.user?.uuid) { %>
-				journey.setUseFullPromptForSelect(true);
-				journey.updateJourneyList(() => {
-					const docBtn = d3.select('div.journey-local');
-					const data = { id: <%- locals.data?.id %> };
-					if (data.id) {
-						docBtn.data([data]);
-						journey.addDocButtons(docBtn);
-					}
-				});
-			<% } %>
 		</script>
 	<% } else if (pagedisplay === 'slideshow') { %>
 		<div class='inner'>

@@ -9,4 +9,4 @@ fi
 
 source ./sh/env.sh
 
-npm run ${CMD} "$@"
+npm run "${CMD}" "$@"

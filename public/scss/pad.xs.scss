@@ -1,3 +1,5 @@
+@import 'vars.xs';
+
 div.fixed-bg {
 	position: fixed;
 	top: 0;
@@ -25,7 +27,7 @@ div.document {
 	min-height: calc(100vh - 45px);
 
 	main {
-		
+
 		.engagement-input-group {
 			position: fixed;
 			width: 225px;
@@ -249,7 +251,7 @@ div.document {
 					.save {
 						display: inline-block;
 						margin: 0 5px 0 5px;
-						
+
 						button {
 							background-color: $c-light-blue;
 							padding:  0 15px;
@@ -269,7 +271,7 @@ div.document {
 						position: relative;
 						display: inline-block;
 						margin: 0 5px 0 5px;
-						
+
 						button {
 							min-height: 45px;
 							padding: 0 15px;
@@ -308,7 +310,7 @@ div.document {
 							menu {
 								width: 100%;
 								border-top: 1px solid $c-light-grey;
-								
+
 								li {
 									width: 100%;
 									margin: 0;
@@ -365,7 +367,7 @@ div.document {
 				position: relative;
 				width: 100%;
 				margin-bottom: 15px;
-				
+
 				.return {
 					display: block;
 					font-size: $t-mid-small;
@@ -438,7 +440,7 @@ div.document {
 
 						.opt {
 							display: inline-block;
-							width: 30px; 
+							width: 30px;
 							height: 30px;
 							text-align: center;
 							cursor: pointer;
@@ -491,7 +493,7 @@ div.document {
 
 								.opt {
 									position: relative;
-									width: 45px; 
+									width: 45px;
 									height: 45px;
 									border: none;
 									outline: none;
@@ -734,7 +736,7 @@ div.document {
 							.mosaic-item:hover {
 								.index-opts {
 									display: flex;
-									
+
 									.opt {
 										/*background-color: $c-light-yellow;*/
 										background-color: $c-light-2;
@@ -792,7 +794,7 @@ div.document {
 									div {
 										padding: 0 5px;
 										cursor: pointer;
-										
+
 										label {
 											cursor: pointer;
 										}
@@ -815,7 +817,7 @@ div.document {
 									.grow {
 										flex-grow: 1;
 										align-self: center;
-										
+
 										.list-item {
 											display: block;
 											width: 100%;
@@ -959,7 +961,7 @@ div.document {
 								min-height: 65px;
 								padding: 10px;
 								margin-top: 30px;
-								
+
 								background: repeating-linear-gradient(
 									45deg,
 									transparent,
@@ -1020,7 +1022,7 @@ div.document {
 									border-bottom: 1px solid $c-dark-blue;
 									outline: none;
 									background-color: transparent;
-									font-size: $t-large; 
+									font-size: $t-large;
 									line-height: 1.5em;
 								}
 								input[type=text]:focus + label,
@@ -1030,8 +1032,8 @@ div.document {
 									transform: translateY(0px);
 								}
 								input[type=text]:-webkit-autofill,
-								input[type=text]:-webkit-autofill:hover, 
-								input[type=text]:-webkit-autofill:focus, 
+								input[type=text]:-webkit-autofill:hover,
+								input[type=text]:-webkit-autofill:focus,
 								input[type=text]:-webkit-autofill:active	{
 									-webkit-box-shadow: 0 0 0 40px $c-mid-1 inset !important;
 									-webkit-text-fill-color: $c-dark-1 !important;
@@ -1157,7 +1159,7 @@ div.document {
 										margin: 0;
 										/*color: $c-light-1;*/
 										color: $c-light-grey;
-										cursor: initial;									
+										cursor: initial;
 									}
 								}
 							}
@@ -1197,7 +1199,7 @@ div.document {
 							.inset-methods,
 							.inset-datasources {
 								max-height: calc(300px);
-							}	
+							}
 						}
 						figcaption {
 							font-size: $t-small;
@@ -1389,7 +1391,7 @@ div.document {
 					/*border-top-color: $c-light-yellow;*/
 					border-top-color: $c-light-2;
 					border-bottom: 1px dotted $c-light-grey;
-					
+
 					.media-container {
 						.media,
 						.media.focus {
@@ -1702,7 +1704,7 @@ footer {
 			}
 			.btn-group {
 				border-top: 1px solid $c-mid-grey;
-				
+
 				button {
 					display: none;
 					height: 30px;
@@ -1780,7 +1782,7 @@ footer {
 						width: 100%;
 						height: 45px;
 						margin: 10px 0 0 0;
-						
+
 						background: repeating-linear-gradient(
 							45deg,
 							transparent,
@@ -1795,7 +1797,7 @@ footer {
 						padding-left: 30px;
 						overflow: hidden;
 						transition: max-height 0.25s ease-out;
-					
+
 						ul.replies {
 
 							li {
@@ -1838,7 +1840,7 @@ footer {
 			width: 875px;
 			margin: 0 auto;
 			padding: 10px;
-			
+
 			small {
 				font-size: $t-small;
 				line-height: 1.5em;
@@ -1889,9 +1891,9 @@ footer {
 		width: 100%;
 		background-color: #FFF;
 		border: none;
-		
+
 		.inner {
-			
+
 			button.slide-nav {
 				position: fixed;
 				top: 0;

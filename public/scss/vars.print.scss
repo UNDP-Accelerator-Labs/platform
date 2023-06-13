@@ -1,4 +1,4 @@
-/*@import 'vars';*/
+@import 'vars';
 
 $t-xxsmall: 8pt;
 $t-xsmall: 8pt;
@@ -40,3 +40,7 @@ html, body {
 /*.pagedjs_page {
 	margin: auto;
 }*/
+
+.journey-doc {
+	display: none;
+}

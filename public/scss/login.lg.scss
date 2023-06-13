@@ -1,8 +1,10 @@
+@import 'vars.lg';
+
 .login-module {
 	padding: 30px 30px 15px 30px;
 	border-top: 2px solid $c-dark-blue;
 	background-color: #FFF;
-	
+
 	ul {
 		li {
 			position: relative;

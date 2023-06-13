@@ -69,3 +69,14 @@ The file structure of this project is organized as follows:
 - **config**: Contains platform configuration files.
   - **config/db**: Contains database settings.
   - **config/edit**: Contains platform configurable settings.
+
+## Updating to use ltree
+
+For updating tables to use ltree (if you didn't run `init.sql` from scratch)
+go to `routes/scripts` and run:
+
+```
+node setup_versions.js pads update
+node setup_versions.js mobilizations update
+node setup_versions.js templates update
+```

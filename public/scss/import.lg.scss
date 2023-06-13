@@ -1,3 +1,5 @@
+@import 'vars.lg';
+
 div.table {
 	/*display: block;
 	float: left;
@@ -41,7 +43,7 @@ div.table {
 						position: relative;
 						display: inline-block;
 						margin: 0 5px 0 5px;
-						
+
 
 						button {
 							min-height: 30px;
@@ -53,7 +55,7 @@ div.table {
 							line-height: 1.5em;
 							cursor: pointer;
 						}
-						
+
 						button:disabled {
 							background-color: transparent;
 							border: 1px solid $c-light-2;
@@ -112,7 +114,7 @@ div.table {
 						input {
 							display: none;
 						}
-						
+
 						button {
 							width: 100%;
 							height: 100%;
@@ -172,7 +174,7 @@ div.table {
 						border-top: 1px solid $c-light-2;
 						/*border-bottom: 1px solid $c-light-2;*/
 						background-color: #FFF;
-						
+
 						button {
 							height: 60px;
 							width: 60px;
@@ -308,7 +310,7 @@ div.table {
 									vertical-align: middle;
 									border: none;
 									outline: none;
-									margin-left: 15px; 
+									margin-left: 15px;
 									background-color: transparent;
 									color: $c-mid-grey;
 
@@ -418,7 +420,7 @@ div.table {
 	.document {
 		float: none;
 		margin: auto;
-		
+
 		main {
 			padding: 0;
 			margin: 0 auto;

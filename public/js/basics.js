@@ -16,14 +16,11 @@ function getMediaSize () {
 	})?.label
 }
 const jsonQueryHeader = { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-function _fetch(_method, _uri, _q, _expectJSON, _cookies, _checkStatus) {
+function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
 	return new Promise((resolve, reject) => {
 		const args = { method: _method, headers: jsonQueryHeader };
 		if (_q) {
 			args['body'] = JSON.stringify(_q);
-		}
-		if (_cookies) {
-			args['credentials'] = 'include';  // FIXME: investigate whether this is actually necessary
 		}
 		fetch(_uri, args)
 		.then(response => {
@@ -44,17 +41,17 @@ function _fetch(_method, _uri, _q, _expectJSON, _cookies, _checkStatus) {
 		});
 	});
 }
-function GET (_uri, _expectJSON = true, _cookies = false, _checkStatus = false) {
-	return _fetch('GET', _uri, null, _expectJSON, _cookies, _checkStatus);
+function GET (_uri, _expectJSON = true, _checkStatus = false) {
+	return _fetch('GET', _uri, null, _expectJSON, _checkStatus);
 }
-function POST (_uri, _q, _expectJSON = true, _cookies = false, _checkStatus = false) {
-	return _fetch('POST', _uri, _q || {}, _expectJSON, _cookies, _checkStatus);
+function POST (_uri, _q, _expectJSON = true, _checkStatus = false) {
+	return _fetch('POST', _uri, _q || {}, _expectJSON, _checkStatus);
 }
-function PUT (_uri, _q, _expectJSON = true, _cookies = false, _checkStatus = false) {
-	return _fetch('PUT', _uri, _q || {}, _expectJSON, _cookies, _checkStatus);
+function PUT (_uri, _q, _expectJSON = true, _checkStatus = false) {
+	return _fetch('PUT', _uri, _q || {}, _expectJSON, _checkStatus);
 }
-function DELETE (_uri, _q, _expectJSON = true, _cookies = false, _checkStatus = false) {
-	return _fetch('DELETE', _uri, _q || {}, _expectJSON, _cookies, _checkStatus);
+function DELETE (_uri, _q, _expectJSON = true, _checkStatus = false) {
+	return _fetch('DELETE', _uri, _q || {}, _expectJSON, _checkStatus);
 }
 function toggleClass (node, classname) {
 	d3.select(node).classed(classname, function () { return !d3.select(this).classed(classname) })

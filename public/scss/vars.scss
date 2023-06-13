@@ -328,3 +328,93 @@ input.toggle:disabled + label::after {
 	}
 }
 
+div.journey {
+	position: relative;
+	width: 100%;
+	height: 65px;
+	border-bottom: 2px solid $c-light-blue;
+
+	input[type=text] {
+		float: left;
+		position: relative;
+		width: calc(100% - 30px - 65px);
+		height: 50px;
+		margin: 15px 0 0 15px;
+		border: none;
+		/*border-bottom: 1px solid #FFF;*/
+		outline: none;
+		background-color: transparent;
+		font-size: 24px;
+		color: $c-dark-blue;
+	}
+	label[for=journey-main] {
+		position: absolute;
+		top: 5px;
+		left: 15px;
+		font-size: 16px;
+		color: $c-light-grey;
+		transform: translateY(16px);
+		transition: transform .25s, font-size .25s;
+		pointer-events: none;
+	}
+	input[type=text]:focus + label,
+	input[type=text]:active + label,
+	input[type=text].has-value + label {
+		font-size: 12px;
+		transform: translateY(5px);
+	}
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	input:-webkit-autofill:active  {
+		-webkit-box-shadow: 0 0 0 40px #FFF inset !important;
+		-webkit-text-fill-color: $c-dark-blue !important;
+	}
+	button {
+		float: left;
+		width: 65px;
+		height: 60px;
+		margin-top: 5px;
+		background-color: transparent;
+		border: none;
+		outline: none;
+		color: $c-dark-blue;
+		cursor: pointer;
+	}
+	button:hover {
+		color: $c-mid-blue-semi;
+	}
+	button:active {
+		color: $c-mid-blue;
+	}
+}
+
+.journey-article-inactive {
+	filter: opacity(0.4) !important;
+}
+.journey-btn-active {
+	background-color: $c-light-blue !important;
+}
+.journey-btn-active:hover {
+	background-color: $c-mid-blue-semi !important;
+}
+.journey-btn-active:active {
+	background-color: $c-mid-blue !important;
+}
+
+.journey-doc {
+	button {
+		display: inline-block;
+		cursor: pointer;
+		padding: 0.25em 10px;
+		margin: 0 2px 0 0;
+		border: 1px solid $c-light-blue;
+		background-color: transparent;
+	}
+	button:hover {
+		background-color: #ddd;
+	}
+	button:active {
+		background-color: #ccc;
+	}
+}

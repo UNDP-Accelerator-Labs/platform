@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure/msal-node": "^1.17.3",
     "@azure/storage-blob": "^12.14.0",
     "@turf/turf": "^5.1.6",
     "archiver": "^5.1.0",

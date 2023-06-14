@@ -7,7 +7,7 @@ const { app_title_short } = require('../../../config')
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
-	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, accessToken } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
@@ -25,6 +25,7 @@ exports.sessiondata = _data => {
 		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
+	obj.accessToken = accessToken || null
 
 	return obj
 }

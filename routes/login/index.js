@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken')
 exports.check = require('./check.js')
 exports.render = require('./render.js')
 exports.process = require('./process.js')
+exports.initiate_sso = require('./sso-inits.js')
+exports.validate_sso = require('./sso-validate.js')
 
 exports.redirect = (req, res, next) => {
 	const language = checklanguage(req.params?.language ? req.params.language : req.session.language)

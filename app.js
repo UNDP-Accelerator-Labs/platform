@@ -81,6 +81,11 @@ const routes = require('./routes/')
 
 app.get('/', routes.redirect.home, routes.redirect.public)
 
+//MICROSOFT SSO PATHS
+app.get('/sso-login', routes.initiate_sso);
+  
+app.get('/auth/openid/return', routes.validate_sso);
+
 // PUBLIC VIEWS
 app.get('/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
 app.get('/:language/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED

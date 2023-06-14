@@ -168,6 +168,8 @@ exports.render.login = require('./login/').render
 exports.process.login = require('./login/').process
 exports.process.logout = require('./login/').logout
 exports.redirect.home = require('./login/').redirect
+exports.initiate_sso = require('./login').initiate_sso
+exports.validate_sso = require('./login').validate_sso
 
 exports.redirect.public = (req, res) => res.redirect('/public')
 exports.dispatch.public = require('./login/').public

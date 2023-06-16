@@ -10,7 +10,8 @@ public/*uploads/
 dep.*
 *.env
 tmp/
-routes/scripts/
+routes/scripts/*
+!routes/scripts/shared/
 public/generated/
 presentations/
 dump/

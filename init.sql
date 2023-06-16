@@ -136,7 +136,7 @@ CREATE TABLE mobilizations (
 	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
 	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	status INT DEFAULT 1, 
+	status INT DEFAULT 1,
 	public BOOLEAN DEFAULT FALSE,
 	start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	end_date TIMESTAMPTZ,
@@ -163,6 +163,11 @@ CREATE TABLE mobilization_contributions (
 	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE extern_db (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	db VARCHAR(20) UNIQUE NOT NULL,
+	url_prefix TEXT NOT NULL
+);
 CREATE TABLE pinboards (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	title VARCHAR(99),
@@ -176,7 +181,8 @@ CREATE TABLE pinboards (
 	display_fullscreen BOOLEAN DEFAULT FALSE,
 	slideshow BOOLEAN DEFAULT FALSE,
 	"date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
+	mobilization_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	mobilization INT  -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
 );
 ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
 
@@ -184,16 +190,16 @@ CREATE TABLE pinboard_contributors (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	participant uuid,
-	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE	
+	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
 
 CREATE TABLE pinboard_contributions (
-	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
+	pad INT UNIQUE NOT NULL,
+	db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	PRIMARY KEY (pad, db, pinboard)
 );
-ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, pinboard);
 
 CREATE TABLE tagging (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

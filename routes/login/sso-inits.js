@@ -6,7 +6,7 @@ const msalClient = new msal.ConfidentialClientApplication(msalConfig);
 
 module.exports = async (req, res, next) => {
 	const authCodeUrlParameters = {
-		scopes: ['user.read'], // Adjust the scopes based on your requirements
+		scopes: ['user.read', 'User.ReadBasic.All'], // Adjust the scopes based on your requirements
 		redirectUri: SSO_REDIRECT_URL,
 	};
 

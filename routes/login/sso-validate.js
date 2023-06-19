@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
 	const tokenRequest = {
 		code: req.query.code,
 		redirectUri: SSO_REDIRECT_URL,
-		scopes: ['user.read'], // Adjust the scopes based on your requirements
+		scopes: ['user.read', 'User.ReadBasic.All'], // Adjust the scopes based on your requirements
 	};
 
     const { referer, host } = req.headers || {}
@@ -74,13 +74,13 @@ module.exports = (req, res, next) => {
 
                     // GET USER INFO
                     return t.oneOrNone(userInfoQuery, [ app_languages, email ])
-                    .then(results => {
+                    .then(async results => {
                         if (!results) {
                             res.redirect('/login')
                         } else {
                             const { language, rights } = results;
                             results.accessToken = accessToken;
-                            Object.assign(req.session, datastructures.sessiondata(results))
+                            await Object.assign(req.session, datastructures.sessiondata(results))
                             
                             if (!originalUrl || originalUrl === path) {
                                 const { read, write } = modules.find(d => d.type === 'pads')?.rights;
@@ -112,14 +112,14 @@ module.exports = (req, res, next) => {
                             if (result) {
                                 // GET USER INFO
                                 return t.oneOrNone(userInfoQuery, [ app_languages, email ])
-                                .then(results => {
+                                .then(async results => {
 
                                     if (!results) {
                                         res.redirect('/login')
                                     } else {
                                         const { language, rights } = results;
                                         results.accessToken = accessToken;
-                                        Object.assign(req.session, datastructures.sessiondata(results))
+                                        await Object.assign(req.session, datastructures.sessiondata(results))
 
                                         if (!originalUrl || originalUrl === path) {
                                             const { read, write } = modules.find(d => d.type === 'pads')?.rights

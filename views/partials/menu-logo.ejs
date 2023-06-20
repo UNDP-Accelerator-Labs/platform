@@ -73,16 +73,16 @@
 																						<div class='sub'>
 																							<%- vocabulary['created by'][language](t.ownername) %>
 																						</div>
-																					<% } %>
+																					<% } // t.owner %>
 																				</button>
-																			<% } else { %>
+																			<% } else { // t.title %>
 																				<button class='wrapable'>
 																					<label>[<%- vocabulary['untitled template'][language] %>]</label>
 																					<% if (t.owner !== uuid) { %>
 																						<div class='sub'>
 																							<%- vocabulary['created by'][language](t.ownername) %>
 																						</div>
-																					<% } %>
+																					<% } // t.owner %>
 																				</button>
 																			<% } // t.title %>
 																		</a>

@@ -1,5 +1,4 @@
-const path = require('path')
-let {
+const {
 	app_title,
 	app_title_short,
 	app_suite,
@@ -24,6 +23,7 @@ let {
 const { translations } = require('./edit/translations.js')
 exports.translations = translations
 
+exports.app_id = app_id
 exports.app_title = app_title
 exports.app_title_short = app_title_short
 exports.app_suite = app_suite

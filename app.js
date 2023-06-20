@@ -2,7 +2,7 @@
 global.include = path => require(`${__dirname}/${path}`)
 global.rootpath = __dirname
 
-const { app_suite, app_suite_secret, DB } = include('config/')
+const { app_id, app_suite, app_suite_secret, DB } = include('config/')
 const express = require('express')
 const path = require('path')
 const bodyparser = require('body-parser')
@@ -58,20 +58,23 @@ if (process.env.NODE_ENV === 'production') {
 	install_dependencies()
 }
 
-const sessionMiddleware = session({ 
+const cookie = {
+	httpOnly: true, // THIS IS ACTUALLY DEFAULT
+	secure: process.env.NODE_ENV === 'production',
+	maxAge: 1000 * 60 * 60 * 24 * 1, // 1 DAY
+	sameSite: 'lax',
+};
+if (app_id === 'local') {
+	cookie.domain = process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost';
+}
+const sessionMiddleware = session({
 	name: `${app_suite}-session`,
 	// secret: 'acclabspadspass',
 	secret: `${app_suite}-${app_suite_secret}-pass`,
 	store: new pgSession({ pgPromise: DB.general }),
 	resave: false,
 	saveUninitialized: false,
-	cookie: {
-		httpOnly: true, // THIS IS ACTUALLY DEFAULT
-		secure: process.env.NODE_ENV === 'production',
-		maxAge: 1000 * 60 * 60 * 24 * 1, // 1 DAY
-		sameSite: 'lax',
-		domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost'
-	}
+	cookie,
 })
 
 app.use(sessionMiddleware)
@@ -80,6 +83,26 @@ const routes = require('./routes/')
 
 
 app.get('/', routes.redirect.home, routes.redirect.public)
+
+// HEALTH-CHECK + INFO
+let versionString = null;
+
+function getVersionString() {
+	return new Promise((resolve) => {
+		if (versionString !== null) {
+			resolve(versionString);
+			return;
+		}
+		fs.readFile('version.txt', (err, data) => {
+			versionString = err ? 'no version available' : data.toString();
+			resolve(versionString);
+		});
+	});
+}
+
+app.get('/version/', (req, res) => {
+	getVersionString().then(vs => res.send(vs)).catch(err => console.log(err));
+});
 
 // PUBLIC VIEWS
 app.get('/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
@@ -148,13 +171,13 @@ app.post('/call/api', routes.process.callapi)
 app.post('/upload/img', upload.array('img'), routes.process.upload)
 app.post('/upload/video', upload.array('video'), routes.process.upload)
 app.post('/upload/pdf', upload.array('pdf'), routes.process.upload)
-app.post('/upload/xlsx', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA 
+app.post('/upload/xlsx', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA
 
 app.post('/screenshot', routes.process.screenshot)
 
 
 // TO DO: UPDATE SCHEMA BELOW
-// app.post('/storeImport', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA 
+// app.post('/storeImport', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA
 app.post('/forwardGeocoding', routes.forwardGeocoding) // UPDATE TO geocode/forward
 app.post('/reverseGeocoding', routes.reverseGeocoding) // UPDATE TO geocode/forward
 
@@ -177,14 +200,17 @@ app.route('/:language/:instance')
 app.get('*', routes.notfound)
 
 // RUN THE SERVER
-const server = app.listen(process.env.PORT || 2000, _ => console.log(`the app is running on port ${process.env.PORT || 2000}`))
+app.listen(process.env.PORT || 2000, _ => {
+	console.log(`the app is running on port ${process.env.PORT || 2000}`)
+	getVersionString().then(vs => console.log(vs)).catch(err => console.log(err));
+})
 
 
 // INITIATE ALL CRON JOBS
 const cron = require('node-cron')
 DB.conn.tx(t => {
 	return t.none(`
-		UPDATE mobilizations 
+		UPDATE mobilizations
 		SET status = status + 1
 		WHERE (start_date <= NOW() AND status = 0)
 			OR (end_date <= NOW() AND status = 1)

@@ -4,8 +4,7 @@ cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../" &> /dev/null
 
 IMAGE_TAG="${IMAGE_TAG:-$(make -s name)}"
 IMAGE_NAME="platform:${IMAGE_TAG}"
-CONFIG_PATH="${CONFIG_PATH:-${DOCKER_CONFIG}}"
-PORT="${PORT:-8080}"
+PORT="${PORT:-2000}"
 
 make -s version-file
 
@@ -13,8 +12,9 @@ echo "building ${IMAGE_NAME}"
 
 docker buildx build \
     --platform linux/amd64 \
+    --build-arg "PORT=${PORT}" \
     -t "${IMAGE_NAME}" \
-    -f Dockerfile \
+    -f deploy/Dockerfile \
     .
 
 echo "built ${IMAGE_NAME}"

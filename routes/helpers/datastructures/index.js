@@ -1,4 +1,20 @@
-const { app_title: title, app_description: description, app_title_short: app_db, app_languages, app_storage, modules, metafields, media_value_keys, engagementtypes, lazyload, browse_display, welcome_module, page_content_limit, DB } = include('config/')
+const {
+	app_id,
+	app_title: title,
+	app_description: description,
+	app_title_short: app_db,
+	app_languages,
+	app_storage,
+	modules,
+	metafields,
+	media_value_keys,
+	engagementtypes,
+	lazyload,
+	browse_display,
+	welcome_module,
+	page_content_limit,
+	DB,
+} = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
@@ -133,7 +149,7 @@ exports.pagemetadata = (_kwargs) => {
 		// PINBOARD LIST
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
 			batch.push(t.any(`
-				SELECT pb.id, pb.title, pb.status, 
+				SELECT pb.id, pb.title, pb.status,
 					COUNT (pc.pad) AS size,
 					COUNT (DISTINCT (p.owner)) AS contributors
 
@@ -184,6 +200,7 @@ exports.pagemetadata = (_kwargs) => {
 				welcome_module,
 				app_storage,
 				app_db,
+				app_id,
 			},
 			user: {
 				uuid,

@@ -1,4 +1,5 @@
 const {
+	app_id,
 	app_title,
 	app_title_short,
 	app_suite,

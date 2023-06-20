@@ -9,7 +9,7 @@ if (app_id === 'ap') {
 	app_obj = {...app_obj, ...require('./global.js')};
 } else if (app_id === 'sm') {
 	app_obj = {...app_obj, ...require('./sm.js')};
-} else if (app !== 'local') {
+} else if (app_id !== 'local') {
 	throw new Error(`APP_ID must be set to a valid value, got '${app_id}'`)
 }
 

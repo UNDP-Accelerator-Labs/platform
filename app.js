@@ -55,7 +55,7 @@ if (process.env.NODE_ENV === 'production') {
 			})
 		})
 	}
-	install_dependencies()
+	install_dependencies().then(() => {}).catch(err => console.log(err));
 }
 
 const cookie = {

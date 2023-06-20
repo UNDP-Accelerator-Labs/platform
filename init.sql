@@ -170,6 +170,8 @@ CREATE TABLE extern_db (
 );
 CREATE TABLE pinboards (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	old_id INT,
+	old_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	title VARCHAR(99),
 	description TEXT,
 	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,

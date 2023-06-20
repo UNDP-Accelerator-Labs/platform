@@ -279,3 +279,6 @@ CREATE TABLE "session" (
 WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
+ALTER TABLE users
+ADD COLUMN createdFromSso BOOLEAN DEFAULT FALSE;

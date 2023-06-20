@@ -93,3 +93,13 @@ exports.view_display = view_display
 exports.welcome_module = welcome_module
 
 exports.fixed_uuid = fixed_uuid
+
+
+//MICROSOFT SSO CONFIG VARIABLES
+exports.msalConfig = {
+	auth: {
+	  clientId: process.env.CLIENT_ID,
+	  authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`,
+	  clientSecret: process.env.CLIENT_SECRET, // Only required for confidential client applications
+	},
+};

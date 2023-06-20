@@ -5,16 +5,13 @@ const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
-	const { uuid } = req.session || {}
+	const { uuid, accessToken } = req.session || {}
 	
 	const cookies = parseCookies(req)
 	let sid = cookies[`${app_suite}-session`]
 	if (sid) sid = sid.split(':')[1].split('.')[0]
-	console.log(cookies)
-	console.log(sid)
 
-
-	if (uuid) next() // A USER IS LOGGED
+	if (uuid || accessToken) next() // A USER IS LOGGED
 	else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
 	else { 
 	// if (['browse', 'contribute', 'view'].includes(activity) && ['pad', 'pads'].includes(object)) {

@@ -19,7 +19,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run sass
+RUN npm run sass-deploy
 
 ENV HOST=0.0.0.0
 ENV PORT=${PORT}

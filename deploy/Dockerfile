@@ -16,10 +16,12 @@ RUN apt-get install -y \
     zip \
     ffmpeg
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY package.json .
+COPY package-lock.json .
 RUN npm install
 COPY . .
 RUN npm run sass-deploy
+RUN npm run build --if-present
 
 ENV HOST=0.0.0.0
 ENV PORT=${PORT}

@@ -40,7 +40,7 @@
 									<div class='dropdown'>
 										<ul>
 											<% if (rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) { %>
-												<% if (app_id !== 'ap') { %>
+												<% if (app_id !== 'ap' && app_id !== 'exp') { %>
 												<li>
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
@@ -62,7 +62,7 @@
 																		<label for='filter-pad-templates'><%- vocabulary['filter'][language](true) %></label>
 																	</li>
 																	<li class='padding'></li>
-																<% } %>
+																<% } // locals.metadata.menu.templates 2 %>
 																<% locals.metadata.menu.templates.forEach(t => { %>
 																	<li class='status-<%- t.status %>'>
 																		<a href='/<%- language %>/contribute/pad?template=<%- t.id %>'>
@@ -84,16 +84,16 @@
 																						</div>
 																					<% } %>
 																				</button>
-																			<% } %>
+																			<% } // t.title %>
 																		</a>
 																	</li>
-																<% }) %>
+																<% }) // locals.metadata.menu.templates.forEach %>
 															</ul>
 														</div>
 													</li>
-												<% } %>
-												<% } // app_id !== 'ap' %>
-											<% } %>
+												<% } // locals.metadata.menu.templates 0 %>
+												<% } // app_id %>
+											<% } // rights %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
 												<li>
 													<button>

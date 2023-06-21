@@ -27,4 +27,4 @@ ENV HOST=0.0.0.0
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 
-CMD ["exec", "npm start 1>&2"]
+CMD ["make", "run-web"]

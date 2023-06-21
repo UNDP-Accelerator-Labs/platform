@@ -43,7 +43,7 @@ git-check:
 	./sh/git_check.sh
 
 run-web:
-	CMD=start ./sh/run.sh 1>&2
+	CMD=start stdbuf -oL ./sh/run.sh
 
 run-sass:
 	CMD=sass ./sh/run.sh

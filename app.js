@@ -98,12 +98,14 @@ function getVersionString() {
 				versionObj = {
 					'name': 'no version available',
 					'commit': 'unknown',
+					'app': `${app_id}`,
 				};
 			} else {
 				const lines = data.toString().split(/[\r\n]+/);
 				versionObj = {
 					'name': lines[0] || 'no version available',
 					'commit': lines[1] || 'unknown',
+					'app': `${app_id}`,
 				};
 			}
 			resolve(versionObj);
@@ -117,6 +119,7 @@ app.get('/version/', (req, res) => {
 		res.status(500).send({
 			'name': 'error while reading version',
 			'commit': 'unknown',
+			'app': `${app_id}`,
 		})
 	});
 });

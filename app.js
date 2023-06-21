@@ -85,23 +85,40 @@ const routes = require('./routes/')
 app.get('/', routes.redirect.home, routes.redirect.public)
 
 // HEALTH-CHECK + INFO
-let versionString = null;
+let versionObj = null;
 
 function getVersionString() {
 	return new Promise((resolve) => {
-		if (versionString !== null) {
-			resolve(versionString);
+		if (versionObj !== null) {
+			resolve(versionObj);
 			return;
 		}
 		fs.readFile('version.txt', (err, data) => {
-			versionString = err ? 'no version available' : data.toString();
-			resolve(versionString);
+			if (err) {
+				versionObj = {
+					'name': 'no version available',
+					'commit': 'unknown',
+				};
+			} else {
+				const lines = data.toString().split(/[\r\n]+/);
+				versionObj = {
+					'name': lines[0] || 'no version available',
+					'commit': lines[1] || 'unknown',
+				};
+			}
+			resolve(versionObj);
 		});
 	});
 }
 
 app.get('/version/', (req, res) => {
-	getVersionString().then(vs => res.send(vs)).catch(err => console.log(err));
+	getVersionString().then(vo => res.send(vo)).catch(err => {
+		console.log(err);
+		res.status(500).send({
+			'name': 'error while reading version',
+			'commit': 'unknown',
+		})
+	});
 });
 
 // PUBLIC VIEWS
@@ -202,7 +219,10 @@ app.get('*', routes.notfound)
 // RUN THE SERVER
 app.listen(process.env.PORT || 2000, _ => {
 	console.log(`the app is running on port ${process.env.PORT || 2000}`)
-	getVersionString().then(vs => console.log(vs)).catch(err => console.log(err));
+	getVersionString().then(vo => {
+		console.log('name', vo.name);
+		console.log('commit', vo.commit);
+	}).catch(err => console.log(err));
 })
 
 

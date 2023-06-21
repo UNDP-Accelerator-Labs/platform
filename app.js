@@ -225,6 +225,7 @@ app.listen(process.env.PORT || 2000, _ => {
 	getVersionString().then(vo => {
 		console.log('name', vo.name);
 		console.log('commit', vo.commit);
+		console.log('app_id', app_id);
 	}).catch(err => console.log(err));
 })
 

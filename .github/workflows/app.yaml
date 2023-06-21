@@ -33,8 +33,8 @@ jobs:
       run: |
         make -s dockerpush
 
-    # - uses: azure/webapps-deploy@v2
-    #   with:
-    #     app-name: 'blogscraper'
-    #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-    #     images: 'acclabdocker.azurecr.io/blogscraper:${{ env.IMAGE_TAG }}'
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'platform'
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_STAGING }}
+        images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'

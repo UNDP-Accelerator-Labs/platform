@@ -35,6 +35,6 @@ jobs:
 
     - uses: azure/webapps-deploy@v2
       with:
-        app-name: 'platform'
+        app-name: 'acclabs-staging'
         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_STAGING }}
         images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'

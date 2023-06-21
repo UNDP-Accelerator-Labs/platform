@@ -27,4 +27,4 @@ ENV HOST=0.0.0.0
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 
-CMD ["stdbuf", "-oL", "make run-web"]
+CMD ["make", "run-web"]

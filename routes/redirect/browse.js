@@ -6,7 +6,6 @@ module.exports = (req, res, next) => {
 	const language = checklanguage(req.params?.language ? req.params.language : req.session.language)
 
 	if (uuid) {
-		console.log('should redirect as user is logged in')
 		if (rights <= modules.find(d => d.type === 'pads')?.rights.write) res.redirect(`/${language}/browse/pads/public`)
 		else res.redirect(`/${language}/browse/pads/private`)
 	} else next()

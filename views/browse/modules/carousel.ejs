@@ -1,0 +1,56 @@
+<%
+	const slides = locals.sample_images
+%>
+
+<div class='slides'>
+	<% slides.forEach(d => { %>
+		<div class='slide'>
+			<a href='../../view/pad?id=<%- d.id %>'>
+				<div class='media media-txt'>
+					<p class='country'><%- d.country %></p>
+					<h1><%- d.title %></h1>
+					<p><% if (d.txt?.[0]?.length > 500) { %><%- d.txt?.[0].slice(0, 500)?.replace(/<\/?[^>]+(>|$)/ig, '').trim() %>…<% } else { %><%- d.txt?.[0]?.replace(/<\/?[^>]+(>|$)/ig, '').trim() %><% } %></p>
+				</div>
+				<% if (locals.metadata.site.app_storage) { %>
+					<img src='<%- new URL(`${locals.metadata.site.app_storage}${d.img[0]?.replace("uploads/sm/", "uploads/")}`).href %>'>
+				<% } else { %>
+					<img src='<%- d.img[0]?.replace("uploads/sm/", "uploads/") %>'>
+				<% } %>
+			</a>
+		</div>
+	<% }) %>
+</div>
+<div class='dots'>
+	<% for (let i = 0; i < slides.length; i ++) { %>
+		<div class='dot'></div>
+	<% } %>
+</div>
+<script type='text/javascript'>
+
+	function animateCarousel (idx) {
+		const carousel = d3.select('.carousel')
+		const deck = carousel.select('.slides')
+		const slides = carousel.selectAll('.slide')
+		const delay = 3000
+
+		if (idx === slides.size()) idx = 0
+		deck.node().scrollTo({
+			top: 0,
+			left: idx * (slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth),
+			behavior: 'smooth'
+		})
+		slides.selectAll('.media-txt')
+		.on('mouseover', _ => clearTimeout(animation))
+		.on('mouseout', _ => animation = setTimeout(_ => animateCarousel(idx + 1), delay))
+		carousel.selectAll('.dot')
+		.classed('highlight', (d, i) => i === idx)
+		.on('click', function (d, i) {
+			idx = i
+			clearTimeout(animation)
+			animateCarousel(idx)
+		})
+
+		let animation = setTimeout(_ => animateCarousel(idx + 1), delay)
+	}
+	animateCarousel(0)
+</script>

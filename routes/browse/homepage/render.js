@@ -1,7 +1,7 @@
 const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, DB } = include('config/')
 const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
 
-const load = require('../pads/load/')
+const load = require('./load/')
 const filter = require('./filter.js')
 
 module.exports = async (req, res) => { 
@@ -136,32 +136,67 @@ module.exports = async (req, res) => {
 			if (welcome_module === 'mosaic') max = 46
 			return data.filter(d => d.img?.length).slice(0, max)
 		}))
+		// LIST OF COUNTRIES WITH CONTACTS
+		batch.push(t.any(`
+			SELECT COUNT(p.id)::INT, p.owner FROM pads p
+			WHERE TRUE
+				$1:raw
+			GROUP BY p.owner
+		;`, [ full_filters ]).then(results => {
+			return DB.general.task(gt => {
+				return gt.any(`
+					SELECT iso3, uuid AS owner FROM users
+					WHERE uuid IN ($1:csv)
+				;`, [ results.map(d => d.owner) ])
+				.then(users => {
+					const data = array.nest.call(join.multijoin.call(results, [ users, 'owner' ]), { key: 'iso3' })
+					.map(d => { return { iso3: d.key, count: array.sum.call(d.values, 'count') } })
+
+					return gt.any(`
+						SELECT DISTINCT (cn.name), cn.iso3, cn.language 
+						FROM users u 
+						INNER JOIN country_names cn 
+							ON cn.iso3 = u.iso3 
+						WHERE u.position = 'Head of Solutions Mapping' 
+							AND cn.language = $1 
+						ORDER BY cn.name
+					;`, [ language ])
+					.then(countries => {
+						return join.multijoin.call(countries, [ data, 'iso3' ])
+					}).catch(err => console.log(err))
+				}).catch(err => console.log(err))
+			}).catch(err => console.log(err))
+		}).catch(err => console.log(err)))
+		// LIST OF PINBOARDS/ COLLECTIONS
+		batch.push(t.any(`
+			SELECT pb.id, COUNT(pc.id)::INT, pb.title, pb.date, pb.owner 
+			FROM pinboards pb
+			INNER JOIN pinboard_contributions pc
+				ON pc.pinboard = pb.id
+			INNER JOIN pads p
+				ON pc.pad = p.id
+			WHERE pb.status > 2
+				$1:raw
+			GROUP BY pb.id
+		;`, [ full_filters ]))
 
 		return t.batch(batch)
 		.then(async results => {
 			let [ statistics, 
 				clusters,
-				sample_images
+				sample_images,
+				countries,
+				pinboards
 			] = results
 
 			const stats = { 
 				total: array.sum.call(statistics.total, 'count'), 
-				filtered: array.sum.call(statistics.filtered, 'count'), 
-				
-				private: statistics.private,
-				curated: statistics.curated,
-				shared: statistics.shared,
-				reviewing: statistics.reviewing,
-				public: statistics.public,
-				
-				breakdown: statistics.filtered,
-				persistent_breakdown: statistics.persistent,
 				contributors: statistics.contributors,
 				tags: statistics.tags
 			}
 
 			const metadata = await datastructures.pagemetadata({ req, res, display, map, mscale })
-			return Object.assign(metadata, { clusters, sample_images, stats })
+			return Object.assign(metadata, { clusters, sample_images, stats, countries, pinboards })
 		}).catch(err => console.log(err))
 	}).then(data => res.render('home', data))
 	.catch(err => console.log(err))

@@ -68,7 +68,7 @@ const sessionMiddleware = session({
 	cookie: {
 		httpOnly: true, // THIS IS ACTUALLY DEFAULT
 		secure: process.env.NODE_ENV === 'production',
-		maxAge: 1000 * 60 * 60 * 24 * 1, // 1 DAY
+		maxAge: 5 * 1000 * 60 * 60 * 24 * 1, // 5 DAYS
 		sameSite: 'lax',
 		domain: process.env.NODE_ENV === 'production' ? '.azurewebsites.net' : 'localhost'
 	}

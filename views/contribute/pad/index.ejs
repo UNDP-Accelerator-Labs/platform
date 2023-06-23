@@ -13,7 +13,7 @@
 	const anonymized = locals.metadata.page.query?.anonymize?.includes('true')
 	
 	let editing = ['contribute', 'edit'].includes(activity) 
-	if (rights === 3 && locals.metadata.user.uuid !== locals.data.owner) editing = false // TO DO: DO THIS IN BACK END AND MAKE EDITABLE ONLY UPON CLICKING
+	// if (rights === 3 && locals.metadata.user.uuid !== locals.data.owner) editing = false // TO DO: DO THIS IN BACK END AND MAKE EDITABLE ONLY UPON CLICKING
 
 	const templated = locals.templated || locals.display_template !== null
 	console.log(locals)

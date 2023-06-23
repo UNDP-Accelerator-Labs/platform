@@ -79,7 +79,6 @@ app.use(sessionMiddleware)
 const routes = require('./routes/')
 
 // PUBLIC VIEWS
-// app.get('/', routes.redirect.home, routes.dispatch.public)
 app.get('/', routes.redirect.home, routes.dispatch.public)
 app.get('/:language/home', routes.dispatch.public)
 

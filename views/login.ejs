@@ -9,28 +9,14 @@
 
 <%- include ('partials/head.ejs') %> 
 
-<!-- <link rel='stylesheet' type='text/css' href='./css/main.css'> -->
-
 </head>
 
 
 <body>
 
-<!-- <button id='global-login'>
-	<a>Use global login</a>
-</button> -->
-
 <%- include ('partials/translations.ejs') %> 
 <%- include ('partials/menu-languages.ejs') %> 
 
-
-<header>
-	<div class='inner'>
-		<%- include ('partials/menu-logo.ejs') %> 
-	</div>
-</header>
-
-<main>
 <div class='screen <% if (locals.errormessage) { %>error<% } else { %>blue<% } %>'>
 	<div class='modal login-module'>
 		<form action='/login' method='POST'>
@@ -45,8 +31,6 @@
 					<div class='required'>
 						<label class='active'>*</label>
 					</div>
-					<!-- <label class='instruction'>Username or email</label> -->
-					<!-- TO DO: TRANSLATE -->
 					<div class='input-group'>
 						<input type='text' id='username' name='username' required>
 						<label for='username'>First and last name, or email</label>
@@ -57,7 +41,6 @@
 					<div class='required'>
 						<label class='active'>*</label>
 					</div>
-					<!-- <label class='instruction'><%- vocabulary['password'][language] %></label> -->
 					<div class='input-group'>
 						<input type='password' id='password' name='password' required>
 						<label for='password'><%- vocabulary['password'][language] %></label>
@@ -67,14 +50,6 @@
 					<button type='submit'><%- vocabulary['log in'][language] %></button>
 				</li>
 			</ul>
-
-
-		
-			<!-- <input type='text' name='username' placeholder='User name'>
-			<input type='password' name='password' placeholder='Password'>
-			<input type='hidden' name='originalUrl' value='<%- locals.originalUrl %>'> -->
-			
-			<!-- TO DO: TRANSLATE -->
 		</form>
 
 		<!-- <p>Find your username and password on <a href="https://undp.sharepoint.com/:x:/r/sites/AcceleratorLabsNetwork/Shared%20Documents/100%20Day%20Action%20Plans/AA_platform/credentials%20-%20Editable.xlsx?d=wa7d7cc5c41e74a258f6cea45b0bfcea5&csf=1&web=1&e=KX4Bc0" target='_blank' style='color: blue; text-decoration: underline;'>Teams</a>, under:</p> -->
@@ -82,15 +57,29 @@
 	</div>
 </div>
 
-<script type='text/javascript'>
-	// d3.select('#global-login a')
-		// .attr('href', `https://acclabs-global.azurewebsites.net/?origin=${encodeURIComponent(window.location)}`)
+<div class='main-content'>
+<header>
+	<div class='inner'>
+		<%- include ('partials/menu-logo.ejs') %> 
+	</div>
+</header>
+<div class='browse'></div>
+<div class='sidebar lg'></div>
+</div>
 
-	// GENERIC BLUR FUNCTION
-	d3.selectAll('input[type=text], input[type=password]')
-	.on('blur.fixlabel', function () { 
-		fixLabel(this)
-	}).each(function () { fixLabel(this) })
+<footer></footer>
+<%- include ('./partials/footer.ejs') %> 
+
+
+<script type='text/javascript'>
+	document.addEventListener('DOMContentLoaded', evt => {
+		// GENERIC BLUR FUNCTION
+		const inputs = d3.selectAll('input[type=text], input[type=password]')
+		inputs.on('blur.fixlabel', function () { 
+			fixLabel(this)
+		})
+		inputs.each(function () { fixLabel(this) })
+	})
 </script>
 </main>
 

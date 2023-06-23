@@ -126,7 +126,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #F3F3F3;
+  background-color: #efefef;
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -293,5 +293,14 @@ input.toggle:disabled + label::after {
     transform: translate(24px, 0);
   }
 }
+.sticky {
+  position: sticky !important;
+  top: 0;
+  left: 0;
+}
+
+/*.fixed {
+	position: fixed !important;
+}*/
 
 /*# sourceMappingURL=vars.css.map */

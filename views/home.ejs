@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<%
+	// CREATE ALIASES
+	const activity = locals.metadata.page.activity
+	const publicpage = locals.metadata.page.public || activity === 'preview'
+	const modules = locals.metadata.site.modules
+	const metafields = locals.metadata.site.metafields
+	const space = locals.metadata.page.space = 'public'
+	const object = locals.metadata.page.object = 'pads'
+	const languages = locals.metadata.site.languages
+	const language = locals.metadata.page.language
+	const rights = locals.metadata.user.rights
+	const pagedisplay = locals.metadata.page.display
+	const pages = locals.metadata.page.count
+
+	const logged = locals.metadata.user.uuid !== null
+	
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
+
+	const slides = locals.sample_images
+	const is_intropage = (publicpage 
+		&& object === 'pads' 
+		&& space !== 'pinned' 
+		&& mapscale !== 'full-screen' 
+		&& locals.metadata.page.id === 1 
+		&& slides?.length > 0)
+	const welcome_module = locals.metadata.site.welcome_module
+%>
+<html lang='<%- language %>'>
+<head>
+
+<%- include ('./partials/head.ejs') %> 
+
+</head>
+
+<body>
+
+<% include ('./partials/translations.ejs') %> 
+
+<%- include ('./partials/menu-languages.ejs') %> 
+<%- include ('./partials/modals.ejs') %> 
+<%- include('./browse/render.ejs') %>
+
+<div class='main-content'>
+<header>
+	<div class='inner'>
+		<%- include ('partials/menu-logo.ejs') %> 
+	</div>
+</header>
+<div class='browse home'>
+	<% if (slides.length) { %>
+		<div class='panel public-page-header'>
+			<div class='<%- welcome_module %> expand'>
+				<% if (mapscale !== 'full-screen') { %>
+					<% if (welcome_module === 'mosaic') { %>
+						<%- include('./browse/modules/mosaic.ejs') %>
+					<% } else if (welcome_module === 'carousel') { %>
+						<%- include('./browse/modules/carousel.ejs') %>
+					<% } %>
+				<% } %>
+				<button class='scroll-nav' onclick='scrollToPanel(this)'><label class='rotate'>&rsaquo;</label></button>
+				<script type='text/javascript'>
+					function scrollToPanel (node) {
+						let next = d3.select('div.public-page-panel .inner').node()
+						window.scrollTo({
+							top: next.offsetTop - 105,
+							left: 0,
+							behavior: 'smooth'
+						})
+					}
+					window.addEventListener('scroll', function (e) {
+						d3.select('button.scroll-nav').classed('hide', document.documentElement.scrollTop > 60)
+					})
+				</script>
+			</div>
+		</div>
+	<% } %>
+	<div class='public-page-panel'>
+		<div class='inner'>
+			<h1 class='site-title'><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+			<!-- <% if (locals.metadata.site.description?.[language]) { %><p class='lead'><%- locals.metadata.site.description[language] %></p><% } %> -->
+			<!-- MAP -->
+			<%- include ('./browse/modules/map') %>
+			<div id='statistics'>
+				<div class='stat-group'>
+					<div class='statistic'>
+						<h1><%- locals.stats?.total %></h1>
+						<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
+					</div>
+				</div>
+				<div class='stat-group'>
+					<% if (locals.stats?.contributors) { %>
+						<div class='statistic'>
+							<h2><%- locals.stats?.contributors %></h2>
+							<p><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
+						</div>
+					<% } %>
+					<% if (locals.metadata.page.map && locals.stats?.total > 0) { %>
+						<div class='statistic'>
+							<h2><%- locals.clusters[locals.clusters.length - 1]?.length %></h2>
+							<p><%- vocabulary['distinct locations'][language](locals.clusters[locals.clusters.length - 1]?.length !== 1) %></p>
+						</div>
+					<% } %>
+					<% locals.stats?.tags?.forEach(d => { %>
+						<div class='statistic'>
+							<h2><%- d.count %></h2>
+							<p><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || d.type.capitalize() %></p>
+						</div>
+					<% }) %>
+				</div>
+			</div>
+			<!-- <h3>ADD TAG CATEGORIES</h3> -->
+			<nav class='enter'>
+				<a href='/<%- language %>/browse/pads/public'>
+					<button type='button' class='highlight'><%- vocabulary['browse publications'][language] %></button>
+				</a>
+				<% if (!logged) { %>
+					<a href='/login'><button type='button'><%- vocabulary['log in'][language] %></button></a>
+					<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
+					<!-- TO DO: TRANSLATE -->
+				<% } %>
+			</nav>
+		</div>
+	</div>
+	<div class='public-page-panel'>
+		<div class='inner'>
+			<p class='lead'>Grassroots innovations are home-grown solutions that have never been codified, applied elsewhere, nor taken to scale. These customized solutions are naturally frugal, grounded in a specific context, and might be more relevant, given their proximity to the problem. These solutions are often the result of innovation—people solving problems from the bottom up.</p>
+		</div>
+	</div>
+	<div class='public-page-panel blue'>
+		<div class='inner'>
+			<blockquote>“In the drive for a fairer world, we have an—often-overlooked—asset: what 8 billion people around the world know about solving problems.”</blockquote>
+			<p>Gina Lucarelli</p>
+		</div>
+	</div>
+	<div class='public-page-panel'>
+		<div class='inner'>
+			<p class='lead'>On this platform you can find many early-stage, home-grown and often open-source grassroots solutions developed by people who are innovating in the margins to solve complex development challenges faced by their communities.</p>
+		</div>
+	</div>
+
+	<div class='public-page-panel blue browse-countries'>
+		<div class='inner'>
+			<h3><%- vocabulary['browse by country'][language] %></h3>
+			<ul class='columns'>
+			<% locals.countries.forEach(d => { %>
+				<li>
+					<% if (d.count > 0) { %>
+						<a href='/<%- language %>/<%- d.iso3 %>' target='_blank'><%- d.name %></a>
+					<% } else { %>
+						<%- d.name %>
+					<% } %>
+					<small><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language]((d.count ?? 0) !== 1).toLowerCase() %></small>
+				</li>
+			<% }) %>
+			</ul>
+		</div>
+	</div>
+	<div class='public-page-panel'>
+		<div class='inner'>
+			<h3><%- vocabulary['browse collections'][language] %></h3>
+			<p class='description'>Collections are curated by contributors.</p>
+			<!-- TO DO: TRANSLATE -->
+			<ul class='columns'>
+			<% locals.pinboards.forEach(d => { %>
+				<li>
+					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
+					<small><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>
+					<small class='contributor'><%- vocabulary['curation credit'][language](d.owner, 'Bob', 'contributors') %></small>
+				</li>
+			<% }) %>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class='sidebar'></div>
+</div>
+
+<%- include ('./partials/footer.ejs') %> 
+
+<script type='text/javascript'>
+	async function selectCountry () {
+		const target_opts = <%- JSON.stringify(locals.countries) %>.map(d => { 
+			return { label: d.name, value: d.iso3, type: 'radio' } 
+		})
+
+		const message = 'Get in touch with the UNDP Accelerator Lab Head of Solutions Mapping in your country.' // TO DO: TRANSLATE
+		const opts = [
+			{ node: 'select', name: 'mobilization', label: 'Select a country', options: target_opts }, // TO DO: TRANSLATE
+			{ node: 'button', type: 'button', label: '<%- vocabulary["import"][language] %>', resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value }
+		]
+		const mobilization = await renderPromiseModal({ message, opts })
+	}
+</script>
+
+</body>
+</html>

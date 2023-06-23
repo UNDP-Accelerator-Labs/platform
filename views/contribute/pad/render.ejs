@@ -730,8 +730,8 @@ function addSection (kwargs) {
 		d3.selectAll('.media-layout').classed('focus', false)
 
 		const section = d3.select('main#pad div.inner div.body')
-			.insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
-			// .insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
+			// .insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
+			.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
 			.classed('repeat', repeat || false)
 			.classed('focus', focus && !templated)
 			.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
@@ -981,7 +981,7 @@ function addImg (kwargs) {
 			if (err) console.log(err)
 		}
 
-		if (src.isURL()) img.src = src
+		if (src.isURL() || src.isBlob()) img.src = src
 		else {
 			<% if (locals.metadata.site.app_storage) { %>
 				img.src = new URL(`<%- locals.metadata.site.app_storage %>/${src}`).href
@@ -1129,8 +1129,15 @@ function addMosaic (kwargs) {
 			if (err) console.log(err)
 		}
 
-		if (d.isURL()) img.src = d
-		else img.src = `/${d}`
+		if (d.isURL() || d.isBlob()) img.src = d
+		// else img.src = `/${d}`
+		else {
+			<% if (locals.metadata.site.app_storage) { %>
+				img.src = new URL(`<%- locals.metadata.site.app_storage %>/${d}`).href
+			<% } else { %>
+				img.src = `/${d}`
+			<% } %>
+		}
 	})
 
 	// WE NEED THE ICON IF
@@ -1666,8 +1673,15 @@ function addEmbed (kwargs) {
 							.attr('src', this.src)
 					}
 
-					if (d.src.isURL()) img.src = d.src
-					else img.src = `/${d.src}`
+					if (d.src.isURL() || d.src.isBlob()) img.src = d.src
+					// else img.src = `/${d.src}`
+					else {
+						<% if (locals.metadata.site.app_storage) { %>
+							img.src = new URL(`<%- locals.metadata.site.app_storage %>/${d.src}`).href
+						<% } else { %>
+							img.src = `/${d.src}`
+						<% } %>
+					}
 				}
 			}
 		} else {

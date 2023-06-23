@@ -27,101 +27,111 @@
 <%- include ('partials/menu-languages.ejs') %> 
 
 
-<header>
-	<div class='inner'>
-		<%- include ('partials/menu-logo.ejs') %> 
-	</div>
-</header>
-
-<%- include ('partials/modals.ejs') %>
-
-<div class='table'>
-	<main id='import-module' class='import-module'>
+<div class='main-content'>
+	<header>
 		<div class='inner'>
-			<div class='head meta-status status-0'>
-				<div class='btn-group'>
-					<form id='contribute'>
-						<button title='<%- vocabulary["import pads"][language] %>' type='submit' disabled><%- vocabulary['import pads'][language] %></button>
-					</form>
-				</div>
-			</div>
-			<div class='body'>
-				<div class='btn-group hide'>
-					<form>
-						<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
-							<i class='material-icons'>layers</i>
-						</button>
-					</form>
-					<form>
-						<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
-							<i class='material-icons'>delete_forever</i>
-						</button>
-					</form>
-				</div>
+			<%- include ('partials/menu-logo.ejs') %> 
+		</div>
+	</header>
 
+	<%- include ('partials/modals.ejs') %>
 
-				<!-- INSPIRED BY https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
-				<div class='input-group' ondrop='dropHandler(event, this)' ondragover='event.preventDefault(); this.classList.toggle("accept")' ondragleave='this.classList.toggle("accept")'>
-					
-					<div class='drop-zone'>
-						<!-- <p>Drag one or more files to this <i>drop zone</i>.</p> -->
-						<input type='file' id='upload' onchange='parseXLSX(event.target.files[0], this)' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
-						<button>
-							<label for='upload'><%- vocabulary['upload source file'][language] %></label>
-						</button>
+	<div class='table'>
+		<main id='import-module' class='import-module'>
+			<div class='inner'>
+				<div class='head meta-status status-0'>
+					<div class='btn-group'>
+						<form id='contribute'>
+							<button title='<%- vocabulary["import pads"][language] %>' type='submit' disabled><%- vocabulary['import pads'][language] %></button>
+						</form>
 					</div>
 				</div>
+				<div class='body'>
+					<!-- INSPIRED BY https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
+					<div class='input-group' ondrop='dropHandler(event, this)' ondragover='event.preventDefault(); this.classList.toggle("accept")' ondragleave='this.classList.toggle("accept")'>
+						
+						<div class='drop-zone'>
+							<!-- <p>Drag one or more files to this <i>drop zone</i>.</p> -->
+							<input type='file' id='upload' onchange='parseXLSX(event.target.files[0], this)' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
+							<button>
+								<label for='upload'><%- vocabulary['upload source file'][language] %></label>
+							</button>
+						</div>
+					</div>
 
-				<script type='text/javascript'>
-					function dropHandler(evt, node) { 
-						evt.preventDefault()
-						const sel = d3.select(node)
-						const label = sel.select('.drop-zone button label')
+					<script type='text/javascript'>
+						function dropHandler(evt, node) { 
+							evt.preventDefault()
+							const sel = d3.select(node)
+							const label = sel.select('.drop-zone button label')
 
-						if (evt.dataTransfer.items) {
-							// DataTransferItemList INTERFACE TO ACCES THE FILE
-							const items = evt.dataTransfer.items
-							if (items.length > 1) {
-								sel.classed('accept', false).classed('reject', true)
-								label.html('<%- vocabulary["chose only one file"][language]("xlsx") %>')
+							if (evt.dataTransfer.items) {
+								// DataTransferItemList INTERFACE TO ACCES THE FILE
+								const items = evt.dataTransfer.items
+								if (items.length > 1) {
+									sel.classed('accept', false).classed('reject', true)
+									label.html('<%- vocabulary["chose only one file"][language]("xlsx") %>')
+								} else {
+									const item = items[0]
+									if (item.kind === 'file') {
+										const file = item.getAsFile();
+										if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
+											parseXLSX(file, d3.select(node).select('input[type=file]').node())
+										} else {
+											sel.classed('accept', false).classed('reject', true)
+											label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
+										}
+									} else {
+										sel.classed('accept', false).classed('reject', true)
+										label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
+									}
+								}
 							} else {
-								const item = items[0]
-								if (item.kind === 'file') {
-									const file = item.getAsFile();
+								// DataTransfer INTERFAE TO ACCESS THE FILE
+								const items = evt.dataTransfer.files
+								if (items.length > 1) {
+									sel.classed('accept', false).classed('reject', true)
+									label.html('<%- vocabulary["chose only one file"][language]("xlsx") %>')
+								} else {
+									const file = evt.dataTransfer.files[0]
 									if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
 										parseXLSX(file, d3.select(node).select('input[type=file]').node())
 									} else {
 										sel.classed('accept', false).classed('reject', true)
 										label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
 									}
-								} else {
-									sel.classed('accept', false).classed('reject', true)
-									label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
 								}
-							}
-						} else {
-							// DataTransfer INTERFAE TO ACCESS THE FILE
-							const items = evt.dataTransfer.files
-							if (items.length > 1) {
-								sel.classed('accept', false).classed('reject', true)
-								label.html('<%- vocabulary["chose only one file"][language]("xlsx") %>')
-							} else {
-								const file = evt.dataTransfer.files[0]
-								if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
-									parseXLSX(file, d3.select(node).select('input[type=file]').node())
-								} else {
-									sel.classed('accept', false).classed('reject', true)
-									label.html('<%- vocabulary["chose file"][language]("xlsx") %>')
-								}
-							}
 
+							}
 						}
-					}
-				</script>
+					</script>
+				</div>
+				<div class='foot'></div>
 			</div>
-			<div class='foot'></div>
+		</main>
+	</div>
+
+	<div class='sidebar table-sidebar'>
+		<div class='inner'>
+			<!-- <div class='btn-group hide'> -->
+			<div class='media-input-group input-group'>
+				<div class='inner'>
+					<div class='btn-group'>
+						<form>
+							<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
+								<i class='material-icons'>layers</i>
+							</button>
+						</form>
+						<form>
+							<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
+								<i class='material-icons'>delete_forever</i>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
-	</main>
+	</div>
 </div>
 
 <script type='text/javascript'>
@@ -352,7 +362,8 @@
 	}
 	function renderTable (cols) {
 		body.select('.btn-group').classed('hide', false)
-		const table = body.addElems('table', 'xls-preview', [cols])
+		const table = body.addElems('div', 'table-container')
+			.addElems('table', 'xls-preview', [cols])
 			.attrs({ 
 				'border': 0,
 				'cellpadding': 0,
@@ -687,6 +698,7 @@
 	}
 
 	function splitValues (col, separator) {
+		if (!separator) return null
 		const cols = d3.select('table.xls-preview').datum()
 		cols.forEach(d => {
 			if (d.key === col) {
@@ -1248,7 +1260,7 @@
 		// 2) SAVE IMAGES
 		const fd = new FormData()
 		const promises = []
-		const imgs = pads.map(d => d.imgs).flat().unique().filter(d => !d.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
+		const imgs = pads.map(d => d.imgs).flat().unique().filter(d => !d?.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
 
 		if (imgs.length) {
 			imgs.forEach(d => {
@@ -1280,7 +1292,7 @@
 				pads.forEach(d => {
 					d.sections.forEach(c => {
 						c.items.forEach(b => {
-							if (b.type === 'img') b.src = files.find(a => b.src.includes(a.originalname))?.src
+							if (b.type === 'img') b.src = files.find(a => b?.src?.includes(a.originalname))?.src
 							if (b.type === 'mosaic') {
 								b.srcs = b.srcs.map(a => {
 									return files.find(z => a.includes(z.originalname))?.src

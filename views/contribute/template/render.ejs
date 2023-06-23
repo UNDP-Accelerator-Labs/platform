@@ -335,7 +335,8 @@ function addSection (kwargs) {
 
 	const section = d3.select('main#template div.inner div.body')
 		// .insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
-		.insertElem(function () { return sibling || d3.select('main#template div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
+		// .insertElem(function () { return sibling || d3.select('main#template div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
+		.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
 		.classed('repeat', repeat || false)
 		.classed('focus', focus || false)
 		.datum({ type: 'section', title, lead, structure, repeat, group })

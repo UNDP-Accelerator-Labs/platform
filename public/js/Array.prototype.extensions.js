@@ -174,7 +174,7 @@ Array.prototype.multizip = function (arr) {
 Array.prototype.last = function () {
 	return this[this.length - 1]
 }
-Array.prototype.chunk = function(size) {
+Array.prototype.chunk = function (size) {
 	const groups = []
 	for (let i = 0; i < this.length; i += size) {
 		groups.push(this.slice(i, i + size))

@@ -12,17 +12,6 @@ module.exports = async (req, res) => {
 	const { object, space, instance } = req.params || {}
 	const { public } = req.session || {}
 
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { rights } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { rights } = datastructures.sessiondata({ public: true }) || {}
-	// }
-	// const language = checklanguage(req.params?.language || req.session.language)
-
-	// if (space === 'private' && rights < modules.find(d => d.type === object)?.rights?.write) { // THE USER DOES NOT HAVE THE RIGHT TO NAVIGATE TO A private VIEW
-		
-	// }
-
 	if (modules.some(d => d.type === object)) {
 		if (!xhr) {
 			if (object === 'pads') pads.render(req, res)
@@ -33,11 +22,11 @@ module.exports = async (req, res) => {
 			else if (object === 'contributors') contributors.render(req, res)
 		} else { // AJAX CALL
 			let data 
-			if (object === 'pads') data = await pads.load({ req: req })
-			else if (object === 'templates') data = await templates.load({ req: req })
-			else if (object === 'files') data = await files.load({ req: req })
-			else if (object === 'reviews') data = await reviews.load({ req: req })
-			else if (object === 'contributors') data = await contributors.load({ req: req })
+			if (object === 'pads') data = await pads.load({ req })
+			else if (object === 'templates') data = await templates.load({ req })
+			else if (object === 'files') data = await files.load({ req })
+			else if (object === 'reviews') data = await reviews.load({ req })
+			else if (object === 'contributors') data = await contributors.load({ req })
 			// TO DO: FOR MOBILIZATIONS
 			res.status(200).json(data)
 		}

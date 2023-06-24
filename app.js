@@ -61,7 +61,7 @@ if (process.env.NODE_ENV === 'production') {
 const cookie = {
 	httpOnly: true, // THIS IS ACTUALLY DEFAULT
 	secure: process.env.NODE_ENV === 'production',
-	maxAge: 1000 * 60 * 60 * 24 * 1, // 1 DAY
+	maxAge: 5 * 1000 * 60 * 60 * 24 * 1, // 5 DAYS
 	sameSite: 'lax',
 };
 if (app_id === 'local') {
@@ -80,9 +80,6 @@ const sessionMiddleware = session({
 app.use(sessionMiddleware)
 
 const routes = require('./routes/')
-
-
-app.get('/', routes.redirect.home, routes.redirect.public)
 
 // HEALTH-CHECK + INFO
 let versionObj = null;
@@ -125,11 +122,13 @@ app.get('/version/', (req, res) => {
 });
 
 // PUBLIC VIEWS
-app.get('/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
-app.get('/:language/public/', routes.dispatch.public) // THIS COULD BE DEPRECATED
+app.get('/', routes.redirect.home, routes.dispatch.public)
+app.get('/:language/home', routes.dispatch.public)
+
 
 app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
-	.get(routes.redirect.home, routes.render.login)
+	// .get(routes.redirect.home, routes.render.login)
+	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.login)
 app.get('/logout', routes.process.logout)
 

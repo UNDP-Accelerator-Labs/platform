@@ -520,6 +520,7 @@ div.document {
 
 								.opt.brush-size {
 									display: inline-block;
+									appearance: none;
 									-webkit-appearance: none;
 									width: 100%;
 									height: 0px;
@@ -1626,8 +1627,8 @@ div.document {
 					}
 				}
 			}
-			.foot {
-			}
+			// .foot {
+			// }
 		}
 	}
 }
@@ -2020,8 +2021,8 @@ footer {
 							text-align: left;
 						}
 					}
-					.required {
-					}
+					// .required {
+					// }
 				}
 			}
 		}

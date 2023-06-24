@@ -49,11 +49,13 @@ exports.pagemetadata = (_kwargs) => {
 	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
+	let activity = path[1]
 
 	let { object, space, instance } = params || {}
 	if (instance) {
 		object = res.locals.instance_vars.object
 		space = res.locals.instance_vars.space
+		activity = 'browse'
 	}
 
 	if (session.uuid) { // USER IS LOGGED IN
@@ -218,7 +220,7 @@ exports.pagemetadata = (_kwargs) => {
 
 				path,
 				referer: headers.referer,
-				activity: path[1],
+				activity,
 				object,
 				space,
 				query: parsedQuery,

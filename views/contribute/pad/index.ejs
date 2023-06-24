@@ -11,7 +11,10 @@
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
 	const anonymized = locals.metadata.page.query?.anonymize?.includes('true')
-	const editing = ['contribute', 'edit'].includes(activity)
+
+	let editing = ['contribute', 'edit'].includes(activity)
+	// if (rights === 3 && locals.metadata.user.uuid !== locals.data.owner) editing = false // TO DO: DO THIS IN BACK END AND MAKE EDITABLE ONLY UPON CLICKING
+
 	const templated = locals.templated || locals.display_template !== null
 %>
 <html lang='<%- language %>'>
@@ -431,110 +434,110 @@
 						</div>
 					</section>
 				<% } %>
-
-
-				<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
-				{ %>
-					<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
-					<div class='media-input-group input-group' tabindex=1>
-						<% if (!templated) { %><button class='scroll-up m lg'><label>&rsaquo;</label></button><% } %>
-						<div class='inner'>
-							<div class='btn-group'>
-							<% if (!templated) { %>
-								<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
-
-								<div class='vertical-separator'></div>
-								<!-- TO DO: TRANSLATE title INFO -->
-								<form action='/upload/img' method='POST' enctype='multipart/form-data'>
-									<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' multiple>
-									<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></label>
-								</form>
-								<form action='/upload/video' method='POST' enctype='multipart/form-data'>
-									<input type='file' id='input-media-video' name='video' accept='video/mp4,video/x-m4v,video/webm,video/*'>
-									<label for='input-media-video' title='Add a video. You can also use the “v” key as a keyboard shortcut.'><i class='material-icons'>ondemand_video</i></label>
-								</form>
-
-								<button id='input-media-drawing' title='Add a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
-								<button id='input-media-txt' title='Add a text block. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
-								<button id='input-media-embed' title='Embed a link or HTML code. Simply paste the link to the video to see it displayed. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
-								<button id='input-media-checklist' title='Add a checklist. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
-								<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
-
-								<div class='vertical-separator'></div>
-							<% } %>
-							<% if (!templated || ![null, undefined].includes(locals.display_template.medium)) { %>
-								<% metafields.forEach(d => { %>
-									<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
-										<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
-										<label class='lg'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
-									</button>
-								<% }) %>
-							<% } %>
-							</div>
-						</div>
-						<% if (!templated) { %><button class='scroll-down m lg'><label>&rsaquo;</label></button><% } %>
-					</div>
-					<script type='text/javascript'>
-						if (!mediaSize) var mediaSize = getMediaSize()
-						if (mediaSize === 'xs') {
-							d3.select('button.input-toolbox')
-							.on('touchend, click', function () {
-								d3.select(this).toggleClass('highlight')
-								d3.select('.media-input-group').node().focus()
-							})
-							d3.select('.media-input-group').on('touchend', function () { this.focus() })
-							.on('focus', function () {
-								if (this.style.maxHeight) this.style.maxHeight = null
-								else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
-							}).on('blur', function () {
-								 this.style.maxHeight = null
-								 d3.select('button.input-toolbox').classed('highlight', false)
-							})
-						}
-						<% if (!templated) { %>
-							d3.select('.media-input-group')
-							.each(function () {
-								const node = this
-								const sel = d3.select(this)
-								const inner = sel.select('.inner')
-								const height = inner.node().clientHeight || inner.node().offsetHeight
-								const scrollheight = inner.node().scrollHeight
-								const scrolltop = inner.node().scrollTop
-								const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
-
-								sel.classed('overflowing', scrollheight > (height + buttonheight))
-
-								sel.select('button.scroll-up')
-									.classed('hide', scrollheight <= (height + buttonheight))
-								.on('click', function () {
-									inner.node().scrollTo({
-										top: scrolltop - (height - buttonheight),
-										left: 0,
-										behavior: 'smooth'
-									})
-								})
-
-								sel.select('button.scroll-down')
-									.classed('hide', scrollheight <= (height + buttonheight))
-								.on('click', function () {
-									inner.node().scrollTo({
-										top: scrolltop + height - buttonheight,
-										left: 0,
-										behavior: 'smooth'
-									})
-								})
-							})
-						<% } %>
-					</script>
-				<% } %>
 			</div>
 		</div>
 	</main>
 </div>
-<div class='sidebar lg'></div>
+<div class='sidebar lg'>
+	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
+	{ %>
+		<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
+		<div class='media-input-group input-group' tabindex=1>
+			<% if (!templated) { %><button class='scroll-up m lg'><label>&rsaquo;</label></button><% } %>
+			<div class='inner'>
+				<div class='btn-group'>
+				<% if (!templated) { %>
+					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
+
+					<div class='vertical-separator'></div>
+					<!-- TO DO: TRANSLATE title INFO -->
+					<form action='/upload/img' method='POST' enctype='multipart/form-data'>
+						<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' multiple>
+						<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></label>
+					</form>
+					<form action='/upload/video' method='POST' enctype='multipart/form-data'>
+						<input type='file' id='input-media-video' name='video' accept='video/mp4,video/x-m4v,video/webm,video/*'>
+						<label for='input-media-video' title='Add a video. You can also use the “v” key as a keyboard shortcut.'><i class='material-icons'>ondemand_video</i></label>
+					</form>
+
+					<button id='input-media-drawing' title='Add a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
+					<button id='input-media-txt' title='Add a text block. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
+					<button id='input-media-embed' title='Embed a link or HTML code. Simply paste the link to the video to see it displayed. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
+					<button id='input-media-checklist' title='Add a checklist. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
+					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
+
+					<div class='vertical-separator'></div>
+				<% } %>
+				<% if (!templated || ![null, undefined].includes(locals.display_template.medium)) { %>
+					<% metafields.forEach(d => { %>
+						<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
+							<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
+							<label class='lg'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
+						</button>
+					<% }) %>
+				<% } %>
+				</div>
+			</div>
+			<% if (!templated) { %><button class='scroll-down m lg'><label>&rsaquo;</label></button><% } %>
+		</div>
+		<script type='text/javascript'>
+			if (!mediaSize) var mediaSize = getMediaSize()
+			if (mediaSize === 'xs') {
+				d3.select('button.input-toolbox')
+				.on('touchend, click', function () {
+					d3.select(this).toggleClass('highlight')
+					d3.select('.media-input-group').node().focus()
+				})
+				d3.select('.media-input-group').on('touchend', function () { this.focus() })
+				.on('focus', function () {
+					if (this.style.maxHeight) this.style.maxHeight = null
+					else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
+				}).on('blur', function () {
+					 this.style.maxHeight = null
+					 d3.select('button.input-toolbox').classed('highlight', false)
+				})
+			}
+			<% if (!templated) { %>
+				d3.select('.media-input-group')
+				.each(function () {
+					const node = this
+					const sel = d3.select(this)
+					const inner = sel.select('.inner')
+					const height = inner.node().clientHeight || inner.node().offsetHeight
+					const scrollheight = inner.node().scrollHeight
+					const scrolltop = inner.node().scrollTop
+					const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
+
+					sel.classed('overflowing', scrollheight > (height + buttonheight))
+
+					sel.select('button.scroll-up')
+						.classed('hide', scrollheight <= (height + buttonheight))
+					.on('click', function () {
+						inner.node().scrollTo({
+							top: scrolltop - (height - buttonheight),
+							left: 0,
+							behavior: 'smooth'
+						})
+					})
+
+					sel.select('button.scroll-down')
+						.classed('hide', scrollheight <= (height + buttonheight))
+					.on('click', function () {
+						inner.node().scrollTo({
+							top: scrolltop + height - buttonheight,
+							left: 0,
+							behavior: 'smooth'
+						})
+					})
+				})
+			<% } %>
+		</script>
+	<% } %>
+</div>
 </div>
 
-<footer>
+<% if (pagedisplay !== 'slideshow') { %><footer>
+<% } else { %><footer class='slideshow'><% } %>
 	<% if (locals.metadata.site.engagementtypes.includes('comment')
 		&& locals.data?.status >= 2
 		&& !pagedisplay.includes('adjacent')
@@ -1295,7 +1298,7 @@
 			containers.classed('focus', false)
 				.selectAll('.inset')
 				.style('max-height', null)
-			main.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
+			d3.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
 
 			if (focused_node.node() && focused_node.classed('title')) {
 				if (!document.activeElement.classList.contains('title')) {
@@ -1352,6 +1355,7 @@
 
 		if (data.sections) {
 			data.sections.forEach(async d => {
+				if (!editing) d.items = d.items.filter(c => c.has_content) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
 				<% if (pagedisplay === 'slideshow') { %>
 					await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
 				<% } else { %>
@@ -1405,7 +1409,8 @@
 			d3.selectAll('.media-layout').classed('focus', false)
 
 			const section = d3.select('main#pad div.inner div.body')
-				.insertElem(sibling || '.media-input-group', 'section', `media-layout layout ${activity}`)
+				// .insertElem(sibling || ':last-child', 'section', `media-layout layout ${activity}`)
+				.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
 				.classed('repeat', repeat || false)
 				// .classed('focus', focus && !templated)
 				.datum({ type: 'section', title, lead, structure, items, repeat, group })

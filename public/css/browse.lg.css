@@ -39,10 +39,6 @@ $c-light-3: #F0F0F0;*/
   padding: 0;
 }
 
-body {
-  /*background-color: #F3F3F3;*/
-}
-
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
   font-family: "Noto Sans", Helvetica, Arial, sans-serif;
   color: #005687;
@@ -115,18 +111,8 @@ input:-webkit-autofill:active {
   background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
 }
 
-.screen.bis {
-  /*background-color: $c-mid-1;*/
-}
-.screen.bis .modal .close {
-  /*background-color: $c-mid-2;*/
-}
-.screen.bis .modal .inner {
-  /*border-top: 3px solid $c-mid-2;*/
-}
-
 .screen.ter {
-  background-color: #F3F3F3;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -198,16 +184,6 @@ input.toggle + label::after {
   line-height: 20px;
   color: #969696;
   transition: transform 0.25s;
-}
-
-input.toggle:checked + label[for=status-0]::after {
-  /*background-color: $c-mid-yellow;*/
-  /*border-color: $c-mid-yellow;*/
-}
-
-input.toggle:checked + label[for=status-1]::after {
-  /*background-color: $c-light-blue;*/
-  /*border-color: $c-light-blue;*/
 }
 
 input.toggle:checked + label::after {
@@ -293,6 +269,15 @@ input.toggle:disabled + label::after {
     transform: translate(24px, 0);
   }
 }
+.sticky {
+  position: sticky !important;
+  top: 0;
+  left: 0;
+}
+
+/*.fixed {
+	position: fixed !important;
+}*/
 html, body {
   font-size: 16px;
   line-height: 1.3em;
@@ -506,7 +491,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: #F3F3F3;
+  background-color: rgb(239, 239, 239);
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -519,12 +504,6 @@ html, body {
   margin-left: 10px;
   color: #000000;
   font-size: 14px;
-}
-.modal .inner ul li:hover {
-  /*button {
-  	background-color: $c-dark-blue;
-  	color: #FFF;
-  }*/
 }
 .modal .inner .foot {
   margin: 10px 0;
@@ -640,7 +619,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: #F3F3F3;
+  background-color: rgb(239, 239, 239);
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -668,7 +647,13 @@ div.public-page-header {
   min-height: 100vh;
 }
 div.public-page-header div.carousel {
-  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  left: 0;
+}
+div.public-page-header div.carousel.expand {
+  width: 100vw;
+  margin-left: calc((100% - 100vw) / 2);
 }
 div.public-page-header div.carousel div.slides {
   display: flex;
@@ -756,7 +741,7 @@ div.public-page-header div.carousel div.dots {
 div.public-page-header div.carousel div.dots .dot {
   height: 15px;
   width: 15px;
-  margin: 0 2.5px;
+  margin: 0 5px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   display: inline-block;
@@ -764,18 +749,20 @@ div.public-page-header div.carousel div.dots .dot {
   cursor: pointer;
 }
 div.public-page-header div.carousel div.dots .highlight {
-  background-color: #0468B1;
+  background-color: #61B233;
 }
 div.public-page-header div.mosaic {
-  position: static;
+  /*position: absolute;*/
   width: 100%;
   min-height: 100vh;
+  left: 0;
   /* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 }
+div.public-page-header div.mosaic.expand {
+  width: 100vw;
+  margin-left: calc((100% - 100vw) / 2);
+}
 div.public-page-header div.mosaic div.slides {
-  /*display: flex;
-  flex-wrap: wrap;
-  justify-content: center;*/
   display: grid;
   grid-template-columns: repeat(auto-fit, 150px);
   grid-auto-rows: 1fr;
@@ -802,7 +789,6 @@ div.public-page-header div.mosaic div.slides div.slide {
   position: relative;
   width: 150px;
   height: 150px;
-  /* margin: 5px 5px 0 0;*/
   transition: transform 0.5s;
   overflow: hidden;
   aspect-ratio: 1;
@@ -858,8 +844,7 @@ div.public-page-header div.mosaic div.slides div.slide::after {
   width: 100%;
   height: 100%;
   background-color: #0468B1;
-  /*mix-blend-mode: hard-light;*/
-  opacity: 0.75;
+  opacity: 0.9;
   transform: translateY(100%);
   transition: transform 0.25s;
   pointer-events: none;
@@ -1014,10 +999,6 @@ div.public-page-header div.mosaic div.slides div.slide:nth-child(49n) img {
 div.public-page-header div.mosaic div.slides div.slide:nth-child(50n) img {
   animation-delay: 2.5s;
 }
-div.public-page-header div.mosaic div.slides div.slide:hover img {
-  filter: grayscale(1) blur(5px);
-  transform: scale(1.25);
-}
 div.public-page-header div.mosaic div.slides div.slide:hover .media-txt, div.public-page-header div.mosaic div.slides div.slide:hover::after {
   transform: translateY(0);
 }
@@ -1073,17 +1054,148 @@ div.public-page-header p.lead {
   line-height: 1.5em;
 }
 
+div.public-page-panel {
+  width: 100%;
+  min-height: 90px;
+  padding: 90px 0;
+}
+div.public-page-panel > .inner {
+  position: relative;
+  width: 930px;
+  margin: auto;
+}
+div.public-page-panel > .inner h1.site-title {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 60px;
+  line-height: 1.2em;
+  margin: calc(-60px * 1.2) 0 1em 0;
+  color: #0468B1;
+  z-index: 1000;
+}
+div.public-page-panel > .inner h3 {
+  margin-bottom: 1em;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 1.3em;
+}
+div.public-page-panel > .inner .lead {
+  font-size: 20px;
+  line-height: 1.3em;
+  margin-bottom: 1em;
+}
+div.public-page-panel > .inner blockquote {
+  font-size: 24px;
+  line-height: 1.3em;
+}
+div.public-page-panel > .inner blockquote + p {
+  margin-top: 1em;
+}
+div.public-page-panel > .inner .description {
+  font-size: 16px;
+  line-height: 1.3em;
+  margin-bottom: 1em;
+  color: #969696;
+}
+div.public-page-panel > .inner #statistics {
+  display: flex;
+  margin: 30px 0;
+}
+div.public-page-panel > .inner #statistics .stat-group {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  margin: 0 30px;
+}
+div.public-page-panel > .inner #statistics .stat-group .statistic {
+  flex: 1 1 0;
+  text-align: center;
+}
+div.public-page-panel > .inner #statistics .stat-group .statistic h1 {
+  font-size: 60px;
+  line-height: 1.2em;
+  margin-bottom: 0;
+}
+div.public-page-panel > .inner #statistics .stat-group .statistic h2 {
+  font-size: 36px;
+  line-height: 1.2em;
+}
+div.public-page-panel > .inner #statistics .stat-group:first-child {
+  border-right: 1px dotted #969696;
+}
+div.public-page-panel > .inner .map-container {
+  width: calc(100% + (100vw - 100%) / 2);
+  margin-left: calc((100% - 100vw) / 4);
+  margin-top: 90px;
+}
+div.public-page-panel > .inner .map-container #map {
+  min-height: 60vh;
+}
+div.public-page-panel > .inner nav.enter {
+  text-align: center;
+  margin: 60px 0;
+}
+div.public-page-panel > .inner nav.enter button {
+  min-height: 45px;
+  padding: 0 15px;
+  border: 1px solid #969696;
+  outline: none;
+  background-color: transparent;
+  font-size: 16px;
+  line-height: 1.5em;
+  color: #969696;
+  cursor: pointer;
+}
+div.public-page-panel > .inner nav.enter button.highlight {
+  background-color: #32BEE1;
+  border-color: #32BEE1;
+  color: #FFF;
+}
+div.public-page-panel > .inner ul.columns {
+  display: flex;
+  flex-flow: wrap;
+  align-items: center;
+}
+div.public-page-panel > .inner ul.columns li {
+  width: 232.5px;
+  margin: 0.25em 0;
+  padding-right: 15px;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 1.3em;
+}
+div.public-page-panel > .inner ul.columns li small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.3em;
+  color: #969696;
+}
+div.public-page-panel.blue {
+  width: 100vw;
+  padding: 90px 0;
+  margin-left: calc((100% - 100vw) / 2);
+  background-color: #0468B1;
+  color: #FFF;
+}
+div.public-page-panel.blue a {
+  color: #B4DC28;
+}
+
 div.main-content {
   display: flex;
+  min-height: 100vh;
 }
 
 div.browse {
   display: block;
-  /*float: left;*/
   width: 930px;
-  padding: 120px 15px 0 15px;
+  padding: 0 15px;
   background-color: #FFF;
   min-height: calc(100vh - 120px);
+}
+div.browse:not(.home) {
+  padding-top: 120px;
 }
 div.browse nav#search-and-filter {
   padding: 5px 14px 15px 14px;
@@ -1278,7 +1390,7 @@ div.browse nav#search-and-filter form .global-actions .add .dropdown menu li inp
   background-color: #E5E5E5;
 }
 div.browse nav#search-and-filter form .global-actions .add .dropdown menu li:hover {
-  background-color: #F3F3F3;
+  background-color: rgb(239, 239, 239);
 }
 div.browse nav#search-and-filter form .global-actions button.download {
   min-height: 30px;
@@ -1430,7 +1542,7 @@ div.browse nav#search-and-filter form .filters section .filter .dropdown menu li
   color: #FFF;
 }
 div.browse nav#search-and-filter form .filters section .filter .dropdown menu li:hover {
-  background-color: #F3F3F3;
+  background-color: rgb(239, 239, 239);
 }
 div.browse nav#search-and-filter form .filters section .filter:last-child {
   margin-bottom: 0;
@@ -1635,1067 +1747,6 @@ div.browse main .inner .head .description:focus {
 div.browse main .inner .meta-status + .head {
   margin: 0 0 15px 0;
 }
-div.browse main .inner section .layout {
-  margin-top: 15px;
-  /*article.mobilization.status-1 {
-  	background: none;
-  }*/
-  /*article:hover {
-  	&::after {
-  		opacity: 1;
-  	}
-  }*/
-}
-div.browse main .inner section .layout article {
-  position: relative;
-  display: flex;
-  padding: 15px 0 0 0;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  /*&::after {
-  	content: '';
-  	position: absolute;
-  	width: 100%;
-  	height: 100%;
-  	left: 0;
-  	top: 0;
-  	background-color: rgba(100,100,100,.1);
-  	opacity: 0;
-  	pointer-events: none;
-  	transition: opacity .15s;
-  }*/
-}
-div.browse main .inner section .layout article .inner {
-  display: flex;
-  flex-flow: row wrap;
-  flex-grow: 1;
-  transition: width 0.25s;
-}
-div.browse main .inner section .layout article .inner .head {
-  flex: 0 0 100%;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-div.browse main .inner section .layout article .inner .head .meta-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .meta-data {
-  margin-bottom: 0;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .meta-data .meta-contributor {
-  font-size: 14px;
-  line-height: 1.5em;
-  color: #0468B1;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .meta-data .meta-date {
-  font-size: 12px;
-  line-height: 1.5em;
-  color: #0468B1;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group {
-  margin-bottom: 5px;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form {
-  position: relative;
-  display: inline-block;
-  margin: 0 2px;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button {
-  min-height: 30px;
-  padding: 0 10px;
-  border: 1px solid #969696;
-  outline: none;
-  background-color: transparent;
-  font-size: 12px;
-  line-height: 1.5em;
-  color: #969696;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.publish,
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.share,
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.active {
-  background-color: #32BEE1;
-  border-color: #32BEE1;
-  color: #FFF;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.delete.active,
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.unpublish.active {
-  border-color: #A51E41;
-  background-color: #A51E41;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button:disabled {
-  background-color: transparent;
-  border: 1px solid #E5E5E5;
-  color: #E5E5E5;
-  pointer-events: none;
-  cursor: default;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown {
-  position: absolute;
-  min-width: 100%;
-  max-height: 0;
-  right: 0;
-  top: calc(100% - 1px);
-  background-color: #FFF;
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-  /*transform: translateX(-50%);*/
-  overflow: hidden;
-  z-index: 10;
-  transition: max-height 0.15s ease-out;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu {
-  width: 100%;
-  border-top: 1px solid #969696;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li {
-  width: 100%;
-  margin: 0;
-  list-style: none;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li button {
-  width: 100%;
-  padding: 5px 10px;
-  border: none;
-  text-align: left;
-  white-space: nowrap;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li button.highlight {
-  background-color: #32BEE1;
-  color: #FFF;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button:not(:disabled) {
-  background-color: #F3F3F3;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button.highlight {
-  background-color: #969696;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button {
-  border-bottom: 1px dotted #969696;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button.highlight {
-  border-color: #FFF;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button:disabled {
-  border-color: #E5E5E5;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form:first-child {
-  margin-left: 0;
-}
-div.browse main .inner section .layout article .inner .head .meta-group .btn-group form:last-child {
-  margin-right: 0;
-}
-div.browse main .inner section .layout article .inner .body {
-  flex: 0 0 calc(100% - 330px);
-  padding-right: 30px;
-  /*padding-bottom: 10px;*/
-}
-div.browse main .inner section .layout article .inner .body .meta, div.browse main .inner section .layout article .inner .body .media {
-  margin: 5px 0;
-}
-div.browse main .inner section .layout article .inner .body .media-title {
-  margin-top: 10px;
-  margin-bottom: 0;
-}
-div.browse main .inner section .layout article .inner .body .media-title a {
-  color: #005687;
-}
-div.browse main .inner section .layout article .inner .body .media-title a h1 {
-  font-size: 20px;
-  line-height: 1.3em;
-  font-weight: bold;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .body .media-title a h1 img {
-  vertical-align: text-bottom;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .body .media-txt {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 14px;
-  line-height: 1.3em;
-  white-space: pre-line;
-}
-div.browse main .inner section .layout article .inner .body .media-txt a {
-  color: #000000;
-}
-div.browse main .inner section .layout article .inner .body .media-txt a .read-more {
-  color: #32BEE1;
-}
-div.browse main .inner section .layout article .inner .body .media-txt a:hover {
-  text-decoration: none;
-}
-div.browse main .inner section .layout article .inner .body .media-txt a:hover .read-more {
-  text-decoration: underline;
-}
-div.browse main .inner section .layout article .inner .body .meta-mobilization,
-div.browse main .inner section .layout article .inner .body .meta-template {
-  display: inline-block;
-  font-size: 12px;
-  line-height: 1.5em;
-  margin-bottom: 10px;
-}
-div.browse main .inner section .layout article .inner .body .meta-tree {
-  display: flex;
-  align-items: center;
-}
-div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree {
-  margin-right: 10px;
-}
-div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a img {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a small {
-  display: inline-block;
-  font-size: 12px;
-  line-height: 1em;
-  color: #969696;
-  text-align: center;
-}
-div.browse main .inner section .layout article .inner .body .meta-mobilization,
-div.browse main .inner section .layout article .inner .body .meta-template,
-div.browse main .inner section .layout article .inner .body .meta-followup,
-div.browse main .inner section .layout article .inner .body .meta-forward,
-div.browse main .inner section .layout article .inner .body .meta-public,
-div.browse main .inner section .layout article .inner .body .meta-copy,
-div.browse main .inner section .layout article .inner .body .meta-child {
-  color: #969696;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-div.browse main .inner section .layout article .inner .body .meta-mobilization {
-  padding-right: 10px;
-  margin-right: 10px;
-  border-right: 1px solid #969696;
-}
-div.browse main .inner section .layout article .inner .body .meta-followup,
-div.browse main .inner section .layout article .inner .body .meta-forward,
-div.browse main .inner section .layout article .inner .body .meta-public,
-div.browse main .inner section .layout article .inner .body .meta-copy,
-div.browse main .inner section .layout article .inner .body .meta-child {
-  width: 100%;
-  /*margin: 10px 0 0 0;*/
-  margin: 0;
-}
-div.browse main .inner section .layout article .inner .body .create {
-  position: relative;
-  display: inline-block;
-  margin: 5px 10px 10px 0;
-}
-div.browse main .inner section .layout article .inner .body .create button {
-  padding: 0 5px;
-  border: 1px solid #32BEE1;
-  outline: none;
-  background-color: transparent;
-  font-size: 12px;
-  line-height: 1.5em;
-  color: #32BEE1;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .body .create .dropdown {
-  position: absolute;
-  min-width: 100%;
-  width: 300px;
-  max-height: 0;
-  left: 0;
-  top: 100%;
-  margin-top: -2px;
-  background-color: #FFF;
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-  z-index: 10;
-  transition: max-height 0.25s ease-out;
-}
-div.browse main .inner section .layout article .inner .body .create .dropdown menu {
-  width: 100%;
-  border-top: 1px solid #969696;
-}
-div.browse main .inner section .layout article .inner .body .create .dropdown menu li {
-  display: inline-block;
-  width: 100%;
-  margin: 0;
-  list-style: none;
-  white-space: pre;
-}
-div.browse main .inner section .layout article .inner .body .create .dropdown menu li a button {
-  height: auto;
-  padding: 5px 10px;
-  font-size: 12px;
-  background-color: transparent;
-  border: none;
-  color: #000000;
-  text-align: left;
-}
-div.browse main .inner section .layout article .inner .body .create .dropdown menu li:hover {
-  background-color: #F3F3F3;
-}
-div.browse main .inner section .layout article .inner .body.full-width {
-  flex: 0 0 100%;
-}
-div.browse main .inner section .layout article .inner .body.full-width .media-title {
-  width: calc(100% - 330px);
-}
-div.browse main .inner section .layout article .inner .foot {
-  align-self: top;
-}
-div.browse main .inner section .layout article .inner .foot .media-img {
-  position: relative;
-  width: 300px;
-  height: 200px;
-  display: flex;
-  align-items: flex-end;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  width: 30px;
-  height: 90px;
-  top: -10px;
-  right: 10px;
-  background-color: #0468B1;
-  font-size: 12px;
-  line-height: 1.5em;
-  text-align: center;
-  color: #FFF;
-  z-index: 100;
-  transform: translateY(-10px);
-  transform-origin: top center;
-  transition: transform 0.15s ease-out, background-color 0.25s;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark .label {
-  transform: rotate(-90deg);
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark::before {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translateY(90px);
-  width: 0;
-  height: 0;
-  border-top: 7px solid #0468B1;
-  border-left: 15px solid transparent;
-  transform-origin: top center;
-  transition: transform 0.15s ease-out, border-top-color 0.25s;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translateY(90px);
-  width: 0;
-  height: 0;
-  border-top: 7px solid #0468B1;
-  border-right: 15px solid transparent;
-  transform-origin: top center;
-  transition: transform 0.15s ease-out, border-top-color 0.25s;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover,
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
-  display: flex;
-  transform: translateY(0);
-  background-color: #005687;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after {
-  border-top-color: #005687;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active {
-  transform: translateY(0) scaleY(0.5);
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active .label {
-  display: none;
-}
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
-div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after {
-  transform: translateY(90px) scaleY(2);
-}
-div.browse main .inner section .layout article .inner .foot .media-img a {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  color: #005687;
-}
-div.browse main .inner section .layout article .inner .foot .media-img a img {
-  display: block;
-  width: 100%;
-  background-color: #E5E5E5;
-  height: 100%;
-  font-size: 12px;
-  line-height: 1.5em;
-  line-height: 200px;
-  text-align: center;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 300px;
-  height: calc(100% - 15px);
-  padding-bottom: 15px;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats {
-  margin: auto 5px;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a h1 {
-  text-align: center;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a h1 small {
-  font-size: 12px;
-  line-height: 1.5em;
-  display: block;
-  font-weight: normal;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a h1 small.total {
-  display: inline-block;
-  font-weight: normal;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a:hover {
-  text-decoration: none;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a:hover h1 small {
-  text-decoration: underline;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled {
-  color: #005687;
-}
-div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small {
-  text-decoration: none !important;
-  font-weight: normal;
-}
-div.browse main .inner section .layout article .inner .pinboard-group {
-  width: 100%;
-  margin-top: 5px;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add {
-  position: relative;
-  width: 100%;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text] {
-  position: relative;
-  /*width: calc(100% - 20px);*/
-  width: 100%;
-  height: 30px;
-  padding: 0;
-  margin-top: 10px;
-  border: none;
-  outline: none;
-  background-color: transparent;
-  border-bottom: 1px dotted #969696;
-  font-size: 12px;
-  color: #005687;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus {
-  border-bottom-color: #969696;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add label {
-  position: absolute;
-  left: 0;
-  font-size: 12px;
-  line-height: 1.5em;
-  color: #969696;
-  transform: translateY(15px);
-  transition: transform 0.25s, font-size 0.25s;
-  pointer-events: none;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add button {
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 20px;
-  height: 30px;
-  margin-top: 10px;
-  background: url("../imgs/icons/i-add-sm.svg") center no-repeat;
-  border: none;
-  outline: none;
-  float: right;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus + label,
-div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text].has-value + label {
-  font-size: 10px;
-  line-height: 1.5em;
-  transform: translateY(2.5px);
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus ~ button,
-div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text].has-value ~ button {
-  display: block;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown {
-  position: absolute;
-  width: 100%;
-  max-height: 0;
-  left: 0;
-  top: 100%;
-  background-color: #FFF;
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-  z-index: 10;
-  transition: max-height 0.25s ease-out;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu {
-  width: 100%;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li {
-  display: inline-block;
-  width: 100%;
-  margin: 0;
-  list-style: none;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li input[type=checkbox] {
-  display: none;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li label {
-  display: flex;
-  align-items: center;
-  position: static;
-  padding: 5px 20px 5px 15px;
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1.5em;
-  color: #000000;
-  transform: none;
-  pointer-events: all;
-  cursor: pointer;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li label .count {
-  margin-left: auto;
-  padding-left: 10px;
-  color: #969696;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li input:checked + label {
-  background-color: #E5E5E5;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li:hover {
-  background-color: #F3F3F3;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin {
-  display: inline-block;
-  height: 15px;
-  padding: 0;
-  margin-right: 5px;
-  font-size: 10px;
-  line-height: 15px;
-  border: 1px solid #969696;
-  color: #969696;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin label {
-  cursor: pointer;
-  vertical-align: top;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin .type {
-  flex-shrink: 0;
-  /*font-size: $t-xsmall;*/
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin .name {
-  flex-grow: 1;
-  margin: 0 5px 0 5px;
-  white-space: nowrap;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin .close {
-  display: inline-block;
-  position: relative;
-  width: 15px;
-  height: 15px;
-  background-color: #969696;
-  text-align: center;
-  font-size: 12px;
-  color: #FFF;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin .close::before {
-  content: "";
-  position: absolute;
-  height: 100%;
-  width: 0;
-  left: 50%;
-  border-left: 1px solid #FFF;
-  transform: rotate(45deg);
-  transform-origin: center;
-}
-div.browse main .inner section .layout article .inner .pinboard-group .pin .close::after {
-  content: "";
-  position: absolute;
-  height: 100%;
-  width: 0;
-  left: 50%;
-  border-left: 1px solid #FFF;
-  transform: rotate(-45deg);
-  transform-origin: center;
-}
-div.browse main .inner section .layout article .outer {
-  position: relative;
-  flex-grow: 0;
-  flex-shrink: 0;
-  background-color: #FFF;
-}
-div.browse main .inner section .layout article .outer .inner {
-  display: flex;
-  position: relative;
-  z-index: 1;
-  width: 0;
-  height: calc(100% + 15px);
-  /*padding: 15px 0 0 0;*/
-  margin-top: -15px;
-  /*border-bottom: 1px dotted $c-light-grey;*/
-  transition: width 0.25s;
-  overflow: hidden;
-  background: repeating-linear-gradient(45deg, #FFF, #FFF 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
-}
-div.browse main .inner section .layout article .outer .inner form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-}
-div.browse main .inner section .layout article .outer .inner form button {
-  width: calc(100% - 30px);
-  height: 45px;
-  margin: 5px 15px;
-  border: none;
-  outline: none;
-  border: 1px solid #A51E41;
-  background-color: transparent;
-  font-size: 14px;
-  line-height: 1.5em;
-  color: #A51E41;
-  cursor: pointer;
-  overflow: hidden;
-}
-div.browse main .inner section .layout article .outer .inner form button.cancel {
-  border-color: #646464;
-  color: #646464;
-}
-div.browse main .inner section .layout article .outer::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 100%;
-  height: 15px;
-  top: -15px;
-  background-color: #FFF;
-}
-div.browse main .inner section .layout article .outer::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 100%;
-  height: 15px;
-  top: 100%;
-  background-color: #FFF;
-}
-div.browse main .inner section .layout article .outer.expand .inner {
-  width: 120px;
-}
-div.browse main .inner section .layout article:hover {
-  background-color: #F3F3F3;
-}
-div.browse main .inner section .layout article:not(.pad):not(.review):not(.contributor) {
-  border-bottom: 1px dotted #969696;
-  padding-top: 15px;
-  padding-bottom: 15px;
-}
-div.browse main .inner section .layout article.status--1 {
-  filter: grayscale(1);
-  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
-}
-div.browse main .inner section .layout article.status-0 {
-  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255, 193, 14, 0.1) 3px, rgba(255, 193, 14, 0.1) 6px);
-}
-div.browse main .inner section .layout article.status-1 {
-  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(50, 190, 225, 0.1) 3px, rgba(50, 190, 225, 0.1) 6px);
-}
-div.browse main .inner section .layout article.mobilization.status-0 {
-  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
-}
-div.browse main .inner section .layout .tag-group .meta-tags {
-  margin-left: -2px;
-}
-div.browse main .inner section .layout .tag-group .meta-tags a {
-  display: inline-block;
-  color: #0468B1;
-  /*.tag {
-  	border: 1px solid $c-mid-blue;
-  	padding: 0 10px;
-  	margin-right: 5px;
-  	font-size: $t-small;
-  	line-height: 1.5em;
-
-  	label {
-  		cursor: pointer;
-  	}
-  }*/
-}
-div.browse main .inner section .layout .tag-group .meta-tags a .tag {
-  border: none;
-  padding: 0 10px;
-  margin: 0 2.5px 2.5px 0;
-  background-color: #E5E5E5;
-  border-radius: calc(12px * 1.75);
-  font-size: 12px;
-  line-height: 1.75em;
-  color: #646464;
-}
-div.browse main .inner section .layout .tag-group .meta-tags a .tag label {
-  cursor: pointer;
-}
-div.browse main .inner section .layout .tag-group .meta-tags a:hover {
-  text-decoration: none;
-}
-div.browse main .inner section .layout .tag-group .meta-sdgs {
-  font-size: 12px;
-  line-height: 1.5em;
-}
-div.browse main .inner section .layout .tag-group .meta-sdgs span {
-  margin-right: 5px;
-  color: #969696;
-}
-div.browse main .inner section .layout .tag-group .meta-sdgs a {
-  display: inline-block;
-  margin: 0 5px;
-  font-size: 14px;
-  line-height: 1.2em;
-  font-weight: bold;
-}
-div.browse main .inner section .layout .engagement-group {
-  margin-top: 10px;
-}
-div.browse main .inner section .layout .engagement-group .engagement {
-  display: inline-block;
-  border: none;
-  outline: none;
-  background-color: transparent;
-}
-div.browse main .inner section .layout .engagement-group .engagement img {
-  vertical-align: middle;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
-div.browse main .inner section .layout .engagement-group .engagement span {
-  display: inline-block;
-  margin-right: 5px;
-  text-align: center;
-  font-size: 12px;
-  color: #969696;
-}
-div.browse main .inner section .layout .engagement-group .engagement:disabled img {
-  cursor: initial;
-  opacity: 0.5;
-}
-div.browse main .inner section .layout.columns {
-  display: grid;
-  grid-template-columns: repeat(3, 300px);
-  grid-gap: 15px;
-}
-div.browse main .inner section .layout.columns article {
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  vertical-align: top;
-  grid-column: span 1;
-  padding-top: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-div.browse main .inner section .layout.columns article .inner {
-  display: block;
-}
-div.browse main .inner section .layout.columns article .inner .head {
-  display: block;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group {
-  text-align: left;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form {
-  position: relative;
-  display: inline-block;
-  margin: 0 2px;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button {
-  min-height: 30px;
-  padding: 0 10px;
-  border: 1px solid #969696;
-  outline: none;
-  background-color: transparent;
-  font-size: 12px;
-  line-height: 1.5em;
-  color: #969696;
-  cursor: pointer;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button.publish,
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button.share,
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button.active,
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button.accept {
-  background-color: #32BEE1;
-  border-color: #32BEE1;
-  color: #FFF;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button.delete.active,
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button.unpublish.active {
-  border-color: #A51E41;
-  background-color: #A51E41;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form button:disabled {
-  background-color: transparent;
-  border: 1px solid #E5E5E5;
-  color: #E5E5E5;
-  pointer-events: none;
-  cursor: default;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown {
-  position: absolute;
-  min-width: 100%;
-  max-height: 0;
-  left: 50%;
-  top: calc(100% - 1px);
-  background-color: #FFF;
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
-  transform: translateX(-50%);
-  overflow: hidden;
-  z-index: 10;
-  transition: max-height 0.15s ease-out;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu {
-  width: 100%;
-  border-top: 1px solid #969696;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li {
-  width: 100%;
-  margin: 0;
-  list-style: none;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li button {
-  width: 100%;
-  padding: 5px 10px;
-  border: none;
-  text-align: center;
-  white-space: nowrap;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:hover button:not(:disabled) {
-  background-color: #F3F3F3;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button {
-  border-bottom: 1px dotted #969696;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button:disabled {
-  border-color: #E5E5E5;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form:first-child {
-  margin-left: 0;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group form:last-child {
-  margin-right: 0;
-}
-div.browse main .inner section .layout.columns article .inner .head .btn-group:empty {
-  margin: 0;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img {
-  position: relative;
-  width: 300px;
-  height: 200px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: flex-end;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  width: 30px;
-  height: 90px;
-  top: -10px;
-  right: 10px;
-  background-color: #0468B1;
-  font-size: 12px;
-  line-height: 1.5em;
-  text-align: center;
-  color: #FFF;
-  z-index: 100;
-  transform: translateY(-10px);
-  transform-origin: top center;
-  transition: transform 0.15s ease-out, background-color 0.25s;
-  cursor: pointer;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark .label {
-  transform: rotate(-90deg);
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark::before {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translateY(90px);
-  width: 0;
-  height: 0;
-  border-top: 7px solid #0468B1;
-  border-left: 15px solid transparent;
-  transform-origin: top center;
-  transition: transform 0.15s ease-out, border-top-color 0.25s;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translateY(90px);
-  width: 0;
-  height: 0;
-  border-top: 7px solid #0468B1;
-  border-right: 15px solid transparent;
-  transform-origin: top center;
-  transition: transform 0.15s ease-out, border-top-color 0.25s;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover,
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
-  display: flex;
-  transform: translateY(0);
-  background-color: #005687;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
-  border-top-color: #005687;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active {
-  transform: translateY(0) scaleY(0.5);
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active .label {
-  display: none;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
-div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
-  transform: translateY(90px) scaleY(2);
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img a {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  color: #005687;
-}
-div.browse main .inner section .layout.columns article .inner .head .media-img a img {
-  display: block;
-  width: 100%;
-  background-color: #E5E5E5;
-  height: 100%;
-  font-size: 12px;
-  line-height: 1.5em;
-  line-height: 200px;
-  text-align: center;
-}
-div.browse main .inner section .layout.columns article .inner .body {
-  display: block;
-  width: 100%;
-  padding: 0;
-}
-div.browse main .inner section .layout.columns article .inner .body .meta-data {
-  margin: 0 0 5px 0;
-}
-div.browse main .inner section .layout.columns article .inner .body .meta-data .meta-contributor {
-  display: inline-block;
-  margin: 0 5px 0 0;
-  font-size: 14px;
-  line-height: 1.5em;
-  color: #0468B1;
-}
-div.browse main .inner section .layout.columns article .inner .body .meta-data .meta-contributor::after {
-  content: ", ";
-  font-size: 14px;
-  line-height: 1.5em;
-  color: #32BEE1;
-}
-div.browse main .inner section .layout.columns article .inner .body .meta-data .meta-date {
-  display: inline-block;
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.5em;
-  color: #0468B1;
-}
-div.browse main .inner section .layout.columns article .inner .body .media-title a h1 {
-  font-size: 20px;
-  line-height: 1.2em;
-  margin: 0;
-  text-align: left;
-}
-div.browse main .inner section .layout.columns article .inner .body .media-title a h1 img {
-  vertical-align: text-bottom;
-}
-div.browse main .inner section .layout.columns article .inner .body .meta-mobilization,
-div.browse main .inner section .layout.columns article .inner .body .meta-template {
-  display: block;
-  padding: 0;
-  margin: 0;
-  border: none;
-}
-div.browse main .inner section .layout.columns article .inner .body .meta-followup,
-div.browse main .inner section .layout.columns article .inner .body .meta-forward,
-div.browse main .inner section .layout.columns article .inner .body .meta-public,
-div.browse main .inner section .layout.columns article .inner .body .meta-copy,
-div.browse main .inner section .layout.columns article .inner .body .meta-child {
-  margin: 10px 0;
-}
-div.browse main .inner section .layout.columns article .inner .foot .meta, div.browse main .inner section .layout.columns article .inner .foot .media {
-  margin: 5px 0;
-}
-div.browse main .inner section .layout.columns article .inner .foot .meta-group {
-  width: 100%;
-  padding-top: 5px;
-  padding-bottom: 15px;
-}
-div.browse main .inner section .layout.columns article .inner .foot .meta-group .meta-stats {
-  width: 25%;
-}
-div.browse main .inner section .layout.columns article .inner .pinboard-group .add input[type=text] {
-  border-bottom-color: transparent;
-}
-div.browse main .inner section .layout.columns article .inner .pinboard-group .add input[type=text]:focus {
-  border-bottom-color: #969696;
-}
-div.browse main .inner section .layout.columns article .outer {
-  height: 0;
-  transition: height 0.25s;
-  overflow: hidden;
-}
-div.browse main .inner section .layout.columns article .outer .inner {
-  width: 100%;
-  height: auto;
-  margin-top: 0;
-  padding: 15px 0;
-}
-div.browse main .inner section .layout.columns article .outer::before {
-  height: 0;
-  top: 0;
-}
-div.browse main .inner section .layout.columns article .outer::after {
-  height: 0;
-}
-div.browse main .inner section .layout.columns article .outer.expand {
-  height: 140px;
-}
 div.browse main .outer {
   /* margin-top: 30px;*/
   margin-top: 0px;
@@ -2728,17 +1779,1285 @@ div.browse main .outer .nav-info {
     transform: translateX(0);
   }
 }
+div.browse main .inner section .layout,
+div.browse .public-page-panel .inner section .layout {
+  margin-top: 15px;
+}
+div.browse main .inner section .layout article,
+div.browse .public-page-panel .inner section .layout article {
+  position: relative;
+  display: flex;
+  padding: 15px 0 0 0;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  /*&::after {
+  	content: '';
+  	position: absolute;
+  	width: 100%;
+  	height: 100%;
+  	left: 0;
+  	top: 0;
+  	background-color: rgba(100,100,100,.1);
+  	opacity: 0;
+  	pointer-events: none;
+  	transition: opacity .15s;
+  }*/
+}
+div.browse main .inner section .layout article .inner,
+div.browse .public-page-panel .inner section .layout article .inner {
+  display: flex;
+  flex-flow: row wrap;
+  flex-grow: 1;
+  transition: width 0.25s;
+}
+div.browse main .inner section .layout article .inner .head,
+div.browse .public-page-panel .inner section .layout article .inner .head {
+  flex: 0 0 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.browse main .inner section .layout article .inner .head .meta-group,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .meta-data,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .meta-data {
+  margin-bottom: 0;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .meta-data .meta-contributor,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .meta-data .meta-contributor {
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #0468B1;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .meta-data .meta-date,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .meta-data .meta-date {
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #0468B1;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group {
+  margin-bottom: 5px;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form {
+  position: relative;
+  display: inline-block;
+  margin: 0 2px;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #969696;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #969696;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.publish,
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.share,
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.active,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button.publish,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button.share,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button.active {
+  background-color: #32BEE1;
+  border-color: #32BEE1;
+  color: #FFF;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.delete.active,
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button.unpublish.active,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button.delete.active,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button.unpublish.active {
+  border-color: #A51E41;
+  background-color: #A51E41;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form button:disabled,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form button:disabled {
+  background-color: transparent;
+  border: 1px solid #E5E5E5;
+  color: #E5E5E5;
+  pointer-events: none;
+  cursor: default;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown {
+  position: absolute;
+  min-width: 100%;
+  max-height: 0;
+  right: 0;
+  top: calc(100% - 1px);
+  background-color: #FFF;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  /*transform: translateX(-50%);*/
+  overflow: hidden;
+  z-index: 10;
+  transition: max-height 0.15s ease-out;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu {
+  width: 100%;
+  border-top: 1px solid #969696;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li {
+  width: 100%;
+  margin: 0;
+  list-style: none;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li button,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li button {
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  text-align: left;
+  white-space: nowrap;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li button.highlight,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li button.highlight {
+  background-color: #32BEE1;
+  color: #FFF;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button:not(:disabled),
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button:not(:disabled) {
+  background-color: rgb(239, 239, 239);
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button.highlight,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button.highlight {
+  background-color: #969696;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button {
+  border-bottom: 1px dotted #969696;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button.highlight,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button.highlight {
+  border-color: #FFF;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button:disabled,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:not(:last-child) button:disabled {
+  border-color: #E5E5E5;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form:first-child,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form:first-child {
+  margin-left: 0;
+}
+div.browse main .inner section .layout article .inner .head .meta-group .btn-group form:last-child,
+div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form:last-child {
+  margin-right: 0;
+}
+div.browse main .inner section .layout article .inner .body,
+div.browse .public-page-panel .inner section .layout article .inner .body {
+  flex: 0 0 calc(100% - 330px);
+  padding-right: 30px;
+  /*padding-bottom: 10px;*/
+}
+div.browse main .inner section .layout article .inner .body .meta, div.browse main .inner section .layout article .inner .body .media,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta,
+div.browse .public-page-panel .inner section .layout article .inner .body .media {
+  margin: 5px 0;
+}
+div.browse main .inner section .layout article .inner .body .media-title,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-title {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+div.browse main .inner section .layout article .inner .body .media-title a,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-title a {
+  color: #005687;
+}
+div.browse main .inner section .layout article .inner .body .media-title a h1,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-title a h1 {
+  font-size: 20px;
+  line-height: 1.3em;
+  font-weight: bold;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .body .media-title a h1 img,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-title a h1 img {
+  vertical-align: text-bottom;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .body .media-txt,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-txt {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.3em;
+  white-space: pre-line;
+}
+div.browse main .inner section .layout article .inner .body .media-txt a,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-txt a {
+  color: #000000;
+}
+div.browse main .inner section .layout article .inner .body .media-txt a .read-more,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-txt a .read-more {
+  color: #32BEE1;
+}
+div.browse main .inner section .layout article .inner .body .media-txt a:hover,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-txt a:hover {
+  text-decoration: none;
+}
+div.browse main .inner section .layout article .inner .body .media-txt a:hover .read-more,
+div.browse .public-page-panel .inner section .layout article .inner .body .media-txt a:hover .read-more {
+  text-decoration: underline;
+}
+div.browse main .inner section .layout article .inner .body .meta-mobilization,
+div.browse main .inner section .layout article .inner .body .meta-template,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-mobilization,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-template {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1.5em;
+  margin-bottom: 10px;
+}
+div.browse main .inner section .layout article .inner .body .meta-tree,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-tree {
+  display: flex;
+  align-items: center;
+}
+div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-tree .meta-versiontree {
+  margin-right: 10px;
+}
+div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-tree .meta-versiontree a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a img,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-tree .meta-versiontree a img {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .body .meta-tree .meta-versiontree a small,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-tree .meta-versiontree a small {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1em;
+  color: #969696;
+  text-align: center;
+}
+div.browse main .inner section .layout article .inner .body .meta-mobilization,
+div.browse main .inner section .layout article .inner .body .meta-template,
+div.browse main .inner section .layout article .inner .body .meta-followup,
+div.browse main .inner section .layout article .inner .body .meta-forward,
+div.browse main .inner section .layout article .inner .body .meta-public,
+div.browse main .inner section .layout article .inner .body .meta-copy,
+div.browse main .inner section .layout article .inner .body .meta-child,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-mobilization,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-template,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-followup,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-forward,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-public,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-copy,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-child {
+  color: #969696;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.browse main .inner section .layout article .inner .body .meta-mobilization,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-mobilization {
+  padding-right: 10px;
+  margin-right: 10px;
+  border-right: 1px solid #969696;
+}
+div.browse main .inner section .layout article .inner .body .meta-followup,
+div.browse main .inner section .layout article .inner .body .meta-forward,
+div.browse main .inner section .layout article .inner .body .meta-public,
+div.browse main .inner section .layout article .inner .body .meta-copy,
+div.browse main .inner section .layout article .inner .body .meta-child,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-followup,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-forward,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-public,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-copy,
+div.browse .public-page-panel .inner section .layout article .inner .body .meta-child {
+  width: 100%;
+  /*margin: 10px 0 0 0;*/
+  margin: 0;
+}
+div.browse main .inner section .layout article .inner .body .create,
+div.browse .public-page-panel .inner section .layout article .inner .body .create {
+  position: relative;
+  display: inline-block;
+  margin: 5px 10px 10px 0;
+}
+div.browse main .inner section .layout article .inner .body .create button,
+div.browse .public-page-panel .inner section .layout article .inner .body .create button {
+  padding: 0 5px;
+  border: 1px solid #32BEE1;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #32BEE1;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .body .create .dropdown,
+div.browse .public-page-panel .inner section .layout article .inner .body .create .dropdown {
+  position: absolute;
+  min-width: 100%;
+  width: 300px;
+  max-height: 0;
+  left: 0;
+  top: 100%;
+  margin-top: -2px;
+  background-color: #FFF;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  z-index: 10;
+  transition: max-height 0.25s ease-out;
+}
+div.browse main .inner section .layout article .inner .body .create .dropdown menu,
+div.browse .public-page-panel .inner section .layout article .inner .body .create .dropdown menu {
+  width: 100%;
+  border-top: 1px solid #969696;
+}
+div.browse main .inner section .layout article .inner .body .create .dropdown menu li,
+div.browse .public-page-panel .inner section .layout article .inner .body .create .dropdown menu li {
+  display: inline-block;
+  width: 100%;
+  margin: 0;
+  list-style: none;
+  white-space: pre;
+}
+div.browse main .inner section .layout article .inner .body .create .dropdown menu li a button,
+div.browse .public-page-panel .inner section .layout article .inner .body .create .dropdown menu li a button {
+  height: auto;
+  padding: 5px 10px;
+  font-size: 12px;
+  background-color: transparent;
+  border: none;
+  color: #000000;
+  text-align: left;
+}
+div.browse main .inner section .layout article .inner .body .create .dropdown menu li:hover,
+div.browse .public-page-panel .inner section .layout article .inner .body .create .dropdown menu li:hover {
+  background-color: rgb(239, 239, 239);
+}
+div.browse main .inner section .layout article .inner .body.full-width,
+div.browse .public-page-panel .inner section .layout article .inner .body.full-width {
+  flex: 0 0 100%;
+}
+div.browse main .inner section .layout article .inner .body.full-width .media-title,
+div.browse .public-page-panel .inner section .layout article .inner .body.full-width .media-title {
+  width: calc(100% - 330px);
+}
+div.browse main .inner section .layout article .inner .foot,
+div.browse .public-page-panel .inner section .layout article .inner .foot {
+  align-self: top;
+}
+div.browse main .inner section .layout article .inner .foot .media-img,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 30px;
+  height: 90px;
+  top: -10px;
+  right: 10px;
+  background-color: #0468B1;
+  font-size: 12px;
+  line-height: 1.5em;
+  text-align: center;
+  color: #FFF;
+  z-index: 100;
+  transform: translateY(-10px);
+  transform-origin: top center;
+  transition: transform 0.15s ease-out, background-color 0.25s;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark .label,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark .label {
+  transform: rotate(-90deg);
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark::before,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translateY(90px);
+  width: 0;
+  height: 0;
+  border-top: 7px solid #0468B1;
+  border-left: 15px solid transparent;
+  transform-origin: top center;
+  transition: transform 0.15s ease-out, border-top-color 0.25s;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark::after,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(90px);
+  width: 0;
+  height: 0;
+  border-top: 7px solid #0468B1;
+  border-right: 15px solid transparent;
+  transform-origin: top center;
+  transition: transform 0.15s ease-out, border-top-color 0.25s;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover,
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark:hover,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active {
+  display: flex;
+  transform: translateY(0);
+  background-color: #005687;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark:hover::before,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark:hover::after,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active::before,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active::after {
+  border-top-color: #005687;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active {
+  transform: translateY(0) scaleY(0.5);
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active .label,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active .label {
+  display: none;
+}
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::before,
+div.browse main .inner section .layout article .inner .foot .media-img .bookmark.active::after,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active::before,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img .bookmark.active::after {
+  transform: translateY(90px) scaleY(2);
+}
+div.browse main .inner section .layout article .inner .foot .media-img a,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img a {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: #005687;
+}
+div.browse main .inner section .layout article .inner .foot .media-img a img,
+div.browse .public-page-panel .inner section .layout article .inner .foot .media-img a img {
+  display: block;
+  width: 100%;
+  background-color: #E5E5E5;
+  height: 100%;
+  font-size: 12px;
+  line-height: 1.5em;
+  line-height: 200px;
+  text-align: center;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 300px;
+  height: calc(100% - 15px);
+  padding-bottom: 15px;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats {
+  margin: auto 5px;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a h1,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a h1 {
+  text-align: center;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a h1 small,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a h1 small {
+  font-size: 12px;
+  line-height: 1.5em;
+  display: block;
+  font-weight: normal;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a h1 small.total,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a h1 small.total {
+  display: inline-block;
+  font-weight: normal;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a:hover,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a:hover {
+  text-decoration: none;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a:hover h1 small,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a:hover h1 small {
+  text-decoration: underline;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled {
+  color: #005687;
+}
+div.browse main .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small,
+div.browse .public-page-panel .inner section .layout article .inner .foot .meta-group .meta-stats a.disabled h1 small {
+  text-decoration: none !important;
+  font-weight: normal;
+}
+div.browse main .inner section .layout article .inner .pinboard-group,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group {
+  width: 100%;
+  margin-top: 5px;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add {
+  position: relative;
+  width: 100%;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text],
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add input[type=text] {
+  position: relative;
+  /*width: calc(100% - 20px);*/
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  margin-top: 10px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  border-bottom: 1px dotted #969696;
+  font-size: 12px;
+  color: #005687;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add input[type=text]:focus {
+  border-bottom-color: #969696;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add label,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add label {
+  position: absolute;
+  left: 0;
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #969696;
+  transform: translateY(15px);
+  transition: transform 0.25s, font-size 0.25s;
+  pointer-events: none;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add button,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add button {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 30px;
+  margin-top: 10px;
+  background: url("../imgs/icons/i-add-sm.svg") center no-repeat;
+  border: none;
+  outline: none;
+  float: right;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus + label,
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text].has-value + label,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add input[type=text]:focus + label,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add input[type=text].has-value + label {
+  font-size: 10px;
+  line-height: 1.5em;
+  transform: translateY(2.5px);
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text]:focus ~ button,
+div.browse main .inner section .layout article .inner .pinboard-group .add input[type=text].has-value ~ button,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add input[type=text]:focus ~ button,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add input[type=text].has-value ~ button {
+  display: block;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown {
+  position: absolute;
+  width: 100%;
+  max-height: 0;
+  left: 0;
+  top: 100%;
+  background-color: #FFF;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  z-index: 10;
+  transition: max-height 0.25s ease-out;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu {
+  width: 100%;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li {
+  display: inline-block;
+  width: 100%;
+  margin: 0;
+  list-style: none;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li input[type=checkbox],
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li input[type=checkbox] {
+  display: none;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li label,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li label {
+  display: flex;
+  align-items: center;
+  position: static;
+  padding: 5px 20px 5px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #000000;
+  transform: none;
+  pointer-events: all;
+  cursor: pointer;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li label .count,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li label .count {
+  margin-left: auto;
+  padding-left: 10px;
+  color: #969696;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li input:checked + label,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li input:checked + label {
+  background-color: #E5E5E5;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li:hover,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li:hover {
+  background-color: rgb(239, 239, 239);
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin {
+  display: inline-block;
+  height: 15px;
+  padding: 0;
+  margin-right: 5px;
+  font-size: 10px;
+  line-height: 15px;
+  border: 1px solid #969696;
+  color: #969696;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin label,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin label {
+  cursor: pointer;
+  vertical-align: top;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin .type,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin .type {
+  flex-shrink: 0;
+  /*font-size: $t-xsmall;*/
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin .name,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin .name {
+  flex-grow: 1;
+  margin: 0 5px 0 5px;
+  white-space: nowrap;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin .close,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin .close {
+  display: inline-block;
+  position: relative;
+  width: 15px;
+  height: 15px;
+  background-color: #969696;
+  text-align: center;
+  font-size: 12px;
+  color: #FFF;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin .close::before,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin .close::before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 0;
+  left: 50%;
+  border-left: 1px solid #FFF;
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+div.browse main .inner section .layout article .inner .pinboard-group .pin .close::after,
+div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin .close::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 0;
+  left: 50%;
+  border-left: 1px solid #FFF;
+  transform: rotate(-45deg);
+  transform-origin: center;
+}
+div.browse main .inner section .layout article .outer,
+div.browse .public-page-panel .inner section .layout article .outer {
+  position: relative;
+  flex-grow: 0;
+  flex-shrink: 0;
+  background-color: #FFF;
+}
+div.browse main .inner section .layout article .outer .inner,
+div.browse .public-page-panel .inner section .layout article .outer .inner {
+  display: flex;
+  position: relative;
+  z-index: 1;
+  width: 0;
+  height: calc(100% + 15px);
+  /*padding: 15px 0 0 0;*/
+  margin-top: -15px;
+  /*border-bottom: 1px dotted $c-light-grey;*/
+  transition: width 0.25s;
+  overflow: hidden;
+  background: repeating-linear-gradient(45deg, #FFF, #FFF 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
+}
+div.browse main .inner section .layout article .outer .inner form,
+div.browse .public-page-panel .inner section .layout article .outer .inner form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+div.browse main .inner section .layout article .outer .inner form button,
+div.browse .public-page-panel .inner section .layout article .outer .inner form button {
+  width: calc(100% - 30px);
+  height: 45px;
+  margin: 5px 15px;
+  border: none;
+  outline: none;
+  border: 1px solid #A51E41;
+  background-color: transparent;
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #A51E41;
+  cursor: pointer;
+  overflow: hidden;
+}
+div.browse main .inner section .layout article .outer .inner form button.cancel,
+div.browse .public-page-panel .inner section .layout article .outer .inner form button.cancel {
+  border-color: #646464;
+  color: #646464;
+}
+div.browse main .inner section .layout article .outer::before,
+div.browse .public-page-panel .inner section .layout article .outer::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  height: 15px;
+  top: -15px;
+  background-color: #FFF;
+}
+div.browse main .inner section .layout article .outer::after,
+div.browse .public-page-panel .inner section .layout article .outer::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  height: 15px;
+  top: 100%;
+  background-color: #FFF;
+}
+div.browse main .inner section .layout article .outer.expand .inner,
+div.browse .public-page-panel .inner section .layout article .outer.expand .inner {
+  width: 120px;
+}
+div.browse main .inner section .layout article:hover,
+div.browse .public-page-panel .inner section .layout article:hover {
+  background-color: rgb(239, 239, 239);
+}
+div.browse main .inner section .layout article:not(.pad):not(.review):not(.contributor),
+div.browse .public-page-panel .inner section .layout article:not(.pad):not(.review):not(.contributor) {
+  border-bottom: 1px dotted #969696;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+div.browse main .inner section .layout article.status--1,
+div.browse .public-page-panel .inner section .layout article.status--1 {
+  filter: grayscale(1);
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
+}
+div.browse main .inner section .layout article.status-0,
+div.browse .public-page-panel .inner section .layout article.status-0 {
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255, 193, 14, 0.1) 3px, rgba(255, 193, 14, 0.1) 6px);
+}
+div.browse main .inner section .layout article.status-1,
+div.browse .public-page-panel .inner section .layout article.status-1 {
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(50, 190, 225, 0.1) 3px, rgba(50, 190, 225, 0.1) 6px);
+}
+div.browse main .inner section .layout article.mobilization.status-0,
+div.browse .public-page-panel .inner section .layout article.mobilization.status-0 {
+  background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(150, 150, 150, 0.1) 3px, rgba(150, 150, 150, 0.1) 6px);
+}
+div.browse main .inner section .layout .tag-group .meta-tags,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-tags {
+  margin-left: -2px;
+}
+div.browse main .inner section .layout .tag-group .meta-tags a,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-tags a {
+  display: inline-block;
+  color: #0468B1;
+  /*.tag {
+  	border: 1px solid $c-mid-blue;
+  	padding: 0 10px;
+  	margin-right: 5px;
+  	font-size: $t-small;
+  	line-height: 1.5em;
+
+  	label {
+  		cursor: pointer;
+  	}
+  }*/
+}
+div.browse main .inner section .layout .tag-group .meta-tags a .tag,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-tags a .tag {
+  border: none;
+  padding: 0 10px;
+  margin: 0 2.5px 2.5px 0;
+  background-color: #E5E5E5;
+  border-radius: calc(12px * 1.75);
+  font-size: 12px;
+  line-height: 1.75em;
+  color: #646464;
+}
+div.browse main .inner section .layout .tag-group .meta-tags a .tag label,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-tags a .tag label {
+  cursor: pointer;
+}
+div.browse main .inner section .layout .tag-group .meta-tags a:hover,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-tags a:hover {
+  text-decoration: none;
+}
+div.browse main .inner section .layout .tag-group .meta-sdgs,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-sdgs {
+  font-size: 12px;
+  line-height: 1.5em;
+}
+div.browse main .inner section .layout .tag-group .meta-sdgs span,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-sdgs span {
+  margin-right: 5px;
+  color: #969696;
+}
+div.browse main .inner section .layout .tag-group .meta-sdgs a,
+div.browse .public-page-panel .inner section .layout .tag-group .meta-sdgs a {
+  display: inline-block;
+  margin: 0 5px;
+  font-size: 14px;
+  line-height: 1.2em;
+  font-weight: bold;
+}
+div.browse main .inner section .layout .engagement-group,
+div.browse .public-page-panel .inner section .layout .engagement-group {
+  margin-top: 10px;
+}
+div.browse main .inner section .layout .engagement-group .engagement,
+div.browse .public-page-panel .inner section .layout .engagement-group .engagement {
+  display: inline-block;
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+div.browse main .inner section .layout .engagement-group .engagement img,
+div.browse .public-page-panel .inner section .layout .engagement-group .engagement img {
+  vertical-align: middle;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+div.browse main .inner section .layout .engagement-group .engagement span,
+div.browse .public-page-panel .inner section .layout .engagement-group .engagement span {
+  display: inline-block;
+  margin-right: 5px;
+  text-align: center;
+  font-size: 12px;
+  color: #969696;
+}
+div.browse main .inner section .layout .engagement-group .engagement:disabled img,
+div.browse .public-page-panel .inner section .layout .engagement-group .engagement:disabled img {
+  cursor: initial;
+  opacity: 0.5;
+}
+div.browse main .inner section .layout.columns,
+div.browse .public-page-panel .inner section .layout.columns {
+  display: grid;
+  grid-template-columns: repeat(3, 300px);
+  grid-gap: 15px;
+}
+div.browse main .inner section .layout.columns article,
+div.browse .public-page-panel .inner section .layout.columns article {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  vertical-align: top;
+  grid-column: span 1;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+div.browse main .inner section .layout.columns article .inner,
+div.browse .public-page-panel .inner section .layout.columns article .inner {
+  display: block;
+}
+div.browse main .inner section .layout.columns article .inner .head,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head {
+  display: block;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group {
+  text-align: left;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form {
+  position: relative;
+  display: inline-block;
+  margin: 0 2px;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #969696;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #969696;
+  cursor: pointer;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button.publish,
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button.share,
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button.active,
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button.accept,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button.publish,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button.share,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button.active,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button.accept {
+  background-color: #32BEE1;
+  border-color: #32BEE1;
+  color: #FFF;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button.delete.active,
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button.unpublish.active,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button.delete.active,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button.unpublish.active {
+  border-color: #A51E41;
+  background-color: #A51E41;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form button:disabled,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form button:disabled {
+  background-color: transparent;
+  border: 1px solid #E5E5E5;
+  color: #E5E5E5;
+  pointer-events: none;
+  cursor: default;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown {
+  position: absolute;
+  min-width: 100%;
+  max-height: 0;
+  left: 50%;
+  top: calc(100% - 1px);
+  background-color: #FFF;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  transform: translateX(-50%);
+  overflow: hidden;
+  z-index: 10;
+  transition: max-height 0.15s ease-out;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu {
+  width: 100%;
+  border-top: 1px solid #969696;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li {
+  width: 100%;
+  margin: 0;
+  list-style: none;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li button,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li button {
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  text-align: center;
+  white-space: nowrap;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:hover button:not(:disabled),
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:hover button:not(:disabled) {
+  background-color: rgb(239, 239, 239);
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button {
+  border-bottom: 1px dotted #969696;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button:disabled,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button:disabled {
+  border-color: #E5E5E5;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form:first-child,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form:first-child {
+  margin-left: 0;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group form:last-child,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form:last-child {
+  margin-right: 0;
+}
+div.browse main .inner section .layout.columns article .inner .head .btn-group:empty,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group:empty {
+  margin: 0;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 30px;
+  height: 90px;
+  top: -10px;
+  right: 10px;
+  background-color: #0468B1;
+  font-size: 12px;
+  line-height: 1.5em;
+  text-align: center;
+  color: #FFF;
+  z-index: 100;
+  transform: translateY(-10px);
+  transform-origin: top center;
+  transition: transform 0.15s ease-out, background-color 0.25s;
+  cursor: pointer;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark .label,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark .label {
+  transform: rotate(-90deg);
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark::before,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translateY(90px);
+  width: 0;
+  height: 0;
+  border-top: 7px solid #0468B1;
+  border-left: 15px solid transparent;
+  transform-origin: top center;
+  transition: transform 0.15s ease-out, border-top-color 0.25s;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark::after,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(90px);
+  width: 0;
+  height: 0;
+  border-top: 7px solid #0468B1;
+  border-right: 15px solid transparent;
+  transform-origin: top center;
+  transition: transform 0.15s ease-out, border-top-color 0.25s;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover,
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark:hover,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active {
+  display: flex;
+  transform: translateY(0);
+  background-color: #005687;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark:hover::before,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark:hover::after,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
+  border-top-color: #005687;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active {
+  transform: translateY(0) scaleY(0.5);
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active .label,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active .label {
+  display: none;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
+div.browse main .inner section .layout.columns article .inner .head .media-img .bookmark.active::after,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active::before,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img .bookmark.active::after {
+  transform: translateY(90px) scaleY(2);
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img a,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img a {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: #005687;
+}
+div.browse main .inner section .layout.columns article .inner .head .media-img a img,
+div.browse .public-page-panel .inner section .layout.columns article .inner .head .media-img a img {
+  display: block;
+  width: 100%;
+  background-color: #E5E5E5;
+  height: 100%;
+  font-size: 12px;
+  line-height: 1.5em;
+  line-height: 200px;
+  text-align: center;
+}
+div.browse main .inner section .layout.columns article .inner .body,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body {
+  display: block;
+  width: 100%;
+  padding: 0;
+}
+div.browse main .inner section .layout.columns article .inner .body .meta-data,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-data {
+  margin: 0 0 5px 0;
+}
+div.browse main .inner section .layout.columns article .inner .body .meta-data .meta-contributor,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-data .meta-contributor {
+  display: inline-block;
+  margin: 0 5px 0 0;
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #0468B1;
+}
+div.browse main .inner section .layout.columns article .inner .body .meta-data .meta-contributor::after,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-data .meta-contributor::after {
+  content: ", ";
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #32BEE1;
+}
+div.browse main .inner section .layout.columns article .inner .body .meta-data .meta-date,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-data .meta-date {
+  display: inline-block;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #0468B1;
+}
+div.browse main .inner section .layout.columns article .inner .body .media-title a h1,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .media-title a h1 {
+  font-size: 20px;
+  line-height: 1.2em;
+  margin: 0;
+  text-align: left;
+}
+div.browse main .inner section .layout.columns article .inner .body .media-title a h1 img,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .media-title a h1 img {
+  vertical-align: text-bottom;
+}
+div.browse main .inner section .layout.columns article .inner .body .meta-mobilization,
+div.browse main .inner section .layout.columns article .inner .body .meta-template,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-mobilization,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-template {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+div.browse main .inner section .layout.columns article .inner .body .meta-followup,
+div.browse main .inner section .layout.columns article .inner .body .meta-forward,
+div.browse main .inner section .layout.columns article .inner .body .meta-public,
+div.browse main .inner section .layout.columns article .inner .body .meta-copy,
+div.browse main .inner section .layout.columns article .inner .body .meta-child,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-followup,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-forward,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-public,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-copy,
+div.browse .public-page-panel .inner section .layout.columns article .inner .body .meta-child {
+  margin: 10px 0;
+}
+div.browse main .inner section .layout.columns article .inner .foot .meta, div.browse main .inner section .layout.columns article .inner .foot .media,
+div.browse .public-page-panel .inner section .layout.columns article .inner .foot .meta,
+div.browse .public-page-panel .inner section .layout.columns article .inner .foot .media {
+  margin: 5px 0;
+}
+div.browse main .inner section .layout.columns article .inner .foot .meta-group,
+div.browse .public-page-panel .inner section .layout.columns article .inner .foot .meta-group {
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 15px;
+}
+div.browse main .inner section .layout.columns article .inner .foot .meta-group .meta-stats,
+div.browse .public-page-panel .inner section .layout.columns article .inner .foot .meta-group .meta-stats {
+  width: 25%;
+}
+div.browse main .inner section .layout.columns article .inner .pinboard-group .add input[type=text],
+div.browse .public-page-panel .inner section .layout.columns article .inner .pinboard-group .add input[type=text] {
+  border-bottom-color: transparent;
+}
+div.browse main .inner section .layout.columns article .inner .pinboard-group .add input[type=text]:focus,
+div.browse .public-page-panel .inner section .layout.columns article .inner .pinboard-group .add input[type=text]:focus {
+  border-bottom-color: #969696;
+}
+div.browse main .inner section .layout.columns article .outer,
+div.browse .public-page-panel .inner section .layout.columns article .outer {
+  height: 0;
+  transition: height 0.25s;
+  overflow: hidden;
+}
+div.browse main .inner section .layout.columns article .outer .inner,
+div.browse .public-page-panel .inner section .layout.columns article .outer .inner {
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  padding: 15px 0;
+}
+div.browse main .inner section .layout.columns article .outer::before,
+div.browse .public-page-panel .inner section .layout.columns article .outer::before {
+  height: 0;
+  top: 0;
+}
+div.browse main .inner section .layout.columns article .outer::after,
+div.browse .public-page-panel .inner section .layout.columns article .outer::after {
+  height: 0;
+}
+div.browse main .inner section .layout.columns article .outer.expand,
+div.browse .public-page-panel .inner section .layout.columns article .outer.expand {
+  height: 140px;
+}
 
 div.browse.public {
   padding-top: 90px;
 }
 
 div.browse.slideshow {
-  position: absolute;
+  /*position: absolute;
   top: 30px;
   left: 0;
-  width: 100vw;
-  padding: 0;
+  width: 100vw;*/
+  padding: 0 15px;
   margin: 0;
   border: none;
   min-height: 0;
@@ -2772,8 +3091,10 @@ div.browse.slideshow button.slide-nav:hover {
   background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(50, 190, 225, 0.1) 3px, rgba(50, 190, 225, 0.1) 6px);
 }
 div.browse.slideshow main {
-  position: relative;
+  position: absolute;
+  width: 100%;
   height: 100%;
+  left: 0;
   padding-bottom: 0;
 }
 div.browse.slideshow main .inner {
@@ -2931,22 +3252,22 @@ div.browse.slideshow main .inner section .layout article:hover::after {
   opacity: 0.75;
 }
 
-div.browse.slideshow + footer {
+footer.slideshow {
   position: fixed;
   bottom: 0;
   background-color: transparent;
   z-index: 100;
 }
-div.browse.slideshow + footer .inner {
+footer.slideshow .inner {
   border: none;
   width: 100%;
   box-sizing: border-box;
 }
-div.browse.slideshow + footer .inner div.dots {
+footer.slideshow .inner div.dots {
   width: 100%;
   text-align: center;
 }
-div.browse.slideshow + footer .inner div.dots .dot {
+footer.slideshow .inner div.dots .dot {
   height: 15px;
   width: 15px;
   margin: 0 5px;
@@ -2956,8 +3277,8 @@ div.browse.slideshow + footer .inner div.dots .dot {
   transition: background-color 0.25s ease;
   cursor: pointer;
 }
-div.browse.slideshow + footer .inner div.dots .highlight {
-  background-color: #0468B1;
+footer.slideshow .inner div.dots .highlight {
+  background-color: #61B233;
 }
 
 footer {

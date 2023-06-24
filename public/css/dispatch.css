@@ -28081,7 +28081,9 @@ div#reviews .review:not(:last-child)::after {
   }
   div.public-page-panel > .inner #statistics .stat-group .statistic {
     flex: 1 1 0;
+    align-self: flex-start;
     text-align: center;
+    margin: 0 15px;
   }
   div.public-page-panel > .inner #statistics .stat-group .statistic h1 {
     font-size: 60px;

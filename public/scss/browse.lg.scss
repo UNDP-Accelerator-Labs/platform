@@ -318,14 +318,19 @@ div.public-page-panel {
 		margin: auto;
 
 		h1.site-title {
+			font-size: $t-xxlarge;
+			line-height: 1.2em;
+			color: $c-mid-blue;
+			text-align: center;
+			margin-bottom: 90px;
+		}
+		h1.site-title.map-overlay {
 			position: absolute;
 			right: 0;
 			top: 0;
-			font-size: $t-xxlarge;
-			line-height: 1.2em;
 			margin: calc(-#{$t-xxlarge} * 1.2) 0 1em 0;
-			color: $c-mid-blue;
 			z-index: 1000;
+			text-align: left;
 		}
 		h3 {
 			margin-bottom: 1em;
@@ -363,7 +368,9 @@ div.public-page-panel {
 
 				.statistic {
 					flex: 1 1 0;
+					align-self: flex-start;
 					text-align: center;
+					margin: 0 15px;
 
 					h1 {
 						font-size: $t-xxlarge;

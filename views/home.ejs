@@ -82,15 +82,19 @@
 	<% } %>
 	<div class='public-page-panel'>
 		<div class='inner'>
-			<h1 class='site-title'><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
-			<!-- <% if (locals.metadata.site.description?.[language]) { %><p class='lead'><%- locals.metadata.site.description[language] %></p><% } %> -->
-			<!-- MAP -->
-			<%- include ('./browse/modules/map') %>
+			<% if (locals.metadata.page.map && locals.stats?.total > 0) { %>
+				<h1 class='site-title map-overlay'><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+				<!-- <% if (locals.metadata.site.description?.[language]) { %><p class='lead'><%- locals.metadata.site.description[language] %></p><% } %> -->
+				<!-- MAP -->
+				<%- include ('./browse/modules/map') %>
+			<% } else { %>
+				<h1 class='site-title'><%- locals.metadata.site.title %></h1>
+			<% } %>
 			<div id='statistics'>
 				<div class='stat-group'>
 					<div class='statistic'>
 						<h1><%- locals.stats?.total %></h1>
-						<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
+						<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.total !== 1)?.capitalize() || object.capitalize() %></p>
 					</div>
 				</div>
 				<div class='stat-group'>

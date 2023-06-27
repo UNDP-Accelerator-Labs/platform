@@ -1,3 +1,5 @@
+@import 'vars.lg';
+
 nav#languages {
 	position: fixed;
 	display: flex;
@@ -638,9 +640,9 @@ header {
 				}
 			}
 		}
-		nav#site-title.public {
-			/*margin-top: 90px;*/
-		}
+		// nav#site-title.public {
+		// 	/*margin-top: 90px;*/
+		// }
 		nav#modules {
 			margin-bottom: 120px;
 			pointer-events: all;
@@ -723,7 +725,7 @@ header {
 	flex: 1 1 0;
 	/*float: right;*/
 	top: 0;
-	vertical-align: top;
+	vertical-align: top;  // FIXME: vertical-align is ignored due to display block
 	/*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
 	/* min-height: 100vh; */
 }

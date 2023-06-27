@@ -15,10 +15,6 @@ module.exports = async kwargs => {
 	// GET FILTERS
 	const [ full_filters ] = await filter(req, res)
 	
-	const module_rights = modules.find(d => d.type === object)?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
-
 	return conn.task(t => {
 		const batch = []
 		// GET PADS COUNT BY STATUS

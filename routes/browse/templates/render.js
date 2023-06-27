@@ -1,4 +1,4 @@
-const { page_content_limit, DB } = include('config/')
+const { page_content_limit, modules, DB } = include('config/')
 const { array, checklanguage, datastructures } = include('routes/helpers/')
 
 const load = require('./load/')
@@ -7,9 +7,9 @@ const load = require('./load/')
 const filter = require('./filter.js')
 
 module.exports = async (req, res) => {
-	const { public } = req.session || {}
+	const { public, rights } = req.session || {}
 
-	if (public) res.redirect('/login')
+	if (public || rights < modules.find(d => d.type === 'templates')?.rights.read) res.redirect('/login')
 	else {
 		const { object, space } = req.params || {}
 		const { display } = req.query || {}

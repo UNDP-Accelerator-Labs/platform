@@ -117,7 +117,12 @@ const Entry = function (_kwargs) {
 				})
 		}.bind(this),
 		actions: function (_sel) {
-			<% if (rights >= (modules.find(d => d.type === object)?.rights.write ?? Infinity)) { %>
+			<% 
+				let { write } = modules.find(d => d.type === object)?.rights
+				if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+				
+				if (rights >= (write ?? Infinity)) 
+			{ %>
 				_sel.addElems('div', 'btn-group')
 				.addElems('form', 'actions', d => {
 					const opts = []

@@ -13,7 +13,7 @@
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
 	const pages = locals.metadata.page.count
-	
+
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
 	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
@@ -22,11 +22,11 @@
 	}
 
 	const slides = locals.sample_images
-	// const is_intropage = (publicpage 
-	// 	&& object === 'pads' 
-	// 	&& space !== 'pinned' 
-	// 	&& mapscale !== 'full-screen' 
-	// 	&& locals.metadata.page.id === 1 
+	// const is_intropage = (publicpage
+	// 	&& object === 'pads'
+	// 	&& space !== 'pinned'
+	// 	&& mapscale !== 'full-screen'
+	// 	&& locals.metadata.page.id === 1
 	// 	&& slides?.length > 0)
 	const is_intropage = false
 	const welcome_module = locals.metadata.site.welcome_module
@@ -34,18 +34,18 @@
 <html lang='<%- language %>'>
 <head>
 
-<%- include ('../partials/head.ejs') %> 
+<%- include ('../partials/head.ejs') %>
 
 </head>
 
 <body>
 
-<% include ('../partials/translations.ejs') %> 
+<% include ('../partials/translations.ejs') %>
 
-<%- include ('../partials/menu-languages.ejs') %> 
-<%- include ('../partials/modals.ejs') %> 
+<%- include ('../partials/menu-languages.ejs') %>
+<%- include ('../partials/modals.ejs') %>
 
-<%- include ('./modules/download.ejs') %> 
+<%- include ('./modules/download.ejs') %>
 <%- include('./render.ejs') %>
 
 
@@ -83,7 +83,7 @@
 		<header>
 			<% if (!is_intropage) { %><div class='inner'>
 			<% } else { %><div class='inner fixed'><% } %>
-				<%- include ('../partials/menu-logo.ejs') %> 
+				<%- include ('../partials/menu-logo.ejs') %>
 			</div>
 		</header>
 
@@ -116,7 +116,7 @@
 							const tabs = d3.select(`nav.tabs .inner .${mediaSize}`)
 							let activetab = d3.select('.dropdown menu li.active')
 							const button = d3.select(`nav.tabs .inner .${mediaSize} button.space`)
-							
+
 							if (activetab.select('input')?.node()) {
 								button.html(activetab.select('input').node().value)
 							} else {
@@ -188,7 +188,7 @@
 									</menu>
 									<div class='btn-group'>
 										<button type='button' onclick='openPreview()'><%- vocabulary['preview'][language] %></button>
-										
+
 										<button type='button' onclick='setShareOptions()'>Share</button>
 										<!-- TO DO: TRANSLATE -->
 
@@ -206,11 +206,11 @@
 
 										async function setShareOptions () {
 											const contributors = await POST('/<%- language %>/browse/contributors/invited', { limit: null })
-											
+
 											const formdata = { action: '/share/pinboard',  method: 'POST' }
 											const message = 'Share with contributors'
 											const opts = []
-											
+
 											contributors.data.forEach(d => {
 												opts.push({ node: 'input', type: 'checkbox', name: 'contributor', value: d.id, placeholder: d.name, checked: (<%- JSON.stringify(locals.pinboard.contributors) %>).includes(d.id), default: true })
 											})
@@ -262,7 +262,7 @@
 								</form>
 							</div>
 						<% } %>
-					
+
 						<div class='head'>
 							<% if (activity !== 'preview' && locals.pinboard.editable) { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave()' contenteditable><%- locals.pinboard.title %></div>
@@ -283,7 +283,7 @@
 								if (evt.code === 'Enter' || evt.keyCode === 13) {
 									evt.preventDefault()
 									node.blur()
-								}	
+								}
 							}
 
 							async function partialSave () {
@@ -302,7 +302,7 @@
 									console.log('saved')
 									const { datum } = res
 									updateTab(datum.title)
-									
+
 									// TO DO: UPDATE THIS TO USE THE RENDER FUNCTIONS BELOW
 									// d3.selectAll('.pin, .pinboard').html(d => d.title = datum.title)
 									d3.selectAll('.pin label.name').html(d => d.title = datum.title)
@@ -313,7 +313,7 @@
 
 					<!-- SEARCH AND FILTER MENU -->
 					<% if (
-						!(space === 'pinned' 
+						!(space === 'pinned'
 							&& (!locals.pinboard?.editable || activity === 'preview')
 							&& !locals.pinboard?.display_filters)
 						&& pagedisplay !== 'slideshow'
@@ -323,9 +323,9 @@
 
 					<!-- MAP -->
 					<% if (
-						(locals.metadata.page.map 
+						(locals.metadata.page.map
 							&& locals.stats?.filtered > 0)
-						&& !(space === 'pinned' 
+						&& !(space === 'pinned'
 							&& (!locals.pinboard?.editable || activity === 'preview')
 							&& !locals.pinboard?.display_map)
 						&& pagedisplay !== 'slideshow'
@@ -385,20 +385,20 @@
 </footer>
 
 
-<%- include ('../partials/footer.ejs') %> 
+<%- include ('../partials/footer.ejs') %>
 
 <script type='text/javascript'>
 	if (!mediaSize) var mediaSize = getMediaSize()
 	const main = d3.select('div.browse main')
 	const layout = main.select('div.inner')
 	const overview = layout.select('section.overview')
-	
+
 	let page = <% if (!isNaN(locals.metadata.page.id)) { %><%- locals.metadata.page.id %><% } else if (![null, undefined].includes(locals.metadata.page.id)) { %>'<%- locals.metadata.page.id %>'<% } else { %>undefined<% } %>;
 	var lazyloading = false
 
 	function renderSections (_data) {
 		const sections = layout.addElems('section', 'container <%- object %>', _data)
-		
+
 		sections.addElems('div', 'layout')
 		.each(function (d) {
 			const section = d3.select(this)
@@ -419,15 +419,15 @@
 		const { data, display } = _kwargs
 		console.log(data)
 
-		const entry = new Entry({ 
-			parent: _section, 
+		const entry = new Entry({
+			parent: _section,
 			data: data,
 			display: display,
 			language: '<%- language %>'
 		})
 		// CREATE ALIAS FOR render
 		const render = entry.render
-	
+
 		if (display === 'columns') {
 			render.img(entry.head)
 			render.actions(entry.head)
@@ -470,7 +470,7 @@
 			render.pin(entry.inner)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
-		}		
+		}
 	}
 
 	function initSlideshow () {
@@ -573,10 +573,10 @@
 			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && !lazyloading) {
 				console.log('hit the bottom')
 				main.select('.lds-ellipsis').classed('hide', false)
-				
+
 				if (!isNaN(page)) page ++
 				lazyloading = true
-				
+
 				const url = new URL(window.location)
 				const queryparams = new URLSearchParams(url.search)
 				queryparams.set('page', page)
@@ -601,7 +601,7 @@
 			queryparams.set('page', sel.attr('data-page'))
 			sel.attr('href', `?${queryparams.toString()}`)
 		})
-	}	
+	}
 
 	<% if (pagedisplay === 'slideshow') { %>
 		window.addEventListener('keydown', function (e) {

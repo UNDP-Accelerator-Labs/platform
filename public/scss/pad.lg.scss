@@ -1,3 +1,5 @@
+@import 'vars.lg';
+
 div.fixed-bg {
 	position: fixed;
 	top: 0;
@@ -18,11 +20,9 @@ div.hashed {
 div.document {
 	position: relative;
 	display: block;
-	/* float: left;*/
-	width: calc(300px * 3 + 15px * 2 - 90px);
+	width: calc(300px * 3 + 15px * 2 - 90px - 2px);
 	padding: 30px 60px 0 60px;
 	background-color: #FFF;
-	/* min-height: calc(100vh - 30px); */
 	border-left: 1px solid $c-light-2;
 	border-right: 1px solid $c-light-2;
 
@@ -523,6 +523,7 @@ div.document {
 
 								.opt.brush-size {
 									display: inline-block;
+									appearance: none;
 									-webkit-appearance: none;
 									width: 100%;
 									height: 0px;
@@ -1471,8 +1472,8 @@ div.document {
 					animation: slide-down 1s;
 				}
 			}
-			.foot {
-			}
+			// .foot {
+			// }
 		}
 	}
 	.media-input-group {

@@ -136,7 +136,7 @@ module.exports = async (req, res) => {
 			if (welcome_module === 'mosaic') max = 46
 			return data.filter(d => d.img?.length).slice(0, max)
 		}))
-		// LIST OF COUNTRIES WITH CONTACTS
+		// LIST OF COUNTRIES
 		batch.push(t.any(`
 			SELECT COUNT(p.id)::INT, p.owner FROM pads p
 			WHERE TRUE

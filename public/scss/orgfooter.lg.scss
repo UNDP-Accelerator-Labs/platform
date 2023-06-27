@@ -1,3 +1,5 @@
+@import 'vars.lg';
+
 .org-footer {
 	position: relative;
 	background-color: #0468B1;
@@ -45,23 +47,23 @@
 
 			.inner {
 				padding: 45px 45px 0px 45px;
-					
+
 				ul {
 					margin: 15px 0 0 0;
 					padding: 0;
-				
+
 					li{
 						font-size: $t-mid-small;
 						list-style: none;
 						margin-bottom: 0.5em;
 					}
 				}
-				
+
 				a {
 					color: #fff;
 					font-weight: normal;
 				}
-					
+
 				.social-media-links li {
 					display: inline-block;
 					font-size: $t-mid;
@@ -84,8 +86,8 @@
 			width: calc(300px * 3 + 15px * 2);
 			padding: 0 15px;
 		}
-		.footer-column.right {
-		}
+		// .footer-column.right {
+		// }
 	}
 	.footer-row.signature {
 		padding: 0 45px;

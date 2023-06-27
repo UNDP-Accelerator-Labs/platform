@@ -39,10 +39,6 @@ $c-light-3: #F0F0F0;*/
   padding: 0;
 }
 
-body {
-  /*background-color: #F3F3F3;*/
-}
-
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
   font-family: "Noto Sans", Helvetica, Arial, sans-serif;
   color: #005687;
@@ -113,16 +109,6 @@ input:-webkit-autofill:active {
 
 .screen.error {
   background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(165, 30, 65, 0.1) 3px, rgba(165, 30, 65, 0.1) 6px);
-}
-
-.screen.bis {
-  /*background-color: $c-mid-1;*/
-}
-.screen.bis .modal .close {
-  /*background-color: $c-mid-2;*/
-}
-.screen.bis .modal .inner {
-  /*border-top: 3px solid $c-mid-2;*/
 }
 
 .screen.ter {
@@ -198,16 +184,6 @@ input.toggle + label::after {
   line-height: 20px;
   color: #969696;
   transition: transform 0.25s;
-}
-
-input.toggle:checked + label[for=status-0]::after {
-  /*background-color: $c-mid-yellow;*/
-  /*border-color: $c-mid-yellow;*/
-}
-
-input.toggle:checked + label[for=status-1]::after {
-  /*background-color: $c-light-blue;*/
-  /*border-color: $c-light-blue;*/
 }
 
 input.toggle:checked + label::after {

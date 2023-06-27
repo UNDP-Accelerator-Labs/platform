@@ -470,8 +470,6 @@ exports.process.request = require('./request/')
 exports.process.accept = require('./accept/').accept
 exports.process.decline = require('./accept/').decline
 
-
-
 // THIS IS DEPRECATED
 exports.process.download = (req, res) => {
 	const { uuid } = req.session || {}

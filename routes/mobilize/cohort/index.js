@@ -50,7 +50,14 @@ module.exports = (req, res) => {
 				.then(async results => {
 					const data = await join.users(results, [ language, 'id' ])
 					data.sort((a, b) => a.country?.localeCompare(b.country))
-					return data.filter(d => d.rights >= modules.find(d => d.type === 'pads')?.rights.write)
+				
+					let { write } = modules.find(d => d.type === 'pads')?.rights
+					if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+					console.log('check write', write)
+					
+					return data.filter(d => d.rights >= write)
+					// TO DO: NEW write STRUCTURE
+					// THIS IS IN THE CASE OF A DEEP DIVE CAMPAIGN, IDENTIFY USERS WHO STILL HAVE AUTHORING RIGHTS
 				}).catch(err => console.log(err)))
 			} else {
 				if (rights < 3) { // IF THE USER/ HOST IS NOT A sudo ADMIN

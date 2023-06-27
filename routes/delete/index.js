@@ -10,7 +10,10 @@ module.exports = (req, res) => {
 	const { object } = req.params || {}
 
 	if (modules.some(d => d.type === object)) {
-		const { read, write } = modules.find(d => d.type === object).rights
+		let { write } = modules.find(d => d.type === object).rights
+		// MAKE SURE write IS THE NUMERICAL VALUE
+		if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+		console.log('check write', write)
 
 		if (object === 'pads' && rights >= write) return pad(req, res)
 		else if (object === 'templates' && rights >= write) return template(req, res)

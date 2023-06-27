@@ -152,7 +152,7 @@ function findNests (_str) {
 			return `(${d.split(/\bor\b/gi).map(c => `(${c.trim()})`).join(' ')})`
 		}).join(' ');
 	} else {
-		_str = '';
+		_str = '()';
 	}
 
 	return _str

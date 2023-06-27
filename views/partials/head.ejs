@@ -3,6 +3,11 @@
 	const language = locals.metadata.page.language
 	const title = locals.metadata?.page?.title
 	const description = locals.metadata?.site?.description[language]
+
+	const site_title = locals?.data?.publishable ? locals?.data?.title : null
+	const site_description = locals?.data?.publishable ?? locals?.data?.sections?.[0]?.items?.find(c => c?.type === 'txt'  && c?.txt?.length)?.txt;
+	const img = locals?.data?.publishable ?? locals?.data?.sections[0]?.items?.find(c => c?.type === 'img' && c?.src?.length )?.src
+
 	let ogp_locale = 'en_GB' 
 
 	if(language == 'fr'){
@@ -14,7 +19,9 @@
 	else if(language == 'pt'){
 		ogp_locale = 'pt_PT'
 	}
+
 %>
+
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
 <meta name='apple-mobile-web-app-capable' content='yes'>
@@ -23,15 +30,13 @@
 
 <!-- OGP tags -->
 <meta property="og:title" content="<%= title %>">
-<meta property="og:description" content="<%= description %>">
+<meta property="og:description" content="<%= site_description ?? description %>">
 <meta property="og:locale" content="<%= ogp_locale %>">
-<meta property="og:site_name" content="<%= title %>">
+<meta property="og:site_name" content="<%= site_title ?? title %>">
 
-<meta property="og:image" content="https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png" />
-<meta property="og:image:secure_url" content="https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png" />
-<!-- <meta property="og:image:type" content="image/png" /> -->
+<meta property="og:image" content="<% img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
+<meta property="og:image:secure_url" content="<% img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
 <meta property="og:image:width" content="400" />
-<!-- <meta property="og:image:height" content="300" /> -->
 <meta property="og:image:alt" content="UNDP Accelerator Labs Logo" />
 
 <title><%- title %></title>

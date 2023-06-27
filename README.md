@@ -73,7 +73,7 @@ The file structure of this project is organized as follows:
 ## Updating to use ltree
 
 For updating tables to use ltree (if you didn't run `init.sql` from scratch)
-go to `routes/scripts` and run:
+go to `routes/scripts/shared` and run:
 
 ```
 node setup_versions.js pads update

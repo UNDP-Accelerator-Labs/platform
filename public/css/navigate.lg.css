@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -491,7 +491,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -619,7 +619,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -708,7 +708,7 @@ nav.tabs {
   top: 30px;
   /*width: calc(55% - 30px);*/
   /*min-width: calc(300px * 3 + 15px * 2);*/
-  width: 930px;
+  width: calc(300px * 3 + 15px * 2);
   height: 75px;
   margin-left: -15px;
   padding: 0 15px;
@@ -865,7 +865,7 @@ nav.tabs .inner div.lg ul li .dropdown {
   position: absolute;
   max-height: 0;
   max-width: 300px;
-  top: 100%;
+  top: calc(100%);
   background-color: #FFF;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
   overflow: auto;
@@ -899,7 +899,7 @@ nav.tabs .inner div.lg ul li .dropdown menu li a {
 }
 nav.tabs .inner div.lg menu li .dropdown menu li:hover,
 nav.tabs .inner div.lg ul li .dropdown menu li:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 nav.tabs .inner div.lg menu li:hover button::after,
 nav.tabs .inner div.lg menu li.active button::after,
@@ -1306,7 +1306,7 @@ header .inner nav#modules menu li:not(:first-child)::before {
   position: absolute;
   width: 100px;
   height: 0px;
-  left: calc(50% - 50px);
+  left: calc(50% - 100px / 2);
   border-top: 1px dotted #969696;
 }
 header .inner nav.pagination {

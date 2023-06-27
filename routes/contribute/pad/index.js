@@ -10,13 +10,12 @@ module.exports = (req, res) => {
 	const path = req.path.substring(1).split('/')
 	const activity = path[1]
 
-	const module_rights = modules.find(d => d.type === 'pads')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
-		return check_authorization({ connection: t, id, mobilization, source, uuid, rights, collaborators, public })
+		return check_authorization({ connection: t, id, template, mobilization, source, uuid, rights, collaborators, public })
 		.then(result => {
 			const { authorized, redirect } = result
 
@@ -232,16 +231,23 @@ module.exports = (req, res) => {
 	}).catch(err => console.log(err))
 }
 
-function check_authorization (_kwargs) {
+async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { id, mobilization, source, uuid, rights, collaborators, public } = _kwargs
+	const { id, template, mobilization, source, uuid, rights, collaborators, public } = _kwargs
 
-	const { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
+	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
+	if (typeof write === 'object') {
+		if (!id && template) write = write.templated
+		else if (id) {
+			const used_template = await conn.one(`SELECT template FROM pads WHERE id = $1::INT;`, [ id ], d => d.template ?? false)
+			if (used_template) write = write.templated
+		} else write = write.blank
+	}
+	console.log('check write', write)
 	
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
+	let collaborators_ids = collaborators.map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
-	// if (!uuid || !modules.some(d => d.type === 'pads' && rights >= d.rights.write)) {
 	if (public || rights < write) {
 		// if public and status < 3 then not authorized
 		if (mobilization) {

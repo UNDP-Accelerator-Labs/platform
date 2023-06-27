@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -491,7 +491,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -619,7 +619,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -753,7 +753,7 @@ html, body {
 }
 .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body {
   padding: 0 15px;
-  width: 270px;
+  width: calc(300px - 30px);
 }
 .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content .container .layout.columns article .inner .body a {
   color: #32BEE1;

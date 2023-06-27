@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -747,7 +747,7 @@ nav.tabs .inner .dropdown ul li .dropdown menu li a {
 }
 nav.tabs .inner .dropdown menu li .dropdown menu li:hover,
 nav.tabs .inner .dropdown ul li .dropdown menu li:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 nav.tabs .inner .dropdown menu li:hover input[type=text],
 nav.tabs .inner .dropdown menu li.active input[type=text],
@@ -793,7 +793,8 @@ nav.tabs .inner .btn-group a.active i {
   color: #FFF;
 }
 
-header { /* LEFT COlUMN */
+header {
+  /* LEFT COlUMN */
   position: fixed;
   display: block;
   top: 0;
@@ -1059,7 +1060,7 @@ header .inner nav#modules menu li:not(:first-child)::before {
   position: absolute;
   width: 100px;
   height: 0px;
-  left: calc(50% - 50px);
+  left: calc(50% - 100px / 2);
   border-top: 1px dotted #969696;
 }
 
@@ -1125,7 +1126,7 @@ header.open {
 nav#filters {
   display: inline-block;
   vertical-align: top;
-  margin-top: 45px;
+  margin-top: calc(30px + 15px);
 }
 nav#filters .inner {
   position: fixed;

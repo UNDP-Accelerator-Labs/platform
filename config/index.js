@@ -37,12 +37,18 @@ exports.colors = colors
 // DESIRED MODULES
 if (!modules) modules = []
 // if (!modules.includes('pads')) modules.unshift('pads') // ALWAYS INCLUDE PADS
-if (!modules.some(d => d.type === 'pads')) modules.unshift({ type: 'pads', rights: { read: 0, write: 1 } }) // ALWAYS INCLUDE PADS
+if (!modules.some(d => d.type === 'pads')) modules.unshift({ type: 'pads', rights: { read: 0, write: { blank: 1, templated: 1 } } }) // ALWAYS INCLUDE PADS
+// THIS IS TO MAKE SURE THE pads MODULE ALWAYS HAS write.blank AND write.templated
+if (modules.some(d => d.type === 'pads' && typeof d.rights?.write === 'number')) {
+	let m = modules.find(d => d.type === 'pads')
+	const { write } = m.rights
+	m.rights.write = { blank: write, templated: write }
+}
 // if (modules.includes('mobilizations')) {
 // 	if (!modules.includes('templates')) modules.push('templates')
 // }
 if (modules.some(d => d.type === 'mobilizations')) {
-	const rights = modules.find(d => d.type === 'mobilizations').rights
+	const { rights } = modules.find(d => d.type === 'mobilizations')
 
 	if (!modules.some(d => d.type === 'templates')) {
 		modules.push({ type: 'templates', rights })
@@ -51,6 +57,18 @@ if (modules.some(d => d.type === 'mobilizations')) {
 		modules.push({ type: 'contributors', rights })
 	}
 }
+// IF THERE ARE TEMPLATES, AND THE contribute RIGHTS FOR PADS HAVE NOT BEEN SET, SET THEM
+// if (modules.some(d => d.type === 'templates') 
+// 	&& !modules.some(d => d.type === 'pads' 
+// 		&& !isNaN(d.rights?.write.templated)
+// 	)
+// ) {
+// 	let { rights } = modules.find(d => d.type === 'pads')
+// 	const { write } = rights
+// 	if (typeof write === 'object') rights.templated = rights.blank
+// 	else rights = { blank: rights, templated: rights }
+// 	modules.find(d => d.type === 'pads').rights = rights
+// }
 // if (modules.some(d => d.type === 'contributors')) {
 // 	if (!modules.some(d => d.type === 'mobilizations')) {
 // 		const rights = modules.find(d => d.type === 'contributors').rights

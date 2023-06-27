@@ -113,7 +113,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -492,7 +492,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -620,7 +620,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -661,7 +661,7 @@ div.document {
   position: relative;
   display: block;
   /* float: left;*/
-  width: 840px;
+  width: calc(300px * 3 + 15px * 2 - 90px);
   padding: 30px 60px 0 60px;
   background-color: #FFF;
   /* min-height: calc(100vh - 30px); */
@@ -1042,7 +1042,7 @@ div.document main .inner .meta-status .btn-group form .dropdown menu li:hover,
 div.document main#pad .inner .meta-status .btn-group form .dropdown menu li:hover, div.document main#reference .inner .meta-status .btn-group form .dropdown menu li:hover,
 div.document main#template .inner .meta-status .btn-group form .dropdown menu li:hover,
 div.document main#mobilization .inner .meta-status .btn-group form .dropdown menu li:hover {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 div.document main .inner .meta-status .btn-group form .dropdown menu li:not(:last-child),
 div.document main#pad .inner .meta-status .btn-group form .dropdown menu li:not(:last-child), div.document main#reference .inner .meta-status .btn-group form .dropdown menu li:not(:last-child),
@@ -1725,7 +1725,7 @@ div.document main#template .inner .body .layout .media-container .media-img,
 div.document main#template .inner .body .layout .meta-container .media-img,
 div.document main#mobilization .inner .body .layout .media-container .media-img,
 div.document main#mobilization .inner .body .layout .meta-container .media-img {
-  min-height: 125px;
+  min-height: calc(65px + 30px * 2);
 }
 div.document main .inner .body .layout .media-container .media-img img,
 div.document main .inner .body .layout .meta-container .media-img img,
@@ -1777,7 +1777,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-mosai
   grid-gap: 15px;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  min-height: 125px;
+  min-height: calc(65px + 30px * 2);
 }
 div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item,
@@ -1819,7 +1819,7 @@ div.document main#mobilization .inner .body .layout .meta-container .media-mosai
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  top: calc(50% - 15px);
+  top: calc(50% - 30px / 2);
   left: 0;
 }
 div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item .index-opts .opt,
@@ -2140,7 +2140,8 @@ div.document main#mobilization .inner .body .layout .media-container .meta-radio
 div.document main#mobilization .inner .body .layout .meta-container .media-checklist ol .opt,
 div.document main#mobilization .inner .body .layout .meta-container .media-radiolist ol .opt,
 div.document main#mobilization .inner .body .layout .meta-container .meta-checklist ol .opt,
-div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt { /* CHANGE THE .option CLASS IN TEMPLATE TO STANDARDIZE TO .opt (ALREADY DONE IN pad.js) */
+div.document main#mobilization .inner .body .layout .meta-container .meta-radiolist ol .opt {
+  /* CHANGE THE .option CLASS IN TEMPLATE TO STANDARDIZE TO .opt (ALREADY DONE IN pad.js) */
   display: flex;
   align-items: center;
   margin: 0;
@@ -3571,7 +3572,7 @@ div.document main#template .inner .body .layout .media-container .inset .inset-l
 div.document main#template .inner .body .layout .meta-container .inset .inset-location,
 div.document main#mobilization .inner .body .layout .media-container .inset .inset-location,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-location {
-  max-height: 205px;
+  max-height: calc(300px - 75px - 20px);
   padding: 0 10px 10px 10px;
   overflow: auto;
 }
@@ -3833,7 +3834,7 @@ div.document main#mobilization .inner .body .layout .meta-container .inset .inse
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-skills,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-methods,
 div.document main#mobilization .inner .body .layout .meta-container .inset .inset-datasources {
-  max-height: 205px;
+  max-height: calc(300px - 75px - 20px);
   /*padding: 0 0 10px 10px;*/
   padding: 5px 10px 10px 10px;
   overflow: auto;
@@ -4062,7 +4063,9 @@ div.document main#reference .inner .body .layout .meta-container .inset.template
 div.document main#template .inner .body .layout .media-container .inset.template,
 div.document main#template .inner .body .layout .meta-container .inset.template,
 div.document main#mobilization .inner .body .layout .media-container .inset.template,
-div.document main#mobilization .inner .body .layout .meta-container .inset.template { /* THIS IS FOR TEMPLATES */ }
+div.document main#mobilization .inner .body .layout .meta-container .inset.template {
+  /* THIS IS FOR TEMPLATES */
+}
 div.document main .inner .body .layout .media-container .inset.template div,
 div.document main .inner .body .layout .meta-container .inset.template div,
 div.document main#pad .inner .body .layout .media-container .inset.template div,
@@ -4456,7 +4459,7 @@ div.document main#mobilization .inner .body .layout .meta-container .inset.templ
 div.document main#mobilization .inner .body .layout .meta-container .inset.template .inset-skills,
 div.document main#mobilization .inner .body .layout .meta-container .inset.template .inset-methods,
 div.document main#mobilization .inner .body .layout .meta-container .inset.template .inset-datasources {
-  max-height: 300px;
+  max-height: calc(300px);
 }
 div.document main .inner .body .layout .media-container figcaption,
 div.document main .inner .body .layout .meta-container figcaption,
@@ -4677,7 +4680,7 @@ div.document main#mobilization .inner .body .layout .media-container:not(.group-
 div.document main#mobilization .inner .body .layout .media-container:not(.group-container):hover .media-embed,
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container).focus .media-embed,
 div.document main#mobilization .inner .body .layout .meta-container:not(.group-container):hover .media-embed {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 div.document main .inner .body .layout .media-container:not(.group-container).focus canvas,
 div.document main .inner .body .layout .media-container:not(.group-container):hover canvas,
@@ -4782,7 +4785,7 @@ div.document main .inner .body .layout.focus,
 div.document main#pad .inner .body .layout.focus, div.document main#reference .inner .body .layout.focus,
 div.document main#template .inner .body .layout.focus,
 div.document main#mobilization .inner .body .layout.focus {
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
 }
 div.document main .inner .body .layout.view,
 div.document main#pad .inner .body .layout.view, div.document main#reference .inner .body .layout.view,
@@ -4996,7 +4999,7 @@ div.document main#mobilization .inner .body .layout.animate-in {
 div.document .media-input-group {
   position: fixed;
   top: 0;
-  left: calc((100vw - 975px) / 2 + 900px + 1px);
+  left: calc((100vw - (300px * 3 + 15px * 5)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
   max-height: 80vh;
   transform: translateY(90px);
   border-top: 1px solid #E5E5E5;
@@ -5169,7 +5172,7 @@ div.document.slideshow {
   top: 30px;
   left: 0;
   width: 100vw;*/
-  width: 930px;
+  width: calc(300px * 3 + 15px * 2);
   position: static;
   padding: 0 15px;
   margin: 0;
@@ -5231,16 +5234,16 @@ div.document.slideshow main#pad > .inner .slide {
   width: 100vw !important;
   max-height: 100%;
   box-sizing: border-box;
-  padding: 0 calc((100vw - 840px) / 2) 60px calc((100vw - 840px) / 2);
+  padding: 0 calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2) 60px calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2);
   scroll-snap-align: center;
   overflow-x: visible;
   overflow-y: scroll;
 }
 div.document.slideshow main#pad > .inner .slide div.required {
-  left: calc((100vw - 840px) / 2 - 45px);
+  left: calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2 - 45px);
 }
 div.document.slideshow main#pad > .inner .slide .opts .opt-group label {
-  left: calc((100vw - 840px) / 2) !important;
+  left: calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2) !important;
 }
 div.document.slideshow main#pad > .inner .description-layout.slide {
   border-bottom: none;
@@ -5314,14 +5317,14 @@ footer {
   position: relative;
   width: 100%;
   clear: both;
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
   border-top: 1px solid #E5E5E5;
   z-index: 1000;
 }
 footer .inner {
   position: relative;
   display: block;
-  width: 718px;
+  width: calc(300px * 3 + 15px * 2 - 210px - 2px);
   margin: 0 auto;
   padding: 30px 60px 30px 60px;
   border-left: 1px solid #FFF;
@@ -5521,7 +5524,7 @@ footer .inner .approval-message::after {
   left: -11px;
   width: 10px;
   vertical-align: middle;
-  background-color: rgb(239, 239, 239);
+  background-color: #efefef;
   border-top: 1px solid #C2B4D6;
   /*border-bottom: 1px solid $c-light-1;*/
   font-size: 36px;

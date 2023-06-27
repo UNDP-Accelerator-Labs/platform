@@ -1,10 +1,10 @@
-const { DB } = include('config/')
+const { modules, DB } = include('config/')
 
 module.exports = (req, res) => {
-	const { uuid } = req.session || {}
+	const { uuid, rights } = req.session || {}
 	let filters = []
 	
-	if (uuid) filters.push(DB.pgp.as.format('(p.status >= 2)'))
+	if (uuid && rights >= modules.find(d => d.type === 'pads')?.rights.read) filters.push(DB.pgp.as.format('(p.status >= 2)'))
 	else filters.push(DB.pgp.as.format('(p.status > 2)'))
 
 	filters = filters.join(' AND ')

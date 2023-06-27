@@ -17,20 +17,30 @@
 		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
 		else mapscale = 'contain'
 	}
+
+	const { write: writepads } = modules.find(d => d.type === 'pads')?.rights
+	let minwritepads = writepads
+	if (typeof writepads === 'object') minwritepads = Math.min(writepads.blank, writepads.templated)
+
+	const writablemodules = modules.filter(d => !['pinboards', 'teams'].includes(d.type))
+		.map(d => { 
+			const { write } = d.rights
+			if (typeof write === 'object') return Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+			else return write
+		})
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
 		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
 
-		<% if (rights >= Math.min(...modules.filter(d => !['pinboards', 'teams'].includes(d.type)).map(d => d.rights.write))) { %>
+		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
 				<button><%- vocabulary['new'][language] %></button>
 				<div class='dropdown main'>
 					<ul>
-						<!-- TO DO: BASE THIS ON modules -->
 						<% if (modules.some(d => d.type === 'pads')) { %>
 
-							<% if (rights >= Math.min(modules.find(d => d.type === 'pads')?.rights.write ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
+							<% if (rights >= Math.min(minwritepads ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
 								<li>
 									<button>
 										<img src='/imgs/icons/i-pad.svg'>
@@ -39,8 +49,8 @@
 									</button>
 									<div class='dropdown'>
 										<ul>
-											<% if (rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) { %>
-												<% if (app_id !== 'ap' && app_id !== 'exp') { %>
+											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
+											<!-- THE ISSUE HERE IS WE WANT TO PREVENT USERS OF THE experiments AND action plans PLATFORMS FROM CREATING BLANK PADS -->
 												<li>
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
@@ -48,6 +58,8 @@
 														</button>
 													</a>
 												</li>
+											<% } // rights %>
+											<% if (rights >= (writepads.templated ?? writepads) ?? Infinity) { %>
 												<% if (locals.metadata.menu.templates?.length > 0) { %>
 													<li>
 														<button>
@@ -92,7 +104,6 @@
 														</div>
 													</li>
 												<% } // locals.metadata.menu.templates 0 %>
-												<% } // app_id %>
 											<% } // rights %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
 												<li>
@@ -135,14 +146,12 @@
 											<!-- IF WE WANT xlsx FUNCTIONALITY FOR MOBILIZATIONS, UNCOMMENT THE FOLLOWING -->
 											<!-- <%# if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)	|| locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %> -->
 
-											<% if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)) { %>
-												<% if (app_id !== 'ap') { %>
+											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
 												<li class='lg'>
 													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
 													</a>
 												</li>
-												<% } // app_id !== 'ap' %>
 											<% } %>
 										</ul>
 									</div>
@@ -478,7 +487,10 @@
 <nav id='modules'>
 	<menu>
 	<% modules.filter(d => {
-		if (rights < d.rights.write) return false
+		let { write } = d.rights
+		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+
+		if (rights < write) return false
 		else return !['pinboards', 'teams'].includes(d.type)
 	}).forEach(d => { %>
 		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity)

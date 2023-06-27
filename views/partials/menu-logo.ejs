@@ -494,8 +494,8 @@
 		else return !['pinboards', 'teams'].includes(d.type)
 	}).forEach(d => { %>
 		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity)
-			&& [d.type, d.type.slice(0, -1)].includes(object))
-		{ %>
+			&& [d.type, d.type.slice(0, -1)].includes(object)
+		) { %>
 			<li class='active'>
 		<% } else { %>
 			<li>

@@ -647,7 +647,8 @@ main#mobilize-new {
   /* THIS MIMICS THE div.document IN pad.ejs  */
   display: block;
   float: left;
-  width: calc(300px * 3 + 15px * 2);
+  width: calc(300px * 3 + 15px * 2 + 15px * 2);
+  /* THE SECOND 15*2 IS TO ACCOUNT FOR PADDING IN THE OTHER PAGES */
   padding-top: 30px;
   height: calc(100vh - 30px);
 }

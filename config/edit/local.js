@@ -98,7 +98,7 @@ exports.colors = {
 }
 
 // DISPLAY VARIABLES
-exports.map = false
+exports.map = true
 exports.lazyload = false
 exports.page_content_limit = 25
 exports.followup_count = 1

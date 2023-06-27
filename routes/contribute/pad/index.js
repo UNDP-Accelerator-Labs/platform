@@ -243,7 +243,6 @@ async function check_authorization (_kwargs) {
 			if (used_template) write = write.templated
 		} else write = write.blank
 	}
-	console.log('check write', write)
 	
 	let collaborators_ids = collaborators.map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
@@ -261,7 +260,7 @@ async function check_authorization (_kwargs) {
 		else {
 			if (id) return conn.one(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => public ? d.status > 2 : d.status >= read)
 				.then(result => {
-					if (result === true) return { authorized: rights >= read, redirect: 'view' }
+					if (result === true) return { authorized: (public || rights >= read), redirect: 'view' }
 					else return { authorized: false }
 				}).catch(err => console.log(err))
 			else return new Promise(resolve => resolve({ authorized: false })) // THIS IS A NEW PAD, BUT THE USER IS IN PUBLIC VIEW OR DOES NOT HAVE THE RIGHTS TO WRITE

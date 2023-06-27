@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -491,7 +491,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -619,7 +619,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -645,19 +645,19 @@ html, body {
 
 div.table {
   display: block;
-  width: calc(300px * 3 + 15px * 2 + 15px * 2);
+  width: 960px;
   padding: 30px 0 0 0;
   background-color: #FFF;
   min-height: calc(100vh - 60px);
 }
 div.table main {
-  width: calc(100vw - ((100vw - (300px * 3 + 15px * 4)) / 2) - 120px);
+  width: calc(100vw - (100vw - 960px) / 2 - 120px);
 }
 div.table main .inner .head {
   position: fixed;
   top: 30px;
   /*left: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
-  width: calc(100vw - ((100vw - (300px * 3 + 15px * 4)) / 2) - 120px);
+  width: calc(100vw - (100vw - 960px) / 2 - 120px);
   margin: 0;
   background-color: #FFF;
   z-index: 100;
@@ -755,7 +755,7 @@ div.table main .inner .body .btn-group {
   justify-content: center;
   top: 0;
   /*left: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
-  width: calc(100vw - ((100vw - (300px * 3 + 15px * 4)) / 2) - 120px);
+  width: calc(100vw - (100vw - 960px) / 2 - 120px);
   padding-top: 120px;
   border-bottom: 1px solid #E5E5E5;
   background-color: #FFF;
@@ -809,7 +809,7 @@ div.table main .inner .body .table-container table {
 div.table main .inner .body .table-container table thead {
   /*position: sticky;
   top: 90px;*/
-  background: repeating-linear-gradient(-45deg, #FFF, #FFF 3px, #efefef 3px, #efefef 6px);
+  background: repeating-linear-gradient(-45deg, #FFF, #FFF 3px, rgb(239, 239, 239) 3px, rgb(239, 239, 239) 6px);
   z-index: 1000;
 }
 div.table main .inner .body .table-container table thead th {

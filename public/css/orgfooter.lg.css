@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -491,7 +491,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -619,7 +619,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -669,7 +669,7 @@ html, body {
 .org-footer .footer-row .footer-column h3 {
   font-weight: bold;
   font-size: 14px;
-  margin: calc(67px - 45px) 0 0 0;
+  margin: 22px 0 0 0;
   text-transform: uppercase;
 }
 .org-footer .footer-row .footer-column .outer .logo {
@@ -711,7 +711,7 @@ html, body {
   padding-top: 30px;
 }
 .org-footer .footer-row .footer-column.center {
-  width: calc(300px * 3 + 15px * 2);
+  width: 930px;
   padding: 0 15px;
 }
 .org-footer .footer-row.signature {

@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -454,9 +454,9 @@ div.public-page-header div.carousel div.slides div.slide {
 }
 div.public-page-header div.carousel div.slides div.slide .media-txt {
   position: absolute;
-  left: calc((100vw - (300px * 3 + 15px * 4)) / 2);
+  left: calc((100vw - 960px) / 2);
   bottom: 60px;
-  max-width: calc((300px * 3 + 15px * 4) / 2);
+  max-width: 480px;
   color: #FFF;
 }
 div.public-page-header div.carousel div.slides div.slide .media-txt h1 {
@@ -824,7 +824,7 @@ div.browse main .inner section .layout article .inner .head .meta-group .btn-gro
   /*color: $c-dark-grey;*/
 }
 div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article .inner .head .meta-group .btn-group form:first-child {
   margin-left: 0;
@@ -971,7 +971,7 @@ div.browse main .inner section .layout article .inner .body .create .dropdown me
   text-align: left;
 }
 div.browse main .inner section .layout article .inner .body .create .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article .inner .body.full-width {
   flex: 0 0 100%;
@@ -1203,7 +1203,7 @@ div.browse main .inner section .layout article .inner .pinboard-group .add .drop
   background-color: #E5E5E5;
 }
 div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article .inner .pinboard-group .pin {
   display: inline-block;
@@ -1478,7 +1478,7 @@ div.browse main .inner section .layout.columns article .inner .head .btn-group f
   border: none;
 }
 div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) {
   border-bottom: 1px dotted #969696;
@@ -1676,7 +1676,7 @@ div.browse main .inner section .layout.columns article .outer::after {
   height: 0;
 }
 div.browse main .inner section .layout.columns article .outer.expand {
-  height: calc(55px * 2 + 15px * 2);
+  height: 140px;
 }
 div.browse main .inner section .layout.columns article:not(.pad) {
   border-bottom: 1px dotted #969696;

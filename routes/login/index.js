@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken')
 exports.check = require('./check.js')
 exports.render = require('./render.js')
 exports.process = require('./process.js')
+exports.forgetPassword = require('./forget-password.js').forgetPassword
+exports.getResetToken = require('./forget-password.js').getResetToken
+exports.updatePassword = require('./forget-password.js').updatePassword
 
 
 exports.public = (req, res) => {

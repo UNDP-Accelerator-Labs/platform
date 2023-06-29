@@ -47,7 +47,7 @@ async function sendResetEmail(email, html) {
    const baseUrl = req.headers['host']; // Extracting the base URL from the 'host' header
 
   // Generate the password reset link with the extracted token and base URL
-  const resetLink = `http://${baseUrl}/reset/${token}`;
+  const resetLink = `https://${baseUrl}/reset/${token}`;
   const html = `
   <div>
       <p>Dear User,</p>

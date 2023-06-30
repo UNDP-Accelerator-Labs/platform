@@ -1,18 +1,16 @@
 const sendEmail = require('../helpers').email
-const {  DB } = include('config/')
+const { DB } = include('config/')
 const { datastructures } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
 
  // Function to send password reset email
 async function sendResetEmail(email, html) {
-    let kwargs = {
-        from : 'no-reply@acclab-platform.org',
-        to : email,
-        subject : 'Password reset',
-        html
-    }
-
-    sendEmail(kwargs)
+  sendEmail({
+    from: 'no-reply@acclab-platform.org',
+    to: email,
+    subject: 'Password reset',
+    html
+  });
 }
 
  // Generate and send password reset token
@@ -74,7 +72,7 @@ exports.getResetToken = async (req, res, next) => {
   const { token } = req.params;
   req.session.errormessage = '';
 
- jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
+  jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
     if(decoded) {
       if (!verifyTokenFields(decoded, res)) {
         return res.status(401).send('invalid token');
@@ -86,74 +84,69 @@ exports.getResetToken = async (req, res, next) => {
       const data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
 
       return res.render('reset-password', data );
-    }
-    else {
+    } else {
       req.session.errormessage = 'Invalid or expired token.';
       return res.redirect('/login');
-
     }
   });
-
 };
 
 // Update password after reset
 exports.updatePassword = async (req, res, next) => {
-    const { password, confirmPassword, token } = req.body;
-    req.session.errormessage = '';
+  const { password, confirmPassword, token } = req.body;
+  req.session.errormessage = '';
 
-    const { originalUrl, path } = req || {}
+  const { originalUrl, path } = req || {}
 
-    jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
-      if(decoded){
-        if (!verifyTokenFields(decoded, res)) {
-          return res.status(401).send('invalid token');
+  jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
+    if(decoded) {
+      if (!verifyTokenFields(decoded, res)) {
+        return res.status(401).send('invalid token');
+      }
+      const { originalUrl, path } = req || {}
+        // Check if the password and confirm password match
+        if (password !== confirmPassword) {
+          req.session.errormessage = 'Password and confirm password do not match.';
+
+          const { errormessage, successmessage } = req.session || {}
+          const metadata = await datastructures.pagemetadata({ req, res })
+
+          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+
+          return res.render('reset-password', data );
         }
-        const { originalUrl, path } = req || {}
-         // Check if the password and confirm password match
-          if (password !== confirmPassword) {
-            req.session.errormessage = 'Password and confirm password do not match.';
+
+        let checkPass = isPasswordSecure(password)
+        if(Object.keys(checkPass).some((key) => !checkPass[key])){
+            const msgs = {
+              'pw-length': 'Password is too short!',
+              'pw-upper': 'Password requires at least one uppercase letter!',
+              'pw-lower': 'Password requires at least one lowercase letter!',
+              'pw-number': 'Password requires at least one numberal!',
+              'pw-special': 'Password requires at least one of the special characters: !@#$%^&*()',
+              'pw-common': 'Password cannot be a commonly used password!',
+            };
+            req.session.errormessage = Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]).join('\n');
 
             const { errormessage, successmessage } = req.session || {}
             const metadata = await datastructures.pagemetadata({ req, res })
-
             let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
 
             return res.render('reset-password', data );
-          }
+        }
 
-          let checkPass = isPasswordSecure(password)
-          if(Object.keys(checkPass).some((key) => !checkPass[key])){
-              const msgs = {
-                'pw-length': 'Password is too short!',
-                'pw-upper': 'Password requires at least one uppercase letter!',
-                'pw-lower': 'Password requires at least one lowercase letter!',
-                'pw-number': 'Password requires at least one numberal!',
-                'pw-special': 'Password requires at least one of the special characters: !@#$%^&*()',
-                'pw-common': 'Password cannot be a commonly used password!',
-              };
-              req.session.errormessage = Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]).join('\n');
-
-              const { errormessage, successmessage } = req.session || {}
-              const metadata = await datastructures.pagemetadata({ req, res })
-              let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
-
-              return res.render('reset-password', data );
-          }
-
-          // Update the password and clear the reset token
-            await DB.general.none(`
-            UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
-          `, [password, decoded.email]);
-          // Redirect the user to the login page
-          res.redirect('/login');
-
-      } else {
-        req.session.errormessage = 'Invalid or expired token.';
-        return res.redirect('/login');
-      }
-    });
-
-  };
+        // Update the password and clear the reset token
+          await DB.general.none(`
+          UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
+        `, [password, decoded.email]);
+        // Redirect the user to the login page
+        res.redirect('/login');
+    } else {
+      req.session.errormessage = 'Invalid or expired token.';
+      return res.redirect('/login');
+    }
+  });
+};
 
 
 const isPasswordSecure = (password) => {

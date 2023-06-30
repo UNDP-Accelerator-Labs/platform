@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -491,7 +491,7 @@ html, body {
   color: #969696;
 }
 .modal .inner ul li .filter .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .modal .inner ul li .filter .dropdown menu li.active {
   background-color: #32BEE1;
@@ -619,7 +619,7 @@ html, body {
   transform: none;
 }
 .modal.longlist .inner ul li.opt label:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .modal.longlist .inner ul li.opt input:checked + label {
   background-color: #32BEE1;
@@ -685,7 +685,7 @@ div.public-page-header div.carousel div.slides div.slide a {
 div.public-page-header div.carousel div.slides div.slide a .media-txt {
   align-self: center;
   position: absolute;
-  width: calc(300px * 2 + 15px);
+  width: 615px;
   color: #005687;
   z-index: 10;
   opacity: 0;
@@ -1048,7 +1048,7 @@ div.public-page-header h2 {
   font-weight: normal;
 }
 div.public-page-header p.lead {
-  width: calc(300px * 3 + 15px * 2);
+  width: 930px;
   margin: auto;
   font-size: 20px;
   line-height: 1.5em;
@@ -1061,7 +1061,7 @@ div.public-page-panel {
 }
 div.public-page-panel > .inner {
   position: relative;
-  width: calc(300px * 3 + 15px * 2);
+  width: 930px;
   margin: auto;
 }
 div.public-page-panel > .inner h1.site-title {
@@ -1165,7 +1165,7 @@ div.public-page-panel > .inner ul.columns {
   align-items: center;
 }
 div.public-page-panel > .inner ul.columns li {
-  width: calc((300px * 3 + 15px * 2) / 4);
+  width: 232.5px;
   margin: 0.25em 0;
   padding-right: 15px;
   box-sizing: border-box;
@@ -1196,7 +1196,7 @@ div.main-content {
 
 div.browse {
   display: block;
-  width: calc(300px * 3 + 15px * 2);
+  width: 930px;
   padding: 0 15px;
   background-color: #FFF;
   min-height: calc(100vh - 120px);
@@ -1397,7 +1397,7 @@ div.browse nav#search-and-filter form .global-actions .add .dropdown menu li inp
   background-color: #E5E5E5;
 }
 div.browse nav#search-and-filter form .global-actions .add .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse nav#search-and-filter form .global-actions button.download {
   min-height: 30px;
@@ -1549,7 +1549,7 @@ div.browse nav#search-and-filter form .filters section .filter .dropdown menu li
   color: #FFF;
 }
 div.browse nav#search-and-filter form .filters section .filter .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse nav#search-and-filter form .filters section .filter:last-child {
   margin-bottom: 0;
@@ -1932,7 +1932,7 @@ div.browse .public-page-panel .inner section .layout article .inner .head .meta-
 }
 div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button:not(:disabled),
 div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button:not(:disabled) {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button.highlight,
 div.browse .public-page-panel .inner section .layout article .inner .head .meta-group .btn-group form .dropdown menu li:hover button.highlight {
@@ -2150,7 +2150,7 @@ div.browse .public-page-panel .inner section .layout article .inner .body .creat
 }
 div.browse main .inner section .layout article .inner .body .create .dropdown menu li:hover,
 div.browse .public-page-panel .inner section .layout article .inner .body .create .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article .inner .body.full-width,
 div.browse .public-page-panel .inner section .layout article .inner .body.full-width {
@@ -2447,7 +2447,7 @@ div.browse .public-page-panel .inner section .layout article .inner .pinboard-gr
 }
 div.browse main .inner section .layout article .inner .pinboard-group .add .dropdown menu li:hover,
 div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .add .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article .inner .pinboard-group .pin,
 div.browse .public-page-panel .inner section .layout article .inner .pinboard-group .pin {
@@ -2583,7 +2583,7 @@ div.browse .public-page-panel .inner section .layout article .outer.expand .inne
 }
 div.browse main .inner section .layout article:hover,
 div.browse .public-page-panel .inner section .layout article:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout article:not(.pad):not(.review):not(.contributor),
 div.browse .public-page-panel .inner section .layout article:not(.pad):not(.review):not(.contributor) {
@@ -2805,7 +2805,7 @@ div.browse .public-page-panel .inner section .layout.columns article .inner .hea
 }
 div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:hover button:not(:disabled),
 div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:hover button:not(:disabled) {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.browse main .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button,
 div.browse .public-page-panel .inner section .layout.columns article .inner .head .btn-group form .dropdown menu li:not(:last-child) button {
@@ -3052,7 +3052,7 @@ div.browse .public-page-panel .inner section .layout.columns article .outer::aft
 }
 div.browse main .inner section .layout.columns article .outer.expand,
 div.browse .public-page-panel .inner section .layout.columns article .outer.expand {
-  height: calc(55px * 2 + 15px * 2);
+  height: 140px;
 }
 
 div.browse.public {
@@ -3071,7 +3071,7 @@ div.browse.slideshow {
   height: calc(100vh - 30px);
 }
 div.browse.slideshow nav.tabs {
-  left: calc((100vw - (300px * 3 + 15px * 2)) / 2);
+  left: calc((100vw - 930px) / 2);
 }
 div.browse.slideshow button.slide-nav {
   position: fixed;
@@ -3135,7 +3135,7 @@ div.browse.slideshow main .inner section .layout article .inner {
   width: 100vw;
   max-height: 100%;
   box-sizing: border-box;
-  padding: 0 calc((100vw - (300px * 2 + 15px * 1)) / 2) 30px calc((100vw - (300px * 2 + 15px * 1)) / 2);
+  padding: 0 calc((100vw - 615px) / 2) 30px calc((100vw - 615px) / 2);
 }
 div.browse.slideshow main .inner section .layout article .inner .head {
   flex: unset;
@@ -3181,7 +3181,7 @@ div.browse.slideshow main .inner section .layout article .inner .head .media-img
   background-color: #E5E5E5;
   font-size: 12px;
   line-height: 1.5em;
-  line-height: calc(75vh);
+  line-height: 75vh;
   text-align: center;
   object-fit: contain;
 }

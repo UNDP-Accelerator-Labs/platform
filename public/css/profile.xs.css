@@ -112,7 +112,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -664,7 +664,7 @@ html, body {
   color: #969696;
 }
 .fact-sheet main#profile .inner .body form div.info ul li div.select .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 .fact-sheet main#profile .inner .body form div.info ul li button.add-info {
   min-height: 45px;

@@ -8,7 +8,7 @@
 	const site_description = locals?.data?.publishable ?? locals?.data?.sections?.[0]?.items?.find(c => c?.type === 'txt'  && c?.txt?.length)?.txt;
 	const img = locals?.data?.publishable ?? locals?.data?.sections[0]?.items?.find(c => c?.type === 'img' && c?.src?.length )?.src
 
-	let ogp_locale = 'en_GB' 
+	let ogp_locale = 'en_US' 
 
 	if(language == 'fr'){
 		ogp_locale = 'fr_FR'

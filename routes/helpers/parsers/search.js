@@ -6,7 +6,7 @@ const fNest = /[\(\)\"\w\d\*\']+(\sor)?\s\(+[\"\w\d\*\s\'\(]+\)+/dgi
 function prepStr (_str) {
 	const max = ([..._str.matchAll(findPhrase)]?.length ?? 0) - 1
 
-	function findPhrases (_i = 0) {	
+	function findPhrases (_i = 0) {
 		let [ start, end ] = [..._str.matchAll(findPhrase)][_i].indices[0]
 		_str = `${_str.slice(0, start)}${_str.slice(start, end).replace(/\s/g, '__')}${_str.slice(end)}`
 		if (_i < max) findPhrases(_i + 1)
@@ -17,27 +17,27 @@ function prepStr (_str) {
 
 function completeStr (_str) {
 	const max = (_str.match(findOR)?.length ?? 0) - 1
-	
+
 	function helper (_i = 0) {
 		let [ start, end ] = [..._str.matchAll(findOR)][_i].indices[0]
 		let addParentheses = false
 		// LOOK BEHIND FOR 'OR' OR '('
 		const behind = _str.slice(0, start).split(/\s/)
 		if (!/\bor\b/i.test(behind[behind.length - 2])) {
-			if (behind[behind.length - 1].charAt(0) !== '(' 
+			if (behind[behind.length - 1].charAt(0) !== '('
 				&& behind[behind.length - 1].charAt(behind[behind.length - 1].length - 1) !== ')'
 			) {
 				const insertidx = _str.indexOf(behind[behind.length - 1])
 				_str = `${_str.slice(0, insertidx)}(${_str.slice(insertidx)}`
 				end ++ // THIS IS BECAUSE WE ADD ONE CHARACTER TO THE ORIGINAL STRING
 				addParentheses = true
-			} 
+			}
 		}
 		// LOOK FORWARD FOR 'OR' OR '('
 		const forward = _str.slice(end).split(/\s/)
 		if (addParentheses === true) {
 			if (!/\bor\b/i.test(forward[1])) {
-				if (forward[0].charAt(0) !== '(' 
+				if (forward[0].charAt(0) !== '('
 					&& forward[0].charAt(forward[0].length - 1) !== ')'
 				) {
 					const insertidx = end + forward[0].length
@@ -146,9 +146,14 @@ function findNests (_str) {
 		if (openParentheses === closeParentheses) _str = `${_str.slice(0, d.index)}(${d[0]})${_str.slice(d.index + d[0].length)}`
 	})
 
-	_str = _str.match(/(?<=\()[\w\d\*\s\']+(?=\))/gi).map(d => {
-		return `(${d.split(/\bor\b/gi).map(c => `(${c.trim()})`).join(' ')})`
-	}).join(' ')
+	const words = _str.match(/(?<=\()[\w\d\*\s\']+(?=\))/gi);
+	if (words !== null) {
+		_str = words.map(d => {
+			return `(${d.split(/\bor\b/gi).map(c => `(${c.trim()})`).join(' ')})`
+		}).join(' ');
+	} else {
+		_str = '()';
+	}
 
 	return _str
 }
@@ -162,7 +167,7 @@ function cartesian (_arr) {
 	// https://stackoverflow.com/questions/15298912/javascript-generating-combinations-from-n-arrays-with-m-elements
 	const r = []
 	const max = _arr.length - 1
-	
+
 	function helper (arr, i) {
 		for (let j = 0; j < _arr[i].length; j++) {
 			const a = arr.slice(0) // clone arr
@@ -201,7 +206,7 @@ exports.sqlregex = (_data, _language) => { // DO SOMETHING HERE FOR RTL LANGUAGE
 				c = c.replace(/\"+/g, '')
 				if (c.charAt(c.length - 1) === '*') return `(?=.*${m}${c.slice(0, -1)})`
 				else if (c.charAt(0) === '#') return `(?=.*(^|[^\\w#])${c}($|[^\\w#]))`
-				else return `(?=.*${m}${c}${M})` 
+				else return `(?=.*${m}${c}${M})`
 			}
 			else { // NEGATIVE LOOKAHEAD
 				c = c.replace(/\"+/g, '')
@@ -214,6 +219,6 @@ exports.sqlregex = (_data, _language) => { // DO SOMETHING HERE FOR RTL LANGUAGE
 	return `(${query.join('|')})`
 }
 
-// let str = `"hello world" AND peoples AND dah OR (world and (chicken or ham and (cheese or letuce))) AND steak or "bacon and cheese"` 
+// let str = `"hello world" AND peoples AND dah OR (world and (chicken or ham and (cheese or letuce))) AND steak or "bacon and cheese"`
 // let str = 'hello*'
 // console.log(this.sqlregex(str))

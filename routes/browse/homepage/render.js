@@ -4,7 +4,7 @@ const { array, datastructures, checklanguage, join, parsers } = include('routes/
 const load = require('./load/')
 const filter = require('./filter.js')
 
-module.exports = async (req, res) => { 
+module.exports = async (req, res) => {
 	if (!req.session.uuid) Object.assign(req.session, datastructures.sessiondata({ public: true }))
 
 	const { uuid, rights, collaborators, public } = req.session || {}
@@ -16,10 +16,10 @@ module.exports = async (req, res) => {
 
 	// GET FILTERS
 	const [ full_filters ] = filter(req, res)
-	
+
 	DB.conn.tx(async t => {
 		const batch = []
-		
+
 		// SUMMARY STATISTICS
 		batch.push(load.statistics({ connection: t, req, res }))
 		// LOCATIONS DATA
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
 				// [1000, 100] ARE THE DISTANCES (IN KM) FOR THE DBSCAN CLUSTERING
 				[1000, 100].forEach(d => {
 					batch1.push(t1.any(`
-						SELECT 
+						SELECT
 						jsonb_build_object(
 							'type', 'Feature',
 							'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
 						FROM (
 							SELECT points.pad, ST_ClusterDBSCAN(points.projected_geom, eps := $1, minpoints := 2) over () AS cid, points.geo
 							FROM (
-								SELECT ST_Transform(ST_SetSRID(ST_Point(l.lng, l.lat), 4326), 3857) AS projected_geom, ST_Point(l.lng, l.lat) AS geo, l.pad 
+								SELECT ST_Transform(ST_SetSRID(ST_Point(l.lng, l.lat), 4326), 3857) AS projected_geom, ST_Point(l.lng, l.lat) AS geo, l.pad
 								FROM locations l
 								INNER JOIN pads p
 									ON l.pad = p.id
@@ -57,14 +57,14 @@ module.exports = async (req, res) => {
 				})
 				// NEED EXTRA LEVEL WITH SINGLE (NOT CLUSTERED) POINTS
 				batch1.push(t1.any(`
-					SELECT 
+					SELECT
 					jsonb_build_object(
 						'type', 'Feature',
 						'geometry', ST_AsGeoJson(points.geo)::jsonb,
 						'properties', json_build_object('pads', json_agg(DISTINCT (points.pad)), 'count', COUNT(points.pad), 'cid', NULL)::jsonb
 					) AS json
 					FROM (
-						SELECT ST_Point(l.lng, l.lat) AS geo, l.pad 
+						SELECT ST_Point(l.lng, l.lat) AS geo, l.pad
 						FROM locations l
 						INNER JOIN pads p
 							ON l.pad = p.id
@@ -75,7 +75,7 @@ module.exports = async (req, res) => {
 				;`, [ full_filters ])
 				.then(results => results.map(d => d.json))
 				.catch(err => console.log(err)))
-			} else if (map) { 
+			} else if (map) {
 				// USERS CANNOT INPUT LOCATIONS, BUT THERE IS A MAP SO WE POPULATE IT WITH USER LOCATION INFO
 				batch1.push(t1.any(`
 					SELECT p.id AS pad, p.owner FROM pads p
@@ -87,9 +87,9 @@ module.exports = async (req, res) => {
 						const columns = Object.keys(results[0])
 						const values = DB.pgp.helpers.values(results, columns)
 						const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
-						
+
 						return DB.general.any(`
-							SELECT 
+							SELECT
 							jsonb_build_object(
 								'type', 'Feature',
 								'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
@@ -97,7 +97,7 @@ module.exports = async (req, res) => {
 							) AS json
 							FROM (
 								SELECT c.iso3 AS cid, ST_Point(c.lng, c.lat) AS geo, t.pad FROM countries c
-								INNER JOIN users u 
+								INNER JOIN users u
 									ON u.iso3 = c.iso3
 								INNER JOIN ($1:raw) t
 									ON t.owner::uuid = u.uuid::uuid
@@ -114,7 +114,7 @@ module.exports = async (req, res) => {
 			return t1.batch(batch1)
 			.catch(err => console.log(err))
 		}))
-		
+
 		// THIS IS FOR THE BANNER AT THE TOP OF PUBLIC PAGES
 		batch.push(t.any(`
 			SELECT p.id, p.title, p.owner, p.sections FROM pads p
@@ -143,6 +143,9 @@ module.exports = async (req, res) => {
 				$1:raw
 			GROUP BY p.owner
 		;`, [ full_filters ]).then(results => {
+			if (!results.length) {
+				return [];
+			}
 			return DB.general.task(gt => {
 				return gt.any(`
 					SELECT iso3, uuid AS owner FROM users
@@ -153,12 +156,12 @@ module.exports = async (req, res) => {
 					.map(d => { return { iso3: d.key, count: array.sum.call(d.values, 'count') } })
 
 					return gt.any(`
-						SELECT DISTINCT (cn.name), cn.iso3, cn.language 
-						FROM users u 
-						INNER JOIN country_names cn 
-							ON cn.iso3 = u.iso3 
-						WHERE u.position = 'Head of Solutions Mapping' 
-							AND cn.language = $1 
+						SELECT DISTINCT (cn.name), cn.iso3, cn.language
+						FROM users u
+						INNER JOIN country_names cn
+							ON cn.iso3 = u.iso3
+						WHERE u.position = 'Head of Solutions Mapping'
+							AND cn.language = $1
 						ORDER BY cn.name
 					;`, [ language ])
 					.then(countries => {
@@ -169,7 +172,7 @@ module.exports = async (req, res) => {
 		}).catch(err => console.log(err)))
 		// LIST OF PINBOARDS/ COLLECTIONS
 		batch.push(t.any(`
-			SELECT pb.id, COUNT(pc.id)::INT, pb.title, pb.date, pb.owner 
+			SELECT pb.id, COUNT(pc.id)::INT, pb.title, pb.date, pb.owner
 			FROM pinboards pb
 			INNER JOIN pinboard_contributions pc
 				ON pc.pinboard = pb.id
@@ -182,15 +185,15 @@ module.exports = async (req, res) => {
 
 		return t.batch(batch)
 		.then(async results => {
-			let [ statistics, 
+			let [ statistics,
 				clusters,
 				sample_images,
 				countries,
 				pinboards
 			] = results
 
-			const stats = { 
-				total: array.sum.call(statistics.total, 'count'), 
+			const stats = {
+				total: array.sum.call(statistics.total, 'count'),
 				contributors: statistics.contributors,
 				tags: statistics.tags
 			}

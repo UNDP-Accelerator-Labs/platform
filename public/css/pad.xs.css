@@ -113,7 +113,7 @@ input:-webkit-autofill:active {
 }
 
 .screen.ter {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   /*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
 }
 .screen.ter .modal .close {
@@ -718,7 +718,7 @@ div.document main .inner .meta-status .btn-group form .dropdown menu li button {
   white-space: nowrap;
 }
 div.document main .inner .meta-status .btn-group form .dropdown menu li:hover {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.document main .inner .meta-status .btn-group form .dropdown menu li:not(:last-child) {
   border-bottom: 1px dotted #969696;
@@ -1069,7 +1069,7 @@ div.document main .inner .body .layout .meta-container .media-txt p {
 }
 div.document main .inner .body .layout .media-container .media-img,
 div.document main .inner .body .layout .meta-container .media-img {
-  min-height: calc(65px + 30px * 2);
+  min-height: 125px;
 }
 div.document main .inner .body .layout .media-container .media-img img,
 div.document main .inner .body .layout .meta-container .media-img img {
@@ -1093,7 +1093,7 @@ div.document main .inner .body .layout .meta-container .media-mosaic {
   grid-gap: 15px;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  min-height: calc(65px + 30px * 2);
+  min-height: 125px;
 }
 div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item,
 div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-item {
@@ -1114,7 +1114,7 @@ div.document main .inner .body .layout .meta-container .media-mosaic .mosaic-ite
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  top: calc(50% - 30px / 2);
+  top: calc(50% - 15px);
   left: 0;
 }
 div.document main .inner .body .layout .media-container .media-mosaic .mosaic-item .index-opts .opt,
@@ -1218,8 +1218,7 @@ div.document main .inner .body .layout .media-container .meta-radiolist ol .opt,
 div.document main .inner .body .layout .meta-container .media-checklist ol .opt,
 div.document main .inner .body .layout .meta-container .media-radiolist ol .opt,
 div.document main .inner .body .layout .meta-container .meta-checklist ol .opt,
-div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt {
-  /* CHANGE THE .option CLASS IN TEMPLATE TO STANDARDIZE TO .opt (ALREADY DONE IN pad.js) */
+div.document main .inner .body .layout .meta-container .meta-radiolist ol .opt { /* CHANGE THE .option CLASS IN TEMPLATE TO STANDARDIZE TO .opt (ALREADY DONE IN pad.js) */
   display: flex;
   align-items: center;
   margin: 0;
@@ -1652,7 +1651,7 @@ div.document main .inner .body .layout .meta-container .inset .search button {
 }
 div.document main .inner .body .layout .media-container .inset .inset-location,
 div.document main .inner .body .layout .meta-container .inset .inset-location {
-  max-height: calc(300px - 75px - 20px);
+  max-height: 205px;
   padding: 0 10px 10px 10px;
   overflow: auto;
 }
@@ -1733,7 +1732,7 @@ div.document main .inner .body .layout .meta-container .inset .inset-tag,
 div.document main .inner .body .layout .meta-container .inset .inset-skills,
 div.document main .inner .body .layout .meta-container .inset .inset-methods,
 div.document main .inner .body .layout .meta-container .inset .inset-datasources {
-  max-height: calc(300px - 75px - 20px);
+  max-height: 205px;
   /*padding: 0 0 10px 10px;*/
   padding: 5px 10px 10px 10px;
   overflow: auto;
@@ -1799,9 +1798,7 @@ div.document main .inner .body .layout .meta-container .inset .inset-datasources
   color: #FFF;
 }
 div.document main .inner .body .layout .media-container .inset.template,
-div.document main .inner .body .layout .meta-container .inset.template {
-  /* THIS IS FOR TEMPLATES */
-}
+div.document main .inner .body .layout .meta-container .inset.template { /* THIS IS FOR TEMPLATES */ }
 div.document main .inner .body .layout .media-container .inset.template div,
 div.document main .inner .body .layout .meta-container .inset.template div {
   padding: 0 0 10px 10px;
@@ -1908,7 +1905,7 @@ div.document main .inner .body .layout .meta-container .inset.template .inset-ta
 div.document main .inner .body .layout .meta-container .inset.template .inset-skills,
 div.document main .inner .body .layout .meta-container .inset.template .inset-methods,
 div.document main .inner .body .layout .meta-container .inset.template .inset-datasources {
-  max-height: calc(300px);
+  max-height: 300px;
 }
 div.document main .inner .body .layout .media-container figcaption,
 div.document main .inner .body .layout .meta-container figcaption {
@@ -2010,7 +2007,7 @@ div.document main .inner .body .layout .media-container:not(.group-container).fo
 div.document main .inner .body .layout .media-container:not(.group-container):hover .media-embed,
 div.document main .inner .body .layout .meta-container:not(.group-container).focus .media-embed,
 div.document main .inner .body .layout .meta-container:not(.group-container):hover .media-embed {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.document main .inner .body .layout .media-container:not(.group-container).focus canvas,
 div.document main .inner .body .layout .media-container:not(.group-container):hover canvas,
@@ -2052,7 +2049,7 @@ div.document main .inner .body .layout:hover > .placement-opts {
   display: block;
 }
 div.document main .inner .body .layout.focus {
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
 }
 div.document main .inner .body .layout.view {
   border-top: none;
@@ -2298,7 +2295,7 @@ footer {
   position: relative;
   width: 100vw;
   clear: both;
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   border-top: 1px solid #E5E5E5;
 }
 footer .inner {
@@ -2499,7 +2496,7 @@ footer .inner .approval-message::after {
   left: -11px;
   width: 10px;
   vertical-align: middle;
-  background-color: #efefef;
+  background-color: rgb(239, 239, 239);
   border-top: 1px solid #C2B4D6;
   /*border-bottom: 1px solid $c-light-1;*/
   font-size: 36px;
@@ -2567,7 +2564,7 @@ footer .inner .approval-message::after {
 .document.slideshow main#pad .inner .slide .required {
   position: absolute;
   left: 100%;
-  top: calc(50% - 33px / 2);
+  top: calc(50% - 16.5px);
   width: 30px;
   text-align: center;
   line-height: 33px;

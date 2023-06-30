@@ -3,17 +3,6 @@
 
 This is a Node.js application that uses Express.js for routing and EJS as the view engine. It interacts with two Postgres databases, where one stores shared information like user sessions and credentials, and the other stores information on pads.
 
-## Branches and Deployment
-
-There are different branches in this repository that trigger automatic deployment to the relevant Azure web app instances:
-
-- **global_platform** branch deploys to the Global platform Azure web app instance: [acclabs-global.azurewebsites.net](https://acclabs-global.azurewebsites.net/)
-- **experiments_platform** branch deploys to the Experiment platform Azure web app instance: [acclabs-global.azurewebsites.net/en/browse/pads/public](https://acclabs-global.azurewebsites.net/en/browse/pads/public)
-- **solutions_mapping_platform** branch deploys to the Solution mapping platform Azure web app instance: [undphqexoacclabsapp01.azurewebsites.net](https://undphqexoacclabsapp01.azurewebsites.net/)
-- **action_plans_platform** branch deploys to the Action plan Azure web app instance: [acclabs-actionplans.azurewebsites.net](https://acclabs-actionplans.azurewebsites.net/)
-
-The deployment actions are defined in the `.github/workflows` folder of each deployment branches.
-
 ## Local Setup
 
 ## Getting started
@@ -30,7 +19,7 @@ To set up the code locally, follow these steps:
 8. Copy `template.env` to `.env` and set the environment variables and the appropriate credentials.
     (If the env file is other than `.env` you can specify the path via
     `ENV=<pathtoenv> make <command>` on all make commands)
-9. Update the configuration in `config/edit/index.js` if needed.
+9. Update the configuration in `config/edit/local.js` if needed.
 
 ## Run the servers
 
@@ -69,3 +58,35 @@ The file structure of this project is organized as follows:
 - **config**: Contains platform configuration files.
   - **config/db**: Contains database settings.
   - **config/edit**: Contains platform configurable settings.
+
+## Create docker image locally
+
+Run
+```
+make -s build
+```
+to build the docker image.
+Use `make -s git-check` to verify that the current working copy is clean and
+that no unwanted (or uncommit) files will be included in the image.
+
+## Push docker image
+
+Make sure to log in to azure via `make azlogin`.
+
+Run
+```
+make -s build
+make -s dockerpush
+```
+to build the image and push it to azure. Make sure to update the image in the
+Deployment Center. This is only if you need to test non major version changes.
+For proper deployment use the deploy functionality as described below.
+
+## Deploying new version to staging
+
+Make sure to be on the master branch with a clean working copy.
+
+Run
+```
+make -s publish
+```

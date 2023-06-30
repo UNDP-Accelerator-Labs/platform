@@ -1,15 +1,8 @@
-
-
-const crypto = require('crypto');
-const moment = require('moment')
 const sendEmail = require('../helpers').email
 const {  DB } = include('config/')
 const { datastructures } = include('routes/helpers/')
+const jwt = require('jsonwebtoken');
 
- // Function to generate a random token
-function generateToken() {
-  return crypto.randomBytes(20).toString('hex');
-}
  // Function to send password reset email
 async function sendResetEmail(email, html) {
     let kwargs = {
@@ -35,14 +28,7 @@ async function sendResetEmail(email, html) {
     return;
   }
    // Generate a password reset token and save it in the database
-  const token = generateToken();
-  const expiryDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-  // Set the expiry date to 24 hours from now
-  const expiryDate = new Date(Date.now() + expiryDuration);
-
-  await DB.general.none(`
-    UPDATE users SET reset_token = $1, reset_token_expiry = $3 WHERE email = $2;
-  `, [token, email, expiryDate]);
+  const token = await jwt.sign({ email }, process.env.APP_SECRET, { expiresIn: '24h' } )
 
    const baseUrl = req.headers['host']; // Extracting the base URL from the 'host' header
 
@@ -54,7 +40,7 @@ async function sendResetEmail(email, html) {
       <br/>
       <p>We have received a request to reset your password. Please click the link below to proceed:</p>
       <p><a href="${resetLink}">Reset Password</a></p>
-      <p>This link will expire on ${moment(expiryDate).format('MMMM Do YYYY, h:mm:ss a')}</p>
+      <p>This link will expire in 24 hours.</p>
 
       <p>If you did not request a password reset, please ignore this email.</p>
       <br/>
@@ -73,33 +59,27 @@ async function sendResetEmail(email, html) {
 
 
  // Reset password page
- exports.getResetToken = async (req, res, next) => {
+exports.getResetToken = async (req, res, next) => {
   const { token } = req.params;
   req.session.errormessage = '';
 
-   // Check if the token exists in the database
-  const user = await DB.general.oneOrNone(`
-    SELECT * FROM users WHERE reset_token = $1;
-  `, [token]);
-   if (!user) {
-    req.session.errormessage = 'Invalid or expired token.';
-    res.redirect('/login');
-    return;
-  }
-   // Check if the token has expired
-  const expiryDate = moment(user.reset_token_expiry);
-  if (moment().isAfter(expiryDate)) {
-    req.session.errormessage = 'Invalid or expired token.';
-    res.redirect('/login');
-    return;
-  }
-   // Render the reset password form
-   const { originalUrl, path } = req || {}
-   const { errormessage, successmessage } = req.session || {}
-    const metadata = await datastructures.pagemetadata({ req, res })
-    const data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+ jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
+    if(decoded){
+      // Render the reset password form
+      const { originalUrl, path } = req || {}
+      const { errormessage, successmessage } = req.session || {}
+      const metadata = await datastructures.pagemetadata({ req, res })
+      const data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
 
-    res.render('reset-password', data );
+      return res.render('reset-password', data );
+    }
+    else {
+      req.session.errormessage = 'Invalid or expired token.';
+      return res.redirect('/login');
+      
+    }
+  });
+
 };
 
 // Update password after reset
@@ -108,51 +88,59 @@ exports.updatePassword = async (req, res, next) => {
     req.session.errormessage = '';
 
     const { originalUrl, path } = req || {}
-    
-     // Check if the token exists in the database
-    const user = await DB.general.oneOrNone(`
-      SELECT * FROM users WHERE reset_token = $1;
-    `, [token]);
-     if (!user) {
-      req.session.errormessage = 'Invalid or expired token.';
-      res.redirect('/login');
-      return;
-    }
-     // Check if the password and confirm password match
-    if (password !== confirmPassword) {
-      req.session.errormessage = 'Password and confirm password do not match.';
+
+    jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
+      if(decoded){
+
+        const { originalUrl, path } = req || {}
+         // Check if the password and confirm password match
+          if (password !== confirmPassword) {
+            req.session.errormessage = 'Password and confirm password do not match.';
+            
+            const { errormessage, successmessage } = req.session || {}
+            const metadata = await datastructures.pagemetadata({ req, res })
+
+            let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+        
+            return res.render('reset-password', data );
+          }
+
+          let checkPass = isPasswordSecure(password)
+          if(!checkPass?.isValid){
+              req.session.errormessage = checkPass.message;
       
-      const { errormessage, successmessage } = req.session || {}
-      const metadata = await datastructures.pagemetadata({ req, res })
+              const { errormessage, successmessage } = req.session || {}
+              const metadata = await datastructures.pagemetadata({ req, res })
+              let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+          
+              return res.render('reset-password', data );
+          }
 
-      let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
-   
-       return res.render('reset-password', data );
-    }
-
-    if(!isPasswordSecure(password)){
-        req.session.errormessage = 'Password must be at least 8 characters and contains at least one uppercase, lowercase, number, and special character';
-
-        const { errormessage, successmessage } = req.session || {}
-        const metadata = await datastructures.pagemetadata({ req, res })
-        let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+          // Update the password and clear the reset token
+            await DB.general.none(`
+            UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
+          `, [password, decoded?.email]);
+          // Redirect the user to the login page 
+          res.redirect('/login');
+          
+      }
+      else {
+        req.session.errormessage = 'Invalid or expired token.';
+        return res.redirect('/login');
+        
+      }
+    });
     
-        return res.render('reset-password', data );
-    }
-    
-     // Update the password and clear the reset token
-    await DB.general.none(`
-      UPDATE users SET password = CRYPT($1, password), reset_token = NULL WHERE reset_token = $2;
-    `, [password, token]);
-     // Redirect the user to the login page 
-    res.redirect('/login');
   };
 
 
 const isPasswordSecure = (password) => {
     // Check length
     if (password.length < 8) {
-      return false;
+      return {
+        isValid: false,
+        message: 'Password must be at least 8 characters.'
+      };
     }
      // Check complexity (contains at least one uppercase, lowercase, number, and special character)
     const uppercaseRegex = /[A-Z]/;
@@ -165,12 +153,21 @@ const isPasswordSecure = (password) => {
       !numberRegex.test(password) ||
       !specialCharRegex.test(password)
     ) {
-      return false;
+      return {
+        isValid: false,
+        message: 'Password must contains at least one uppercase, lowercase, number, and special character.'
+      };
     }
      // Check against common passwords (optional)
     const commonPasswords = ['password', '123456', 'qwerty'];
     if (commonPasswords.includes(password)) {
-      return false;
+      return {
+        isValid: false,
+        message: 'Your password failed check against common and easy passwords.'
+      };
     }
-     return true;
+     return {
+      isValid: true,
+      message: 'Password updated successfully!'
+    };
   }

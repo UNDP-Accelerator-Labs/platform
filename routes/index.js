@@ -172,6 +172,9 @@ exports.redirect.browse = require('./redirect/').browse
 
 exports.dispatch.public = require('./browse/homepage').render //require('./login/').public
 
+exports.process.forgetPassword = require('./login/').forgetPassword
+exports.process.getResetToken = require('./login/').getResetToken
+exports.process.updatePassword = require('./login/').updatePassword
 
 /* =============================================================== */
 /* =========================== BROWSE ============================ */

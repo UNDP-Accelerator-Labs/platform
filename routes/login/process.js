@@ -6,13 +6,14 @@ module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
-	const { path } = req || {}
+	const { path, ip: ownIp } = req || {}
 
 	if (token) {
 		// VERIFY TOKEN
-		const { uuid, rights } = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
-
-		if (uuid) {
+		const { uuid, rights, ip } = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+		if (ip && ip !== ownIp) {
+			res.redirect('/')
+		} else if (uuid) {
 			DB.general.tx(t => {
 				// GET USER INFO
 				return t.oneOrNone(`

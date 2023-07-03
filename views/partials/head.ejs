@@ -9,7 +9,7 @@
 	const site_description = locals?.data?.publishable ? locals?.data?.sections?.[0]?.items?.find(c => c?.type === 'txt'  && c?.txt?.length)?.txt : null;
 	const img = locals?.data?.publishable ? locals?.data?.sections[0]?.items?.find(c => c?.type === 'img' && c?.src?.length )?.src : null
 
-	let ogp_locale = 'en_US' 
+	let ogp_locale = 'en_US'
 
 
 	if(language == 'fr'){
@@ -36,8 +36,8 @@
 <meta property="og:locale" content="<%= ogp_locale %>">
 <meta property="og:site_name" content="<%= site_title ?? title %>">
 
-<meta property="og:image" content="<% img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
-<meta property="og:image:secure_url" content="<% img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
+<meta property="og:image" content="<%= img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' =%>"/>
+<meta property="og:image:secure_url" content="<%= img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' =%>"/>
 <meta property="og:image:width" content="400" />
 
 <meta property="og:image:alt" content="UNDP Accelerator Labs" />

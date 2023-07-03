@@ -7,14 +7,10 @@ module.exports = (req, res, next) => {
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
 	const { path, ip: ownIp } = req || {}
-	console.log(`RECEIVED TOKEN ${token}`);
-	console.log(`REDIRECT PATH ${redirectPath}`);
-	console.log(`IP ${ownIp}`);
 
 	if (token) {
 		// VERIFY TOKEN
 		const { uuid, rights, ip } = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
-		console.log(`INFO ${uuid} ${ip}`);
 		if (ip && ip !== ownIp) {
 			res.redirect('/')
 		} else if (uuid) {
@@ -59,7 +55,6 @@ module.exports = (req, res, next) => {
 
 					if (next) next()
 					else if(redirectPath) {
-						console.log(`FORWARD TO ${redirectPath}`)
 						res.redirect(`${redirectPath}`)
 					} else {
 						// NOTE: THIS DOES THE SAME AS routes/redirect/browse

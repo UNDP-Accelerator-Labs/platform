@@ -827,13 +827,9 @@ exports.api.datasources = (req, res) => {
 	}
 }
 
-
-
 exports.notfound = (req, res) => {
-	res.send('This is not the route that you are looking for')
+	res.send(`${req.originalUrl} is not the route that you are looking for`)
 }
-
-
 
 String.prototype.simplify = function () {
 	return this.valueOf().replace(/[^\w\s]/gi, '').replace(/\s/g, '').toLowerCase()

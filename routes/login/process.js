@@ -59,6 +59,7 @@ module.exports = (req, res, next) => {
 
 					if (next) next()
 					else if(redirectPath) {
+						console.log(`FORWARD TO ${redirectPath}`)
 						res.redirect(`${redirectPath}`)
 					} else {
 						// NOTE: THIS DOES THE SAME AS routes/redirect/browse

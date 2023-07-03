@@ -130,16 +130,17 @@ app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
 	// .get(routes.redirect.home, routes.render.login)
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.login)
+app.get('/transfer', routes.process.login)
 app.get('/logout', routes.process.logout)
 
-app.route('/reset/:token') 
+app.route('/reset/:token')
 	.get(routes.redirect.browse, routes.render.login)
 
-app.route('/forget-password') 
+app.route('/forget-password')
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.forgetPassword)
 
-app.route('/reset-password') 
+app.route('/reset-password')
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.updatePassword)
 

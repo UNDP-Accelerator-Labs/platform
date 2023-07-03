@@ -4,13 +4,14 @@ const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
+	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
 	const { path } = req || {}
-	
+
 	if (token) {
 		// VERIFY TOKEN
 		const { uuid, rights } = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
-		
+
 		if (uuid) {
 			DB.general.tx(t => {
 				// GET USER INFO
@@ -52,7 +53,9 @@ module.exports = (req, res, next) => {
 					Object.assign(req.session, datastructures.sessiondata(result))
 
 					if (next) next()
-					else {
+					else if(redirectPath) {
+						res.redirect(`${redirectPath}`)
+					} else {
 						// NOTE: THIS DOES THE SAME AS routes/redirect/browse
 						let { read, write } = modules.find(d => d.type === 'pads')?.rights
 						if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
@@ -61,7 +64,7 @@ module.exports = (req, res, next) => {
 						if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
 						else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
 						else res.redirect(`/${language}/browse/pads/public`)
-					} 
+					}
 				})
 			}).catch(err => console.log(err))
 		} else res.redirect('/login')
@@ -72,7 +75,7 @@ module.exports = (req, res, next) => {
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
 			res.redirect('/login')
-		} else { 
+		} else {
 			DB.general.tx(t => {
 				// TEST USERNAME
 				return t.oneOrNone(`
@@ -138,7 +141,9 @@ module.exports = (req, res, next) => {
 										const { language, rights } = result
 										Object.assign(req.session, datastructures.sessiondata(result))
 
-										if (!originalUrl || originalUrl === path) {
+										if(redirectPath) {
+											res.redirect(`${redirectPath}`)
+										} else if (!originalUrl || originalUrl === path) {
 											const { read, write } = modules.find(d => d.type === 'pads')?.rights
 
 											if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)

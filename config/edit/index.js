@@ -5,8 +5,6 @@ if (app_id === 'ap') {
 	app_obj = {...app_obj, ...require('./ap.js')};
 } else if (app_id === 'exp') {
 	app_obj = {...app_obj, ...require('./exp.js')};
-} else if (app_id === 'global') {
-	app_obj = {...app_obj, ...require('./global.js')};
 } else if (app_id === 'sm') {
 	app_obj = {...app_obj, ...require('./sm.js')};
 } else if (app_id !== 'local') {

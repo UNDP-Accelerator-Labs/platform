@@ -5,7 +5,6 @@
 	const object = locals.metadata.page.object
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
-
 %>
 
 <menu>
@@ -23,7 +22,7 @@
 		<li class='<% if (space === "past") { %>active<% } %>'>
 			<a href='./past'>
 				<button><%- vocabulary['space'][language](object, 'past') %><div class='count'><%- locals.stats?.past %></div></button>
-			</a>	
+			</a>
 		</li>
 	<% } else if (object === 'mobilizations') { %>
 		<li class='<% if (space === "scheduled") { %>active<% } %>'>
@@ -39,7 +38,7 @@
 		<li class='<% if (space === "past") { %>active<% } %>'>
 			<a href='./past'>
 				<button><%- vocabulary['space'][language](object, 'past') %><div class='count'><%- locals.stats?.past %></div></button>
-			</a>	
+			</a>
 		</li>
 	<% } else if (object === 'contributors') { %>
 		<li class='<% if (space === "invited") { %>active<% } %>'>
@@ -49,8 +48,8 @@
 				</button>
 			</a>
 		</li>
-		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.read) 
-			&& locals.pinboards_list?.length) 
+		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.read)
+			&& locals.pinboards_list?.length)
 		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
@@ -78,17 +77,21 @@
 			</a>
 		</li>
 	<% } else { %>
-		<% if (modules.some(d => d.type === object && rights >= d.rights.write)) { %>
+		<% if (modules.some(d => {
+			let { write } = d.rights
+			if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+			return d.type === object && rights >= write
+		})) { %>
 			<li class='<% if (space === "private") { %>active<% } %>'>
 				<a href='./private'>
 					<button><%- vocabulary['space'][language](object, 'private') %>
 						<div class='count'><%- locals.stats?.private %></div>
 					</button>
-				</a>	
+				</a>
 			</li>
 		<% } %>
 		<% if (['pads', 'templates'].includes(object)
-			&& modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) 
+			&& (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) || rights > 2)
 			&& locals.stats?.curated > 0
 		) { %>
 			<li class='<% if (space === "curated") { %>active<% } %>'>
@@ -98,9 +101,9 @@
 					</button>
 				</a>
 			</li>
-		<% } %>	
-		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read) 
-			&& locals.pinboards_list?.length) 
+		<% } %>
+		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read)
+			&& locals.pinboards_list?.length)
 		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
@@ -127,8 +130,8 @@
 				</button>
 			</a>
 		</li>
-		<% if (object === 'pads' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read) 
-			&& locals.stats?.reviewing > 0) 
+		<% if (object === 'pads' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read)
+			&& locals.stats?.reviewing > 0)
 		{ %>
 			<li class='<% if (space === "reviewing") { %>active<% } %>'>
 				<a href='./reviewing'>
@@ -147,8 +150,8 @@
 				</a>
 			</li>
 		<% } %>
-		<% if (object === 'templates' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read) 
-			&& locals.metadata.menu.review_templates?.length > 0) 
+		<% if (object === 'templates' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read)
+			&& locals.metadata.menu.review_templates?.length > 0)
 		{ %>
 			<li class='<% if (space === "reviews") { %>active<% } %>'>
 				<a href='./reviews'>

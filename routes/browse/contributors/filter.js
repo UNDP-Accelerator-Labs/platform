@@ -17,7 +17,12 @@ module.exports = req => {
 	if (status) base_filters.push(DB.pgp.as.format(`AND u.confirmed::INT IN ($1:csv)`, [ status ]))
 
 	let f_space = null	
-	if (space === 'all') f_space = DB.pgp.as.format(`AND (u.rights >= $1::INT)`, [ modules.find(d => d.type === 'pads')?.rights.write || 4 ])
+	// THE all SPACE SHOWS ALL CONTRIBUTORS, i.e. USERS WHO ARE ALLOWED TO WRTIE PADS
+	let { write } = modules.find(d => d.type === 'pads')?.rights
+	if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+	console.log('check write', write)
+
+	if (space === 'all') f_space = DB.pgp.as.format(`AND (u.rights >= $1::INT)`, [ write ?? 4 ])
 	if (space === 'invited') f_space = DB.pgp.as.format(`AND (u.uuid IN (SELECT contributor FROM cohorts WHERE host = $1) OR $2 > 2)`, [ uuid, rights ])
 	if (f_space) base_filters.push(f_space)
 

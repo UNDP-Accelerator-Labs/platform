@@ -1,3 +1,5 @@
+@import 'vars.xs';
+
 div.public-page-header {
 	min-height: 100vh;
 	div.carousel {
@@ -507,7 +509,7 @@ div.browse {
 
 									.meta-versiontree {
 										margin-right: 10px;
-										
+
 										a {
 											img {
 												width: 30px;

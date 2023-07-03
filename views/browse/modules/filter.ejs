@@ -1,5 +1,5 @@
 <%
-	
+
 	// CREATE ALIASES
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
@@ -12,16 +12,16 @@
 	<nav id='search-and-filter' class='lg'>
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
-			<% 
+			<%
 				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
-				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key)) 
+				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
 
 				view_params.forEach(d => {
 					query[d].forEach(c => {
 			%>
 				<input type='hidden' name='<%- d %>' value='<%- c %>'>
-			<% 
-					}) 
+			<%
+					})
 				})
 			%>
 
@@ -125,7 +125,7 @@
 		</form>
 	</nav>
 <% } else { %>
-	<nav><p><%- vocabulary['no entries'][language] %></p></nav> 
+	<nav><p><%- vocabulary['no entries'][language] %></p></nav>
 <% } %>
 
 <script type='text/javascript'>
@@ -144,7 +144,7 @@
 		parent.selectAll('input[type=hidden]')
 			.attr('disabled', node.checked ? null : true)
 	}
-	
+
 	// MAIN SEARCH BAR
 	d3.selectAll('.filter input[type=text]')
 	.on('keyup', function () {
@@ -161,7 +161,7 @@
 		if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 		if (filters) filters.node().style.overflow = 'visible'
 
-		dropdown.selectAll('label, a').on('mousedown', function () { 
+		dropdown.selectAll('label, a').on('mousedown', function () {
 			d3.event.preventDefault()
 			// this.previousElementSibling.setAttribute('checked', '')
 		})
@@ -200,7 +200,7 @@
 			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
 			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 
-			dropdown.selectAll('li').on('mousedown', function () { 
+			dropdown.selectAll('li').on('mousedown', function () {
 				d3.event.preventDefault()
 			})
 		}).on('blur', function () {
@@ -212,19 +212,19 @@
 		d3.select('#new-pinboard')
 		.on('click', async function () {
 			const node = d3.select('#pin-all').node()
-			
+
 			if (node.value.trim().length) {
 				const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
 
 				const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
-					const match = [...this.childNodes].filter(function (d) { 
+					const match = [...this.childNodes].filter(function (d) {
 						return d.nodeType === Node.TEXT_NODE
 					}).map(d => d.textContent.trim().toLowerCase()).join(' ')
 					return match === node.value.trim().toLowerCase()
 				})
 
 				if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
-					pinAll(existingBoard.node().previousElementSibling)							
+					pinAll(existingBoard.node().previousElementSibling)
 				} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 					const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: <%- JSON.stringify(locals.pads) %>, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 					window.location = `./pinned?pinboard=${board_id}`

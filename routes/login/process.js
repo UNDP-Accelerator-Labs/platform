@@ -51,11 +51,12 @@ module.exports = (req, res, next) => {
 					const { language, rights } = result
 					Object.assign(req.session, datastructures.sessiondata(result))
 
-					console.log(referer)
-
 					if (next) next()
 					else {
-						const { read, write } = modules.find(d => d.type === 'pads')?.rights
+						// NOTE: THIS DOES THE SAME AS routes/redirect/browse
+						let { read, write } = modules.find(d => d.type === 'pads')?.rights
+						if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+						console.log('check write', write)
 
 						if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
 						else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)

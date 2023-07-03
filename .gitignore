@@ -18,3 +18,5 @@ dump/
 _00_inspiration.png
 feedback/
 *.ai
+*.diff
+version.txt

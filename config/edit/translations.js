@@ -7,8 +7,6 @@ exports.translations = {
 		'pt': 'This is a description of the app.'
 	},
 	"email notifications": {
-		
+
 	}
 }
-
-

@@ -22,7 +22,7 @@ module.exports = (req, res, next) => {
 		}
 		const { uuid, rights, ip } = tobj;
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
-			res.redirect('/')
+			res.redirect(redirectPath)
 		} else if (uuid) {
 			DB.general.tx(t => {
 				// GET USER INFO
@@ -63,9 +63,10 @@ module.exports = (req, res, next) => {
 					const { language, rights } = result
 					Object.assign(req.session, datastructures.sessiondata(result))
 
-					if (next) next()
-					else if(redirectPath) {
+					if(redirectPath) {
 						res.redirect(`${redirectPath}`)
+					} else if (next) {
+						next()
 					} else {
 						// NOTE: THIS DOES THE SAME AS routes/redirect/browse
 						let { read, write } = modules.find(d => d.type === 'pads')?.rights
@@ -79,7 +80,6 @@ module.exports = (req, res, next) => {
 				})
 			}).catch(err => console.log(err))
 		} else res.redirect('/login')
-
 	} else {
 		const { username, password, originalUrl } = req.body || {}
 

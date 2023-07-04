@@ -2,6 +2,7 @@ const { app_title: title, app_description: description, app_languages, app_stora
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
+const jwt = require('jsonwebtoken')
 
 if (!exports.legacy) exports.legacy = {}
 
@@ -20,8 +21,8 @@ exports.sessiondata = _data => {
 	obj.language = language || 'en'
 	obj.country = {
 		iso3: iso3 || 'NUL',
-		name: countryname || 'Null Island', 
-		bureau: bureau, 
+		name: countryname || 'Null Island',
+		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
 
@@ -30,7 +31,7 @@ exports.sessiondata = _data => {
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
 	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
-	let { headers, path, params, query, session } = req || {}
+	let { headers, path, params, query, session, ip } = req || {}
 	path = path.substring(1).split('/')
 
 	let { object, space, instance } = params || {}
@@ -48,9 +49,9 @@ exports.pagemetadata = (_kwargs) => {
 
 	const parsedQuery = {}
 	for (let key in query) {
-		if (key === 'search') { 
+		if (key === 'search') {
 			if (query[key].trim().length) parsedQuery[key] = query[key]
-		} else { 
+		} else {
 			if (!Array.isArray(query[key])) parsedQuery[key] = [query[key]]
 			else parsedQuery[key] = query[key]
 		}
@@ -75,7 +76,7 @@ exports.pagemetadata = (_kwargs) => {
 		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
 			batch.push(t.any(`
 				SELECT m.id, m.title, m.owner, m.child, m.status,
-					COALESCE((SELECT tm.id FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target_id, 
+					COALESCE((SELECT tm.id FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target_id,
 					COALESCE((SELECT sm.id FROM mobilizations sm WHERE sm.id = m.source LIMIT 1), NULL) AS source_id
 				FROM mobilizations m
 				WHERE status = 2
@@ -90,7 +91,7 @@ exports.pagemetadata = (_kwargs) => {
 		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
 			batch.push(t.any(`
 				SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child,
-					to_char(m.start_date, 'DD Mon YYYY') AS start_date 
+					to_char(m.start_date, 'DD Mon YYYY') AS start_date
 				FROM mobilizations m
 				WHERE (m.id IN (SELECT mobilization FROM mobilization_contributors WHERE participant = $1)
 					OR m.owner = $1
@@ -113,7 +114,7 @@ exports.pagemetadata = (_kwargs) => {
 			;`, [ app_languages ]))
 			gbatch.push(gt.any(`
 				SELECT language, secondary_languages FROM users
-				-- SELECT COUNT (id)::INT AS count, language FROM users 
+				-- SELECT COUNT (id)::INT AS count, language FROM users
 				-- GROUP BY language
 			;`))
 			return gt.batch(gbatch)
@@ -132,7 +133,7 @@ exports.pagemetadata = (_kwargs) => {
 		let [ templates, mobilizations, participations, languagedata, review_templates ] = results
 		let [ languages, speakers ] = languagedata
 
-		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS 
+		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
 		// TO WIDEN THE POSSIBLE REVIEWER POOL
 		if (review_templates) {
 			speakers = speakers.map(d => {
@@ -149,6 +150,17 @@ exports.pagemetadata = (_kwargs) => {
 			})
 		} else review_templates = []
 
+		const baseurl = 'https://acclabs-actionlearningplans.azurewebsites.net/';
+		const origUrl = encodeURIComponent(req.originalUrl);
+		const forward = {};
+		if (uuid) {
+			const curHost = `${baseurl}`.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+			const token = jwt.sign({ uuid, rights, ip }, process.env.APP_SECRET, { audience: 'user:known', issuer: curHost, expiresIn: '1h' })
+			console.log(`WRAPPING USER uuid:${uuid} rights:${rights} ip:${ip}`)
+			forward.url = `${baseurl.replace(/\/$/, '')}/transfer?path=${origUrl}&token=${token}`;
+		} else {
+			forward.url = d.baseurl;
+		}
 		const obj = {}
 		obj.metadata = {
 			site: {
@@ -160,13 +172,13 @@ exports.pagemetadata = (_kwargs) => {
 				media_value_keys,
 				engagementtypes,
 				welcome_module,
-				app_storage
+				app_storage,
 			},
 			user: {
 				uuid,
 				name,
 				country,
-				rights
+				rights,
 			},
 			page: {
 				title,
@@ -175,7 +187,8 @@ exports.pagemetadata = (_kwargs) => {
 				count: pagecount ?? null,
 				language,
 				public,
-				
+
+				forward,
 				path,
 				referer: headers.referer,
 				activity: path[1],
@@ -190,7 +203,7 @@ exports.pagemetadata = (_kwargs) => {
 				page_content_limit
 			},
 			menu: {
-				templates, 
+				templates,
 				mobilizations,
 				participations,
 				review_templates
@@ -264,7 +277,7 @@ exports.pagedata = (_req, _data) => {
 			id: 0,
 			count: 0,
 			lang, // NEED TO FETCH SOMEWHERE
-			
+
 			path, // NEED TO RETRIEVE path FROM req
 			activity: path[1],
 			object,

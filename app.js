@@ -9,7 +9,7 @@ const bodyparser = require('body-parser')
 const session = require('express-session')
 const pgSession = require('connect-pg-simple')(session)
 
-const multer = require('multer')
+// const multer = require('multer')
 // const upload = multer({ dest: './tmp' })
 // const fs = require('fs')
 const cors = require('cors');

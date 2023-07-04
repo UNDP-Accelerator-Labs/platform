@@ -10,7 +10,17 @@ module.exports = (req, res, next) => {
 
 	if (token) {
 		// VERIFY TOKEN
-		const { uuid, rights, ip } = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+		let tobj;
+		try {
+			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+		} catch(_) {
+			tobj = {};
+			if (redirectPath) {
+				res.redirect(redirectPath)
+				return;
+			}
+		}
+		const { uuid, rights, ip } = tobj;
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
 			res.redirect('/')
 		} else if (uuid) {

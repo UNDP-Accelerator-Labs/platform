@@ -1,19 +1,19 @@
-const path = require('path')
-let { 
-	app_title, 
-	app_title_short, 
+// const path = require('path')
+let {
+	app_title,
+	app_title_short,
 	app_suite,
 	app_suite_secret,
 	app_languages,
 	app_description,
 	app_storage,
-	modules, 
-	metafields, 
-	engagementtypes, 
-	colors, 
-	map, 
-	lazyload, 
-	page_content_limit, 
+	modules,
+	metafields,
+	engagementtypes,
+	colors,
+	map,
+	lazyload,
+	page_content_limit,
 	followup_count,
 	browse_display,
 	view_display,
@@ -41,7 +41,7 @@ if (!modules.some(d => d.type === 'pads')) modules.unshift({ type: 'pads', right
 // }
 if (modules.some(d => d.type === 'mobilizations')) {
 	const rights = modules.find(d => d.type === 'mobilizations').rights
-	
+
 	if (!modules.some(d => d.type === 'templates')) {
 		modules.push({ type: 'templates', rights })
 	}

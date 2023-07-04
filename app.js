@@ -10,7 +10,7 @@ const session = require('express-session')
 const pgSession = require('connect-pg-simple')(session)
 
 const multer = require('multer')
-const upload = multer({ dest: './tmp' })
+// const upload = multer({ dest: './tmp' })
 // const fs = require('fs')
 const cors = require('cors');
 const { datastructures } = include('routes/helpers/')
@@ -80,9 +80,8 @@ app.use(sessionMiddleware)
 // const routes = require('./routes/')
 
 app.get('*', (req, res) => {
-	datastructures.pagemetadata({ req, res }).then((obj) => {
-		res.render('transfer', obj)
-	}).catch((e) => console.log(e))
+	const obj = datastructures.pagemetadata({ req, res })
+	res.render('transfer', obj)
 })
 // app.get('/', routes.redirect.home, routes.redirect.public)
 

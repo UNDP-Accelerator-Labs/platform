@@ -128,103 +128,102 @@
 						</div>
 					<% } %>
 				</section>
-
-				<% if (['contribute', 'edit'].includes(activity)) { %>
-					<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
-					<div class='media-input-group input-group' tabindex='1'>
-						<button class='scroll-up m lg'><label>&rsaquo;</label></button>
-						<div class='inner'>
-							<div class='btn-group'>
-							<% if (!review_template) { %>
-								<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
-								<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
-							<% } %>
-							
-							<button id='input-meta-group' title='Add a group of inputs.'><i class='material-icons'>dynamic_form</i></button>
-							<div class='vertical-separator'></div>
-							<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
-							<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
-							<!-- TO DO: TRANSLATE -->
-							<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
-							<% if (!review_template) { %>
-								<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>insert_photo</i></button>
-								<button id='input-media-drawing' title='Request a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
-							<% } %>
-							<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
-							
-							<% if (!review_template) { %>	
-								<div class='vertical-separator'></div>
-								<% locals.metadata.site.metafields.forEach(d => { %>
-									<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
-										<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
-										<label>
-											<span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span>
-										</label>
-									</button>
-								<% }) %>
-							<% } %>
-							</div>
-						</div>
-						<button class='scroll-down m lg'><label>&rsaquo;</label></button>
-					</div>
-					<script type='text/javascript'>
-						if (!mediaSize) var mediaSize = getMediaSize()
-						if (mediaSize === 'xs') {
-							d3.select('button.input-toolbox')
-							.on('touchend, click', function () {
-								d3.select(this).toggleClass('highlight')
-								d3.select('.media-input-group').node().focus() 
-							})
-							d3.select('.media-input-group').on('touchend', function () { this.focus() })
-							.on('focus', function () {
-								if (this.style.maxHeight) this.style.maxHeight = null
-								else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
-							}).on('blur', function () {
-								 this.style.maxHeight = null
-								 d3.select('button.input-toolbox').classed('highlight', false)
-							})
-						}
-						d3.select('.media-input-group')
-						.each(function () {
-							const node = this
-							const sel = d3.select(this)
-							const inner = sel.select('.inner')
-							const height = inner.node().clientHeight || inner.node().offsetHeight
-							const scrollheight = inner.node().scrollHeight
-							const scrolltop = inner.node().scrollTop
-							const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
-
-							sel.classed('overflowing', scrollheight > (height + buttonheight))
-							
-							sel.select('button.scroll-up')
-								.classed('hide', scrollheight <= (height + buttonheight))
-							.on('click', function () {
-								inner.node().scrollTo({
-									top: scrolltop - (height - buttonheight),
-									left: 0,
-									behavior: 'smooth'
-								})
-							})
-
-							sel.select('button.scroll-down')
-								.classed('hide', scrollheight <= (height + buttonheight))
-							.on('click', function () {
-								inner.node().scrollTo({
-									top: scrolltop + height - buttonheight,
-									left: 0,
-									behavior: 'smooth'
-								})
-							})
-						})
-					</script>
-				<% } %>
 			</div>
-			
 		</div>
 	</main>
 </div>
 
-<div class='sidebar lg'></div>
+<div class='sidebar lg'>
+	<% if (['contribute', 'edit'].includes(activity)) { %>
+		<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
+		<div class='media-input-group input-group' tabindex='1'>
+			<button class='scroll-up m lg'><label>&rsaquo;</label></button>
+			<div class='inner'>
+				<div class='btn-group'>
+				<% if (!review_template) { %>
+					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
+					<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
+				<% } %>
+				
+				<button id='input-meta-group' title='Add a group of inputs.'><i class='material-icons'>dynamic_form</i></button>
+				<div class='vertical-separator'></div>
+				<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
+				<button id='input-media-checklist' title='Request a response from multiple choices. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
+				<!-- TO DO: TRANSLATE -->
+				<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
+				<% if (!review_template) { %>
+					<button id='input-media-img' title='Request an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>insert_photo</i></button>
+					<button id='input-media-drawing' title='Request a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
+				<% } %>
+				<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
+				
+				<% if (!review_template) { %>	
+					<div class='vertical-separator'></div>
+					<% locals.metadata.site.metafields.forEach(d => { %>
+						<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
+							<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
+							<label>
+								<span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span>
+							</label>
+						</button>
+					<% }) %>
+				<% } %>
+				</div>
+			</div>
+			<button class='scroll-down m lg'><label>&rsaquo;</label></button>
+		</div>
+		<script type='text/javascript'>
+			if (!mediaSize) var mediaSize = getMediaSize()
+			if (mediaSize === 'xs') {
+				d3.select('button.input-toolbox')
+				.on('touchend, click', function () {
+					d3.select(this).toggleClass('highlight')
+					d3.select('.media-input-group').node().focus() 
+				})
+				d3.select('.media-input-group').on('touchend', function () { this.focus() })
+				.on('focus', function () {
+					if (this.style.maxHeight) this.style.maxHeight = null
+					else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
+				}).on('blur', function () {
+					 this.style.maxHeight = null
+					 d3.select('button.input-toolbox').classed('highlight', false)
+				})
+			}
+			d3.select('.media-input-group')
+			.each(function () {
+				const node = this
+				const sel = d3.select(this)
+				const inner = sel.select('.inner')
+				const height = inner.node().clientHeight || inner.node().offsetHeight
+				const scrollheight = inner.node().scrollHeight
+				const scrolltop = inner.node().scrollTop
+				const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
+
+				sel.classed('overflowing', scrollheight > (height + buttonheight))
+				
+				sel.select('button.scroll-up')
+					.classed('hide', scrollheight <= (height + buttonheight))
+				.on('click', function () {
+					inner.node().scrollTo({
+						top: scrolltop - (height - buttonheight),
+						left: 0,
+						behavior: 'smooth'
+					})
+				})
+
+				sel.select('button.scroll-down')
+					.classed('hide', scrollheight <= (height + buttonheight))
+				.on('click', function () {
+					inner.node().scrollTo({
+						top: scrolltop + height - buttonheight,
+						left: 0,
+						behavior: 'smooth'
+					})
+				})
+			})
+		</script>
+	<% } %>
+</div>
 </div>
 
 <% if (locals.metadata.site.engagementtypes.includes('comment')) { %>
@@ -475,12 +474,12 @@
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
 				&& !d3.select('.modal').node()
 			) {
-				if (e.key === 'i' || e.keyCode === 73) main.select('.media-input-group label[for=input-media-img]').classed('highlight', true)
-				if (e.key === 'd' || e.keyCode === 68) main.select('.media-input-group label[for=input-media-drawing]').classed('highlight', true)
-				if (e.key === 't' || e.keyCode === 84) main.select('.media-input-group label[for=input-media-txt]').classed('highlight', true)
-				if (e.key === 'l' || e.keyCode === 76) main.select('.media-input-group label[for=input-media-checklist]').classed('highlight', true)
-				if (e.key === 'r' || e.keyCode === 82) main.select('.media-input-group label[for=input-media-radiolist]').classed('highlight', true)
-				if (e.key === 'e' || e.keyCode === 69) main.select('.media-input-group label[for=input-media-embed]').classed('highlight', true)
+				if (e.key === 'i' || e.keyCode === 73) d3.select('.media-input-group label[for=input-media-img]').classed('highlight', true)
+				if (e.key === 'd' || e.keyCode === 68) d3.select('.media-input-group label[for=input-media-drawing]').classed('highlight', true)
+				if (e.key === 't' || e.keyCode === 84) d3.select('.media-input-group label[for=input-media-txt]').classed('highlight', true)
+				if (e.key === 'l' || e.keyCode === 76) d3.select('.media-input-group label[for=input-media-checklist]').classed('highlight', true)
+				if (e.key === 'r' || e.keyCode === 82) d3.select('.media-input-group label[for=input-media-radiolist]').classed('highlight', true)
+				if (e.key === 'e' || e.keyCode === 69) d3.select('.media-input-group label[for=input-media-embed]').classed('highlight', true)
 			}
 		}
 	})

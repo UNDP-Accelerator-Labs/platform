@@ -17,7 +17,6 @@ module.exports = (req, res, next) => {
 	if (uuid) next() // A USER IS LOGGED
 	else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
 	else { 
-	// if (['browse', 'contribute', 'view'].includes(activity) && ['pad', 'pads'].includes(object)) {
 		Object.assign(req.session, datastructures.sessiondata({ public: true }))
 		next()
 	}

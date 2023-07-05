@@ -9,7 +9,7 @@
 	@import 'navigate.xs';
 	@import 'filter.lg';
 	@import 'map.lg';
-	
+
 	@import 'login.lg';
 	@import 'pad.xs';
 	@import 'profile.xs';
@@ -23,7 +23,7 @@
 	@import 'navigate.xs';
 	@import 'filter.lg';
 	@import 'map.lg';
-	
+
 	@import 'login.lg';
 	@import 'pad.xs';
 	@import 'profile.xs';
@@ -37,13 +37,14 @@
 	@import 'navigate.m';
 	@import 'filter.lg';
 	@import 'map.lg';
-	
+
 	@import 'login.lg';
 	@import 'pad.xs';
 	@import 'profile.xs';
 	@import 'browse.m';
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
+	@import 'vars.print';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -51,7 +52,7 @@
 	@import 'navigate.lg';
 	@import 'filter.lg';
 	@import 'map.lg';
-	
+
 	@import 'login.lg';
 	@import 'pad.lg';
 	@import 'profile.lg';
@@ -59,13 +60,13 @@
 	@import 'browse.lg';
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
+	@import 'vars.print';
 }
 
 
 
 @media print {
 	@import 'vars.print';
-/*	@import 'pad.lg';*/
 	@page {
 		size: A4 portrait;
 		margin: 20mm 30mm;
@@ -110,13 +111,13 @@
 			break-before: page;
 
 			.title {
-				string-set: title content(text);
+				string-set: title content(text);  // FIXME: string-set is a deprecated property
 				line-height: 1.2em;
 			}
 
 			section {
 				margin: 24pt 0;
-			
+
 				p {
 					margin: 6pt 0 12pt 0;
 					color: $c-dark-grey;
@@ -137,7 +138,7 @@
 				ol.indexes {
 					margin: 12pt 0;
 					text-align: center;
-				
+
 					li {
 						display: inline;
 						list-style: none;
@@ -155,7 +156,7 @@
 					grid-template-columns: repeat(6,1fr);
 					align-items: top;
 					justify-content: center;*/
-					
+
 					li.tag {
 						display: inline-block;
 						background-image: url("../imgs/icons/i-generic-tag-btn.svg");
@@ -172,7 +173,7 @@
 				ul.locations {
 					margin-left: 0;
 					margin-bottom: 0;
-					
+
 					li {
 						background-image: url("../imgs/icons/i-locations-btn.svg");
 						background-repeat: no-repeat;
@@ -205,7 +206,7 @@
 			}
 		}
 	}
-	
+
 	.meta-info.mobilization-info,
 	.scroll-nav {
 		display: none !important;
@@ -219,7 +220,7 @@
 	.input-toolbox {
 		display: none;
 	}
-	
+
 	.opts {
 		display: none !important;
 	}

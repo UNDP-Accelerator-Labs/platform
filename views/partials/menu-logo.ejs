@@ -16,20 +16,30 @@
 		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
 		else mapscale = 'contain'
 	}
+
+	const { write: writepads } = modules.find(d => d.type === 'pads')?.rights
+	let minwritepads = writepads
+	if (typeof writepads === 'object') minwritepads = Math.min(writepads.blank, writepads.templated)
+
+	const writablemodules = modules.filter(d => !['pinboards', 'teams'].includes(d.type))
+		.map(d => { 
+			const { write } = d.rights
+			if (typeof write === 'object') return Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+			else return write
+		})
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
 		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
 
-		<% if (rights >= Math.min(...modules.filter(d => !['pinboards', 'teams'].includes(d.type)).map(d => d.rights.write))) { %>
+		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
 				<button><%- vocabulary['new'][language] %></button>
 				<div class='dropdown main'>
 					<ul>
-						<!-- TO DO: BASE THIS ON modules -->
 						<% if (modules.some(d => d.type === 'pads')) { %>
 
-							<% if (rights >= Math.min(modules.find(d => d.type === 'pads')?.rights.write ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
+							<% if (rights >= Math.min(minwritepads ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
 								<li>
 									<button>
 										<img src='/imgs/icons/i-pad.svg'>
@@ -38,7 +48,8 @@
 									</button>
 									<div class='dropdown'>
 										<ul>
-											<% if (rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) { %>
+											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
+											<!-- THE ISSUE HERE IS WE WANT TO PREVENT USERS OF THE experiments AND action plans PLATFORMS FROM CREATING BLANK PADS -->
 												<li>
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
@@ -46,6 +57,8 @@
 														</button>
 													</a>
 												</li>
+											<% } // rights %>
+											<% if (rights >= (writepads.templated ?? writepads) ?? Infinity) { %>
 												<% if (locals.metadata.menu.templates?.length > 0) { %>
 													<li>
 														<button>
@@ -60,7 +73,7 @@
 																		<label for='filter-pad-templates'><%- vocabulary['filter'][language](true) %></label>
 																	</li>
 																	<li class='padding'></li>
-																<% } %>
+																<% } // locals.metadata.menu.templates 2 %>
 																<% locals.metadata.menu.templates.forEach(t => { %>
 																	<li class='status-<%- t.status %>'>
 																		<a href='/<%- language %>/contribute/pad?template=<%- t.id %>'>
@@ -71,26 +84,26 @@
 																						<div class='sub'>
 																							<%- vocabulary['created by'][language](t.ownername) %>
 																						</div>
-																					<% } %>
+																					<% } // t.owner %>
 																				</button>
-																			<% } else { %>
+																			<% } else { // t.title %>
 																				<button class='wrapable'>
 																					<label>[<%- vocabulary['untitled template'][language] %>]</label>
 																					<% if (t.owner !== uuid) { %>
 																						<div class='sub'>
 																							<%- vocabulary['created by'][language](t.ownername) %>
 																						</div>
-																					<% } %>
+																					<% } // t.owner %>
 																				</button>
-																			<% } %>
+																			<% } // t.title %>
 																		</a>
 																	</li>
-																<% }) %>
+																<% }) // locals.metadata.menu.templates.forEach %>
 															</ul>
 														</div>
 													</li>
-												<% } %>
-											<% } %>
+												<% } // locals.metadata.menu.templates 0 %>
+											<% } // rights %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
 												<li>
 													<button>
@@ -131,8 +144,8 @@
 											<% } %>
 											<!-- IF WE WANT xlsx FUNCTIONALITY FOR MOBILIZATIONS, UNCOMMENT THE FOLLOWING -->
 											<!-- <%# if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)	|| locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %> -->
-											
-											<% if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)) { %>
+
+											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
 												<li class='lg'>
 													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
@@ -205,7 +218,7 @@
 													</div>
 												</li>
 											<% } %>
-											<% if (modules?.some(d => d.type === 'reviews' 
+											<% if (modules?.some(d => d.type === 'reviews'
 												&& (rights >= d.rights.coordinate || rights > 2)
 											)) { %>
 												<li>
@@ -327,7 +340,7 @@
 													</div>
 												</li>
 											<% } %>
-											
+
 											<% if (locals.metadata.menu.mobilizations?.filter(d => !d.target_id).length > 0) { %>
 												<li>
 													<button>
@@ -352,7 +365,7 @@
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
 																					<%- vocabulary['launched by'][language](d.ownername, null) %>
-																				<% } %>	
+																				<% } %>
 																			</div>
 																		</button>
 																	</a>
@@ -385,7 +398,7 @@
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
 																					<%- vocabulary['launched by'][language](d.ownername, null) %>
-																				<% } %>	
+																				<% } %>
 																			</div>
 																		</button>
 																	</a>
@@ -424,7 +437,7 @@
 																					<%- vocabulary['launched by'][language](d.ownername, vocabulary['date'][language]({ date: d.start_date })) %>
 																				<% } else { %>
 																					<%- vocabulary['launched by'][language](null, vocabulary['date'][language]({ date: d.start_date })) %>
-																				<% } %>	
+																				<% } %>
 																			</div>
 																		</button>
 																	</a>
@@ -434,12 +447,12 @@
 													</div>
 												</li>
 											<% } %>
-											
+
 										</ul>
 									</div>
 								</li>
 							<% } %>
-						<% } %>	
+						<% } %>
 						<% if (locals.metadata?.site?.modules?.includes('analyses')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'analyses')?.rights.write ?? Infinity)) { %>
 								<li>
@@ -462,7 +475,7 @@
 				<% } else { %><%- locals.metadata.user.country.name %><% } %>
 			</h2>
 		<% } %>
-		
+
 		<% if (['contribute', 'edit'].includes(activity)) { %>
 			<div class='save lg hide'>
 				<button><%- vocabulary['save'][language] %></button>
@@ -473,12 +486,15 @@
 <nav id='modules'>
 	<menu>
 	<% modules.filter(d => {
-		if (rights < d.rights.write) return false
+		let { write } = d.rights
+		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+
+		if (rights < write) return false
 		else return !['pinboards', 'teams'].includes(d.type)
-	}).forEach(d => { %>		
-		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity) 
-			&& [d.type, d.type.slice(0, -1)].includes(object)) 
-		{ %>
+	}).forEach(d => { %>
+		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity)
+			&& [d.type, d.type.slice(0, -1)].includes(object)
+		) { %>
 			<li class='active'>
 		<% } else { %>
 			<li>
@@ -507,7 +523,7 @@
 	// THIS IS FOR MOBILE DISPLAY
 	if (mediaSize === 'xs') {
 		d3.select('.create').selectAll('button')
-		.on('touchend', function () { 
+		.on('touchend', function () {
 			// d3.event.preventDefault()
 			this.focus()
 		}).on('focus', function () {
@@ -541,7 +557,7 @@
 				} else { // COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
 					let dropdown = d3.select(this.nextElementSibling)
 					let i = 0
-					while (dropdown.node() && !dropdown.classed('main')) {					
+					while (dropdown.node() && !dropdown.classed('main')) {
 						if (i === 5) break // THIS IS TO PREVENT A WILD while STATEMENT
 						// THERE SHOULD NOT BE MORE THAN 5 DROPDOWN LEVELS
 						dropdown.node().style.maxHeight = null
@@ -550,7 +566,7 @@
 						i++
 					}
 				}
-			} 
+			}
 		})
 	} else if (mediaSize === 'lg') {
 		d3.selectAll('#site-title .inner .create button')

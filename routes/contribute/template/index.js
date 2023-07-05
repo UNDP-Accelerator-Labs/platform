@@ -21,7 +21,7 @@ module.exports = (req, res) => {
 
 		DB.conn.tx(t => {
 			// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A TEMPLATE
-			return check_authorization({ connection: t, id, rights, collaborators })
+			return check_authorization({ connection: t, uuid, id, rights, collaborators })
 			.then(result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
@@ -193,7 +193,7 @@ module.exports = (req, res) => {
 
 function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { id, rights, collaborators } = _kwargs
+	const { uuid, id, rights, collaborators } = _kwargs
 
 	const { read, write } = modules.find(d => d.type === 'templates')?.rights
 	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)

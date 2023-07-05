@@ -167,11 +167,14 @@ exports.check.login = require('./login/').check
 exports.render.login = require('./login/').render
 exports.process.login = require('./login/').process
 exports.process.logout = require('./login/').logout
-exports.redirect.home = require('./login/').redirect
+exports.redirect.home = require('./redirect/').home
+exports.redirect.browse = require('./redirect/').browse
 
-exports.redirect.public = (req, res) => res.redirect('/public')
-exports.dispatch.public = require('./login/').public
+exports.dispatch.public = require('./browse/homepage').render //require('./login/').public
 
+exports.process.forgetPassword = require('./login/').forgetPassword
+exports.process.getResetToken = require('./login/').getResetToken
+exports.process.updatePassword = require('./login/').updatePassword
 
 /* =============================================================== */
 /* =========================== BROWSE ============================ */
@@ -474,7 +477,6 @@ exports.process.journeyCreate = require('./journey/').create;
 exports.process.journeyList = require('./journey/').list;
 exports.process.journeyDoc = require('./journey/').doc;
 exports.process.journeyCollection = require('./journey/').collection;
-
 
 // THIS IS DEPRECATED
 exports.process.download = (req, res) => {
@@ -830,13 +832,9 @@ exports.api.datasources = (req, res) => {
 	}
 }
 
-
-
 exports.notfound = (req, res) => {
-	res.send('This is not the route that you are looking for')
+	res.send(`${req.originalUrl} is not the route that you are looking for`)
 }
-
-
 
 String.prototype.simplify = function () {
 	return this.valueOf().replace(/[^\w\s]/gi, '').replace(/\s/g, '').toLowerCase()

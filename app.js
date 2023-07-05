@@ -179,7 +179,6 @@ app.get('*', (req, res) => {
 // RUN THE SERVER
 const server = app.listen(process.env.PORT || 2000, _ => console.log(`the app is running on port ${process.env.PORT || 2000}`))
 
-
 // INITIATE ALL CRON JOBS
 // const cron = require('node-cron')
 // DB.conn.tx(t => {

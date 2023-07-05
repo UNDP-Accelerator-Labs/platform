@@ -1,0 +1,16 @@
+<%
+    const {forward} = locals.metadata.page;
+%>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>AccLabs Platform</title>
+        <meta http-equiv="refresh" content="10; URL=<%= forward.url %>" />
+    </head>
+    <body>
+        The page you are looking for has moved.
+        If you are not being redirected in 10s
+        <a href="<%= forward.url %>">click here</a>!
+    </body>
+</html>

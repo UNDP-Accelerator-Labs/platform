@@ -1,7 +1,8 @@
-const { app_title: title, app_description: description, app_languages, apps_in_suite, modules, metafields, media_value_keys, engagementtypes, lazyload, browse_display, welcome_module, page_content_limit, DB } = include('config/')
-const checklanguage = require('../language').main
-const join = require('../joins')
+const { app_title_short, modules, metafields, engagementtypes, lazyload, browse_display, DB } = include('config/')
+// const checklanguage = require('../language')
+// const join = require('../joins')
 const array = require('../array')
+const jwt = require('jsonwebtoken')
 
 if (!exports.legacy) exports.legacy = {}
 
@@ -22,185 +23,203 @@ exports.sessiondata = _data => {
 	obj.language = language || 'en'
 	obj.country = {
 		iso3: iso3 || 'NUL',
-		name: countryname || 'Null Island', 
-		bureau: bureau, 
+		name: countryname || 'Null Island',
+		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
 
 	return obj
 }
 exports.pagemetadata = (_kwargs) => {
-	const conn = _kwargs.connection || DB.conn
-	let { page, pagecount, map, display, mscale, source, req, res } = _kwargs || {}
-	if (!source || !apps_in_suite.some(d => d.key === source)) source = apps_in_suite[0].key
+	// const conn = _kwargs.connection || DB.conn
+	const { req } = _kwargs
+	// const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
+	let { session, ip } = req || {}
+	// path = path.substring(1).split('/')
 
-	let { headers, path, params, query, session } = req || {}
-	path = path.substring(1).split('/')
-
-	let { object, space, instance } = params || {}
-	if (instance) {
-		object = res.locals.instance_vars.object
-		space = res.locals.instance_vars.space
-	}
+	// let { object, space, instance } = params || {}
+	// if (instance) {
+	// 	object = res.locals.instance_vars.object
+	// 	space = res.locals.instance_vars.space
+	// }
 
 	if (session.uuid) { // USER IS LOGGED IN
 		var { uuid, username: name, country, rights, collaborators, public } = session || {}
 	} else { // PUBLIC/ NO SESSION
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
-	const language = checklanguage(params?.language || session.language || this.sessiondata())
+	// const language = checklanguage(params?.language || session.language || this.sessiondata())
 
-	const parsedQuery = {}
-	for (let key in query) {
-		if (key === 'search') { 
-			if (query[key].trim().length) parsedQuery[key] = query[key]
-		} else { 
-			if (!Array.isArray(query[key])) parsedQuery[key] = [query[key]]
-			else parsedQuery[key] = query[key]
-		}
-	}
+	// const parsedQuery = {}
+	// for (let key in query) {
+	// 	if (key === 'search') {
+	// 		if (query[key].trim().length) parsedQuery[key] = query[key]
+	// 	} else {
+	// 		if (!Array.isArray(query[key])) parsedQuery[key] = [query[key]]
+	// 		else parsedQuery[key] = query[key]
+	// 	}
+	// }
 
 	// ADD A CALL FOR ALL TEMPLATES (NAME + ID)
-	return conn.tx(t => {
-		const batch = []
-		if (modules.some(d => d.type === 'templates' && rights >= d.rights.read)) {
-			batch.push(t.any(`
-				SELECT id, title, owner, status FROM templates
-				WHERE (status >= 2
-					OR (status = 1 AND owner = $1))
-					AND id NOT IN (SELECT template FROM review_templates)
-				ORDER BY date DESC
-			;`, [ uuid ]).catch(err => console.log(err))
-			.then(async results => {
-				const data = await join.users(results, [ language, 'owner' ])
-				return data
-			}).catch(err => console.log(err)))
-		} else batch.push(null)
-		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
-			batch.push(t.any(`
-				SELECT m.id, m.title, m.owner, m.child, m.status,
-					COALESCE((SELECT tm.id FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target_id, 
-					COALESCE((SELECT sm.id FROM mobilizations sm WHERE sm.id = m.source LIMIT 1), NULL) AS source_id
-				FROM mobilizations m
-				WHERE status = 2
-					AND (owner = $1 OR $2 > 2)
-				ORDER BY m.end_date DESC
-			;`, [ uuid, rights ])
-			.then(async results => {
-				const data = await join.users(results, [ language, 'owner' ])
-				return data
-			}).catch(err => console.log(err)))
-		} else batch.push(null)
-		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
-			batch.push(t.any(`
-				SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child,
-					to_char(m.start_date, 'DD Mon YYYY') AS start_date 
-				FROM mobilizations m
-				WHERE m.id IN (SELECT mobilization FROM mobilization_contributors WHERE participant = $1)
-					OR m.public = TRUE
-					AND m.status = 1
-				ORDER BY m.start_date DESC
-			;`, [ uuid ]).catch(err => console.log(err))
-			.then(async results => {
-				const data = await join.users(results, [ language, 'owner' ])
-				return data
-			}).catch(err => console.log(err)))
-		} else batch.push(null)
-		batch.push(DB.general.task(gt => {
-			const gbatch = []
-			gbatch.push(gt.any(`
-				SELECT DISTINCT (name), language FROM languages
-				WHERE language IN ($1:csv)
-				ORDER BY language
-			;`, [ app_languages ]))
-			gbatch.push(gt.any(`
-				SELECT language, secondary_languages FROM users
-				-- SELECT COUNT (id)::INT AS count, language FROM users 
-				-- GROUP BY language
-			;`))
-			return gt.batch(gbatch)
-			.catch(err => console.log(err))
-		}).catch(err => console.log(err)))
-		// REVIEW TEMPLATES
-		if (modules.some(d => d.type === 'reviews' && rights >= d.rights.read)) {
-			batch.push(t.any(`
-				SELECT template, language FROM review_templates
-			;`).then())
-		} else batch.push(null)
+	// return conn.tx(t => {
+	// 	const batch = []
+	// 	if (modules.some(d => d.type === 'templates' && rights >= d.rights.read)) {
+	// 		batch.push(t.any(`
+	// 			SELECT id, title, owner, status FROM templates
+	// 			WHERE (status >= 2
+	// 				OR (status = 1 AND owner = $1))
+	// 				AND id NOT IN (SELECT template FROM review_templates)
+	// 			ORDER BY date DESC
+	// 		;`, [ uuid ]).catch(err => console.log(err))
+	// 		.then(async results => {
+	// 			const data = await join.users(results, [ language, 'owner' ])
+	// 			return data
+	// 		}).catch(err => console.log(err)))
+	// 	} else batch.push(null)
+	// 	if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
+	// 		batch.push(t.any(`
+	// 			SELECT m.id, m.title, m.owner, m.child, m.status,
+	// 				COALESCE((SELECT tm.id FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target_id,
+	// 				COALESCE((SELECT sm.id FROM mobilizations sm WHERE sm.id = m.source LIMIT 1), NULL) AS source_id
+	// 			FROM mobilizations m
+	// 			WHERE status = 2
+	// 				AND (owner = $1 OR $2 > 2)
+	// 			ORDER BY m.end_date DESC
+	// 		;`, [ uuid, rights ])
+	// 		.then(async results => {
+	// 			const data = await join.users(results, [ language, 'owner' ])
+	// 			return data
+	// 		}).catch(err => console.log(err)))
+	// 	} else batch.push(null)
+	// 	if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
+	// 		batch.push(t.any(`
+	// 			SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child,
+	// 				to_char(m.start_date, 'DD Mon YYYY') AS start_date
+	// 			FROM mobilizations m
+	// 			WHERE (m.id IN (SELECT mobilization FROM mobilization_contributors WHERE participant = $1)
+	// 				OR m.owner = $1
+	// 			)
+	// 				OR m.public = TRUE
+	// 				AND m.status = 1
+	// 			ORDER BY m.start_date DESC
+	// 		;`, [ uuid ]).catch(err => console.log(err))
+	// 		.then(async results => {
+	// 			const data = await join.users(results, [ language, 'owner' ])
+	// 			return data
+	// 		}).catch(err => console.log(err)))
+	// 	} else batch.push(null)
+	// 	batch.push(DB.general.task(gt => {
+	// 		const gbatch = []
+	// 		gbatch.push(gt.any(`
+	// 			SELECT DISTINCT (name), language FROM languages
+	// 			WHERE language IN ($1:csv)
+	// 			ORDER BY language
+	// 		;`, [ app_languages ]))
+	// 		gbatch.push(gt.any(`
+	// 			SELECT language, secondary_languages FROM users
+	// 			-- SELECT COUNT (id)::INT AS count, language FROM users
+	// 			-- GROUP BY language
+	// 		;`))
+	// 		return gt.batch(gbatch)
+	// 		.catch(err => console.log(err))
+	// 	}).catch(err => console.log(err)))
+	// 	// REVIEW TEMPLATES
+	// 	if (modules.some(d => d.type === 'reviews' && rights >= d.rights.read)) {
+	// 		batch.push(t.any(`
+	// 			SELECT template, language FROM review_templates
+	// 		;`).then())
+	// 	} else batch.push(null)
 
-		return t.batch(batch)
-		.catch(err => console.log(err))
-	}).then(results => {
-		let [ templates, mobilizations, participations, languagedata, review_templates ] = results
-		let [ languages, speakers ] = languagedata
+	// 	return t.batch(batch)
+	// 	.catch(err => console.log(err))
+	// }
+	// ).then(results => {
+		// let [ templates, mobilizations, participations, languagedata, review_templates ] = results
+		// let [ languages, speakers ] = languagedata
 
-		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS 
+		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
 		// TO WIDEN THE POSSIBLE REVIEWER POOL
-		if (review_templates) {
-			speakers = speakers.map(d => {
-				const l = d.secondary_languages || []
-				l.push(d.language)
-				return l
-			}).flat()
-			speakers = array.count.call(speakers, { keyname: 'language' })
+		// if (review_templates) {
+		// 	speakers = speakers.map(d => {
+		// 		const l = d.secondary_languages || []
+		// 		l.push(d.language)
+		// 		return l
+		// 	}).flat()
+		// 	speakers = array.count.call(speakers, { keyname: 'language' })
 
-			review_templates = join.multijoin.call(review_templates, [ speakers, 'language' ])
-			review_templates = join.multijoin.call(review_templates, [ languages, 'language' ])
-			review_templates.forEach(d => {
-				d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
-			})
-		} else review_templates = []
+		// 	review_templates = join.multijoin.call(review_templates, [ speakers, 'language' ])
+		// 	review_templates = join.multijoin.call(review_templates, [ languages, 'language' ])
+		// 	review_templates.forEach(d => {
+		// 		d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
+		// 	})
+		// } else review_templates = []
 
+		const baseurl = {
+			'action-plans': 'https://acclabs-actionlearningplans.azurewebsites.net/',
+			'experiments': 'https://acclabs-experiments.azurewebsites.net/',
+			'pads': 'https://acclabs.azurewebsites.net/',
+			'solutions-mapping': 'https://acclabs-solutionsmapping.azurewebsites.net/',
+		}[app_title_short];
+		const origUrl = encodeURIComponent(req.originalUrl);
+		const forward = {};
+		if (uuid) {
+			const curHost = `${baseurl}`.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+			const token = jwt.sign({ uuid, rights, ip }, process.env.APP_SECRET, { audience: 'user:known', issuer: curHost, expiresIn: '1h' })
+			console.log(`WRAPPING USER uuid:${uuid} rights:${rights} ip:${ip}`)
+			forward.url = `${baseurl.replace(/\/$/, '')}/transfer?path=${origUrl}&token=${token}`;
+		} else {
+			forward.url = `${baseurl.replace(/\/$/, '')}${req.originalUrl}`;
+		}
 		const obj = {}
 		obj.metadata = {
-			site: {
-				apps_in_suite,
-				title,
-				description,
-				languages,
-				modules,
-				metafields,
-				media_value_keys,
-				engagementtypes,
-				welcome_module
-			},
-			user: {
-				uuid,
-				name,
-				country,
-				rights
-			},
+			// site: {
+			// 	title,
+			// 	description,
+			// 	languages,
+			// 	modules,
+			// 	metafields,
+			// 	media_value_keys,
+			// 	engagementtypes,
+			// 	welcome_module,
+			// 	app_storage,
+			// },
+			// user: {
+			// 	uuid,
+			// 	name,
+			// 	country,
+			// 	rights,
+			// },
 			page: {
-				title,
-				instance_title: res?.locals.instance_vars?.title || null,
-				id: page ?? undefined,
-				count: pagecount ?? null,
-				language,
-				public,
-				
-				path,
-				referer: headers.referer,
-				activity: path[1],
-				object,
-				space,
-				query: parsedQuery,
+				// title,
+				// instance_title: res?.locals.instance_vars?.title || null,
+				// id: page ?? undefined,
+				// count: pagecount ?? null,
+				// language,
+				// public,
 
-				source,
-				lazyload,
-				map: map || false,
-				mscale: mscale || 'contain',
-				display: display || browse_display,
-				page_content_limit
+				forward,
+				// path,
+				// referer: headers.referer,
+				// activity: path[1],
+				// object,
+				// space,
+				// query: parsedQuery,
+
+				// lazyload,
+				// map: map || false,
+				// mscale: mscale || 'contain',
+				// display: display || browse_display,
+				// page_content_limit
 			},
-			menu: {
-				templates, 
-				mobilizations,
-				participations,
-				review_templates
-			}
+			// menu: {
+			// 	templates,
+			// 	mobilizations,
+			// 	participations,
+			// 	review_templates
+			// }
 		}
 		return obj
-	}).catch(err => console.log(err))
+	// }).catch(err => console.log(err))
 }
 exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIONS MAPPING PLATFORM
 	const conn = _kwargs.connection || DB.conn
@@ -267,7 +286,7 @@ exports.pagedata = (_req, _data) => {
 			id: 0,
 			count: 0,
 			lang, // NEED TO FETCH SOMEWHERE
-			
+
 			path, // NEED TO RETRIEVE path FROM req
 			activity: path[1],
 			object,

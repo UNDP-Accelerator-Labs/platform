@@ -30,32 +30,6 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 
 if (process.env.NODE_ENV === 'production') {
 	app.set('trust proxy', 1) // trust first proxy
-
-	async function install_dependencies () {
-		// MAKE SURE ffmpeg IS INSTALLED
-		await new Promise(resolve => {
-			const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'ffmpeg'])
-			install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
-			install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
-			install_ffmpeg.on('error', err => console.log(err))
-			install_ffmpeg.on('exit', code => {
-				console.log(`ffmpeg installation exited: ${code}`)
-				resolve()
-			})
-		})
-		// MAKE SURE zip IS INSTALLED
-		await new Promise(resolve => {
-			const install_ffmpeg = spawn('apt-get', ['-y', 'install', 'zip'])
-			install_ffmpeg.stdout.on('data', data => console.log(`stdout: ${data}`))
-			install_ffmpeg.stderr.on('data', data => console.log(`stderr: ${data}`))
-			install_ffmpeg.on('error', err => console.log(err))
-			install_ffmpeg.on('exit', code => {
-				console.log(`zip installation exited: ${code}`)
-				resolve()
-			})
-		})
-	}
-	install_dependencies().then(() => {}).catch(err => console.log(err));
 }
 
 const cookie = {
@@ -130,16 +104,17 @@ app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
 	// .get(routes.redirect.home, routes.render.login)
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.login)
+app.get('/transfer', routes.process.login)
 app.get('/logout', routes.process.logout)
 
-app.route('/reset/:token') 
+app.route('/reset/:token')
 	.get(routes.redirect.browse, routes.render.login)
 
-app.route('/forget-password') 
+app.route('/forget-password')
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.forgetPassword)
 
-app.route('/reset-password') 
+app.route('/reset-password')
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.updatePassword)
 

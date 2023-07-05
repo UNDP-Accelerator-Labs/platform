@@ -1,14 +1,15 @@
 FROM node:16-slim
 
-RUN apt-get update && apt-get -y upgrade \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get install -y --no-install-recommends \
     git \
     libpq-dev \
     gcc \
     linux-libc-dev \
     libc6-dev \
     make
-RUN apt-get install -y \
+RUN apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     wget \

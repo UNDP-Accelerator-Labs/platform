@@ -44,6 +44,7 @@
 	@import 'browse.m';
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
+	@import 'vars.print';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -59,13 +60,13 @@
 	@import 'browse.lg';
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
+	@import 'vars.print';
 }
 
 
 
 @media print {
 	@import 'vars.print';
-/*	@import 'pad.lg';*/
 	@page {
 		size: A4 portrait;
 		margin: 20mm 30mm;

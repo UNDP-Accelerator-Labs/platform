@@ -39,6 +39,8 @@
 <script type='text/javascript' src='/scripts/pagedjs/dist/paged.polyfill.js'></script>
 <link rel='stylesheet' type='text/css' href='/css/pagedjs.interface.css'>
 
+
+
 <%- include('./render.ejs') %>
 
 
@@ -62,13 +64,16 @@
 	const templated = <%- JSON.stringify(templated) %>;
 	let activity = '<%- activity %>';
 
-
 	// POPULATE THE PAGE
 	const data = <%- JSON.stringify(locals.data || {}) %>;
 
 	if (!Array.isArray(data)) { // THIS IS A SINGLE PAD WITH display === 'print'
 		Promise.all(renderBooklet([data]))
-		.then(_ => window.PagedPolyfill.preview())
+		.then(_ => {
+			console.log('done rendering')
+			window.PagedPolyfill.preview()
+			return null
+		})
 	} else { // THIS IS AN ACTUAL BOOKLET (OR COMPILATION OF PADS)
 		// TO DO: ADD MODAL TO GROUP INTO CHAPTERS
 		// > DROPDOWN FOR PAGE SIZE
@@ -82,10 +87,9 @@
 		.then(_ => {
 			console.log('done rendering')
 			window.PagedPolyfill.preview()
+			return null
 		})
 	}
-
-
 
 	function renderBooklet (booklet) {
 		console.log(booklet)
@@ -105,8 +109,8 @@
 				})).then(_ => resolve())
 			})
 		})
-	}	
-	
+	}
+
 	class MyHandler extends Paged.Handler { 
 		// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
 		constructor(chunker, polisher, caller) {
@@ -127,6 +131,7 @@
 		}
 	}
 	Paged.registerHandlers(MyHandler);
+
 
 
 	

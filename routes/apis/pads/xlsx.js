@@ -16,6 +16,7 @@ module.exports = async (req, res) => {
 	const { action } = req.params || {}
 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
+	if (typeof include_data === 'string') include_data = JSON.parse(include_data)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
 	if (action === 'fetch') include_data = true
 	
@@ -544,16 +545,18 @@ module.exports = async (req, res) => {
 								else XLSX.writeFile(wb, path.join(dir, `${app_title_short}_data.xlsx`), {})
 							}
 						}
-						if (include_data) return pad_group.values
+
+
+						// if (include_data) return pad_group.values
+						if (include_data) return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]])
 						else return null
 					}).catch(err => console.log(err))	
-				})
+				}).catch(err => console.log(err))
 			})
 
 			return t.batch(batch)
 			.then(results => {
 				return [ open, results ]
-				// return open
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 	}).then(results => {
@@ -579,15 +582,15 @@ module.exports = async (req, res) => {
 		} else {
 			req.session.destroy() // THIS IS TO PREVENT EXTERNAL CALLS TO THE API FROM LOGGING IN
 
-			const structure = array.unique.call(data.flat().filter(d => d).map(d => Object.keys(d)).flat(), { onkey: true })
-			const entries = data.flat().filter(d => d).map(d => {
-				return structure.map(c => {
-					return d[c] ? JSON.stringify(d[c]) : null
-				})
-			})
-			const csv = `${structure.map(d => JSON.stringify(d)).join(',')}<br/>${entries.join('<br/>')}`
+			// const structure = array.unique.call(data.flat().filter(d => d).map(d => Object.keys(d)).flat(), { onkey: true })
+			// const entries = data.flat().filter(d => d).map(d => {
+			// 	return structure.map(c => {
+			// 		return d[c] ? JSON.stringify(d[c]) : null
+			// 	})
+			// })
+			// const csv = `${structure.map(d => JSON.stringify(d)).join(',')}<br/>${entries.join('<br/>')}`
 
-			if (data.length) res.send(csv)
+			if (data.length) res.send(data[0].replace(/\n/g, '<br/>'))
 			else res.send('Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.')
 		}
 	}).catch(err => console.log(err))

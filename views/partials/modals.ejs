@@ -307,7 +307,7 @@
 					'checked': d.checked || null,
 					'disabled': d.disabled || null
 				}).html(d.label)
-			.on('click', async d => { // PROBABLY d DOES NOT NEED TO BE PASSED HERE (LIKE IN THE keyup BELOW)
+			.on('click', async function (d) { // PROBABLY d DOES NOT NEED TO BE PASSED HERE (LIKE IN THE keyup BELOW)
 				if (['button', 'submit'].includes(d.type)) {
 					if (resolve) {
 						if (typeof d.resolve === 'function') {
@@ -317,7 +317,7 @@
 						else resolve(d.resolve)
 						modal.remove()
 						screen.classed('hide', true)
-					}
+					} else if (d.fn && typeof d.fn === 'function') d.fn.call(this, d)
 				}
 			}).on('keyup', async _ => {
 				const evt = d3.event

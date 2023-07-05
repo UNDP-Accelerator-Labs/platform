@@ -1,4 +1,20 @@
-const { app_title: title, app_description: description, app_title_short: app_db, app_languages, app_storage, modules, metafields, media_value_keys, engagementtypes, lazyload, browse_display, welcome_module, page_content_limit, DB } = include('config/')
+const {
+	app_id,
+	app_title: title,
+	app_description: description,
+	app_title_short: app_db,
+	app_languages,
+	app_storage,
+	modules,
+	metafields,
+	media_value_keys,
+	engagementtypes,
+	lazyload,
+	browse_display,
+	welcome_module,
+	page_content_limit,
+	DB,
+} = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
@@ -33,11 +49,13 @@ exports.pagemetadata = (_kwargs) => {
 	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
+	let activity = path[1]
 
 	let { object, space, instance } = params || {}
 	if (instance) {
 		object = res.locals.instance_vars.object
 		space = res.locals.instance_vars.space
+		activity = 'browse'
 	}
 
 	if (session.uuid) { // USER IS LOGGED IN
@@ -133,7 +151,7 @@ exports.pagemetadata = (_kwargs) => {
 		// PINBOARD LIST
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
 			batch.push(t.any(`
-				SELECT pb.id, pb.title, pb.status, 
+				SELECT pb.id, pb.title, pb.status,
 					COUNT (pc.pad) AS size,
 					COUNT (DISTINCT (p.owner)) AS contributors
 
@@ -183,7 +201,8 @@ exports.pagemetadata = (_kwargs) => {
 				engagementtypes,
 				welcome_module,
 				app_storage,
-				app_db,
+				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
+				app_id,
 			},
 			user: {
 				uuid,
@@ -201,7 +220,7 @@ exports.pagemetadata = (_kwargs) => {
 
 				path,
 				referer: headers.referer,
-				activity: path[1],
+				activity,
 				object,
 				space,
 				query: parsedQuery,

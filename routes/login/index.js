@@ -5,24 +5,22 @@ const jwt = require('jsonwebtoken')
 exports.check = require('./check.js')
 exports.render = require('./render.js')
 exports.process = require('./process.js')
+exports.forgetPassword = require('./forget-password.js').forgetPassword
+exports.getResetToken = require('./forget-password.js').getResetToken
+exports.updatePassword = require('./forget-password.js').updatePassword
 
-exports.redirect = (req, res, next) => {
-	const language = checklanguage(req.params?.language ? req.params.language : req.session.language)
-	if (req.session.uuid) {
-		console.log('should redirect as user is logged in')
-		if (req.session.rights >= (modules.find(d => d.type === 'pads')?.rights.write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
-		else res.redirect(`/${language}/browse/pads/public`)
-	} else next()
-}
+
 exports.public = (req, res) => {
 	// THIS IS THE MAIN PUBLIC PAGE
-	const { path, xhr, query } = req
-	const language = checklanguage(req.params?.language ? req.params.language : req.session.language)
+	// const language = checklanguage(req.params?.language ? req.params.language : req.session.language)
 
-	Object.assign(req.session, datastructures.sessiondata({ public: true }))
+	// Object.assign(req.session, datastructures.sessiondata({ public: true }))
 
-	if (!req.params.language) res.redirect(`/${req.session.language}/public`)
-	else res.redirect(`/${req.params.language}/browse/pads/public`)
+	// if (!req.params.language) res.redirect(`/${req.session.language}/public`)
+	// else res.redirect(`/${req.params.language}/browse/pads/public`)
+	// res.redirect(`/${language}/browse/pads/public`)
+
+	// return require('./browse/homepage').render
 }
 
 exports.logout = require('./logout.js')

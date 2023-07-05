@@ -53,10 +53,14 @@ module.exports = kwargs => {
 				OR $2::INT > 2
 		;`, [ uuid, rights ], d => d.count).then(d => { return { invited: d } }))
 		// GET ALL CONTRIBUTOR BREAKDOOWN BY CONFIRMATION STATUS
+		// THE all SPACE SHOWS ALL CONTRIBUTORS, i.e. USERS WHO ARE ALLOWED TO WRTIE PADS
+		let { write } = modules.find(d => d.type === 'pads')?.rights
+		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+		console.log('check write', write)
 		batch.push(t.one(`
 			SELECT COUNT(DISTINCT (u.uuid))::INT FROM users u
 			WHERE rights >= $1::INT
-		;`, [ modules.find(d => d.type === 'pads')?.rights.write || 4 ], d => d.count).then(d => { return { all: d } }))
+		;`, [ write ?? 4 ], d => d.count).then(d => { return { all: d } }))
 
 		// GET CONTRIBUTOR COUNT BY FIRST LETTER (FOR pagination)
 		batch.push(t.any(`

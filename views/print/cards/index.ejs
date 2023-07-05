@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!-- THIS IS A SUPER SIMPLIFIED VERSION OF contribute/pad.ejs -->
+<%
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+	const anonymized = locals.metadata.page.query?.anonymize?.includes('true')
+	const render = locals.metadata.page.query?.render?.includes('true')
+%>
+<html lang='<%- language %>'>
+<head>
+
+<%- include ('../../partials/head.ejs') %> 
+
+<script type='text/javascript' src='/scripts/html2canvas/dist/html2canvas.js'></script>
+<script type='text/javascript' src='/scripts/jspdf/dist/jspdf.umd.min.js'></script>
+
+
+</head>
+
+<body>
+
+<%- include ('../../partials/translations.ejs') %> 
+<%# include ('../../partials/menu-languages.ejs') %> 
+<%- include ('../../partials/modals.ejs') %> 
+
+<div class='document print'>
+</div>
+
+
+<script type='text/javascript'>
+	const centerpoint = <%- JSON.stringify(locals.metadata.user.country.lnglat || {}) %>
+
+	// POPULATE THE PAGE
+	let data = <%- JSON.stringify(locals.data || {}) %>;
+	if (!Array.isArray(data)) data = [data]
+
+	Promise.all(renderCards(data))
+	.then(results => {
+		console.log('done rendering')
+
+		<% if (render) { %>
+			const { width: orwidth, height: orheight, imgdata: orimgdata } = results[0]
+			const { jsPDF } = window.jspdf
+			const pdf = new jsPDF({ unit: 'px', format: [ orwidth, orheight ], hotfixes: ['px_scaling'] })
+			pdf.addImage(orimgdata, 'png', 0, 0, orwidth, orheight)
+			results.shift()
+			results.forEach((d, i) => {
+				const { width, height, imgdata } = d
+				pdf.addPage([ width, height ])
+				pdf.addImage(imgdata, 'png', 0, 0, width, height)
+			})
+			pdf.save('pads-cards-compilation.pdf')
+			window.close()
+		<% } %>
+
+		return null
+	})
+
+	function renderCards (cards) {
+		return cards.map((data, i) => {
+			const { id, title, img, txt, sdgs, tags, iso3, country, date } = data
+
+			return new Promise(resolve => {
+				// ADD THE TITLE
+				const article = d3.select('div.document')
+				.addElem('article', 'print card')
+				
+
+				if (img) {
+					const imgnode = article.addElem('img')
+					const blob = new Image
+					blob.onload = function () {
+						imgnode.node().src = this.src
+
+						html2canvas(article.node())
+						.then(canvas => {
+							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
+							let imgdata = canvas.toDataURL('image/png')
+							imgdata.replace(/^data:image\/png/, 'data:application/octet-stream')
+							
+							// const download = article.addElems('a')
+							// 	.attr('download', `card-${i + 1}.png`)
+							// 	.attr('href', imgdata)
+							// .on('click', _ => article.remove())
+							// .html('download')
+
+							const { width, height } = canvas
+							resolve({ imgdata, width, height })
+							
+						}).catch(err => console.log(err))
+					}
+					blob.src = img
+				}
+				
+				article.addElem('small', 'media media-source')
+				.html(`id: ${id}`)
+
+				article.addElem('h1', 'media media-title')
+				.html(title)
+
+				article.addElems('div', 'meta meta-contributor')
+				.html(d => {
+					if (iso3 === 'NUL') return '<%- vocabulary["global"][language] %>'
+					return country || '<%- vocabulary["anonymous contributor"][language] %>'
+				})
+				article.addElems('div', 'meta meta-date')
+				.html(d => Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(date))
+
+				article.addElem('p', 'media media-txt')
+				.html(txt[0]?.split(/\n\n+/)[0].trim())
+
+				const taggroup = article.addElems('div', 'meta tag-group')
+				const sdgtags = taggroup.addElems('div', 'meta meta-sdgs', d => sdgs?.length ? [sdgs] : [])
+				sdgtags.addElems('span', 'sdg-label')
+					.html(d => Function(`"use strict";return (<%- vocabulary["sdg"][language] %>)`)()((d?.length || 0) > 1))
+				sdgtags.addElems('span', 'sdg', d => d)
+					.html(d => d.key || d)
+				taggroup.addElems('div', 'meta meta-tags', d => tags?.length ? [tags] : [])
+				.addElems('div', 'tag', d => d)
+					.addElems('label')
+					.html(d => d.name.capitalize())
+				
+				article.addElem('small', 'meta meta-source')
+				.html(`Source: ${window.location.origin}/<%- language %>/view/pad?id=${id}`)
+			})
+		})
+	}
+
+</script>
+
+</body>
+</html>

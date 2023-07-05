@@ -11,10 +11,6 @@ module.exports = req => {
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
 	else page = +page
-
-	const module_rights = modules.find(d => d.type === object)?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 	
 	// BASE FILTERS
 	const base_filters = []

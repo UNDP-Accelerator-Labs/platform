@@ -10,7 +10,7 @@ const filter = require('./filter.js')
 module.exports = async (req, res) => { 
 	const { uuid, rights, collaborators, public } = req.session || {}
 
-	if (public) res.redirect('/login')
+	if (public || rights < modules.find(d => d.type === 'reviews')?.rights.read) res.redirect('/login')
 	else {
 		const { object, space } = req.params || {}
 		const { display } = req.query || {}
@@ -19,10 +19,6 @@ module.exports = async (req, res) => {
 		// GET FILTERS
 		const [ f_space, order, page, full_filters ] = await filter(req)
 		
-		const module_rights = modules.find(d => d.type === object)?.rights
-		let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-		if (!collaborators_ids.length) collaborators_ids = [ uuid ]
-
 		DB.conn.tx(async t => {
 			const batch = []
 			

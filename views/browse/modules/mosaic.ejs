@@ -1,12 +1,13 @@
 <%
 	const slides = locals.sample_images
+	const language = locals.metadata.page.language
 %>
 
 <div class='slides'>
 	<div class='blank-area'></div>
 	<% slides.forEach(d => { %>
 		<div class='slide'>
-			<a href='../../view/pad?id=<%- d.id %>'>
+			<a href='/<%- language %>/view/pad?id=<%- d.id %>'>
 				<div class='media media-txt'>
 					<p class='country'><%- d.country %></p>
 					<h1><% if (d.title?.length > 50) { %><%- d.title?.slice(0, 50).trim() %>…<% } else { %><%- d.title %><% } %></h1>

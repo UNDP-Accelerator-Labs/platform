@@ -172,6 +172,9 @@ exports.redirect.browse = require('./redirect/').browse
 
 exports.dispatch.public = require('./browse/homepage').render //require('./login/').public
 
+exports.process.forgetPassword = require('./login/').forgetPassword
+exports.process.getResetToken = require('./login/').getResetToken
+exports.process.updatePassword = require('./login/').updatePassword
 
 /* =============================================================== */
 /* =========================== BROWSE ============================ */
@@ -824,13 +827,9 @@ exports.api.datasources = (req, res) => {
 	}
 }
 
-
-
 exports.notfound = (req, res) => {
-	res.send('This is not the route that you are looking for')
+	res.send(`${req.originalUrl} is not the route that you are looking for`)
 }
-
-
 
 String.prototype.simplify = function () {
 	return this.valueOf().replace(/[^\w\s]/gi, '').replace(/\s/g, '').toLowerCase()

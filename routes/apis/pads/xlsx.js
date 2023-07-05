@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
 	if (typeof include_data === 'string') include_data = JSON.parse(include_data)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
 	if (action === 'fetch') include_data = true
-	
+
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.body.language || req.session.language)
 
@@ -43,23 +43,23 @@ module.exports = async (req, res) => {
 
 	DB.conn.tx(t => {
 		return t.any(`
-			SELECT p.id AS pad_id, 
-				p.owner AS contributor_id, 
-				p.title, 
-				p.date AS created_at, 
-				p.update_at AS updated_at, 
-				p.status, 
-				p.source AS source_pad_id, 
-				p.template, 
-				p.full_text, 
-				p.sections 
+			SELECT p.id AS pad_id,
+				p.owner AS contributor_id,
+				p.title,
+				p.date AS created_at,
+				p.update_at AS updated_at,
+				p.status,
+				p.source AS source_pad_id,
+				p.template,
+				p.full_text,
+				p.sections
 			FROM pads p
-			
+
 			WHERE TRUE
 				$1:raw
 				$2:raw
 				AND p.id NOT IN (SELECT review FROM reviews)
-			
+
 			ORDER BY id DESC
 		;`, [ full_filters, cors_filter ]).then(async pads => {
 			// JOIN THE USER INFOR FOR COUNTRY NAMES
@@ -182,7 +182,7 @@ module.exports = async (req, res) => {
 							if (include_locations) {
 								var max_locations = array.nest.call(locations, { key: 'pad_id' })?.map(d => d.count)
 								if (max_locations.length) max_locations = Math.max(...max_locations)
-								else max_locations = 0	
+								else max_locations = 0
 							}
 							// EXTRACT METAFIELDS AND DETERMINE MAX METAFIELDS
 							if (include_metafields) {
@@ -197,7 +197,7 @@ module.exports = async (req, res) => {
 									obj.max = Math.max(...meta_counts.filter(c => c.key === d).map(c => c.count))
 									return obj
 								})
-	
+
 								// var attachments = pad_group.values.map(d => parsers.getAttachments(d).map(c => { return { pad_id: d.pad_id, resource: c } }))
 								// var max_attachments = Math.max(...attachments.map(d => d.length))
 							}
@@ -219,7 +219,7 @@ module.exports = async (req, res) => {
 										var id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
 										var name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
 									}
-									
+
 									return [ id, name ]
 								}
 								function check_for_items (items, pad_id, id_prefix, name_prefix, structure = []) {
@@ -255,7 +255,7 @@ module.exports = async (req, res) => {
 
 													if (d.centerpoints?.[i]) obj.content = `${d.centerpoints[i]?.lat}, ${d.centerpoints[i]?.lng}`
 													else obj.content = null
-													structure.push(obj)	
+													structure.push(obj)
 												}
 											} else if (include_tags && ['index', 'tag'].includes(d.type)) {
 												const max = max_tags.find(c => c.type === d.name)?.max ?? 0
@@ -267,7 +267,7 @@ module.exports = async (req, res) => {
 												// 	obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i}`
 
 												// 	obj.content = c.name ?? null
-												// 	structure.push(obj)	
+												// 	structure.push(obj)
 												// })
 
 												for (let i = 0; i < max; i ++) {
@@ -277,7 +277,7 @@ module.exports = async (req, res) => {
 													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
 
 													obj.content = d.tags[i]?.name ?? null
-													structure.push(obj)	
+													structure.push(obj)
 												}
 											} else if (include_metafields && metafields.filter(c => !['tag', 'index', 'location'].includes(c.type)).some(c => c.type === d.type && c.name === d.name)) {
 												const max = max_metafields.find(c => c.type === `${d.type}-${d.name}`)?.max ?? 0
@@ -289,7 +289,7 @@ module.exports = async (req, res) => {
 												// 	obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
 
 												// 	obj.content = d.srcs[i] ?? null
-												// 	structure.push(obj)	
+												// 	structure.push(obj)
 												// }
 
 												for (let i = 0; i < max; i ++) {
@@ -304,7 +304,7 @@ module.exports = async (req, res) => {
 													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
 
 													obj.content = (Array.isArray(value) ? value[i] : value) ?? null
-													structure.push(obj)	
+													structure.push(obj)
 												}
 											} else {
 												const obj = {}
@@ -341,7 +341,7 @@ module.exports = async (req, res) => {
 												structure.push(obj)
 											}
 										}
-										
+
 										if (d.items) structure = check_for_items(d.items, pad_id, cid, cname, structure)
 										else if (Array.isArray(d)) structure = check_for_items(d, pad_id, cid, cname, structure)
 									})
@@ -357,7 +357,7 @@ module.exports = async (req, res) => {
 										})
 									return Object.assign(flatObj.call(structure), { pad_id: d.pad_id })
 								})
-								
+
 								const content_lengths = flat_content.map(d => Object.keys(d).length)
 								var headers = flat_content.find(d => Object.keys(d).length === Math.max(...content_lengths))
 								headers = Object.keys(headers).filter(c => c !== 'pad_id')
@@ -367,7 +367,7 @@ module.exports = async (req, res) => {
 								// ANONYMIZE CONTRIBUTORS
 								// NOTE THIS id IS COMMON TO ALL WORKBOOKS (IF SEVERAL ARE GENERATED)
 								d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
-								
+
 								// FIGURE OUT WHICH CONTENT STRUCTURE TO KEEP
 								if (!use_templates) {
 									d.content = d.full_text?.replace(/<[^>]*>/g, '')
@@ -456,7 +456,7 @@ module.exports = async (req, res) => {
 							// NOTE THIS IS UNIQUE TO EACH WORKBOOK, WHEREAS THE contributor_list IS COMMON TO ALL WORKBOOKS
 							let commenter_list = array.unique.call(comments, { key: 'user_id', onkey: true })
 							commenter_list = array.shuffle.call(commenter_list)
-							
+
 							comments.forEach(d => {
 								// ANONYMIZE CONTRIBUTORS
 								d.user_id = `u-${commenter_list.indexOf(d.user_id) + 1}`
@@ -465,7 +465,7 @@ module.exports = async (req, res) => {
 							XLSX.utils.book_append_sheet(wb, comments_sheet, 'metadata-comments')
 							// XLSX.utils.sheet_to_csv(ws)
 						}
-						
+
 						// RENDER THE FILES
 						if (render) {
 							if (use_templates) {
@@ -486,7 +486,7 @@ module.exports = async (req, res) => {
 											return new Promise(async resolve1 => {
 												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-												
+
 												try {
 													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
@@ -498,7 +498,7 @@ module.exports = async (req, res) => {
 										imgs.forEach((d, i) => {
 											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-											try { 
+											try {
 												fs.copyFileSync(path.join(rootpath, `/public${d.image.replace('uploads/sm', 'uploads')}`), path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`), fs.constants.COPYFILE_EXCL)
 											} catch(err) { console.log(err) }
 										})
@@ -522,7 +522,7 @@ module.exports = async (req, res) => {
 											return new Promise(async resolve1 => {
 												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-												
+
 												try {
 													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
@@ -550,7 +550,7 @@ module.exports = async (req, res) => {
 						// if (include_data) return pad_group.values
 						if (include_data) return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]])
 						else return null
-					}).catch(err => console.log(err))	
+					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
 			})
 
@@ -581,14 +581,6 @@ module.exports = async (req, res) => {
 			})
 		} else {
 			req.session.destroy() // THIS IS TO PREVENT EXTERNAL CALLS TO THE API FROM LOGGING IN
-
-			// const structure = array.unique.call(data.flat().filter(d => d).map(d => Object.keys(d)).flat(), { onkey: true })
-			// const entries = data.flat().filter(d => d).map(d => {
-			// 	return structure.map(c => {
-			// 		return d[c] ? JSON.stringify(d[c]) : null
-			// 	})
-			// })
-			// const csv = `${structure.map(d => JSON.stringify(d)).join(',')}<br/>${entries.join('<br/>')}`
 
 			if (data.length) res.send(data[0].replace(/\n/g, '<br/>'))
 			else res.send('Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.')

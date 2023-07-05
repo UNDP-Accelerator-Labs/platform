@@ -51,6 +51,13 @@ const Entry = function (_kwargs) {
 			&& d.ongoing_associated_mobilizations === undefined
 			&& d.past_associated_mobilizations === undefined)
 		})
+	this.prefoot = this.inner.addElems('div', 'prefoot', d => {
+		if (display !== 'slideshow') {
+			return [d];
+		} else {
+			return [];
+		}
+	});
 	this.foot = this.inner.addElems('div', 'foot', d => {
 		if (display === 'columns'
 			|| d.img?.length > 0

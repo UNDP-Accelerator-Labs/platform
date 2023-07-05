@@ -174,71 +174,7 @@ app.get('*', (req, res) => {
 // app.route('/:language/:instance')
 // 	.get(routes.check.login, routes.dispatch.browse)
 
-<<<<<<< HEAD
-app.get('/api/skills', routes.api.skills) // TO DO: THIS SHOULD BE DEPRECATED
-app.get('/api/methods', routes.api.methods) // TO DO: THIS SHOULD BE DEPRECATED
-app.route('/api/datasources')
-	.get(routes.api.datasources)
-	.post(routes.api.datasources)
-
-// LEGACY APIS FOR FEEDING THE ACTION PLANS
-// ULTIMATELY THIS SHOULD BE REMOVED
-const cors = require('cors')
-const whitelist = ['http://localhost:2000', 'https://acclabs-actionplans.azurewebsites.net']
-const corsOpts = {
-	origin: function (origin, callback) {
-		// if (whitelist.includes(origin)) callback(null, true)
-		// else callback(new Error('Not allowed by CORS'))
-		callback(null, true) // THIS SHOULD BE TEMP TO ALLOW QUERIES FROM LOCALHOST
-	},
-	optionsSuccessStatus: 200,
-	methods: 'GET, POST'
-}
-app.options('/api/sdgs', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*')
-	res.setHeader('Access-Control-Allow-Methods', '*')
-	res.setHeader('Access-Control-Allow-Headers', '*')
-	res.end()
-})
-app.get('/api/sdgs', cors(corsOpts), routes.api.sdgs)
-
-app.options('/api/thematic_areas', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*')
-	res.setHeader('Access-Control-Allow-Methods', '*')
-	res.setHeader('Access-Control-Allow-Headers', '*')
-	res.end()
-})
-app.get('/api/thematic_areas', cors(corsOpts), routes.api.thematic_areas)
-app.post('/api/thematic_areas', cors(corsOpts), routes.api.thematic_areas)
-
-app.options('/api/solutions', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*')
-	res.setHeader('Access-Control-Allow-Methods', '*')
-	res.setHeader('Access-Control-Allow-Headers', '*')
-	res.end()
-})
-app.get('/api/solutions', cors(corsOpts), routes.api.solutions)
-
-app.options('/api/file', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', '*')
-	res.setHeader('Access-Control-Allow-Methods', '*')
-	res.setHeader('Access-Control-Allow-Headers', '*')
-	res.end()
-})
-app.get('/api/file', cors(corsOpts), routes.api.file)
-// REMOVE ALL UP TO HERE
-
-
-
-
-// INSTANCES
-app.route('/:language/:instance')
-	.get(routes.check.login, routes.dispatch.browse)
-
-app.get('*', routes.notfound)
-=======
 // app.get('*', routes.notfound)
->>>>>>> 7dcac25 (plain redirect (#38))
 
 // RUN THE SERVER
 const server = app.listen(process.env.PORT || 2000, _ => console.log(`the app is running on port ${process.env.PORT || 2000}`))

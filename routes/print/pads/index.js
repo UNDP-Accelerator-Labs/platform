@@ -1,17 +1,14 @@
 // THIS IS AN ULTR SIMLPFIED VERSION OF browse/pads
 const { map, DB } = include('config/')
-const { checklanguage, datastructures, array, join } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, array, join } = include('routes/helpers/')
 
 const { filter } = require('../../browse/pads/')
 
 module.exports = async (req, res) => {
 	const { object } = req.params || {}
 	const { uuid, rights, collaborators } = req.session || {}
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { uuid, rights, collaborators } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
+	const { format } = req.query || {}
+
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
@@ -60,8 +57,17 @@ module.exports = async (req, res) => {
 		/* $3 */ order
 	]).then(async results => {
 		const data = await join.users(results, [ language, 'owner' ])
+		data.forEach(d => {
+			d.img = parsers.getImg(d)
+			d.sdgs = parsers.getSDGs(d)
+			d.tags = parsers.getTags(d)
+			d.txt = parsers.getTxt(d)
+		})
+
 		const metadata = await datastructures.pagemetadata({ req, res, pagecount: data?.length ?? 0, map })
 		const booklet = Object.assign(metadata, { data })
-		res.render('print/pads/', booklet)
+		if (format === 'booklet') res.render('print/booklet/', booklet)
+		else res.render('print/cards', booklet)
+	
 	}).catch(err => console.log(err))
 }

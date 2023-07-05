@@ -44,18 +44,23 @@
 			type: 'radio',
 			required: true
 		})
+		target_opts.push({
+			label: '.pdf',
+			value: 'pdf',
+			type: 'radio',
+			required: true
+		})
 		// TO DO: IMPROVE THIS SINCE FOR NOW IT IS LIMITED TO THE 25 SHOWN ON THE CURRENT PAGE
 		const templates = <%- JSON.stringify(locals.sections.map(d => d.data.map(c => c.template)).flat()) %>
 		const notemplates = templates.every(d => [null, undefined].includes(d))
 
 		// const countries = (<%- JSON.stringify(locals.sections.map(d => d.data.map(c => c.country)).flat()) %>).unique()
 		const years = (<%- JSON.stringify(locals.sections.map(d => d.data).flat()) %>).unique()
-		console.log(years)
 
 		const formdata = { action: '/apis/download/pads',  method: 'POST' }
 		const message = '<%- vocabulary["select download options"][language] %>'
 		const opts = []
-		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts, classname: 'csv xlsx json geojson docx', fn: resetFeatures })
+		opts.push({ node: 'select', name: 'output', label: '<%- vocabulary["select format"][language] %>', options: target_opts, classname: 'csv xlsx json geojson docx pdf', fn: resetFeatures })
 		
 		opts.push({ node: 'input', type: 'checkbox', name: 'use_templates', value: true, placeholder: '<%- vocabulary["use templates"][language] %>', checked: true, default: true, classname: 'hide csv xlsx json geojson' })
 		opts.push({ node: 'input', type: 'checkbox', name: 'include_data', value: true, placeholder: '<%- vocabulary["include data"][language] %>', checked: true, default: true, classname: 'hide csv xlsx json geojson docx' })
@@ -130,24 +135,26 @@
 		// opts.push({ node: 'select', name: 'chapters', label: 'Chapter by', options: chapter_opts, classname: 'hide docx', fn: limitSelection }) // TO DO: TRANSLATE
 		opts.push({ node: 'select', name: 'chapters', label: 'Chapter by', options: chapter_opts, classname: 'hide docx' }) // TO DO: TRANSLATE
 
-		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>', classname: 'submit' })
+		opts.push({ node: 'input', type: 'radio', name: 'format', value: 'cards', placeholder: 'Cards', checked: true,default: true, classname: 'hide pdf' }) // TO DO: TRANSLATE
+
+		// DOWNLOAD FOR EVERY CASE EXCEPT PDF
+		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>', classname: 'submit hide csv xlsx json geojson docx' })
+		// DOWNLOAD FOR PDF
+		opts.push({ node: 'button', type: 'button', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>', classname: 'submit hide pdf', fn: downloadPDF })
+
 
 		function resetFeatures (data) {
 			const { value } = data
 			const form = d3.select(this.form)
 			// UPDATE THIS TO li LEVEL
-			form.selectAll(`li.opt:not(.submit)`)
+			// form.selectAll(`li.opt:not(.submit)`)
+			form.selectAll(`li.opt`)
 			.each(function () {
 				const sel = d3.select(this)
 				const deactivate = !sel.classed(value)
 				sel.classed('hide', deactivate)
 				sel.selectAll('input:not([type=hidden])').each(function () { this.disabled = deactivate })
 			})
-
-			if (value === 'docx' && notemplates) {
-				// STANDARDIZE STRUCTURE OPTION
-				// TO DO: ADD GROUP BY OPTION (e.g. COUNTRY, YEAR, TEMPLATE)
-			}
 		}
 		function limitSelection (data) {
 			const { name, type, form: formnode } = this
@@ -162,6 +169,21 @@
 					d3.select(this.parentNode).classed('active', false)
 				}
 			})
+		}
+		function downloadPDF (data) {
+			const elements = Array.from(this.form.elements).filter(elem => {
+				const sel = d3.select(elem)
+				const parent = sel.findAncestor('li')
+				return !parent.classed('hide') && elem.checked && elem.name !== 'output'
+			})
+			const url = new URL(window.location)
+			const pathname = url.pathname.replace('/browse/', '/print/')
+			const queryparams = new URLSearchParams(url.search)
+			elements.forEach(d => {
+				queryparams.set(d.name, d.value)
+			})
+			queryparams.set('render', true)
+			window.open(`${pathname}?${queryparams.toString()}`, '_blank')
 		}
 	
 	<% } else if (object === 'contributors') { %>

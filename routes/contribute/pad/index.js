@@ -82,6 +82,12 @@ module.exports = (req, res) => {
 					batch.push(t.oneOrNone(`
 						SELECT p.id, p.title, p.owner, p.sections, p.template, p.status,
 
+							CASE
+								WHEN AGE(now(), p.date) < '0 second'::interval
+									THEN jsonb_build_object('interval', 'positive', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(p.date, now())), 'hours', EXTRACT(hour FROM AGE(p.date, now())), 'days', EXTRACT(day FROM AGE(p.date, now())), 'months', EXTRACT(month FROM AGE(p.date, now())))
+								ELSE jsonb_build_object('interval', 'negative', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), p.date)), 'hours', EXTRACT(hour FROM AGE(now(), p.date)), 'days', EXTRACT(day FROM AGE(now(), p.date)), 'months', EXTRACT(month FROM AGE(now(), p.date)))
+							END AS date,
+
 							CASE WHEN p.id IN (SELECT pad FROM review_requests)
 								THEN 1
 								ELSE 0
@@ -279,6 +285,9 @@ async function check_authorization (_kwargs) {
 							WHERE mc.pad = $1::INT
 						)
 						OR $3 > 2
+					) AND NOT (
+						id IN (SELECT review FROM reviews)
+						AND status >= 2
 					)
 			;`, [ id, collaborators_ids, rights ])
 			.then(result => {

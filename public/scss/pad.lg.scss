@@ -381,6 +381,26 @@ div.document {
 					margin-top: 12.5px;
 					color: $c-light-grey;
 				}
+				.meta-country {
+					display: inline-block;
+					margin: 0;
+					font-size: $t-mid-small;
+					line-height: 1.5em;
+					color: $c-light-grey;
+
+					&::after {
+						content: ', ';
+						font-size: $t-mid-small;
+						line-height: 1.5em;
+					}
+				}
+				.meta-date {
+					display: inline-block;
+					margin: 0;
+					font-size: $t-mid-small;
+					line-height: 1.5em;
+					color: $c-light-grey;
+				}
 				.dropdown {
 					display: none;
 				}

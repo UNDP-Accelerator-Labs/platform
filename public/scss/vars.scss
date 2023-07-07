@@ -145,19 +145,7 @@ input:-webkit-autofill:active  {
 		rgba(165, 30, 65, 0.1) 6px
 	);
 }
-// .screen.bis {
-// 	/*background-color: $c-mid-1;*/
 
-// 	.modal {
-
-// 		.close {
-// 			/*background-color: $c-mid-2;*/
-// 		}
-// 		.inner {
-// 			/*border-top: 3px solid $c-mid-2;*/
-// 		}
-// 	}
-// }
 .screen.ter {
 	background-color: $c-light-3;
 	/*background: linear-gradient(135deg, $c-light-2 0%, $c-light-3 100%);*/
@@ -245,14 +233,6 @@ input.toggle + label::after {
 	color: $c-light-grey;
 	transition: transform .25s;
 }
-// input.toggle:checked + label[for='status-0']::after {
-// 	/*background-color: $c-mid-yellow;*/
-// 	/*border-color: $c-mid-yellow;*/
-// }
-// input.toggle:checked + label[for='status-1']::after {
-// 	/*background-color: $c-light-blue;*/
-// 	/*border-color: $c-light-blue;*/
-// }
 input.toggle:checked + label::after {
 	transform: translate(20px, 0);
 	background-color: $c-dark-blue;

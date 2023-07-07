@@ -807,51 +807,6 @@ header {
 				display: flex;
 				flex-wrap: wrap;
 
-				/*.tag {
-					display: flex;
-					align-items: center;
-					border: 1px solid $c-light-grey;
-					padding: 0 0 0 10px;
-					margin: 2.5px;
-					background-color: #FFF;
-					font-size: $t-small;
-					line-height: 1.5em;
-					color: $c-light-grey;
-
-					label {
-						cursor: pointer;
-					}
-					.type {
-						flex-shrink: 0;
-						font-size: $t-xsmall;
-						padding-right: 5px;
-						border-right: 1px dotted $c-light-grey;
-					}
-					.name {
-						margin: 0 10px 0 5px;
-						white-space: nowrap;
-						color: $c-dark-grey;
-					}
-					.close {
-						flex-shrink: 0;
-						display: inline-block;
-						width: calc(#{$t-mid-small} * 1.5);
-						padding: 0 0;
-						background-color: $c-light-grey;
-						text-align: center;
-						color: #FFF;
-						font-size: $t-mid-small;
-						line-height: 1.5em;
-
-						&::before {
-
-						}
-						&::after {
-
-						}
-					}
-				}*/
-
 				.tag {
 					display: inline-block;
 					height: calc(#{$t-small} * 1.5);
@@ -884,6 +839,9 @@ header {
 						width: calc(#{$t-small} * 1.5);
 						height: calc(#{$t-small} * 1.5);
 						background-color: $c-light-grey;
+						float: none;
+						transform: none;
+						padding: 0;
 
 						&::before {
 							content: '';

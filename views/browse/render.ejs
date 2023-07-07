@@ -267,7 +267,6 @@ const Entry = function (_kwargs) {
 					const { inputs } = datum
 					const { name, value } = d3.select(this).datum()
 
-					// const target_opts = <%- JSON.stringify(languages.filter(d => locals.metadata.menu.review_templates?.some(c => c.language === d.language))?.map(d => { return { label: d.name, value: d.language, type: 'radio', required: true } })) %>
 					const target_opts = <%- JSON.stringify(locals.metadata.menu.review_templates.map(d => { return { label: d.name, value: d.language, count: d.count, disabled: { value: d.disabled, label: vocabulary["missing reviewers"][language] }, type: 'radio', required: true } })) %>
 
 					// TO DO: FILTER THIS BASED ON USER RIGHTS >= review.rights.write
@@ -281,31 +280,40 @@ const Entry = function (_kwargs) {
 					
 					const opts = []
 					opts.push({ node: 'select', name: 'language', label: '<%- vocabulary["select language"][language](false) %>', options: target_opts, fn: updateReviewerList })
-					opts.push({ node: 'select', name: 'reviewers', label: 'Select specific reviewers', options: reviewer_opts, classname: 'reviewer-list' }) // TO DO: TRANSLATE
+					opts.push({ node: 'select', name: 'reviewers', label: '<%- vocabulary["select reviewers"][language] %>', options: reviewer_opts, classname: 'reviewer-list hide', fn: countReviewers })
 					
 					inputs.forEach(d => {
 						opts.push({ node: 'input', type: 'hidden', name: d.name, value: d.value })
 					})
 
-					opts.push({ node: 'button', type: 'submit', name: name, value: value, label: '<%- vocabulary["submit for review"][language] %>' })
+					opts.push({ node: 'button', type: 'submit', name: name, value: value, disabled: true, label: '<%- vocabulary["submit for review"][language] %>' })
 					const new_constraint = await renderFormModal({ message, formdata, opts })
+					// THIS IS A FORM MODAL SO IT SHOULD RELOAD THE PAGE
 				}
 
 				function updateReviewerList (d) {
 					const { value: language } = d
-					const menu = d3.select(this).findAncestor('opts')
-					const reviewer_list = menu.selectAll('.reviewer-list .dropdown menu li')
+					const form = d3.select(this.form)
+					const reviewer_list = form.selectAll('.reviewer-list')
+					const list = reviewer_list.selectAll('.dropdown menu li')
+					const button = form.select('button[type=submit]')
+					button.node().disabled = false
 					
-					reviewer_list
-					.classed('persistent-hide', function () {
+					reviewer_list.classed('hide', false)
+					list.classed('persistent-hide', function () {
 						return !d3.select(this).classed(language)
 					}) // THIS CANNOT BE A SIMPLE hide CALSS AS IT CONFLICTS WITH THE SEARCH OPERATIONS (BECAUSE IT ALSO USES THE class='hide')
 					.select('input')
 					.each(function () { 
 						this.disabled = !d3.select(this.parentNode).classed(language) 
 					})
-
-
+				}
+				function countReviewers (d) {
+					const form = d3.select(this.form)
+					const button = form.select('button[type=submit]')
+					const count = form.selectAll('input[name=reviewers]:checked').size()
+					if (![0, <%- modules.find(d => d.type === 'reviews')?.reviewers %>].includes(count)) button.node().disabled = true
+					else button.node().disabled = false
 				}
 
 				function copyLink (datum) {

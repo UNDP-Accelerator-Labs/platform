@@ -55,13 +55,24 @@
 															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id.toString())) { %>disabled<% } %>>
 														<% }) %>
 													<% } %>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this)'>
+													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this); toggletag(this, <%- JSON.stringify(c) %>)'>
 													<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 												</li>
 											<% }) %>
 										</menu>
 									</div>
 								</div>
+								<% const active_filters = d[key].filter(c => query?.[key]?.includes(c.id.toString()))
+								if (active_filters.length) { %>
+									<div class='active-filters'>
+										<% active_filters.forEach(c => { %>
+											<div class='tag' data-id='<%- c.id %>'>
+												<label class='name'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %></label>
+												<label class='close' onclick='rmtag(this, <%- JSON.stringify(c) %>)'></label>
+											</div>
+										<% }) %>
+									</div>
+								<% } %>
 							<% } %>
 						</section>
 					<% }) %>
@@ -92,23 +103,21 @@
 				<div class='global-actions'>
 					<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
 					<% if (space !== 'pinned') { %>
-						<%# if (query.search?.length || Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
-							<div class='add filter pinboards'>
-								<input type='text' id='pin-all'>
-								<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
-								<button id='new-pinboard' type='button'></button>
-								<div class='dropdown'>
-									<menu>
-										<% locals.pinboards_list?.forEach(d => { %>
-											<li class='pinboard'>
-												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-												<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
-											</li>
-										<% }) %>
-									</menu>
-								</div>
+						<div class='add filter pinboards'>
+							<input type='text' id='pin-all'>
+							<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
+							<button id='new-pinboard' type='button'></button>
+							<div class='dropdown'>
+								<menu>
+									<% locals.pinboards_list?.forEach(d => { %>
+										<li class='pinboard'>
+											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
+											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+										</li>
+									<% }) %>
+								</menu>
 							</div>
-						<%# } %>
+						</div>
 					<% } %>
 
 					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
@@ -142,10 +151,41 @@
 			filters.style.overflow = 'hidden'
 		} else filters.style.maxHeight = `${filters.scrollHeight + padding}px`
 	}
-	function addequivalents (node, equivalents) {
+	function addequivalents (node) {
 		const parent = d3.select(node.parentNode)
 		parent.selectAll('input[type=hidden]')
 			.attr('disabled', node.checked ? null : true)
+	}
+	function toggletag (node, d) {
+		const sel = d3.select(node)
+		const filter = sel.findAncestor('filter')
+		let taggroup = d3.select(filter.node().nextElementSibling)
+		
+		if (!taggroup.node() || !taggroup.classed('active-filters')) {
+			taggroup = d3.select(filter.node().parentNode)
+			.insertElem(_ => filter.node().nextElementSibling, 'div', 'active-filters')
+		}
+
+		if (node.checked) {
+			const tag = taggroup.addElem('div', 'tag')
+			.attr('data-id', d.id)
+			tag.addElems('label', 'name')
+			.html(Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown'][language]))
+			tag.addElems('label', 'close')
+			.on('click', function () { rmtag(this, d) })
+		} else {
+			taggroup.selectAll(`.tag[data-id="${d.id}"]`).remove()
+			if (taggroup.selectAll('.tag').size() === 0) taggroup.remove()
+		}
+	}
+	function rmtag (node, d) {
+		const sel = d3.select(node)
+		const tag = sel.findAncestor('tag')
+		const taggroup = tag.findAncestor('active-filters')
+		const filter = d3.select(taggroup.node().previousElementSibling)
+		const input = filter.selectAll('input').filter(function () { return this.value.toString() === d.id.toString() }).node()
+		input.checked = false
+		toggletag(input, d)
 	}
 
 	// MAIN SEARCH BAR

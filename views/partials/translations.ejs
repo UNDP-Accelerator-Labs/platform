@@ -1,4 +1,5 @@
 <%
+	const modules = locals.metadata.site.modules
 	vocabulary = {
 		"contribute": {
 			"en": "Contribute",
@@ -323,6 +324,12 @@
 			"fr": "Soumettre",
 			"es": "Entregar",
 			"pt": "Submeter"
+		},
+		"submit review": { // USED
+			"en": "Submit review",
+			"fr": "Soumettre la relecture",
+			"es": "Enviar la revisión",
+			"pt": "Enviar la revisão"
 		},
 		"submit for review": { // USED
 			"en": "Submit for review",
@@ -1132,8 +1139,14 @@
 		"back to browse": {
 			"en": "Return to browsing",
 			"fr": "Retour à la galerie",
-			"es": "De vuelta a la galería",
-			"pt": "De volta à galeria"
+			"es": "Volver a la galería",
+			"pt": "Voltar à galeria"
+		},
+		"back to reviews": {
+			"en": "Return to list of reviews",
+			"fr": "Retour à la liste de relectures",
+			"es": "Volver a la lista de reseñas",
+			"pt": "Voltar à lista de comentários"
 		},
 		"bookmark": {
 			"en": active => {
@@ -2894,6 +2907,12 @@
 			"fr": "Display les avis des relecteurs",
 			"es": "Mostrar las reseñas",
 			"pt": "Exibir os comentários"
+		},
+		"select reviewers": { // USED
+			"en": "Select " + modules.find(d => d.type === 'reviews')?.reviewers + " reviewers (optional)",
+			"fr": "Sélectionner " + modules.find(d => d.type === 'reviews')?.reviewers + " relect.rice.eur.s (facultatif)",
+			"es": "Seleccionar " + modules.find(d => d.type === 'reviews')?.reviewers + " revisor.a.e.s (opcional)",
+			"pt": "Selecione " + modules.find(d => d.type === 'reviews')?.reviewers + " revisores (opcional)"
 		},
 		"review": { // USED
 			"en": (verb, plural, preposition) => {

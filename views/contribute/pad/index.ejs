@@ -88,7 +88,6 @@
 </head>
 
 <body>
-<!-- <div class='fixed-bg hashed'></div> -->
 
 <%- include ('../../partials/translations.ejs') %>
 <%- include ('../../partials/menu-languages.ejs') %>
@@ -176,50 +175,6 @@
 <!-- PB HERE WITH THE else if FOR SLIDESHOW OF A PAD THAT HAS A SOURCE BUT IS NOT DISPLAYED ADJACENT -->
 <div class='document<% if ((locals.source || locals.data?.reviews?.length > 0) && !["adjacent-source", "adjacent-reviews", "slideshow"].includes(pagedisplay)) { %> offset<% } else if (locals.source && pagedisplay === "adjacent-source") { %> split-screen right<% } else if (locals.data?.reviews?.length > 0 && pagedisplay === "adjacent-reviews") { %> split-screen left<% } else if (pagedisplay === "slideshow") { %> slideshow<% } %>'>
 	<main id='pad' class='pad'>
-		<!-- BELOW ARE ENGAGEMENT FEATURES -->
-		<!-- <% if (['edit', 'view'].includes(activity) && (locals.data && locals.data.published)) { %>
-			<div class='engagement-input-group'>
-				<div class='engagement bookmark <% if (locals.data.bookmarked) { %>active<% } %>' data-type='bookmark' data-count='<%- locals.engagement["bookmark"] %>'>
-					<div class='label'><%- vocabulary['bookmark'][language](locals.data.bookmarked) %></div>
-				</div>
-				<ul>
-					<% ['inspiration', 'approval', 'flag'].forEach(type => {
-						let count = locals.engagement[`${type}s`] || 0
-						let icon
-						let label
-						let active = false
-
-						if (type === 'bookmark') {
-							icon = 'bookmark'
-							label = 'Bookmark'
-							active = locals.data.bookmarked
-						}
-						else if (type === 'inspiration') {
-							icon = 'wb_sunny'
-							label = 'Inspiring'
-							active = locals.data.inspired
-						}
-						else if (type === 'approval') {
-							icon = 'thumb_up'
-							label = 'Tested and validated'
-							active = locals.data.approved
-						}
-						else if (type === 'flag') {
-							icon = '()'
-							label = 'For Tomorrow'
-							active = locals.data.flagged
-						}
-					%>
-						<li>
-							<button class='engagement <% if (active) { %>active<% } %>' data-type='<%- type %>' data-count='<%- count %>'>
-								<i class='material-icons-outlined'><%- icon %></i>
-								<small><%- label %></small>
-							</button>
-						</li>
-					<% }) %>
-				</ul>
-			</div>
-		<% } %> -->
 		<div class='inner'>
 			<% if (editing) { %>
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
@@ -240,7 +195,7 @@
 							{ %>
 								<% if (object === 'review') { %>
 									<input type='hidden' name='source' value='<%- locals.source %>'>
-									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['publish'][language] %></button>
+									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
 									<button type='button' class='publish' name='status' value='1' onclick='saveAndSubmit(this)' disabled><%- vocabulary['submit'][language] %></button>
 									<script type='text/javascript'>
@@ -254,12 +209,12 @@
 										}
 									</script>
 								<% } else { %>
-									<button type='button' class='publish' disabled>Publish</button>
+									<button type='button' class='publish' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
 							<% } else { %>
 								<% if (object === 'review') { %>
 									<input type='hidden' name='source' value='<%- locals.source %>'>
-									<button type='submit' class='publish' name='status' value='2'><%- vocabulary['publish'][language] %></button>
+									<button type='submit' class='publish' name='status' value='2'><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
 									<!-- TO DO: INTERCEPT AND partialSave -->
 									<button type='submit' class='publish' name='status' value='1'><%- vocabulary['submit'][language] %></button>
@@ -406,12 +361,20 @@
 							<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
 								<% if (activity === 'edit') { %>
 									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
+									<div class='meta meta-country'><%- locals.data?.country %></div>
+									<div class='meta meta-date'><%- vocabulary['date'][language](locals.data?.date) %></div>
 								<% } else { %>
 									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
+									<div class='meta meta-date'><%- vocabulary['date'][language](locals.data?.date) %></div>
 								<% } %>
 							<% } %>
 						<% } %>
 					<% } else { %><!-- IF THE PAD IS A REVIEW, SO THE TITLE ONLY NEEDS TO BE THE REVIEWER ID -->
+						<% if (locals.metadata.page.referer?.includes('browse/reviews')) { %>
+							<a href='<%- locals.metadata.page.referer %>' class='return'><%- vocabulary['back to reviews'][language] %></a>
+						<% } else { %>
+							<a href='<%- `/${language}/browse/reviews/ongoing` %>' class='return'><%- vocabulary['back to reviews'][language] %></a>
+						<% } %>
 						<div class='title'>
 							<%- vocabulary['review'][language](false, false) %> #<%- locals.data?.review_idx %>
 						</div>

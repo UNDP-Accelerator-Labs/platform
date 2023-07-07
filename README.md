@@ -102,10 +102,10 @@ make -s publish
 ## Updating to use ltree
 
 For updating tables to use ltree (if you didn't run `init.sql` from scratch)
-go to `routes/scripts/shared` and run:
+run:
 
 ```
-node setup_versions.js pads update
-node setup_versions.js mobilizations update
-node setup_versions.js templates update
+ENV=<yourenv> CMD=setup_versions.js make -s script pads update
+ENV=<yourenv> CMD=setup_versions.js make -s script mobilizations update
+ENV=<yourenv> CMD=setup_versions.js make -s script templates update
 ```

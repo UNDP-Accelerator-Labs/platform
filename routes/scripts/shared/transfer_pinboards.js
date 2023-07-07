@@ -17,6 +17,7 @@ const link_map = {
 	'global': 'https://acclabs.azurewebsites.net/',
 	'sm': 'https://acclabs-solutionsmapping.azurewebsites.net/',
 };
+const db_map = {};
 
 if (action === undefined || action === 'transfer') {
     DB.general.tx(async (gt) => {
@@ -81,15 +82,15 @@ if (action === undefined || action === 'transfer') {
             cbatch.push(ct.none(`ALTER TABLE pinboard_contributions RENAME TO _pinboard_contributions;`));
             await ct.batch(cbatch);
             cbatch.clear();
-            Object.keys(link_map).forEach((key) => {
-                gbatch.push(gt.none(`
+            await Promise.all(Object.keys(link_map).map(async (key) => {
+                const db_id = await gt.one(`
                     INSERT INTO extern_db (db, url_prefix)
                     VALUES ($1, $2)
-                    ON CONFLICT ON CONSTRAINT extern_db_db_key DO NOTHING;
-                `, [key, link_map[key]]));
-            });
-            await gt.batch(gbatch);
-            gbatch.clear();
+                    ON CONFLICT ON CONSTRAINT extern_db_db_key DO NOTHING
+                    RETURNING id;
+                `, [key, link_map[key]]);
+                db_map[key] = db_id;
+            }));
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'rollback') {

@@ -16,6 +16,7 @@
 	@import 'browse.xs';
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
+	@import '_journey.lg';
 }
 /* Medium devices (tablets, 768px and up) */
 @media (max-width: 768px) {
@@ -30,6 +31,7 @@
 	@import 'browse.xs';
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
+	@import '_journey.lg';
 }
 /* Large devices (desktops, 1024px and up) */
 @media (max-width: 1024px) {
@@ -45,6 +47,7 @@
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
 	@import 'vars.print';
+	@import '_journey.lg';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -61,12 +64,15 @@
 	@import 'mobilize.lg';
 	@import 'orgfooter.lg';
 	@import 'vars.print';
+	@import '_journey.lg';
 }
 
 
 
 @media print {
 	@import 'vars.print';
+	@import '_journey.print';
+
 	@page {
 		size: A4 portrait;
 		margin: 20mm 30mm;

@@ -807,6 +807,9 @@ div.public-page-panel > .inner nav.enter {
   text-align: center;
   margin: 60px 0;
 }
+div.public-page-panel > .inner nav.enter a:hover {
+  text-decoration: none;
+}
 div.public-page-panel > .inner nav.enter button {
   min-height: 45px;
   padding: 0 15px;
@@ -867,6 +870,12 @@ div.browse {
 }
 div.browse:not(.home) {
   padding-top: 120px;
+}
+div.browse h1.instance-title {
+  font-size: 36px;
+  line-height: 1.2em;
+  margin-bottom: 30px;
+  text-align: center;
 }
 div.browse nav#search-and-filter {
   padding: 5px 14px 15px 14px;

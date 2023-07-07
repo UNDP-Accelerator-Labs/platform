@@ -202,7 +202,7 @@ exports.pagemetadata = (_kwargs) => {
 				welcome_module,
 				app_storage,
 				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
-				app_id,
+				app_id
 			},
 			user: {
 				uuid,

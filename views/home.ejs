@@ -90,13 +90,13 @@
 				<h1 class='site-title'><%- locals.metadata.site.title %></h1>
 			<% } %>
 			<div id='statistics'>
-				<div class='stat-group'>
+				<div translate="no" class='stat-group'>
 					<div class='statistic'>
 						<h1><%- locals.stats?.total %></h1>
 						<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.total !== 1)?.capitalize() || object.capitalize() %></p>
 					</div>
 				</div>
-				<div class='stat-group'>
+				<div translate="no" class='stat-group'>
 					<% if (locals.stats?.contributors) { %>
 						<div class='statistic'>
 							<h2><%- locals.stats?.contributors %></h2>
@@ -120,10 +120,10 @@
 			<!-- <h3>ADD TAG CATEGORIES</h3> -->
 			<nav class='enter'>
 				<a href='/<%- language %>/browse/pads/public'>
-					<button type='button' class='highlight'><%- vocabulary['browse publications'][language] %></button>
+					<button translate="no" type='button' class='highlight'><%- vocabulary['browse publications'][language] %></button>
 				</a>
 				<% if (!logged) { %>
-					<a href='/login'><button type='button'><%- vocabulary['log in'][language] %></button></a>
+					<a href='/login'><button translate="no" type='button'><%- vocabulary['log in'][language] %></button></a>
 					<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 					<!-- TO DO: TRANSLATE -->
 				<% } %>
@@ -158,7 +158,7 @@
 					<% } else { %>
 						<%- d.name %>
 					<% } %>
-					<small><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language]((d.count ?? 0) !== 1).toLowerCase() %></small>
+					<small translate="no" ><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language]((d.count ?? 0) !== 1).toLowerCase() %></small>
 				</li>
 			<% }) %>
 			</ul>
@@ -171,9 +171,9 @@
 			<!-- TO DO: TRANSLATE -->
 			<ul class='columns'>
 			<% locals.pinboards.forEach(d => { %>
-				<li>
+				<li >
 					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
-					<small><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>
+					<small translate="no" ><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>
 					<small class='contributor'><%- vocabulary['curation credit'][language](d.owner, 'Bob', 'contributors') %></small>
 				</li>
 			<% }) %>

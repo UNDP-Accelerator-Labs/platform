@@ -30,7 +30,9 @@
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
-		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
+		<a href="/">
+			<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
+		</a>
 
 		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
@@ -46,7 +48,7 @@
 										<label><%- vocabulary['pad'][language](false).capitalize() %></label>
 										<span class='expandable'>></span>
 									</button>
-									<div class='dropdown'>
+									<div translate="no" class='dropdown'>
 										<ul>
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
 											<!-- THE ISSUE HERE IS WE WANT TO PREVENT USERS OF THE experiments AND action plans PLATFORMS FROM CREATING BLANK PADS -->
@@ -468,22 +470,22 @@
 				</div>
 			</div>
 		<% } %>
-		<h1><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+		<h1 translate="no" ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
 		<% if (!publicpage) { %>
-			<h2>
+			<h2 translate="no">
 				<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
 				<% } else { %><%- locals.metadata.user.country.name %><% } %>
 			</h2>
 		<% } %>
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
-			<div class='save lg hide'>
+			<div translate="no" class='save lg hide'>
 				<button><%- vocabulary['save'][language] %></button>
 			</div>
 		<% } %>
 	</div>
 </nav>
-<nav id='modules'>
+<nav translate="no" id='modules'>
 	<menu>
 	<% modules.filter(d => {
 		let { write } = d.rights

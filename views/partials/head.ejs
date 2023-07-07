@@ -8,6 +8,8 @@
 
 	const site_description = locals?.data?.publishable ? locals?.data?.sections?.[0]?.items?.find(c => c?.type === 'txt'  && c?.txt?.length)?.txt : null;
 	const img = locals?.data?.publishable ? locals?.data?.sections[0]?.items?.find(c => c?.type === 'img' && c?.src?.length )?.src : null
+	const activity = locals.metadata.page.activity
+	const is_public = locals.metadata.page.public || activity === 'preview'
 
 	let ogp_locale = 'en_US'
 
@@ -58,6 +60,8 @@
 <script type='text/javascript' src='/js/basics.js'></script>
 <script type='text/javascript' src='/js/upload.js'></script>
 
+<!-- Google Translate CDN -->
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <!-- <script src = '/socket.io/socket.io.js'></script> -->
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
@@ -70,3 +74,25 @@
 <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined'>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel='stylesheet' type='text/css' href='/css/dispatch.css'>
+<script type="text/javascript">
+	var languageAlias = '<%= language %>';
+	var isPublic = '<%- is_public %>' === 'true'
+	var googleTranslateElement;
+
+	function googleTranslateElementInit() {
+		if(isPublic){
+			googleTranslateElement = new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+		}
+	}
+
+	function stopGoogleTranslate() {
+		if (googleTranslateElement && googleTranslateElementIsTranslatable()) {
+			googleTranslateElementIsTranslatable().isTranslatable = false;
+			googleTranslateElement.showBanner(false);
+		}
+	}
+
+	if(!isPublic) stopGoogleTranslate()
+
+</script>
+

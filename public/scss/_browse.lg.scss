@@ -1,5 +1,3 @@
-@import 'vars.lg';
-
 div.public-page-header {
 	min-height: 100vh;
 
@@ -752,7 +750,7 @@ div.browse {
 				transition: max-height 0.25s ease-out;
 
 				section {
-					flex-grow: 1;
+					flex: 1 1 0;
 					margin-top: 15px;
 					padding: 0 7.5px;
 
@@ -836,6 +834,71 @@ div.browse {
 					}
 					.filter:last-child {
 						margin-bottom: 0;
+					}
+					.active-filters {
+						margin: -15px auto 15px auto;
+						padding: 10px 15px;
+						border: 1px dotted $c-light-grey;
+						border-top: none;
+						width: calc(100% - 30px);
+						box-sizing: border-box;
+
+						.tag {
+							display: inline-block;
+							height: calc(#{$t-small} * 1.5);
+							padding: 0;
+							margin: 2.5px;
+							font-size: $t-small;
+							line-height: 1.5em;
+							border: 1px solid $c-light-grey;
+							color: $c-light-grey;
+							white-space: nowrap;
+
+							label {
+								cursor: pointer;
+								vertical-align: top;
+								position: static;
+								font-size: $t-small;
+								line-height: 1.5em;
+							}
+							.name {
+								margin: 0 5px 0 5px;
+								white-space: nowrap;
+								color: $c-dark-grey;
+							}
+							.close {
+								display: inline-block;
+								position: relative;
+								width: calc(#{$t-small} * 1.5);
+								height: calc(#{$t-small} * 1.5);
+								background-color: $c-light-grey;
+								padding: 0;
+								float: none;
+								transform: none;
+								top: 0;
+
+								&::before {
+									content: '';
+									position: absolute;
+									height: 100%;
+									width: 0;
+									left: 50%;
+									border-left: 1px solid #FFF;
+									transform: rotate(45deg);
+									transform-origin: center;
+								}
+								&::after {
+									content: '';
+									position: absolute;
+									height: 100%;
+									width: 0;
+									left: 50%;
+									border-left: 1px solid #FFF;
+									transform: rotate(-45deg);
+									transform-origin: center;
+								}
+							}
+						}
 					}
 				}
 				/*section:nth-child(odd):not(:last-child) {

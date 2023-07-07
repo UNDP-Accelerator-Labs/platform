@@ -169,6 +169,11 @@ CREATE TABLE extern_db (
 	db VARCHAR(20) UNIQUE NOT NULL,
 	url_prefix TEXT NOT NULL
 );
+INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://acclabs-actionlearningplans.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('exp', 'https://acclabs-experiments.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://acclabs.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://acclabs-solutionsmapping.azurewebsites.net/');
+
 CREATE TABLE pinboards (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
 	old_id INT,

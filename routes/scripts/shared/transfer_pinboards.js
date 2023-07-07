@@ -14,7 +14,7 @@ console.log(
 const link_map = {
 	'ap': 'https://acclabs-actionlearningplans.azurewebsites.net/',
 	'exp': 'https://acclabs-experiments.azurewebsites.net/',
-	'global': 'http://acclabs.azurewebsites.net/',
+	'global': 'https://acclabs.azurewebsites.net/',
 	'sm': 'https://acclabs-solutionsmapping.azurewebsites.net/',
 };
 
@@ -53,7 +53,6 @@ if (action === undefined || action === 'transfer') {
         gbatch.push(gt.none(`
             CREATE TABLE IF NOT EXISTS pinboard_contributors (
                 id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-                -- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
                 participant uuid,
                 pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
             );
@@ -85,7 +84,8 @@ if (action === undefined || action === 'transfer') {
             Object.keys(link_map).forEach((key) => {
                 gbatch.push(gt.none(`
                     INSERT INTO extern_db (db, url_prefix)
-                    VALUES ($1, $2);
+                    VALUES ($1, $2)
+                    ON CONFLICT ON CONSTRAINT extern_db_db_key DO NOTHING;
                 `, [key, link_map[key]]));
             });
             await gt.batch(gbatch);
@@ -103,16 +103,17 @@ if (action === undefined || action === 'transfer') {
         gbatch.clear();
         DB.conn.tx(async (ct) => {
             const cbatch = [];
+            cbatch.push(ct.none(`ALTER TABLE _pinboard_contributions RENAME TO pinboard_contributions;`));
+            cbatch.push(ct.none(`ALTER TABLE _pinboard_contributors RENAME TO pinboard_contributors;`));
+            cbatch.push(ct.none(`ALTER TABLE _pinboards RENAME TO pinboards;`));
             cbatch.push(ct.none(`ALTER TABLE mobilizations DROP COLUMN collection_id;`));
             cbatch.push(ct.none(`ALTER TABLE mobilizations RENAME COLUMN old_collection TO collection;`));
             cbatch.push(ct.none(`
                 ALTER TABLE mobilizations ADD CONSTRAINT mobilizations_collection_fkey
                 FOREIGN KEY (collection) REFERENCES pinboards (id) MATCH SIMPLE
                     ON UPDATE NO ACTION
-                    ON DELETE NO ACTION;`));
-                    cbatch.push(ct.none(`ALTER TABLE _pinboard_contributions RENAME TO pinboard_contributions;`));
-                    cbatch.push(ct.none(`ALTER TABLE _pinboard_contributors RENAME TO pinboard_contributors;`));
-            cbatch.push(ct.none(`ALTER TABLE _pinboards RENAME TO pinboards;`));
+                    ON DELETE NO ACTION;
+            `));
             await ct.batch(cbatch);
             cbatch.clear();
         });

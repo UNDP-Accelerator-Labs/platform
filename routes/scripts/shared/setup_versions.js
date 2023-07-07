@@ -1,6 +1,9 @@
 const { DB } = require('../../../config')
-let table = process.argv[2]
-const arg = process.argv[3]
+let table = process.env['TABLE']
+const arg = process.env['ACTION']
+if (!arg) {
+	throw new Error(`missing argument action=${process.argv}`);
+}
 
 if (!table) table = 'pads'
 

@@ -146,7 +146,8 @@ CREATE TABLE mobilizations (
 	pad_limit INT DEFAULT 1,
 	description TEXT,
 	language VARCHAR(9),
-	collection INT REFERENCES pinboards(id),
+	collection INT,
+	old_collection INT,
 	version ltree
 );
 CREATE INDEX version_idx ON mobilizations USING GIST (version);

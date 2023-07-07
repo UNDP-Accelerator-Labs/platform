@@ -105,7 +105,35 @@ For updating tables to use ltree (if you didn't run `init.sql` from scratch)
 run:
 
 ```
-ENV=<yourenv> CMD=setup_versions.js make -s script pads update
-ENV=<yourenv> CMD=setup_versions.js make -s script mobilizations update
-ENV=<yourenv> CMD=setup_versions.js make -s script templates update
+make -s script ENV=<yourenv> CMD=setup_versions.js TABLE=pads ACTION=update
+make -s script ENV=<yourenv> CMD=setup_versions.js TABLE=mobilizations ACTION=update
+make -s script ENV=<yourenv> CMD=setup_versions.js TABLE=templates ACTION=update
+```
+
+## Updating to move pinboards
+
+For moving the pinboards tables (if you didn't run `init.sql` from scratch)
+run:
+
+```
+make script ENV=.ap.env CMD=transfer_pinboards.js ACTION=transfer
+make script ENV=.exp.env CMD=transfer_pinboards.js ACTION=transfer
+make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=transfer
+```
+
+Where the env files contain the connections to the respective dbs.
+At this point the changes are still reversible via:
+
+```
+make script ENV=.ap.env CMD=transfer_pinboards.js ACTION=rollback
+make script ENV=.exp.env CMD=transfer_pinboards.js ACTION=rollback
+make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=rollback
+```
+
+To finalize the changes and making it irreversible run:
+
+```
+make script ENV=.ap.env CMD=transfer_pinboards.js ACTION=finish
+make script ENV=.exp.env CMD=transfer_pinboards.js ACTION=finish
+make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=finish
 ```

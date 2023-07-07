@@ -1,6 +1,10 @@
 const { DB } = require('../../../config')
 const action = process.env['ACTION'];
 
+Array.prototype.clear = function () {
+	this.length = 0;
+};
+
 const { database: fInfoDB, host: fInfoHost, user: fInfoUser } = DB.conn.$cn;
 const { database: tInfoDB, host: tInfoHost, user: tInfoUser } = DB.general.$cn;
 console.log(`action ${action || 'transfer'}`)
@@ -8,10 +12,10 @@ console.log(
     `transferring from ${fInfoDB} ${fInfoHost} ${fInfoUser} ` +
     `to ${tInfoDB} ${tInfoHost} ${tInfoUser}}`);
 const link_map = {
-	'action-plans': 'https://acclabs-actionlearningplans.azurewebsites.net/',
-	'experiments': 'https://acclabs-experiments.azurewebsites.net/',
-	'pads': 'http://acclabs.azurewebsites.net/',
-	'solutions-mapping': 'https://acclabs-solutionsmapping.azurewebsites.net//',
+	'ap': 'https://acclabs-actionlearningplans.azurewebsites.net/',
+	'exp': 'https://acclabs-experiments.azurewebsites.net/',
+	'global': 'http://acclabs.azurewebsites.net/',
+	'sm': 'https://acclabs-solutionsmapping.azurewebsites.net/',
 };
 
 if (action === undefined || action === 'transfer') {
@@ -31,9 +35,7 @@ if (action === undefined || action === 'transfer') {
                 old_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
                 title VARCHAR(99),
                 description TEXT,
-                -- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
                 owner uuid,
-                -- public BOOLEAN DEFAULT FALSE,
                 status INT DEFAULT 0,
                 display_filters BOOLEAN DEFAULT FALSE,
                 display_map BOOLEAN DEFAULT FALSE,
@@ -41,7 +43,7 @@ if (action === undefined || action === 'transfer') {
                 slideshow BOOLEAN DEFAULT FALSE,
                 "date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 mobilization_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
-                mobilization INT  -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
+                mobilization INT
             );
         `));
         gbatch.push(gt.none(`ALTER TABLE pinboards DROP CONSTRAINT IF EXISTS unique_pinboard_owner;`));
@@ -69,12 +71,25 @@ if (action === undefined || action === 'transfer') {
             );
         `));
         await gt.batch(gbatch);
+        gbatch.clear();
         await DB.conn.tx(async (ct) => {
             const cbatch = [];
             cbatch.push(ct.none(`ALTER TABLE mobilizations DROP CONSTRAINT IF EXISTS mobilizations_collection_fkey;`));
             cbatch.push(ct.none(`ALTER TABLE mobilizations RENAME COLUMN collection TO old_collection;`));
             cbatch.push(ct.none(`ALTER TABLE mobilizations ADD COLUMN IF NOT EXISTS collection_id INT;`));
+            cbatch.push(ct.none(`ALTER TABLE pinboards RENAME TO _pinboards;`));
+            cbatch.push(ct.none(`ALTER TABLE pinboard_contributors RENAME TO _pinboard_contributors;`));
+            cbatch.push(ct.none(`ALTER TABLE pinboard_contributions RENAME TO _pinboard_contributions;`));
             await ct.batch(cbatch);
+            cbatch.clear();
+            Object.keys(link_map).forEach((key) => {
+                gbatch.push(gt.none(`
+                    INSERT INTO extern_db (db, url_prefix)
+                    VALUES ($1, $2);
+                `, [key, link_map[key]]));
+            });
+            await gt.batch(gbatch);
+            gbatch.clear();
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'rollback') {
@@ -85,6 +100,7 @@ if (action === undefined || action === 'transfer') {
         gbatch.push(gt.none(`DROP TABLE IF EXISTS pinboards CASCADE`));
         gbatch.push(gt.none(`DROP TABLE IF EXISTS extern_db CASCADE`));
         await gt.batch(gbatch);
+        gbatch.clear();
         DB.conn.tx(async (ct) => {
             const cbatch = [];
             cbatch.push(ct.none(`ALTER TABLE mobilizations DROP COLUMN collection_id;`));
@@ -94,7 +110,11 @@ if (action === undefined || action === 'transfer') {
                 FOREIGN KEY (collection) REFERENCES pinboards (id) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION;`));
+                    cbatch.push(ct.none(`ALTER TABLE _pinboard_contributions RENAME TO pinboard_contributions;`));
+                    cbatch.push(ct.none(`ALTER TABLE _pinboard_contributors RENAME TO pinboard_contributors;`));
+            cbatch.push(ct.none(`ALTER TABLE _pinboards RENAME TO pinboards;`));
             await ct.batch(cbatch);
+            cbatch.clear();
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'finish') {

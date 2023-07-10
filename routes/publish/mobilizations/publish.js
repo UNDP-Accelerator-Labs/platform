@@ -108,7 +108,7 @@ module.exports = (req, res) => {
 					return t.none(`
 						INSERT INTO pinboard_contributors (pinboard, participant)
 						VALUES ($1::INT, $2)
-						ON CONFLICT ON CONSTRAINT unique_pinboard_contributor
+						ON CONFLICT ON CONSTRAINT pinboard_contributors_pkey
 							DO NOTHING
 					;`, [ result, uuid ])
 				}).catch(err => console.log(err)))

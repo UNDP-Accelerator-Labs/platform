@@ -199,7 +199,6 @@ CREATE TABLE pinboard_contributors (
 	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
 	PRIMARY KEY (participant, pinboard)
 );
-ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
 
 CREATE TABLE pinboard_contributions (
 	pad INT NOT NULL,

@@ -58,8 +58,8 @@ if (modules.some(d => d.type === 'mobilizations')) {
 	}
 }
 // IF THERE ARE TEMPLATES, AND THE contribute RIGHTS FOR PADS HAVE NOT BEEN SET, SET THEM
-// if (modules.some(d => d.type === 'templates') 
-// 	&& !modules.some(d => d.type === 'pads' 
+// if (modules.some(d => d.type === 'templates')
+// 	&& !modules.some(d => d.type === 'pads'
 // 		&& !isNaN(d.rights?.write.templated)
 // 	)
 // ) {
@@ -100,7 +100,24 @@ exports.engagementtypes = engagementtypes || []
 exports.app_languages = app_languages.sort((a, b) => a.localeCompare(b))
 
 // DB CONNECTION
-exports.DB = require('./db/').DB
+const DB = require('./db/').DB;
+exports.DB = DB;
+
+// own db id
+let ownDBid = null;
+
+exports.ownDB = async function () {
+	if (ownDBid === null) {
+		let aid = app_id;
+		if (app_id === 'local') {
+			aid = 'sm';
+		}
+		ownDBid = (await DB.general.one(`
+			SELECT id FROM extern_db WHERE db = $1;
+		`, [aid])).id;
+	}
+	return ownDBid;
+};
 
 // DISPLAY VARIABLES
 exports.map = map

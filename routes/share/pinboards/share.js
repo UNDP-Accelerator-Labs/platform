@@ -16,8 +16,10 @@ module.exports = (req, res) => {
 
 	DB.conn.tx(t => {
 		const batch = []
+		// FIXME @joschi update pinboards
 		const sql = `${DB.pgp.helpers.insert(data, [ 'pinboard', 'participant' ], 'pinboard_contributors')} ON CONFLICT ON CONSTRAINT unique_pinboard_contributor DO NOTHING;`
 		batch.push(t.none(sql))
+		// FIXME @joschi update pinboards
 		batch.push(t.none(`
 			DELETE FROM pinboard_contributors
 			WHERE pinboard = $1::INT
@@ -26,6 +28,7 @@ module.exports = (req, res) => {
 		;`, [ pinboard, contributor ]))
 		return t.batch(batch)
 		.then(_ => {
+			// FIXME @joschi update pinboards
 			return t.one(`SELECT title FROM pinboards WHERE id = $1::INT;`, [ pinboard ])
 			.then(result => {
 				const { title } = result
@@ -36,7 +39,7 @@ module.exports = (req, res) => {
 						AND notifications = TRUE
 				;`, [ contributor, uuid ])
 				.then(results => {
-					// SEND EMAIL NOTIFICATION	
+					// SEND EMAIL NOTIFICATION
 					// NEED TO CHECK IF EMAIL NOTIFICATIONS IS ACTIVATED
 					return Promise.all(results.map(d => {
 						sendemail({

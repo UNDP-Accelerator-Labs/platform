@@ -171,6 +171,7 @@ module.exports = async (req, res) => {
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err)))
 		// LIST OF PINBOARDS/ COLLECTIONS
+		// FIXME @joschi update pinboards
 		batch.push(t.any(`
 			SELECT pb.id, COUNT(pc.id)::INT, pb.title, pb.date, pb.owner
 			FROM pinboards pb

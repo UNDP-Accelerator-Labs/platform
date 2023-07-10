@@ -7,13 +7,13 @@ module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
 	const { object } = req.params || {}
-	
+
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
-	
+
 	let collaborators_ids = collaborators.map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
@@ -25,8 +25,8 @@ module.exports = async kwargs => {
 		// THE ORDER HERE IS IMPORTANT, THIS IS WHAT ENSURE THE TREE CONSTRUCTION LOOP WORKS
 		return t.any(`
 			SELECT id FROM pads p
-			WHERE TRUE 
-				$1:raw 
+			WHERE TRUE
+				$1:raw
 				AND p.id NOT IN (SELECT review FROM reviews)
 			$2:raw
 			LIMIT $3 OFFSET $4
@@ -34,7 +34,7 @@ module.exports = async kwargs => {
 		.then(async pads => {
 			pads = pads.map(d => d.id)
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
-			
+
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
@@ -77,7 +77,7 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// REVIEW STATUS
 			batch.push(t.any(`
-				SELECT p.id, 
+				SELECT p.id,
 					CASE WHEN rr.pad IS NOT NULL
 						THEN 1
 						ELSE 0
@@ -89,7 +89,7 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// TEMPLATE INFORMATION
 			batch.push(t.any(`
-				SELECT p.id, t.title AS template_title 
+				SELECT p.id, t.title AS template_title
 				FROM templates t
 				INNER JOIN pads p
 					ON p.template = t.id
@@ -97,7 +97,7 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// MOBILIZATION INFORMATION
 			batch.push(t.any(`
-				SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit 
+				SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit
 				FROM mobilizations m
 				INNER JOIN mobilization_contributions mc
 					ON mc.mobilization = m.id
@@ -105,6 +105,7 @@ module.exports = async kwargs => {
 				GROUP BY (mc.pad, m.title, m.pad_limit)
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// PINBOARD INFORMATION
+			// FIXME @joschi update pinboards
 			batch.push(t.any(`
 				SELECT p.id, json_agg(json_build_object('id', pb.id, 'title', pb.title)) AS pinboards
 				FROM pads p
@@ -118,8 +119,8 @@ module.exports = async kwargs => {
 			;`, [ padlist, current_user ]).catch(err => console.log(err)))
 			// FOLLOW UP STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
-				SELECT p.id, 
-					COALESCE((nlevel(p.version) > 1 
+				SELECT p.id,
+					COALESCE((nlevel(p.version) > 1
 						AND index(p.version, text2ltree(p.id::text)) > 0
 						AND m.copy = FALSE
 					), FALSE) AS is_followup
@@ -137,10 +138,10 @@ module.exports = async kwargs => {
 				const batch1 = []
 
 				batch1.push(t1.any(`
-					SELECT p.id AS id, 
+					SELECT p.id AS id,
 						json_agg(json_build_object(
-							'id', m.id, 
-							'title', m.title, 
+							'id', m.id,
+							'title', m.title,
 							'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
 							'template', m.template,
 							'count', (
@@ -163,11 +164,12 @@ module.exports = async kwargs => {
 						AND p.id IN $1:raw
 					GROUP BY p.id
 				;`, [ padlist, followup_count ]))
+				// FIXME @joschi update pinboards
 				batch1.push(t1.any(`
-					SELECT p.id AS id, 
+					SELECT p.id AS id,
 						json_agg(json_build_object(
-							'id', m.id, 
-							'title', m.title, 
+							'id', m.id,
+							'title', m.title,
 							'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
 							'template', m.template,
 							'count', (
@@ -207,8 +209,8 @@ module.exports = async kwargs => {
 			}).catch(err => console.log(err)))
 			// FORWARD STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
-				SELECT p.id, 
-					COALESCE((nlevel(p.version) > 1 
+				SELECT p.id,
+					COALESCE((nlevel(p.version) > 1
 						AND index(p.version, text2ltree(p.id::text)) > 0
 						AND m.copy = TRUE
 					), FALSE) AS is_forward
@@ -222,10 +224,10 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// FORWARD OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
-				SELECT p.id AS id, 
+				SELECT p.id AS id,
 					json_agg(json_build_object(
-						'id', m.id, 
-						'title', m.title, 
+						'id', m.id,
+						'title', m.title,
 						'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
 						'template', m.template,
 						'count', (
@@ -256,7 +258,7 @@ module.exports = async kwargs => {
 			}).catch(err => console.log(err)))
 			// DETECT PUBLICATION LIMIT TO DETERMINE WHETHER OR NOT THE PAD CAN BE PUBLISHED
 			batch.push(t.any(`
-				SELECT p.id, COALESCE(m.pad_limit - COUNT(contributed.id), 1)::INT AS available_publications 
+				SELECT p.id, COALESCE(m.pad_limit - COUNT(contributed.id), 1)::INT AS available_publications
 				FROM pads p
 				INNER JOIN mobilization_contributions mc
 					ON mc.pad = p.id
@@ -286,7 +288,7 @@ module.exports = async kwargs => {
 				LEFT JOIN ($3:raw) ce ON ce.docid = p.id
 				WHERE p.id IN $1:raw
 			;`, [ padlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
-			
+
 			return t.batch(batch)
 			.then(results => {
 				let data = pads.map(d => { return { id: d } })
@@ -295,7 +297,7 @@ module.exports = async kwargs => {
 				})
 				return data
 			}).catch(err => console.log(err))
-			
+
 		}).then(results => {
 			// THIS IS A LEGACY FIX FOR THE SOLUTIONS MAPPING PLATFORM
 			// NEED TO CHECK WHETHER THERE IS A CONSENT FORM ATTACHED FOR SOLUTIONS THAT ARE NOT PUBLIC (status = 2)
@@ -306,11 +308,11 @@ module.exports = async kwargs => {
 	}).then(async results => {
 		const data = await join.users(results, [ language, 'owner' ])
 
-		return { 
+		return {
 			data,
-			// count: (page - 1) * page_content_limit, 
-			// count: page * page_content_limit, 
-			count: page_content_limit, 
+			// count: (page - 1) * page_content_limit,
+			// count: page * page_content_limit,
+			count: page_content_limit,
 			sections: [{ data }]
 		}
 	}).catch(err => console.log(err))

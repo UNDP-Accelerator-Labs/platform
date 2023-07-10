@@ -4,6 +4,7 @@ module.exports = (req, res) => {
 	const { id, ...data } = req.body || {}
 	const sql = DB.pgp.helpers.sets(data)
 
+	// FIXME @joschi update pinboards
 	DB.conn.one(`
 		UPDATE pinboards
 		SET $1:raw

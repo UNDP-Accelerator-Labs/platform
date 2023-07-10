@@ -12,13 +12,14 @@ module.exports = kwargs => {
 
 	// GET FILTERS
 	const [ f_space, page, full_filters ] = filter(kwargs.req)
-	
+
 	let collaborators_ids = collaborators.map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	return conn.task(gt => {
+		// FIXME @joschi update pinboards?
 		return gt.any(`
-			SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status, 
+			SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status,
 			u.confirmed_at, u.left_at,
 			u.language, u.secondary_languages,
 			to_char(u.confirmed_at, 'DD Mon YYYY') AS start_date, to_char(u.left_at, 'DD Mon YYYY') AS end_date,
@@ -32,7 +33,7 @@ module.exports = kwargs => {
 			-- THIS IS THE PINBOARD CASE STATEMENT
 			COALESCE(
 			(SELECT json_agg(json_build_object(
-					'id', t.id, 
+					'id', t.id,
 					'title', t.name
 				)) FROM teams t
 				INNER JOIN team_members tm
@@ -48,7 +49,7 @@ module.exports = kwargs => {
 			-- FROM cohorts c
 			-- INNER JOIN users u
 			-- 	ON u.uuid = c.contributor
-			
+
 			INNER JOIN country_names cn
 				ON cn.iso3 = u.iso3
 			INNER JOIN languages l
@@ -83,7 +84,7 @@ module.exports = kwargs => {
 							AND m.status = 2
 						GROUP BY mc.participant
 					;`, [ users.map(d => d.id) ]))
-					
+
 					batch.push(t.any(`
 						SELECT owner AS id, COALESCE(COUNT (id), 0)::INT AS private_associated_pads FROM pads
 						WHERE owner IN ($1:csv)
@@ -97,7 +98,7 @@ module.exports = kwargs => {
 							AND status >= 2
 						GROUP BY owner
 					;`, [ users.map(d => d.id) ]))
-					
+
 					return t.batch(batch)
 					.then(results => {
 						const [ ongoing_associated_mobilizations, past_associated_mobilizations, private_associated_pads, associated_pads ] = results
@@ -125,10 +126,10 @@ module.exports = kwargs => {
 		// })
 		// sections.sort((a, b) => a.key?.localeCompare(b.key))
 
-		return { 
+		return {
 			data,
-			// count: (page - 1) * page_content_limit, 
-			// count: page * page_content_limit, 
+			// count: (page - 1) * page_content_limit,
+			// count: page * page_content_limit,
 			sections: [{ data }]
 			// sections
 		}

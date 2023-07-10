@@ -3,13 +3,14 @@ const { modules, DB } = include('config/')
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id, mobilization } = req.body || {}
-	
+
 	let collaborators_ids = collaborators.map(d => d.uuid)
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	if (!board_id) { // CREATE NEW BOARD
 		if (board_title?.trim().length > 0) {
 			return DB.conn.tx(t => {
+				// FIXME @joschi update pinboards
 				return t.oneOrNone(`
 					INSERT INTO pinboards (title, owner)
 					VALUES ($1, $2)
@@ -18,6 +19,7 @@ exports.pin = (req, res) => {
 					RETURNING id
 				;`, [ board_title, uuid ])
 				.then(result => {
+					// FIXME @joschi update pinboards
 					if (result) return result
 					else return t.one(`
 						SELECT id FROM pinboards
@@ -28,19 +30,20 @@ exports.pin = (req, res) => {
 					const { id } = result
 					const batch = []
 
+					// FIXME @joschi update pinboards
 					batch.push(t.none(`
 						INSERT INTO pinboard_contributors (pinboard, participant)
 						VALUES ($1::INT, $2)
 						ON CONFLICT ON CONSTRAINT unique_pinboard_contributor
 							DO NOTHING
 					;`, [ id, uuid ]))
-					
+
 					batch.push(
 						t.none(insertpads(id, object_id, mobilization))
 						.then(_ => t.none(updatestatus(id, object_id, mobilization)))
 						.catch(err => console.log(err))
 					)
-					
+
 					return t.batch(batch)
 					.then(_ => {
 						const batch = []
@@ -89,6 +92,7 @@ exports.unpin = (req, res) => {
 			return t.none(removepads(board_id, object_id, mobilization, uuid))
 			.then(_ => t.none(updatestatus(board_id, object_id, mobilization)))
 			.then(_ => {
+				// FIXME @joschi update pinboards
 				return t.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
@@ -121,11 +125,13 @@ function insertpads (_id, _object_id, _mobilization) {
 			return obj
 		})
 
+		// FIXME @joschi update pinboards
 		const insert = DB.pgp.helpers.insert(data, ['pinboard', 'pad'], 'pinboard_contributions')
 		const constraint = DB.pgp.as.format(`ON CONFLICT ON CONSTRAINT unique_pad_pinboard DO NOTHING`)
 		return `${insert} ${constraint}`
 
 	} else if (_mobilization) {
+		// FIXME @joschi update pinboards
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET mobilization = $1::INT
@@ -136,16 +142,18 @@ function insertpads (_id, _object_id, _mobilization) {
 function removepads (_id, _object_id, _mobilization, _uuid) {
 	if (_object_id) {
 		if (!Array.isArray(_object_id)) _object_id = [_object_id]
+		// FIXME @joschi update pinboards
 		return DB.pgp.as.format(`
 			DELETE FROM pinboard_contributions
 			WHERE pinboard = $1::INT
 				AND pad IN ($2:csv)
 				AND pinboard IN (
-					SELECT id FROM pinboards 
+					SELECT id FROM pinboards
 					WHERE owner = $3
 				)
 		;`, [ _id, _object_id, _uuid ])
 	} else if (_mobilization) {
+		// FIXME @joschi update pinboards
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET mobilization = NULL
@@ -156,6 +164,7 @@ function removepads (_id, _object_id, _mobilization, _uuid) {
 }
 function updatestatus (_id, _object_id, _mobilization) {
 	if (_object_id) {
+		// FIXME @joschi update pinboards
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = (SELECT GREATEST (
@@ -168,6 +177,7 @@ function updatestatus (_id, _object_id, _mobilization) {
 			WHERE id = $1::INT
 		;`, [ _id ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS
+		// FIXME @joschi update pinboards
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = (
@@ -179,11 +189,12 @@ function updatestatus (_id, _object_id, _mobilization) {
 				WHERE pin.id = $1::INT
 			)
 			WHERE id = $1::INT
-		;`, [ _id ])	
+		;`, [ _id ])
 	}
 }
 function retrievepins (_object_id) {
 	if (!Array.isArray(_object_id)) _object_id = [_object_id]
+	// FIXME @joschi update pinboards
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
@@ -194,6 +205,7 @@ function retrievepins (_object_id) {
 	;`, [ _object_id ])
 }
 function retrievepinboards (_owners) {
+	// FIXME @joschi update pinboards
 	return DB.pgp.as.format(`
 		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count FROM pinboards p
 		INNER JOIN pinboard_contributions pc

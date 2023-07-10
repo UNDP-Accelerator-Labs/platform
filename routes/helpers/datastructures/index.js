@@ -150,6 +150,7 @@ exports.pagemetadata = (_kwargs) => {
 		} else batch.push(null)
 		// PINBOARD LIST
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
+			// FIXME @joschi update pinboards
 			batch.push(t.any(`
 				SELECT pb.id, pb.title, pb.status,
 					COUNT (pc.pad) AS size,

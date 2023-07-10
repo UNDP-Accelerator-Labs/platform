@@ -37,6 +37,7 @@ module.exports = async (req, res) => {
 						;`, [ decodeURI(instance) ]) // CHECK WHETHER THE instance IS A TEAM: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
 						.then(result => {
 							if (!result) {
+								// FIXME @joschi update pinboards
 								return DB.conn.oneOrNone(`
 									SELECT id, title FROM pinboards
 									WHERE LOWER(title) = LOWER($1)
@@ -87,6 +88,7 @@ module.exports = async (req, res) => {
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'pinned') {
 			if (public) {
+				// FIXME @joschi update pinboards
 				if (pinboard) f_space = DB.pgp.as.format(`
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
 						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
@@ -94,6 +96,7 @@ module.exports = async (req, res) => {
 					`, [ pinboard ])
 				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
 			} else { // THE USER IS LOGGED IN
+				// FIXME @joschi update pinboards
 				if (pinboard) f_space = DB.pgp.as.format(`
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
 						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $3::INT)
@@ -104,7 +107,7 @@ module.exports = async (req, res) => {
 		}
 		else if (space === 'versiontree') {
 			f_space = DB.pgp.as.format(`
-				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))) 
+				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2)))
 				OR p.version <@ (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))))
 			`, [ nodes, collaborators_ids, rights ])
 		}
@@ -135,10 +138,6 @@ module.exports = async (req, res) => {
 		}
 		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
-		// if (pinboard) platform_filters.push(DB.pgp.as.format(`
-		// 		(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
-		// 		OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
-		// 	`, [ pinboard ]))
 		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
 		// if (sources) platform_filters.push(DB.pgp.as.format(`AND p.source IS NULL`))
 

@@ -195,15 +195,14 @@ CREATE TABLE pinboards (
 ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
 
 CREATE TABLE pinboard_contributors (
-	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	participant uuid,
+	participant uuid NOT NULL,
 	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
+	PRIMARY KEY (participant, pinboard)
 );
 ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
 
 CREATE TABLE pinboard_contributions (
-	pad INT UNIQUE NOT NULL,
+	pad INT NOT NULL,
 	db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	PRIMARY KEY (pad, db, pinboard)

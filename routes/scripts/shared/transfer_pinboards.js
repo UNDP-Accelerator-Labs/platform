@@ -1,4 +1,7 @@
-const { DB } = require('../../../config')
+const { DB, app_id } = require('../../../config');
+if (['local', 'global'].includes(app_id)) {
+    throw new Error(`app_id '${app_id}' must be one of 'ap', 'exp', or 'sm'!`);
+}
 const action = process.env['ACTION'];
 
 Array.prototype.clear = function () {
@@ -53,9 +56,9 @@ if (action === undefined || action === 'transfer') {
         `));
         gbatch.push(gt.none(`
             CREATE TABLE IF NOT EXISTS pinboard_contributors (
-                id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-                participant uuid,
-                pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
+                participant uuid NOT NULL,
+                pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+                PRIMARY KEY (participant, pinboard)
             );
         `));
         gbatch.push(gt.none(`ALTER TABLE pinboard_contributors DROP CONSTRAINT IF EXISTS unique_pinboard_contributor;`));
@@ -64,7 +67,7 @@ if (action === undefined || action === 'transfer') {
         `));
         gbatch.push(gt.none(`
             CREATE TABLE IF NOT EXISTS pinboard_contributions (
-                pad INT UNIQUE NOT NULL,
+                pad INT NOT NULL,
                 db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
                 pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
                 PRIMARY KEY (pad, db, pinboard)
@@ -89,8 +92,85 @@ if (action === undefined || action === 'transfer') {
                     ON CONFLICT ON CONSTRAINT extern_db_db_key DO NOTHING
                     RETURNING id;
                 `, [key, link_map[key]]);
-                db_map[key] = db_id;
+                db_map[key] = db_id.id;
             }));
+            const ownDB = db_map[app_id];
+            const pinboards = await ct.manyOrNone(`SELECT * FROM _pinboards;`);
+            (pinboards ?? []).forEach((row) => {
+                gbatch.push(gt.one(`
+                    INSERT INTO pinboards (
+                        old_id,
+                        old_db,
+                        title,
+                        description,
+                        owner,
+                        status,
+                        display_filters,
+                        display_map,
+                        display_fullscreen,
+                        slideshow,
+                        "date",
+                        mobilization_db,
+                        mobilization)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                    RETURNING id, old_id;
+                `, [
+                    row.id,   // old_id
+                    ownDB,  // old_db
+                    row.title,  // title
+                    row.description,  // description
+                    row.owner,  // owner
+                    row.status,  // status
+                    row.display_filters,  // display_filters
+                    row.display_map,  // display_map
+                    row.display_fullscreen,  // display_fullscreen
+                    row.slideshow,  // slideshow
+                    row.date,  // date
+                    row.mobilization !== null ? ownDB : null,  // mobilization_db
+                    row.mobilization,  // mobilization
+                ]));
+            });
+            const oldIdMap = new Map(((await gt.batch(gbatch)) ?? []).map((row) => [row.old_id, row.id]));
+            gbatch.clear();
+            const mids = await ct.manyOrNone(`
+                SELECT DISTINCT old_collection
+                FROM mobilizations
+                WHERE old_collection IS NOT NULL
+                GROUP BY old_collection;
+            `);
+            const mobIds = new Set(mids.map((row) => row.old_collection) ?? []);
+            oldIdMap.forEach((newId, oldId) => {
+                if (mobIds.has(oldId)) {
+                    cbatch.push(ct.none(`
+                        UPDATE mobilizations
+                        SET collection_id = $1
+                        WHERE old_collection = $2;
+                    `, [newId, oldId]));
+                }
+            });
+            ct.batch(cbatch);
+            cbatch.clear();
+            const pcont = await ct.manyOrNone(`
+                SELECT DISTINCT participant, pinboard
+                FROM _pinboard_contributors
+                WHERE participant IS NOT NULL
+                GROUP BY participant, pinboard;
+            `);
+            (pcont ?? []).forEach((row) => {
+                gbatch.push(gt.none(`
+                    INSERT INTO pinboard_contributors (participant, pinboard)
+                    VALUES ($1, $2);
+                `, [row.participant, oldIdMap.get(row.pinboard)]));
+            });
+            const pdocs = await ct.manyOrNone(`SELECT * FROM _pinboard_contributions;`);
+            (pdocs ?? []).forEach((row) => {
+                gbatch.push(gt.none(`
+                    INSERT INTO pinboard_contributions (pad, db, pinboard)
+                    VALUES ($1, $2, $3);
+                `, [row.pad, ownDB, oldIdMap.get(row.pinboard)]));
+            });
+            await gt.batch(gbatch);
+            gbatch.clear();
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'rollback') {
@@ -120,7 +200,14 @@ if (action === undefined || action === 'transfer') {
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'finish') {
-    // TODO
+    DB.conn.tx(async (ct) => {
+        const cbatch = [];
+        cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboard_contributions CASCADE;`));
+        cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboard_contributors CASCADE;`));
+        cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboards CASCADE;`));
+        await ct.batch(cbatch);
+        cbatch.clear();
+    });
 } else {
     console.log(`unknown action ${action}`);
 }

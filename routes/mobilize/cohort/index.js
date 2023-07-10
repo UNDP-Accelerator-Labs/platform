@@ -1,4 +1,6 @@
-const { modules, DB } = include('config/')
+const { ownDB } = require("../../../config")
+
+const { modules, ownDB, DB } = include('config/')
 const { checklanguage, join, datastructures } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -41,14 +43,14 @@ module.exports = (req, res) => {
 					})
 				}).catch(err => console.log(err)))
 			} else if (pinboard) {
-				// FIXME @joschi update pinboards
-				batch.push(t.any(`
-					SELECT DISTINCT (p.owner) AS id FROM pinboard_contributions pc
-					INNER JOIN pads p
-						ON pc.pad = p.id
-					WHERE pc.pinboard = $1
-				;`, [ pinboard ])
-				.then(async results => {
+				batch.push(ownDB().then(async ownId => {
+					const padlist = await DB.general.any(`
+						SELECT pc.pad FROM pinboard_contributions pc
+						WHERE pc.pinboard = $1 AND pc.db = $2
+					;`, [ pinboard, ownId ]);
+					const results = await t.any(`
+						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN $1
+					`, [ padlist.map((row) => row.pad) ]);
 					const data = await join.users(results, [ language, 'id' ])
 					data.sort((a, b) => a.country?.localeCompare(b.country))
 

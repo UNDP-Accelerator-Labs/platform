@@ -49,7 +49,7 @@ module.exports = (req, res) => {
 						WHERE pc.pinboard = $1 AND pc.db = $2
 					;`, [ pinboard, ownId ]);
 					const results = await t.any(`
-						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN $1
+						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN ($1)
 					`, [ padlist.map((row) => row.pad) ]);
 					const data = await join.users(results, [ language, 'id' ])
 					data.sort((a, b) => a.country?.localeCompare(b.country))

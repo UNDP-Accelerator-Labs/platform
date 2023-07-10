@@ -1,4 +1,4 @@
-const { app_title, DB } = include('config/')
+const { app_title, DB, ownDB } = include('config/')
 const { checklanguage, email: sendemail } = include('routes/helpers/')
 
 const cron = require('node-cron')
@@ -97,15 +97,13 @@ module.exports = (req, res) => {
 				;`, [ id ]))
 			} else {
 				// AUTOMATICALLY CREATE A PUBLIC PINBOARD FOR THIS MOBILIZATION
-				// FIXME @joschi update pinboards
-				batch.push(t.one(`
-					INSERT INTO pinboards (title, description, owner, status, mobilization)
-					VALUES ($1, $2, $3, 3, $4::INT)
-					RETURNING id
-				;`, [ title, description, uuid, id ], d => d.id)
-				.then(result => {
-					// FIXME @joschi update pinboards
-					return t.none(`
+				batch.push(ownDB().then(async ownId => {
+					const result = await DB.general.one(`
+						INSERT INTO pinboards (title, description, owner, status, mobilization, mobilization_db)
+						VALUES ($1, $2, $3, 3, $4::INT, $5)
+						RETURNING id
+					;`, [ title, description, uuid, id, ownId ], d => d.id)
+					return DB.general.none(`
 						INSERT INTO pinboard_contributors (pinboard, participant)
 						VALUES ($1::INT, $2)
 						ON CONFLICT ON CONSTRAINT pinboard_contributors_pkey

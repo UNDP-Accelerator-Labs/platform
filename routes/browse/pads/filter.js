@@ -1,4 +1,4 @@
-const { app_title, DB, modules, engagementtypes, metafields } = include('config/')
+const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
@@ -37,8 +37,7 @@ module.exports = async (req, res) => {
 						;`, [ decodeURI(instance) ]) // CHECK WHETHER THE instance IS A TEAM: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
 						.then(result => {
 							if (!result) {
-								// FIXME @joschi update pinboards
-								return DB.conn.oneOrNone(`
+								return DB.general.oneOrNone(`
 									SELECT id, title FROM pinboards
 									WHERE LOWER(title) = LOWER($1)
 										AND status >= 2
@@ -88,20 +87,36 @@ module.exports = async (req, res) => {
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'pinned') {
 			if (public) {
-				// FIXME @joschi update pinboards
-				if (pinboard) f_space = DB.pgp.as.format(`
+				if (pinboard) {
+					const ownId = await ownDB();
+					const pbpads = await DB.general.any(`
+						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
+					`, [ pinboard, ownId ]);
+					const mobs = await DB.general.any(`
+						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
+					`, [ pinboard, ownId ]);
+					f_space = DB.pgp.as.format(`
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
-						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT))))
-					`, [ pinboard ])
+						AND (p.id IN ($1)
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($2))))
+					`, [ pbpads, mobs ])
+				}
 				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
 			} else { // THE USER IS LOGGED IN
-				// FIXME @joschi update pinboards
-				if (pinboard) f_space = DB.pgp.as.format(`
+				if (pinboard) {
+					const ownId = await ownDB();
+					const pbpads = await DB.general.any(`
+						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
+					`, [ pinboard, ownId ]);
+					const mobs = await DB.general.any(`
+						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
+					`, [ pinboard, ownId ]);
+					f_space = DB.pgp.as.format(`
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
-						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $3::INT)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $3::INT))))
-					`, [ collaborators_ids, rights, pinboard ])
+						AND (p.id IN ($3)
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($4))))
+					`, [ collaborators_ids, rights, pbpads, mobs ])
+				}
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
 			}
 		}

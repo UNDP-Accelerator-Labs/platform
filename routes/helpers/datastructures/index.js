@@ -182,7 +182,7 @@ exports.pagemetadata = (_kwargs) => {
 				const owners = new Map((await t.any(`
 					SELECT p.id, p.owner
 					FROM pads p
-					WHERE p.id IN $1
+					WHERE p.id IN ($1)
 				;`, [ [...pads] ])).map((row) => [row.id, row.owner]));
 				return pinboard_stats.map((stats) => {
 					return {

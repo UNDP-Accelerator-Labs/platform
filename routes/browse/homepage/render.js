@@ -188,12 +188,12 @@ module.exports = async (req, res) => {
 				return t.one(`
 					SELECT COUNT(*) AS count
 					FROM pads p
-					WHERE p IN $2 AND
+					WHERE p IN ($2) AND
 						$1:raw
 				`, [ full_filters, pads.get(pbid) ]);
 			}));
 			const countMap = new Map(pbids.map((pbid, index) => [pbid, counts[index]]));
-			return (await t.any(`
+			return (await DB.general.any(`
 				SELECT pb.id, pb.title, pb.date, pb.owner
 				FROM pinboards pb
 				WHERE pb.status > 2

@@ -128,22 +128,22 @@ function removemember (_id, _object_id) {
 	}
 }
 // TO DO: FINISH HERE
-function updatestatus (_id, _object_id) {
-	if (_object_id) {
-		// FIXME @joschi update pinboards
-		return DB.pgp.as.format(`
-			UPDATE pinboards
-			SET status = (SELECT GREATEST (
-				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				WHERE pc.pinboard = $1::INT), 1)
-				, status)
-			)
-			WHERE id = $1::INT
-		;`, [ _id ])
-	}
-}
+// FIXME not used...
+// function updatestatus (_id, _object_id) {
+// 	if (_object_id) {
+// 		return DB.pgp.as.format(`
+// 			UPDATE pinboards
+// 			SET status = (SELECT GREATEST (
+// 				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
+// 				INNER JOIN pinboard_contributions pc
+// 					ON pc.pad = p.id
+// 				WHERE pc.pinboard = $1::INT), 1)
+// 				, status)
+// 			)
+// 			WHERE id = $1::INT
+// 		;`, [ _id ])
+// 	}
+// }
 function retrievepins (_object_id) {
 	return DB.pgp.as.format(`
 		SELECT t.id, t.name AS title FROM teams t

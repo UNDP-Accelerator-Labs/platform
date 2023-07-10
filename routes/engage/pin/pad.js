@@ -40,7 +40,7 @@ exports.pin = (req, res) => {
 
 					batch.push(
 						t.none(insertpads(id, object_id, mobilization))
-						.then(_ => t.none(updatestatus(id, object_id, mobilization)))
+						.then(async _ => DB.general.none(await updatestatus(t, id, object_id, mobilization)))
 						.catch(err => console.log(err))
 					)
 
@@ -63,7 +63,7 @@ exports.pin = (req, res) => {
 		if (object_id) {
 			return DB.conn.tx(t => {
 				return t.none(insertpads(board_id, object_id, mobilization))
-				.then(_ => t.none(updatestatus(board_id, object_id, mobilization)))
+				.then(async _ => DB.general.none(await updatestatus(t, board_id, object_id, mobilization)))
 				.then(_ => {
 					const batch = []
 					batch.push(t.any(retrievepins(object_id)))
@@ -90,10 +90,10 @@ exports.unpin = (req, res) => {
 	if (object_id) {
 		return DB.conn.tx(t => {
 			return t.none(removepads(board_id, object_id, mobilization, uuid))
-			.then(_ => t.none(updatestatus(board_id, object_id, mobilization)))
+			.then(async _ => DB.general.none(await updatestatus(t, board_id, object_id, mobilization)))
 			.then(_ => {
 				// FIXME @joschi update pinboards
-				return t.none(`
+				return DB.general.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
 						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
@@ -162,7 +162,7 @@ function removepads (_id, _object_id, _mobilization, _uuid) {
 		;`, [ _id, _uuid ])
 	}
 }
-function updatestatus (_id, _object_id, _mobilization) {
+async function updatestatus (t, _id, _object_id, _mobilization) {
 	if (_object_id) {
 		// FIXME @joschi update pinboards
 		return DB.pgp.as.format(`

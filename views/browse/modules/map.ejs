@@ -193,6 +193,9 @@ if (drawMap) {
 
 		if (Math.max(...clusters.map(d => d.length)) > 1) {
 			map.fitBounds(bounds.getBounds(), { padding: [15, 15] });
+		} else if (Math.max(...clusters.map(d => d.length)) === 1) {
+			map.fitBounds(bounds.getBounds(), { padding: [15, 15] });
+			map.setZoom(10);
 		} else {
 			map.setView([centerpoint.lat, centerpoint.lng], 2);
 		}

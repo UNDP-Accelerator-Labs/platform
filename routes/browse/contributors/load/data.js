@@ -17,7 +17,6 @@ module.exports = kwargs => {
 	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
 
 	return conn.task(gt => {
-		// FIXME @joschi update pinboards?
 		return gt.any(`
 			SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status,
 			u.confirmed_at, u.left_at,

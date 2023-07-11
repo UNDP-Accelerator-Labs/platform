@@ -79,7 +79,7 @@
 							<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
 							<!-- TO DO: REMOVE if (false) TO REACTIVATE THIS -->
 							<% if (false) { %>
-								<form class='lg' method='POST' action='/generate/pdf'>
+								<form class='lg xl xxl' method='POST' action='/generate/pdf'>
 									<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
 									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
 									<% if (locals.data?.status === 0 || !locals.data?.status) { %><button type='submit' class='generate-pdf' disabled>Generate PDF</button>
@@ -133,11 +133,11 @@
 	</main>
 </div>
 
-<div class='sidebar lg'>
+<div class='sidebar lg xl xxl'>
 	<% if (['contribute', 'edit'].includes(activity)) { %>
 		<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
 		<div class='media-input-group input-group' tabindex='1'>
-			<button class='scroll-up m lg'><label>&rsaquo;</label></button>
+			<button class='scroll-up m lg xl xxl'><label>&rsaquo;</label></button>
 			<div class='inner'>
 				<div class='btn-group'>
 				<% if (!review_template) { %>
@@ -170,7 +170,7 @@
 				<% } %>
 				</div>
 			</div>
-			<button class='scroll-down m lg'><label>&rsaquo;</label></button>
+			<button class='scroll-down m lg xl xxl'><label>&rsaquo;</label></button>
 		</div>
 		<script type='text/javascript'>
 			if (!mediaSize) var mediaSize = getMediaSize()

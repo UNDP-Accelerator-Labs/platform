@@ -15,7 +15,7 @@
 	}
 %>
 
-<div class='map-container<% if (mapscale !== "full-screen") { %> lg<% } %> <%- mapscale %>'>
+<div class='map-container<% if (mapscale !== "full-screen") { %> m lg xl xxl<% } %> <%- mapscale %>'>
 	<div id='map'>
 	</div>
 	<!-- <% if (locals.session_data?.logged) { %>
@@ -28,7 +28,7 @@
 		!(space === 'pinned'
 		&& (!locals.pinboard?.editable || activity === 'preview'))
 	) { %>
-		<div class='btn-group map-scale lg'>
+		<div class='btn-group map-scale m lg xl xxl'>
 			<a class='mscale'>
 				<i class='material-icons'>
 					<% if (mapscale === 'contain') { %>

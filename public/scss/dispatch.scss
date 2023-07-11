@@ -1,10 +1,9 @@
 /* https://www.freecodecamp.org/news/css-media-queries-breakpoints-media-types-standard-resolutions-and-more/ */
-
+/* https://www.browserstack.com/guide/ideal-screen-sizes-for-responsive-design */
 @import '_base';
 
-/* Small devices (landscape phones, 480px and up) */
-@media (max-width: 480px) {
-/*@media (max-width: 480px) and (orientation: portrait) {*/
+/* Extra small devices (landscape phones, 480px and up) */
+@media screen and (max-width: 767px) {
 	@import '_base.xs';
 	@import '_navigate.xs';
 	@import '_filter.lg';
@@ -17,11 +16,12 @@
 	@import '_browse.xs';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
+	@import '_base.print';
 }
-/* Medium devices (tablets, 768px and up) */
-@media (max-width: 768px) {
-	@import '_base.xs';
-	@import '_navigate.xs';
+/* Small devices (tablets, 768px and up) */
+@media screen and (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+	@import '_base.sm';
+	@import '_navigate.sm';
 	@import '_filter.lg';
 	@import '_map.lg';
 	@import '_modals.lg';
@@ -29,12 +29,12 @@
 	@import '_login.lg';
 	@import '_pad.xs';
 	@import '_profile.xs';
-	@import '_browse.xs';
+	@import '_browse.sm';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
 }
-/* Large devices (desktops, 1024px and up) */
-@media (max-width: 1024px) {
+/* Medium devices (desktops, 1024px and up) */
+@media screen and (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape) {
 	@import '_base.m';
 	@import '_navigate.m';
 	@import '_filter.lg';
@@ -42,15 +42,14 @@
 	@import '_modals.lg';
 
 	@import '_login.lg';
-	@import '_pad.xs';
-	@import '_profile.xs';
+	@import '_pad.lg';
+	@import '_profile.lg';
 	@import '_browse.m';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
-	@import '_base.print';
 }
-/* Extra large devices (large desktops, 1200px and up) */
-@media (min-width: 1200px) {
+/* Medium devices (desktops, 1024px and up) */
+@media screen and (min-width: 1200px) and (max-width: 1365px) and (orientation: landscape) {
 	@import '_base.lg';
 	@import '_navigate.lg';
 	@import '_filter.lg';
@@ -60,11 +59,40 @@
 	@import '_login.lg';
 	@import '_pad.lg';
 	@import '_profile.lg';
-	@import '_import.lg';
 	@import '_browse.lg';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
-	@import '_base.print';
+}
+/* Large devices (desktops, 1024px and up) */
+@media screen and (min-width: 1366px) and (orientation: landscape) {
+	@import '_base.xl';
+	@import '_navigate.xl';
+	@import '_filter.lg';
+	@import '_map.lg';
+	@import '_modals.lg';
+
+	@import '_login.lg';
+	@import '_pad.lg';
+	@import '_profile.lg';
+	@import '_browse.xl';
+	@import '_mobilize.lg';
+	@import '_orgfooter.lg';
+}
+/* Extra large devices (large desktops, 1200px and up) */
+@media screen and (min-width: 1920px) and (orientation: landscape) {
+	@import '_base.xl';
+	@import '_navigate.xl';
+	@import '_filter.lg';
+	@import '_map.lg';
+	@import '_modals.lg';
+
+	@import '_login.lg';
+	@import '_pad.lg';
+	@import '_profile.lg';
+	@import '_import.lg';
+	@import '_browse.xl';
+	@import '_mobilize.lg';
+	@import '_orgfooter.lg';
 }
 
 @media print {

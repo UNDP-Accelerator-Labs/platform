@@ -1,16 +1,17 @@
-@import '_vars';
+@import '_vars.sm';
 
 html, body {
 	font-size: $t-main;
 	line-height: 1.3em;
 }
 
-.sm:not(.xs),
-.m:not(.xs),
-.lg:not(.xs),
-.xl:not(.xs) {
+.xs:not(.sm),
+.m:not(.sm),
+.lg:not(.sm),
+.xl:not(.sm) {
 	display: none !important;
 }
+
 
 .modal {
 	width: 300px;

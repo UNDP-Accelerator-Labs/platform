@@ -471,7 +471,6 @@ div.browse {
 
 	&:not(.home) {
 		padding-top: 120px;
-		padding-right: 45px;
 	}
 
 	h1.instance-title {
@@ -1158,7 +1157,8 @@ div.browse {
 			}
 		}
 		.outer {
-			margin-top: 30px;
+			/* margin-top: 30px;*/
+			margin-top: 0px;
 			color: $c-light-grey;
 			font-size: $t-mid-small;
 

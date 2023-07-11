@@ -101,7 +101,7 @@
 			) { %>
 				<nav class='tabs <% if (mapscale === "full-screen") { %>no-bg<% } %>'>
 					<div class='inner'>
-						<div class='xs sm m'>
+						<div class='xs sm'>
 							<button class='space'><%- vocabulary['spaces'][language] %></button>
 							<div class='dropdown'>
 								<%- include('./modules/tabs.ejs') %>
@@ -114,7 +114,7 @@
 								</div>
 							<% } %>
 						</div>
-						<div class='lg'><%- include('./modules/tabs.ejs') %></div>
+						<div class='m lg xl xxl'><%- include('./modules/tabs.ejs') %></div>
 					</div>
 					<script type='text/javascript'>
 						if (!mediaSize) var mediaSize = getMediaSize()
@@ -339,7 +339,7 @@
 						<%- include ('./modules/map') %>
 					<% } else { %>
 						<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.pads?.length === 0) { %>
-							<small class='no-results lg'>
+							<small class='no-results m lg xl xxl'>
 								<%- vocabulary['pads to display'][language](0) %>
 							</small>
 						<% } %>
@@ -347,8 +347,10 @@
 
 					<!-- STATISTICS IN MOBILE VIEW -->
 					<% if (mapscale !== 'full-screen') { %>
-						<div class='xs'>
-							<%- include ('./modules/statistics.ejs') %>
+						<div class='public-page-panel xs sm m lg'>
+							<div class='inner'>
+								<%- include ('./modules/statistics.ejs') %>
+							</div>
 						</div>
 						<% if (locals.stats?.filtered === 0) { %>
 							<small class='no-results xs'>
@@ -358,22 +360,19 @@
 					<% } %>
 				</div>
 
-				<div class='public-page-panel'>
-					<div class='inner'>
-						<nav class='enter'>
-							<!-- <a href='/<%- language %>/browse/pads/public'>
-								<button type='button' class='highlight'><%- vocabulary['browse publications'][language] %></button>
-							</a> -->
-							<% if (!logged) { %>
+				<% if (!logged) { %>
+					<div class='public-page-panel'>
+						<div class='inner'>
+							<nav class='enter'>
 								<a href='/login'><button type='button' class='highlight'><%- vocabulary['log in'][language] %></button></a>
 								<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 								<!-- TO DO: TRANSLATE -->
-							<% } %>
-						</nav>
+							</nav>
+						</div>
 					</div>
-				</div>
+				<% } %>
 
-				<div class='outer'>
+				<div class='outer lg xl xxl'>
 					<% if (pages > 1 && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 						<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
 					<% } %>
@@ -382,7 +381,7 @@
 			</main>
 		</div>
 
-		<div class='sidebar lg'>
+		<div class='sidebar xl xxl'>
 			<div class='inner'>
 				<%# if (pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 				<% if (mapscale !== 'full-screen') { %>
@@ -396,7 +395,7 @@
 
 <% if (pagedisplay !== 'slideshow') { %><footer>
 <% } else { %><footer class='slideshow'><% } %>
-	<nav class='pagination xs sm m'>
+	<nav class='pagination xs sm'>
 		<% if (activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
 	</nav>
 	<% if (pagedisplay === 'slideshow') { %>

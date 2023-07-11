@@ -30,7 +30,7 @@
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
-		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
+		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
 
 		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
@@ -68,7 +68,7 @@
 														<div class='dropdown leaf'>
 															<ul>
 																<% if (locals.metadata.menu.templates.length > 2) { %>
-																	<li class='filter lg'>
+																	<li class='filter lg xl xxl'>
 																		<input type='text' id='filter-pad-templates' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																		<label for='filter-pad-templates'><%- vocabulary['filter'][language](true) %></label>
 																	</li>
@@ -114,7 +114,7 @@
 														<ul>
 															<% if (locals.metadata.menu.participations
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1).length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-pad-mobilizations' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-pad-mobilizations'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -146,7 +146,7 @@
 											<!-- <%# if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)	|| locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %> -->
 
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
-												<li class='lg'>
+												<li class='lg xl xxl'>
 													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
 													</a>
@@ -183,7 +183,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.templates.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-templates-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-templates-copy'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -230,7 +230,7 @@
 														<ul>
 															<!-- TO DO: FINISH THIS WITH A FILTER MENU -->
 															<!-- <% if (locals.metadata.menu.templates.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-templates-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-templates-copy'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -316,7 +316,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.pinboards.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-deep-dive-pinbords' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-deep-dive-pinbords'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -350,7 +350,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.filter(d => !d.target_id).length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-mobilization-followup' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-mobilization-followup'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -384,7 +384,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-mobilization-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-mobilization-copy'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -419,7 +419,7 @@
 														<ul>
 															<% if (locals.metadata.menu.participations
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child).length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter lg xl xxl'>
 																	<input type='text' id='filter-mobilization-child' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-mobilization-child'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -477,7 +477,7 @@
 		<% } %>
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
-			<div class='save lg hide'>
+			<div class='save lg xl xxl hide'>
 				<button><%- vocabulary['save'][language] %></button>
 			</div>
 		<% } %>
@@ -512,7 +512,7 @@
 	<% }) %>
 	</menu>
 </nav>
-<nav class='pagination lg'>
+<nav class='pagination lg xl xxl'>
 	<% if ((activity === 'browse' || locals.instance_vars?.activity === 'browse') && mapscale !== 'full-screen') { %>
 		<%- include('../browse/modules/pagination') %>
 	<% } %>
@@ -568,7 +568,7 @@
 				}
 			}
 		})
-	} else if (mediaSize === 'lg') {
+	} else if (['lg', 'xl', 'xxl'].includes(mediaSize)) {
 		d3.selectAll('#site-title .inner .create button')
 		.on('click', function () {
 			if (this.nextElementSibling?.classList.contains('dropdown')) {

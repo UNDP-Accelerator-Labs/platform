@@ -9,7 +9,7 @@
 %>
 
 <% if (locals.stats?.total > 0) { %>
-	<nav id='search-and-filter' class='lg'>
+	<nav id='search-and-filter' class='m lg xl xxl'>
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
 			<%
@@ -117,11 +117,11 @@
 						</div>
 					<% } %>
 
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+					<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
 				</div>
 			<% } else if (object === 'contributors') { %>
 				<div class='global-actions'>
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+					<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
 					<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
 				</div>
 			<% } %>

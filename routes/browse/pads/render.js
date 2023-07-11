@@ -53,7 +53,6 @@ module.exports = async (req, res) => {
 					// TO DO: DEFAULT HERE IS DBSCAN, MAKE THIS DEPENDENT ON req.query
 					// WE NEED CLUSTERS
 					// [1000, 100] ARE THE DISTANCES (IN KM) FOR THE DBSCAN CLUSTERING
-					console.log('should be different clusters')
 					[1000, 100].forEach(d => {
 						batch1.push(t1.any(`
 							SELECT 
@@ -213,8 +212,6 @@ module.exports = async (req, res) => {
 					pinboard,
 					sample_images
 				] = results
-
-				console.log(clusters)
 
 				// const { sections, pads } = data
 				const { sections } = data

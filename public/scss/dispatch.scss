@@ -1,6 +1,7 @@
 /* https://www.freecodecamp.org/news/css-media-queries-breakpoints-media-types-standard-resolutions-and-more/ */
 /* https://www.browserstack.com/guide/ideal-screen-sizes-for-responsive-design */
 @import '_base';
+@import '_base.print';
 
 /* Extra small devices (landscape phones, 480px and up) */
 @media screen and (max-width: 767px) {
@@ -16,7 +17,6 @@
 	@import '_browse.xs';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
-	@import '_base.print';
 }
 /* Small devices (tablets, 768px and up) */
 @media screen and (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {

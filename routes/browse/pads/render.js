@@ -213,6 +213,7 @@ module.exports = async (req, res) => {
 					sample_images
 				] = results
 
+
 				// const { sections, pads } = data
 				const { sections } = data
 				const stats = { 

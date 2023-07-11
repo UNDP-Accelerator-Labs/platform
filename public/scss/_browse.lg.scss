@@ -481,6 +481,13 @@ div.browse {
 		text-align: center;
 	}
 
+	h1.instance-title {
+		font-size: $t-xlarge;
+		line-height: 1.2em;
+		margin-bottom: 30px;
+		text-align: center;
+	}
+
 	nav#search-and-filter {
 		padding: 5px 14px 15px 14px;
 		border: 1px dotted $c-light-grey;

@@ -214,8 +214,6 @@ module.exports = async (req, res) => {
 					sample_images
 				] = results
 
-				console.log(clusters)
-
 				// const { sections, pads } = data
 				const { sections } = data
 				const stats = { 

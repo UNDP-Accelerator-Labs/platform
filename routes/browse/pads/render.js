@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
 	if (public && !(['public', 'pinned'].includes(space) || instance)) res.redirect('/login')
 	else if (rights < modules.find(d => d.type === 'pads')?.rights.read && !(space === 'public' || instance)) res.redirect(`./public`)
 	else {
-
 		let { mscale, display, pinboard } = req.query || {}
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
@@ -225,7 +224,7 @@ module.exports = async (req, res) => {
 				statistics,
 				clusters,
 				pinboards_list,
-				pinboard,
+				pinboard_out,
 				sample_images
 			] = await t.batch(batch);
 			// const { sections, pads } = data
@@ -247,8 +246,8 @@ module.exports = async (req, res) => {
 				tags: statistics.tags
 			}
 
-			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && (!pinboard?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
-			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, sample_images, stats, filters_menu })
+			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard_out?.slideshow && (!pinboard_out?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
+			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard: pinboard_out, sample_images, stats, filters_menu })
 		}).then(data => res.render('browse/', data))
 		.catch(err => console.log(err))
 	}

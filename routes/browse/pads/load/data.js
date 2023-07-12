@@ -115,7 +115,7 @@ module.exports = async kwargs => {
 					pc.pad IN $1:raw
 					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
 					AND pc.db = $3
-				GROUP BY pc.pad
+				GROUP BY pc.pad, pb.id, pb.title
 			`, [ padlist, current_user, ownId ])).map(row => [row.pad, [row.id, row.title]]));
 			batch.push([...padToPinboard.entries()].map(([padId, [pinId, pinTitle]]) => ({
 				id: padId,
@@ -201,7 +201,7 @@ module.exports = async kwargs => {
 					WHERE m.status = 1
 						AND m.version IS NULL
 						AND p.status >= 2
-						AND m.collection_id IN $1:raw
+						AND m.collection_id IN ($1:csv)
 					GROUP BY p.id
 				;`, [ pbPins, followup_count ]))
 				return t1.batch(batch1)

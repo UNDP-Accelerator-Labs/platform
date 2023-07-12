@@ -188,7 +188,7 @@ module.exports = async (req, res) => {
 				return t.one(`
 					SELECT COUNT(*) AS count
 					FROM pads p
-					WHERE p IN ($2) AND
+					WHERE p.id IN ($2:csv) AND
 						$1:raw
 				`, [ full_filters, pads.get(pbid) ]);
 			}));

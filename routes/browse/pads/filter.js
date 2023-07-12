@@ -97,8 +97,8 @@ module.exports = async (req, res) => {
 					`, [ pinboard, ownId ]);
 					f_space = DB.pgp.as.format(`
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
-						AND (p.id IN ($1)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($2))))
+						AND (p.id IN ($1:csv)
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($2:csv))))
 					`, [ pbpads, mobs ])
 				}
 				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
@@ -113,8 +113,8 @@ module.exports = async (req, res) => {
 					`, [ pinboard, ownId ]);
 					f_space = DB.pgp.as.format(`
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
-						AND (p.id IN ($3)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($4))))
+						AND (p.id IN ($3:csv)
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($4:csv))))
 					`, [ collaborators_ids, rights, pbpads, mobs ])
 				}
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])

@@ -1,4 +1,4 @@
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, DB } = include('config/')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
 const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
@@ -139,25 +139,41 @@ module.exports = async (req, res) => {
 			}))
 			// PINBOARDS LIST
 			if (modules.some(d => d.type === 'pinboards' && d.rights.read <= rights)) {
-				// FIXME @joschi update pinboards
-				batch.push(t.any(`
-					SELECT p.id, p.title,
-						COALESCE(
-							(SELECT COUNT (DISTINCT (pad)) FROM pinboard_contributions WHERE pinboard = p.id),
-							(SELECT COUNT (DISTINCT (pad)) FROM mobilization_contributions WHERE mobilization = p.mobilization),
-						0)::INT AS count
-
+				const ownId = await ownDB();
+				const pcounts = new Map((await DB.general.any(`
+					SELECT COUNT (DISTINCT (pad)) as pcount, pinboard as pid
+					FROM pinboard_contributions
+					WHERE db = $1 GROUP BY pinboard
+				`, [ ownId ])).map((row) => [row.pid, row.pcount]));
+				const mcounts = new Map((await t.any(`
+					SELECT COUNT (DISTINCT (pad)) as mcount, mobilization as mid
+					FROM mobilization_contributions
+					GROUP BY mobilization
+				`)).map((row) => [row.mid, row.mcount]));
+				batch.push(DB.general.any(`
+					SELECT p.id, p.title, mobilization_db as mdb, mobilization as mid
 					FROM pinboards p
-
 					WHERE $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = p.id)
 					GROUP BY p.id
 					ORDER BY p.title
-				;`, [ uuid ]))
+				;`, [ uuid ]).then(rows => {
+					return rows.map((row) => {
+						let count = 0;
+						if (pcounts.has(row.id)) {
+							count = pcounts.get(row.id);
+						} else if (mcounts.has(row.mid) && row.mdb === ownId) {
+							count = mcounts.get(row.mid);
+						}
+						return {
+							...row,
+							count,
+						};
+					});
+				}).catch(err => console.log(err)));
 			} else batch.push(null)
 			// PINBOARD
 			if (modules.some(d => d.type === 'pinboards') && pinboard) {
-				// FIXME @joschi update pinboards
-				batch.push(t.one(`
+				batch.push(DB.general.one(`
 					SELECT p.*, array_agg(pc.participant) AS contributors,
 						CASE WHEN p.owner = $1
 						OR $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = $3::INT)
@@ -203,41 +219,36 @@ module.exports = async (req, res) => {
 				}))
 			} else batch.push(null)
 
-			return t.batch(batch)
-			.then(async results => {
-				let [ data,
-					pads,
-					filters_menu,
-					statistics,
-					clusters,
-					pinboards_list,
-					pinboard,
-					sample_images
-				] = results
+			let [ data,
+				pads,
+				filters_menu,
+				statistics,
+				clusters,
+				pinboards_list,
+				pinboard,
+				sample_images
+			] = await t.batch(batch);
+			// const { sections, pads } = data
+			const { sections } = data
+			const stats = {
+				total: array.sum.call(statistics.total, 'count'),
+				filtered: array.sum.call(statistics.filtered, 'count'),
 
+				private: statistics.private,
+				curated: statistics.curated,
+				shared: statistics.shared,
+				reviewing: statistics.reviewing,
+				public: statistics.public,
 
-				// const { sections, pads } = data
-				const { sections } = data
-				const stats = {
-					total: array.sum.call(statistics.total, 'count'),
-					filtered: array.sum.call(statistics.filtered, 'count'),
+				displayed: data.count,
+				breakdown: statistics.filtered,
+				persistent_breakdown: statistics.persistent,
+				contributors: statistics.contributors,
+				tags: statistics.tags
+			}
 
-					private: statistics.private,
-					curated: statistics.curated,
-					shared: statistics.shared,
-					reviewing: statistics.reviewing,
-					public: statistics.public,
-
-					displayed: data.count,
-					breakdown: statistics.filtered,
-					persistent_breakdown: statistics.persistent,
-					contributors: statistics.contributors,
-					tags: statistics.tags
-				}
-
-				const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && (!pinboard?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
-				return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, sample_images, stats, filters_menu })
-			}).catch(err => console.log(err))
+			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard?.slideshow && (!pinboard?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
+			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard, sample_images, stats, filters_menu })
 		}).then(data => res.render('browse/', data))
 		.catch(err => console.log(err))
 	}

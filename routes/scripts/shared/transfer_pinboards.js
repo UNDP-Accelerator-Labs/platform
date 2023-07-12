@@ -61,10 +61,6 @@ if (action === undefined || action === 'transfer') {
                 PRIMARY KEY (participant, pinboard)
             );
         `));
-        gbatch.push(gt.none(`ALTER TABLE pinboard_contributors DROP CONSTRAINT IF EXISTS unique_pinboard_contributor;`));
-        gbatch.push(gt.none(`
-            ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
-        `));
         gbatch.push(gt.none(`
             CREATE TABLE IF NOT EXISTS pinboard_contributions (
                 pad INT NOT NULL,

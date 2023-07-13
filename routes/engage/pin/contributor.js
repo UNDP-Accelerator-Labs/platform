@@ -1,6 +1,5 @@
-const { safeArr, DEFAULT_UUID } = require("routes/helpers")
-
 const { modules, DB } = include('config/')
+const { safeArr, DEFAULT_UUID } = include("routes/helpers/")
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}

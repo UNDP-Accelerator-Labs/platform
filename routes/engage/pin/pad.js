@@ -160,7 +160,7 @@ async function updatestatus(_id, _object_id, _mobilization, ownId) {
 		const status = await DB.conn.one(`
 			SELECT
 				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				WHERE p.id IN $1:csv), 1) AS status
+				WHERE p.id IN ($1:csv)), 1) AS status
 		`, [ safeArr(pads, -1) ]).status;
 		return DB.pgp.as.format(`
 			UPDATE pinboards

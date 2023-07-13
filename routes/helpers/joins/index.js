@@ -1,5 +1,3 @@
-const { safeArr } = require("..")
-
 const { DB } = include('config/')
 
 exports.joinObj = function (obj = {}) {
@@ -17,13 +15,14 @@ exports.users = (data, args = []) => {
 	if (!key) key = 'owner'
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
+		const uuids = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
 		return DB.general.any(`
 			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, cn.name AS country FROM users u
 			INNER JOIN country_names cn
 				ON u.iso3 = cn.iso3
 			WHERE u.uuid IN ($2:csv)
 				AND cn.language = $3
-		;`, [ key, safeArr(Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key], -1), lang ])
+		;`, [ key, uuids, lang ])
 		.then(users => {
 			if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
 			else return this.joinObj.call(data, users[0])

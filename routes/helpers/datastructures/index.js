@@ -20,7 +20,6 @@ const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
 const { app_title_short } = require('../../../config')
-const { safeArr } = require('..')
 
 if (!exports.legacy) exports.legacy = {}
 
@@ -180,11 +179,12 @@ exports.pagemetadata = (_kwargs) => {
 					padlist.push(row.pad);
 					pinpads.set(row.id, padlist);
 				});
+				const padIds = pads.size ? [...pads] : [-1];
 				const owners = new Map((await t.any(`
 					SELECT p.id, p.owner
 					FROM pads p
 					WHERE p.id IN ($1:csv)
-				;`, [ safeArr([...pads], -1) ])).map((row) => [row.id, row.owner]));
+				;`, [ padIds ])).map((row) => [row.id, row.owner]));
 				return pinboard_stats.map((stats) => {
 					return {
 						...stats,

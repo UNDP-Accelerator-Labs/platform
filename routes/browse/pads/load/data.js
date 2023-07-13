@@ -1,5 +1,5 @@
-const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, DB } = include('config/')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers/')
+const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -7,15 +7,14 @@ module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
 	const { object } = req.params || {}
-	
+
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
-	
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	const engagement = engagementsummary({ doctype: 'pad', engagementtypes, uuid })
  	const current_user = DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ])
@@ -25,8 +24,8 @@ module.exports = async kwargs => {
 		// THE ORDER HERE IS IMPORTANT, THIS IS WHAT ENSURE THE TREE CONSTRUCTION LOOP WORKS
 		return t.any(`
 			SELECT id FROM pads p
-			WHERE TRUE 
-				$1:raw 
+			WHERE TRUE
+				$1:raw
 				AND p.id NOT IN (SELECT review FROM reviews)
 			$2:raw
 			LIMIT $3 OFFSET $4
@@ -34,7 +33,7 @@ module.exports = async kwargs => {
 		.then(async pads => {
 			pads = pads.map(d => d.id)
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
-			
+
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
@@ -77,7 +76,7 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// REVIEW STATUS
 			batch.push(t.any(`
-				SELECT p.id, 
+				SELECT p.id,
 					CASE WHEN rr.pad IS NOT NULL
 						THEN 1
 						ELSE 0
@@ -89,7 +88,7 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// TEMPLATE INFORMATION
 			batch.push(t.any(`
-				SELECT p.id, t.title AS template_title 
+				SELECT p.id, t.title AS template_title
 				FROM templates t
 				INNER JOIN pads p
 					ON p.template = t.id
@@ -97,7 +96,7 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// MOBILIZATION INFORMATION
 			batch.push(t.any(`
-				SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit 
+				SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit
 				FROM mobilizations m
 				INNER JOIN mobilization_contributions mc
 					ON mc.mobilization = m.id
@@ -105,21 +104,33 @@ module.exports = async kwargs => {
 				GROUP BY (mc.pad, m.title, m.pad_limit)
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// PINBOARD INFORMATION
-			batch.push(t.any(`
-				SELECT p.id, json_agg(json_build_object('id', pb.id, 'title', pb.title)) AS pinboards
-				FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				INNER JOIN pinboards pb
-					ON pb.id = pc.pinboard
-				WHERE p.id IN $1:raw
+			const ownId = await ownDB();
+			const padToPinboards = new Map();
+			(await DB.general.any(`
+				SELECT
+					pc.pad, pb.id, pb.title
+				FROM pinboard_contributions pc
+				INNER JOIN pinboards pb ON pb.id = pc.pinboard
+				WHERE
+					pc.pad IN $1:raw
 					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
-				GROUP BY (p.id)
-			;`, [ padlist, current_user ]).catch(err => console.log(err)))
+					AND pc.db = $3
+			`, [ padlist, current_user, ownId ])).forEach(row => {
+				const pinboards = padToPinboards.get(row.pad) ?? [];
+				pinboards.push({
+					id: row.id,
+					title: row.title,
+				});
+				padToPinboards.set(row.pad, pinboards);
+			});
+			batch.push([...pads].map((padId) => ({
+				id: padId,
+				pinboards: padToPinboards.get(padId) ?? [],
+			})));
 			// FOLLOW UP STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
-				SELECT p.id, 
-					COALESCE((nlevel(p.version) > 1 
+				SELECT p.id,
+					COALESCE((nlevel(p.version) > 1
 						AND index(p.version, text2ltree(p.id::text)) > 0
 						AND m.copy = FALSE
 					), FALSE) AS is_followup
@@ -133,14 +144,20 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// FOLLOW UP OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			// THE SOURCE OF THE FOLLOW UP MOBILIZATION IS THE MOBILIZATION THAT THE PAD WAS CONTRIBUTED TO
+			const pbPins = (await DB.general.any(`
+				SELECT pc.pinboard
+				FROM pinboard_contributions pc
+				WHERE pc.pad IN $1:raw AND pc.db = $2
+				GROUP BY pc.pinboard
+			`, [ padlist, ownId ])).map(row => row.pinboard);
 			batch.push(t.task(t1 => {
 				const batch1 = []
 
 				batch1.push(t1.any(`
-					SELECT p.id AS id, 
+					SELECT p.id AS id,
 						json_agg(json_build_object(
-							'id', m.id, 
-							'title', m.title, 
+							'id', m.id,
+							'title', m.title,
 							'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
 							'template', m.template,
 							'count', (
@@ -164,10 +181,10 @@ module.exports = async kwargs => {
 					GROUP BY p.id
 				;`, [ padlist, followup_count ]))
 				batch1.push(t1.any(`
-					SELECT p.id AS id, 
+					SELECT p.id AS id,
 						json_agg(json_build_object(
-							'id', m.id, 
-							'title', m.title, 
+							'id', m.id,
+							'title', m.title,
 							'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
 							'template', m.template,
 							'count', (
@@ -180,18 +197,16 @@ module.exports = async kwargs => {
 							'max', $2::INT
 						)) AS followups
 					FROM pads p
-					INNER JOIN pinboard_contributions pc
-						ON pc.pad = p.id
-					INNER JOIN pinboards pb
-						ON pb.id = pc.pinboard
+					INNER JOIN mobilization_contributions mc
+						ON mc.pad = p.id
 					INNER JOIN mobilizations m
-						ON m.collection = pb.id
+						ON m.id = mc.mobilization
 					WHERE m.status = 1
 						AND m.version IS NULL
 						AND p.status >= 2
-						AND p.id IN $1:raw
+						AND m.collection_id IN ($1:csv)
 					GROUP BY p.id
-				;`, [ padlist, followup_count ]))
+				;`, [ safeArr(pbPins, -1), followup_count ]))
 				return t1.batch(batch1)
 				.then(results => {
 					const [ followups, depths ] = results
@@ -207,8 +222,8 @@ module.exports = async kwargs => {
 			}).catch(err => console.log(err)))
 			// FORWARD STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
-				SELECT p.id, 
-					COALESCE((nlevel(p.version) > 1 
+				SELECT p.id,
+					COALESCE((nlevel(p.version) > 1
 						AND index(p.version, text2ltree(p.id::text)) > 0
 						AND m.copy = TRUE
 					), FALSE) AS is_forward
@@ -222,10 +237,10 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// FORWARD OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
-				SELECT p.id AS id, 
+				SELECT p.id AS id,
 					json_agg(json_build_object(
-						'id', m.id, 
-						'title', m.title, 
+						'id', m.id,
+						'title', m.title,
 						'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
 						'template', m.template,
 						'count', (
@@ -256,7 +271,7 @@ module.exports = async kwargs => {
 			}).catch(err => console.log(err)))
 			// DETECT PUBLICATION LIMIT TO DETERMINE WHETHER OR NOT THE PAD CAN BE PUBLISHED
 			batch.push(t.any(`
-				SELECT p.id, COALESCE(m.pad_limit - COUNT(contributed.id), 1)::INT AS available_publications 
+				SELECT p.id, COALESCE(m.pad_limit - COUNT(contributed.id), 1)::INT AS available_publications
 				FROM pads p
 				INNER JOIN mobilization_contributions mc
 					ON mc.pad = p.id
@@ -286,7 +301,7 @@ module.exports = async kwargs => {
 				LEFT JOIN ($3:raw) ce ON ce.docid = p.id
 				WHERE p.id IN $1:raw
 			;`, [ padlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
-			
+
 			return t.batch(batch)
 			.then(results => {
 				let data = pads.map(d => { return { id: d } })
@@ -295,7 +310,7 @@ module.exports = async kwargs => {
 				})
 				return data
 			}).catch(err => console.log(err))
-			
+
 		}).then(results => {
 			// THIS IS A LEGACY FIX FOR THE SOLUTIONS MAPPING PLATFORM
 			// NEED TO CHECK WHETHER THERE IS A CONSENT FORM ATTACHED FOR SOLUTIONS THAT ARE NOT PUBLIC (status = 2)
@@ -306,11 +321,11 @@ module.exports = async kwargs => {
 	}).then(async results => {
 		const data = await join.users(results, [ language, 'owner' ])
 
-		return { 
+		return {
 			data,
-			// count: (page - 1) * page_content_limit, 
-			// count: page * page_content_limit, 
-			count: page_content_limit, 
+			// count: (page - 1) * page_content_limit,
+			// count: page * page_content_limit,
+			count: page_content_limit,
 			sections: [{ data }]
 		}
 	}).catch(err => console.log(err))

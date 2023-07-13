@@ -7,7 +7,7 @@ const fs = require('fs')
 const turf = require('@turf/turf')
 
 const { app_title_short, DB } = include('config/')
-const { checklanguage, array } = include('routes/helpers/')
+const { checklanguage, array, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = include('routes/browse/contributors/filter')
 
@@ -32,12 +32,12 @@ module.exports = async (req, res) => {
 	}
 
 	DB.general.any(`
-		SELECT u.uuid, u.name, u.email, u.position, 
-			u.iso3, cn.name AS country, 
+		SELECT u.uuid, u.name, u.email, u.position,
+			u.iso3, cn.name AS country,
 			u.language AS primary_language, u.secondary_languages,
 			u.invited_at, u.confirmed_at, u.left_at,
 
-			jsonb_build_object('lat', c.lat, 'lng', c.lng) AS location,			
+			jsonb_build_object('lat', c.lat, 'lng', c.lng) AS location,
 
 			COALESCE(
 			(SELECT json_agg(t.name) FROM teams t
@@ -60,8 +60,8 @@ module.exports = async (req, res) => {
 		ORDER BY u.iso3, u.name ASC
 	;`, [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, ''), cors_filter ]) // NEED TO REMOVE page INFO
 	.then(async users => {
-		const ids = users.map(d => d.uuid)				
-		
+		const ids = safeArr(users.map(d => d.uuid), DEFAULT_UUID)
+
 		return DB.conn.tx(t => {
 			const batch = []
 			// ADD PAD INFO
@@ -134,13 +134,13 @@ module.exports = async (req, res) => {
 				}
 
 				if (!include_teams) delete d.teams
-				
+
 				if (include_contributions) {
 					d.pads = pads?.filter(c => c.owner === d.uuid) || []
 					d.templates = templates?.filter(c => c.owner === d.uuid) || []
 					d.campaigns = mobilizations?.filter(c => c.owner === d.uuid) || []
 				}
-				
+
 				delete d.uuid
 			})
 
@@ -157,7 +157,7 @@ module.exports = async (req, res) => {
 				fs.writeFileSync(path.join(dir, `${app_title_short}_contributors.json`), JSON.stringify(users))
 			}
 			return users
-		}).catch(err => console.log(err))		
+		}).catch(err => console.log(err))
 	}).then(data => {
 		if (render) {
 			var zip = spawn('zip',[ '-rP', pw, 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })

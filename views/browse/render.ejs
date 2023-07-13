@@ -804,7 +804,7 @@ const Entry = function (_kwargs) {
 				&& modules.some(d => d.type === 'teams' && rights >= d.rights.write)
 				)
 			) { %>
-				const pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>
+				const pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>;
 
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
@@ -847,8 +847,7 @@ const Entry = function (_kwargs) {
 								// DECREMENT THE NUMBER OF PINNED PADS FOR THE SELECTED BOARD
 								pinboards.find(b => b.id === d.id).count -= 1
 								// RESET THE MENU
-								d3.select(this).findAncestor('pinboard-group')
-								.each(function (b) {
+								d3.selectAll('.pinboard-group').each(function (b) {
 									b.pinboards = b.pinboards.filter(a => a.id !== d.id)
 								})
 							<% } %>

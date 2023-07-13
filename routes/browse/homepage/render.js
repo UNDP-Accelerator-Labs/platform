@@ -1,5 +1,5 @@
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, DB } = include('config/')
-const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
+const { array, datastructures, checklanguage, join, parsers, safeArr } = include('routes/helpers/')
 
 const load = require('./load/')
 const filter = require('./filter.js')
@@ -171,26 +171,47 @@ module.exports = async (req, res) => {
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err)))
 		// LIST OF PINBOARDS/ COLLECTIONS
-		batch.push(t.any(`
-			SELECT pb.id, COUNT(pc.id)::INT, pb.title, pb.date, pb.owner
-			FROM pinboards pb
-			INNER JOIN pinboard_contributions pc
-				ON pc.pinboard = pb.id
-			INNER JOIN pads p
-				ON pc.pad = p.id
-			WHERE pb.status > 2
-				$1:raw
-			GROUP BY pb.id
-		;`, [ full_filters ]))
+		batch.push(ownDB().then(async ownId => {
+			const pads = new Map();
+			(await DB.general.any(`
+				SELECT pb.id, pc.pad FROM pinboards pb
+				INNER JOIN pinboard_contributions pc
+					ON pc.pinboard = pb.id
+				WHERE pb.status > 2 AND pc.db = $1
+			`, [ ownId ])).forEach(row => {
+				const padlist = pads.get(row.id) ?? [];
+				padlist.push(row.pad);
+				pads.set(row.id, padlist);
+			});
+			const pbids = [...pads.keys()];
+			const counts = await t.batch(pbids.map((pbid) => {
+				return t.one(`
+					SELECT COUNT(*) AS count
+					FROM pads p
+					WHERE p.id IN ($2:csv)
+						$1:raw
+				`, [ full_filters, safeArr(pads.get(pbid), -1) ]);
+			}));
+			const countMap = new Map(pbids.map((pbid, index) => [pbid, counts[index]]));
+			return (await DB.general.any(`
+				SELECT pb.id, pb.title, pb.date, pb.owner
+				FROM pinboards pb
+				WHERE pb.status > 2
+			;`, [ full_filters ])).map(pbRow => ({
+				...pbRow,
+				count: countMap.get(pbRow.id),
+			}));
+		}).catch(err => console.log(err)));
 
 		return t.batch(batch)
 		.then(async results => {
-			let [ statistics,
+			const [ statistics,
 				clusters,
 				sample_images,
 				countries,
 				pinboards
-			] = results
+			] = results;
+			console.log('pinboards hp', pinboards)
 
 			const stats = {
 				total: array.sum.call(statistics.total, 'count'),

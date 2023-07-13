@@ -1,5 +1,5 @@
-const { app_title, DB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers } = include('routes/helpers/')
+const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, country, rights, collaborators, public } = req.session || {}
@@ -14,8 +14,7 @@ module.exports = async (req, res) => {
 	if (!page) page = 1
 	else page = +page
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (instance) {
 		const { instance_vars } = res.locals
@@ -37,7 +36,7 @@ module.exports = async (req, res) => {
 						;`, [ decodeURI(instance) ]) // CHECK WHETHER THE instance IS A TEAM: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
 						.then(result => {
 							if (!result) {
-								return DB.conn.oneOrNone(`
+								return DB.general.oneOrNone(`
 									SELECT id, title FROM pinboards
 									WHERE LOWER(title) = LOWER($1)
 										AND status >= 2
@@ -67,7 +66,6 @@ module.exports = async (req, res) => {
 		}
 	}
 
-
 	// FILTERS
 	return new Promise(async resolve => {
 		// BASE FILTERS
@@ -87,26 +85,44 @@ module.exports = async (req, res) => {
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'pinned') {
 			if (public) {
-				if (pinboard) f_space = DB.pgp.as.format(`
+				if (pinboard) {
+					const ownId = await ownDB();
+					const pbpads = (await DB.general.any(`
+						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
+					`, [ pinboard, ownId ])).map(row => row.pad);
+					const mobs = (await DB.general.any(`
+						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
+					`, [ pinboard, ownId ])).map(row => row.mobilization);
+					f_space = DB.pgp.as.format(`
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
-						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT))))
-					`, [ pinboard ])
+						AND (p.id IN ($1:csv)
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($2:csv))))
+					`, [ safeArr(pbpads, -1), safeArr(mobs, -1) ])
+				}
 				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
 			} else { // THE USER IS LOGGED IN
-				if (pinboard) f_space = DB.pgp.as.format(`
+				if (pinboard) {
+					const ownId = await ownDB();
+					const pbpads = (await DB.general.any(`
+						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
+					`, [ pinboard, ownId ])).map(row => row.pad);
+					const mobs = (await DB.general.any(`
+						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
+					`, [ pinboard, ownId ])).map(row => row.mobilization);
+					f_space = DB.pgp.as.format(`
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
-						AND (p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $3::INT)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $3::INT))))
-					`, [ collaborators_ids, rights, pinboard ])
+						AND (p.id IN ($3:csv)
+						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($4:csv))))
+					`, [ collaborators_ids, rights, safeArr(pbpads, -1), safeArr(mobs, -1) ])
+				}
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
 			}
 		}
 		else if (space === 'versiontree') {
 			f_space = DB.pgp.as.format(`
-				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))) 
+				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2)))
 				OR p.version <@ (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))))
-			`, [ nodes, collaborators_ids, rights ])
+			`, [ safeArr(nodes, -1), collaborators_ids, rights ])
 		}
 		else if (engagementtypes.some(d => space === `${d}s`)) {
 			const type = engagementtypes.find(d => space === `${d}s`)
@@ -122,7 +138,7 @@ module.exports = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
 			;`, [ countries ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 			// platform_filters.push(f_countries)
 		}
@@ -130,15 +146,11 @@ module.exports = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT member FROM team_members WHERE team IN ($1:csv)
 			;`, [ teams ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		}
 		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
-		// if (pinboard) platform_filters.push(DB.pgp.as.format(`
-		// 		(p.id IN (SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT)
-		// 		OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN (SELECT mobilization FROM pinboards WHERE id = $1::INT)))
-		// 	`, [ pinboard ]))
 		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
 		// if (sources) platform_filters.push(DB.pgp.as.format(`AND p.source IS NULL`))
 
@@ -148,9 +160,9 @@ module.exports = async (req, res) => {
 			// TO DO: FINSIH THIS FOR OTHER METAFIELDS
 			if (Object.keys(req.query).includes(d.label) || Object.keys(req.body).includes(d.label)) {
 				if (['tag', 'index'].includes(d.type)) {
-					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, req.query[d.label] || req.body[d.label] ]))
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
 				} else if (!['tag', 'index', 'location', 'attachment'].includes(d.type)) {
-					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, req.query[d.label] || req.body[d.label] ]))
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
 				}
 			}
 		})

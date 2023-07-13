@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const helpers = include('routes/helpers/')
+const {flatObj, safeArr, DEFAULT_UUID} = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -12,9 +12,8 @@ module.exports = async kwargs => {
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req)
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
-	
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
+
 	return conn.task(t => {
 		const batch = []
 		// GET TEMPLATES COUNT BY STATUS
@@ -51,13 +50,13 @@ module.exports = async kwargs => {
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (t.id))::INT FROM templates t
 			WHERE (t.id IN (
-					SELECT template FROM mobilizations 
-					WHERE child = TRUE 
+					SELECT template FROM mobilizations
+					WHERE child = TRUE
 						AND source IN (
 							SELECT id FROM mobilizations WHERE owner IN ($1:csv)
 						)
-					) 
-				OR $2 > 2) 
+					)
+				OR $2 > 2)
 			AND (t.owner NOT IN ($1:csv) OR t.owner IS NULL) AND t.status < 2
 		;`, [ collaborators_ids, rights ], d => d.count).then(d => { return { curated: d } }))
 		// GET SHARED TEMPLATES COUNT
@@ -79,7 +78,7 @@ module.exports = async kwargs => {
 		// GET MOBILIZATIONS BREAKDOWN
 		// if (participations.length) {
 		// 	batch.push(t.any(`
-		// 		SELECT COUNT(DISTINCT (t.id))::INT, mob.id, mob.title FROM templates t 
+		// 		SELECT COUNT(DISTINCT (t.id))::INT, mob.id, mob.title FROM templates t
 		// 		INNER JOIN mobilizations mob
 		// 			ON mob.template = t.id
 		// 		WHERE mob.id IN ($1:csv)
@@ -90,6 +89,6 @@ module.exports = async kwargs => {
 		// } else batch.push([])
 
 		return t.batch(batch)
-	}).then(d => helpers.flatObj.call(d))
+	}).then(d => flatObj.call(d))
 	.catch(err => console.log(err))
 }

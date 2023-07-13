@@ -1,5 +1,5 @@
 const { page_content_limit, modules, DB } = include('config/')
-const { checklanguage, datastructures, parsers, join } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -12,12 +12,11 @@ module.exports = async kwargs => {
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req)
-	
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	return conn.any(`
-		SELECT p.id, p.owner, p.title, p.sections, p.template, 
+		SELECT p.id, p.owner, p.title, p.sections, p.template,
 			t.title AS template_title,
 
 		-- GET DATE
@@ -39,12 +38,12 @@ module.exports = async kwargs => {
 
 		-- GET STATUS
 			COALESCE((SELECT status FROM reviews WHERE (review = p.id OR pad = p.id) AND reviewer = $1), -1) AS status,
-			
+
 		-- DETERMINE IF REVIEWER IS POOLED
 			CASE WHEN $1 IN (
-				SELECT reviewer FROM reviewer_pool 
+				SELECT reviewer FROM reviewer_pool
 				WHERE request IN (
-					SELECT id FROM review_requests 
+					SELECT id FROM review_requests
 					WHERE pad = p.id
 				)
 			) OR $1 IN (SELECT reviewer FROM reviews WHERE review = p.id)
@@ -66,14 +65,14 @@ module.exports = async kwargs => {
 
 		-- GET SOURCE TITLE IF REVIEW
 			CASE WHEN p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
-				THEN (SELECT p2.title FROM pads p2 WHERE p2.id = p.source) 
+				THEN (SELECT p2.title FROM pads p2 WHERE p2.id = p.source)
 				ELSE NULL
 			END AS source_title,
 
 		-- GET REVIEW TEMPLATE
-			CASE 
+			CASE
 			-- REVIEW HAS BEEN ACCEPTED
-			WHEN p.id IN (SELECT review FROM reviews WHERE reviewer = $1) 
+			WHEN p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
 				THEN p.template
 			-- REVIEW HAS NOT BEEN ACCEPTED
 				ELSE (
@@ -87,26 +86,26 @@ module.exports = async kwargs => {
 		-- COUNT ACTIVE REVIEWERS
 			CASE WHEN p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
 				THEN COALESCE((SELECT COUNT (id)::INT
-					FROM reviewer_pool 
-					WHERE status = 1 
+					FROM reviewer_pool
+					WHERE status = 1
 						AND request IN (SELECT id FROM review_requests WHERE pad = p.source))
-				, 0) 
+				, 0)
 				ELSE COALESCE((SELECT COUNT (id)::INT
-					FROM reviewer_pool 
-					WHERE status = 1 
+					FROM reviewer_pool
+					WHERE status = 1
 						AND request IN (SELECT id FROM review_requests WHERE pad = p.id))
 				, 0)
 			END AS reviewers,
 
 		-- COUNT REMAINING AVAILABLE REVIEWERS IN POOL
 			CASE WHEN p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
-				THEN COALESCE((SELECT COUNT (id)::INT 
-					FROM reviewer_pool 
+				THEN COALESCE((SELECT COUNT (id)::INT
+					FROM reviewer_pool
 					WHERE status = 0
 						AND request IN (SELECT id FROM review_requests WHERE pad = p.source))
 				, 0)
-				ELSE COALESCE((SELECT COUNT (id)::INT 
-					FROM reviewer_pool 
+				ELSE COALESCE((SELECT COUNT (id)::INT
+					FROM reviewer_pool
 					WHERE status = 0
 						AND request IN (SELECT id FROM review_requests WHERE pad = p.id))
 				, 0)
@@ -115,8 +114,8 @@ module.exports = async kwargs => {
 		-- DETERMINE IF REVIEW IS REQUIRED (BASED ON NUMBER OF AVAILABLE REVIEWERS IN POOL)
 			CASE WHEN p.id IN (SELECT review FROM reviews WHERE reviewer = $1)
 				THEN TRUE
-				ELSE COALESCE((SELECT COUNT (id)::INT 
-					FROM reviewer_pool 
+				ELSE COALESCE((SELECT COUNT (id)::INT
+					FROM reviewer_pool
 					WHERE status = 0
 						AND request IN (SELECT id FROM review_requests WHERE pad = p.id))
 				, 0) <= $3
@@ -124,36 +123,36 @@ module.exports = async kwargs => {
 
 		-- GET PUBLISHED REVIEWS FOR PADS THAT ARE NOT REVIEWS
 			COALESCE (
-				(SELECT jsonb_agg(id) FROM pads 
-				WHERE id IN (SELECT review FROM reviews) 
+				(SELECT jsonb_agg(id) FROM pads
+				WHERE id IN (SELECT review FROM reviews)
 					AND source = p.id
 					AND status >= 2
 				GROUP BY source
 			)::TEXT, '[]')::JSONB AS reviews,
-			
+
 			CASE WHEN p.owner IN ($2:csv)
 					THEN TRUE
 					ELSE FALSE
 				END AS editable
-		
+
 		FROM pads p
 
 		LEFT JOIN templates t
 			ON t.id = p.template
 
 		WHERE TRUE
-			$5:raw 
-		
+			$5:raw
+
 		$6:raw
 		LIMIT $7 OFFSET $8
-	;`, [ 
+	;`, [
 		/* $1 */ uuid,
-		/* $2 */ collaborators_ids, 
+		/* $2 */ collaborators_ids,
 		/* $3 */ modules.find(d => d.type === 'reviews').reviewers,
-		/* $4 */ rights, 
-		/* $5 */ full_filters, 
-		/* $6 */ order, 
-		/* $7 */ page_content_limit, 
+		/* $4 */ rights,
+		/* $5 */ full_filters,
+		/* $6 */ order,
+		/* $7 */ page_content_limit,
 		/* $8 */ (page - 1) * page_content_limit
 	]).then(async results => {
 		// REMOVE THE follow_ups AND forwards FOR PADS THAT HAVE ALREADY BEEN FOLLOWED UP FOR A GIVEN MOBILIZATION
@@ -166,9 +165,9 @@ module.exports = async kwargs => {
 		})
 
 		const data = await join.users(results.flat(), [ language, 'owner' ])
-		return { 
+		return {
 			data,
-			count: page_content_limit, 
+			count: page_content_limit,
 			sections: [{ data }]
 		}
 	}).catch(err => console.log(err))

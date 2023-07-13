@@ -1,5 +1,5 @@
 const { modules, DB, engagementtypes } = include('config/')
-const { parsers } = include('routes/helpers/')
+const { parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = req => {
 	const { uuid, rights, collaborators } = req.session || {}
@@ -8,11 +8,10 @@ module.exports = req => {
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
-	else page = +page	
+	else page = +page
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
-	
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
+
 	// FILTERS
 	return new Promise(async resolve => {
 
@@ -25,19 +24,19 @@ module.exports = req => {
 		if (space === 'private') f_space = DB.pgp.as.format(`(t.owner IN ($1:csv) AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
 		else if (space === 'curated') f_space = DB.pgp.as.format(`
 			(t.id IN (
-					SELECT template FROM mobilizations 
-					WHERE child = TRUE 
+					SELECT template FROM mobilizations
+					WHERE child = TRUE
 						AND source IN (
 							SELECT id FROM mobilizations WHERE owner IN ($1:csv)
 						)
-					) 
-				OR $2 > 2) 
+					)
+				OR $2 > 2)
 			AND (t.owner NOT IN ($1:csv) OR t.owner IS NULL) AND t.status < 2`, [ collaborators_ids, rights ])
 		else if (space === 'versiontree') {
 			f_space = DB.pgp.as.format(`
-				(t.version @> (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2))) 
+				(t.version @> (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2)))
 				OR t.version <@ (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2))))
-			`, [ nodes, collaborators_ids, rights ])
+			`, [ safeArr(nodes, -1), collaborators_ids, rights ])
 		}
 
 		engagementtypes.forEach(e => {
@@ -58,7 +57,7 @@ module.exports = req => {
 			platform_filters.push(await DB.general.any(`
 				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
 			;`, [ countries ])
-			.then(results =>  DB.pgp.as.format(`t.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results =>  DB.pgp.as.format(`t.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		}
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.id IN (SELECT template FROM mobilizations WHERE id IN ($1:csv))`, [ mobilizations ]))
@@ -73,7 +72,7 @@ module.exports = req => {
 			.trim()
 
 		if (filters.length && filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
-		
+
 		resolve([ `AND ${f_space}`, order, page, filters ])
 	})
 

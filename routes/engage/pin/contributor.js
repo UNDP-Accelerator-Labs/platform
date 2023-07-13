@@ -1,12 +1,12 @@
 const { modules, DB } = include('config/')
+const { safeArr, DEFAULT_UUID } = include("routes/helpers/")
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id } = req.body || {}
-	
+
 	const module_rights = modules.find(d => d.type === 'contributors')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 	if (!board_id) { // CREATE NEW TEAM
 		if (board_title?.trim().length > 0) {
@@ -32,13 +32,13 @@ exports.pin = (req, res) => {
 						INSERT INTO team_members (team, member)
 						VALUES ($1::INT, $2)
 					;`, [ id, uuid ]))
-					
+
 					batch.push(
 						t.none(insertmember(id, object_id))
 						// .then(_ => t.none(updatestatus(id, object_id)))
 						.catch(err => console.log(err))
 					)
-					
+
 					return t.batch(batch)
 					.then(_ => {
 						const batch = []
@@ -81,8 +81,7 @@ exports.unpin = (req, res) => {
 	const { board_id, object_id } = req.body || {}
 
 	const module_rights = modules.find(d => d.type === 'contributors')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 	if (object_id) {
 		return DB.general.tx(t => {
@@ -116,7 +115,7 @@ function insertmember (_id, _object_id) {
 			INSERT INTO team_members (team, member)
 			VALUES ($1::INT, $2)
 		;`, [ _id, _object_id ]) // _object_id SHOULD BE uuid
-	} 
+	}
 }
 function removemember (_id, _object_id) {
 	if (_object_id) {
@@ -125,24 +124,25 @@ function removemember (_id, _object_id) {
 			WHERE team = $1::INT
 				AND member = $2
 		;`, [ _id, _object_id ])
-	} 
-}
-// TO DO: FINISH HERE
-function updatestatus (_id, _object_id) {
-	if (_object_id) {
-		return DB.pgp.as.format(`
-			UPDATE pinboards
-			SET status = (SELECT GREATEST (
-				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				WHERE pc.pinboard = $1::INT), 1)
-				, status)
-			)
-			WHERE id = $1::INT
-		;`, [ _id ])
 	}
 }
+// TO DO: FINISH HERE
+// FIXME not used...
+// function updatestatus (_id, _object_id) {
+// 	if (_object_id) {
+// 		return DB.pgp.as.format(`
+// 			UPDATE pinboards
+// 			SET status = (SELECT GREATEST (
+// 				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
+// 				INNER JOIN pinboard_contributions pc
+// 					ON pc.pad = p.id
+// 				WHERE pc.pinboard = $1::INT), 1)
+// 				, status)
+// 			)
+// 			WHERE id = $1::INT
+// 		;`, [ _id ])
+// 	}
+// }
 function retrievepins (_object_id) {
 	return DB.pgp.as.format(`
 		SELECT t.id, t.name AS title FROM teams t
@@ -158,5 +158,5 @@ function retrievepinboards (_hosts) {
 			ON tm.team = t.id
 		WHERE t.host IN ($1:csv)
 		GROUP BY t.id
-	;`, [ _hosts ])
+	;`, [ safeArr(_hosts, DEFAULT_UUID) ])
 }

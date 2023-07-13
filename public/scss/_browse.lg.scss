@@ -400,6 +400,9 @@ div.public-page-panel {
 			text-align: center;
 			margin: 60px 0;
 
+			a:hover {
+				text-decoration: none;
+			}
 			button {
 				min-height: 45px;
 				padding: 0 15px;
@@ -468,6 +471,13 @@ div.browse {
 
 	&:not(.home) {
 		padding-top: 120px;
+	}
+
+	h1.instance-title {
+		font-size: $t-xlarge;
+		line-height: 1.2em;
+		margin-bottom: 30px;
+		text-align: center;
 	}
 
 	nav#search-and-filter {

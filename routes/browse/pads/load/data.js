@@ -1,5 +1,5 @@
 const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join } = include('routes/helpers/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -14,8 +14,7 @@ module.exports = async kwargs => {
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	const engagement = engagementsummary({ doctype: 'pad', engagementtypes, uuid })
  	const current_user = DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ])
@@ -203,7 +202,7 @@ module.exports = async kwargs => {
 						AND p.status >= 2
 						AND m.collection_id IN ($1:csv)
 					GROUP BY p.id
-				;`, [ pbPins, followup_count ]))
+				;`, [ safeArr(pbPins, -1), followup_count ]))
 				return t1.batch(batch1)
 				.then(results => {
 					const [ followups, depths ] = results

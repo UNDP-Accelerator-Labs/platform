@@ -1,5 +1,5 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, country, rights, collaborators, public } = req.session || {}
@@ -14,8 +14,7 @@ module.exports = async (req, res) => {
 	if (!page) page = 1
 	else page = +page
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (instance) {
 		const { instance_vars } = res.locals
@@ -99,7 +98,7 @@ module.exports = async (req, res) => {
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
 						AND (p.id IN ($1:csv)
 						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($2:csv))))
-					`, [ pbpads, mobs ])
+					`, [ safeArr(pbpads, -1), safeArr(mobs, -1) ])
 				}
 				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
 			} else { // THE USER IS LOGGED IN
@@ -115,7 +114,7 @@ module.exports = async (req, res) => {
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
 						AND (p.id IN ($3:csv)
 						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($4:csv))))
-					`, [ collaborators_ids, rights, pbpads, mobs ])
+					`, [ collaborators_ids, rights, safeArr(pbpads, -1), safeArr(mobs, -1) ])
 				}
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
 			}
@@ -124,7 +123,7 @@ module.exports = async (req, res) => {
 			f_space = DB.pgp.as.format(`
 				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2)))
 				OR p.version <@ (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))))
-			`, [ nodes, collaborators_ids, rights ])
+			`, [ safeArr(nodes, -1), collaborators_ids, rights ])
 		}
 		else if (engagementtypes.some(d => space === `${d}s`)) {
 			const type = engagementtypes.find(d => space === `${d}s`)
@@ -140,7 +139,7 @@ module.exports = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
 			;`, [ countries ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 			// platform_filters.push(f_countries)
 		}
@@ -148,7 +147,7 @@ module.exports = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT member FROM team_members WHERE team IN ($1:csv)
 			;`, [ teams ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		}
 		if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
@@ -162,9 +161,9 @@ module.exports = async (req, res) => {
 			// TO DO: FINSIH THIS FOR OTHER METAFIELDS
 			if (Object.keys(req.query).includes(d.label) || Object.keys(req.body).includes(d.label)) {
 				if (['tag', 'index'].includes(d.type)) {
-					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, req.query[d.label] || req.body[d.label] ]))
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
 				} else if (!['tag', 'index', 'location', 'attachment'].includes(d.type)) {
-					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, req.query[d.label] || req.body[d.label] ]))
+					content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
 				}
 			}
 		})

@@ -1,5 +1,5 @@
 const { modules, metafields, DB } = include('config/')
-const { array, join, flatObj } = include('routes/helpers/')
+const { array, join, flatObj, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -21,11 +21,11 @@ module.exports = async kwargs => {
 			const batch1 = []
 			if (space === 'private') {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (id))::INT, owner 
+					SELECT COUNT (DISTINCT (id))::INT, owner
 					FROM files
 					WHERE owner IN ($1:csv)
 					GROUP BY owner
-				;`, [ req.session.collaborators.map(d => d.uuid) ])
+				;`, [ safeArr(req.session.collaborators.map(d => d.uuid), DEFAULT_UUID) ])
 				.then(async results => {
 					const contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -63,7 +63,7 @@ module.exports = async kwargs => {
 					return countries.length ? { countries } : null
 				}).catch(err => console.log(err)))
 			} else batch1.push(null)
-			
+
 			// GET TEMPLATE BREAKDOWN
 			// if (modules.includes('templates')) {
 			if (modules.some(d => d.type === 'templates')) {
@@ -71,12 +71,12 @@ module.exports = async kwargs => {
 					SELECT COUNT (DISTINCT (f.id))::INT, t.id, t.title FROM files f
 					INNER JOIN pads p
 						ON f.source = p.id
-					INNER JOIN templates t 
+					INNER JOIN templates t
 						ON p.template = t.id
-					WHERE TRUE 
+					WHERE TRUE
 						$1:raw
 					GROUP BY t.id
-				;`, [ f_space ]).then(results => { 
+				;`, [ f_space ]).then(results => {
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
 					const templates = results.map(d => {
 						const obj = {}
@@ -90,7 +90,7 @@ module.exports = async kwargs => {
 					return templates.length ? { templates } : null
 				}))
 			} else batch1.push(null)
-			
+
 			// GET MOBILIZATIONS BREAKDOWN
 			// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
 			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
@@ -100,19 +100,19 @@ module.exports = async kwargs => {
 					SELECT COUNT (DISTINCT (f.id))::INT, m.id, m.title AS name FROM files f
 					LEFT JOIN pads p
 						ON f.source = p.id
-					INNER JOIN mobilization_contributions mc 
+					INNER JOIN mobilization_contributions mc
 						ON mc.pad = p.id
 					INNER JOIN mobilizations m
 						ON m.id = mc.mobilization
 					WHERE (m.id IN (
 						SELECT mobilization
-						FROM mobilization_contributors 
+						FROM mobilization_contributors
 							WHERE participant = $1
 					) OR m.owner = $1)
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.title
-				;`, [ uuid, f_space ]).then(results => { 
+				;`, [ uuid, f_space ]).then(results => {
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)
@@ -120,7 +120,7 @@ module.exports = async kwargs => {
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
 		}).catch(err => console.log(err)))
-		
+
 		// GET THE TAG BREAKDOWNS
 		batch.push(t.task(t1 => {
 			const batch1 = []
@@ -130,7 +130,7 @@ module.exports = async kwargs => {
 					SELECT COUNT (DISTINCT (pad))::INT, tag_id AS id FROM tagging
 					WHERE type = $1
 					GROUP BY tag_id
-				;`, [ d.label ]).then(async results => { 
+				;`, [ d.label ]).then(async results => {
 					const tags = await join.tags(results, [ language, 'id', d.label, d.type ])
 					// if (d.label.toLowerCase() === 'sdgs') {
 					if (d.type === 'index') {
@@ -150,7 +150,7 @@ module.exports = async kwargs => {
 			// 		SELECT COUNT (DISTINCT (pad))::INT, tag_id AS id FROM tagging
 			// 		WHERE type = 'tag'
 			// 		GROUP BY tag_id
-			// 	;`).then(async results => { 
+			// 	;`).then(async results => {
 			// 		const thematic_areas = await join.tags(results, [ language, 'id', 'tags' ])
 			// 		thematic_areas.sort((a, b) => a.name?.localeCompare(b.name))
 			// 		return thematic_areas.length ? { thematic_areas } : null
@@ -164,7 +164,7 @@ module.exports = async kwargs => {
 			// 		WHERE type = 'sdg'
 			// 		GROUP BY tag_id
 			// 		ORDER BY tag_id
-			// 	;`).then(async results => { 
+			// 	;`).then(async results => {
 			// 		const sdgs = await join.tags(results, [ language, 'id', 'sdgs' ])
 			// 		sdgs.forEach(d => {
 			// 			d.name = `${d.key} – ${d.name}`
@@ -181,20 +181,20 @@ module.exports = async kwargs => {
 			// 		SELECT COUNT (DISTINCT (pad))::INT, tag_id AS id FROM tagging
 			// 		WHERE type = 'skill'
 			// 		GROUP BY tag_id
-			// 	;`).then(async results => { 
+			// 	;`).then(async results => {
 			// 		const methods = await join.tags(results, [ language, 'id', 'methods' ])
 			// 		methods.sort((a, b) => a.name?.localeCompare(b.name))
 			// 		return methods.length ? { methods } : null
 			// 	}))
 			// } else batch1.push(null)
-			
+
 			// // GET THE DATA SOURCES BREAKDOWN
 			// if (metafields.includes('datasources')) {
 			// 	batch1.push(t1.any(`
 			// 		SELECT COUNT (DISTINCT (pad))::INT, tag_id AS id FROM tagging
 			// 		WHERE type = 'datasource'
 			// 		GROUP BY tag_id
-			// 	;`).then(async results => { 
+			// 	;`).then(async results => {
 			// 		const datasources = await join.tags(results, [ language, 'id', 'datasources' ])
 			// 		datasources.sort((a, b) => a.name?.localeCompare(b.name))
 			// 		return datasources.length ? { datasources } : null
@@ -204,7 +204,7 @@ module.exports = async kwargs => {
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
 		}).catch(err => console.log(err)))
-		
+
 		return t.batch(batch)
 		.then(results => results.filter(d => d.length))
 	}).then(results => {

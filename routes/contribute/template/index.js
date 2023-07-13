@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
@@ -16,8 +16,7 @@ module.exports = (req, res) => {
 		const activity = path[1]
 
 		const module_rights = modules.find(d => d.type === 'templates')?.rights
-		let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-		if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+		const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 		DB.conn.tx(t => {
 			// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A TEMPLATE
@@ -41,7 +40,7 @@ module.exports = (req, res) => {
 							const batch1 = metafields.filter(d => ['tag', 'index'].includes(d.type))
 							.map(d => {
 								return t1.any(`
-									SELECT id, key, name, type FROM tags 
+									SELECT id, key, name, type FROM tags
 									WHERE type = $1
 										AND language = (COALESCE((SELECT language FROM tags WHERE type = $1 AND language = $2 LIMIT 1), 'en'))
 								;`, [ d.label, language ])
@@ -83,9 +82,9 @@ module.exports = (req, res) => {
 
 								-- THESE ARE THE ENGAGEMENT CASE STATEMENTS
 								$1:raw
-							
+
 							FROM templates t
-							
+
 							LEFT JOIN (
 								SELECT docid, user, array_agg(DISTINCT type) AS types FROM engagement
 								WHERE user = $2
@@ -98,12 +97,12 @@ module.exports = (req, res) => {
 							const data = await join.users(results, [ language, 'owner' ])
 							return data
 						}))
-					} 
+					}
 
 					if (id && engagementtypes?.length > 0) { // GET THE ENGAGEMENT METRICS
 						const engagement = engagementsummary({ doctype: 'template', engagementtypes, docid: +id, uuid })
 						batch.push(t.oneOrNone(`
-							SELECT 
+							SELECT
 								-- THESE ARE THE ENGAGEMENT COALESCE STATEMENTS
 								$1:raw
 							FROM templates t
@@ -114,7 +113,7 @@ module.exports = (req, res) => {
 						if (engagementtypes.includes('comment')) {
 							batch.push(t.any(`
 								SELECT c.id, c.message, c.contributor,
-									
+
 									CASE
 										WHEN AGE(now(), c.date) < '0 second'::interval
 											THEN jsonb_build_object('interval', 'positive', 'date', to_char(c.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(c.date, now())), 'hours', EXTRACT(hour FROM AGE(c.date, now())), 'days', EXTRACT(day FROM AGE(c.date, now())), 'months', EXTRACT(month FROM AGE(c.date, now())))
@@ -122,8 +121,8 @@ module.exports = (req, res) => {
 									END AS date,
 
 									COALESCE(jsonb_agg(jsonb_build_object(
-										'id', r.id, 
-										'message', r.message, 
+										'id', r.id,
+										'message', r.message,
 										'contributor', r.contributor,
 										'date', CASE
 											WHEN AGE(now(), r.date) < '0 second'::interval
@@ -142,8 +141,8 @@ module.exports = (req, res) => {
 									-- END AS date,
 
 									-- COALESCE(jsonb_agg(jsonb_build_object(
-									-- 	'id', r.id, 
-									-- 	'message', r.message, 
+									-- 	'id', r.id,
+									-- 	'message', r.message,
 									-- 	'contributor', r.contributor,
 									-- 	'date', CASE WHEN AGE(now(), r.date) < '1 hour'::interval
 									-- 			THEN to_char(AGE(now(), r.date), 'MI') || ' minutes ago'
@@ -168,8 +167,8 @@ module.exports = (req, res) => {
 								ORDER BY c.date DESC
 							;`, [ id ]).then(async results => {
 								const data = await join.users(results, [ language, 'contributor' ])
-								return Promise.all(data.map(async d => { 
-									d.replies = await join.users(d.replies, [ language, 'contributor' ]) 
+								return Promise.all(data.map(async d => {
+									d.replies = await join.users(d.replies, [ language, 'contributor' ])
 									return d
 								}))
 							}))
@@ -196,8 +195,7 @@ function check_authorization (_kwargs) {
 	const { uuid, id, rights, collaborators } = _kwargs
 
 	const { read, write } = modules.find(d => d.type === 'templates')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 
 	if (rights < write) {
 		if (id) return conn.one(`SELECT status FROM templates WHERE id = $1::INT;`, [ id ], d => d.status > 2)

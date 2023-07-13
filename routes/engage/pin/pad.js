@@ -1,11 +1,11 @@
 const { modules, DB, ownDB } = include('config/')
+const { safeArr, DEFAULT_UUID } = include('routes/helpers')
 
 exports.pin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, board_title, object_id, mobilization } = req.body || {}
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (!board_id) { // CREATE NEW BOARD
 		if (board_title?.trim().length > 0) {
@@ -79,8 +79,7 @@ exports.unpin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, object_id, mobilization } = req.body || {}
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (object_id) {
 		return DB.general.tx(gt => {
@@ -132,7 +131,6 @@ function insertpads (_id, _object_id, _mobilization, ownId) {
 }
 function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 	if (_object_id) {
-		if (!Array.isArray(_object_id)) _object_id = [_object_id]
 		return DB.pgp.as.format(`
 			DELETE FROM pinboard_contributions
 			WHERE pinboard = $1::INT
@@ -142,7 +140,7 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 					WHERE owner = $3
 				)
 				AND db = $4
-		;`, [ _id, _object_id, _uuid, ownId ])
+		;`, [ _id, safeArr(_object_id, -1), _uuid, ownId ])
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
@@ -163,7 +161,7 @@ async function updatestatus(_id, _object_id, _mobilization, ownId) {
 			SELECT
 				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
 				WHERE p.id IN $1:csv), 1) AS status
-		`, [ pads ]).status;
+		`, [ safeArr(pads, -1) ]).status;
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = (SELECT GREATEST ($2, status))
@@ -189,13 +187,12 @@ async function updatestatus(_id, _object_id, _mobilization, ownId) {
 	}
 }
 function retrievepins (_object_id, ownId) {
-	if (!Array.isArray(_object_id)) _object_id = [_object_id]
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
 		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2
-	;`, [ _object_id, ownId ])
+	;`, [ safeArr(_object_id, -1), ownId ])
 }
 function retrievepinboards (_owners, ownId) {
 	return DB.pgp.as.format(`
@@ -204,5 +201,5 @@ function retrievepinboards (_owners, ownId) {
 			ON pc.pinboard = p.id
 		WHERE p.owner IN ($1:csv) AND pc.db = $2
 		GROUP BY p.id
-	;`, [ _owners, ownId ])
+	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])
 }

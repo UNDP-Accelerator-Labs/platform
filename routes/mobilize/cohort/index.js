@@ -1,5 +1,5 @@
 const { modules, ownDB, DB } = include('config/')
-const { checklanguage, join, datastructures } = include('routes/helpers/')
+const { checklanguage, join, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { object } = req.params || {}
@@ -8,8 +8,7 @@ module.exports = (req, res) => {
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	const module_rights = modules.find(d => d.type === 'mobilizations')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 	DB.conn.tx(async t => {
 		const batch = []
@@ -48,7 +47,7 @@ module.exports = (req, res) => {
 					;`, [ pinboard, ownId ]);
 					const results = await t.any(`
 						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN ($1:csv)
-					`, [ padlist.map((row) => row.pad) ]);
+					`, [ safeArr(padlist.map((row) => row.pad), -1) ]);
 					const data = await join.users(results, [ language, 'id' ])
 					data.sort((a, b) => a.country?.localeCompare(b.country))
 

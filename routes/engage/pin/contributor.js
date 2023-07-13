@@ -1,3 +1,5 @@
+const { safeArr, DEFAULT_UUID } = require("routes/helpers")
+
 const { modules, DB } = include('config/')
 
 exports.pin = (req, res) => {
@@ -5,8 +7,7 @@ exports.pin = (req, res) => {
 	const { board_id, board_title, object_id } = req.body || {}
 
 	const module_rights = modules.find(d => d.type === 'contributors')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 	if (!board_id) { // CREATE NEW TEAM
 		if (board_title?.trim().length > 0) {
@@ -81,8 +82,7 @@ exports.unpin = (req, res) => {
 	const { board_id, object_id } = req.body || {}
 
 	const module_rights = modules.find(d => d.type === 'contributors')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 	if (object_id) {
 		return DB.general.tx(t => {
@@ -159,5 +159,5 @@ function retrievepinboards (_hosts) {
 			ON tm.team = t.id
 		WHERE t.host IN ($1:csv)
 		GROUP BY t.id
-	;`, [ _hosts ])
+	;`, [ safeArr(_hosts, DEFAULT_UUID) ])
 }

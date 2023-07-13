@@ -1,5 +1,5 @@
 const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
-const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
+const { array, datastructures, checklanguage, join, parsers, safeArr } = include('routes/helpers/')
 
 const load = require('./load/')
 const filter = require('./filter.js')
@@ -190,7 +190,7 @@ module.exports = async (req, res) => {
 					FROM pads p
 					WHERE p.id IN ($2:csv)
 						$1:raw
-				`, [ full_filters, pads.get(pbid) ]);
+				`, [ full_filters, safeArr(pads.get(pbid), -1) ]);
 			}));
 			const countMap = new Map(pbids.map((pbid, index) => [pbid, counts[index]]));
 			return (await DB.general.any(`

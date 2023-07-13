@@ -1,5 +1,5 @@
 const { page_content_limit, modules, engagementtypes, DB } = include('config/')
-const { array, join, checklanguage } = include('routes/helpers/')
+const { array, join, checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -13,8 +13,7 @@ module.exports = kwargs => {
 	// GET FILTERS
 	const [ f_space, page, full_filters ] = filter(kwargs.req)
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	return conn.task(gt => {
 		return gt.any(`

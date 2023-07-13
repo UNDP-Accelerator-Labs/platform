@@ -20,6 +20,7 @@ const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
 const { app_title_short } = require('../../../config')
+const { safeArr } = require('..')
 
 if (!exports.legacy) exports.legacy = {}
 
@@ -183,7 +184,7 @@ exports.pagemetadata = (_kwargs) => {
 					SELECT p.id, p.owner
 					FROM pads p
 					WHERE p.id IN ($1:csv)
-				;`, [ [...pads] ])).map((row) => [row.id, row.owner]));
+				;`, [ safeArr([...pads], -1) ])).map((row) => [row.id, row.owner]));
 				return pinboard_stats.map((stats) => {
 					return {
 						...stats,

@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { array, checklanguage, join, flatObj } = include('routes/helpers/')
+const { array, checklanguage, join, flatObj, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -17,7 +17,7 @@ module.exports = async kwargs => {
 		const batch = []
 		// GET CONTRBIUTOR BREAKDOWN
 		// DEPENDING ON space, GET names OR COUNTRIES
-		
+
 		batch.push(t.task(t1 => {
 			const batch1 = []
 			if (space === 'private') {
@@ -28,7 +28,7 @@ module.exports = async kwargs => {
 					WHERE TRUE
 						$1:raw
 					GROUP BY owner
-				;`, [ full_filters ])//[ req.session.collaborators.map(d => d.uuid) ])
+				;`, [ safeArr(full_filters, DEFAULT_UUID) ])//[ req.session.collaborators.map(d => d.uuid) ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -71,7 +71,7 @@ module.exports = async kwargs => {
 				}).catch(err => console.log(err)))
 
 			} else batch1.push(null)
-			
+
 			// GET MOBILIZATIONS BREAKDOWN
 			// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
 			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
@@ -83,23 +83,23 @@ module.exports = async kwargs => {
 						ON m.template = t.id
 					WHERE (m.id IN (
 						SELECT mobilization
-						FROM mobilization_contributors 
+						FROM mobilization_contributors
 							WHERE participant = $1
 					) OR m.owner = $1)
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
-				;`, [ uuid, f_space ]).then(results => { 
-				// ;`, [ participations.map(d => d.id), f_space ]).then(results => { 
+				;`, [ uuid, f_space ]).then(results => {
+				// ;`, [ participations.map(d => d.id), f_space ]).then(results => {
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)
-			
+
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
 		}).catch(err => console.log(err)))
-		
-		
+
+
 		return t.batch(batch)
 		.then(results => results.filter(d => d.length))
 	}).then(results => {

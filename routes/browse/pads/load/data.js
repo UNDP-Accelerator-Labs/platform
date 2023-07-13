@@ -105,7 +105,8 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// PINBOARD INFORMATION
 			const ownId = await ownDB();
-			const padToPinboard = new Map((await DB.general.any(`
+			const padToPinboards = new Map();
+			(await DB.general.any(`
 				SELECT
 					pc.pad, pb.id, pb.title
 				FROM pinboard_contributions pc
@@ -114,14 +115,17 @@ module.exports = async kwargs => {
 					pc.pad IN $1:raw
 					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
 					AND pc.db = $3
-				GROUP BY pc.pad, pb.id, pb.title
-			`, [ padlist, current_user, ownId ])).map(row => [row.pad, [row.id, row.title]]));
-			batch.push([...padToPinboard.entries()].map(([padId, [pinId, pinTitle]]) => ({
+			`, [ padlist, current_user, ownId ])).forEach(row => {
+				const pinboards = padToPinboards.get(row.pad) ?? [];
+				pinboards.push({
+					id: row.id,
+					title: row.title,
+				});
+				padToPinboards.set(row.pad, pinboards);
+			});
+			batch.push([...pads].map((padId) => ({
 				id: padId,
-				pinboards: {
-					id: pinId,
-					title: pinTitle,
-				},
+				pinboards: padToPinboards.get(padId) ?? [],
 			})));
 			// FOLLOW UP STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`

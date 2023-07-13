@@ -205,12 +205,13 @@ module.exports = async (req, res) => {
 
 		return t.batch(batch)
 		.then(async results => {
-			let [ statistics,
+			const [ statistics,
 				clusters,
 				sample_images,
 				countries,
 				pinboards
-			] = results
+			] = results;
+			console.log('pinboards hp', pinboards)
 
 			const stats = {
 				total: array.sum.call(statistics.total, 'count'),

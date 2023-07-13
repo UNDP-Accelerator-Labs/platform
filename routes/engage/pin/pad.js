@@ -83,7 +83,7 @@ exports.unpin = (req, res) => {
 
 	if (object_id) {
 		return DB.general.tx(gt => {
-			ownDB().then(async ownId => {
+			return ownDB().then(async ownId => {
 				await gt.none(removepads(board_id, object_id, mobilization, uuid, ownId));
 				await gt.none(await updatestatus(board_id, object_id, mobilization, ownId));
 				await gt.none(`
@@ -98,7 +98,7 @@ exports.unpin = (req, res) => {
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
 				batch.push(gt.any(retrievepinboards([ uuid ], ownId)));
 				return gt.batch(batch);
-			})
+			}).catch(err => console.log(err))
 		}).then(results => {
 			const [ pins, pinboards_list ] = results
 			res.json({ status: 200, message: 'Successfully created pinboard and added pad.', pins, pinboards_list })

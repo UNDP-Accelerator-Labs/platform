@@ -66,7 +66,6 @@ module.exports = async (req, res) => {
 		}
 	}
 
-
 	// FILTERS
 	return new Promise(async resolve => {
 		// BASE FILTERS
@@ -88,12 +87,12 @@ module.exports = async (req, res) => {
 			if (public) {
 				if (pinboard) {
 					const ownId = await ownDB();
-					const pbpads = await DB.general.any(`
+					const pbpads = (await DB.general.any(`
 						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
-					`, [ pinboard, ownId ]);
-					const mobs = await DB.general.any(`
+					`, [ pinboard, ownId ])).map(row => row.pad);
+					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
-					`, [ pinboard, ownId ]);
+					`, [ pinboard, ownId ])).map(row => row.mobilization);
 					f_space = DB.pgp.as.format(`
 						((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
 						AND (p.id IN ($1:csv)
@@ -104,12 +103,12 @@ module.exports = async (req, res) => {
 			} else { // THE USER IS LOGGED IN
 				if (pinboard) {
 					const ownId = await ownDB();
-					const pbpads = await DB.general.any(`
+					const pbpads = (await DB.general.any(`
 						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
-					`, [ pinboard, ownId ]);
-					const mobs = await DB.general.any(`
+					`, [ pinboard, ownId ])).map(row => row.pad);
+					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
-					`, [ pinboard, ownId ]);
+					`, [ pinboard, ownId ])).map(row => row.mobilization);
 					f_space = DB.pgp.as.format(`
 						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
 						AND (p.id IN ($3:csv)

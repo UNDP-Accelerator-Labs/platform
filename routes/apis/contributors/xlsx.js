@@ -7,7 +7,7 @@ const fs = require('fs')
 const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 
 const { app_title_short, DB } = include('config/')
-const { checklanguage, array } = include('routes/helpers/')
+const { checklanguage, array, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = include('routes/browse/contributors/filter')
 
@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
 
 	DB.general.tx(t => {
 		return t.any(`
-			SELECT u.uuid, u.name, u.email, u.position, 
-				u.iso3, cn.name AS country, c.lat, c.lng, 
+			SELECT u.uuid, u.name, u.email, u.position,
+				u.iso3, cn.name AS country, c.lat, c.lng,
 				u.language AS primary_language, u.secondary_languages,
 				u.invited_at, u.confirmed_at, u.left_at
 
@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
 			ORDER BY u.iso3, u.name ASC
 		;`, [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ]) // NEED TO REMOVE page INFO
 		.then(async users => {
-			const ids = users.map(d => d.uuid)				
+			const ids = safeArr(users.map(d => d.uuid), DEFAULT_UUID)
 			const batch = []
 
 			if (include_teams) {
@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
 					ORDER BY tm.member
 				;`, [ ids ]))
 			} else batch.push([])
-			
+
 			if (include_contributions) {
 				batch.push(DB.conn.task(t1 => {
 					const batch1 = []
@@ -175,7 +175,7 @@ module.exports = async (req, res) => {
 						}
 						return obj
 					})
-					
+
 					const data_sheet = XLSX.utils.json_to_sheet(flat_content)
 					XLSX.utils.book_append_sheet(wb, data_sheet, 'data-main')
 				}

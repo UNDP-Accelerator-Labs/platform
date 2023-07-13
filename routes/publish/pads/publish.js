@@ -1,4 +1,5 @@
 const { modules, DB } = include('config/')
+const { safeArr, DEFAULT_UUID } = include("routes/helpers")
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -7,8 +8,7 @@ module.exports = (req, res) => {
 
 	const { uuid, rights, collaborators } = req.session || {}
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	// EXECUTE SQL
 	DB.conn.tx(t => {
@@ -42,7 +42,7 @@ module.exports = (req, res) => {
 						SET status = $1::INT
 					WHERE id IN (
 						SELECT id FROM pads
-						WHERE status >= 1 
+						WHERE status >= 1
 							AND (owner IN ($2:csv)
 							OR $3 > 2)
 						LIMIT $4

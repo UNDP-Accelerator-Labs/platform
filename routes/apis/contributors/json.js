@@ -7,7 +7,7 @@ const fs = require('fs')
 const turf = require('@turf/turf')
 
 const { app_title_short, DB } = include('config/')
-const { checklanguage, array } = include('routes/helpers/')
+const { checklanguage, array, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = include('routes/browse/contributors/filter')
 

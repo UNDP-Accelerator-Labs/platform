@@ -19,6 +19,7 @@ const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
 const { app_title_short } = require('../../../config')
+const { safeArr } = require('..')
 
 if (!exports.legacy) exports.legacy = {}
 

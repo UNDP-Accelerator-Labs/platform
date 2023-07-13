@@ -44,10 +44,10 @@ module.exports = (req, res) => {
 					const padlist = await DB.general.any(`
 						SELECT pc.pad FROM pinboard_contributions pc
 						WHERE pc.pinboard = $1 AND pc.db = $2
-					;`, [ pinboard, ownId ]);
+					;`, [ pinboard, ownId ]).map((row) => row.pad);
 					const results = await t.any(`
 						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN ($1:csv)
-					`, [ safeArr(padlist.map((row) => row.pad), -1) ]);
+					`, [ safeArr(padlist, -1) ]);
 					const data = await join.users(results, [ language, 'id' ])
 					data.sort((a, b) => a.country?.localeCompare(b.country))
 

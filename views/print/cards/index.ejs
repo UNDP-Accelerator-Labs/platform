@@ -29,8 +29,6 @@
 
 
 <script type='text/javascript'>
-	// TO DO: REDUCE RESOLUTION HERE TO HAVE LIGHTER FILE
-	// THIS MIGHT ACTUALLY MAKE THE CHUNKING UNNECESSARY
 	const centerpoint = <%- JSON.stringify(locals.metadata.user.country.lnglat || {}) %>;
 
 	// POPULATE THE PAGE
@@ -58,9 +56,7 @@
 				})
 				pdf.save(`pads-cards-compilation-${i}.pdf`)
 			<% } %>
-
 			d3.select('div.document').html('')
-			console.log(i)
 		}
 		window.close()
 	}
@@ -136,7 +132,7 @@
 					blob.onload = function () {
 						imgnode.node().src = this.src
 
-						html2canvas(article.node(), { useCORS: true, allowTaint: true })
+						html2canvas(article.node(), { useCORS: true, allowTaint: true, scale: 1 })
 						.then(canvas => {
 							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
 							let imgdata = canvas.toDataURL('image/png')
@@ -148,7 +144,7 @@
 						}).catch(err => console.log(err))
 					}
 					blob.onerror = function () {
-						html2canvas(article.node())
+						html2canvas(article.node(), { scale: 1 })
 						.then(canvas => {
 							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
 							let imgdata = canvas.toDataURL('image/png')

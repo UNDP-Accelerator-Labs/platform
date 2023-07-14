@@ -311,7 +311,7 @@ CREATE TABLE IF NOT EXISTS public.journey_docs
     db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
     pad_id integer NOT NULL,
     is_relevant boolean NOT NULL,
-    CONSTRAINT journey_docs_pkey PRIMARY KEY (journey_id, db, pad_id),
+    CONSTRAINT journey_docs_pkey PRIMARY KEY (journey_id, db, pad_id)
 );
 ALTER TABLE IF EXISTS public.users
     ADD COLUMN confirmed_feature_journey timestamp with time zone;

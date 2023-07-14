@@ -1,4 +1,4 @@
-const { app_title_short, fixed_uuid, DB } = include('config/');
+const { fixed_uuid, DB, ownDB } = include('config/');
 const actionApprove = 'approve';
 const actionDislike = 'dislike';
 const actionNeutral = 'neutral';
@@ -18,7 +18,6 @@ module.exports = (req, res) => {
             message: `unknown action: ${action}`,
         });
     }
-    const db = app_title_short;
     const journey_id = +journey_id_in;
     const pad_id = +pad_id_in;
     if (!Number.isFinite(journey_id) || !Number.isFinite(pad_id)) {
@@ -27,11 +26,12 @@ module.exports = (req, res) => {
         });
     }
     DB.general.tx((t) => {
-        return t.one(`
-            SELECT uuid FROM journey WHERE id = $1
-        `, [journey_id]).then((result) => {
+        return ownDB().then(async (ownId) => {
+            const juuid = (await t.one(`
+                SELECT uuid FROM journey WHERE id = $1
+            `, [journey_id])).uuid;
             const batch = [];
-            if (result.uuid === uuid) {
+            if (juuid === uuid) {
                 batch.push(t.none(`
                     UPDATE journey
                     SET last_access = NOW()
@@ -43,7 +43,7 @@ module.exports = (req, res) => {
                         WHERE journey_id = $1
                         AND db = $2
                         AND pad_id = $3
-                    `, [journey_id, db, pad_id]));
+                    `, [journey_id, ownId, pad_id]));
                 } else {
                     const isRelevant = action === actionApprove;
                     batch.push(t.none(`
@@ -51,43 +51,35 @@ module.exports = (req, res) => {
                         VALUES ($1, $2, $3, $4)
                         ON CONFLICT (journey_id, db, pad_id)
                         DO UPDATE SET is_relevant = $4
-                    `, [journey_id, db, pad_id, isRelevant]));
+                    `, [journey_id, ownId, pad_id, isRelevant]));
                 }
             }
-            return t.batch(batch);
-        }).catch((_) => {
-            res.status(422).json({
-                message: 'journey id does not exist',
-            });
-        });
-    }).then((result) => {
-        if (result === undefined) { // previous error
-            return;
-        }
-        if (result.errors) { // batch errors
-            console.log(result);
+            const result = await t.batch(batch);
+            if (result.errors) { // batch errors
+                console.log(result);
+                res.status(500).json({
+                    message: 'error while processing request',
+                });
+                return;
+            }
+            if (result.length !== 2) { // uuid didn't match
+                res.status(422).json({
+                    message: 'journey id does not exist',
+                });
+            } else {
+                res.json({
+                    journey: journey_id,
+                    pad: pad_id,
+                    db: ownId,
+                    value: action,
+                    message: `success! journey_id[${journey_id}] db[${ownId}] pad_id[${pad_id}] value[${action}]`,
+                });
+            }
+        }).catch((err) => {
+            console.log(err);
             res.status(500).json({
                 message: 'error while processing request',
             });
-            return;
-        }
-        if (result.length !== 2) { // uuid didn't match
-            res.status(422).json({
-                message: 'journey id does not exist',
-            });
-        } else {
-            res.json({
-                journey: journey_id,
-                pad: pad_id,
-                db: db,
-                value: action,
-                message: `success! journey_id[${journey_id}] db[${db}] pad_id[${pad_id}] value[${action}]`,
-            });
-        }
-	}).catch((err) => {
-        console.log(err);
-        res.status(500).json({
-            message: 'error while processing request',
         });
     });
 }

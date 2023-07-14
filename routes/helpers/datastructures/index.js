@@ -2,7 +2,6 @@ const {
 	app_id,
 	app_title: title,
 	app_description: description,
-	app_title_short: app_db,
 	app_languages,
 	app_storage,
 	modules,
@@ -196,7 +195,7 @@ exports.pagemetadata = (_kwargs) => {
 
 		return t.batch(batch)
 		.catch(err => console.log(err))
-	}).then(results => {
+	}).then(async results => {
 		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards ] = results
 		let [ languages, speakers ] = languagedata
 
@@ -229,7 +228,7 @@ exports.pagemetadata = (_kwargs) => {
 				engagementtypes,
 				welcome_module,
 				app_storage,
-				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
+				own_db: await ownDB(),
 				app_id
 			},
 			user: {

@@ -1,13 +1,12 @@
 <%
     const language = locals.metadata.page.language;
     const vocab = vocabulary['journey'][language];
-    const app_db = locals.metadata.site.app_db;
+    const own_db = locals.metadata.site.own_db;
 
     //const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: < %- JSON.stringify(locals.pads) % >, action: 'insert', object: '< %- object.slice(0, -1) % >' })
     //window.location = `./pinned?pinboard=${board_id}`
 
     // TODO
-    // - move pinboard to login/global
     // - use API to fetch globally (
     //    https://undphqexoacclabsapp01.azurewebsites.net/apis/fetch/pads?output=json&token=<token>
     //    https://undphqexoacclabsapp01.azurewebsites.net/apis/fetch/pads?output=json&pads=6002&pads=5950
@@ -35,7 +34,7 @@
             this.collectionId = null;
             this.collectionUpdateCbs = [];
 
-            this.appDb = '<%= app_db %>';
+            this.ownDb = (<%- own_db %>);
             if (sessionStorage.journeyId) {
                 this.currentId = +sessionStorage.journeyId || null;
             }
@@ -211,9 +210,9 @@
                 this.collectionId = null;
                 const docs = result['pads'];
                 const newLookup = {};
-                const appDb = this.appDb;
+                const ownDb = this.ownDb;
                 docs.forEach((doc) => {
-                    if (doc['db'] !== appDb) {
+                    if (doc['db'] !== ownDb) {
                         return;
                     }
                     newLookup[`${doc['pad_id']}`] = doc['is_relevant'];

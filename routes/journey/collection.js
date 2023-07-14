@@ -14,11 +14,20 @@ module.exports = (req, res) => {
             message: `id is required: ?journey_id=${journey_id_in}`,
         });
     }
-    DB.general.result(`
-        SELECT jd.db AS db, jd.pad_id AS pad_id, jd.is_relevant AS is_relevant
-        FROM journey_docs AS jd, journey AS jy
-        WHERE jd.journey_id = $1 AND jd.journey_id = jy.id AND jy.uuid = $2
-    `, [journey_id, uuid]).then((result) => {
+    return DB.general.tx(async (t) => {
+        const hasConsent = (await t.one(`
+            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
+        `, [uuid])).confirmed_feature_journey;
+        if (!hasConsent) {
+            return res.status(403).json({
+                message: `${uuid} has to consent to using the journey feature first!`,
+            });
+        }
+        const result = await t.result(`
+            SELECT jd.db AS db, jd.pad_id AS pad_id, jd.is_relevant AS is_relevant
+            FROM journey_docs AS jd, journey AS jy
+            WHERE jd.journey_id = $1 AND jd.journey_id = jy.id AND jy.uuid = $2
+        `, [journey_id, uuid]);
         res.json({
             uuid,
             journey_id,

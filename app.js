@@ -153,6 +153,8 @@ app.put('/journey/create', routes.process.journeyCreate);
 app.get('/journey/list', routes.process.journeyList);
 app.put('/journey/doc', routes.process.journeyDoc);
 app.get('/journey/collection', routes.process.journeyCollection);
+app.get('/journey/consent', routes.process.journeyConsent);
+app.put('/journey/consent', routes.process.journeyConsent);
 
 app.route('/publish/:object')
 	.get(routes.process.publish)

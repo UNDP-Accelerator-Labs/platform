@@ -41,6 +41,7 @@
             if (sessionStorage.journeyPrompt) {
                 this.currentPrompt = this.normalizeJourneyPrompt(sessionStorage.journeyPrompt);
             }
+            this.consent = true;  // we assume consent was given until an API call says otherwise
         };
 
         setUseFullPromptForSelect(isUseFull) {
@@ -129,16 +130,32 @@
             if (this.mainButton !== null) {
                 this.mainButton.text(
                     journeyId === null
-                    ? "<%= vocab['start'] %>"
+                    ? "<%- vocab['start'] %>"
                     : journeyId !== currentId
-                    ? "<%= vocab['continue'] %>"
-                    : "<%= vocab['finish'] %>");
+                    ? "<%- vocab['continue'] %>"
+                    : "<%- vocab['finish'] %>");
             }
             if (this.mainInput !== null) {
                 const value = this.getInputValue();
                 const normPrompt = this.normalizeJourneyPrompt(value);
                 this.mainInput.classed('has-value', !!normPrompt);
             }
+        }
+
+        checkError(err, cb) {
+            if (err) {
+                if (err.status === 401) {  // not logged in
+                    cb && cb();
+                    this.updateCurrentJourney(null, '');
+                    return;
+                } else if (err.status === 403) {  // did not consent
+                    cb && cb();
+                    this.updateCurrentJourney(null, '');
+                    this.consent = false;
+                    return;
+                }
+            }
+            console.error(err);
         }
 
         updateJourneyList(cb = null) {
@@ -150,6 +167,7 @@
             }
             this.listUpdateActive = true;
             GET('/journey/list?lang=<%= language %>', true, true).then((result) => {
+                this.consent = true;
                 this.listUpdateActive = false;
                 const journeys = result['journeys'];
                 this.past = journeys;
@@ -160,14 +178,12 @@
                 cbs.forEach((curCb) => curCb());
             }).catch((err) => {
                 this.listUpdateActive = false;
-                if (err && err.status === 401) {
+                this.checkError(err, () => {
                     this.past = [];
                     const cbs = this.listUpdateCbs;
                     this.listUpdateCbs = [];
                     cbs.forEach((curCb) => curCb());
-                    this.updateCurrentJourney(null, '');
-                }
-                console.error(err);
+                });
             });
         }
 
@@ -222,18 +238,15 @@
                 const cbs = this.collectionUpdateCbs;
                 this.collectionUpdateCbs = [];
                 this.updateDocs(cbs);
-            })
-            .catch((err) => {
+            }).catch((err) => {
                 this.collectionId = null;
-                if (err && err.status === 401) {
+                this.checkError(err, () => {
                     this.docs = [];
                     this.docLookup = {};
                     const cbs = this.collectionUpdateCbs;
                     this.collectionUpdateCbs = [];
                     this.updateDocs(cbs);
-                    this.updateCurrentJourney(null, '');
-                }
-                console.error(err);
+                });
             });
         }
 
@@ -261,7 +274,9 @@
                     }, true, true).then((result) => {
                         this.updateCurrentJourney(result['journey'], result['prompt']);
                         this.updateJourneyDatalist();
-                    }).catch((err) => console.error(err));
+                    }).catch((err) => {
+                        this.checkError(err);
+                    });
                 } else {
                     this.updateCurrentJourney(null, '');
                 }
@@ -277,15 +292,39 @@
             this.updatePrompt(userPrompt, allowReport);
         }
 
-        confirmFeature() {
-            const message = `<h2>A</h2><ul><li>B</li></ul>`;
-            renderPromiseModal({ message, opts: [
-                {
-                    type: 'input',
+        consentFeature() {
+            const message = `
+                <h2>You need to give consent to use this feature!</h2>
+                <p>
+                    This feature enables you to easily and serendipitously
+                    create collections that answer questions about the corpus.
+                    The questions and selected documents might be used for
+                    training a machine learning model to improve the results.
+                </p>
+                <p>
+                    Please indicate below that you understood and approve of
+                    the use of the indicated data for further uses.
+                </p>
+            `;
+            renderPromiseModal({
+                message,
+                opts: [
+                    { node: 'button', type: 'button', label: 'I Approve!', resolve: true },
+                    { node: 'button', type: 'button', label: 'Not Okay!', resolve: false },
+                ],
+            }).then((consent) => {
+                if(!consent) {  // not given consent or closed window
+                    return;
                 }
-            ] })
-            .then(() => {})
-            .catch((err) => console.error(err));
+                PUT('/journey/consent', {
+                    consent: 'approve',
+                }, true, true).then((result) => {
+                    this.consent = true;
+                    this.updateJourneyDatalist();
+                }).catch((err) => {
+                    this.checkError(err);
+                });
+            }).catch((err) => console.error(err));
         }
 
         maybeAddDatalist(sel) {
@@ -319,7 +358,14 @@
                     this.getJourneyByPrompt(normPrompt)[0],
                     this.currentId);
             })
-            .on('blur', () => this.confirmJourneyPrompt(false));
+            .on('blur', () => this.confirmJourneyPrompt(false))
+            .on('click', () => {
+                const evt = d3.event;
+                if (!this.consent) {
+                    evt.preventDefault();
+                    this.consentFeature();
+                }
+            });
             this.mainInput = mainInput;
             this.updateCurrentJourney(this.currentId, this.currentPrompt);
 
@@ -389,7 +435,9 @@
                 'journey_id': journeyId,
             }, true, true).then((result) => {
                 this.updateJourneyDocs();
-            }).catch((err) => console.error(err));
+            }).catch((err) => {
+                this.checkError(err);
+            });
         }
 
         addDocButtons(sel) {

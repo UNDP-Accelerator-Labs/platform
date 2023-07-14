@@ -18,15 +18,22 @@ module.exports = (req, res) => {
             message: 'prompt must not be empty',
         });
     }
-    const upsert = DB.pgp.as.format(`
-        INSERT INTO journey (uuid, prompt, created_at, last_access)
-        VALUES ($1, $2, NOW(), NOW())
-        ON CONFLICT (uuid, prompt) DO UPDATE SET last_access = NOW()
-        RETURNING id
-    ;`, [uuid, prompt]);
-    DB.general.one(upsert)
-    .then((result) => {
-        res.json({
+    return DB.general.tx(async (t) => {
+        const hasConsent = (await t.one(`
+            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
+        `, [uuid])).confirmed_feature_journey;
+        if (!hasConsent) {
+            return res.status(403).json({
+                message: `${uuid} has to consent to using the journey feature first!`,
+            });
+        }
+        const result = await t.one(`
+            INSERT INTO journey (uuid, prompt, created_at, last_access)
+            VALUES ($1, $2, NOW(), NOW())
+            ON CONFLICT (uuid, prompt) DO UPDATE SET last_access = NOW()
+            RETURNING id
+        ;`, [uuid, prompt]);
+        return res.json({
             journey: result.id,
             prompt,
             message: `success! id[${result.id}] uuid[${uuid}] prompt[${prompt}]`,

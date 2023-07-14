@@ -49,13 +49,22 @@ module.exports = (req, res) => {
     }
     const { lang='en' } = req.query || {};
     const timeAgo = new TimeAgo(lang);
-    DB.general.result(`
-        SELECT id, prompt, created_at, last_access
-        FROM journey
-        WHERE uuid = $1
-        ORDER BY last_access DESC
-    `, [uuid]).then((result) => {
-        res.json({
+    return DB.general.tx(async (t) => {
+        const hasConsent = (await t.one(`
+            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
+        `, [uuid])).confirmed_feature_journey;
+        if (!hasConsent) {
+            return res.status(403).json({
+                message: `${uuid} has to consent to using the journey feature first!`,
+            });
+        }
+        const result = await t.result(`
+            SELECT id, prompt, created_at, last_access
+            FROM journey
+            WHERE uuid = $1
+            ORDER BY last_access DESC
+        `, [uuid]);
+        return res.json({
             uuid,
             journeys: result.rows.map((row) => ({
                 id: row.id,

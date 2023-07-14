@@ -35,7 +35,7 @@
             this.collectionId = null;
             this.collectionUpdateCbs = [];
 
-            this.appDb = '<%- app_db %>';
+            this.appDb = '<%= app_db %>';
             if (sessionStorage.journeyId) {
                 this.currentId = +sessionStorage.journeyId || null;
             }
@@ -130,10 +130,10 @@
             if (this.mainButton !== null) {
                 this.mainButton.text(
                     journeyId === null
-                    ? "<%- vocab['start'] %>"
+                    ? "<%= vocab['start'] %>"
                     : journeyId !== currentId
-                    ? "<%- vocab['continue'] %>"
-                    : "<%- vocab['finish'] %>");
+                    ? "<%= vocab['continue'] %>"
+                    : "<%= vocab['finish'] %>");
             }
             if (this.mainInput !== null) {
                 const value = this.getInputValue();
@@ -150,7 +150,7 @@
                 return;
             }
             this.listUpdateActive = true;
-            GET('/journey/list?lang=<%- language %>', true, true).then((result) => {
+            GET('/journey/list?lang=<%= language %>', true, true).then((result) => {
                 this.listUpdateActive = false;
                 const journeys = result['journeys'];
                 this.past = journeys;
@@ -181,7 +181,7 @@
                 datalist.addElems('option', 'journey-past-elem', this.past)
                 .attrs({
                     'value': (d) => this.normalizeJourneyPrompt(d['prompt']),
-                    'label': (d) => `<%- vocab['last_access'] %> ${d['last_access_ago']}`,
+                    'label': (d) => `<%= vocab['last_access'] %> ${d['last_access_ago']}`,
                 });
                 cb && cb();
             });
@@ -209,14 +209,14 @@
                     return;
                 }
                 this.collectionId = null;
-                const docs = result['docs'];
+                const docs = result['pads'];
                 const newLookup = {};
                 const appDb = this.appDb;
                 docs.forEach((doc) => {
                     if (doc['db'] !== appDb) {
                         return;
                     }
-                    newLookup[`${doc['doc_id']}`] = doc['is_relevant'];
+                    newLookup[`${doc['pad_id']}`] = doc['is_relevant'];
                 });
                 this.docs = docs;
                 this.docLookup = newLookup;
@@ -289,11 +289,11 @@
 
             const prompt = escape(this.currentPrompt);
             const links = this.docs.length ? this.docs.map((doc) => {
-                const lang = '<%- language %>';
-                const end = `/${lang}/view/pad?id=${doc.doc_id}`;
+                const lang = '<%= language %>';
+                const end = `/${lang}/view/pad?id=${doc.pad_id}`;
                 const link = `${location.origin}${end}`;
                 return `<a href="${link}">${link}</a>`; // FIXME
-            }).join('</li><li>') : "<%- vocab['doc-help'] %>";
+            }).join('</li><li>') : "<%= vocab['doc-help'] %>";
             const message = `<h2>${prompt}</h2><ul><li>${links}</li></ul>`;
             renderPromiseModal({ message, opts: [] })
             .then(() => {})
@@ -339,7 +339,7 @@
             .attrs({
                 'for': `journey-main`,
             })
-            .text("<%- vocab['intro'] %>");
+            .text("<%= vocab['intro'] %>");
             this.maybeAddDatalist(sel);
             const mainButton = sel.addElem('button')
             .attrs({
@@ -396,7 +396,7 @@
                 this.isDocApprove(docId) ? 'neutral' : 'approve') : (
                 this.isDocDislike(docId) ? 'neutral' : 'dislike');
             PUT('/journey/doc', {
-                'doc_id': docId,
+                'pad_id': docId,
                 'action': action,
                 'journey_id': journeyId,
             }, true, true).then((result) => {
@@ -407,7 +407,7 @@
         addDocButtons(sel) {
             const doc = sel.addElems('div', 'journey-doc');
             const docSpan = doc.addElem('span');
-            docSpan.addElem('span').text("<%- vocab['doc-begin'] %> ");
+            docSpan.addElem('span').text("<%= vocab['doc-begin'] %> ");
             const that = this;
             docSpan.addElem('select').classed('journey-short', true)
             .on('change', function() {
@@ -419,13 +419,13 @@
             docSpan.addElem('span').text(": ");
             doc.addElem('button')
             .classed('journey-btn-approve', true)
-            .text("<%- vocab['doc-approve'] %>")
+            .text("<%= vocab['doc-approve'] %>")
             .on('click', (d) => {
                 this.setDocAction(d.id, true);
             });
             doc.addElem('button')
             .classed('journey-btn-dislike', true)
-            .text("<%- vocab['doc-dislike'] %>")
+            .text("<%= vocab['doc-dislike'] %>")
             .on('click', (d) => {
                 this.setDocAction(d.id, false);
             });

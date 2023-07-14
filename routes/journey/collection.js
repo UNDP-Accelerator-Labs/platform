@@ -15,16 +15,16 @@ module.exports = (req, res) => {
         });
     }
     DB.general.result(`
-        SELECT jd.db AS db, jd.doc_id AS doc_id, jd.is_relevant AS is_relevant
+        SELECT jd.db AS db, jd.pad_id AS pad_id, jd.is_relevant AS is_relevant
         FROM journey_docs AS jd, journey AS jy
         WHERE jd.journey_id = $1 AND jd.journey_id = jy.id AND jy.uuid = $2
     `, [journey_id, uuid]).then((result) => {
         res.json({
             uuid,
             journey_id,
-            docs: result.rows.map((row) => ({
+            pads: result.rows.map((row) => ({
                 db: row.db,
-                doc_id: row.doc_id,
+                pad_id: row.pad_id,
                 is_relevant: row.is_relevant,
             })),
         });

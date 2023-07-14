@@ -12,7 +12,7 @@ module.exports = (req, res) => {
             message: 'must be logged in',
         });
     }
-    const { journey_id: journey_id_in, action, doc_id: doc_id_in } = req.body || {};
+    const { journey_id: journey_id_in, action, pad_id: pad_id_in } = req.body || {};
 	if (!validActions.includes(action)) {
         return res.status(422).json({
             message: `unknown action: ${action}`,
@@ -20,8 +20,8 @@ module.exports = (req, res) => {
     }
     const db = app_title_short;
     const journey_id = +journey_id_in;
-    const doc_id = +doc_id_in;
-    if (!Number.isFinite(journey_id) || !Number.isFinite(doc_id)) {
+    const pad_id = +pad_id_in;
+    if (!Number.isFinite(journey_id) || !Number.isFinite(pad_id)) {
         return res.status(422).json({
             message: `ids are required: ${JSON.stringify(req.body)}`,
         });
@@ -42,16 +42,16 @@ module.exports = (req, res) => {
                         DELETE FROM journey_docs
                         WHERE journey_id = $1
                         AND db = $2
-                        AND doc_id = $3
-                    `, [journey_id, db, doc_id]));
+                        AND pad_id = $3
+                    `, [journey_id, db, pad_id]));
                 } else {
                     const isRelevant = action === actionApprove;
                     batch.push(t.none(`
-                        INSERT INTO journey_docs (journey_id, db, doc_id, is_relevant)
+                        INSERT INTO journey_docs (journey_id, db, pad_id, is_relevant)
                         VALUES ($1, $2, $3, $4)
-                        ON CONFLICT (journey_id, db, doc_id)
+                        ON CONFLICT (journey_id, db, pad_id)
                         DO UPDATE SET is_relevant = $4
-                    `, [journey_id, db, doc_id, isRelevant]));
+                    `, [journey_id, db, pad_id, isRelevant]));
                 }
             }
             return t.batch(batch);
@@ -78,10 +78,10 @@ module.exports = (req, res) => {
         } else {
             res.json({
                 journey: journey_id,
-                doc: doc_id,
+                pad: pad_id,
                 db: db,
                 value: action,
-                message: `success! journey_id[${journey_id}] db[${db}] doc_id[${doc_id}] value[${action}]`,
+                message: `success! journey_id[${journey_id}] db[${db}] pad_id[${pad_id}] value[${action}]`,
             });
         }
 	}).catch((err) => {

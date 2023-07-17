@@ -1,7 +1,7 @@
 const { DB } = include('config/')
 
 module.exports = async (req, res) => {
-	let { tags, type, pads, mobilizations, countries, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { tags, type, pads, mobilizations, countries, regions, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (tags && !Array.isArray(tags)) tags = [tags]
 	if (pads && !Array.isArray(pads)) pads = [pads]
 	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations]
@@ -26,6 +26,15 @@ module.exports = async (req, res) => {
 			;`, [ countries ])
 			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ results.map(d => d.uuid) ]))
 			.catch(err => console.log(err)))
+		} else if (regions) {
+			platform_filters.push(await DB.general.any(`
+				SELECT u.uuid FROM users u
+				INNER JOIN countries c
+				ON c.iso3 = u.iso3
+				WHERE c.bureau IN ($1:csv)
+			;`, [ regions ]))
+			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ results.map(d => d.uuid) ]))
+			.catch(err => console.log(err))
 		}
 		const f_type = DB.pgp.as.format(`AND t.type = $1`, [ type ])
 

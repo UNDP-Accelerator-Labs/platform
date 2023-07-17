@@ -3,7 +3,7 @@ const { join, array } = include('routes/helpers/')
 
 const filter = require('./filter.js')
 
-module.exports = async (req, res) => {	
+module.exports = async (req, res) => {
 	let { timeseries, aggregation } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (!aggregation) aggregation = 'day'
 	// GET FILTERS

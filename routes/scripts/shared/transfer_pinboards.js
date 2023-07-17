@@ -75,7 +75,6 @@ if (action === undefined || action === 'transfer') {
             const cbatch = [];
             cbatch.push(ct.none(`ALTER TABLE mobilizations DROP CONSTRAINT IF EXISTS mobilizations_collection_fkey;`));
             cbatch.push(ct.none(`ALTER TABLE mobilizations RENAME COLUMN collection TO old_collection;`));
-            cbatch.push(ct.none(`ALTER TABLE mobilizations ADD COLUMN IF NOT EXISTS collection_id INT;`));
             cbatch.push(ct.none(`ALTER TABLE pinboards RENAME TO _pinboards;`));
             cbatch.push(ct.none(`ALTER TABLE pinboard_contributors RENAME TO _pinboard_contributors;`));
             cbatch.push(ct.none(`ALTER TABLE pinboard_contributions RENAME TO _pinboard_contributions;`));
@@ -135,17 +134,6 @@ if (action === undefined || action === 'transfer') {
                 GROUP BY old_collection;
             `);
             const mobIds = new Set(mids.map((row) => row.old_collection) ?? []);
-            oldIdMap.forEach((newId, oldId) => {
-                if (mobIds.has(oldId)) {
-                    cbatch.push(ct.none(`
-                        UPDATE mobilizations
-                        SET collection_id = $1
-                        WHERE old_collection = $2;
-                    `, [newId, oldId]));
-                }
-            });
-            ct.batch(cbatch);
-            cbatch.clear();
             const pcont = await ct.manyOrNone(`
                 SELECT DISTINCT participant, pinboard
                 FROM _pinboard_contributors
@@ -167,6 +155,13 @@ if (action === undefined || action === 'transfer') {
             });
             await gt.batch(gbatch);
             gbatch.clear();
+            if (mobIds.size) {
+                console.log('NOTE: double check the following collection ids from the mobilization table:');
+                console.log([...mobIds.values()].map((oldId) => ({
+                    oldId,
+                    newId: oldIdMap.get(oldId),
+                })));
+            }
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'rollback') {
@@ -183,7 +178,6 @@ if (action === undefined || action === 'transfer') {
             cbatch.push(ct.none(`ALTER TABLE _pinboard_contributions RENAME TO pinboard_contributions;`));
             cbatch.push(ct.none(`ALTER TABLE _pinboard_contributors RENAME TO pinboard_contributors;`));
             cbatch.push(ct.none(`ALTER TABLE _pinboards RENAME TO pinboards;`));
-            cbatch.push(ct.none(`ALTER TABLE mobilizations DROP COLUMN collection_id;`));
             cbatch.push(ct.none(`ALTER TABLE mobilizations RENAME COLUMN old_collection TO collection;`));
             cbatch.push(ct.none(`
                 ALTER TABLE mobilizations ADD CONSTRAINT mobilizations_collection_fkey

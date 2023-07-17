@@ -211,7 +211,6 @@ module.exports = async (req, res) => {
 				countries,
 				pinboards
 			] = results;
-			console.log('pinboards hp', pinboards)
 
 			const stats = {
 				total: array.sum.call(statistics.total, 'count'),

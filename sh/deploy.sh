@@ -17,5 +17,6 @@ fi
 TAG=$(make -s next-version)
 
 echo "deploying version: ${TAG}"
+git fetch
 git tag "${TAG}"
 git push --tags

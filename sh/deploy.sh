@@ -14,9 +14,10 @@ if [ $(make -s branch) != "${BRANCH_MAIN}" ]; then
     exit 2
 fi
 
+git fetch
+
 TAG=$(make -s next-version)
 
 echo "deploying version: ${TAG}"
-git fetch
 git tag "${TAG}"
 git push --tags

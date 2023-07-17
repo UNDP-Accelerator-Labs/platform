@@ -1,11 +1,21 @@
 const { DB, app_id } = require('../../../config');
-if (['local', 'global'].includes(app_id)) {
-    throw new Error(`app_id '${app_id}' must be one of 'ap', 'exp', or 'sm'!`);
+const link_map = {
+    'ap': 'https://acclabs-actionlearningplans.azurewebsites.net/',
+    'exp': 'https://acclabs-experiments.azurewebsites.net/',
+    'global': 'https://acclabs.azurewebsites.net/',
+    'sm': 'https://acclabs-solutionsmapping.azurewebsites.net/',
+    'blogs': 'https://acclabs.azurewebsites.net/',
+};
+if (!link_map[app_id]) {
+    throw new Error(`app_id '${app_id}' must be one of 'ap', 'exp', 'sm', 'global', or 'blogs'!`);
+}
+if (app_id === 'global') {
+    console.warn('WARNING! global here refers to the database *not* the global platform!');
 }
 const action = process.env['ACTION'];
 
 Array.prototype.clear = function () {
-	this.length = 0;
+    this.length = 0;
 };
 
 const { database: fInfoDB, host: fInfoHost, user: fInfoUser } = DB.conn.$cn;
@@ -14,12 +24,6 @@ console.log(`action ${action || 'transfer'}`)
 console.log(
     `transferring from ${fInfoDB} ${fInfoHost} ${fInfoUser} ` +
     `to ${tInfoDB} ${tInfoHost} ${tInfoUser}}`);
-const link_map = {
-	'ap': 'https://acclabs-actionlearningplans.azurewebsites.net/',
-	'exp': 'https://acclabs-experiments.azurewebsites.net/',
-	'global': 'https://acclabs.azurewebsites.net/',
-	'sm': 'https://acclabs-solutionsmapping.azurewebsites.net/',
-};
 const db_map = {};
 
 if (action === undefined || action === 'transfer') {

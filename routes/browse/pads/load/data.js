@@ -154,7 +154,7 @@ module.exports = async kwargs => {
 			`, [ padlist ])).map(row => row.id);
 			const pbMobs = (await DB.general.any(`
 				SELECT pb.mobilization as mob
-				FROM pinboard pb
+				FROM pinboards pb
 				WHERE pb.mobilization_db = $2
 					AND pb.mobilization IN ($1:csv)
 			`, [ safeArr(validMobs, -1), ownId ])).map(row => row.mob);

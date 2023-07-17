@@ -146,7 +146,6 @@ CREATE TABLE mobilizations (
 	pad_limit INT DEFAULT 1,
 	description TEXT,
 	language VARCHAR(9),
-	collection_id INT,
 	old_collection INT,
 	version ltree
 );
@@ -173,6 +172,7 @@ INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://acclabs-actionlear
 INSERT INTO extern_db (db, url_prefix) VALUES ('exp', 'https://acclabs-experiments.azurewebsites.net/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://acclabs.azurewebsites.net/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://acclabs-solutionsmapping.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://acclabs.azurewebsites.net/');
 
 CREATE TABLE pinboards (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,

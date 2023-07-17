@@ -739,52 +739,54 @@ header {
 		flex-wrap: wrap;
 		padding: 45px 30px 15px 5px;
 
-		.statistic {
-			display: inline-block;
-			position: relative;
-			width: 50%;
-			margin: 15px 0;
-			text-align: center;
+		.stat-group {
+			.statistic {
+				display: inline-block;
+				position: relative;
+				width: 50%;
+				margin: 15px 0;
+				text-align: center;
 
-			h1 {
-				font-size: $t-large;
-				line-height: 1.5em;
-				color: $c-dark-blue;
+				h1 {
+					font-size: $t-large;
+					line-height: 1.5em;
+					color: $c-dark-blue;
+				}
+				p {
+					margin: 0;
+					font-style: normal;
+					font-size: $t-mid-small;
+					line-height: 1.5em;
+					color: $c-dark-blue;
+				}
+				small {
+					font-size: $t-small;
+					line-height: 1.5em;
+					color: $c-light-grey;
+				}
 			}
-			p {
-				margin: 0;
-				font-style: normal;
-				font-size: $t-mid-small;
-				line-height: 1.5em;
-				color: $c-dark-blue;
-			}
-			small {
-				font-size: $t-small;
-				line-height: 1.5em;
-				color: $c-light-grey;
-			}
-		}
-		.statistic:first-child {
-			width: 100%;
-			margin: 15px 0;
+			.statistic:first-child {
+				width: 100%;
+				margin: 15px 0;
 
-			h1 {
-				font-size: $t-xlarge;
-				line-height: 1.2em;
+				h1 {
+					font-size: $t-xlarge;
+					line-height: 1.2em;
+				}
+				p {
+					font-size: $t-main;
+				}
 			}
-			p {
-				font-size: $t-main;
-			}
-		}
-		.statistic:nth-child(2n) {
-			&::after {
-				content: '';
-				position: absolute;
-				left: 100%;
-				top: 0;
-				width: 0;
-				height: 100%;
-				border-right: 1px dotted $c-light-grey;
+			.statistic:nth-child(2n) {
+				&::after {
+					content: '';
+					position: absolute;
+					left: 100%;
+					top: 0;
+					width: 0;
+					height: 100%;
+					border-right: 1px dotted $c-light-grey;
+				}
 			}
 		}
 	}

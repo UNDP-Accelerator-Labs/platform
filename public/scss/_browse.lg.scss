@@ -312,6 +312,10 @@ div.public-page-panel {
 	min-height: 90px;
 	padding: 90px 0;
 
+	&.sm-padding {
+		padding: 30px 0;
+	}
+
 	& > .inner {
 		position: relative;
 		width: calc(300px * 3 + 15px * 2);

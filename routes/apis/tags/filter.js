@@ -32,9 +32,9 @@ module.exports = async (req, res) => {
 				INNER JOIN countries c
 				ON c.iso3 = u.iso3
 				WHERE c.bureau IN ($1:csv)
-			;`, [ regions ]))
+			;`, [ regions ])
 			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ results.map(d => d.uuid) ]))
-			.catch(err => console.log(err))
+			.catch(err => console.log(err)))
 		}
 		const f_type = DB.pgp.as.format(`AND t.type = $1`, [ type ])
 

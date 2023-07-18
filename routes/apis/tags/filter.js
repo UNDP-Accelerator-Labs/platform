@@ -6,13 +6,14 @@ module.exports = async (req, res) => {
 	if (pads && !Array.isArray(pads)) pads = [pads]
 	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations]
 	if (countries && !Array.isArray(countries)) countries = [countries]
+	if (regions && !Array.isArray(regions)) regions = [regions]
 	if (!type) type = 'thematic_areas'
 
 	return new Promise(async resolve => {
 
 		let general_filters = []
 		let platform_filters = []
-		
+
 		if (tags) {
 			general_filters.push(DB.pgp.as.format(`t.id IN ($1:csv)`, [ tags ]))
 			if (timeseries) platform_filters.push(DB.pgp.as.format(`t.tag_id IN ($1:csv)`, [ tags ]))

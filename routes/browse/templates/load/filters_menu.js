@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { array, checklanguage, join, flatObj, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { array, checklanguage, join, flatObj } = include('routes/helpers/')
 
 const filter = require('../filter')
 

@@ -26,9 +26,14 @@ module.exports = (kwargs) => {
 	}
 
 	return new Promise(resolve => {
-		transporter.sendMail(mailOptions, (err, info) => {
-			if (err) resolve({ status: 500, message: err })
-			resolve({ status: 200, message: `Message ${info?.messageId} sent: ${info?.response}` })
-		})
+		if (process.env.NODE_ENV === 'production') {
+			transporter.sendMail(mailOptions, (err, info) => {
+				if (err) resolve({ status: 500, message: err })
+				resolve({ status: 200, message: `Message ${info?.messageId} sent: ${info?.response}` })
+			})
+		} else {
+			console.log('should not send email because not in prodcution')
+			resolve(null)
+		}
 	})
 }

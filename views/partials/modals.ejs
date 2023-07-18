@@ -203,17 +203,12 @@
 		if (d.node === 'select') {
 			// CREATE DROPDOWN
 			const filter = _sel.addElems('div', 'filter')
-			// .each(function () {
-			// 	if (d.classname) d3.select(this).classed(d.classname, true)
-			// })
+
 			filter.addElems('input', 'dropbtn')
 				.attrs({
 					'id': nodeid,
 					'type': 'text'
 				})
-			// .each(function () {
-			// 	if (d.classname) d3.select(this).classed(d.classname, true)
-			// })
 			.on('keyup', async function (d) {
 				const evt = d3.event
 				const node = this
@@ -236,7 +231,7 @@
 				fixLabel(this)
 			})
 			
-			filter.addElems('label') //, d.classname || null)
+			filter.addElems('label')
 				.attr('for', nodeid)
 			.html(c => c.label)
 			
@@ -258,21 +253,34 @@
 					})
 				.on('change', function (b) {
 					// TO DO: MAKE THIS ONLY POSSIBLE IF THIS input TYPE IS CHECKBOX
+					const node = this
 					const sel = d3.select(this)
 					const input = sel.findAncestor('filter').select('input[type=text]').node()
 					if (c.type === 'radio') {
+						// KEEP TRACK OF SELECTED VALUE
 						if (this.checked) input.value = b.label
 						else input.value = ''
 						input.blur()
 						sel.findAncestor('dropdown').selectAll('li').classed('hide active', false)
-					// } else if (c.type === 'checkbox') {
-					// 	if (this.checked) input.value = `${input.value}, ${b.label}`
-					// 	else input.value = input.value.replace(b.label, '').replace(/,\s*,\s*/g, ', ')
 					} else {
 						input.value = ''
 						sel.findAncestor('dropdown').selectAll('li').classed('hide', false)
+						// KEEP TRACK OF SELECTED VALUES
+						const taggroup = _sel.addElems('div', 'active-filters')
+						const tag = taggroup.addElem('div', 'tag')
+						.datum({ id: b.value })
+						tag.addElems('label', 'name').html(_ => {
+							if (b.label.length > 30) return `${b.label.slice(0, 30)}…`
+							else return b.label
+						})
+						tag.addElems('label', 'close')
+						.on('click', _ => { 
+							rmtag(b.value) 
+							if (d.fn && typeof d.fn === 'function') d.fn.call(this, b)
+						})
 					}
 					sel.findAncestor('li').classed('active', this.checked)
+					if (!this.checked) rmtag(b.value)
 
 					// IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
 					if (d.fn && typeof d.fn === 'function') d.fn.call(this, b)
@@ -294,6 +302,16 @@
 			// .addElems('option', 'target-option', d => d.options)
 			// 	.attr('value', d => d.value)
 			// 	.html(d => d.label)
+
+			function rmtag (id) {
+				const input = dropdown.selectAll('input').filter(d => d.value === id)
+				const taggroup = _sel.select('.active-filters')
+				const tag = taggroup.selectAll('.tag').filter(d => d.id === id)
+				input.node().checked = false
+				input.findAncestor('li').classed('active', input.node().checked)
+				tag.remove()
+				if (taggroup.selectAll('.tag').size() === 0) taggroup.remove()
+			}
 		} else {
 			_sel.addElems(d.node) //, d.classname || null)
 				.each(function (c) {

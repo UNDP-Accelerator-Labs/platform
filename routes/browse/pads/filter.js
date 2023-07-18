@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
 	let { space, object, instance } = req.params || {}
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
-	let { search, status, contributors, countries, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -140,7 +140,15 @@ module.exports = async (req, res) => {
 			;`, [ countries ])
 			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
-			// platform_filters.push(f_countries)
+		} else if (regions) {
+			platform_filters.push(await DB.general.any(`
+				SELECT u.uuid FROM users u
+				INNER JOIN countries c
+				ON c.iso3 = u.iso3
+				WHERE c.bureau IN ($1:csv)
+			;`, [ regions ])
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.catch(err => console.log(err)))
 		}
 		if (teams) {
 			platform_filters.push(await DB.general.any(`

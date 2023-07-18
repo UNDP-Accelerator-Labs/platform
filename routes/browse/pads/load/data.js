@@ -1,3 +1,4 @@
+const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, DB } = include('config/')
 const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')

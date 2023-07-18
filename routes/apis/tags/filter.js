@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
 				SELECT uuid FROM users
 				WHERE iso3 IN ($1:csv)
 			;`, [ countries ])
-			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		} else if (regions) {
 			platform_filters.push(await DB.general.any(`
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
 				ON c.iso3 = u.iso3
 				WHERE c.bureau IN ($1:csv)
 			;`, [ regions ])
-			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		}
 		const f_type = DB.pgp.as.format(`AND t.type = $1`, [ type ])

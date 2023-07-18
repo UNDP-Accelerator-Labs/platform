@@ -25,7 +25,6 @@
 	}
 
 %>
-
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
 <meta name='apple-mobile-web-app-capable' content='yes'>
@@ -74,25 +73,29 @@
 <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined'>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel='stylesheet' type='text/css' href='/css/dispatch.css'>
+
 <script type="text/javascript">
 	var languageAlias = '<%= language %>';
 	var isPublic = '<%- is_public %>' === 'true'
 	var googleTranslateElement;
-
+	
+	function setCookie(key, value, expiry) {
+	  var expires = new Date();
+	  expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
+	  document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+	}
 	function googleTranslateElementInit() {
-		if(isPublic){
-			googleTranslateElement = new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+		if(languageAlias !== 'en'){
+			setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
+			setCookie('googtrans', `/en/${languageAlias}`,1);
 		}
-	}
 
-	function stopGoogleTranslate() {
-		if (googleTranslateElement && googleTranslateElementIsTranslatable()) {
-			googleTranslateElementIsTranslatable().isTranslatable = false;
-			googleTranslateElement.showBanner(false);
-		}
-	}
+		new google.translate.TranslateElement({
+		   pageLanguage: 'en',
+		   layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+		}, 'google_translate_element');
 
-	if(!isPublic) stopGoogleTranslate()
+	}
 
 </script>
 

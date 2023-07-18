@@ -45,7 +45,7 @@ exports.pin = (req, res) => {
 					await gt.batch(batch);
 					const rbatch = [];
 					rbatch.push(id)
-					rbatch.push(gt.any(retrievepins(object_id, ownId)))
+					rbatch.push(gt.any(retrievepins(object_id, uuid, ownId)))
 					// rbatch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
 					rbatch.push(gt.any(retrievepinboards([ uuid ], ownId)))
 					return gt.batch(rbatch);
@@ -62,7 +62,7 @@ exports.pin = (req, res) => {
 					await gt.none(insertpads(board_id, object_id, mobilization, ownId));
 					await gt.none(await updatestatus(board_id, object_id, mobilization, ownId));
 					const batch = [];
-					batch.push(gt.any(retrievepins(object_id, ownId)))
+					batch.push(gt.any(retrievepins(object_id, uuid, ownId)))
 					// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
 					batch.push(gt.any(retrievepinboards([ uuid ], ownId)))
 					return gt.batch(batch)
@@ -85,7 +85,7 @@ exports.unpin = (req, res) => {
 		return DB.general.tx(gt => {
 			return ownDB().then(async ownId => {
 				await gt.none(removepads(board_id, object_id, mobilization, uuid, ownId));
-				await gt.none(await updatestatus(board_id, object_id, mobilization, ownId));
+				await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
 				await gt.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
@@ -93,7 +93,7 @@ exports.unpin = (req, res) => {
 						AND owner = $2
 				;`, [ board_id, uuid, ownId ])
 				const batch = []
-				batch.push(gt.any(retrievepins(object_id, ownId)));
+				batch.push(gt.any(retrievepins(object_id, uuid, ownId)));
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
 				batch.push(gt.any(retrievepinboards([ uuid ], ownId)));
 				return gt.batch(batch);
@@ -148,13 +148,14 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 		;`, [ _id, _uuid ])
 	}
 }
-async function updatestatus(_id, _object_id, _mobilization, ownId) {
+async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 	if (_object_id) {
 		const pads = (await DB.general.any(`
 			SELECT pc.pad AS pad
 			FROM pinboard_contributions pc
-			WHERE pc.db = $2 AND pc.pinboard = $1
-		`, [ _id, ownId ])).map((row) => row.pad);
+			INNER JOIN pinboards pb ON pb.id = pc.pinboard
+			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3
+		`, [ _id, ownId, uuid ])).map((row) => row.pad);
 		const status = await DB.conn.one(`
 			SELECT
 				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
@@ -169,8 +170,8 @@ async function updatestatus(_id, _object_id, _mobilization, ownId) {
 		const mobs = (await DB.general.any(`
 			SELECT pin.mobilization
 			FROM pinboards pin
-			WHERE pin.id = $1 AND pin.mobilization_db = $2
-		`, [ _id, ownId ])).map((row) => row.mobilization);
+			WHERE pin.id = $1 AND pin.mobilization_db = $2 AND pin.owner = $3
+		`, [ _id, ownId, uuid ])).map((row) => row.mobilization);
 		const status = await DB.conn.one(`
 			SELECT MAX (p.status) AS status FROM pads p
 			INNER JOIN mobilization_contributions mc
@@ -184,13 +185,13 @@ async function updatestatus(_id, _object_id, _mobilization, ownId) {
 		;`, [ _id, status ]);
 	}
 }
-function retrievepins (_object_id, ownId) {
+function retrievepins (_object_id, uuid, ownId) {
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
-		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2
-	;`, [ safeArr(_object_id, -1), ownId ])
+		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2 AND pb.owner = $3
+	;`, [ safeArr(_object_id, -1), ownId, uuid ])
 }
 function retrievepinboards (_owners, ownId) {
 	return DB.pgp.as.format(`

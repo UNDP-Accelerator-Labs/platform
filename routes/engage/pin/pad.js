@@ -164,8 +164,8 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = (SELECT GREATEST ($2, status))
-			WHERE id = $1::INT
-		;`, [ _id, status ])
+			WHERE id = $1::INT AND owner = $3
+		;`, [ _id, status, uuid ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS
 		const mobs = (await DB.general.any(`
 			SELECT pin.mobilization
@@ -181,8 +181,8 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = $2
-			WHERE id = $1::INT
-		;`, [ _id, status ]);
+			WHERE id = $1::INT AND owner = $3
+		;`, [ _id, status, uuid ]);
 	}
 }
 function retrievepins (_object_id, uuid, ownId) {

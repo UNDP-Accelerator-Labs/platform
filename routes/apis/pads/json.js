@@ -87,6 +87,13 @@ module.exports = async (req, res) => {
 		GROUP BY (p.id)
 		ORDER BY p.id DESC
 	;`, [ full_filters, cors_filter ]).then(async pads => {	
+		pads = await join.users(pads, [ language, 'contributor_id' ])
+		// AND DELETE ALL THE PERSONAL INFORMATION
+		pads.forEach(d => {
+			delete d.position
+			delete d.ownername
+		})
+		
 		let contributor_list = array.unique.call(pads, { key: 'contributor_id', onkey: true })
 		contributor_list = array.shuffle.call(contributor_list)
 

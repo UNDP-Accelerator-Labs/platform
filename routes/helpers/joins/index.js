@@ -1,5 +1,3 @@
-const { safeArr } = require("..")
-
 const { DB } = include('config/')
 
 exports.joinObj = function (obj = {}) {
@@ -23,7 +21,7 @@ exports.users = (data, args = []) => {
 				ON u.iso3 = cn.iso3
 			WHERE u.uuid IN ($2:csv)
 				AND cn.language = $3
-		;`, [ key, safeArr(Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key], -1), lang ])
+		;`, [ key, Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key], lang ])
 		.then(users => {
 			if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
 			else return this.joinObj.call(data, users[0])

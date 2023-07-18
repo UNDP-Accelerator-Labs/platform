@@ -1,3 +1,4 @@
+const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
 const { DB } = include('config/')
 
 module.exports = async (req, res) => {

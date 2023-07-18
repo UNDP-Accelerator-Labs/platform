@@ -130,7 +130,7 @@ module.exports = async (req, res) => {
 				ON c.iso3 = u.iso3
 				WHERE c.bureau IN ($1:csv)
 			;`, [ regions ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		}
 		if (teams) {

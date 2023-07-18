@@ -88,6 +88,8 @@ exports.safeArr = function (arr, defaultValue) {
 	// e.g., -1 for ids or DEFAULT_UUID for uuids
 	// arr can be a single element or null
 
+	// see https://stackoverflow.com/a/13210590/20487202 for why this is needed
+
 	// arr is a null value --> return the defaultValue to not match anything
 	if (arr === null || arr === undefined) {
 		return [defaultValue];

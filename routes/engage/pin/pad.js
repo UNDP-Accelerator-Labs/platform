@@ -92,7 +92,6 @@ exports.unpin = (req, res) => {
 					DELETE FROM pinboards
 					WHERE id = $1::INT
 						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
-						-- AND owner IN ($2:csv)
 						AND owner = $2
 				;`, [ board_id, uuid /* collaborators_ids */ ])
 			}).then(_ => {

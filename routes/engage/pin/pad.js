@@ -90,9 +90,8 @@ exports.unpin = (req, res) => {
 					DELETE FROM pinboards
 					WHERE id = $1::INT
 						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $3) = 0
-						-- AND owner IN ($2:csv)
 						AND owner = $2
-				;`, [ board_id, uuid /* collaborators_ids */, ownId ])
+				;`, [ board_id, uuid, ownId ])
 				const batch = []
 				batch.push(gt.any(retrievepins(object_id, ownId)));
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -105,7 +104,6 @@ exports.unpin = (req, res) => {
 		}).catch(err => console.log(err))
 	} else res.json({ status: 400, message: 'You are not removing a pad.' })
 }
-
 
 function insertpads (_id, _object_id, _mobilization, ownId) {
 	if (_object_id) {
@@ -177,8 +175,8 @@ async function updatestatus(_id, _object_id, _mobilization, ownId) {
 			SELECT MAX (p.status) AS status FROM pads p
 			INNER JOIN mobilization_contributions mc
 				ON mc.pad = p.id
-			WHERE mc.mobilization IN (mobs)
-		`, [ mobs ]).status;
+			WHERE mc.mobilization IN ($1:csv)
+		`, [ safeArr(mobs, -1) ]).status;
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = $2

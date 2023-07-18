@@ -24,7 +24,6 @@ module.exports = async kwargs => {
 				batch1.push(t1.any(`
 					SELECT COUNT (DISTINCT (t.id))::INT, t.owner
 					FROM templates t
-					-- WHERE owner IN ($1:csv)
 					WHERE TRUE
 						$1:raw
 					GROUP BY owner

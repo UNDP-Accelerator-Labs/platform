@@ -38,7 +38,7 @@ exports.pin = (req, res) => {
 
 					batch.push(
 						gt.none(insertpads(id, object_id, mobilization, ownId))
-						.then(async _ => gt.none(await updatestatus(id, object_id, mobilization, ownId)))
+						.then(async _ => gt.none(await updatestatus(id, object_id, mobilization, uuid, ownId)))
 						.catch(err => console.log(err))
 					)
 
@@ -60,7 +60,7 @@ exports.pin = (req, res) => {
 			return DB.general.tx(gt => {
 				return ownDB().then(async ownId => {
 					await gt.none(insertpads(board_id, object_id, mobilization, ownId));
-					await gt.none(await updatestatus(board_id, object_id, mobilization, ownId));
+					await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
 					const batch = [];
 					batch.push(gt.any(retrievepins(object_id, uuid, ownId)))
 					// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -149,6 +149,7 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 	}
 }
 async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
+	console.log('UPDATESTATUS', _object_id)  // @joschi
 	if (_object_id) {
 		const pads = (await DB.general.any(`
 			SELECT pc.pad AS pad
@@ -156,16 +157,18 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 			INNER JOIN pinboards pb ON pb.id = pc.pinboard
 			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3
 		`, [ _id, ownId, uuid ])).map((row) => row.pad);
-		const status = await DB.conn.one(`
-			SELECT
-				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				WHERE p.id IN ($1:csv)), 1) AS status
-		`, [ safeArr(pads, -1) ]).status;
+		console.log('PADS', pads, _id, ownId, uuid);  // @joschi
+		const status = await DB.conn.any(`
+			SELECT COALESCE(MIN(p.status), 0) as status
+			FROM pads p
+			WHERE p.id IN ($1:csv)
+		`, [ safeArr(pads, -1) ]);
+		console.log('STATUSVAL', status);  // @joschi
 		return DB.pgp.as.format(`
 			UPDATE pinboards
-			SET status = (SELECT GREATEST ($2, status))
+			SET status = $2
 			WHERE id = $1::INT AND owner = $3
-		;`, [ _id, status, uuid ])
+		;`, [ _id, !status.length ? 0 : status[0].status > 1 ? 1 : 0, uuid ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS
 		const mobs = (await DB.general.any(`
 			SELECT pin.mobilization

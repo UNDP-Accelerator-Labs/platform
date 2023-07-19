@@ -117,22 +117,14 @@ exports.updatePassword = async (req, res, next) => {
         }
 
         let checkPass = isPasswordSecure(password)
-        if(Object.keys(checkPass).some((key) => !checkPass[key])){
-            const msgs = {
-              'pw-length': 'Password is too short!',
-              'pw-upper': 'Password requires at least one uppercase letter!',
-              'pw-lower': 'Password requires at least one lowercase letter!',
-              'pw-number': 'Password requires at least one numberal!',
-              'pw-special': 'Password requires at least one of the special characters: !@#$%^&*()',
-              'pw-common': 'Password cannot be a commonly used password!',
-            };
-            req.session.errormessage = Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]).join('\n');
+        if(checkPass.length){
+          req.session.errormessage = checkPass;
 
-            const { errormessage, successmessage } = req.session || {}
-            const metadata = await datastructures.pagemetadata({ req, res })
-            let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+          const { errormessage, successmessage } = req.session || {}
+          const metadata = await datastructures.pagemetadata({ req, res })
+          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
 
-            return res.render('reset-password', data );
+          return res.render('reset-password', data );
         }
 
         // Update the password and clear the reset token
@@ -149,7 +141,7 @@ exports.updatePassword = async (req, res, next) => {
 };
 
 
-const isPasswordSecure = (password) => {
+exports.isPasswordSecure = (password) => {
   // Check complexity (contains at least one uppercase, lowercase, number, and special character)
   const uppercaseRegex = /[A-Z]/;
   const lowercaseRegex = /[a-z]/;
@@ -157,7 +149,7 @@ const isPasswordSecure = (password) => {
   const specialCharRegex = /[!@#$%^&*\(\)]/;
   // Check against common passwords (optional)
   const commonPasswords = ['password', '123456', 'qwerty'];
-  return {
+  let checkPass = {
     'pw-length': !(password.length < 8),  // Check length
     'pw-upper': uppercaseRegex.test(password),
     'pw-lower': lowercaseRegex.test(password),
@@ -165,4 +157,16 @@ const isPasswordSecure = (password) => {
     'pw-special': specialCharRegex.test(password),
     'pw-common': !commonPasswords.includes(password),
   };
+
+  const msgs = {
+    'pw-length': 'Password is too short!',
+    'pw-upper': 'Password requires at least one uppercase letter!',
+    'pw-lower': 'Password requires at least one lowercase letter!',
+    'pw-number': 'Password requires at least one numberal!',
+    'pw-special': 'Password requires at least one of the special characters: !@#$%^&*()',
+    'pw-common': 'Password cannot be a commonly used password!',
+  };
+
+  return Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]).join('\n');
+
 }

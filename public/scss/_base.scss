@@ -275,6 +275,8 @@ input.toggle:disabled + label::after {
 	top: 0;
 	left: 0;
 }
-/*.fixed {
-	position: fixed !important;
-}*/
+.errormessage {
+	font-size: 12px; 
+	color: red; 
+	padding-top: 10px;
+}

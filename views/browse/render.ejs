@@ -797,7 +797,7 @@ const Entry = function (_kwargs) {
 				&& modules.some(d => d.type === 'teams' && rights >= d.rights.write)
 				)
 			) { %>
-				const pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>;
+				let pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>;
 
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
@@ -817,6 +817,9 @@ const Entry = function (_kwargs) {
 								location.reload()
 							<% } else { %>
 								pins.call(renderPins, res.pins)
+								pinboards = res.pinboards_list;
+								renderDropdown(d.object_id);
+								/* @joschi
 								d3.selectAll('.pinboard-group .dropdown')
 									.selectAll('.pinboard')
 								.filter(c => c.id === d.id)
@@ -843,6 +846,7 @@ const Entry = function (_kwargs) {
 								d3.selectAll('.pinboard-group').each(function (b) {
 									b.pinboards = b.pinboards.filter(a => a.id !== d.id)
 								})
+								*/
 							<% } %>
 						}
 					})
@@ -865,7 +869,9 @@ const Entry = function (_kwargs) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-
+								pinboards = res.pinboards_list;
+								renderDropdown(d.object_id);
+								/* @joschi
 								pinboards.find(b => b.id === d.id).count += 1
 								d3.selectAll('.pinboard-group .dropdown')
 									.selectAll('.pinboard .count')
@@ -876,11 +882,15 @@ const Entry = function (_kwargs) {
 								.each(function (c) {
 									c.pinboards.push({ id: d.id, title: d.title })
 								})
+								*/
 							}
 						} else {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
+								pinboards = res.pinboards_list;
+								renderDropdown(d.object_id);
+								/* @joschi
 								d3.selectAll('.pinboard-group .dropdown')
 									.selectAll('.pinboard').filter(c => c.id === d.id)
 								.each(function (c) {
@@ -901,6 +911,7 @@ const Entry = function (_kwargs) {
 										sel.select('.count').html(c.count)
 									}
 								})
+								*/
 							}
 						}
 					})
@@ -918,11 +929,23 @@ const Entry = function (_kwargs) {
 						.html(d => d.title)
 				}
 
+				const pinPbMap = {};
 				const pingroup = _sel.addElems('div', 'pinboard-group')
-				const pins = pingroup.addElems('div', 'pins')
-				.each(function (d) { d3.select(this).call(renderPins, d.pinboards) })
+				const pins = pingroup.addElems('div', 'pins').each(function(d) {
+					pinPbMap[d.id] = d;
+					d3.select(this).call(renderPins, d.pinboards);
+				})
 
 				const newpin = pingroup.addElems('div', 'add filter')
+
+				const renderDropdown = (pid) => {
+					const d = pinPbMap[pid];
+					console.log(pinboards, d);
+					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
+					// RENDER THE DROPDOWN
+					newpin.call(renderPinOptions, data)
+				};
+
 				newpin.addElems('input')
 					.attrs({ 'type': 'text', 'id': 'new-pinboard' })
 				.on('keyup', function (d) {
@@ -940,9 +963,7 @@ const Entry = function (_kwargs) {
 						newpin.select('button').node().click()
 					}
 				}).on('focus', function (d) {
-					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
-					// RENDER THE DROPDOWN
-					newpin.call(renderPinOptions, data)
+					renderDropdown(d.id);
 
 					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
 					dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
@@ -973,10 +994,16 @@ const Entry = function (_kwargs) {
 
 							if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
 								const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
-								if (res.status === 200) pins.call(renderPins, res.pins)
+								if (res.status === 200) {
+									pins.call(renderPins, res.pins)
+									pinboards = res.pinboards_list;
+									renderDropdown(d.id);
+									/* @joschi
 								d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')
 									.filter(c => c.id === d.id)
 									.html(c => c.count += 1)
+									*/
+								}
 							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {

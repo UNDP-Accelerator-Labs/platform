@@ -1,5 +1,5 @@
 const { app_title, DB } = include('config/')
-const { checklanguage, email: sendemail } = include('routes/helpers/')
+const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -23,7 +23,7 @@ module.exports = (req, res) => {
 			WHERE pinboard = $1::INT
 				AND participant NOT IN ($2:csv)
 				AND participant NOT IN (SELECT owner FROM pinboards WHERE id = $1::INT)
-		;`, [ pinboard, contributor ]))
+		;`, [ pinboard, safeArr(contributor, DEFAULT_UUID) ]))
 		return t.batch(batch)
 		.then(_ => {
 			return t.one(`SELECT title FROM pinboards WHERE id = $1::INT;`, [ pinboard ])
@@ -34,7 +34,7 @@ module.exports = (req, res) => {
 					WHERE uuid IN ($1:csv)
 						AND uuid <> $2
 						AND notifications = TRUE
-				;`, [ contributor, uuid ])
+				;`, [ safeArr(contributor, DEFAULT_UUID), uuid ])
 				.then(results => {
 					// SEND EMAIL NOTIFICATION
 					// NEED TO CHECK IF EMAIL NOTIFICATIONS IS ACTIVATED

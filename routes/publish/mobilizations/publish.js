@@ -1,5 +1,5 @@
 const { app_title, DB, ownDB } = include('config/')
-const { checklanguage, email: sendemail } = include('routes/helpers/')
+const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const cron = require('node-cron')
 
@@ -124,7 +124,7 @@ module.exports = (req, res) => {
 						WHERE uuid IN ($1:csv)
 							AND uuid <> $2
 							AND notifications = TRUE
-					;`, [ cohort, uuid ]).then(async results => {
+					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ]).then(async results => {
 						const bcc = results.map(d => d.email)
 						bcc.push('myjyby@gmail.com') // TO DO: THIS IS TEMP
 

@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { array, checklanguage, join, flatObj, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { array, checklanguage, join, flatObj } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -24,11 +24,10 @@ module.exports = async kwargs => {
 				batch1.push(t1.any(`
 					SELECT COUNT (DISTINCT (t.id))::INT, t.owner
 					FROM templates t
-					-- WHERE owner IN ($1:csv)
 					WHERE TRUE
 						$1:raw
 					GROUP BY owner
-				;`, [ safeArr(full_filters, DEFAULT_UUID) ])//[ req.session.collaborators.map(d => d.uuid) ])
+				;`, [ full_filters ])//[ req.session.collaborators.map(d => d.uuid) ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND

@@ -18,7 +18,6 @@ const {
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
-const { app_title_short } = require('../../../config')
 
 if (!exports.legacy) exports.legacy = {}
 

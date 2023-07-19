@@ -1,4 +1,5 @@
 const { modules, DB } = include('config/')
+const { safeArr, DEFAULT_UUID } = include("routes/helpers")
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -6,8 +7,7 @@ module.exports = (req, res) => {
 	const { uuid, rights, collaborators } = req.session || {}
 
 	const module_rights = modules.find(d => d.type === 'pinboards')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
 	// EXECUTE SQL
 	DB.conn.tx(t => {

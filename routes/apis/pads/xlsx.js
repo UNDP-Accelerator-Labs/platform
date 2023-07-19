@@ -8,7 +8,7 @@ const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 const { BlobServiceClient } = require('@azure/storage-blob')
 
 const { app_title_short, app_storage, metafields, media_value_keys, DB } = include('config/')
-const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers/')
+const { checklanguage, array, join, parsers, flatObj, safeArr } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter')
 
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
 			const batch = pads.map(pad_group => {
 				return t.task(t1 => {
 					const batch1 = []
-					const ids = pad_group.values.map(d => d.pad_id)
+					const ids = safeArr(pad_group.values.map(d => d.pad_id), -1)
 					if (include_tags) {
 						batch1.push(t1.any(`
 							SELECT pad AS pad_id, tag_id, type FROM tagging

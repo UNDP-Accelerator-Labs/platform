@@ -1,0 +1,27 @@
+name: Feature Request
+
+about: Suggest a new feature for the project
+
+title: "[FEATURE] "
+
+labels:
+  - feature request
+
+assignees: []
+
+body:
+  ## Problem Description
+
+  [Describe the problem or limitation that this feature request aims to address]
+
+  ## Proposed Solution
+
+  [Explain your suggested solution or feature. How would it improve the project?]
+
+  ## Use Cases (if applicable)
+
+  [Provide specific use cases or scenarios where this feature would be beneficial]
+
+  ## Additional Information
+
+  [Add any other relevant details or resources to support the feature request]

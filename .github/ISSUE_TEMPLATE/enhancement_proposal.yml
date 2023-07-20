@@ -1,0 +1,31 @@
+name: Enhancement Proposal
+
+about: Propose an enhancement or improvement to the project
+
+title: "[ENHANCEMENT] "
+
+labels:
+  - enhancement
+
+assignees: []
+
+body:
+  ## Proposal Description
+
+  [Provide a brief description of the enhancement or improvement]
+
+  ## Current Behavior (if applicable)
+
+  [Describe the current behavior or limitations, if relevant]
+
+  ## Proposed Behavior
+
+  [Describe how the enhancement will improve or change the current behavior]
+
+  ## Use Cases (if applicable)
+
+  [Explain any specific use cases where this enhancement would be beneficial]
+
+  ## Additional Information
+
+  [Add any other relevant details or resources that support the proposal]

@@ -470,22 +470,22 @@
 				</div>
 			</div>
 		<% } %>
-		<h1 translate="no" ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+		<h1><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
 		<% if (!publicpage) { %>
-			<h2 translate="no">
+			<h2>
 				<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
 				<% } else { %><%- locals.metadata.user.country.name %><% } %>
 			</h2>
 		<% } %>
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
-			<div translate="no" class='save lg hide'>
+			<div class='save lg hide'>
 				<button><%- vocabulary['save'][language] %></button>
 			</div>
 		<% } %>
 	</div>
 </nav>
-<nav translate="no" id='modules'>
+<nav id='modules'>
 	<menu>
 	<% modules.filter(d => {
 		let { write } = d.rights

@@ -40,22 +40,30 @@ div.journey {
 		-webkit-box-shadow: 0 0 0 40px #FFF inset !important;
 		-webkit-text-fill-color: $c-dark-blue !important;
 	}
-	button {
-		float: left;
+	a {
+		display: flex;
+		justify-content: center;
+    	vertical-align: middle;
+		font-size: 26px;
+		float: right;
 		width: 65px;
 		height: 60px;
 		margin-top: 5px;
+		line-height: 60px;
 		background-color: transparent;
 		border: none;
 		outline: none;
-		color: $c-dark-blue;
+		color: $c-light-grey;
 		cursor: pointer;
+		text-decoration: none;
 	}
-	button:hover {
+	a:hover {
 		color: $c-mid-blue-semi;
+		text-decoration: none;
 	}
-	button:active {
+	a:active {
 		color: $c-mid-blue;
+		text-decoration: none;
 	}
 }
 

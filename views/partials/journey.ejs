@@ -13,7 +13,7 @@
             this.currentId = null;
             this.currentPrompt = '';
             this.mainInput = null;
-            this.mainButton = null;
+            this.infoButton = null;
             this.datalist = null;
             this.useFullPromptForSelect = false;
 
@@ -115,14 +115,6 @@
         }
 
         updateJourneyMainButton(journeyId, currentId) {
-            if (this.mainButton !== null) {
-                this.mainButton.text(
-                    journeyId === null
-                    ? "<%- vocab['start'] %>"
-                    : journeyId !== currentId
-                    ? "<%- vocab['continue'] %>"
-                    : "<%- vocab['finish'] %>");
-            }
             if (this.mainInput !== null) {
                 const value = this.getInputValue();
                 const normPrompt = this.normalizeJourneyPrompt(value);
@@ -343,6 +335,7 @@
                 if (evt.code === 'Enter' || evt.keyCode === 13) {
                     this.confirmJourneyPrompt(false);
                     evt.preventDefault();
+                    evt.srcElement.blur();
                 }
             })
             .on('change', () => {
@@ -369,12 +362,14 @@
             })
             .text("<%= vocab['intro'] %>");
             this.maybeAddDatalist(sel);
-            const mainButton = sel.addElem('button')
+            const journeyInfoUrl = '<%= journey_info_url %>';
+            const infoButton = sel.addElem('a')
             .attrs({
-                'type': 'button',
+                'href': journeyInfoUrl,
+                'target': '_blank',
             })
-            .on('click', () => this.confirmJourneyPrompt(true));
-            this.mainButton = mainButton;
+            .text('ⓘ');
+            this.infoButton = infoButton;
 
             this.updateJourneyDatalist();
         }

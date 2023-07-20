@@ -808,7 +808,7 @@ const Entry = function (_kwargs) {
 
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
-						return _data?.map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
+						return _data?.filter((pb) => !pb.is_journey).map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
 					})
 					pin.addElems('label', 'name')
 						.attr('title', d => d.title)

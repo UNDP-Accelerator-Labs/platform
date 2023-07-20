@@ -35,9 +35,9 @@ module.exports = (req, res) => {
             });
         }
         const ownId = await ownDB();
-        const jrow = (await t.one(`
+        const jrow = await t.one(`
             SELECT uuid, linked_pinboard FROM journey WHERE id = $1
-        `, [journey]));
+        `, [journey]);
         const batch = [];
         if (jrow.uuid === uuid) {
             batch.push(t.none(`

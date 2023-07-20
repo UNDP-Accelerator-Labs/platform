@@ -125,7 +125,7 @@ function removemember (_id, _object_id) {
 }
 function retrievepins (_object_id) {
 	return DB.pgp.as.format(`
-		SELECT t.id, t.name AS title FROM teams t
+		SELECT t.id, t.name AS title, FALSE AS is_journey FROM teams t
 		INNER JOIN team_members tm
 			ON tm.team = t.id
 		WHERE tm.member = $1
@@ -133,7 +133,7 @@ function retrievepins (_object_id) {
 }
 function retrievepinboards (_hosts) {
 	return DB.pgp.as.format(`
-		SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count FROM teams t
+		SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, FALSE AS is_journey FROM teams t
 		INNER JOIN team_members tm
 			ON tm.team = t.id
 		WHERE t.host IN ($1:csv)

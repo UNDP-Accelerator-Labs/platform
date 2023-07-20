@@ -157,7 +157,7 @@ exports.pagemetadata = (_kwargs) => {
 					INNER JOIN pinboard_contributions pc
 						ON pc.pinboard = pb.id
 
-					WHERE pb.owner = $1 AND pc.db = $2
+					WHERE pb.owner = $1 AND pc.db = $2 AND pc.is_included = true
 					GROUP BY pb.id
 				;`, [ uuid, ownId ]);
 				const pinboard_pads = await DB.general.any(`
@@ -167,7 +167,7 @@ exports.pagemetadata = (_kwargs) => {
 					INNER JOIN pinboard_contributions pc
 						ON pc.pinboard = pb.id
 
-					WHERE pb.owner = $1 AND pc.db = $2
+					WHERE pb.owner = $1 AND pc.db = $2 AND pc.is_included = true
 				;`, [ uuid, ownId ]);
 				const pads = new Set();
 				const pinpads = new Map();

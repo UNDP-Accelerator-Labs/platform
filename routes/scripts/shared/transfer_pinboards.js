@@ -70,6 +70,7 @@ if (action === undefined || action === 'transfer') {
                 pad INT NOT NULL,
                 db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
                 pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+                is_included boolean NOT NULL DEFAULT true,
                 PRIMARY KEY (pad, db, pinboard)
             );
         `));

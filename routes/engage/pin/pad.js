@@ -89,7 +89,7 @@ exports.unpin = (req, res) => {
 				await gt.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
-						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $3) = 0
+						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $3 AND is_included = true) = 0
 						AND owner = $2
 				;`, [ board_id, uuid, ownId ])
 				const batch = []
@@ -116,7 +116,10 @@ function insertpads (_id, _object_id, _mobilization, ownId) {
 			return obj
 		})
 		const insert = DB.pgp.helpers.insert(data, ['pinboard', 'pad', 'db'], 'pinboard_contributions')
-		const constraint = DB.pgp.as.format(`ON CONFLICT ON CONSTRAINT pinboard_contributions_pkey DO NOTHING`)
+		const constraint = DB.pgp.as.format(`
+			ON CONFLICT ON CONSTRAINT pinboard_contributions_pkey
+			DO UPDATE SET is_included = true
+		`)
 		return `${insert} ${constraint}`
 
 	} else if (_mobilization) {
@@ -155,7 +158,7 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 			SELECT pc.pad AS pad
 			FROM pinboard_contributions pc
 			INNER JOIN pinboards pb ON pb.id = pc.pinboard
-			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3
+			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3 AND pc.is_included = true
 		`, [ _id, ownId, uuid ])).map((row) => row.pad);
 		console.log('PADS', pads, _id, ownId, uuid);  // @joschi
 		const status = await DB.conn.any(`
@@ -193,7 +196,7 @@ function retrievepins (_object_id, uuid, ownId) {
 		SELECT pb.id, pb.title FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
-		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2 AND pb.owner = $3
+		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2 AND pb.owner = $3 AND pbc.is_included = true
 	;`, [ safeArr(_object_id, -1), ownId, uuid ])
 }
 function retrievepinboards (_owners, ownId) {
@@ -201,7 +204,7 @@ function retrievepinboards (_owners, ownId) {
 		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count FROM pinboards p
 		INNER JOIN pinboard_contributions pc
 			ON pc.pinboard = p.id
-		WHERE p.owner IN ($1:csv) AND pc.db = $2
+		WHERE p.owner IN ($1:csv) AND pc.db = $2 AND pc.is_included = true
 		GROUP BY p.id
 	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])
 }

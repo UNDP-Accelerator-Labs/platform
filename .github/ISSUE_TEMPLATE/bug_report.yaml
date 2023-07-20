@@ -21,9 +21,18 @@ body:
     id: what-happened
     attributes:
       label: Issue description
-      description: Provide a brief description of the issue.
+      description: Provide a brief description of the issue. 
       placeholder: Provide steps to reproduce
       value: "Issue description"
+    validations:
+      required: true
+  - type: textarea
+    id: url
+    attributes:
+      label: Where did this happen? 
+      description: Provide describe which pad, template, collection, url and screenshot.
+      placeholder: Describe which pad, collection, url and screenshot.
+      value: "url"
     validations:
       required: true
   - type: textarea

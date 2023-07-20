@@ -115,6 +115,7 @@ module.exports = async kwargs => {
 					pc.pad IN $1:raw
 					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
 					AND pc.db = $3
+					AND pc.is_included = true
 			`, [ padlist, current_user, ownId ])).forEach(row => {
 				const pinboards = padToPinboards.get(row.pad) ?? [];
 				pinboards.push({

@@ -142,7 +142,7 @@ module.exports = async (req, res) => {
 				const pcounts = new Map((await DB.general.any(`
 					SELECT COUNT (DISTINCT (pad)) as pcount, pinboard as pid
 					FROM pinboard_contributions
-					WHERE db = $1 GROUP BY pinboard
+					WHERE db = $1 AND is_included = true GROUP BY pinboard
 				`, [ ownId ])).map((row) => [row.pid, row.pcount]));
 				const mcounts = new Map((await t.any(`
 					SELECT COUNT (DISTINCT (pad)) as mcount, mobilization as mid

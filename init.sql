@@ -300,18 +300,13 @@ CREATE TABLE IF NOT EXISTS public.journey
     prompt text COLLATE pg_catalog."default" NOT NULL,
     last_access timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    linked_pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    linked_pinboard INT UNIQUE REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT journey_pkey PRIMARY KEY (id, uuid, prompt),
     CONSTRAINT id_key UNIQUE (id),
 	CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)
 );
-CREATE TABLE IF NOT EXISTS public.journey_docs
-(
-    journey_id INT NOT NULL REFERENCES journey(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    pad_id integer NOT NULL,
-    is_relevant boolean NOT NULL,
-    CONSTRAINT journey_docs_pkey PRIMARY KEY (journey_id, db, pad_id)
-);
+CREATE INDEX idx_linked_pinboard ON journey (linked_pinboard);
 ALTER TABLE IF EXISTS public.users
     ADD COLUMN confirmed_feature_journey timestamp with time zone;
+ALTER TABLE IF EXISTS public.pinboard_contributions
+    ADD COLUMN is_included boolean NOT NULL DEFAULT true;

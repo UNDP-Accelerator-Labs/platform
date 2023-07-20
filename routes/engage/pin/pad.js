@@ -141,6 +141,7 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 					WHERE owner = $3
 				)
 				AND db = $4
+				AND is_included = true
 		;`, [ _id, safeArr(_object_id, -1), _uuid, ownId ])
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`

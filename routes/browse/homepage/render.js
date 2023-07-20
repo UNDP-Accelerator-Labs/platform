@@ -177,7 +177,7 @@ module.exports = async (req, res) => {
 				SELECT pb.id, pc.pad FROM pinboards pb
 				INNER JOIN pinboard_contributions pc
 					ON pc.pinboard = pb.id
-				WHERE pb.status > 2 AND pc.db = $1
+				WHERE pb.status > 2 AND pc.db = $1 AND pc.is_included = true
 			`, [ ownId ])).forEach(row => {
 				const padlist = pads.get(row.id) ?? [];
 				padlist.push(row.pad);

@@ -1,0 +1,39 @@
+name: Bug Report
+
+about: Create a bug report to help us improve
+
+title: "[BUG] "
+
+labels:
+  - bug
+
+assignees: []
+
+body:
+  ## Issue Description
+
+  [Provide a brief description of the issue]
+
+  ## Steps to Reproduce
+
+  1. [First step]
+  2. [Second step]
+  3. [and so on...]
+
+  ## Expected Behavior
+
+  [Describe what you expected to happen]
+
+  ## Actual Behavior
+
+  [Describe what actually happened]
+
+  ## Environment (if applicable)
+
+  - OS: [e.g., Windows, macOS, Linux]
+  - Browser: [e.g., Chrome, Firefox, Safari]
+  - Version: [e.g., 1.2.3]
+
+  ## Additional Information
+
+  [Add any other relevant details]

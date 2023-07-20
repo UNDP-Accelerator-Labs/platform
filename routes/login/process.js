@@ -20,8 +20,10 @@ module.exports = (req, res, next) => {
 				return;
 			}
 		}
-		const { uuid, rights, ip } = tobj;
+		const { uuid, rights, ip, acceptedorigins } = tobj;
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
+			res.redirect(redirectPath)
+		} else if (acceptedorigins && !acceptedorigins.includes(referer)) {
 			res.redirect(redirectPath)
 		} else if (uuid) {
 			DB.general.tx(t => {

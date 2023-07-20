@@ -92,6 +92,7 @@ module.exports = async (req, res) => {
 		pads.forEach(d => {
 			delete d.position
 			delete d.ownername
+			delete d.rights
 		})
 		
 		let contributor_list = array.unique.call(pads, { key: 'contributor_id', onkey: true })

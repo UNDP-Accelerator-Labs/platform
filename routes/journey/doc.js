@@ -12,15 +12,15 @@ module.exports = (req, res) => {
             message: 'must be logged in',
         });
     }
-    const { journey_id: journey_id_in, action, pad_id: pad_id_in } = req.body || {};
+    const { journey: journey_in, action, pad: pad_in } = req.body || {};
 	if (!validActions.includes(action)) {
         return res.status(422).json({
             message: `unknown action: ${action}`,
         });
     }
-    const journey_id = +journey_id_in;
-    const pad_id = +pad_id_in;
-    if (!Number.isFinite(journey_id) || !Number.isFinite(pad_id)) {
+    const journey = +journey_in;
+    const pad = +pad_in;
+    if (!Number.isFinite(journey) || !Number.isFinite(pad)) {
         return res.status(422).json({
             message: `ids are required: ${JSON.stringify(req.body)}`,
         });
@@ -35,31 +35,31 @@ module.exports = (req, res) => {
             });
         }
         const ownId = await ownDB();
-        const juuid = (await t.one(`
-            SELECT uuid FROM journey WHERE id = $1
-        `, [journey_id])).uuid;
+        const jrow = (await t.one(`
+            SELECT uuid, linked_pinboard FROM journey WHERE id = $1
+        `, [journey]));
         const batch = [];
-        if (juuid === uuid) {
+        if (jrow.uuid === uuid) {
             batch.push(t.none(`
                 UPDATE journey
                 SET last_access = NOW()
                 WHERE id = $1
-            `, [journey_id]));
+            `, [journey]));
             if (action === actionNeutral) {
                 batch.push(t.none(`
-                    DELETE FROM journey_docs
-                    WHERE journey_id = $1
+                    DELETE FROM pinboard_contributions
+                    WHERE pinboard = $1
                     AND db = $2
-                    AND pad_id = $3
-                `, [journey_id, ownId, pad_id]));
+                    AND pad = $3
+                `, [jrow.linked_pinboard, ownId, pad]));
             } else {
-                const isRelevant = action === actionApprove;
+                const isIncluded = action === actionApprove;
                 batch.push(t.none(`
-                    INSERT INTO journey_docs (journey_id, db, pad_id, is_relevant)
+                    INSERT INTO pinboard_contributions (pinboard, db, pad, is_included)
                     VALUES ($1, $2, $3, $4)
-                    ON CONFLICT (journey_id, db, pad_id)
-                    DO UPDATE SET is_relevant = $4
-                `, [journey_id, ownId, pad_id, isRelevant]));
+                    ON CONFLICT (pinboard, db, pad)
+                    DO UPDATE SET is_included = $4
+                `, [jrow.linked_pinboard, ownId, pad, isIncluded]));
             }
         }
         const result = await t.batch(batch);
@@ -75,11 +75,11 @@ module.exports = (req, res) => {
             });
         }
         return res.json({
-            journey: journey_id,
-            pad: pad_id,
+            journey,
+            pad,
             db: ownId,
             value: action,
-            message: `success! journey_id[${journey_id}] db[${ownId}] pad_id[${pad_id}] value[${action}]`,
+            message: `success! journey[${journey}] db[${ownId}] pad[${pad}] value[${action}]`,
         });
     }).catch((err) => {
         console.log(err);

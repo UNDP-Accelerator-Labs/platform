@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS public.journey
     prompt text COLLATE pg_catalog."default" NOT NULL,
     last_access timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    linked_pinboard INT UNIQUE REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    linked_pinboard INT UNIQUE NOT NULL REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT journey_pkey PRIMARY KEY (id, uuid, prompt),
     CONSTRAINT id_key UNIQUE (id),
 	CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)

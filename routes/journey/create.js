@@ -27,6 +27,7 @@ module.exports = (req, res) => {
                 message: `${uuid} has to consent to using the journey feature first!`,
             });
         }
+        // TODO @joschi
         const result = await t.one(`
             INSERT INTO journey (uuid, prompt, created_at, last_access)
             VALUES ($1, $2, NOW(), NOW())

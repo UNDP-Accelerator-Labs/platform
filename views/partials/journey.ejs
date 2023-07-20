@@ -3,19 +3,6 @@
     const vocab = vocabulary['journey'][language];
     const own_db = locals.metadata.site.own_db;
     const journey_info_url = 'https://github.com/UNDP-Accelerator-Labs/platform/blob/jk-like/journey.md';
-
-    //const { board_id } = await POST('/pin', { board_title: node.value.trim(), object_id: < %- JSON.stringify(locals.pads) % >, action: 'insert', object: '< %- object.slice(0, -1) % >' })
-    //window.location = `./pinned?pinboard=${board_id}`
-
-    // TODO
-    // - use API to fetch globally (
-    //    https://undphqexoacclabsapp01.azurewebsites.net/apis/fetch/pads?output=json&token=<token>
-    //    https://undphqexoacclabsapp01.azurewebsites.net/apis/fetch/pads?output=json&pads=6002&pads=5950
-    //)
-    // - add columns to pinboard and rename to collections
-    // - have a dialog to inform user how to use journey before first time (with ok/consent button)
-    // - link journey to collection
-    //
 %>
 <script type='text/javascript'>
     class Journey {
@@ -232,7 +219,7 @@
                     if (doc['db'] !== ownDb) {
                         return;
                     }
-                    newLookup[`${doc['pad_id']}`] = doc['is_relevant'];
+                    newLookup[`${doc['pad']}`] = doc['is_included'];
                 });
                 this.docs = docs;
                 this.docLookup = newLookup;
@@ -437,9 +424,9 @@
                 this.isDocApprove(docId) ? 'neutral' : 'approve') : (
                 this.isDocDislike(docId) ? 'neutral' : 'dislike');
             PUT('/journey/doc', {
-                'pad_id': docId,
+                'pad': docId,
                 'action': action,
-                'journey_id': journeyId,
+                'journey': journeyId,
             }, true, true).then((result) => {
                 this.updateJourneyDocs();
             }).catch((err) => {

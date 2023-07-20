@@ -24,17 +24,18 @@ module.exports = (req, res) => {
             });
         }
         const result = await t.result(`
-            SELECT jd.db AS db, jd.pad_id AS pad_id, jd.is_relevant AS is_relevant
-            FROM journey_docs AS jd, journey AS jy
-            WHERE jd.journey_id = $1 AND jd.journey_id = jy.id AND jy.uuid = $2
+            SELECT pc.db AS db, pc.pad AS pad, pc.is_included AS is_included
+            FROM pinboard_contributions AS pc
+            INNER JOIN journey AS jy ON jy.linked_pinboard = pc.pinboard
+            WHERE jy.id = $1 AND jy.uuid = $2
         `, [journey_id, uuid]);
         res.json({
             uuid,
             journey_id,
             pads: result.rows.map((row) => ({
                 db: row.db,
-                pad_id: row.pad_id,
-                is_relevant: row.is_relevant,
+                pad: row.pad,
+                is_included: row.is_included,
             })),
         });
     }).catch((err) => {

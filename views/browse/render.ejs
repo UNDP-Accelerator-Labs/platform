@@ -804,7 +804,7 @@ const Entry = function (_kwargs) {
 				&& modules.some(d => d.type === 'teams' && rights >= d.rights.write)
 				)
 			) { %>
-				let pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>;
+				let pinboards = (<%- JSON.stringify(locals.pinboards_list || []) %>).filter((pb) => !pb.is_journey);
 
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
@@ -824,7 +824,7 @@ const Entry = function (_kwargs) {
 								location.reload()
 							<% } else { %>
 								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list;
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
 								/* @joschi
 								d3.selectAll('.pinboard-group .dropdown')
@@ -876,7 +876,7 @@ const Entry = function (_kwargs) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list;
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
 								/* @joschi
 								pinboards.find(b => b.id === d.id).count += 1
@@ -895,7 +895,7 @@ const Entry = function (_kwargs) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list;
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
 								/* @joschi
 								d3.selectAll('.pinboard-group .dropdown')
@@ -1003,7 +1003,7 @@ const Entry = function (_kwargs) {
 								const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
 									pins.call(renderPins, res.pins)
-									pinboards = res.pinboards_list;
+									pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 									renderDropdown(d.id);
 									/* @joschi
 								d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')

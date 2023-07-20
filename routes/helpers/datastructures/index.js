@@ -151,7 +151,10 @@ exports.pagemetadata = (_kwargs) => {
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
 			batch.push(ownDB().then(async (ownId) => {
 				const pinboard_stats = await DB.general.any(`
-					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size
+					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size,
+						CASE WHEN EXISTS (
+							SELECT 1 FROM journey WHERE linked_pinboard = pb.id
+						) THEN TRUE ELSE FALSE END AS is_journey
 
 					FROM pinboards pb
 					INNER JOIN pinboard_contributions pc

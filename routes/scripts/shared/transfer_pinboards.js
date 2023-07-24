@@ -207,13 +207,22 @@ if (action === undefined || action === 'transfer') {
         });
     }).catch((e) => {console.error(e);});
 } else if (action === 'finish') {
-    DB.conn.tx(async (ct) => {
-        const cbatch = [];
-        cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboard_contributions CASCADE;`));
-        cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboard_contributors CASCADE;`));
-        cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboards CASCADE;`));
-        await ct.batch(cbatch);
-        cbatch.clear();
+    DB.general.tx(async (gt) => {
+        const gbatch = [];
+        gbatch.push(gt.none(`ALTER TABLE pinboards DROP CONSTRAINT IF EXISTS unique_pinboard_owner;`));
+        gbatch.push(gt.none(`
+            ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
+        `));
+        await gt.batch(gbatch);
+        gbatch.clear();
+        DB.conn.tx(async (ct) => {
+            const cbatch = [];
+            cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboard_contributions CASCADE;`));
+            cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboard_contributors CASCADE;`));
+            cbatch.push(ct.none(`DROP TABLE IF EXISTS _pinboards CASCADE;`));
+            await ct.batch(cbatch);
+            cbatch.clear();
+        });
     });
 } else {
     console.log(`unknown action ${action}`);

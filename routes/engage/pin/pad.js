@@ -151,7 +151,6 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 	}
 }
 async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
-	console.log('UPDATESTATUS', _object_id)  // @joschi
 	if (_object_id) {
 		const pads = (await DB.general.any(`
 			SELECT pc.pad AS pad
@@ -159,18 +158,16 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 			INNER JOIN pinboards pb ON pb.id = pc.pinboard
 			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3
 		`, [ _id, ownId, uuid ])).map((row) => row.pad);
-		console.log('PADS', pads, _id, ownId, uuid);  // @joschi
 		const status = await DB.conn.any(`
-			SELECT COALESCE(MIN(p.status), 0) as status
+			SELECT GREATEST(1, COALESCE(MIN(p.status), 0)) as status
 			FROM pads p
 			WHERE p.id IN ($1:csv)
 		`, [ safeArr(pads, -1) ]);
-		console.log('STATUSVAL', status);  // @joschi
 		return DB.pgp.as.format(`
 			UPDATE pinboards
 			SET status = GREATEST($2, status)
 			WHERE id = $1::INT AND owner = $3
-		;`, [ _id, !status.length ? 0 : status[0].status > 1 ? 1 : 0, uuid ])
+		;`, [ _id, !status.length ? 1 : status[0].status, uuid ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS
 		const mobs = (await DB.general.any(`
 			SELECT pin.mobilization

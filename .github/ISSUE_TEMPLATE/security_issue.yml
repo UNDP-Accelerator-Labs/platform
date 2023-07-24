@@ -1,0 +1,36 @@
+name: Security Issue
+
+about: Report a security vulnerability in the project
+
+title: "[SECURITY] "
+
+labels:
+  - security
+
+assignees: []
+
+body:
+  ## Description
+
+  [Provide a detailed description of the security issue]
+
+  ## Affected Versions
+
+  [List the platform(s) of the project that are affected by this security issue]
+
+  ## Steps to Reproduce (if applicable)
+
+  [Provide steps to reproduce the vulnerability, if possible]
+
+  ## Potential Impacts
+
+  [Explain the potential impact of the vulnerability if left unaddressed]
+
+  ## Suggested Fix
+
+  [Offer any suggestions or insights on how to fix the security issue]
+
+
+  ## Additional Information
+
+  [Add any other relevant details or resources to help address the security issue]

@@ -65,7 +65,7 @@ module.exports = req => {
 		// ORDER
 		let order = DB.pgp.as.format(`ORDER BY t.date DESC`)
 
-		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' OR ') ]
+		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' AND ') ]
 			.filter(d => d)
 			.map(d => `(${d.trim()})`)
 			.join(' AND ')

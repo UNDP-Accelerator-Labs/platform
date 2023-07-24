@@ -1,13 +1,28 @@
 const { app_title, app_suite, DB } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
+const { isPasswordSecure } = require('../../login')
 
 module.exports = (req, res) => {
 	const { referer } = req?.headers || {}
+	const { path } = req;
 	const { uuid, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
 
+	if(password.length){
+		
+		let checkPass = isPasswordSecure(password);
+		let extendedUrl =  `&reset_message=${checkPass}`;
+
+		if(referer.includes('/contribute/contributor')){
+			extendedUrl = `?reset_message=${checkPass}`
+		}
+
+		if(checkPass.length){
+			return res.redirect(`${referer}${extendedUrl}`);
+        }
+	}
 	if (!id) {
 		DB.general.tx(t => {
 			return t.one(`

@@ -165,7 +165,7 @@ module.exports = async (req, res) => {
 		// ORDER
 		const order = DB.pgp.as.format(`ORDER BY p.date DESC`)
 
-		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' OR '), content_filters.filter(d => d).join(' OR ') ]
+		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' AND '), content_filters.filter(d => d).join(' AND ') ]
 			.filter(d => d?.length)
 			.map(d => `(${d.trim()})`)
 			.join(' AND ')

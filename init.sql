@@ -192,7 +192,10 @@ CREATE TABLE pinboards (
 	mobilization_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	mobilization INT  -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
 );
+-- for migrating
 ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner, old_db);
+ALTER TABLE pinboards DROP CONSTRAINT IF EXISTS unique_pinboard_owner;
+ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
 
 CREATE TABLE pinboard_contributors (
 	participant uuid NOT NULL,

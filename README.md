@@ -132,6 +132,9 @@ make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=rollback
 make script ENV=.global.env CMD=transfer_pinboards.js ACTION=rollback
 ```
 
+Manually check for duplicate `owner, title` pairs in the `pinboards` table
+and ensure to solve those conflicts. Then recreate the `unique_pinboard_owner`
+constraint using the version in `init.sql`.
 To finalize the changes and making it irreversible run:
 
 ```

@@ -27,7 +27,7 @@ body:
     id: suggestions
     attributes:
       label: How would it improve the project?
-      description: Explain your suggested solution or feature. 
+      description: Explain your suggested solution or feature.
       placeholder: The feature will improve or change the current behavior...
     validations:
       required: false

@@ -55,4 +55,3 @@ body:
       placeholder: Add any other relevant info
     validations:
       required: false
-      

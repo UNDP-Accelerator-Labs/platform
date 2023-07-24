@@ -138,7 +138,7 @@
 		opts.push({ node: 'input', type: 'radio', name: 'format', value: 'cards', placeholder: 'Cards', checked: true,default: true, classname: 'hide pdf' }) // TO DO: TRANSLATE
 
 		// DOWNLOAD FOR EVERY CASE EXCEPT PDF
-		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, label: '<%- vocabulary["download"][language] %>', classname: 'submit hide csv xlsx json geojson docx' })
+		opts.push({ node: 'button', type: 'submit', name: 'render', value: true, disabled:true, label: '<%- vocabulary["download"][language] %>', classname: 'submit hide csv xlsx json geojson docx' })
 		// DOWNLOAD FOR PDF
 		opts.push({ node: 'button', type: 'button', name: 'render', value: true, disabled: true, label: '<%- vocabulary["download"][language] %>', classname: 'submit pdf', fn: downloadPDF })
 
@@ -146,16 +146,14 @@
 		function resetFeatures (data) {
 			const { value } = data
 			const form = d3.select(this.form)
-			// UPDATE THIS TO li LEVEL
-			// form.selectAll(`li.opt:not(.submit)`)
-			form.select('button[type=submit]').node().disabled = false
 
 			form.selectAll(`li.opt`)
 			.each(function () {
 				const sel = d3.select(this)
 				const deactivate = !sel.classed(value)
 				sel.classed('hide', deactivate)
-				sel.selectAll('input:not([type=hidden])').each(function () { this.disabled = deactivate })
+				sel.selectAll('input:not([type=hidden])').each(function () { this.disabled = deactivate }) // THIS DOES NOT SEEM TO DO ANYTHING
+				sel.selectAll('button').attr('disabled', deactivate ? true : null)
 			})
 		}
 		function limitSelection (data) {

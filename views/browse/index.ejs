@@ -21,6 +21,8 @@
 		else mapscale = 'contain'
 	}
 
+	const logged = locals.metadata.user.uuid !== null
+
 	const slides = locals.sample_images
 	// const is_intropage = (publicpage
 	// 	&& object === 'pads'
@@ -28,6 +30,7 @@
 	// 	&& mapscale !== 'full-screen'
 	// 	&& locals.metadata.page.id === 1
 	// 	&& slides?.length > 0)
+	
 	const is_intropage = false
 	const welcome_module = locals.metadata.site.welcome_module
 %>
@@ -88,6 +91,9 @@
 		</header>
 
 		<div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %>'>
+			<% if (locals.metadata.page.instance_title) { %>
+				<h1 class='instance-title'><%- locals.metadata.page.instance_title %></h1>
+			<% } %>
 			<% if (!publicpage
 				&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
 				&& pagedisplay !== 'slideshow'
@@ -351,6 +357,22 @@
 						<% } %>
 					<% } %>
 				</div>
+
+				<div class='public-page-panel'>
+					<div class='inner'>
+						<nav class='enter'>
+							<!-- <a href='/<%- language %>/browse/pads/public'>
+								<button type='button' class='highlight'><%- vocabulary['browse publications'][language] %></button>
+							</a> -->
+							<% if (!logged) { %>
+								<a href='/login'><button type='button' class='highlight'><%- vocabulary['log in'][language] %></button></a>
+								<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
+								<!-- TO DO: TRANSLATE -->
+							<% } %>
+						</nav>
+					</div>
+				</div>
+
 				<div class='outer'>
 					<% if (pages > 1 && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 						<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>

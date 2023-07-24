@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { datastructures, checklanguage, flatObj } = include('routes/helpers/')
+const { datastructures, checklanguage, flatObj, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -19,9 +19,8 @@ module.exports = async kwargs => {
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
-	
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	return conn.task(t => {
 		const batch = []
@@ -71,8 +70,8 @@ module.exports = async kwargs => {
 				SELECT mc.pad FROM mobilization_contributions mc
 				INNER JOIN mobilizations m
 					ON m.id = mc.mobilization
-				WHERE m.owner IN ($1:csv) 
-			) OR $2 > 2) 
+				WHERE m.owner IN ($1:csv)
+			) OR $2 > 2)
 				AND p.id NOT IN (SELECT review FROM reviews)
 				AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL)
 				AND p.status < 2
@@ -89,9 +88,9 @@ module.exports = async kwargs => {
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
 			WHERE ((p.id IN (
-					SELECT mc.pad FROM mobilization_contributions mc 
-					INNER JOIN mobilizations m 
-						ON m.id = mc.mobilization 
+					SELECT mc.pad FROM mobilization_contributions mc
+					INNER JOIN mobilizations m
+						ON m.id = mc.mobilization
 					WHERE m.owner IN ($1:csv)
 				) OR $2 > 2) OR (p.owner IN ($1:csv)))
 				AND p.id IN (SELECT pad FROM review_requests)
@@ -116,14 +115,14 @@ module.exports = async kwargs => {
 		batch.push(t.any(`
 			SELECT COUNT (DISTINCT (tag_id))::INT, type FROM tagging
 				WHERE pad IN (
-					SELECT id FROM pads p 
+					SELECT id FROM pads p
 						WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
 				)
 			GROUP BY type
 		;`, [ full_filters ]).then(d => { return { tags: d } })
 		.catch(err => console.log(err)))
-		
+
 		return t.batch(batch)
 		.catch(err => console.log(err))
 	}).then(d => flatObj.call(d))

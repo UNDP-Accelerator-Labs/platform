@@ -35,7 +35,6 @@ exports.pin = (req, res) => {
 
 					batch.push(
 						t.none(insertmember(id, object_id))
-						// .then(_ => t.none(updatestatus(id, object_id)))
 						.catch(err => console.log(err))
 					)
 
@@ -59,7 +58,6 @@ exports.pin = (req, res) => {
 		if (object_id) {
 			return DB.general.tx(t => {
 				return t.none(insertmember(board_id, object_id))
-				// .then(_ => t.none(updatestatus(board_id, object_id)))
 				.then(_ => {
 					const batch = []
 					batch.push(t.any(retrievepins(object_id)))
@@ -86,7 +84,6 @@ exports.unpin = (req, res) => {
 	if (object_id) {
 		return DB.general.tx(t => {
 			return t.none(removemember(board_id, object_id))
-			// .then(_ => t.none(updatestatus(board_id, object_id)))
 			.then(_ => {
 				return t.none(`
 					DELETE FROM teams
@@ -124,22 +121,6 @@ function removemember (_id, _object_id) {
 			WHERE team = $1::INT
 				AND member = $2
 		;`, [ _id, _object_id ])
-	}
-}
-// TO DO: FINISH HERE
-function updatestatus (_id, _object_id) {
-	if (_object_id) {
-		return DB.pgp.as.format(`
-			UPDATE pinboards
-			SET status = (SELECT GREATEST (
-				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				WHERE pc.pinboard = $1::INT), 1)
-				, status)
-			)
-			WHERE id = $1::INT
-		;`, [ _id ])
 	}
 }
 function retrievepins (_object_id) {

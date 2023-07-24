@@ -14,6 +14,7 @@ help:
 	@echo "git-check	ensures no git visible files have been altered"
 	@echo "run-web	runs the webserver"
 	@echo "run-sass	runs the sass compiler"
+	@echo "script	run a script from the scripts folder"
 
 export LC_ALL=C
 export LANG=C
@@ -59,3 +60,6 @@ azlogin:
 
 dockerpush:
 	./sh/dockerpush.sh
+
+script:
+	./sh/script.sh

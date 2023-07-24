@@ -1,4 +1,4 @@
-const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, DB } = include('config/')
+const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
 const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = require('../filter')
@@ -104,17 +104,29 @@ module.exports = async kwargs => {
 				GROUP BY (mc.pad, m.title, m.pad_limit)
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// PINBOARD INFORMATION
-			batch.push(t.any(`
-				SELECT p.id, json_agg(json_build_object('id', pb.id, 'title', pb.title)) AS pinboards
-				FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				INNER JOIN pinboards pb
-					ON pb.id = pc.pinboard
-				WHERE p.id IN $1:raw
+			const ownId = await ownDB();
+			const padToPinboards = new Map();
+			(await DB.general.any(`
+				SELECT
+					pc.pad, pb.id, pb.title
+				FROM pinboard_contributions pc
+				INNER JOIN pinboards pb ON pb.id = pc.pinboard
+				WHERE
+					pc.pad IN $1:raw
 					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
-				GROUP BY (p.id)
-			;`, [ padlist, current_user ]).catch(err => console.log(err)))
+					AND pc.db = $3
+			`, [ padlist, current_user, ownId ])).forEach(row => {
+				const pinboards = padToPinboards.get(row.pad) ?? [];
+				pinboards.push({
+					id: row.id,
+					title: row.title,
+				});
+				padToPinboards.set(row.pad, pinboards);
+			});
+			batch.push([...pads].map((padId) => ({
+				id: padId,
+				pinboards: padToPinboards.get(padId) ?? [],
+			})));
 			// FOLLOW UP STATUS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			batch.push(t.any(`
 				SELECT p.id,
@@ -132,6 +144,20 @@ module.exports = async kwargs => {
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// FOLLOW UP OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 			// THE SOURCE OF THE FOLLOW UP MOBILIZATION IS THE MOBILIZATION THAT THE PAD WAS CONTRIBUTED TO
+			const validMobs = (await t.any(`
+				SELECT DISTINCT mc.mobilization as id
+				FROM pads p
+				INNER JOIN mobilization_contributions mc
+					ON mc.pad = p.id
+				WHERE p.status >= 2
+					AND p.id IN $1:raw
+			`, [ padlist ])).map(row => row.id);
+			const pbMobs = (await DB.general.any(`
+				SELECT pb.mobilization as mob
+				FROM pinboards pb
+				WHERE pb.mobilization_db = $2
+					AND pb.mobilization IN ($1:csv)
+			`, [ safeArr(validMobs, -1), ownId ])).map(row => row.mob);
 			batch.push(t.task(t1 => {
 				const batch1 = []
 
@@ -179,18 +205,16 @@ module.exports = async kwargs => {
 							'max', $2::INT
 						)) AS followups
 					FROM pads p
-					INNER JOIN pinboard_contributions pc
-						ON pc.pad = p.id
-					INNER JOIN pinboards pb
-						ON pb.id = pc.pinboard
+					INNER JOIN mobilization_contributions mc
+						ON mc.pad = p.id
 					INNER JOIN mobilizations m
-						ON m.collection = pb.id
+						ON m.id = mc.mobilization
 					WHERE m.status = 1
 						AND m.version IS NULL
 						AND p.status >= 2
-						AND p.id IN $1:raw
+						AND m.id IN ($1:csv)
 					GROUP BY p.id
-				;`, [ padlist, followup_count ]))
+				;`, [ safeArr(pbMobs, -1), followup_count ]))
 				return t1.batch(batch1)
 				.then(results => {
 					const [ followups, depths ] = results

@@ -2,8 +2,6 @@ name: Bug Report
 description: File a bug report
 title: "[Bug]: "
 labels: ["bug", "triage"]
-assignees:
-  - []
 body:
   - type: markdown
     attributes:
@@ -21,7 +19,7 @@ body:
     id: what-happened
     attributes:
       label: Issue description
-      description: Provide a brief description of the issue. 
+      description: Provide a brief description of the issue.
       placeholder: Provide steps to reproduce
       value: "Issue description"
     validations:
@@ -29,7 +27,7 @@ body:
   - type: textarea
     id: url
     attributes:
-      label: Where did this happen? 
+      label: Where did this happen?
       description: Provide describe which pad, template, collection, url and screenshot.
       placeholder: Describe which pad, collection, url and screenshot.
       value: "url"
@@ -50,7 +48,7 @@ body:
       label: Platform
       description: What platform are you reporting?
       options:
-        - Action Plan 
+        - Action Plan
         - Solution Mapping
         - Experiments
         - Global

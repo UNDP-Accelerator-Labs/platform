@@ -809,7 +809,7 @@ const Entry = function (_kwargs) {
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
 						return _data?.filter((pb) => !pb.is_journey).map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
-					})
+					}, (d) => d.id)
 					pin.addElems('label', 'name')
 						.attr('title', d => d.title)
 						.html(d => {
@@ -824,36 +824,13 @@ const Entry = function (_kwargs) {
 								location.reload()
 							<% } else { %>
 								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								const tmpPinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								if (tmpPinboards.length !== pinboards.length) {
+									location.reload();
+								}
+								pinboards = tmpPinboards;
 								renderDropdown(d.object_id);
-								/* @joschi
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard')
-								.filter(c => c.id === d.id)
-								.each(function (c) {
-									// c.count -= 1
-									const sel = d3.select(this)
-									if (c.count === 0) { // IF NOT ASSOCIATED TO A MOBILIZATION
-										sel.remove()
-										// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-										renderPinNavigation(res.pinboards_list)
-									} else {
-										if (d.object_id === c.object_id) {
-											d.checked = null
-											sel.select('input').attr('checked', d.checked)
-											sel.select('input').node().checked = false
-										}
-										// sel.select('.count').html(c.count)
-									}
-								})
-
-								// DECREMENT THE NUMBER OF PINNED PADS FOR THE SELECTED BOARD
-								pinboards.find(b => b.id === d.id).count -= 1
-								// RESET THE MENU
-								d3.selectAll('.pinboard-group').each(function (b) {
-									b.pinboards = b.pinboards.filter(a => a.id !== d.id)
-								})
-								*/
+								renderPinNavigation(pinboards);
 							<% } %>
 						}
 					})
@@ -861,7 +838,7 @@ const Entry = function (_kwargs) {
 				function renderPinOptions (_input, _data) {
 					const dropdown = _input.addElems('div', 'dropdown')
 						.addElems('menu')
-					const opts = dropdown.addElems('li', 'pinboard', _data)
+					const opts = dropdown.addElems('li', 'pinboard', _data, (d) => d.id)
 					opts.addElems('input')
 						.attrs({
 							'id': d => `board-${d.id}-object-${d.object_id}`,
@@ -878,47 +855,19 @@ const Entry = function (_kwargs) {
 								pins.call(renderPins, res.pins)
 								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
-								/* @joschi
-								pinboards.find(b => b.id === d.id).count += 1
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard .count')
-									.filter(c => c.id === d.id)
-								.html(c => c.count += 1)
-
-								sel.findAncestor('pinboard-group')
-								.each(function (c) {
-									c.pinboards.push({ id: d.id, title: d.title })
-								})
-								*/
+								renderPinNavigation(pinboards);
 							}
 						} else {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								const tmpPinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								if (tmpPinboards.length !== pinboards.length) {
+									location.reload();
+								}
+								pinboards = tmpPinboards;
 								renderDropdown(d.object_id);
-								/* @joschi
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard').filter(c => c.id === d.id)
-								.each(function (c) {
-									c.count -= 1
-									pinboards.find(b => b.id === d.id).count -= 1
-
-									const sel = d3.select(this)
-									if (c.count === 0) {
-										sel.remove()
-										// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-										renderPinNavigation(res.pinboards_list)
-									} else {
-										if (d.object_id === c.object_id) {
-											d.checked = null
-											sel.select('input').attr('checked', d.checked)
-											sel.select('input').node().checked = false
-										}
-										sel.select('.count').html(c.count)
-									}
-								})
-								*/
+								renderPinNavigation(pinboards);
 							}
 						}
 					})
@@ -929,8 +878,15 @@ const Entry = function (_kwargs) {
 						.html(d => d.count)
 				}
 				function renderPinNavigation (_data) {
-					d3.select('#pinboards-list menu')
-						.addElems('li', null, _data)
+					// NOTE: d can be undefined here for elements that were
+					// added through ejs instead of d3
+					d3.select('#pinboards-list-lg menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1)
+					.addElems('a')
+						.attr('href', d => `./pinned?pinboard=${d.id}`)
+						.html(d => d.title)
+					d3.select('#pinboards-list-xs menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
 						.html(d => d.title)
@@ -947,7 +903,6 @@ const Entry = function (_kwargs) {
 
 				const renderDropdown = (pid) => {
 					const d = pinPbMap[pid];
-					console.log(pinboards, d);
 					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
 					// RENDER THE DROPDOWN
 					newpin.call(renderPinOptions, data)
@@ -1005,11 +960,7 @@ const Entry = function (_kwargs) {
 									pins.call(renderPins, res.pins)
 									pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 									renderDropdown(d.id);
-									/* @joschi
-								d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')
-									.filter(c => c.id === d.id)
-									.html(c => c.count += 1)
-									*/
+									renderPinNavigation(pinboards);
 								}
 							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })

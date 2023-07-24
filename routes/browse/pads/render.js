@@ -195,9 +195,7 @@ module.exports = async (req, res) => {
 					GROUP BY p.id
 				;`, [ uuid, rights, pinboard ])
 				.then(async result => {
-					console.log('RESULT', result);  // @joschi
 					const data = await join.users(result, [ language, 'owner' ])
-					console.log('DATA', data);  // @joschi
 					return data
 				}).catch(err => console.log(err)))
 			} else batch.push(null)

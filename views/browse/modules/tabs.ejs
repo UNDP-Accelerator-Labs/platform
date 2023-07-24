@@ -57,7 +57,7 @@
 					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %></label>
 				</div>
 
-				<div id='pinboards-list' class='dropdown'>
+				<div id='pinboards-list-xs' class='dropdown'>
 					<menu>
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
@@ -111,7 +111,7 @@
 					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
 				</div>
 
-				<div id='pinboards-list' class='dropdown'>
+				<div id='pinboards-list-lg' class='dropdown'>
 					<menu>
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>

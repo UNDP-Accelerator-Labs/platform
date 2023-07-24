@@ -4,6 +4,7 @@ const {
 	app_description: description,
 	app_languages,
 	app_storage,
+	app_suite_url,
 	modules,
 	metafields,
 	media_value_keys,
@@ -231,7 +232,8 @@ exports.pagemetadata = (_kwargs) => {
 				welcome_module,
 				app_storage,
 				own_db: await ownDB(),
-				app_id
+				app_id,
+				app_suite_url,
 			},
 			user: {
 				uuid,
@@ -323,7 +325,8 @@ exports.pagedata = (_req, _data) => {
 			modules,
 			metafields,
 			engagementtypes,
-			public
+			public,
+			app_suite_url
 		},
 		user: {
 			// TO DO: GET THIS FROM SESSION DATA OR FROM this.sessiondata

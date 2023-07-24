@@ -86,12 +86,14 @@ exports.unpin = (req, res) => {
 			return ownDB().then(async ownId => {
 				await gt.none(removepads(board_id, object_id, mobilization, uuid, ownId));
 				await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
+				// we ignore the db and is_included fields here so we don't delete pinboards if the only
+				// pads of the board are on a different database or ignored
 				await gt.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
-						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $3 AND is_included = true) = 0
+						AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
 						AND owner = $2
-				;`, [ board_id, uuid, ownId ])
+				;`, [ board_id, uuid ])
 				const batch = []
 				batch.push(gt.any(retrievepins(object_id, uuid, ownId)));
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -153,7 +155,6 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 	}
 }
 async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
-	console.log('UPDATESTATUS', _object_id)  // @joschi
 	if (_object_id) {
 		const pads = (await DB.general.any(`
 			SELECT pc.pad AS pad
@@ -161,18 +162,16 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 			INNER JOIN pinboards pb ON pb.id = pc.pinboard
 			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3 AND pc.is_included = true
 		`, [ _id, ownId, uuid ])).map((row) => row.pad);
-		console.log('PADS', pads, _id, ownId, uuid);  // @joschi
 		const status = await DB.conn.any(`
-			SELECT COALESCE(MIN(p.status), 0) as status
+			SELECT GREATEST(1, COALESCE(MIN(p.status), 0)) as status
 			FROM pads p
 			WHERE p.id IN ($1:csv)
 		`, [ safeArr(pads, -1) ]);
-		console.log('STATUSVAL', status);  // @joschi
 		return DB.pgp.as.format(`
 			UPDATE pinboards
-			SET status = $2
+			SET status = GREATEST($2, status)
 			WHERE id = $1::INT AND owner = $3
-		;`, [ _id, !status.length ? 0 : status[0].status > 1 ? 1 : 0, uuid ])
+		;`, [ _id, !status.length ? 1 : status[0].status, uuid ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS
 		const mobs = (await DB.general.any(`
 			SELECT pin.mobilization

@@ -829,7 +829,7 @@ const Entry = function (_kwargs) {
 								}
 								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
-								renderPinNavigation(pinboards);
+								renderPinNavigation(res.pinboards_list);
 							<% } %>
 						}
 					})
@@ -854,7 +854,7 @@ const Entry = function (_kwargs) {
 								pins.call(renderPins, res.pins)
 								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
-								renderPinNavigation(pinboards);
+								renderPinNavigation(res.pinboards_list);
 							}
 						} else {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
@@ -865,7 +865,7 @@ const Entry = function (_kwargs) {
 								}
 								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
-								renderPinNavigation(pinboards);
+								renderPinNavigation(res.pinboards_list);
 							}
 						}
 					})
@@ -882,12 +882,12 @@ const Entry = function (_kwargs) {
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.title)
+						.html(d => d.is_journey ? `Journey: ${d.title}` : d.title)
 					d3.select('#pinboards-list-xs menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.title)
+						.html(d => d.is_journey ? `Journey: ${d.title}` : d.title)
 				}
 
 				const pinPbMap = {};
@@ -958,7 +958,7 @@ const Entry = function (_kwargs) {
 									pins.call(renderPins, res.pins)
 									pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 									renderDropdown(d.id);
-									renderPinNavigation(pinboards);
+									renderPinNavigation(res.pinboards_list);
 								}
 							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })

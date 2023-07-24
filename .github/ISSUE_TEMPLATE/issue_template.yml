@@ -2,8 +2,6 @@ name: Issue Report
 description: File a bug report
 title: "[Issue]: "
 labels: ["bug", "issue"]
-assignees:
-  - []
 body:
   - type: markdown
     attributes:

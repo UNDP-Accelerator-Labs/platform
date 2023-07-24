@@ -1,0 +1,31 @@
+name: Documentation Improvement
+
+about: Propose a documentation improvement for the project
+
+title: "[DOCS] "
+
+labels:
+  - documentation
+
+assignees: []
+
+body:
+  ## Documentation Area
+
+  [Specify the area of documentation that requires improvement, e.g., installation guide, API documentation, usage examples, etc.]
+
+  ## Current Documentation (if applicable)
+
+  [Briefly describe the current state of the documentation in the specified area]
+
+  ## Proposed Improvement
+
+  [Describe the suggested improvement or addition to the documentation]
+
+  ## Rationale
+
+  [Explain why this improvement is necessary or beneficial]
+
+  ## Additional Information
+
+  [Add any other relevant details or resources that support the documentation improvement proposal]

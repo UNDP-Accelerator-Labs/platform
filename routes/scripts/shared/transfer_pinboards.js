@@ -93,7 +93,7 @@ if (action === undefined || action === 'transfer') {
                 `, [key, link_map[key]]);
                 db_map[key] = db_id.id;
             }));
-            const ownDB = db_map[app_id];
+            const ownId = db_map[app_id];
             const pinboards = await ct.manyOrNone(`SELECT * FROM _pinboards;`);
             (pinboards ?? []).forEach((row) => {
                 gbatch.push(gt.one(`
@@ -115,7 +115,7 @@ if (action === undefined || action === 'transfer') {
                     RETURNING id, old_id;
                 `, [
                     row.id,   // old_id
-                    ownDB,  // old_db
+                    ownId,  // old_db
                     row.title,  // title
                     row.description,  // description
                     row.owner,  // owner
@@ -125,7 +125,7 @@ if (action === undefined || action === 'transfer') {
                     row.display_fullscreen,  // display_fullscreen
                     row.slideshow,  // slideshow
                     row.date,  // date
-                    row.mobilization !== null ? ownDB : null,  // mobilization_db
+                    row.mobilization !== null ? ownId : null,  // mobilization_db
                     row.mobilization,  // mobilization
                 ]));
             });
@@ -155,7 +155,7 @@ if (action === undefined || action === 'transfer') {
                 gbatch.push(gt.none(`
                     INSERT INTO pinboard_contributions (pad, db, pinboard)
                     VALUES ($1, $2, $3);
-                `, [row.pad, ownDB, oldIdMap.get(row.pinboard)]));
+                `, [row.pad, ownId, oldIdMap.get(row.pinboard)]));
             });
             await gt.batch(gbatch);
             gbatch.clear();

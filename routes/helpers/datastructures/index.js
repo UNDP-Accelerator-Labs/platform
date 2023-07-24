@@ -2,7 +2,6 @@ const {
 	app_id,
 	app_title: title,
 	app_description: description,
-	app_title_short: app_db,
 	app_languages,
 	app_storage,
 	app_suite_url,
@@ -229,7 +228,6 @@ exports.pagemetadata = (_kwargs) => {
 				engagementtypes,
 				welcome_module,
 				app_storage,
-				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
 				app_id,
 				app_suite_url,
 			},

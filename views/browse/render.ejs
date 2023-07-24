@@ -824,11 +824,10 @@ const Entry = function (_kwargs) {
 								location.reload()
 							<% } else { %>
 								pins.call(renderPins, res.pins)
-								const tmpPinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
-								if (tmpPinboards.length !== pinboards.length) {
+								if (res.pinboards_list.length !== pinboards.length) {
 									location.reload();
 								}
-								pinboards = tmpPinboards;
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
 								renderPinNavigation(pinboards);
 							<% } %>
@@ -861,11 +860,10 @@ const Entry = function (_kwargs) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								const tmpPinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
-								if (tmpPinboards.length !== pinboards.length) {
+								if (res.pinboards_list.length !== pinboards.length) {
 									location.reload();
 								}
-								pinboards = tmpPinboards;
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
 								renderDropdown(d.object_id);
 								renderPinNavigation(pinboards);
 							}

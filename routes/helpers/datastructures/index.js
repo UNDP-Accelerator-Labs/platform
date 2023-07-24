@@ -5,6 +5,7 @@ const {
 	app_title_short: app_db,
 	app_languages,
 	app_storage,
+	app_suite_url,
 	modules,
 	metafields,
 	media_value_keys,
@@ -229,7 +230,8 @@ exports.pagemetadata = (_kwargs) => {
 				welcome_module,
 				app_storage,
 				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
-				app_id
+				app_id,
+				app_suite_url,
 			},
 			user: {
 				uuid,
@@ -321,7 +323,8 @@ exports.pagedata = (_req, _data) => {
 			modules,
 			metafields,
 			engagementtypes,
-			public
+			public,
+			app_suite_url
 		},
 		user: {
 			// TO DO: GET THIS FROM SESSION DATA OR FROM this.sessiondata

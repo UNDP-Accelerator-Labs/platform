@@ -86,12 +86,14 @@ exports.unpin = (req, res) => {
 			return ownDB().then(async ownId => {
 				await gt.none(removepads(board_id, object_id, mobilization, uuid, ownId));
 				await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
+				// we ignore the db field here so we don't delete pinboards if the only
+				// pads of the board are on a different database
 				await gt.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
-						AND (SELECT COUNT (pad) FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $3) = 0
+						AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
 						AND owner = $2
-				;`, [ board_id, uuid, ownId ])
+				;`, [ board_id, uuid ])
 				const batch = []
 				batch.push(gt.any(retrievepins(object_id, uuid, ownId)));
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -166,7 +168,7 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 		console.log('STATUSVAL', status);  // @joschi
 		return DB.pgp.as.format(`
 			UPDATE pinboards
-			SET status = $2
+			SET status = GREATEST($2, status)
 			WHERE id = $1::INT AND owner = $3
 		;`, [ _id, !status.length ? 0 : status[0].status > 1 ? 1 : 0, uuid ])
 	} else if (_mobilization) { // TO DO: CHECK WHETHER THIS WORKS

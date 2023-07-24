@@ -1,18 +1,20 @@
 <%
 	// CREATE ALIASES
 	const publicpage = locals.metadata.page.public
+	const activity = locals.metadata.page.activity
+	const is_public = locals.metadata.page.public || activity === 'preview'
 	const languages = locals.metadata.site.languages
 	const language = locals.metadata.page.language
 	const username = locals.metadata.user.name
 	const uuid = locals.metadata.user.uuid
+	const app_suite_url = locals.metadata.site.app_suite_url
 
 %>
 
 <nav id='languages'>
 	<menu>
-		<!-- TO DO: PASS THIS FROM CONFIG FILE (THERE MIGHT NOT ALWAYS BE A SUITE) -->
 		<li class='home-btn lg'>
-			<a href='https://acclabs.azurewebsites.net/'>Accelerator Labs Suite</a>
+			<a href='<%= app_suite_url %>'>Accelerator Labs Suite</a>
 		</li>
 		<li class='options'>
 			<ul>

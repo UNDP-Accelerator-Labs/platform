@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 	else {
 
 		const { object } = req.params || {}
-		const { id } = req.query || {}
+		const { id, reset_message } = req.query || {}
 		const language = checklanguage(req.params?.language || req.session.language)
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
@@ -104,9 +104,9 @@ module.exports = async (req, res) => {
 					return t.batch(batch)
 					.then(async results => {
 						const [ countries, languages, teams, data ] = results
-
+						
 						const metadata = await datastructures.pagemetadata({ req })
-						return Object.assign(metadata, { data, countries, languages, teams })
+						return Object.assign(metadata, { data, countries, languages, teams, reset_errormessage: reset_message })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}

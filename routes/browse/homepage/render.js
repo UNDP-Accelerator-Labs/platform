@@ -1,5 +1,5 @@
 const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, DB } = include('config/')
-const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
+const { array, datastructures, checklanguage, join, parsers, safeArr } = include('routes/helpers/')
 
 const load = require('./load/')
 const filter = require('./filter.js')

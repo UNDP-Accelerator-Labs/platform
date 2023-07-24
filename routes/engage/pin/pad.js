@@ -163,7 +163,7 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3 AND pc.is_included = true
 		`, [ _id, ownId, uuid ])).map((row) => row.pad);
 		const status = await DB.conn.any(`
-			SELECT GREATEST(1, COALESCE(MIN(p.status), 0)) as status
+			SELECT LEAST(1, GREATEST(1, COALESCE(MIN(p.status), 0))) as status
 			FROM pads p
 			WHERE p.id IN ($1:csv)
 		`, [ safeArr(pads, -1) ]);

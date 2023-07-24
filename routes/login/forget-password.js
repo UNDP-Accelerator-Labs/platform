@@ -149,7 +149,7 @@ exports.isPasswordSecure = (password) => {
   const specialCharRegex = /[!@#$%^&*\(\)]/;
   // Check against common passwords (optional)
   const commonPasswords = ['password', '123456', 'qwerty'];
-  let checkPass = {
+  const checkPass = {
     'pw-length': !(password.length < 8),  // Check length
     'pw-upper': uppercaseRegex.test(password),
     'pw-lower': lowercaseRegex.test(password),

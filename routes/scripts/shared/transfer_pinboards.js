@@ -86,13 +86,26 @@ if (action === undefined || action === 'transfer') {
             await ct.batch(cbatch);
             cbatch.clear();
             await Promise.all(Object.keys(link_map).map(async (key) => {
-                const db_id = await gt.one(`
-                    INSERT INTO extern_db (db, url_prefix)
-                    VALUES ($1, $2)
-                    ON CONFLICT ON CONSTRAINT extern_db_db_key DO NOTHING
-                    RETURNING id;
-                `, [key, link_map[key]]);
-                db_map[key] = db_id.id;
+                const read_id = await gt.any(`
+                    SELECT id FROM extern_db WHERE db = $1;
+                `, [key]);
+                if (!read_id.length) {
+                    const db_id = await gt.any(`
+                        INSERT INTO extern_db (db, url_prefix)
+                        VALUES ($1, $2)
+                        ON CONFLICT ON CONSTRAINT extern_db_db_key DO NOTHING
+                        RETURNING id;
+                    `, [key, link_map[key]]);
+                    if (db_id.length) {
+                        db_map[key] = db_id[0].id;
+                    } else {
+                        db_map[key] = await gt.one(`
+                            SELECT id FROM extern_db WHERE db = $1 LIMIT 1;
+                        `, [key]).id;
+                    }
+                } else {
+                    db_map[key] = read_id[0].id;
+                }
             }));
             const ownId = db_map[app_id];
             const pinboards = await ct.manyOrNone(`SELECT * FROM _pinboards;`);

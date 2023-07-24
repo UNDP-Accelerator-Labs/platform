@@ -47,7 +47,7 @@ module.exports = (req, res) => {
         `, [uuid, prompt]);
         let journey;
         if (!jid.length) {
-            const pbid = (await t.one(`
+            const pbid = (await t.any(`
                 INSERT INTO pinboards (
                     owner,
                     title,
@@ -58,18 +58,24 @@ module.exports = (req, res) => {
                 VALUES ($1, $2, '', NULL, NULL)
                 ON CONFLICT (title, owner) DO NOTHING
                 RETURNING id
-            `, [uuid, limitPromptForPinboard(prompt)])).id;
+            `, [uuid, limitPromptForPinboard(prompt)]));
+            if (!pbid.length) {
+                pbid.push(await t.one(`
+                    SELECT id FROM pinboards
+                    WHERE owner = $1 AND title = $2 LIMIT 1;
+                `, [uuid, limitPromptForPinboard(prompt)]));
+            }
             await t.none(`
                 INSERT INTO pinboard_contributors (participant, pinboard)
                 VALUES ($1, $2)
                 ON CONFLICT (participant, pinboard) DO NOTHING
-            `, [uuid, pbid]);
+            `, [uuid, pbid[0].id]);
             const result = await t.one(`
                 INSERT INTO journey (uuid, prompt, created_at, last_access, linked_pinboard)
                 VALUES ($1, $2, NOW(), NOW(), $3)
                 ON CONFLICT (uuid, prompt) DO UPDATE SET last_access = NOW()
                 RETURNING id
-            ;`, [uuid, prompt, pbid]);
+            ;`, [uuid, prompt, pbid[0].id]);
             journey = result.id;
         } else {
             journey = jid[0].id;

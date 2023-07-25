@@ -1,22 +1,22 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
-	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || '';
-	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}`
-	const description = locals.metadata?.site?.description[language]
+	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || ''; //COUNTRY INSTANCE TITLE OR COLLECTION TITLE
+	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}` //DEFAULT PAGE TITLE => ADD COUNTRY NAME TITLE IF IT EXIST
+	const description = locals.metadata?.site?.description[language] //DEFAULT PAGE DESCRIPTION
 
 	const site_title = locals?.metadata?.page?.public ?
 		locals?.data?.title || locals?.display_template?.title
-		: null;
+		: null; //PAGE TITLE OR TEMPLATE TITLE IF IT EXIST IN PAD AND TEMPLATE
 
 	const site_description = locals?.metadata?.page?.public && locals?.item_description?.length
 		? locals?.item_description[0]
 		: locals?.pinboard?.description?.length
 		? locals?.pinboard?.description?.replace(/(<([^>]+)>)/gi, '')
-		: null;
+		: null; //PAGE DESCRIPTION IF IT PUBLIC AND EXIST IN PAD, TEMPLATE, COLLECTION OR COUNTRY PAGE INSTANCE
 	const img = locals?.metadata?.page?.public && locals?.item_attachments?.length
 		? locals?.item_attachments[0]
-		: null;
+		: null; //PAGE IMAGE FROM PADS ONLY, ELSE DEFAULT TO PLATFORM LOGO
 
 	const currentpage_url = locals?.metadata?.page?.currentpage_url
 

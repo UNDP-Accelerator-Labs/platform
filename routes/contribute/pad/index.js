@@ -222,8 +222,8 @@ module.exports = (req, res) => {
 					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data });
 
 					const item_description = parsers.getTxt(data);
-					const item_attachments = parsers.getAttachments(data);
-					
+					const item_attachments = parsers.getPadImgs(data)
+				
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null) })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments, item_description, item_attachments })

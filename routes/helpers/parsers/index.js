@@ -1,3 +1,5 @@
+const { app_storage, app_title_short } = require('../../../config/')
+
 exports.getImg = (_json = {}, _unique = true) => { 
 	if (_json?.sections) {
 		const media = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
@@ -76,6 +78,16 @@ exports.getAttachments = (_json = {}) => {
 		return attachments
 	} else return []
 }
+
+exports.getPadImgs = (_json = {}) => { 
+	if (_json?.sections) {
+		const meta = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
+		const attachments = meta.filter(c => c.type === 'img' && c.src?.length > 0)
+			.map(d => `${app_storage}/` + d.src).flat()
+		return attachments
+	} else return []
+}
+
 exports.regexQuery = require('./search.js').sqlregex
 
 exports.isURL = function (str = '') {

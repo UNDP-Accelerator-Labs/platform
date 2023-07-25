@@ -1,7 +1,7 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
-	const country_page_title = locals.metadata?.page?.instance_title || null;
+	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || '';
 	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}`
 	const description = locals.metadata?.site?.description[language]
 
@@ -11,6 +11,8 @@
 
 	const site_description = locals?.metadata?.page?.public && locals?.item_description?.length
 		? locals?.item_description[0]
+		: locals?.pinboard?.description?.length
+		? locals?.pinboard?.description?.replace(/(<([^>]+)>)/gi, '')
 		: null;
 	const img = locals?.metadata?.page?.public && locals?.item_attachments?.length
 		? locals?.item_attachments[0]

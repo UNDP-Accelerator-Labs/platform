@@ -803,6 +803,7 @@ exports.api.methods = (req, res) => {
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }
+// TO DO: this api is deprecated
 exports.api.datasources = (req, res) => {
 	if (req.method === 'GET') {
 		DB.general.any(`
@@ -815,8 +816,6 @@ exports.api.datasources = (req, res) => {
 		const { uuid } = req.session || {}
 		const { tag } = req.body || {}
 
-		// FIXME if the entry already exists we will return 500 here (because of 'one')
-		// maybe use oneOrNone and put a select query in the then body
 		DB.general.one(`
 			INSERT INTO datasources (name, contributor)
 			VALUES ($1, $2)

@@ -1,16 +1,25 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
-	const title = locals.metadata?.page?.title
+	const country_page_title = locals.metadata?.page?.instance_title || null;
+	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}`
 	const description = locals.metadata?.site?.description[language]
 
-	const site_title = locals?.data?.publishable ? locals?.data?.title : null
+	const site_title = locals?.metadata?.page?.public ?
+		locals?.data?.title || locals?.display_template?.title
+		: null;
 
-	const site_description = locals?.data?.publishable ? locals?.data?.sections?.[0]?.items?.find(c => c?.type === 'txt'  && c?.txt?.length)?.txt : null;
-	const img = locals?.data?.publishable ? locals?.data?.sections[0]?.items?.find(c => c?.type === 'img' && c?.src?.length )?.src : null
+	const site_description = locals?.metadata?.page?.public && locals?.item_description?.length
+		? locals?.item_description[0]
+		: null;
+	const img = locals?.metadata?.page?.public && locals?.item_attachments?.length
+		? locals?.item_attachments[0]
+		: null;
+
+	const currentpage_url = locals?.metadata?.page?.currentpage_url
 
 	let ogp_locale = 'en_US'
-
+	const defaultLogoImg = "https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png"
 
 	if(language == 'fr'){
 		ogp_locale = 'fr_FR'
@@ -23,24 +32,29 @@
 	}
 
 %>
+
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
 <meta name='apple-mobile-web-app-capable' content='yes'>
 <meta names='apple-mobile-web-app-status-bar-style' content='black-translucent'>
 <meta name="theme-color" content="#16a0d6e7"/>
 
-<!-- OGP tags -->
-<meta property="og:title" content="<%= title %>">
+<!-- Facebook Meta Tags -->
+<meta property="og:url" content="<%= currentpage_url %>" >
+<meta property="og:type" content="website">
+<meta property="og:title" content="<%= site_title ?? title %>">
 <meta property="og:description" content="<%= site_description ?? description %>">
+<meta property="og:image" content="<%= img ?? defaultLogoImg %>">
 <meta property="og:locale" content="<%= ogp_locale %>">
-<meta property="og:site_name" content="<%= site_title ?? title %>">
+<meta property="og:image:width" content="<%= img ? 300 : 586 %>" />
+<meta property="og:image:height" content="<%=  img ? 200 : 365 %>" />
 
-<meta property="og:image" content="<%= img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
-<meta property="og:image:secure_url" content="<%= img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
-<meta property="og:image:width" content="400" />
-
-<meta property="og:image:alt" content="UNDP Accelerator Labs" />
-
+<!-- Twitter Meta Tags -->
+<meta property="twitter:url" content="<%= currentpage_url %>" >
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= site_title ?? title %>">
+<meta name="twitter:description" content="<%= site_description ?? description %>">
+<meta name="twitter:image" content="<%= img ?? defaultLogoImg %>">
 
 <title><%- title %></title>
 

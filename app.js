@@ -201,7 +201,7 @@ app.route('/apis/:action/:object')
 
 app.get('/api/skills', routes.api.skills) // TO DO: THIS SHOULD BE DEPRECATED
 app.get('/api/methods', routes.api.methods) // TO DO: THIS SHOULD BE DEPRECATED
-app.route('/api/datasources')
+app.route('/api/datasources') // TO DO: THIS SHOULD BE DEPRECATED
 	.get(routes.api.datasources)
 	.post(routes.api.datasources)
 

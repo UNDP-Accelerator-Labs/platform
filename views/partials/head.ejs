@@ -5,17 +5,17 @@
 	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}`
 	const description = locals.metadata?.site?.description[language]
 
-	const site_title = locals?.metadata?.page?.public ? 
+	const site_title = locals?.metadata?.page?.public ?
 		locals?.data?.title || locals?.display_template?.title
-		: ''
+		: null;
 
-	const site_description = locals?.metadata?.page?.public && locals?.item_description?.length 
+	const site_description = locals?.metadata?.page?.public && locals?.item_description?.length
 		? locals?.item_description[0]
-		: ''
-	const img = locals?.metadata?.page?.public && locals?.item_attachments?.length 
+		: null;
+	const img = locals?.metadata?.page?.public && locals?.item_attachments?.length
 		? locals?.item_attachments[0]
-		: ''
-	
+		: null;
+
 	const currentpage_url = locals?.metadata?.page?.currentpage_url
 
 	let ogp_locale = 'en_US'
@@ -46,8 +46,8 @@
 <meta property="og:description" content="<%= site_description ?? description %>">
 <meta property="og:image" content="<%= img ?? defaultLogoImg %>">
 <meta property="og:locale" content="<%= ogp_locale %>">
-<meta property="og:image:width" content="400" />
-<meta property="og:image:height" content="400" />
+<meta property="og:image:width" content="<%= img ? 300 : 586 %>" />
+<meta property="og:image:height" content="<%=  img ? 200 : 365 %>" />
 
 <!-- Twitter Meta Tags -->
 <meta property="twitter:url" content="<%= currentpage_url %>" >

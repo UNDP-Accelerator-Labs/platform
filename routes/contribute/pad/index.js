@@ -1,5 +1,5 @@
 const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -219,11 +219,14 @@ module.exports = (req, res) => {
 					let [ display_template, display_mobilization, tags, data, ...engagementdata ] = results
 					const [ engagement, comments ] = engagementdata || []
 
-					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data })
+					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data });
 
+					const item_description = parsers.getTxt(data);
+					const item_attachments = parsers.getAttachments(data);
+					
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null) })
-					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
+					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments, item_description, item_attachments })
 				}).then(data => {
 					// IF DISPLAY FOR PRINT, RENDER PRINT
 					if (display === 'print') res.render('print/pads/', data)

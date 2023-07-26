@@ -50,7 +50,6 @@ exports.pagemetadata = (_kwargs) => {
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 	let activity = path[1]
-
 	const currentpage_url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
 
 	let { object, space, instance } = params || {}

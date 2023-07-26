@@ -247,7 +247,6 @@ module.exports = async (req, res) => {
 			}
 
 
-			console.log(pinboard_out)
 			
 			const excerpt = pinboard_out?.status > 2 ? { title: pinboard_out.title, txt: pinboard_out.description, p: true } : null
 

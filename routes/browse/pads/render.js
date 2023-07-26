@@ -246,7 +246,11 @@ module.exports = async (req, res) => {
 				tags: statistics.tags
 			}
 
-			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard_out?.slideshow && (!pinboard_out?.editable || activity === 'preview') ? 'slideshow' : display, mscale })
+
+			
+			const excerpt = pinboard_out?.status > 2 ? { title: pinboard_out.title, txt: pinboard_out.description, p: true } : null
+
+			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard_out?.slideshow && (!pinboard_out?.editable || activity === 'preview') ? 'slideshow' : display, mscale, excerpt })
 			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard: pinboard_out, sample_images, stats, filters_menu })
 		}).then(data => res.render('browse/', data))
 		.catch(err => console.log(err))

@@ -52,7 +52,7 @@ exports.pagemetadata = (_kwargs) => {
 	let activity = path[1]
 
 	const currentpage_url = req.protocol + '://' + req.get('host') + req.originalUrl;
-
+	const host_url = req.protocol + '://' + req.get('host');
 	let { object, space, instance } = params || {}
 	if (instance) {
 		object = res.locals.instance_vars.object
@@ -250,6 +250,7 @@ exports.pagemetadata = (_kwargs) => {
 				path,
 				referer: headers.referer,
 				currentpage_url,
+				host_url,
 				activity,
 				object,
 				space,

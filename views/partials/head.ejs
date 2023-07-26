@@ -21,7 +21,7 @@
 	const currentpage_url = locals?.metadata?.page?.currentpage_url
 
 	let ogp_locale = 'en_US'
-	const defaultLogoImg = "https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_opaque.png"
+	const defaultLogoImg = locals?.metadata?.page?.host_url + "/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_opaque.png"
 
 	if(language == 'fr'){
 		ogp_locale = 'fr_FR'

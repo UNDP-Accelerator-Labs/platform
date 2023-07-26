@@ -79,14 +79,7 @@ exports.getAttachments = (_json = {}) => {
 	} else return []
 }
 
-exports.getPadImgs = (_json = {}) => {
-	if (_json?.sections) {
-		const meta = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
-		const attachments = meta.filter(c => c.type === 'img' && c.src?.length > 0)
-			.map(d => `${app_storage}/` + d.src).flat()
-		return attachments
-	} else return []
-}
+
 
 exports.regexQuery = require('./search.js').sqlregex
 

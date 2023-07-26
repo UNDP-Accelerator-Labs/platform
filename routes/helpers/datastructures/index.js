@@ -46,12 +46,12 @@ exports.sessiondata = _data => {
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
-	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
+	const { page, pagecount, map, display, mscale, excerpt, req, res } = _kwargs || {}
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 	let activity = path[1]
 
-	const currentpage_url = req.protocol + '://' + req.get('host') + req.originalUrl;
+	const currentpage_url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
 
 	let { object, space, instance } = params || {}
 	if (instance) {
@@ -246,6 +246,7 @@ exports.pagemetadata = (_kwargs) => {
 				count: pagecount ?? null,
 				language,
 				public,
+				excerpt: excerpt || { title: res?.locals.instance_vars?.title || title, txt: res?.locals.instance_vars?.description || description, p: false },
 
 				path,
 				referer: headers.referer,

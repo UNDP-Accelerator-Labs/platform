@@ -99,6 +99,8 @@
 	</header>
 <% } %>
 
+<div class='filler m'></div>
+
 <%- include ('../../partials/modals.ejs') %>
 
 <% if (locals.source) { %>
@@ -401,10 +403,10 @@
 		</div>
 	</main>
 </div>
-<div class='sidebar lg xl xxl'>
+<div class='sidebar m lg xl xxl'>
 	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
 	{ %>
-		<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
+		<button class='input-toolbox xs sm'><i class='material-icons'>edit</i></button>
 		<div class='media-input-group input-group' tabindex=1>
 			<% if (!templated) { %><button class='scroll-up m lg xl xxl'><label>&rsaquo;</label></button><% } %>
 			<div class='inner'>

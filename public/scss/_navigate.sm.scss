@@ -70,7 +70,7 @@ nav#languages {
 button#expand-nav {
 	position: fixed;
 	display: block;
-	top: 60px;
+	top: 15px;
 	left: 15px;
 	width: 60px;
 	height: 60px;
@@ -148,6 +148,7 @@ nav.tabs {
 			padding-left: 60px;
 			background-color: transparent;
 			font-weight: bold;
+			font-size: $t-main;
 
 			&::after {
 				content: '>';
@@ -413,6 +414,12 @@ header { /* LEFT COlUMN */
 				width: 100%;
 				min-height: auto;
 
+				img.logo {
+					height: 125px;
+					/*margin-left: 80px;*/
+					margin-right: 60px;
+				}
+
 				.create,
 				.save {
 					position: relative;
@@ -651,64 +658,6 @@ header { /* LEFT COlUMN */
 }
 header.open {
 	transform: translateX(0);
-}
-
-#statistics {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
-	padding-bottom: 30px;
-	margin-bottom: 30px;
-	border-bottom: 1px dotted $c-light-grey;
-
-	.statistic {
-		position: relative;
-		width: 25%;
-		margin: 5px 0;
-		text-align: center;
-
-		h1 {
-			font-size: $t-main;
-			line-height: 1.5em;
-			color: $c-dark-blue;
-		}
-		p {
-			margin: 0;
-			font-style: normal;
-			font-size: $t-small;
-			line-height: 1.2em;
-			color: $c-dark-blue;
-		}
-		small {
-			font-size: $t-small;
-			line-height: 1.5em;
-			color: $c-light-grey;
-		}
-	}
-	.statistic:first-child {
-		width: 50%;
-		margin: 15px 0;
-
-		h1 {
-			font-size: $t-xlarge;
-			line-height: 1.2em;
-		}
-		p {
-			font-size: $t-main;
-		}
-	}
-	/*.statistic:nth-child(2n  1) {
-		&::after {
-			content: '';
-			position: absolute;
-			left: 100%;
-			top: 0;
-			width: 0;
-			height: 100%;
-			border-right: 1px dotted $c-light-grey;
-		}
-	}*/
 }
 
 nav#filters {

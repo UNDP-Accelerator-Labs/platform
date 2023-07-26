@@ -19,7 +19,7 @@
 	@import '_orgfooter.lg';
 }
 /* Small devices (tablets, 768px and up) */
-@media screen and (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+@media screen and (min-width: 768px) and (max-width: 1023px) {
 	@import '_base.sm';
 	@import '_navigate.sm';
 	@import '_filter.lg';
@@ -38,11 +38,11 @@
 	@import '_base.m';
 	@import '_navigate.m';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map.m';
 	@import '_modals.lg';
 
 	@import '_login.lg';
-	@import '_pad.lg';
+	@import '_pad.m';
 	@import '_profile.lg';
 	@import '_browse.m';
 	@import '_mobilize.lg';
@@ -68,7 +68,7 @@
 	@import '_base.xl';
 	@import '_navigate.xl';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map.xl';
 	@import '_modals.lg';
 
 	@import '_login.lg';

@@ -8,7 +8,7 @@
 <div id='statistics'>
 	<div class='stat-group'>
 		<div class='statistic'>
-			<h1><%- locals.stats?.filtered %></h1>
+			<h1><%- locals.stats?.filtered > 1000 ? `${Math.floor(locals.stats?.filtered / 100) / 10}K+` : locals.stats?.filtered %></h1>
 			<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
 			
 			<% if (locals.metadata.page.count > 1) { %>
@@ -18,24 +18,26 @@
 			<% } %>
 		</div>
 	</div>
-	<div class='stat-group'>
-		<% if (locals.stats?.contributors) { %>
-			<div class='statistic'>
-				<h2><%- locals.stats?.contributors %></h2>
-				<p><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
-			</div>
-		<% } %>
-		<% if (locals.metadata.page.map && locals.stats?.filtered > 0) { %>
-			<div class='statistic'>
-				<h2><%- locals.clusters[locals.clusters.length - 1]?.length %></h2>
-				<p><%- vocabulary['distinct locations'][language](locals.clusters[locals.clusters.length - 1]?.length !== 1) %></p>
-			</div>
-		<% } %>
-		<% locals.stats?.tags?.forEach(d => { %>
-			<div class='statistic'>
-				<h2><%- d.count %></h2>
-				<p><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || d.type.capitalize() %></p>
-			</div>
-		<% }) %>
-	</div>
+	<% if (locals.stats?.contributors > 0 || (locals.metadata.page.map && locals.stats?.filtered > 0) || locals.stats?.tags?.some(d => d.count > 0)) { %>
+		<div class='stat-group'>
+			<% if (locals.stats?.contributors) { %>
+				<div class='statistic'>
+					<h2><%- locals.stats?.contributors %></h2>
+					<p><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
+				</div>
+			<% } %>
+			<% if (locals.metadata.page.map && locals.stats?.filtered > 0) { %>
+				<div class='statistic'>
+					<h2><%- locals.clusters[locals.clusters.length - 1]?.length %></h2>
+					<p><%- vocabulary['distinct locations'][language](locals.clusters[locals.clusters.length - 1]?.length !== 1) %></p>
+				</div>
+			<% } %>
+			<% locals.stats?.tags?.forEach(d => { %>
+				<div class='statistic'>
+					<h2><%- d.count %></h2>
+					<p><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || d.type.capitalize() %></p>
+				</div>
+			<% }) %>
+		</div>
+	<% } %>
 </div>

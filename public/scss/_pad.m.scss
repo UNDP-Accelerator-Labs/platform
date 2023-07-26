@@ -15,11 +15,16 @@ div.hashed {
 		rgba(150, 150, 150, .1) 6px
 	);
 }
+div.filler {
+	display: block;
+	flex: 1 1 0;
+	pointer-events: none;
+}
 div.document {
 	position: relative;
 	display: block;
 	width: calc(300px * 3 + 15px * 2 - 90px - 2px);
-	padding: 30px 60px 0 60px;
+	padding: 45px 60px 0 60px;
 	background-color: #FFF;
 	border-left: 1px solid $c-light-2;
 	border-right: 1px solid $c-light-2;
@@ -1871,12 +1876,9 @@ footer {
 	.inner {
 		position: relative;
 		display: block;
-		width: calc(300px * 3 + 15px * 2 - 210px - 2px);
+		width: calc(100% - 60px);
 		margin: 0 auto;
-		padding: 30px 60px 30px 60px;
-		border-left: 1px solid #FFF;
-		border-right: 1px solid #FFF;
-		transform: translateX(1px);
+		padding: 30px;
 
 		h2 {
 			font-size: $t-main;
@@ -2242,7 +2244,7 @@ div.display-option.split-screen.right {
 
 .media-input-group {
 	position: sticky;
-	top: 90px;
+	top: 105px;
 	width: 60px;
 	max-height: 80vh;
 	margin-left: -61px;

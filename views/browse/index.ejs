@@ -329,7 +329,7 @@
 
 					<!-- MAP -->
 					<% if (
-						(locals.metadata.page.map
+						(locals.metadata.page.map 
 							&& locals.stats?.filtered > 0)
 						&& !(space === 'pinned'
 							&& (!locals.pinboard?.editable || activity === 'preview')
@@ -395,7 +395,7 @@
 
 <% if (pagedisplay !== 'slideshow') { %><footer>
 <% } else { %><footer class='slideshow'><% } %>
-	<nav class='pagination xs sm'>
+	<nav class='pagination xs sm m'>
 		<% if (activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
 	</nav>
 	<% if (pagedisplay === 'slideshow') { %>

@@ -53,9 +53,10 @@ module.exports = (req, res) => {
                     title,
                     description,
                     mobilization_db,
-                    mobilization
+                    mobilization,
+                    status
                 )
-                VALUES ($1, $2, '', NULL, NULL)
+                VALUES ($1, $2, '', NULL, NULL, 1)
                 ON CONFLICT (title, owner) DO NOTHING
                 RETURNING id
             `, [uuid, limitPromptForPinboard(prompt)]));

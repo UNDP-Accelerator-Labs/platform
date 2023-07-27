@@ -54,6 +54,9 @@
 					<% if (locals.data?.uuid && editable) { %>
 						<input type='hidden' name='id' value='<%- locals.data?.uuid %>'>
 					<% } %>
+					<% if(!locals.data?.uuid && locals.reset_errormessage) { %>
+						<div class="errormessage" ><%- locals.reset_errormessage.replace(/\n/g, '<br>') %></div>
+					<% } %>
 					<div class='main-info info'>
 						<ul>
 							<li>
@@ -90,7 +93,11 @@
 					</div>
 					<% if (editable) { %>
 						<% if (locals.data?.uuid) { %>
-							<button type='button' class='expand-collapsed' id='reset-password'><%- vocabulary['reset password'][language] %></button>
+							<button type='button' class='expand-collapsed' id='reset-password'><%- vocabulary['reset password'][language] %>
+								<% if(locals.reset_errormessage) { %>
+									<div class="errormessage" ><%- locals.reset_errormessage.replace(/\n/g, '<br>') %></div>
+								<% } %>
+							</button>
 							<div class='old-password-info info collapsed'>
 								<ul>
 									<li>
@@ -492,14 +499,11 @@
 			const dropdown = d3.select(node).findAncestor('select').select('.dropdown')
 			dropdown.selectAll('menu li')
 				.classed('hide', function () {
-					console.log(Array.from(dropdown.selectAll('menu li input:checked').nodes()))
 					return !this.textContent.trim().toLowerCase()
 						.includes(node.value.trim().toLowerCase())
 					
 					&& (!dropdown.selectAll('menu li input:checked').size() || !Array.from(dropdown.selectAll('menu li input:checked').nodes())
 						.every(sel => {
-							console.log(node)
-							console.log(node.value)
 							return node.value.trim().toLowerCase().split(',')
 							.map(d => d.trim())
 							.includes(sel.parentNode.textContent.trim().toLowerCase())

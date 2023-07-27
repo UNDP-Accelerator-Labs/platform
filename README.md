@@ -98,3 +98,58 @@ Run
 ```
 make -s publish
 ```
+
+## Updating to use ltree
+
+For updating tables to use ltree (if you didn't run `init.sql` from scratch)
+run:
+
+```
+make -s script ENV=<yourenv> CMD=setup_versions.js TABLE=pads ACTION=update
+make -s script ENV=<yourenv> CMD=setup_versions.js TABLE=mobilizations ACTION=update
+make -s script ENV=<yourenv> CMD=setup_versions.js TABLE=templates ACTION=update
+```
+
+## Updating to move pinboards
+
+For moving the pinboards tables (if you didn't run `init.sql` from scratch)
+run:
+
+```
+make script ENV=.ap.env CMD=transfer_pinboards.js ACTION=transfer
+make script ENV=.exp.env CMD=transfer_pinboards.js ACTION=transfer
+make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=transfer
+make script ENV=.global.env CMD=transfer_pinboards.js ACTION=transfer
+```
+
+Where the env files contain the connections to the respective dbs.
+At this point the changes are still reversible via:
+
+```
+make script ENV=.ap.env CMD=transfer_pinboards.js ACTION=rollback
+make script ENV=.exp.env CMD=transfer_pinboards.js ACTION=rollback
+make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=rollback
+make script ENV=.global.env CMD=transfer_pinboards.js ACTION=rollback
+```
+
+Manually check for duplicate `owner, title` pairs in the `pinboards` table
+and ensure to solve those conflicts. Then recreate the `unique_pinboard_owner`
+constraint using the version in `init.sql`. You can find those duplicates via:
+```
+SELECT t.owner, t.title, t.count FROM (
+    SELECT owner, title, COUNT(*) count FROM pinboards GROUP BY owner, title
+) as t WHERE t.count > 1
+```
+Once the duplicates are dealt with (e.g., by renaming) run:
+```
+ALTER TABLE pinboards DROP CONSTRAINT IF EXISTS unique_pinboard_owner;
+ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
+```
+To finalize the changes and making it irreversible run:
+
+```
+make script ENV=.ap.env CMD=transfer_pinboards.js ACTION=finish
+make script ENV=.exp.env CMD=transfer_pinboards.js ACTION=finish
+make script ENV=.sm.env CMD=transfer_pinboards.js ACTION=finish
+make script ENV=.global.env CMD=transfer_pinboards.js ACTION=finish
+```

@@ -16,6 +16,7 @@ RUN apt-get install -y --no-install-recommends \
     unzip \
     zip \
     ffmpeg
+RUN npm install -g npm@latest
 WORKDIR /usr/src/app
 COPY package.json .
 COPY package-lock.json .

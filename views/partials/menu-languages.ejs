@@ -13,7 +13,6 @@
 
 <nav id='languages'>
 	<menu>
-		<!-- DONE => TO DO: PASS THIS FROM CONFIG FILE (THERE MIGHT NOT ALWAYS BE A SUITE) -->
 		<li class='home-btn lg'>
 			<a href='<%= app_suite_url %>'>Accelerator Labs Suite</a>
 		</li>
@@ -34,7 +33,7 @@
 			<% if (!publicpage) { %>
 				<span><%- vocabulary['logged in'][language](username, uuid) %>. | </span><a href='/logout' class='logout'><%- vocabulary['log out'][language] %></a>
 			<% } else { %>
-				<a href='/login' class='login'><%- vocabulary['log in'][language] %></a> 
+				<a href='/login' class='login'><%- vocabulary['log in'][language] %></a>
 			<% } %>
 		</li>
 	</menu>

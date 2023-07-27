@@ -1,7 +1,7 @@
 const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers } = include('routes/helpers/')
 
-module.exports = (req, res) => {	
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	const { object } = req.params || {}
 	const { id, template, source, mobilization, display } = req.query || {}
@@ -10,8 +10,7 @@ module.exports = (req, res) => {
 	const path = req.path.substring(1).split('/')
 	const activity = path[1]
 
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
@@ -57,7 +56,7 @@ module.exports = (req, res) => {
 						const batch1 = metafields.filter(d => ['tag', 'index'].includes(d.type))
 						.map(d => {
 							return t1.any(`
-								SELECT id, key, name, type FROM tags 
+								SELECT id, key, name, type FROM tags
 								WHERE type = $1
 									AND language = (COALESCE((SELECT language FROM tags WHERE type = $1 AND language = $2 LIMIT 1), 'en'))
 							;`, [ d.label, language ])
@@ -91,7 +90,7 @@ module.exports = (req, res) => {
 							CASE WHEN p.id IN (SELECT pad FROM review_requests)
 								THEN 1
 								ELSE 0
-							END AS review_status, 
+							END AS review_status,
 
 							CASE WHEN p.id IN (SELECT review FROM reviews)
 								THEN TRUE
@@ -100,31 +99,31 @@ module.exports = (req, res) => {
 
 							-- EXAMPLE FROM https://stackoverflow.com/questions/43053262/return-row-position-postgres
 							COALESCE(
-								(SELECT idx FROM (SELECT review, row_number() over(ORDER BY id) AS idx FROM reviews 
+								(SELECT idx FROM (SELECT review, row_number() over(ORDER BY id) AS idx FROM reviews
 									WHERE pad = p.source) res
 									WHERE review = p.id
 								)::INT,
 							NULL) AS review_idx,
 
 							COALESCE (
-								(SELECT jsonb_agg(json_build_object('id', id, 'owner', owner)) FROM pads 
-								WHERE id IN (SELECT review FROM reviews WHERE status >= 2) 
+								(SELECT jsonb_agg(json_build_object('id', id, 'owner', owner)) FROM pads
+								WHERE id IN (SELECT review FROM reviews WHERE status >= 2)
 									AND source = p.id
 								GROUP BY source
 							)::TEXT, '[]')::JSONB AS reviews,
 
 							-- THESE ARE THE ENGAGEMENT CASE STATEMENTS
 							$1:raw
-						
+
 						FROM pads p
-						
+
 						LEFT JOIN (
 							SELECT docid, user, array_agg(DISTINCT type) AS types FROM engagement
 							WHERE user = $2
 								AND doctype = 'pad'
 							GROUP BY (docid, user)
 						) e ON e.docid = p.id
-						
+
 						WHERE p.id = $3::INT
 					;`, [ engagement.cases, uuid, id ])
 					.then(async result => {
@@ -143,7 +142,7 @@ module.exports = (req, res) => {
 					const engagement = engagementsummary({ doctype: 'pad', engagementtypes, docid: id, uuid })
 					// GET THE ENGAGEMENT METRICS
 					batch.push(t.oneOrNone(`
-						SELECT 
+						SELECT
 							-- THESE ARE THE ENGAGEMENT COALESCE STATEMENTS
 							$1:raw
 						FROM pads p
@@ -162,16 +161,16 @@ module.exports = (req, res) => {
 								END AS date,
 
 								COALESCE(jsonb_agg(jsonb_build_object(
-									'id', r.id, 
-									'message', r.message, 
+									'id', r.id,
+									'message', r.message,
 									'contributor', r.contributor,
-									'date', CASE 
+									'date', CASE
 										WHEN AGE(now(), r.date) < '0 second'::interval -- TECHNICALLY THIS SHOULD NOT BE NEEDED, AS MESSAGES CANNOT BE PROGRAMMED FOR LATER SEND
 											THEN jsonb_build_object('interval', 'positive', 'date', to_char(r.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(r.date, now())), 'hours', EXTRACT(hour FROM AGE(r.date, now())), 'days', EXTRACT(day FROM AGE(r.date, now())), 'months', EXTRACT(month FROM AGE(r.date, now())))
 										ELSE jsonb_build_object('interval', 'negative', 'date', to_char(r.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), r.date)), 'hours', EXTRACT(hour FROM AGE(now(), r.date)), 'days', EXTRACT(day FROM AGE(now(), r.date)), 'months', EXTRACT(month FROM AGE(now(), r.date)))
 										END
 								)) FILTER (WHERE r.id IS NOT NULL), '[]') AS replies
-								
+
 								-- CASE WHEN AGE(now(), c.date) < '1 hour'::interval
 								-- 		THEN to_char(AGE(now(), c.date), 'MI') || ' minutes ago'
 								-- 	WHEN AGE(now(), c.date) < '1 day'::interval
@@ -182,8 +181,8 @@ module.exports = (req, res) => {
 								-- END AS date,
 
 								-- COALESCE(jsonb_agg(jsonb_build_object(
-								-- 	'id', r.id, 
-								-- 	'message', r.message, 
+								-- 	'id', r.id,
+								-- 	'message', r.message,
 								-- 	'contributor', r.contributor,
 								-- 	'date', CASE WHEN AGE(now(), r.date) < '1 hour'::interval
 								-- 			THEN to_char(AGE(now(), r.date), 'MI') || ' minutes ago'
@@ -208,8 +207,8 @@ module.exports = (req, res) => {
 							ORDER BY c.date DESC
 						;`, [ id ]).then(async results => {
 							const data = await join.users(results, [ language, 'contributor' ])
-							return Promise.all(data.map(async d => { 
-								d.replies = await join.users(d.replies, [ language, 'contributor' ]) 
+							return Promise.all(data.map(async d => {
+								d.replies = await join.users(d.replies, [ language, 'contributor' ])
 								return d
 							}))
 						}))
@@ -220,10 +219,13 @@ module.exports = (req, res) => {
 					let [ display_template, display_mobilization, tags, data, ...engagementdata ] = results
 					const [ engagement, comments ] = engagementdata || []
 
-					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data })
+					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data });
 
+					const excerpt = data.status > 2 ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
+					// const item_attachments = parsers.getPadImgs(data)
+				
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
-					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null) })
+					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
 				}).then(data => {
 					// IF DISPLAY FOR PRINT, RENDER PRINT
@@ -249,9 +251,8 @@ async function check_authorization (_kwargs) {
 			if (used_template) write = write.templated
 		} else write = write.blank
 	}
-	
-	let collaborators_ids = collaborators.map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (public || rights < write) {
 		// if public and status < 3 then not authorized
@@ -276,8 +277,8 @@ async function check_authorization (_kwargs) {
 				SELECT TRUE AS bool FROM pads
 				WHERE id = $1::INT
 					AND (
-						owner IN ($2:csv) 
-						OR owner IN ( 
+						owner IN ($2:csv)
+						OR owner IN (
 							-- THIS IS FOR CURATING PADS CONTRIBUTED TO MOBILIZATIONS
 							SELECT m.owner FROM mobilizations m
 							INNER JOIN mobilization_contributions mc
@@ -309,7 +310,7 @@ async function check_authorization (_kwargs) {
 
 				if (source) {
 					// INTERCEPT IF THERE ARE ALREADY FOLLOW UPS IN THIS MOBILIZATION
-					// FIRST, CHECK IF THERE IS A SOURCE AND THIS IS IN A MOBILIZATION 
+					// FIRST, CHECK IF THERE IS A SOURCE AND THIS IS IN A MOBILIZATION
 					// AND WHETHER THE PAD HAS ALREADY BEEN FOLLOWED UP IN THIS MOBILIZATION
 					batch.push(t.one(`
 						SELECT COUNT (mc.pad) FROM mobilization_contributions mc

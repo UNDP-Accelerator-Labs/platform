@@ -8,6 +8,7 @@ exports.process = require('./process.js')
 exports.forgetPassword = require('./forget-password.js').forgetPassword
 exports.getResetToken = require('./forget-password.js').getResetToken
 exports.updatePassword = require('./forget-password.js').updatePassword
+exports.isPasswordSecure = require('./forget-password.js').isPasswordSecure
 
 
 exports.public = (req, res) => {

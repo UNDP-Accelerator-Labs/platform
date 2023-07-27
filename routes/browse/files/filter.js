@@ -1,16 +1,16 @@
 const { DB, engagementtypes } = include('config/')
-const { parsers } = include('routes/helpers/')
+const { parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = req => {
 	const { uuid, country, rights, collaborators } = req.session || {}
 	const { space } = req.params || {}
 	let { pads, search, contributors, countries, templates, mobilizations, methods, datasources, sdgs, tags, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const sudo = rights > 2
-	
+
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
 	else page = +page
-	
+
 	// FILTERS
 	return new Promise(async resolve => {
 		// TO DO: CHANGE pads TO files, ALSO IN THE req.query
@@ -25,22 +25,22 @@ module.exports = req => {
 			f_countries = await DB.general.any(`
 				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
 			;`, [ countries ])
-			.then(results =>  DB.pgp.as.format(`f.owner IN ($1:csv)`, [ results.map(d => d.uuid) ]))
+			.then(results =>  DB.pgp.as.format(`f.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err))
 		}
 
 		const f_templates = templates ? DB.pgp.as.format(`f.source IN (SELECT id FROM pads WHERE template IN ($1:csv))`, [ templates ]) : null
 		// THE MOBILIZATION FILTER BELOW WILL ONLY PICK UP ON FILES GENERATED IN THE PLATFORM, NOT ON FILES UPLOADED
 		const f_mobilizations = mobilizations ? DB.pgp.as.format(`f.source IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]) : null
-		
+
 		// PUBLIC/ PRIVATE FILTERS
 		let f_space = ''
-		if (space === 'private' && !sudo) f_space = DB.pgp.as.format(`AND f.owner IN ($1:csv)`, [ collaborators.map(d => d.uuid) ])
-		
+		if (space === 'private' && !sudo) f_space = DB.pgp.as.format(`AND f.owner IN ($1:csv)`, [ safeArr(collaborators.map(d => d.uuid), DEFAULT_UUID) ])
+
 		engagementtypes.forEach(e => {
 			if (space === `${e}s`) f_space = DB.pgp.as.format(`AND f.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'file' AND type = $2)`, [ uuid, e ])
 		})
-		
+
 		if (space === 'shared')	f_space = DB.pgp.as.format(`AND f.status = 2`)
 		if (space === 'public')	f_space = DB.pgp.as.format(`AND f.status = 3`)
 		// ORDER

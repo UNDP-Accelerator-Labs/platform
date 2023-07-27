@@ -30,7 +30,7 @@
 	// 	&& mapscale !== 'full-screen'
 	// 	&& locals.metadata.page.id === 1
 	// 	&& slides?.length > 0)
-	
+
 	const is_intropage = false
 	const welcome_module = locals.metadata.site.welcome_module
 %>
@@ -439,7 +439,6 @@
 
 	function renderVignette (_section, _kwargs) {
 		const { data, display } = _kwargs
-		console.log(data)
 
 		const entry = new Entry({
 			parent: _section,

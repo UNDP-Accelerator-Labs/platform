@@ -803,6 +803,7 @@ exports.api.methods = (req, res) => {
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }
+// TO DO: this api is deprecated
 exports.api.datasources = (req, res) => {
 	if (req.method === 'GET') {
 		DB.general.any(`

@@ -2,7 +2,6 @@ const {
 	app_id,
 	app_title: title,
 	app_description: description,
-	app_title_short: app_db,
 	app_languages,
 	app_storage,
 	app_suite_url,
@@ -15,11 +14,11 @@ const {
 	welcome_module,
 	page_content_limit,
 	DB,
+	ownDB,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
-const { app_title_short } = require('../../../config')
 
 if (!exports.legacy) exports.legacy = {}
 
@@ -47,10 +46,11 @@ exports.sessiondata = _data => {
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
-	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
+	const { page, pagecount, map, display, mscale, excerpt, req, res } = _kwargs || {}
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 	let activity = path[1]
+	const currentpage_url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
 
 	let { object, space, instance } = params || {}
 	if (instance) {
@@ -151,20 +151,47 @@ exports.pagemetadata = (_kwargs) => {
 		} else batch.push(null)
 		// PINBOARD LIST
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
-			batch.push(t.any(`
-				SELECT pb.id, pb.title, pb.status,
-					COUNT (pc.pad) AS size,
-					COUNT (DISTINCT (p.owner)) AS contributors
+			batch.push(ownDB().then(async (ownId) => {
+				const pinboard_stats = await DB.general.any(`
+					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size
 
-				FROM pinboards pb
-				INNER JOIN pinboard_contributions pc
-					ON pc.pinboard = pb.id
-				INNER JOIN pads p
-					ON pc.pad = p.id
+					FROM pinboards pb
+					INNER JOIN pinboard_contributions pc
+						ON pc.pinboard = pb.id
 
-				WHERE pb.owner = $1
-				GROUP BY pb.id
-			;`, [ uuid ]))
+					WHERE pb.owner = $1 AND pc.db = $2
+					GROUP BY pb.id
+				;`, [ uuid, ownId ]);
+				const pinboard_pads = await DB.general.any(`
+					SELECT pb.id, pc.pad
+
+					FROM pinboards pb
+					INNER JOIN pinboard_contributions pc
+						ON pc.pinboard = pb.id
+
+					WHERE pb.owner = $1 AND pc.db = $2
+				;`, [ uuid, ownId ]);
+				const pads = new Set();
+				const pinpads = new Map();
+				pinboard_pads.forEach((row) => {
+					pads.add(row.pad);
+					const padlist = pinpads.get(row.id) ?? [];
+					padlist.push(row.pad);
+					pinpads.set(row.id, padlist);
+				});
+				const padIds = pads.size ? [...pads] : [-1];
+				const owners = new Map((await t.any(`
+					SELECT p.id, p.owner
+					FROM pads p
+					WHERE p.id IN ($1:csv)
+				;`, [ padIds ])).map((row) => [row.id, row.owner]));
+				return pinboard_stats.map((stats) => {
+					return {
+						...stats,
+						contributors: new Set(pinpads.get(stats.id).map((pad_id) => owners.get(pad_id))).size,
+					}
+				});
+			}).catch(err => console.log(err)));
 		} else batch.push(null)
 
 		return t.batch(batch)
@@ -202,7 +229,6 @@ exports.pagemetadata = (_kwargs) => {
 				engagementtypes,
 				welcome_module,
 				app_storage,
-				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
 				app_id,
 				app_suite_url,
 			},
@@ -219,9 +245,11 @@ exports.pagemetadata = (_kwargs) => {
 				count: pagecount ?? null,
 				language,
 				public,
+				excerpt: excerpt || { title: res?.locals.instance_vars?.title || title, txt: res?.locals.instance_vars?.description || description, p: false },
 
 				path,
 				referer: headers.referer,
+				currentpage_url,
 				activity,
 				object,
 				space,

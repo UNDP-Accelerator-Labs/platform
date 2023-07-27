@@ -9,7 +9,8 @@ queries for building a collection featuring a certain topic. In the future we ar
 let the journey description prioritize relevant pads in your searches. Therefore, it is best to
 verbosely describe what you are looking for when naming a journey. 
 
-We collect questions and corresponding documents for potentially training machine learning models.
+For the above mentioned suggestion feature, we collect questions and corresponding documents
+for potentially training machine learning models.
 The data is anonymized and any connection to a user or account is removed prior to training.
 
 The goal of the project is to create a language model that can suggest documents

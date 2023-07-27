@@ -5,10 +5,10 @@
 	const language = locals.metadata.page.language
 %>
 
-<div id='statistics'>
+<div id='statistics' class="google-translate-attr">
 	<div class='statistic'>
 		<h1><%- locals.stats?.filtered %></h1>
-		<p translate="no"><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
+		<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
 		
 		<% if (locals.metadata.page.count > 1) { %>
 			<small ><%- vocabulary['showing range'][language](locals.stats?.displayed * (page - 1) + 1, Math.min(locals.stats?.displayed * page, locals.stats?.filtered)) %></small>

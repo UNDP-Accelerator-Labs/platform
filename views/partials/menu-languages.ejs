@@ -12,7 +12,7 @@
 %>
 
 <nav id='languages'>
-	<menu>
+	<menu class="google-translate-attr">
 		<li class='home-btn lg'>
 			<a href='<%= app_suite_url %>'>Accelerator Labs Suite</a>
 		</li>
@@ -23,9 +23,7 @@
 						<a class='<% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
 					</li>
 				<% }) %>
-				<% if(is_public) { %>
-					<li  class='googletranslator' id="google_translate_element"></li >
-				<%} %>
+				<li  class='googletranslator' id="google_translate_element"></li >
 				
 			</ul>
 		</li>

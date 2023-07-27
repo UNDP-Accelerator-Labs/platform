@@ -221,9 +221,9 @@ module.exports = (req, res) => {
 
 					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data });
 
-					const excerpt = data.status > 2 ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
+					const excerpt = (data && data.status && data.status > 2) ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
 					// const item_attachments = parsers.getPadImgs(data)
-				
+
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })

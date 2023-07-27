@@ -221,12 +221,12 @@ module.exports = (req, res) => {
 
 					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data });
 
-					const item_description = parsers.getTxt(data);
-					const item_attachments = parsers.getAttachments(data);
-					
+					const excerpt = data.status > 2 ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
+					// const item_attachments = parsers.getPadImgs(data)
+				
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
-					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null) })
-					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments, item_description, item_attachments })
+					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt })
+					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
 				}).then(data => {
 					// IF DISPLAY FOR PRINT, RENDER PRINT
 					if (display === 'print') res.render('print/pads/', data)

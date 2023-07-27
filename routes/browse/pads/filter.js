@@ -37,13 +37,13 @@ module.exports = async (req, res) => {
 						.then(result => {
 							if (!result) {
 								return DB.general.oneOrNone(`
-									SELECT id, title FROM pinboards
+									SELECT id, title, description FROM pinboards
 									WHERE LOWER(title) = LOWER($1)
 										AND status >= 2
 									LIMIT 1
 								;`, [ decodeURI(instance) ])  // CHECK WHETHER THE instance IS A PINBOARD: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
 								.then(result => {
-									if (result) return { object: 'pads', space: 'pinned', pinboard: result?.id, title: result?.title }
+									if (result) return { object: 'pads', space: 'pinned', pinboard: result?.id, title: result?.title, description: result?.description }
 									else return res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
 								}).catch(err => console.log(err))
 							} else return { object: 'pads', space: 'public', teams: [result?.id], title: result?.name }

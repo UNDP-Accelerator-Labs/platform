@@ -375,34 +375,47 @@
         }
 
         hasJourney() {
-            return !!this.currentId && !!this.currentPrompt;
+            return this.past.length > 0;
         }
 
         updateDocs(cbs) {
-            const hasJourney = this.hasJourney();
+            const showJourney = this.hasJourney();
             d3.selectAll('div.journey-doc').styles({
-                'display': hasJourney ? null : 'none',
+                'display': showJourney ? null : 'none',
             });
-            if (!hasJourney) {
+            if (!showJourney) {
                 return;
             }
             const useFull = this.useFullPromptForSelect;
             d3.selectAll('div.journey-doc span select.journey-short')
-            .addElems('option', 'journey-short-list', this.past)
-            .attrs({
-                'value': (d) => d['id'],
+            .addElems('option', 'journey-short-list', [
+                {
+                    id: null,
+                    prompt: `<%= vocab['select'] %>`,
+                    short: `<%= vocab['select'] %>`,
+                },
+                ...this.past,
+            ]).attrs({
+                'value': (d) => `${d['id']}`,
             })
             .text((d) => useFull ? d['prompt'] : d['short']);
             const currentId = this.currentId;
             d3.selectAll('div.journey-doc span select.journey-short')
             .each(function () {
-                d3.select(this).node().value = currentId;
+                d3.select(this).node().value = `${currentId}`;
             })
             d3.selectAll('button.journey-btn-approve').classed('journey-btn-active', (d) => {
                 return this.isDocApprove(d.id);
+            }).styles({
+                'display': (d) => currentId ? null : 'none',
             });
             d3.selectAll('button.journey-btn-dislike').classed('journey-btn-active', (d) => {
                 return this.isDocDislike(d.id);
+            }).styles({
+                'display': (d) => currentId ? null : 'none',
+            });
+            d3.selectAll('span.journey-colon').styles({
+                'display': (d) => currentId ? null : 'none',
             });
             d3.selectAll('article.pad').classed('journey-article-inactive', (d) => {
                 return this.isDocDislike(d.id);
@@ -441,7 +454,7 @@
                     that.updateById(+curId);
                 }
             });
-            docSpan.addElem('span').text(": ");
+            docSpan.addElem('span').text(": ").classed('journey-colon', true);
             doc.addElem('button')
             .classed('journey-btn-approve', true)
             .text("<%= vocab['doc-approve'] %>")

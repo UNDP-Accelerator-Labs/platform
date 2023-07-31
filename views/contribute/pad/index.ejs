@@ -20,14 +20,6 @@
 <html lang='<%- language %>'>
 <head>
 
-<% if (locals.data?.status >= 2 && !locals.data?.is_review) { %>
-	<!-- TO DO: FINISH THIS -->
-	<!-- <meta property='og:title' content='<%- locals.data.title %>' /> -->
-	<!-- <meta property='og:type' content='article' /> -->
-	<!-- <meta property='og:url' content='https://www.imdb.com/title/tt0117500/' /> -->
-	<!-- <meta property='og:image' content='https://ia.media-imdb.com/images/rock.jpg' /> -->
-<% } %>
-
 <%- include ('../../partials/head.ejs') %>
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
@@ -784,8 +776,6 @@
 			// datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
 			datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
 			datum.has_content = datum.txt?.trim()?.length > 0
-			console.log(JSON.stringify(datum.txt))
-			console.log(JSON.stringify(datum.txt).trim())
 			items.push(datum)
 		}
 		else if (datum.type === 'embed') {
@@ -1318,7 +1308,10 @@
 
 		if (data.sections) {
 			data.sections.forEach(async d => {
-				if (!editing) d.items = d.items.filter(c => c.has_content) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
+				if (!editing) d.items = d.items.filter(c => {
+					if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
+					else return c.has_content
+				}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
 				<% if (pagedisplay === 'slideshow') { %>
 					await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
 				<% } else { %>

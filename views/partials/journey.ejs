@@ -1,0 +1,475 @@
+<%
+    const language = locals.metadata.page.language;
+    const vocab = vocabulary['journey'][language];
+    const own_db = locals.metadata.site.own_db;
+    const journey_info_url = 'https://github.com/UNDP-Accelerator-Labs/platform/blob/jk-like/journey.md';
+%>
+<script type='text/javascript'>
+    class Journey {
+        constructor() {
+            this.past = [];
+            this.docs = [];
+            this.docLookup = {};
+            this.currentId = null;
+            this.currentPrompt = '';
+            this.mainInput = null;
+            this.infoButton = null;
+            this.datalist = null;
+            this.useFullPromptForSelect = false;
+
+            this.listUpdateActive = false;
+            this.listUpdateCbs = [];
+            this.collectionId = null;
+            this.collectionUpdateCbs = [];
+
+            this.ownDb = (<%- own_db %>);
+            if (sessionStorage.journeyId) {
+                this.currentId = +sessionStorage.journeyId || null;
+            }
+            if (sessionStorage.journeyPrompt) {
+                this.currentPrompt = this.normalizeJourneyPrompt(sessionStorage.journeyPrompt);
+            }
+            this.consent = true;  // we assume consent was given until an API call says otherwise
+        };
+
+        setUseFullPromptForSelect(isUseFull) {
+            this.useFullPromptForSelect = isUseFull;
+        }
+
+        getInputValue() {
+            if (!this.mainInput) {
+                return null;
+            }
+            const node = this.mainInput.node();
+            if (!node) {
+                return null;
+            }
+            return node.value;
+        }
+
+        normalizeJourneyPrompt(prompt) {
+            if (!prompt) {
+                return '';
+            }
+            return prompt.replace(/[\s\n\r]+/g, ' ').trim();
+        }
+
+        updateCurrentJourney(curId, curPrompt) {
+            const normPrompt = this.normalizeJourneyPrompt(curPrompt);
+            this.currentPrompt = normPrompt;
+            if (normPrompt !== sessionStorage.journeyPrompt) {
+                sessionStorage.journeyPrompt = normPrompt;
+                if (!normPrompt) {
+                    curId = null;
+                }
+            }
+            this.currentId = curId;
+            if (curId !== sessionStorage.journeyId) {
+                sessionStorage.journeyId = +curId || 0;
+            }
+            if (this.mainInput !== null) {
+                const mainInput = this.mainInput.node();
+                if (mainInput) {
+                    if (mainInput.value !== normPrompt) {
+                        mainInput.value = normPrompt;
+                    }
+                }
+            }
+            this.updateJourneyMainButton(
+                this.getJourneyByPrompt(normPrompt)[0],
+                curId);
+            this.updateJourneyDocs();
+        }
+
+        getJourneyById(journeyId) {
+            return this.past.reduce((prev, d) => {
+                if (d['id'] === journeyId) {
+                    return [d['id'], d['prompt']];
+                }
+                return prev;
+            }, [null, '']);
+        }
+
+        updateById(newId) {
+            const [nextId, nextPrompt] = this.getJourneyById(+newId);
+            this.updateCurrentJourney(nextId, nextPrompt);
+        }
+
+        getJourneyByPrompt(journeyPrompt) {
+            const prompt = this.normalizeJourneyPrompt(journeyPrompt);
+            return this.past.reduce((prev, d) => {
+                if (d['prompt'] === prompt) {
+                    return [d['id'], d['prompt']];
+                }
+                return prev;
+            }, [null, prompt]);
+        }
+
+        getShortPrompt(journeyId) {
+            return this.past.reduce((prev, d) => {
+                if (d['id'] === journeyId) {
+                    return d['short'];
+                }
+                return prev;
+            }, '');
+        }
+
+        updateJourneyMainButton(journeyId, currentId) {
+            if (this.mainInput !== null) {
+                const value = this.getInputValue();
+                const normPrompt = this.normalizeJourneyPrompt(value);
+                this.mainInput.classed('has-value', !!normPrompt);
+            }
+        }
+
+        checkError(err, cb) {
+            if (err) {
+                if (err.status === 401) {  // not logged in
+                    cb && cb();
+                    this.updateCurrentJourney(null, '');
+                    return;
+                } else if (err.status === 403) {  // did not consent
+                    cb && cb();
+                    this.updateCurrentJourney(null, '');
+                    this.consent = false;
+                    return;
+                }
+            }
+            console.error(err);
+        }
+
+        updateJourneyList(cb = null) {
+            if (cb) {
+                this.listUpdateCbs.push(cb);
+            }
+            if (this.listUpdateActive) {
+                return;
+            }
+            this.listUpdateActive = true;
+            GET('/journey/list?lang=<%= language %>', true, true).then((result) => {
+                this.consent = true;
+                this.listUpdateActive = false;
+                const journeys = result['journeys'];
+                this.past = journeys;
+                const [curId, curPrompt] = this.getJourneyById(this.currentId);
+                this.updateCurrentJourney(curId, curPrompt);
+                const cbs = this.listUpdateCbs;
+                this.listUpdateCbs = [];
+                cbs.forEach((curCb) => curCb());
+            }).catch((err) => {
+                this.listUpdateActive = false;
+                this.checkError(err, () => {
+                    this.past = [];
+                    const cbs = this.listUpdateCbs;
+                    this.listUpdateCbs = [];
+                    cbs.forEach((curCb) => curCb());
+                });
+            });
+        }
+
+        updateJourneyDatalist(cb = null) {
+            const datalist = this.datalist;
+            if (!datalist) {
+                return;
+            }
+            this.updateJourneyList(() => {
+                datalist.addElems('option', 'journey-past-elem', this.past)
+                .attrs({
+                    'value': (d) => this.normalizeJourneyPrompt(d['prompt']),
+                    'label': (d) => `<%= vocab['last_access'] %> ${d['last_access_ago']}`,
+                });
+                cb && cb();
+            });
+        }
+
+        updateJourneyDocs(cb = null) {
+            if (cb) {
+                this.collectionUpdateCbs.push(cb);
+            }
+            const curId = this.currentId;
+            if (!curId) {
+                this.docs = [];
+                this.docLookup = {};
+                const cbs = this.collectionUpdateCbs;
+                this.collectionUpdateCbs = [];
+                this.updateDocs(cbs);
+                return;
+            }
+            if (this.collectionId === curId) {
+                return;
+            }
+            this.collectionId = curId;
+            GET(`/journey/collection?journey_id=${curId}`, true, true).then((result) => {
+                if (this.collectionId !== null && this.collectionId !== curId) {
+                    return;
+                }
+                this.collectionId = null;
+                const docs = result['pads'];
+                const newLookup = {};
+                const ownDb = this.ownDb;
+                docs.forEach((doc) => {
+                    if (doc['db'] !== ownDb) {
+                        return;
+                    }
+                    newLookup[`${doc['pad']}`] = doc['is_included'];
+                });
+                this.docs = docs;
+                this.docLookup = newLookup;
+                const cbs = this.collectionUpdateCbs;
+                this.collectionUpdateCbs = [];
+                this.updateDocs(cbs);
+            }).catch((err) => {
+                this.collectionId = null;
+                this.checkError(err, () => {
+                    this.docs = [];
+                    this.docLookup = {};
+                    const cbs = this.collectionUpdateCbs;
+                    this.collectionUpdateCbs = [];
+                    this.updateDocs(cbs);
+                });
+            });
+        }
+
+        isDocApprove(docId) {
+            return this.docLookup[`${docId}`] === true;
+        }
+
+        isDocDislike(docId) {
+            return this.docLookup[`${docId}`] === false;
+        }
+
+        updatePrompt(userPrompt, allowReport) {
+            const currentId = this.currentId;
+            this.updateJourneyDatalist(() => {
+                const [curId, curPrompt] = this.getJourneyByPrompt(userPrompt);
+                if (curId !== null && curId === currentId) {
+                    if (allowReport) {
+                        this.updateJourneyDocs();
+                    }
+                } else if (curId !== null) {
+                    this.updateCurrentJourney(curId, curPrompt);
+                } else if (curPrompt) {
+                    PUT(`/journey/create`, {
+                        'prompt': curPrompt,
+                    }, true, true).then((result) => {
+                        this.updateCurrentJourney(result['journey'], result['prompt']);
+                        this.updateJourneyDatalist();
+                    }).catch((err) => {
+                        this.checkError(err);
+                    });
+                } else {
+                    this.updateCurrentJourney(null, '');
+                }
+            });
+        }
+
+        confirmJourneyPrompt(allowReport) {
+            const mainInput = this.mainInput;
+            if (mainInput === null) {
+                return;
+            }
+            const userPrompt = this.getInputValue();
+            this.updatePrompt(userPrompt, allowReport);
+        }
+
+        consentFeature() {
+            const journeyInfoUrl = '<%= journey_info_url %>';
+            const message = `
+                <h2>You need to give consent to use this feature!</h2>
+                <p>
+                    This feature enables you to easily and serendipitously
+                    create collections that answer questions about the corpus.
+                    The questions and selected documents might be used for
+                    training a machine learning model to improve the results.
+                    All data is anonymized and in no way connected to your account.
+                </p>
+                <p>
+                    <a href="${journeyInfoUrl}" target="_blank">Click here for more information.</a>
+                </p>
+                </p>
+                <p>
+                    Please indicate below that you understood and approve of
+                    the use of the indicated data for further uses.
+                </p>
+            `;
+            renderPromiseModal({
+                message,
+                opts: [
+                    { node: 'button', type: 'button', label: 'I Approve!', resolve: true },
+                    { node: 'button', type: 'button', label: 'Not Okay!', resolve: false },
+                ],
+            }).then((consent) => {
+                if(!consent) {  // not given consent or closed window
+                    return;
+                }
+                PUT('/journey/consent', {
+                    consent: 'approve',
+                }, true, true).then((result) => {
+                    this.consent = true;
+                    this.updateJourneyDatalist();
+                }).catch((err) => {
+                    this.checkError(err);
+                });
+            }).catch((err) => console.error(err));
+        }
+
+        maybeAddDatalist(sel) {
+            if (this.datalist !== null) {
+                return;
+            }
+            const datalist = sel.addElem('datalist').attrs({
+                'id': 'journey-past',
+            });
+            this.datalist = datalist;
+        }
+
+        addJourneyMain(sel) {
+            const mainInput = sel.addElem('input')
+            .attrs({
+                'type': 'text',
+                'id': `journey-main`,
+                'list': 'journey-past',
+            })
+            .on('keydown', () => {
+                const evt = d3.event;
+                if (evt.code === 'Enter' || evt.keyCode === 13) {
+                    this.confirmJourneyPrompt(false);
+                    evt.preventDefault();
+                    evt.srcElement.blur();
+                }
+            })
+            .on('change', () => {
+                const value = this.getInputValue();
+                const normPrompt = this.normalizeJourneyPrompt(value);
+                this.updateJourneyMainButton(
+                    this.getJourneyByPrompt(normPrompt)[0],
+                    this.currentId);
+            })
+            .on('blur', () => this.confirmJourneyPrompt(false))
+            .on('click', () => {
+                const evt = d3.event;
+                if (!this.consent) {
+                    evt.preventDefault();
+                    this.consentFeature();
+                }
+            });
+            this.mainInput = mainInput;
+            this.updateCurrentJourney(this.currentId, this.currentPrompt);
+
+            sel.addElem('label')
+            .attrs({
+                'for': `journey-main`,
+            })
+            .text("<%= vocab['intro'] %>");
+            this.maybeAddDatalist(sel);
+            const journeyInfoUrl = '<%= journey_info_url %>';
+            const infoButton = sel.addElem('a')
+            .attrs({
+                'href': journeyInfoUrl,
+                'target': '_blank',
+            })
+            .text('ⓘ');
+            this.infoButton = infoButton;
+
+            this.updateJourneyDatalist();
+        }
+
+        hasJourney() {
+            return this.past.length > 0;
+        }
+
+        updateDocs(cbs) {
+            const showJourney = this.hasJourney();
+            d3.selectAll('div.journey-doc').styles({
+                'display': showJourney ? null : 'none',
+            });
+            if (!showJourney) {
+                return;
+            }
+            const useFull = this.useFullPromptForSelect;
+            d3.selectAll('div.journey-doc span select.journey-short')
+            .addElems('option', 'journey-short-list', [
+                {
+                    id: null,
+                    prompt: `<%= vocab['select'] %>`,
+                    short: `<%= vocab['select'] %>`,
+                },
+                ...this.past,
+            ]).attrs({
+                'value': (d) => `${d['id']}`,
+            })
+            .text((d) => useFull ? d['prompt'] : d['short']);
+            const currentId = this.currentId;
+            d3.selectAll('div.journey-doc span select.journey-short')
+            .each(function () {
+                d3.select(this).node().value = `${currentId}`;
+            })
+            d3.selectAll('button.journey-btn-approve').classed('journey-btn-active', (d) => {
+                return this.isDocApprove(d.id);
+            }).styles({
+                'display': (d) => currentId ? null : 'none',
+            });
+            d3.selectAll('button.journey-btn-dislike').classed('journey-btn-active', (d) => {
+                return this.isDocDislike(d.id);
+            }).styles({
+                'display': (d) => currentId ? null : 'none',
+            });
+            d3.selectAll('span.journey-colon').styles({
+                'display': (d) => currentId ? null : 'none',
+            });
+            d3.selectAll('article.pad').classed('journey-article-inactive', (d) => {
+                return this.isDocDislike(d.id);
+            });
+            cbs.forEach((curCb) => curCb());
+        }
+
+        setDocAction(docId, isApprove) {
+            const journeyId = this.currentId;
+            if (!journeyId) {
+                return;
+            }
+            const action = isApprove ? (
+                this.isDocApprove(docId) ? 'neutral' : 'approve') : (
+                this.isDocDislike(docId) ? 'neutral' : 'dislike');
+            PUT('/journey/doc', {
+                'pad': docId,
+                'action': action,
+                'journey': journeyId,
+            }, true, true).then((result) => {
+                this.updateJourneyDocs();
+            }).catch((err) => {
+                this.checkError(err);
+            });
+        }
+
+        addDocButtons(sel) {
+            const doc = sel.addElems('div', 'journey-doc');
+            const docSpan = doc.addElem('span');
+            docSpan.addElem('span').text("<%= vocab['doc-begin'] %> ");
+            const that = this;
+            docSpan.addElem('select').classed('journey-short', true)
+            .on('change', function() {
+                const curId = d3.select(this)?.node()?.value;
+                if (curId !== null) {
+                    that.updateById(+curId);
+                }
+            });
+            docSpan.addElem('span').text(": ").classed('journey-colon', true);
+            doc.addElem('button')
+            .classed('journey-btn-approve', true)
+            .text("<%= vocab['doc-approve'] %>")
+            .on('click', (d) => {
+                this.setDocAction(d.id, true);
+            });
+            doc.addElem('button')
+            .classed('journey-btn-dislike', true)
+            .text("<%= vocab['doc-dislike'] %>")
+            .on('click', (d) => {
+                this.setDocAction(d.id, false);
+            });
+            this.updateJourneyDocs();
+        }
+    } // Journey
+
+    const journey = new Journey();
+</script>

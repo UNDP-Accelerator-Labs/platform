@@ -43,7 +43,7 @@ module.exports = (req, res) => {
 				batch.push(ownDB().then(async ownId => {
 					const padlist = (await DB.general.any(`
 						SELECT pc.pad FROM pinboard_contributions pc
-						WHERE pc.pinboard = $1 AND pc.db = $2
+						WHERE pc.pinboard = $1 AND pc.db = $2 AND pc.is_included = true
 					;`, [ pinboard, ownId ])).map((row) => row.pad);
 					const results = await t.any(`
 						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN ($1:csv)

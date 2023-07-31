@@ -149,6 +149,13 @@ app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
 app.post('/validate', routes.process.validate)
 
+app.put('/journey/create', routes.process.journeyCreate);
+app.get('/journey/list', routes.process.journeyList);
+app.put('/journey/doc', routes.process.journeyDoc);
+app.get('/journey/collection', routes.process.journeyCollection);
+app.get('/journey/consent', routes.process.journeyConsent);
+app.put('/journey/consent', routes.process.journeyConsent);
+
 app.route('/publish/:object')
 	.get(routes.process.publish)
 	.post(routes.process.publish)

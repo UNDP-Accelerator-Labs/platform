@@ -153,13 +153,16 @@ exports.pagemetadata = (_kwargs) => {
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
 			batch.push(ownDB().then(async (ownId) => {
 				const pinboard_stats = await DB.general.any(`
-					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size
+					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size,
+						CASE WHEN EXISTS (
+							SELECT 1 FROM journey WHERE linked_pinboard = pb.id
+						) THEN TRUE ELSE FALSE END AS is_journey
 
 					FROM pinboards pb
 					INNER JOIN pinboard_contributions pc
 						ON pc.pinboard = pb.id
 
-					WHERE pb.owner = $1 AND pc.db = $2
+					WHERE pb.owner = $1 AND pc.db = $2 AND pc.is_included = true
 					GROUP BY pb.id
 				;`, [ uuid, ownId ]);
 				const pinboard_pads = await DB.general.any(`
@@ -169,7 +172,7 @@ exports.pagemetadata = (_kwargs) => {
 					INNER JOIN pinboard_contributions pc
 						ON pc.pinboard = pb.id
 
-					WHERE pb.owner = $1 AND pc.db = $2
+					WHERE pb.owner = $1 AND pc.db = $2 AND pc.is_included = true
 				;`, [ uuid, ownId ]);
 				const pads = new Set();
 				const pinpads = new Map();
@@ -196,7 +199,7 @@ exports.pagemetadata = (_kwargs) => {
 
 		return t.batch(batch)
 		.catch(err => console.log(err))
-	}).then(results => {
+	}).then(async results => {
 		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards ] = results
 		let [ languages, speakers ] = languagedata
 
@@ -229,6 +232,7 @@ exports.pagemetadata = (_kwargs) => {
 				engagementtypes,
 				welcome_module,
 				app_storage,
+				own_db: await ownDB(),
 				app_id,
 				app_suite_url,
 			},

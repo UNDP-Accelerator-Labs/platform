@@ -88,7 +88,7 @@ module.exports = async (req, res) => {
 				if (pinboard) {
 					const ownId = await ownDB();
 					const pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
+						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
 					`, [ pinboard, ownId ])).map(row => row.pad);
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
@@ -104,7 +104,7 @@ module.exports = async (req, res) => {
 				if (pinboard) {
 					const ownId = await ownDB();
 					const pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2
+						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
 					`, [ pinboard, ownId ])).map(row => row.pad);
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2

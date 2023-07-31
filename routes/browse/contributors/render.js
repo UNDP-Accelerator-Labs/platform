@@ -6,7 +6,7 @@ const filter = require('./filter.js')
 
 module.exports = (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
-	
+
 	if (public || rights < modules.find(d => d.type === 'contributors')?.rights.read) res.redirect('/login')
 	else {
 		const { object, space } = req.params || {}
@@ -19,7 +19,7 @@ module.exports = (req, res) => {
 		else {
 			DB.general.tx(async t => {
 				const batch = []
-				
+
 				// PADS DATA
 				batch.push(load.data({ connection: t, req }))
 				// FILTERS_MENU
@@ -30,7 +30,7 @@ module.exports = (req, res) => {
 				// PINBOARDS LIST
 				if (modules.some(d => d.type === 'teams' && d.rights.read <= rights)) {
 					batch.push(t.any(`
-						SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count FROM teams t
+						SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, FALSE AS is_journey FROM teams t
 						INNER JOIN team_members tm
 							ON tm.team = t.id
 						WHERE t.host = $1
@@ -44,7 +44,7 @@ module.exports = (req, res) => {
 					;`, [ uuid, rights ])
 					.catch(err => console.log(err)))
 				} else batch.push(null)
-				// PINBOARD 
+				// PINBOARD
 				if (modules.some(d => d.type === 'teams') && pinboard) {
 					batch.push(t.one(`
 						SELECT t.id, t.name AS title, t.host AS owner, t.description, t.status,
@@ -52,8 +52,8 @@ module.exports = (req, res) => {
 							OR $2 > 2
 								THEN TRUE
 								ELSE FALSE
-							END AS editable
-
+							END AS editable,
+							FALSE AS is_journey
 						FROM teams t
 						WHERE t.id = $3::INT
 					;`, [ uuid, rights, pinboard, language ])
@@ -65,16 +65,16 @@ module.exports = (req, res) => {
 					let [ data,
 						filters_menu,
 						statistics,
-						pinboards_list, // LIST OF AVAILABLE TEAMS 
+						pinboards_list, // LIST OF AVAILABLE TEAMS
 						pinboard // CURRENTLY DISLAYED TEAM (IF APPLICABLE)
 					] = results
 
 					const { sections } = data
-					const stats = { 
-						total: array.sum.call(statistics.total, 'count'), 
+					const stats = {
+						total: array.sum.call(statistics.total, 'count'),
 						filtered: array.sum.call(statistics.filtered, 'count'),
 						displayed: array.sum.call(statistics.displayed, 'count'),
-						
+
 						// breakdown: statistics.filtered,
 						persistent_breakdown: statistics.persistent,
 
@@ -83,7 +83,7 @@ module.exports = (req, res) => {
 						// curated: statistics.curated,
 						// shared: statistics.shared,
 						// public: statistics.public,
-						
+
 						// contributors: statistics.contributors,
 
 						toc: statistics.toc

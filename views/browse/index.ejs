@@ -102,9 +102,11 @@
 				<nav class='tabs <% if (mapscale === "full-screen") { %>no-bg<% } %>'>
 					<div class='inner'>
 						<div class='xs sm'>
-							<button class='space'><%- vocabulary['spaces'][language] %></button>
-							<div class='dropdown'>
-								<%- include('./modules/tabs.ejs') %>
+							<div class='spaces'>
+								<button class='space'><%- vocabulary['spaces'][language] %></button>
+								<div class='dropdown'>
+									<%- include('./modules/tabs.ejs') %>
+								</div>
 							</div>
 							<% if (object === 'pads') { %>
 								<div class='btn-group map-scale'>
@@ -130,29 +132,71 @@
 								activetab.remove()
 							}
 
-							button.on('touchend', function () { this.focus() })
-							.on('focus', function () {
+							// button.on('touchend', function () { this.focus() })
+							// .on('focus', function () {
+							// 	const dropdown = d3.select(this.nextElementSibling)
+							// 	if (dropdown.node()) {
+							// 		if (dropdown.node().style.maxHeight) {
+							// 			dropdown.node().style.maxHeight = null
+							// 			dropdown.node().style.overflow = null
+							// 		} else {
+							// 			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+							// 			setTimeout(_ => {
+							// 				dropdown.node().style.overflow = 'visible'
+							// 			}, 250)
+							// 		}
+							// 	}
+							// }).on('blur', function () {
+							// 	if (!d3.event.relatedTarget || !d3.select(d3.event.relatedTarget).hasAncestor(this.nextElementSibling)) {
+							// 		const dropdown = d3.select(this.nextElementSibling)
+							// 		if (dropdown.node()) {
+							// 			dropdown.node().style.maxHeight = null
+							// 			dropdown.node().style.overflow = null
+							// 		}
+							// 	}
+							// })
+
+							button.on('click', function () {
 								const dropdown = d3.select(this.nextElementSibling)
-								if (dropdown.node()) {
+								if (dropdown.node() && dropdown.classed('dropdown')) {
 									if (dropdown.node().style.maxHeight) {
 										dropdown.node().style.maxHeight = null
 										dropdown.node().style.overflow = null
+										dropdown.findAncestor('li').classed('open', false)
 									} else {
+										// COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
+										if (d3.select(this).hasAncestor('dropdown')) {
+											const parent_dropdown = d3.select(this).findAncestor('dropdown')
+											parent_dropdown.selectAll('.dropdown')
+											.each(function () {
+												this.style.maxHeight = null
+												this.style.overflow = null
+												d3.select(this).findAncestor('li').classed('open', false)
+											})
+										}
+
 										dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 										setTimeout(_ => {
-											dropdown.node().style.overflow = 'visible'
+											if (dropdown.select('.dropdown').size() > 0) dropdown.node().style.overflow = 'visible'
+											else dropdown.node().style.overflow = 'scroll'
 										}, 250)
-									}
-								}
-							}).on('blur', function () {
-								if (!d3.event.relatedTarget || !d3.select(d3.event.relatedTarget).hasAncestor(this.nextElementSibling)) {
-									const dropdown = d3.select(this.nextElementSibling)
-									if (dropdown.node()) {
-										dropdown.node().style.maxHeight = null
-										dropdown.node().style.overflow = null
+										d3.select('nav.tabs .inner .spaces').classed('open', true)
+										dropdown.findAncestor('li')?.classed('open', true)
 									}
 								}
 							})
+
+							window.addEventListener('mouseup', function (e) {
+								if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('spaces')) {
+									d3.selectAll('nav.tabs .inner .open').classed('open', false)
+									.selectAll('.dropdown')
+									.each(function () {
+										this.style.maxHeight = null
+										this.style.overflow = null
+									})
+								}
+							})
+
 						}
 					</script>
 				</nav>

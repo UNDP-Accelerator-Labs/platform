@@ -259,7 +259,7 @@ div.public-page-panel {
 div.browse {
 	display: block;
 	width: calc(300px * 2 + 15px);
-	padding: 120px 15px 0 15px;
+	padding: 105px 15px 0 15px;
 	margin: auto;
 	background-color: #FFF;
 	min-height: calc(100% - 120px);
@@ -361,17 +361,17 @@ div.browse {
 					position: relative;
 					width: 300px;
 					margin-right: 15px;
+					border-bottom: 1px dotted $c-light-grey;
 
 					input[type=text] {
 						position: relative;
-						width: 100%;
+						width: calc(100% - 30px);
 						height: 30px;
 						padding: 0;
 						margin-top: 10px;
 						border: none;
 						outline: none;
 						background-color: transparent;
-						border-bottom: 1px dotted $c-light-grey;
 						font-size: $t-small;
 						color: $c-dark-blue;
 					}
@@ -387,17 +387,17 @@ div.browse {
 						transform: translateY(15px);
 						transition: transform .25s, font-size .25s;
 						pointer-events: none;
-
-						/*&::after {
-							content: '';
-							position: absolute;
-							top: 4px;
-							left: calc(100% + 5px);
-							width: 15px;
-							height: 15px;
-							margin: auto;
-							background: url('../imgs/icons/i-search-sm.svg');
-						}*/
+					}
+					button {
+						display: none;
+						width: 30px;
+						height: 30px;
+						margin-top: 10px;
+						background: url('../imgs/icons/i-add.svg');
+						border: none;
+						outline: none;
+						float: right;
+						cursor: pointer;
 					}
 					input[type=text]:focus + label,
 					input[type=text].has-value + label {
@@ -405,13 +405,16 @@ div.browse {
 						line-height: 1.5em;
 						transform: translateY(2.5px);
 					}
-
+					input[type=text]:focus ~ button,
+					input[type=text].has-value ~ button {
+						display: block;
+					}
 					.dropdown {
 						position: absolute;
 						width: 100%;
 						max-height: 0;
 						left: 0;
-						top: 100%;
+						top: calc(100% + 1px);
 						background-color: #FFF;
 						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
 						overflow: auto;

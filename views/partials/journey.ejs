@@ -2,7 +2,7 @@
     const language = locals.metadata.page.language;
     const vocab = vocabulary['journey'][language];
     const own_db = locals.metadata.site.own_db;
-    const journey_info_url = 'https://github.com/UNDP-Accelerator-Labs/platform/blob/jk-like/journey.md';
+    const journey_info_url = 'https://github.com/UNDP-Accelerator-Labs/platform/blob/master/journey.md';
 %>
 <script type='text/javascript'>
     class Journey {
@@ -276,6 +276,9 @@
             const journeyInfoUrl = '<%= journey_info_url %>';
             const message = `
                 <h2>You need to give consent to use this feature!</h2>
+                <p>
+                    This is an experimental feature!
+                </p>
                 <p>
                     This feature enables you to easily and serendipitously
                     create collections that answer questions about the corpus.

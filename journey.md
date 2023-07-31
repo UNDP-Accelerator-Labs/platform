@@ -1,13 +1,15 @@
-Journey Feature and Data Usage
+Exploration Feature and Data Usage
 ==
 
-Journey's are a special kind of collection that is tightly integrated with browsing the platform.
+This is currently an experimental feature!
+
+Journey's (aka Explorations) are a special kind of collection that is tightly integrated with browsing the platform.
 You can select relevant pads for the journey which adds them to the collection. You can also indicate
 that a pad is not relevant for a journey which will make the pads show transparent when they appear
 in search results. This way you can quickly see which pads might be of interest when doing multiple
 queries for building a collection featuring a certain topic. In the future we are planning to
 let the journey description prioritize relevant pads in your searches. Therefore, it is best to
-verbosely describe what you are looking for when naming a journey. 
+verbosely describe what you are looking for when naming a journey.
 
 For the above mentioned suggestion feature, we collect questions and corresponding documents
 for potentially training machine learning models.

@@ -128,6 +128,7 @@ module.exports = (req, res) => {
 					;`, [ engagement.cases, uuid, id ])
 					.then(async result => {
 						if (result.reviews?.length > 0) {
+							// TO DO: INVESTIGATE THIS
 							if (result.reviews.length % modules.find(d => d.type === 'reviews')?.reviewers !== 0) {
 								result.reviews = result.reviews.filter(d => d.owner === uuid)
 							}

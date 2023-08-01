@@ -1,39 +1,42 @@
 const { app_title } = include('config/')
 const nodeMailer = require('nodemailer')
+const sgMail = require('@sendgrid/mail');
 
 module.exports = (kwargs) => {
-	let { from, to, subject, html } = kwargs
-	if (!from) from = `"${app_title}" <myjyby@gmail.com>`
+	const { SENDGRID_API_KEY, SENDER_IDENTITY } = process.env;
+	sgMail.setApiKey(SENDGRID_API_KEY);
+
+	let { to, subject, html } = kwargs
+
 	if (!to) return { status: 500, message: 'The message has no recipient.' }
 	if (!subject) return { status: 500, message: 'The message has no subject.' }
 	if (!html) return { status: 500, message: 'There is no message to send.' }
 
-	// https://appdividend.com/2022/03/03/send-email-in-node-js/#:~:text=js-,To%20send%20an%20email%20in%20Node.,sending%20email%20messages%20between%20servers.
-	let transporter = nodeMailer.createTransport({
-		host: 'smtp.gmail.com',
-		port: 465,
-		secure: true,
-		auth: {
-			user: process.env.SMTPuser,
-			pass: process.env.SMTPpassword
-		}
-	})
-	let mailOptions = {
-		from,
+	try {
+		const msg = {
 		to,
+		from: `${app_title} <${SENDER_IDENTITY}>`,
 		subject,
-		html
-	}
+		html,
+		};
 
-	return new Promise(resolve => {
-		if (process.env.NODE_ENV === 'production') {
-			transporter.sendMail(mailOptions, (err, info) => {
-				if (err) resolve({ status: 500, message: err })
-				resolve({ status: 200, message: `Message ${info?.messageId} sent: ${info?.response}` })
-			})
-		} else {
-			console.log('should not send email because not in prodcution')
-			resolve(null)
-		}
-	})
+		return new Promise(resolve => {
+			if (process.env.NODE_ENV === 'local') {
+				sgMail.send(msg)
+				.then(() => {}, error => {
+					if (error.response) {
+						resolve({ status: 500, message: error.response })
+					}
+					resolve({ status: 200, message: `Message sent!` })
+				  });
+			} else {
+				console.log('should not send email because not in prodcution')
+				resolve(null)
+			}
+		})
+	} catch (error) {
+		console.error('Error sending email:', error);
+	}
 }
+
+

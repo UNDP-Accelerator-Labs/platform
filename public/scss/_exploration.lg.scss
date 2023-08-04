@@ -110,3 +110,20 @@ div.exploration {
 		box-sizing: border-box;
 	}
 }
+
+.exploration-big {
+	flex-direction: row;
+	justify-content: start;
+	height: auto;
+	vertical-align: middle;
+
+	span {
+		line-height: 24px;
+		margin-right: 5px;
+	}
+
+	select {
+		width: auto;
+		margin-right: 5px;
+	}
+}

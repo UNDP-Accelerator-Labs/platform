@@ -623,7 +623,8 @@
 					const data = { id: <%- locals.data?.id %> };
 					if (data.id) {
 						docBtn.data([data]);
-						exploration.addDocButtons(docBtn);
+						exploration.setVisible(true);
+						exploration.addDocButtons(docBtn, false);
 					}
 				});
 			<% } %>

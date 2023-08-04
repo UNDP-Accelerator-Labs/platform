@@ -31,6 +31,7 @@
                 this.currentPrompt = this.normalizeExplorationPrompt(sessionStorage.explorationPrompt);
             }
             this.visible = !!this.currentId;
+            this.limitedSpace = true;
             this.consent = true;  // we assume consent was given until an API call says otherwise
         };
 
@@ -431,9 +432,11 @@
             }).styles({
                 'display': (d) => currentId ? null : 'none',
             });
-            d3.selectAll('span.exploration-title').styles({
-                'display': (d) => currentId ? null : 'none',
-            });
+            if (this.limitedSpace) {
+                d3.selectAll('span.exploration-title').styles({
+                    'display': (d) => currentId ? null : 'none',
+                });
+            }
             d3.selectAll('article.pad').classed('exploration-article-inactive', (d) => {
                 return this.isDocDislike(d.id);
             });
@@ -459,30 +462,51 @@
             });
         }
 
-        addDocButtons(sel) {
+        addDocButtons(sel, hasLimitedSpace) {
             const doc = sel.addElems('div', 'exploration-doc');
             const that = this;
-            const docSpan = doc.addElem('span');
-            docSpan.addElem('span').text("<%= vocab['doc-begin'] %>: ").classed('exploration-title', true);
-            docSpan.addElem('button')
-            .classed('exploration-btn-approve', true)
-            .text("<%= vocab['doc-approve'] %>")
-            .on('click', (d) => {
-                this.setDocAction(d.id, true);
-            });
-            docSpan.addElem('button')
-            .classed('exploration-btn-dislike', true)
-            .text("<%= vocab['doc-dislike'] %>")
-            .on('click', (d) => {
-                this.setDocAction(d.id, false);
-            });
-            doc.addElem('select').classed('exploration-short', true)
-            .on('change', function() {
-                const curId = d3.select(this)?.node()?.value;
-                if (curId !== null) {
-                    that.updateById(+curId);
-                }
-            });
+
+            function addTitle(curSel) {
+                curSel.addElem('span').text("<%= vocab['doc-begin'] %>: ").classed('exploration-title', true);
+            }
+
+            function addButtons(curSel) {
+                curSel.addElem('button')
+                .classed('exploration-btn-approve', true)
+                .text("<%= vocab['doc-approve'] %>")
+                .on('click', (d) => {
+                    this.setDocAction(d.id, true);
+                });
+                curSel.addElem('button')
+                .classed('exploration-btn-dislike', true)
+                .text("<%= vocab['doc-dislike'] %>")
+                .on('click', (d) => {
+                    this.setDocAction(d.id, false);
+                });
+            }
+
+            function addSelect(curSel) {
+                curSel.addElem('select').classed('exploration-short', true)
+                .on('change', function() {
+                    const curId = d3.select(this)?.node()?.value;
+                    if (curId !== null) {
+                        that.updateById(+curId);
+                    }
+                });
+            }
+
+            if (hasLimitedSpace) {
+                const docSpan = doc.addElem('span');
+                addTitle(docSpan);
+                addButtons(docSpan);
+                addSelect(doc);
+            } else {
+                addTitle(doc);
+                addSelect(doc);
+                addButtons(doc);
+                doc.classed('exploration-big', true);
+            }
+            this.limitedSpace = hasLimitedSpace;
             this.updateExplorationDocs();
         }
     } // Exploration

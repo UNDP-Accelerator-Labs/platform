@@ -340,7 +340,7 @@
             this.datalist = datalist;
         }
 
-        addExplorationMain(sel) {
+        addExplorationMain(sel, cb) {
             const mainInput = sel.addElem('input')
             .attrs({
                 'type': 'text',
@@ -388,11 +388,11 @@
             .text('ⓘ');
             this.infoButton = infoButton;
 
-            this.updateExplorationDatalist();
+            this.updateExplorationDatalist(cb);
         }
 
         hasExploration() {
-            return this.past.length > 0 && this.isVisible();
+            return this.past.length > 0;
         }
 
         isVisible() {
@@ -408,10 +408,10 @@
         }
 
         updateDocs(cbs) {
-            const showExploration = this.hasExploration();
             d3.selectAll('div.exploration').styles({
                 'display': this.isVisible() ? null : 'none',
             });
+            const showExploration = this.hasExploration() && this.isVisible();
             d3.selectAll('div.exploration-doc').styles({
                 'display': showExploration ? null : 'none',
             });

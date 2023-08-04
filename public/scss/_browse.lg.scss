@@ -507,6 +507,23 @@ div.browse {
 				background-color: $c-light-2;
 				cursor: auto;
 			}
+			.stm-hint {
+				display: inline-block;
+				position: absolute;
+				transform: translate(-3px, -15px);
+				padding: 0 5px;
+				border-radius: 5px;
+				border-bottom-left-radius: 0;
+				color: $c-dark-grey;
+				background-color: $c-mid-yellow;
+				z-index: 1;
+				cursor: pointer;
+				user-select: none;
+				pointer-events: all;
+			}
+			.stm-hidden {
+				display: none;
+			}
 		}
 
 		form {

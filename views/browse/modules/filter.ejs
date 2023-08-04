@@ -5,6 +5,7 @@
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
+	let fixedEid = null;
 %>
 
 <% if (locals.stats?.total > 0) { %>
@@ -12,7 +13,12 @@
 		<% if (locals.metadata?.user?.uuid) { %>
 		<div class="search-type-menu">
 			<span class="stm stm-select" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
-			<span class="stm" id="stm-exploration"><%- vocabulary["search-type-menu"][language]["exploration"] %></span>
+			<span class="stm" id="stm-exploration">
+				<%- vocabulary["search-type-menu"][language]["exploration"] %>
+				<div class="stm-hint stm-hidden">
+					<%- vocabulary["exploration"][language]["hint"] %>
+				</div>
+			</span>
 		</div>
 		<% } // logged in (uuid) %>
 		<form autocomplete='off'>
@@ -23,6 +29,12 @@
 				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
 
 				view_params.forEach(d => {
+					if (d === 'explorationid') {
+						query[d].forEach(c => {
+							fixedEid = +c;
+						});
+						return;
+					}
 					query[d].forEach(c => {
 			%>
 				<input type='hidden' name='<%- d %>' value='<%- c %>'>
@@ -147,6 +159,20 @@
 <% } %>
 
 <script type='text/javascript'>
+	let curSelectSTM = 'stm-browse';
+	let hasUsedExploration = false;
+	let hasUserHidden = false;
+
+	function updateExplorationHint() {
+		d3.selectAll('.stm-hint').classed('stm-hidden', () => {
+			return hasUserHidden || curSelectSTM !== 'stm-browse' || hasUsedExploration;
+		})
+	}
+
+	d3.selectAll('#search-field').on('focus', () => {
+		updateExplorationHint();
+	});
+
 	function expandfilters (node) {
 		d3.select(node).toggleClass('close')
 		const filters = node.form.querySelector('.filters')
@@ -286,29 +312,68 @@
 	<% } %>
 
 	<% if (locals.metadata?.user?.uuid) { %>
+		let isExplorationInit = false;
+		const fixedEid = <%- JSON.stringify(fixedEid) %>;
 		const formExplorationId = d3.select('#form-exploration-id');
-		exploration.addExplorationMain(d3.select('div.exploration'));
+		exploration.addExplorationMain(d3.select('div.exploration'), () => {
+			hasUsedExploration = exploration.hasExploration();
+			if (fixedEid) {
+				exploration.updateById(fixedEid);
+			}
+			if (fixedEid || exploration.isVisible()) {
+				doSelectSTM('stm-exploration');
+			}
+			isExplorationInit = true;
+		});
 		exploration.addIdChangeListener((eid, isVisible) => {
 			formExplorationId.attrs({
 				'value': isVisible ? eid : null,
 			});
+			hasUsedExploration = exploration.hasExploration();
+			if (isExplorationInit) {
+				const oldUrl = `${window.location}`;
+				const newUrl = new URL(window.location);
+				if (eid) {
+					newUrl.searchParams.set('explorationid', +eid);
+				} else {
+					newUrl.searchParams.delete('explorationid');
+				}
+				if (oldUrl !== `${newUrl}`) {
+					window.history.replaceState({}, '', newUrl);
+					console.log('replaced', newUrl);
+				}
+			}
 		});
 
-		let curSelectSTM = 'stm-browse';
 		function doSelectSTM(stm) {
 			curSelectSTM = stm;
 			d3.selectAll('.stm').classed('stm-select', function () {
 				return d3.select(this).attr('id') === curSelectSTM;
 			});
-			exploration.setVisible(curSelectSTM === 'stm-exploration');
+			const isExploration = curSelectSTM === 'stm-exploration';
+			exploration.setVisible(isExploration);
+			if (isExploration) {
+				updateExplorationHint();
+			} else {
+				exploration.updateById(null);
+			}
 			exploration.triggerIdChange();
 		}
 
-		d3.selectAll('.stm').on('click', function (e) {
+		let onlyHide = false;
+
+		d3.selectAll('.stm').on('click', function () {
+			if (onlyHide) {
+				onlyHide = false;
+				return;
+			}
 			doSelectSTM(d3.select(this).attr('id'));
 		});
-		if (exploration.isVisible()) {
-			doSelectSTM('stm-exploration');
-		}
+
+		d3.selectAll('.stm-hint').on('click', function (e) {
+			d3.select(this).classed('stm-hidden', true);
+			onlyHide = true;
+			hasUserHidden = true;
+		});
 	<% } // logged in (uuid) %>
 </script>

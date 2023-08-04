@@ -289,31 +289,16 @@
         consentFeature() {
             const explorationInfoUrl = '<%= exploration_info_url %>';
             const message = `
-                <h2>You need to give consent to use this feature!</h2>
-                <p>
-                    This is an experimental feature!
-                </p>
-                <p>
-                    This feature enables you to easily and serendipitously
-                    create collections that answer questions about the corpus.
-                    The questions and selected documents might be used for
-                    training a machine learning model to improve the results.
-                    All data is anonymized and in no way connected to your account.
-                </p>
-                <p>
-                    <a href="${explorationInfoUrl}" target="_blank">Click here for more information.</a>
-                </p>
-                </p>
-                <p>
-                    Please indicate below that you understood and approve of
-                    the use of the indicated data for further uses.
-                </p>
+                <h2><%= vocab['welcome'] %></h2>
+                <p><%= vocab['explain'] %></p>
+                <a href="${explorationInfoUrl}" target="_blank"><%= vocab['info'] %></a>
+                <p><%= vocab['indicate'] %></p>
             `;
             renderPromiseModal({
                 message,
                 opts: [
-                    { node: 'button', type: 'button', label: 'I Approve!', resolve: true },
-                    { node: 'button', type: 'button', label: 'Not Okay!', resolve: false },
+                    { node: 'button', type: 'button', label: `<%= vocab['feature-approve'] %>`, resolve: true },
+                    { node: 'button', type: 'button', label: `<%= vocab['feature-reject'] %>`, resolve: false },
                 ],
             }).then((consent) => {
                 if(!consent) {  // not given consent or closed window

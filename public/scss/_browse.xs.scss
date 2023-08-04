@@ -805,7 +805,24 @@ div.browse {
 										line-height: 1.5em;
 										transform: translateY(2.5px);
 									}
-
+									button {
+										display: none;
+										position: absolute;
+										right: 0;
+										top: 0;
+										width: 20px;
+										height: 30px;
+										margin-top: 10px;
+										background: url('../imgs/icons/i-add-sm.svg') center no-repeat;
+										border: none;
+										outline: none;
+										float: right;
+										cursor: pointer;
+									}
+									input[type=text]:focus ~ button,
+									input[type=text].has-value ~ button {
+										display: block;
+									}
 									.dropdown {
 										position: absolute;
 										width: 100%;

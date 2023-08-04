@@ -390,7 +390,7 @@
                 return;
             }
             const useFull = this.useFullPromptForSelect;
-            d3.selectAll('div.exploration-doc span select.exploration-short')
+            d3.selectAll('div.exploration-doc select.exploration-short')
             .addElems('option', 'exploration-short-list', [
                 {
                     id: null,
@@ -403,7 +403,7 @@
             })
             .text((d) => useFull ? d['prompt'] : d['short']);
             const currentId = this.currentId;
-            d3.selectAll('div.exploration-doc span select.exploration-short')
+            d3.selectAll('div.exploration-doc select.exploration-short')
             .each(function () {
                 d3.select(this).node().value = `${currentId}`;
             })
@@ -417,7 +417,7 @@
             }).styles({
                 'display': (d) => currentId ? null : 'none',
             });
-            d3.selectAll('span.exploration-colon').styles({
+            d3.selectAll('span.exploration-title').styles({
                 'display': (d) => currentId ? null : 'none',
             });
             d3.selectAll('article.pad').classed('exploration-article-inactive', (d) => {
@@ -447,28 +447,27 @@
 
         addDocButtons(sel) {
             const doc = sel.addElems('div', 'exploration-doc');
-            const docSpan = doc.addElem('span');
-            docSpan.addElem('span').text("<%= vocab['doc-begin'] %> ");
             const that = this;
-            docSpan.addElem('select').classed('exploration-short', true)
-            .on('change', function() {
-                const curId = d3.select(this)?.node()?.value;
-                if (curId !== null) {
-                    that.updateById(+curId);
-                }
-            });
-            docSpan.addElem('span').text(": ").classed('exploration-colon', true);
-            doc.addElem('button')
+            const docSpan = doc.addElem('span');
+            docSpan.addElem('span').text("<%= vocab['doc-begin'] %>: ").classed('exploration-title', true);
+            docSpan.addElem('button')
             .classed('exploration-btn-approve', true)
             .text("<%= vocab['doc-approve'] %>")
             .on('click', (d) => {
                 this.setDocAction(d.id, true);
             });
-            doc.addElem('button')
+            docSpan.addElem('button')
             .classed('exploration-btn-dislike', true)
             .text("<%= vocab['doc-dislike'] %>")
             .on('click', (d) => {
                 this.setDocAction(d.id, false);
+            });
+            doc.addElem('select').classed('exploration-short', true)
+            .on('change', function() {
+                const curId = d3.select(this)?.node()?.value;
+                if (curId !== null) {
+                    that.updateById(+curId);
+                }
             });
             this.updateExplorationDocs();
         }

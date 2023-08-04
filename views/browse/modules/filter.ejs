@@ -323,7 +323,10 @@
 			if (fixedEid || exploration.isVisible()) {
 				doSelectSTM('stm-exploration');
 			}
-			isExplorationInit = true;
+			if (!isExplorationInit) {
+				isExplorationInit = true;
+				exploration.triggerIdChange();
+			}
 		});
 		exploration.addIdChangeListener((eid, isVisible) => {
 			formExplorationId.attrs({

@@ -75,7 +75,7 @@
 </script>
 <%- include('./render.ejs') %>
 <% if (locals.metadata?.user?.uuid) { %>
-	<%- include ('../../partials/journey.ejs') %>
+	<%- include ('../../partials/exploration.ejs') %>
 <% } %>
 </head>
 
@@ -394,7 +394,7 @@
 				<% } %>
 			</div>
 			<% if (locals.metadata?.user?.uuid) { %>
-			<div class='journey-local'></div>
+			<div class='exploration-local'></div>
 			<% } %>
 		</div>
 	</main>
@@ -617,13 +617,13 @@
 
 			// comments.addElems('div', 'body').html(d => d)
 			<% if (locals.metadata?.user?.uuid) { %>
-				journey.setUseFullPromptForSelect(true);
-				journey.updateJourneyList(() => {
-					const docBtn = d3.select('div.journey-local');
+				exploration.setUseFullPromptForSelect(true);
+				exploration.updateExplorationList(() => {
+					const docBtn = d3.select('div.exploration-local');
 					const data = { id: <%- locals.data?.id %> };
 					if (data.id) {
 						docBtn.data([data]);
-						journey.addDocButtons(docBtn);
+						exploration.addDocButtons(docBtn);
 					}
 				});
 			<% } %>

@@ -48,7 +48,7 @@
 <%- include ('../partials/menu-languages.ejs') %>
 <%- include ('../partials/modals.ejs') %>
 
-<%- include ('../partials/journey.ejs') %>
+<%- include ('../partials/exploration.ejs') %>
 <%- include ('./modules/download.ejs') %>
 <%- include('./render.ejs') %>
 
@@ -469,7 +469,7 @@
 			render.pin(entry.foot)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
-			render.journey(entry.prefoot)
+			render.exploration(entry.prefoot)
 		} else if (display === 'slideshow') {
 			render.img(entry.head)
 			render.owner(entry.metagroup)
@@ -493,7 +493,7 @@
 			render.pin(entry.inner)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
-			render.journey(entry.prefoot)
+			render.exploration(entry.prefoot)
 		}
 	}
 

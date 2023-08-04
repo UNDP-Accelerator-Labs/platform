@@ -295,8 +295,8 @@ WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 
--- journey tables
-CREATE TABLE IF NOT EXISTS public.journey
+-- exploration tables
+CREATE TABLE IF NOT EXISTS public.exploration
 (
     id SERIAL UNIQUE NOT NULL,
     uuid uuid NOT NULL,
@@ -304,12 +304,12 @@ CREATE TABLE IF NOT EXISTS public.journey
     last_access timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
     linked_pinboard INT UNIQUE NOT NULL REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT journey_pkey PRIMARY KEY (id, uuid, prompt),
+    CONSTRAINT exploration_pkey PRIMARY KEY (id, uuid, prompt),
     CONSTRAINT id_key UNIQUE (id),
 	CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)
 );
-CREATE INDEX idx_linked_pinboard ON journey (linked_pinboard);
+CREATE INDEX idx_linked_pinboard ON exploration (linked_pinboard);
 ALTER TABLE IF EXISTS public.users
-    ADD COLUMN confirmed_feature_journey timestamp with time zone;
+    ADD COLUMN confirmed_feature_exploration timestamp with time zone;
 ALTER TABLE IF EXISTS public.pinboard_contributions
     ADD COLUMN is_included boolean NOT NULL DEFAULT true;

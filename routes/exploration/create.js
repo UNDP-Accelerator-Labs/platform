@@ -35,17 +35,17 @@ module.exports = (req, res) => {
     }
     return DB.general.tx(async (t) => {
         const hasConsent = (await t.one(`
-            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
-        `, [uuid])).confirmed_feature_journey;
+            SELECT confirmed_feature_exploration FROM users WHERE uuid = $1
+        `, [uuid])).confirmed_feature_exploration;
         if (!hasConsent) {
             return res.status(403).json({
-                message: `${uuid} has to consent to using the journey feature first!`,
+                message: `${uuid} has to consent to using the exploration feature first!`,
             });
         }
         const jid = await t.any(`
-            SELECT id FROM journey WHERE uuid = $1 AND prompt = $2
+            SELECT id FROM exploration WHERE uuid = $1 AND prompt = $2
         `, [uuid, prompt]);
-        let journey;
+        let exploration;
         if (!jid.length) {
             const pbid = (await t.any(`
                 INSERT INTO pinboards (
@@ -72,24 +72,24 @@ module.exports = (req, res) => {
                 ON CONFLICT (participant, pinboard) DO NOTHING
             `, [uuid, pbid[0].id]);
             const result = await t.one(`
-                INSERT INTO journey (uuid, prompt, created_at, last_access, linked_pinboard)
+                INSERT INTO exploration (uuid, prompt, created_at, last_access, linked_pinboard)
                 VALUES ($1, $2, NOW(), NOW(), $3)
                 ON CONFLICT (uuid, prompt) DO UPDATE SET last_access = NOW()
                 RETURNING id
             ;`, [uuid, prompt, pbid[0].id]);
-            journey = result.id;
+            exploration = result.id;
         } else {
-            journey = jid[0].id;
+            exploration = jid[0].id;
             await t.none(`
-                UPDATE journey
+                UPDATE exploration
                 SET last_access = NOW()
                 WHERE id = $1
-            `, [journey]);
+            `, [exploration]);
         }
         return res.json({
-            journey,
+            exploration,
             prompt,
-            message: `success! id[${journey}] uuid[${uuid}] prompt[${prompt}]`,
+            message: `success! id[${exploration}] uuid[${uuid}] prompt[${prompt}]`,
         });
     }).catch((err) => {
         console.log(err);

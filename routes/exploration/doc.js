@@ -12,39 +12,39 @@ module.exports = (req, res) => {
             message: 'must be logged in',
         });
     }
-    const { journey: journey_in, action, pad: pad_in } = req.body || {};
+    const { exploration: exploration_in, action, pad: pad_in } = req.body || {};
 	if (!validActions.includes(action)) {
         return res.status(422).json({
             message: `unknown action: ${action}`,
         });
     }
-    const journey = +journey_in;
+    const exploration = +exploration_in;
     const pad = +pad_in;
-    if (!Number.isFinite(journey) || !Number.isFinite(pad)) {
+    if (!Number.isFinite(exploration) || !Number.isFinite(pad)) {
         return res.status(422).json({
             message: `ids are required: ${JSON.stringify(req.body)}`,
         });
     }
     return DB.general.tx(async (t) => {
         const hasConsent = (await t.one(`
-            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
-        `, [uuid])).confirmed_feature_journey;
+            SELECT confirmed_feature_exploration FROM users WHERE uuid = $1
+        `, [uuid])).confirmed_feature_exploration;
         if (!hasConsent) {
             return res.status(403).json({
-                message: `${uuid} has to consent to using the journey feature first!`,
+                message: `${uuid} has to consent to using the exploration feature first!`,
             });
         }
         const ownId = await ownDB();
         const jrow = await t.one(`
-            SELECT uuid, linked_pinboard FROM journey WHERE id = $1
-        `, [journey]);
+            SELECT uuid, linked_pinboard FROM exploration WHERE id = $1
+        `, [exploration]);
         const batch = [];
         if (jrow.uuid === uuid) {
             batch.push(t.none(`
-                UPDATE journey
+                UPDATE exploration
                 SET last_access = NOW()
                 WHERE id = $1
-            `, [journey]));
+            `, [exploration]));
             if (action === actionNeutral) {
                 batch.push(t.none(`
                     DELETE FROM pinboard_contributions
@@ -71,15 +71,15 @@ module.exports = (req, res) => {
         }
         if (result.length !== 2) { // uuid didn't match
             return res.status(422).json({
-                message: 'journey id does not exist',
+                message: 'exploration id does not exist',
             });
         }
         return res.json({
-            journey,
+            exploration,
             pad,
             db: ownId,
             value: action,
-            message: `success! journey[${journey}] db[${ownId}] pad[${pad}] value[${action}]`,
+            message: `success! exploration[${exploration}] db[${ownId}] pad[${pad}] value[${action}]`,
         });
     }).catch((err) => {
         console.log(err);

@@ -26,7 +26,7 @@
 			%>
 
 			<% if (locals.metadata?.user?.uuid) { %>
-			<div class='journey'></div>
+			<div class='exploration'></div>
 			<% } %>
 			<div class='search'>
 				<% if (query?.search?.length) { %>
@@ -109,7 +109,7 @@
 							<button id='new-pinboard' type='button'></button>
 							<div class='dropdown'>
 								<menu>
-									<% locals.pinboards_list?.filter((pb) => !pb.is_journey).forEach(d => { %>
+									<% locals.pinboards_list?.filter((pb) => !pb.is_exploration).forEach(d => { %>
 										<li class='pinboard'>
 											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
 											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
@@ -280,6 +280,6 @@
 	<% } %>
 
 	<% if (locals.metadata?.user?.uuid) { %>
-		journey.addJourneyMain(d3.select('div.journey'));
+		exploration.addExplorationMain(d3.select('div.exploration'));
 	<% } %>
 </script>

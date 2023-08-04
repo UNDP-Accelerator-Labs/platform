@@ -155,8 +155,8 @@ exports.pagemetadata = (_kwargs) => {
 				const pinboard_stats = await DB.general.any(`
 					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size,
 						CASE WHEN EXISTS (
-							SELECT 1 FROM journey WHERE linked_pinboard = pb.id
-						) THEN TRUE ELSE FALSE END AS is_journey
+							SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
+						) THEN TRUE ELSE FALSE END AS is_exploration
 
 					FROM pinboards pb
 					INNER JOIN pinboard_contributions pc

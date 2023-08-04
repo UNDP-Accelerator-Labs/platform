@@ -110,8 +110,8 @@ module.exports = async kwargs => {
 				SELECT
 					pc.pad, pb.id, pb.title,
 					CASE WHEN EXISTS (
-						SELECT 1 FROM journey WHERE linked_pinboard = pb.id
-					) THEN TRUE ELSE FALSE END AS is_journey
+						SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
+					) THEN TRUE ELSE FALSE END AS is_exploration
 				FROM pinboard_contributions pc
 				INNER JOIN pinboards pb ON pb.id = pc.pinboard
 				WHERE
@@ -124,7 +124,7 @@ module.exports = async kwargs => {
 				pinboards.push({
 					id: row.id,
 					title: row.title,
-					is_journey: row.is_journey,
+					is_exploration: row.is_exploration,
 				});
 				padToPinboards.set(row.pad, pinboards);
 			});

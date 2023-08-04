@@ -195,8 +195,8 @@ function retrievepins (_object_id, uuid, ownId) {
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title,
 			CASE WHEN EXISTS (
-				SELECT 1 FROM journey WHERE linked_pinboard = pb.id
-			) THEN TRUE ELSE FALSE END AS is_journey
+				SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
+			) THEN TRUE ELSE FALSE END AS is_exploration
 		FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
@@ -207,8 +207,8 @@ function retrievepinboards (_owners, ownId) {
 	return DB.pgp.as.format(`
 		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count,
 			CASE WHEN EXISTS (
-				SELECT 1 FROM journey WHERE linked_pinboard = p.id
-			) THEN TRUE ELSE FALSE END AS is_journey
+				SELECT 1 FROM exploration WHERE linked_pinboard = p.id
+			) THEN TRUE ELSE FALSE END AS is_exploration
 		FROM pinboards p
 		INNER JOIN pinboard_contributions pc
 			ON pc.pinboard = p.id

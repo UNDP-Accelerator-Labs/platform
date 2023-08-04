@@ -473,11 +473,11 @@ exports.process.request = require('./request/')
 exports.process.accept = require('./accept/').accept
 exports.process.decline = require('./accept/').decline
 
-exports.process.journeyCreate = require('./journey/').create;
-exports.process.journeyList = require('./journey/').list;
-exports.process.journeyDoc = require('./journey/').doc;
-exports.process.journeyCollection = require('./journey/').collection;
-exports.process.journeyConsent = require('./journey/').consent;
+exports.process.explorationCreate = require('./exploration').create;
+exports.process.explorationList = require('./exploration').list;
+exports.process.explorationDoc = require('./exploration').doc;
+exports.process.explorationCollection = require('./exploration').collection;
+exports.process.explorationConsent = require('./exploration').consent;
 
 // THIS IS DEPRECATED
 exports.process.download = (req, res) => {

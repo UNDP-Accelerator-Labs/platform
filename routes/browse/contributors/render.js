@@ -30,7 +30,7 @@ module.exports = (req, res) => {
 				// PINBOARDS LIST
 				if (modules.some(d => d.type === 'teams' && d.rights.read <= rights)) {
 					batch.push(t.any(`
-						SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, FALSE AS is_journey FROM teams t
+						SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, FALSE AS is_exploration FROM teams t
 						INNER JOIN team_members tm
 							ON tm.team = t.id
 						WHERE t.host = $1
@@ -53,7 +53,7 @@ module.exports = (req, res) => {
 								THEN TRUE
 								ELSE FALSE
 							END AS editable,
-							FALSE AS is_journey
+							FALSE AS is_exploration
 						FROM teams t
 						WHERE t.id = $3::INT
 					;`, [ uuid, rights, pinboard, language ])

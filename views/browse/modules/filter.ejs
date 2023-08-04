@@ -5,13 +5,19 @@
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
-
 %>
 
 <% if (locals.stats?.total > 0) { %>
 	<nav id='search-and-filter' class='lg'>
+		<% if (locals.metadata?.user?.uuid) { %>
+		<div class="search-type-menu">
+			<span class="stm stm-select" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
+			<span class="stm" id="stm-exploration"><%- vocabulary["search-type-menu"][language]["exploration"] %></span>
+		</div>
+		<% } // logged in (uuid) %>
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
+			<input id='form-exploration-id' type='hidden' name='explorationid' value='' />
 			<%
 				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
 				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
@@ -27,7 +33,7 @@
 
 			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='exploration'></div>
-			<% } %>
+			<% } // logged in (uuid) %>
 			<div class='search'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
@@ -280,6 +286,29 @@
 	<% } %>
 
 	<% if (locals.metadata?.user?.uuid) { %>
+		const formExplorationId = d3.select('#form-exploration-id');
 		exploration.addExplorationMain(d3.select('div.exploration'));
-	<% } %>
+		exploration.addIdChangeListener((eid, isVisible) => {
+			formExplorationId.attrs({
+				'value': isVisible ? eid : null,
+			});
+		});
+
+		let curSelectSTM = 'stm-browse';
+		function doSelectSTM(stm) {
+			curSelectSTM = stm;
+			d3.selectAll('.stm').classed('stm-select', function () {
+				return d3.select(this).attr('id') === curSelectSTM;
+			});
+			exploration.setVisible(curSelectSTM === 'stm-exploration');
+			exploration.triggerIdChange();
+		}
+
+		d3.selectAll('.stm').on('click', function (e) {
+			doSelectSTM(d3.select(this).attr('id'));
+		});
+		if (exploration.isVisible()) {
+			doSelectSTM('stm-exploration');
+		}
+	<% } // logged in (uuid) %>
 </script>

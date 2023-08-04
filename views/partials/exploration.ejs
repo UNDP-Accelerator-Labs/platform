@@ -16,6 +16,7 @@
             this.infoButton = null;
             this.datalist = null;
             this.useFullPromptForSelect = false;
+            this.onIdChange = [];
 
             this.listUpdateActive = false;
             this.listUpdateCbs = [];
@@ -29,8 +30,20 @@
             if (sessionStorage.explorationPrompt) {
                 this.currentPrompt = this.normalizeExplorationPrompt(sessionStorage.explorationPrompt);
             }
+            this.visible = !!this.currentId;
             this.consent = true;  // we assume consent was given until an API call says otherwise
         };
+
+        addIdChangeListener(cb) {
+            this.onIdChange.push(cb);
+            this.triggerIdChange();
+        }
+
+        triggerIdChange() {
+            const currentId = this.currentId;
+            const isVisible = this.isVisible();
+            this.onIdChange.forEach((cb) => cb(currentId, isVisible));
+        }
 
         setUseFullPromptForSelect(isUseFull) {
             this.useFullPromptForSelect = isUseFull;
@@ -79,6 +92,7 @@
                 this.getExplorationByPrompt(normPrompt)[0],
                 curId);
             this.updateExplorationDocs();
+            this.triggerIdChange();
         }
 
         getExplorationById(explorationId) {
@@ -378,11 +392,26 @@
         }
 
         hasExploration() {
-            return this.past.length > 0;
+            return this.past.length > 0 && this.isVisible();
+        }
+
+        isVisible() {
+            return this.visible;
+        }
+
+        setVisible(visible) {
+            const oldVisible = this.visible;
+            this.visible = visible;
+            if (oldVisible !== visible) {
+                this.updateDocs([]);
+            }
         }
 
         updateDocs(cbs) {
             const showExploration = this.hasExploration();
+            d3.selectAll('div.exploration').styles({
+                'display': this.isVisible() ? null : 'none',
+            });
             d3.selectAll('div.exploration-doc').styles({
                 'display': showExploration ? null : 'none',
             });

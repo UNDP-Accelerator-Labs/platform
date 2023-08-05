@@ -1,5 +1,4 @@
 <%
-
 	// CREATE ALIASES
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
@@ -161,11 +160,13 @@
 <script type='text/javascript'>
 	let curSelectSTM = 'stm-browse';
 	let hasUsedExploration = false;
-	let hasUserHidden = false;
 
 	function updateExplorationHint() {
 		d3.selectAll('.stm-hint').classed('stm-hidden', () => {
-			return hasUserHidden || curSelectSTM !== 'stm-browse' || hasUsedExploration;
+			if (sessionStorage.explorationHintUserHiddenCount && +sessionStorage.explorationHintUserHiddenCount > 1) {
+				return true;
+			}
+			return curSelectSTM !== 'stm-browse' || hasUsedExploration;
 		})
 	}
 
@@ -376,7 +377,11 @@
 		d3.selectAll('.stm-hint').on('click', function (e) {
 			d3.select(this).classed('stm-hidden', true);
 			onlyHide = true;
-			hasUserHidden = true;
+			if (sessionStorage.explorationHintUserHiddenCount) {
+				sessionStorage.explorationHintUserHiddenCount = +sessionStorage.explorationHintUserHiddenCount + 1;
+			} else {
+				sessionStorage.explorationHintUserHiddenCount = 1;
+			}
 		});
 	<% } // logged in (uuid) %>
 </script>

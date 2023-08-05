@@ -13,7 +13,7 @@
 	const pages = locals.metadata.page.count
 
 	const logged = locals.metadata.user.uuid !== null
-	
+
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
 	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
@@ -22,33 +22,33 @@
 	}
 
 	const slides = locals.sample_images
-	const is_intropage = (publicpage 
-		&& object === 'pads' 
-		&& space !== 'pinned' 
-		&& mapscale !== 'full-screen' 
-		&& locals.metadata.page.id === 1 
+	const is_intropage = (publicpage
+		&& object === 'pads'
+		&& space !== 'pinned'
+		&& mapscale !== 'full-screen'
+		&& locals.metadata.page.id === 1
 		&& slides?.length > 0)
 	const welcome_module = locals.metadata.site.welcome_module
 %>
 <html lang='<%- language %>'>
 <head>
 
-<%- include ('./partials/head.ejs') %> 
+<%- include ('./partials/head.ejs') %>
 
 </head>
 
 <body>
 
-<% include ('./partials/translations.ejs') %> 
+<% include ('./partials/translations.ejs') %>
 
-<%- include ('./partials/menu-languages.ejs') %> 
-<%- include ('./partials/modals.ejs') %> 
+<%- include ('./partials/menu-languages.ejs') %>
+<%- include ('./partials/modals.ejs') %>
 <%- include('./browse/render.ejs') %>
 
 <div class='main-content'>
 <header>
 	<div class='inner'>
-		<%- include ('partials/menu-logo.ejs') %> 
+		<%- include ('partials/menu-logo.ejs') %>
 	</div>
 </header>
 <div class='browse home'>
@@ -184,12 +184,12 @@
 <div class='sidebar'></div>
 </div>
 
-<%- include ('./partials/footer.ejs') %> 
+<%- include ('./partials/footer.ejs') %>
 
 <script type='text/javascript'>
 	async function selectCountry () {
-		const target_opts = <%- JSON.stringify(locals.countries) %>.map(d => { 
-			return { label: d.name, value: d.iso3, type: 'radio' } 
+		const target_opts = <%- JSON.stringify(locals.countries) %>.map(d => {
+			return { label: d.name, value: d.iso3, type: 'radio' }
 		})
 
 		const message = 'Get in touch with the UNDP Accelerator Lab Head of Solutions Mapping in your country.' // TO DO: TRANSLATE
@@ -199,7 +199,12 @@
 		]
 		const mobilization = await renderPromiseModal({ message, opts })
 	}
-</script>
 
+<% if (!locals.metadata?.user?.uuid) { %>
+	sessionStorage.removeItem('explorationHintUserHiddenCount');
+	sessionStorage.removeItem('explorationPrompt');
+	sessionStorage.removeItem('explorationId');
+<% } // logged out (!uuid) %>
+</script>
 </body>
 </html>

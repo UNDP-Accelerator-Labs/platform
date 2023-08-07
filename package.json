@@ -49,8 +49,8 @@
     "html-pdf-node": "^1.0.8",
     "html2pdf.js": "^0.10.1",
     "nodemon": "^2.0.22",
-    "pagedjs-cli": "^0.3.3",
     "pagedjs": "^0.4.0",
+    "pagedjs-cli": "^0.3.3",
     "pdfkit": "^0.13.0",
     "sass": "^1.62.1",
     "socket.io": "^4.5.4"

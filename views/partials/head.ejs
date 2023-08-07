@@ -1,6 +1,8 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
+	const languages = locals.metadata.site.languages
+	const page_language = locals.metadata.page.page_language
 	const excerpt = locals.metadata.page.excerpt
 
 	const currentpage_url = new URL(locals.metadata.page.currentpage_url?.replace('/edit/', '/view/'))
@@ -27,7 +29,6 @@
 	else if (language == 'es') ogp_locale = 'es_ES'
 	else if(language == 'pt') ogp_locale = 'pt_PT'
 %>
-
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
 <meta name='apple-mobile-web-app-capable' content='yes'>
@@ -66,6 +67,10 @@
 <script type='text/javascript' src='/js/basics.js'></script>
 <script type='text/javascript' src='/js/upload.js'></script>
 
+<!-- Google Translate CDN -->
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<!-- <script src = '/socket.io/socket.io.js'></script> -->
+
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
 	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
 	crossorigin=''/>
@@ -77,3 +82,59 @@
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel='stylesheet' type='text/css' href='/css/dispatch.css'>
 
+<script type="text/javascript">
+	var languageAlias = '<%= page_language %>';
+	var googleTranslateElement;
+	var languages= ('<%= languages.map(p=> p.language) %>').split(',');
+	
+	function setCookie(key, value, expiry) {
+	  var expires = new Date();
+	  expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
+	  document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+	}
+	function googleTranslateElementInit() {
+		if(languageAlias !== 'en'){
+			setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
+			setCookie('googtrans', `/en/${languageAlias}`,1);
+		}
+
+		d3.select("#dummy_lang").style("display", "none");
+		new google.translate.TranslateElement({
+		   pageLanguage: 'en',
+		   layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+		}, 'google_translate_element');
+
+	}
+
+	function rewriteUrl(lang, reload = false){
+		var currentUrl = window.location.href;
+		var languagePattern = /\/[a-z]{2,3}\//;
+		var newUrl = currentUrl.replace(languagePattern, "/" + lang + "/");
+
+		if(reload) window.location.href = newUrl;
+		else window.history.replaceState({}, "", newUrl);
+	}
+
+	//IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
+	//THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
+	function updateDomTree(lang){
+		let value = languages.includes(lang) ? 'no' : 'yes'
+		d3.selectAll(".google-translate-attr")
+  			.attr("translate", value);
+	}
+
+	//LISTEN TO CHANGES IN LANGUAGE COOKIES 
+	cookieStore.addEventListener('change', ({changed}) => {
+		for (const {name, value} of changed) {
+			if(name === 'googtrans'){
+				var lang = value?.split('/')[2]
+				updateDomTree(lang)
+				rewriteUrl(lang)
+			}
+		}
+		if(!changed.length){
+			rewriteUrl('en', true);
+		}
+	});
+
+</script>

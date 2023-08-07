@@ -98,6 +98,7 @@
 			setCookie('googtrans', `/en/${languageAlias}`,1);
 		}
 
+		d3.select("#dummy_lang").style("display", "none");
 		new google.translate.TranslateElement({
 		   pageLanguage: 'en',
 		   layout: google.translate.TranslateElement.InlineLayout.SIMPLE

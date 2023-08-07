@@ -2,6 +2,7 @@
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
 	const languages = locals.metadata.site.languages
+	const page_language = locals.metadata.page.page_language
 	const excerpt = locals.metadata.page.excerpt
 
 	const currentpage_url = new URL(locals.metadata.page.currentpage_url?.replace('/edit/', '/view/'))
@@ -83,7 +84,7 @@
 <link rel='stylesheet' type='text/css' href='/css/dispatch.css'>
 
 <script type="text/javascript">
-	var languageAlias = '<%= language %>';
+	var languageAlias = '<%= page_language %>';
 	var googleTranslateElement;
 	var languages= ('<%= languages.map(p=> p.language) %>').split(',');
 	

@@ -142,7 +142,7 @@ module.exports = async (req, res) => {
 				const pcounts = new Map((await DB.general.any(`
 					SELECT COUNT (DISTINCT (pad)) as pcount, pinboard as pid
 					FROM pinboard_contributions
-					WHERE db = $1 GROUP BY pinboard
+					WHERE db = $1 AND is_included = true GROUP BY pinboard
 				`, [ ownId ])).map((row) => [row.pid, row.pcount]));
 				const mcounts = new Map((await t.any(`
 					SELECT COUNT (DISTINCT (pad)) as mcount, mobilization as mid
@@ -150,7 +150,10 @@ module.exports = async (req, res) => {
 					GROUP BY mobilization
 				`)).map((row) => [row.mid, row.mcount]));
 				batch.push(DB.general.any(`
-					SELECT p.id, p.title, mobilization_db as mdb, mobilization as mid
+					SELECT p.id, p.title, mobilization_db as mdb, mobilization as mid,
+						CASE WHEN EXISTS (
+							SELECT 1 FROM journey WHERE linked_pinboard = p.id
+						) THEN TRUE ELSE FALSE END AS is_journey
 					FROM pinboards p
 					WHERE $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = p.id)
 					GROUP BY p.id
@@ -179,8 +182,10 @@ module.exports = async (req, res) => {
 						OR $2 > 2
 							THEN TRUE
 							ELSE FALSE
-						END AS editable
-
+						END AS editable,
+						CASE WHEN EXISTS (
+							SELECT 1 FROM journey WHERE linked_pinboard = p.id
+						) THEN TRUE ELSE FALSE END AS is_journey
 					FROM pinboards p
 
 					INNER JOIN pinboard_contributors pc

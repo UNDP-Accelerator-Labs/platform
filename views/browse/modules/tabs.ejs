@@ -62,7 +62,7 @@
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>'><%- d.title %></a>
+								<a href='./pinned?pinboard=<%- d.id %>'><%- d.is_journey ? 'Journey: ' : ''%><%- d.title %></a>
 							</li>
 						<% }) %>
 					</menu>
@@ -116,7 +116,7 @@
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>'><%- d.title %></a>
+								<a href='./pinned?pinboard=<%- d.id %>'><%- d.is_journey ? 'Journey: ' : ''%><%- d.title %></a>
 							</li>
 						<% }) %>
 					</menu>

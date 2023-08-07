@@ -54,7 +54,7 @@ module.exports = async kwargs => {
 				$1:raw
 			GROUP BY p.status
 			ORDER BY p.status
-		;`, [ full_filters.replace(/(AND\s)?p\.status IN \([\'\d\,\s]+\)(\sAND\s)?/g, '') ]).then(d => { return { persistent: d } })
+		;`, [ full_filters.replace(/(AND\s)?p\.status IN \([\'\d\,\s]+\)(\sAND\s)?/g, '$2') ]).then(d => { return { persistent: d } })
 		.catch(err => console.log(err)))
 		// GET PRIVATE PADS COUNT
 		batch.push(t.one(`

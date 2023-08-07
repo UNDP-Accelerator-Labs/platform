@@ -128,6 +128,7 @@ module.exports = (req, res) => {
 					;`, [ engagement.cases, uuid, id ])
 					.then(async result => {
 						if (result.reviews?.length > 0) {
+							// TO DO: INVESTIGATE THIS
 							if (result.reviews.length % modules.find(d => d.type === 'reviews')?.reviewers !== 0) {
 								result.reviews = result.reviews.filter(d => d.owner === uuid)
 							}
@@ -221,9 +222,9 @@ module.exports = (req, res) => {
 
 					if (id) data = await datastructures.legacy.publishablepad({ connection: t, data });
 
-					const excerpt = data.status > 2 ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
+					const excerpt = data?.status > 2 ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
 					// const item_attachments = parsers.getPadImgs(data)
-				
+
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })

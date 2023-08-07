@@ -41,10 +41,10 @@ module.exports = (req, res) => {
 				}).catch(err => console.log(err)))
 			} else if (pinboard) {
 				batch.push(ownDB().then(async ownId => {
-					const padlist = await DB.general.any(`
+					const padlist = (await DB.general.any(`
 						SELECT pc.pad FROM pinboard_contributions pc
-						WHERE pc.pinboard = $1 AND pc.db = $2
-					;`, [ pinboard, ownId ]).map((row) => row.pad);
+						WHERE pc.pinboard = $1 AND pc.db = $2 AND pc.is_included = true
+					;`, [ pinboard, ownId ])).map((row) => row.pad);
 					const results = await t.any(`
 						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN ($1:csv)
 					`, [ safeArr(padlist, -1) ]);

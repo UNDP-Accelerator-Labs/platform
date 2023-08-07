@@ -177,7 +177,7 @@ module.exports = async (req, res) => {
 				SELECT pb.id, pc.pad FROM pinboards pb
 				INNER JOIN pinboard_contributions pc
 					ON pc.pinboard = pb.id
-				WHERE pb.status > 2 AND pc.db = $1
+				WHERE pb.status > 2 AND pc.db = $1 AND pc.is_included = true
 			`, [ ownId ])).forEach(row => {
 				const padlist = pads.get(row.id) ?? [];
 				padlist.push(row.pad);
@@ -194,7 +194,10 @@ module.exports = async (req, res) => {
 			}));
 			const countMap = new Map(pbids.map((pbid, index) => [pbid, counts[index]]));
 			return (await DB.general.any(`
-				SELECT pb.id, pb.title, pb.date, pb.owner
+				SELECT pb.id, pb.title, pb.date, pb.owner,
+					CASE WHEN EXISTS (
+						SELECT 1 FROM journey WHERE linked_pinboard = pb.id
+					) THEN TRUE ELSE FALSE END AS is_journey
 				FROM pinboards pb
 				WHERE pb.status > 2
 			;`, [ full_filters ])).map(pbRow => ({

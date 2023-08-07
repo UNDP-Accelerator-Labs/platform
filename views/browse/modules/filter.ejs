@@ -129,7 +129,7 @@
 									<% locals.pinboards_list?.filter((pb) => !pb.is_exploration).forEach(d => { %>
 										<li class='pinboard'>
 											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+											<label class='title notranslate' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
 										</li>
 									<% }) %>
 								</menu>

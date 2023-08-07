@@ -86,8 +86,8 @@ exports.unpin = (req, res) => {
 			return ownDB().then(async ownId => {
 				await gt.none(removepads(board_id, object_id, mobilization, uuid, ownId));
 				await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
-				// we ignore the db field here so we don't delete pinboards if the only
-				// pads of the board are on a different database
+				// we ignore the db and is_included fields here so we don't delete pinboards if the only
+				// pads of the board are on a different database or ignored
 				await gt.none(`
 					DELETE FROM pinboards
 					WHERE id = $1::INT
@@ -118,7 +118,10 @@ function insertpads (_id, _object_id, _mobilization, ownId) {
 			return obj
 		})
 		const insert = DB.pgp.helpers.insert(data, ['pinboard', 'pad', 'db'], 'pinboard_contributions')
-		const constraint = DB.pgp.as.format(`ON CONFLICT ON CONSTRAINT pinboard_contributions_pkey DO NOTHING`)
+		const constraint = DB.pgp.as.format(`
+			ON CONFLICT ON CONSTRAINT pinboard_contributions_pkey
+			DO UPDATE SET is_included = true
+		`)
 		return `${insert} ${constraint}`
 
 	} else if (_mobilization) {
@@ -140,6 +143,7 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 					WHERE owner = $3
 				)
 				AND db = $4
+				AND is_included = true
 		;`, [ _id, safeArr(_object_id, -1), _uuid, ownId ])
 	} else if (_mobilization) {
 		return DB.pgp.as.format(`
@@ -156,7 +160,7 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 			SELECT pc.pad AS pad
 			FROM pinboard_contributions pc
 			INNER JOIN pinboards pb ON pb.id = pc.pinboard
-			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3
+			WHERE pc.db = $2 AND pc.pinboard = $1 AND pb.owner = $3 AND pc.is_included = true
 		`, [ _id, ownId, uuid ])).map((row) => row.pad);
 		const status = await DB.conn.any(`
 			SELECT LEAST(1, GREATEST(1, COALESCE(MIN(p.status), 0))) as status
@@ -189,18 +193,26 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 }
 function retrievepins (_object_id, uuid, ownId) {
 	return DB.pgp.as.format(`
-		SELECT pb.id, pb.title FROM pinboards pb
+		SELECT pb.id, pb.title,
+			CASE WHEN EXISTS (
+				SELECT 1 FROM journey WHERE linked_pinboard = pb.id
+			) THEN TRUE ELSE FALSE END AS is_journey
+		FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
-		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2 AND pb.owner = $3
+		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2 AND pb.owner = $3 AND pbc.is_included = true
 	;`, [ safeArr(_object_id, -1), ownId, uuid ])
 }
 function retrievepinboards (_owners, ownId) {
 	return DB.pgp.as.format(`
-		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count FROM pinboards p
+		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count,
+			CASE WHEN EXISTS (
+				SELECT 1 FROM journey WHERE linked_pinboard = p.id
+			) THEN TRUE ELSE FALSE END AS is_journey
+		FROM pinboards p
 		INNER JOIN pinboard_contributions pc
 			ON pc.pinboard = p.id
-		WHERE p.owner IN ($1:csv) AND pc.db = $2
+		WHERE p.owner IN ($1:csv) AND pc.db = $2 AND pc.is_included = true
 		GROUP BY p.id
 	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])
 }

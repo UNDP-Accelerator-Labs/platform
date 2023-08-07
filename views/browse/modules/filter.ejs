@@ -25,6 +25,9 @@
 				})
 			%>
 
+			<% if (locals.metadata?.user?.uuid) { %>
+			<div class='journey'></div>
+			<% } %>
 			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
@@ -106,7 +109,7 @@
 							<button id='new-pinboard' type='button'></button>
 							<div class='dropdown'>
 								<menu>
-									<% locals.pinboards_list?.forEach(d => { %>
+									<% locals.pinboards_list?.filter((pb) => !pb.is_journey).forEach(d => { %>
 										<li class='pinboard'>
 											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
 											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
@@ -157,7 +160,7 @@
 		const sel = d3.select(node)
 		const filter = sel.findAncestor('filter')
 		let taggroup = d3.select(filter.node().nextElementSibling)
-		
+
 		if (!taggroup.node() || !taggroup.classed('active-filters')) {
 			taggroup = d3.select(filter.node().parentNode)
 			.insertElem(_ => filter.node().nextElementSibling, 'div', 'active-filters')
@@ -274,5 +277,9 @@
 				dropdown.selectAll('menu li').classed('hide', false)
 			}
 		})
+	<% } %>
+
+	<% if (locals.metadata?.user?.uuid) { %>
+		journey.addJourneyMain(d3.select('div.journey'));
 	<% } %>
 </script>

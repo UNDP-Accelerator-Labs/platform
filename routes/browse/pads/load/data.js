@@ -108,18 +108,23 @@ module.exports = async kwargs => {
 			const padToPinboards = new Map();
 			(await DB.general.any(`
 				SELECT
-					pc.pad, pb.id, pb.title
+					pc.pad, pb.id, pb.title,
+					CASE WHEN EXISTS (
+						SELECT 1 FROM journey WHERE linked_pinboard = pb.id
+					) THEN TRUE ELSE FALSE END AS is_journey
 				FROM pinboard_contributions pc
 				INNER JOIN pinboards pb ON pb.id = pc.pinboard
 				WHERE
 					pc.pad IN $1:raw
 					AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
 					AND pc.db = $3
+					AND pc.is_included = true
 			`, [ padlist, current_user, ownId ])).forEach(row => {
 				const pinboards = padToPinboards.get(row.pad) ?? [];
 				pinboards.push({
 					id: row.id,
 					title: row.title,
+					is_journey: row.is_journey,
 				});
 				padToPinboards.set(row.pad, pinboards);
 			});

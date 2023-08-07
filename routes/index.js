@@ -473,6 +473,12 @@ exports.process.request = require('./request/')
 exports.process.accept = require('./accept/').accept
 exports.process.decline = require('./accept/').decline
 
+exports.process.journeyCreate = require('./journey/').create;
+exports.process.journeyList = require('./journey/').list;
+exports.process.journeyDoc = require('./journey/').doc;
+exports.process.journeyCollection = require('./journey/').collection;
+exports.process.journeyConsent = require('./journey/').consent;
+
 // THIS IS DEPRECATED
 exports.process.download = (req, res) => {
 	const { uuid } = req.session || {}

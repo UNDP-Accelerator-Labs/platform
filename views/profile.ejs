@@ -42,12 +42,12 @@
 			<div class='meta-status status-<%- locals.data?.uuid ? 2 : 0 %>'>
 				<div class='btn-group'>
 					<% if (editable) { %>
-						<button type='submit' class='save' form='profile-form' disabled='true'><%- vocabulary['save'][language] %></button>
+						<button type='submit' class='save google-translate-attr' form='profile-form' disabled='true'><%- vocabulary['save'][language] %></button>
 					<% } %>
 				</div>
 			</div>
 			<div class='head'>
-				<div class='title'><%- vocabulary['contributor profile'][language] %></div>
+				<div class='title google-translate-attr'><%- vocabulary['contributor profile'][language] %></div>
 			</div>
 			<div class='body'>
 				<form action='/save/contributor' method='POST' id='profile-form' autocomplete='off'>
@@ -63,37 +63,37 @@
 								<div class='required'>
 									<label class='active'>*</label>
 								</div>
-								<label class='instruction'><%- vocabulary['name'][language] %></label>
+								<label class='instruction google-translate-attr'><%- vocabulary['name'][language] %></label>
 								<div class='input-group'>
 									<input type='text' id='new-name' name='new_name' autocomplete='new-name' value='<%- locals.data?.name %>' required <% if (!editable) { %>disabled<% } %>>
-									<label for='new-name'><%- vocabulary['first and last name'][language] %></label>
+									<label for='new-name' class="google-translate-attr"><%- vocabulary['first and last name'][language] %></label>
 								</div>
 							</li>
 							<li>
 								<div class='required'>
 									<label class='active'>*</label>
 								</div>
-								<label class='instruction'><%- vocabulary['email'][language] %></label>
+								<label class='instruction google-translate-attr'><%- vocabulary['email'][language] %></label>
 								<div class='input-group'>
 									<input type='email' id='new-email' name='new_email' autocomplete='new-email' pattern='.+@.+\.\w+' value='<%- locals.data?.email %>' required <% if (!editable) { %>disabled<% } %>>
-									<label for='new-email'><%- vocabulary['email address'][language] %></label>
+									<label for='new-email' class="google-translate-attr"><%- vocabulary['email address'][language] %></label>
 								</div>
 							</li>
 							<li>
 								<div class='required'>
 									<label class='active'>*</label>
 								</div>
-								<label class='instruction'><%- vocabulary['job title'][language] %></label>
+								<label class='instruction google-translate-attr'><%- vocabulary['job title'][language] %></label>
 								<div class='input-group'>
 									<input type='text' id='new-position' name='new_position' autocomplete='new-position' value='<%- locals.data?.position %>' required <% if (!editable) { %>disabled<% } %>>
-									<label for='new-position'><%- vocabulary['job title'][language] %></label>
+									<label for='new-position' class="google-translate-attr"><%- vocabulary['job title'][language] %></label>
 								</div>
 							</li>
 						</ul>
 					</div>
 					<% if (editable) { %>
 						<% if (locals.data?.uuid) { %>
-							<button type='button' class='expand-collapsed' id='reset-password'><%- vocabulary['reset password'][language] %>
+							<button type='button' class='expand-collapsed google-translate-attr' id='reset-password'><%- vocabulary['reset password'][language] %>
 								<% if(locals.reset_errormessage) { %>
 									<div class="errormessage" ><%- locals.reset_errormessage.replace(/\n/g, '<br>') %></div>
 								<% } %>
@@ -104,17 +104,17 @@
 										<div class='required'>
 											<label class='active'>*</label>
 										</div>
-										<label class='instruction'><%- vocabulary['old password'][language] %></label>
+										<label class='instruction google-translate-attr'><%- vocabulary['old password'][language] %></label>
 										<div class='input-group'>
 											<input type='password' id='old-password' name='old_password' autocomplete='old-password' <% if (!locals.data?.uuid) { %>required<% } %> <% if (!editable) { %>disabled<% } %>>
-											<label for='old-password'><%- vocabulary['password'][language] %></label>
+											<label for='old-password' class="google-translate-attr"><%- vocabulary['password'][language] %></label>
 										</div>
 									</li>
 									<li>
 										<div class='required'>
 											<label class='active'>*</label>
 										</div>
-										<button type='button' class='expand-collapsed' id='check-old-password'><%- vocabulary['verify old password'][language] %></button>
+										<button type='button' class='expand-collapsed google-translate-attr' id='check-old-password'><%- vocabulary['verify old password'][language] %></button>
 									</li>
 								</ul>
 							</div>
@@ -126,13 +126,13 @@
 										<label class='active'>*</label>
 									</div>
 									<% if (locals.data?.uuid) { %>
-										<label class='instruction'><%- vocabulary['new password'][language] %></label>
+										<label class='instruction google-translate-attr'><%- vocabulary['new password'][language] %></label>
 									<% } else { %>
-										<label class='instruction'><%- vocabulary['password'][language] %></label>
+										<label class='instruction google-translate-attr'><%- vocabulary['password'][language] %></label>
 									<% } %>
 									<div class='input-group'>
 										<input type='password' id='new-password' name='new_password' autocomplete='new-password' <% if (!locals.data?.uuid) { %>required<% } %> <% if (!editable) { %>disabled<% } %>>
-										<label for='new-password'><%- vocabulary['password'][language] %></label>
+										<label for='new-password' class="google-translate-attr"><%- vocabulary['password'][language] %></label>
 									</div>
 								</li>
 								<li>
@@ -140,13 +140,13 @@
 										<label class='active'>*</label>
 									</div>
 									<% if (locals.data?.uuid) { %>
-										<label class='instruction'><%- vocabulary['confirm new password'][language] %></label>
+										<label class='instruction google-translate-attr'><%- vocabulary['confirm new password'][language] %></label>
 									<% } else { %>
-										<label class='instruction'><%- vocabulary['confirm password'][language] %></label>
+										<label class='instruction google-translate-attr'><%- vocabulary['confirm password'][language] %></label>
 									<% } %>
 									<div class='input-group'>
 										<input type='password' id='confirm-password' name='confirm_password' autocomplete='confirm-password' <% if (!locals.data?.uuid) { %>required<% } %> <% if (!editable) { %>disabled<% } %>>
-										<label for='confirm-password'><%- vocabulary['password'][language] %></label>
+										<label for='confirm-password' class="google-translate-attr"><%- vocabulary['password'][language] %></label>
 									</div>
 								</li>
 							</ul>
@@ -158,10 +158,10 @@
 								<div class='required'>
 									<label class='active'>*</label>
 								</div>
-								<label for='user-country' class='instruction'><%- vocabulary['country'][language] %></label>
+								<label for='user-country' class='instruction google-translate-attr'><%- vocabulary['country'][language] %></label>
 								<div class='select'>
 									<input type='text' id='new-country' autocomplete='new-country' value='<%- locals.data?.country %>' <% if (!editable) { %>disabled<% } %>>
-									<label for='new-country'><%- vocabulary['select country'][language] %></label>
+									<label for='new-country' class="google-translate-attr"><%- vocabulary['select country'][language] %></label>
 									<% if (editable) { %>
 										<div class='dropdown'>
 											<menu>
@@ -180,10 +180,10 @@
 								<div class='required'>
 									<label class='active'>*</label>
 								</div>
-								<label class='instruction'><%- vocabulary['preferred language'][language] %></label>
+								<label class='instruction google-translate-attr'><%- vocabulary['preferred language'][language] %></label>
 								<div class='select'>
 									<input type='text' id='new-language' autocomplete='new-language' value='<%- locals.data?.languagename %>' <% if (!editable) { %>disabled<% } %>>
-									<label for='new-language'><%- vocabulary['select language'][language]() %></label>
+									<label for='new-language' class="google-translate-attr"><%- vocabulary['select language'][language]() %></label>
 									<% if (editable) { %>
 										<div class='dropdown'>
 											<menu>
@@ -203,10 +203,10 @@
 								<!-- ADD OTHER FLUENT LANGUAGES -->
 								<li>
 								<% if (locals.data?.secondary_languages?.length > 0) { %>
-									<label class='instruction'><%- vocabulary['other languages'][language] %></label>
+									<label class='instruction google-translate-attr'><%- vocabulary['other languages'][language] %></label>
 									<div class='select'>
 										<input type='text' id='secondary-languages' autocomplete='secondary-languages' value='<%- locals.languages.filter(d => locals.data?.secondary_languages?.includes(d.language)).map(d => d.name).join(", ") %>' <% if (!editable) { %>disabled<% } %>>
-										<label for='secondary-languages'><%- vocabulary['select language'][language](true) %></label>
+										<label for='secondary-languages' class="google-translate-attr"><%- vocabulary['select language'][language](true) %></label>
 										<% if (editable) { %>
 											<div class='dropdown'>
 												<menu>
@@ -222,7 +222,7 @@
 										<% } %>
 									</div>
 								<% } else { %>
-									<button class='add-info' type='button' onclick='addLanguage(this.parentNode)'>
+									<button class='add-info google-translate-attr' type='button' onclick='addLanguage(this.parentNode)'>
 										<span class='add-circle'>+</span><%- vocabulary['add other languages'][language] %>
 									</button>
 								<% } %>
@@ -233,11 +233,11 @@
 								<div class='required'>
 									<label class='active'>*</label>
 								</div>
-								<label class='instruction'><%- vocabulary['user rights'][language] %></label>
+								<label class='instruction google-translate-attr'><%- vocabulary['user rights'][language] %></label>
 								<div class='select'>
 									<% if (editable && (!locals.data || locals.data?.rights <= rights)) { %>
 										<input type='text' id='new-rights' value='<%- locals.data?.rights %>'>
-										<label for='new-rights'><%- vocabulary['grant rights'][language] %></label>
+										<label for='new-rights' class="google-translate-attr"><%- vocabulary['grant rights'][language] %></label>
 										<div class='dropdown'>
 											<menu>
 												<% for (let i = 0; i <= rights; i ++) { %>
@@ -262,10 +262,10 @@
 							</li>
 							<% if (!locals.data || locals.data?.host_editor) { %>
 								<li>
-									<label class='instruction'><%- vocabulary['teams'][language] %></label>
+									<label class='instruction google-translate-attr'><%- vocabulary['teams'][language] %></label>
 									<div class='select'>
 										<input type='text' id='new-team' <% if (!editable) { %>disabled<% } %>>
-										<label for='new-team'><%- vocabulary['assign to teams'][language] %></label>
+										<label for='new-team' class="google-translate-attr"><%- vocabulary['assign to teams'][language] %></label>
 										<% if (editable) { %>
 											<div class='dropdown'>
 												<menu>
@@ -293,7 +293,7 @@
 									</div>
 								</li>
 							<% } else { %>
-								<li>
+								<li class="google-translate-attr">
 									<label class='instruction'><%- vocabulary['teams'][language] %></label>
 									<div class='pinboard-group'>
 										<div class='pinboard'>
@@ -313,7 +313,7 @@
 					<div class='secondary-info info'>
 						<ul>
 							<% if (modules.some(d => d.type === 'reviews' && rights >= d.rights.write)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<label class='instruction'><%- vocabulary['accept to review'][language] %></label>
 									<div class='input-group'>
 										<input type='checkbox' id='accept-reviews' name='reviewer' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.reviewer) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
@@ -321,7 +321,7 @@
 									</div>
 								</li>
 							<% } %>
-							<li>
+							<li class="google-translate-attr">
 								<label class='instruction'><%- vocabulary['email notifications'][language] %></label>
 								<div class='input-group'>
 									<input type='checkbox' id='email-notifications' name='email_notifications' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.notifications) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
@@ -340,7 +340,7 @@
 							<button class='request-token' type='button' onclick='requestToken(this.form)'>Request an API token</button>
 							<div class='input-group'>
 								<input type='text' name='api-token' class='hide' onclick='this.select()' readonly>
-								<button type='button' class='copy hide' onclick='copyToken(this.form)'><%- vocabulary['copy'][language](true) %></button>
+								<button type='button' class='copy hide google-translate-attr' onclick='copyToken(this.form)'><%- vocabulary['copy'][language](true) %></button>
 							</div>
 						</form>
 					</div>

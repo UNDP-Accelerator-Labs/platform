@@ -875,11 +875,13 @@ const Entry = function (_kwargs) {
 					d3.select('#pinboards-list-lg menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
+						.classed('google-translate-attr', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
 						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 					d3.select('#pinboards-list-xs menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
+						.classed('google-translate-attr', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
 						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 				}

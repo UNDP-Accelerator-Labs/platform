@@ -69,6 +69,7 @@ exports.pagemetadata = (_kwargs) => {
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
 	const language = checklanguage(params?.language || session.language || this.sessiondata())
+	const page_language = params?.language;
 
 	const parsedQuery = {}
 	for (let key in query) {
@@ -252,6 +253,7 @@ exports.pagemetadata = (_kwargs) => {
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,
+				page_language,
 				public,
 				excerpt: excerpt || { title: res?.locals.instance_vars?.title || title, txt: res?.locals.instance_vars?.description || description, p: false },
 

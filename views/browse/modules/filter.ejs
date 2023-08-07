@@ -45,7 +45,7 @@
 			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='exploration'></div>
 			<% } // logged in (uuid) %>
-			<div class='search'>
+			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
 				<% } else { %>
@@ -60,11 +60,11 @@
 					<% locals.filters_menu?.forEach(d => { %>
 						<section>
 							<% for (let key in d) { %>
-								<div class='filter'>
+								<div class='filter google-translate-attr'>
 									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
 									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 									<div class='dropdown'>
-										<menu>
+										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
 												<li>
 													<% if (c.equivalents?.length) { %>
@@ -94,14 +94,14 @@
 						</section>
 					<% }) %>
 					<div class='break'></div>
-					<button type='submit' class='submit-filters'>
+					<button type='submit' class='submit-filters google-translate-attr'>
 						<%- vocabulary['apply filters'][language] %>
 					</button>
 				</div>
 			<% } %>
 
 			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
-				<div class='status'>
+				<div class='status google-translate-attr'>
 					<menu>
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
@@ -120,7 +120,7 @@
 				<div class='global-actions'>
 					<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
 					<% if (space !== 'pinned') { %>
-						<div class='add filter pinboards'>
+						<div class='add filter pinboards google-translate-attr'>
 							<input type='text' id='pin-all'>
 							<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
 							<button id='new-pinboard' type='button'></button>
@@ -141,7 +141,7 @@
 				</div>
 			<% } else if (object === 'contributors') { %>
 				<div class='global-actions'>
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+					<button type='button' class='download lg google-translate-attr' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
 					<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
 				</div>
 			<% } %>
@@ -154,7 +154,7 @@
 		</form>
 	</nav>
 <% } else { %>
-	<nav><p><%- vocabulary['no entries'][language] %></p></nav>
+	<nav><p class="google-translate-attr"><%- vocabulary['no entries'][language] %></p></nav>
 <% } %>
 
 <script type='text/javascript'>

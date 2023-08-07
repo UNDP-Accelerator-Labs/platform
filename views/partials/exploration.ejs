@@ -189,6 +189,7 @@
             }
             this.updateExplorationList(() => {
                 datalist.addElems('option', 'exploration-past-elem', this.past)
+                .classed('google-translate-attr', true)
                 .attrs({
                     'value': (d) => this.normalizeExplorationPrompt(d['prompt']),
                     'label': (d) => `<%= vocab['last_access'] %> ${d['last_access_ago']}`,
@@ -290,10 +291,10 @@
         consentFeature() {
             const explorationInfoUrl = '<%= exploration_info_url %>';
             const message = `
-                <h2><%= vocab['welcome'] %></h2>
-                <p><%= vocab['explain'] %></p>
-                <a href="${explorationInfoUrl}" target="_blank"><%= vocab['info'] %></a>
-                <p><%= vocab['indicate'] %></p>
+                <h2 class="google-translate-attr"><%= vocab['welcome'] %></h2>
+                <p class="google-translate-attr"><%= vocab['explain'] %></p>
+                <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr"><%= vocab['info'] %></a>
+                <p class="google-translate-attr"><%= vocab['indicate'] %></p>
             `;
             renderPromiseModal({
                 message,
@@ -360,6 +361,7 @@
             this.updateCurrentExploration(this.currentId, this.currentPrompt);
 
             sel.addElem('label')
+            .classed('google-translate-attr', true)
             .attrs({
                 'for': `exploration-main`,
             })
@@ -415,7 +417,7 @@
                 ...this.past,
             ]).attrs({
                 'value': (d) => `${d['id']}`,
-            })
+            }).classed('google-translate-attr', true)
             .text((d) => useFull ? d['prompt'] : d['short']);
             const currentId = this.currentId;
             d3.selectAll('div.exploration-doc select.exploration-short')
@@ -467,18 +469,23 @@
             const that = this;
 
             function addTitle(curSel) {
-                curSel.addElem('span').text("<%= vocab['doc-begin'] %>: ").classed('exploration-title', true);
+                curSel.addElem('span')
+                .text("<%= vocab['doc-begin'] %>: ")
+                .classed('exploration-title', true)
+                .classed('google-translate-attr', true);
             }
 
             function addButtons(curSel) {
                 curSel.addElem('button')
                 .classed('exploration-btn-approve', true)
+                .classed('google-translate-attr', true)
                 .text("<%= vocab['doc-approve'] %>")
                 .on('click', (d) => {
                     this.setDocAction(d.id, true);
                 });
                 curSel.addElem('button')
                 .classed('exploration-btn-dislike', true)
+                .classed('google-translate-attr', true)
                 .text("<%= vocab['doc-dislike'] %>")
                 .on('click', (d) => {
                     this.setDocAction(d.id, false);

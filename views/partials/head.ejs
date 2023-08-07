@@ -118,9 +118,11 @@
 	//IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
 	//THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
 	function updateDomTree(lang){
-		let value = languages.includes(lang) ? 'no' : 'yes'
-		d3.selectAll(".google-translate-attr")
-  			.attr("translate", value);
+		const isMainLanguage = languages.includes(lang)
+		d3.selectAll('.google-translate-attr')
+  			.classed('notranslate', function() {
+				return d3.select(this).node().classed('notranslate') || isMainLanguage;
+			});
 	}
 
 	//LISTEN TO CHANGES IN LANGUAGE COOKIES

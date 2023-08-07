@@ -805,6 +805,7 @@ const Entry = function (_kwargs) {
 						return _data?.filter((pb) => !pb.is_exploration).map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
 					}, (d) => d.id)
 					pin.addElems('label', 'name')
+						.classed('notranslate', true)
 						.attr('title', d => d.title)
 						.html(d => {
 							if (d.title.length > 25) return `${d.title.slice(0, 25)}…`
@@ -864,6 +865,7 @@ const Entry = function (_kwargs) {
 						}
 					})
 					opts.addElems('label', 'title')
+						.classed('notranslate', true)
 						.attr('for', d => `board-${d.id}-object-${d.object_id}`)
 						.html(d => d.title)
 					.addElems('span', 'count')
@@ -875,13 +877,13 @@ const Entry = function (_kwargs) {
 					d3.select('#pinboards-list-lg menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
-						.classed('google-translate-attr', true)
+						.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
 						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 					d3.select('#pinboards-list-xs menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
-						.classed('google-translate-attr', true)
+						.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
 						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 				}

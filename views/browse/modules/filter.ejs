@@ -11,10 +11,10 @@
 	<nav id='search-and-filter' class='lg'>
 		<% if (locals.metadata?.user?.uuid) { %>
 		<div class="search-type-menu">
-			<span class="stm stm-select" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
-			<span class="stm" id="stm-exploration">
+			<span class="stm stm-select google-translate-attr" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
+			<span class="stm google-translate-attr" id="stm-exploration">
 				<%- vocabulary["search-type-menu"][language]["exploration"] %>
-				<div class="stm-hint stm-hidden">
+				<div class="stm-hint stm-hidden google-translate-attr">
 					<%- vocabulary["exploration"][language]["hint"] %>
 				</div>
 			</span>

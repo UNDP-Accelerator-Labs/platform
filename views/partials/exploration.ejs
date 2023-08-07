@@ -189,7 +189,7 @@
             }
             this.updateExplorationList(() => {
                 datalist.addElems('option', 'exploration-past-elem', this.past)
-                .classed('google-translate-attr', true)
+                .classed('notranslate', true)
                 .attrs({
                     'value': (d) => this.normalizeExplorationPrompt(d['prompt']),
                     'label': (d) => `<%= vocab['last_access'] %> ${d['last_access_ago']}`,
@@ -417,7 +417,8 @@
                 ...this.past,
             ]).attrs({
                 'value': (d) => `${d['id']}`,
-            }).classed('google-translate-attr', true)
+            })
+            .classed('notranslate', (d) => d['id'] !== null)
             .text((d) => useFull ? d['prompt'] : d['short']);
             const currentId = this.currentId;
             d3.selectAll('div.exploration-doc select.exploration-short')

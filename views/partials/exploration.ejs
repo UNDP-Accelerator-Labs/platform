@@ -1,8 +1,9 @@
 <%
     const language = locals.metadata.page.language;
+    const page_language = locals.metadata.page.page_language;
     const vocab = vocabulary['exploration'][language];
     const own_db = locals.metadata.site.own_db;
-    const exploration_info_url = `https://github.com/UNDP-Accelerator-Labs/platform/blob/master/exploration-${language}.md`;
+    const exploration_info_url = `/${page_language}/exploration-info/`;
 %>
 <script type='text/javascript'>
     class Exploration {

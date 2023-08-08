@@ -141,6 +141,8 @@ app.route('/:language/print/:object/:space')
 
 app.get('/:language/analyse/:object', routes.dispatch.analyse) // TO DO
 
+app.get('/:language/exploration-info', routes.render.explorationInfo)
+
 app.post('/check/:object', routes.process.check)
 
 app.post('/save/:object', routes.process.save)

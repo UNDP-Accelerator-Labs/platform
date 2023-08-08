@@ -105,9 +105,11 @@
 	}
 
 	function rewriteUrl(lang, reload = false){
-		var currentUrl = window.location.href;
-		var languagePattern = /\/[a-z]{2,3}\//;
-		var newUrl = currentUrl.replace(languagePattern, "/" + lang + "/");
+		const currentUrl = new URL(window.location);
+		const languagePattern = /^\/[a-z]{2,3}\//;
+		const newPath = currentUrl.pathname.replace(languagePattern, "/" + lang + "/");
+		currentUrl.pathname = newPath;
+		const newUrl = `${currentUrl}`;
 
 		if(reload) window.location.href = newUrl;
 		else window.history.replaceState({}, "", newUrl);
@@ -115,8 +117,8 @@
 
 	//IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
 	//THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
-	function updateDomTree(lang){
-		const isMainLanguage = languages.includes(lang)
+	function updateDomTree(lang) {
+		const isMainLanguage = languages.includes(lang) && lang !== 'en'
 		d3.selectAll('.google-translate-attr')
   			.classed('notranslate', function() {
 				return d3.select(this).classed('notranslate') || isMainLanguage;

@@ -22,8 +22,6 @@ if (!exports.public) { exports.public = {} }
 if (!exports.private) { exports.private = {} }
 if (!exports.dispatch) { exports.dispatch = {} }
 
-
-
 exports.forwardGeocoding = require('./helpers/geo/').forwardcode.render
 // (req, res) => {
 // 	const { locations, list } = req.body || {}
@@ -130,9 +128,6 @@ exports.reverseGeocoding = require('./helpers/geo/').reversecode.render
 // 	})
 // }
 
-
-
-
 exports.process.callapi = (req, res) => {
 	const { uri, method, key, expect } = req.body || {}
 	const headers = {
@@ -182,6 +177,13 @@ exports.process.updatePassword = require('./login/').updatePassword
 exports.dispatch.browse = require('./browse/')
 
 exports.dispatch.print = require('./print/')
+
+exports.render.explorationInfo = async (req, res) => {
+	const { originalUrl } = req || {};
+	const metadata = await helpers.datastructures.pagemetadata({ req, res });
+	const data = Object.assign(metadata, { originalUrl });
+	return res.render('exploration-info', data);
+}
 
 /* =============================================================== */
 /* ========================= MOBILIZE ============================ */

@@ -93,10 +93,8 @@
 	  document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
 	}
 	function googleTranslateElementInit() {
-		if(languageAlias !== 'en'){
-			setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
-			setCookie('googtrans', `/en/${languageAlias}`,1);
-		}
+		setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
+		setCookie('googtrans', `/en/${languageAlias}`, 1);
 
 		d3.select("#gtranslate-dummy-lang").style("display", "none");
 		new google.translate.TranslateElement({

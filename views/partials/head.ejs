@@ -121,7 +121,7 @@
 		const isMainLanguage = languages.includes(lang)
 		d3.selectAll('.google-translate-attr')
   			.classed('notranslate', function() {
-				return d3.select(this).node().classed('notranslate') || isMainLanguage;
+				return d3.select(this).classed('notranslate') || isMainLanguage;
 			});
 	}
 

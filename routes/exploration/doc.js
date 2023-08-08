@@ -7,10 +7,7 @@ const validActions = [actionApprove, actionDislike, actionNeutral];
 module.exports = (req, res) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
-        return res.json({
-            status: 401,
-            message: 'must be logged in',
-        });
+        throw new Error('uuid not set');
     }
     const { exploration: exploration_in, action, pad: pad_in } = req.body || {};
 	if (!validActions.includes(action)) {
@@ -26,14 +23,6 @@ module.exports = (req, res) => {
         });
     }
     return DB.general.tx(async (t) => {
-        const hasConsent = (await t.one(`
-            SELECT confirmed_feature_exploration FROM users WHERE uuid = $1
-        `, [uuid])).confirmed_feature_exploration;
-        if (!hasConsent) {
-            return res.status(403).json({
-                message: `${uuid} has to consent to using the exploration feature first!`,
-            });
-        }
         const ownId = await ownDB();
         const jrow = await t.one(`
             SELECT uuid, linked_pinboard FROM exploration WHERE id = $1

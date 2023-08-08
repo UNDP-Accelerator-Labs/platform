@@ -478,6 +478,8 @@ exports.process.explorationList = require('./exploration').list;
 exports.process.explorationDoc = require('./exploration').doc;
 exports.process.explorationCollection = require('./exploration').collection;
 exports.process.explorationConsent = require('./exploration').consent;
+exports.process.explorationLoginCheck = require('./exploration').loginCheck;
+exports.process.explorationConsentCheck = require('./exploration').consentCheck;
 
 // THIS IS DEPRECATED
 exports.process.download = (req, res) => {

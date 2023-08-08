@@ -149,12 +149,34 @@ app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
 app.post('/validate', routes.process.validate)
 
-app.put('/exploration/create', routes.process.explorationCreate);
-app.get('/exploration/list', routes.process.explorationList);
-app.put('/exploration/doc', routes.process.explorationDoc);
-app.get('/exploration/collection', routes.process.explorationCollection);
-app.get('/exploration/consent', routes.process.explorationConsent);
-app.put('/exploration/consent', routes.process.explorationConsent);
+app.put(
+	'/exploration/create',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationCreate);
+app.get(
+	'/exploration/list',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationList);
+app.put(
+	'/exploration/doc',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationDoc);
+app.get(
+	'/exploration/collection',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationCollection);
+app.get(
+	'/exploration/consent',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsent);
+app.put(
+	'/exploration/consent',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsent);
 
 app.route('/publish/:object')
 	.get(routes.process.publish)

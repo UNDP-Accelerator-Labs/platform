@@ -3,9 +3,7 @@ const { DB, fixed_uuid } = include('config/');
 module.exports = (req, res) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
-        return res.status(401).json({
-            message: 'must be logged in',
-        });
+        throw new Error('uuid not set');
     }
     if (req.method === 'GET') {
         DB.general.one(`

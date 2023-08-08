@@ -22,9 +22,7 @@ function limitPromptForPinboard(prompt) {
 module.exports = (req, res) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
-        return res.status(401).json({
-            message: 'must be logged in',
-        });
+        throw new Error('uuid not set');
     }
     const { prompt: prompt_in } = req.body || {};
     const prompt = normalize(prompt_in);
@@ -34,14 +32,6 @@ module.exports = (req, res) => {
         });
     }
     return DB.general.tx(async (t) => {
-        const hasConsent = (await t.one(`
-            SELECT confirmed_feature_exploration FROM users WHERE uuid = $1
-        `, [uuid])).confirmed_feature_exploration;
-        if (!hasConsent) {
-            return res.status(403).json({
-                message: `${uuid} has to consent to using the exploration feature first!`,
-            });
-        }
         const jid = await t.any(`
             SELECT id FROM exploration WHERE uuid = $1 AND prompt = $2
         `, [uuid, prompt]);

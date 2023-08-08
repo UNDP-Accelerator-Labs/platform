@@ -362,7 +362,7 @@ div.public-page-panel {
 
 			.stat-group {
 				display: flex;
-				flex: 1 1 0;
+				flex: 30%;
 				align-items: center;
 				margin: 0 30px;
 
@@ -383,8 +383,9 @@ div.public-page-panel {
 					}
 				}
 			}
-			.stat-group:first-child {
-				border-right: 1px dotted $c-light-grey;
+			.stat-group:nth-child(2) {
+				flex: 70%;
+				border-left: 1px dotted $c-light-grey;
 			}
 		}
 		.map-container {
@@ -425,12 +426,10 @@ div.public-page-panel {
 			display: flex;
 			flex-flow: wrap;
 			align-items: center;
+			gap: 15px 15px;
 
 			li {
-				width: calc((300px * 3 + 15px * 2) / 4);
-				margin: .25em 0;
-				padding-right: 15px;
-				box-sizing: border-box;
+				flex: calc((100% - 15px * (4 - 1)) / 4) 0 0;
 				font-size: $t-main;
 				line-height: 1.3em;
 
@@ -464,7 +463,7 @@ div.main-content {
 
 div.browse {
 	display: block;
-	width: calc(300px * 3 + 15px * 2);
+	flex: calc(300px * 3 + 15px * 2) 0 0;
 	padding: 0 15px;
 	background-color: #FFF;
 	min-height: calc(100vh - 120px);

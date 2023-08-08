@@ -411,10 +411,18 @@ header { /* LEFT COlUMN */
 				width: 100%;
 				min-height: auto;
 
-				img.logo {
-					height: 125px;
-					/*margin-left: 80px;*/
-					margin-right: 60px;
+				.logo-container {
+					display: flex;
+					justify-content: center;
+					width: 100%;
+					overflow: hidden;
+
+					img.logo {
+						height: 125px;
+					}
+					.filler {
+						flex: 60px 0 1;
+					}
 				}
 
 				.create,

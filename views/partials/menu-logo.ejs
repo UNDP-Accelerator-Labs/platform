@@ -30,7 +30,10 @@
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
-		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
+		<div class='logo-container'>
+			<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
+			<div class='filler'></div>
+		</div>
 
 		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
@@ -532,6 +535,7 @@
 				if (dropdown.node().style.maxHeight) {
 					dropdown.node().style.maxHeight = null
 					dropdown.node().style.overflow = null
+					d3.select('#site-title .inner .create').classed('open', false)
 					dropdown.findAncestor('li').classed('open', false)
 				} else {
 					// COLLAPSE ALL DROPDOWNS BETWEEN .main AND target

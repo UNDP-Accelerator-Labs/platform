@@ -162,7 +162,8 @@
 									if (dropdown.node().style.maxHeight) {
 										dropdown.node().style.maxHeight = null
 										dropdown.node().style.overflow = null
-										dropdown.findAncestor('li').classed('open', false)
+										d3.select('nav.tabs .inner .spaces')?.classed('open', false)
+										dropdown.findAncestor('li')?.classed('open', false)
 									} else {
 										// COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
 										if (d3.select(this).hasAncestor('dropdown')) {
@@ -171,7 +172,7 @@
 											.each(function () {
 												this.style.maxHeight = null
 												this.style.overflow = null
-												d3.select(this).findAncestor('li').classed('open', false)
+												d3.select(this).findAncestor('li')?.classed('open', false)
 											})
 										}
 
@@ -180,7 +181,7 @@
 											if (dropdown.select('.dropdown').size() > 0) dropdown.node().style.overflow = 'visible'
 											else dropdown.node().style.overflow = 'scroll'
 										}, 250)
-										d3.select('nav.tabs .inner .spaces').classed('open', true)
+										d3.select('nav.tabs .inner .spaces')?.classed('open', true)
 										dropdown.findAncestor('li')?.classed('open', true)
 									}
 								}
@@ -188,6 +189,7 @@
 
 							window.addEventListener('mouseup', function (e) {
 								if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('spaces')) {
+									console.log('in here')
 									d3.selectAll('nav.tabs .inner .open').classed('open', false)
 									.selectAll('.dropdown')
 									.each(function () {

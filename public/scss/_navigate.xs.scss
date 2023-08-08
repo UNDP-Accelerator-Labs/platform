@@ -70,7 +70,7 @@ nav#languages {
 button#expand-nav {
 	position: fixed;
 	display: block;
-	top: 60px;
+	top: 15px;
 	left: 15px;
 	width: 60px;
 	height: 60px;
@@ -80,6 +80,7 @@ button#expand-nav {
 	background-color: #FFF;
 	z-index: 10000;
 	box-shadow: 0 0 10px rgba(0,0,0,.25);
+	cursor: pointer;
 
 	.line {
 		position: absolute;
@@ -137,239 +138,315 @@ nav.tabs {
 	.inner {
 		width: 100%;
 
-		button.space {
-			float: left;
-			position: relative;
-			width: calc(100% - 60px);
-			height: 60px;
-			border: none;
-			outline: none;
-			padding-left: 60px;
-			background-color: transparent;
-			font-weight: bold;
+		.xs {
+			display: flex;
+			justify-content: center;
+			align-items: center;
 
-			&::after {
-				content: '>';
-				position: absolute;
-				height: 60px;
-				top: 0;
-				color: $c-light-grey;
-				text-align: center;
-				transform: rotate(90deg);
-			}
-		}
-		.count {
-			position: relative;
-			display: inline-block;
-			font-size: $t-small;
-			font-weight: normal;
-			margin: 0 0 0 15px;
-			color: $c-light-grey;
-		}
-		.count::before {
-			content: '';
-			position: absolute;
-			height: 20px;
-			width: 0;
-			left: -10px;
-			top: -2px;
-			border-left: 1px dotted $c-light-grey;
-		}
+			.spaces {
+				flex-grow: 1;
 
-		.dropdown {
-			position: absolute;
-			width: calc(100% - 60px);
-			max-height: 0;
-			left: 30px;
-			top: calc(100% + 1px);
-			background-color: #FFF;
-			box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-			overflow: hidden;
-			z-index: 100;
-			transition: max-height 0.25s ease-out;
-
-			menu,
-			ul {
-				width: 100%;
-
-				li {
+				button.space {
+					float: left;
 					position: relative;
-					display: block;
-					vertical-align: top;  // FIXME: vertical-align is ignored due to display block
+					width: calc(100% - 60px);
+					height: 60px;
+					border: none;
+					outline: none;
+					padding-left: 60px;
+					background-color: transparent;
+					font-weight: bold;
+					font-size: $t-mid;
+					cursor: pointer;
 
-					a {
-						display: block;
-					}
-
-					button {
-						position: relative;
-						width: 100%;
-						height: 45px;
-						padding: 0;
-						outline: none;
-						border: none;
-						background-color: transparent;
-						font-size: $t-mid-small;
+					&::after {
+						content: '>';
+						position: absolute;
+						top: 20px;
+						margin-left: 15px;
 						color: $c-light-grey;
+						text-align: center;
+						transition: transform .25s;
+						transform-origin: center;
 						font-weight: normal;
-						cursor: pointer;
-						overflow: hidden;
+						font-size: $t-main;
 					}
-
-					input[type=text] {
-						position: relative;
-						width: calc(100% - 30px);
-						height: 38px;
-						padding: 4.5px 15px 0 15px;
-						border: none;
-						outline: none;
-						background-color: transparent;
-						font-size: $t-mid-small;
-						color: $c-dark-blue;
-						text-align: center;
-					}
-					label {
+				}
+				.count {
+					position: relative;
+					display: inline-block;
+					font-size: $t-mid-small;
+					font-weight: normal;
+					margin: 0 0 0 15px;
+					color: $c-light-grey;
+					
+					&::before {
+						content: '';
 						position: absolute;
+						height: 20px;
+						width: 0;
+						left: -10px;
+						top: -2px;
+						border-left: 1px dotted $c-light-grey;
+					}
+				}
+
+				&.open {
+					button.space {
+						&::after {
+							transform: rotate(90deg);
+						}
+					}
+				}
+
+				.dropdown {
+					position: absolute;
+					width: calc(100% - 60px);
+					max-height: 0;
+					left: 30px;
+					top: calc(100% + 1px);
+					background-color: #FFF;
+					box-shadow: 0px 10px 10px rgba(0,0,0,.1);
+					overflow: hidden;
+					z-index: 100;
+					transition: max-height 0.25s ease-out;
+
+					menu,
+					ul {
 						width: 100%;
-						left: 0;
-						font-size: $t-mid-small;
-						line-height: 1.5em;
-						color: $c-light-grey;
-						transform: translateY(10px);
-						transition: transform .25s, font-size .25s;
-						text-align: center;
+						border-top: 1px solid $c-dark-blue;
 
-						.count {
+						li {
 							position: relative;
-							display: inline-block;
-							font-size: $t-small;
-							margin: 0 0 5px 15px;
-							color: $c-light-grey;
-						}
-						.count::before {
-							content: '';
-							position: absolute;
-							vertical-align: middle;
-							height: 20px;
-							width: 0;
-							left: -10px;
-							top: 0;
-							border-left: 1px dotted $c-light-grey;
-						}
+							min-height: 45px;
+							display: block;
 
-						&::after {
-							content: '';
-							position: absolute;
-							top: 4px;
-							margin-left: 10px;
-							width: 15px;
-							height: 15px;
-							background: url('../imgs/icons/i-search-sm.svg');
-						}
-					}
-					input[type=text] + label {
-						pointer-events: none;
-					}
-					input[type=text]:focus + label,
-					input[type=text].has-value + label {
-						font-size: $t-small;
-						line-height: 1.5em;
-						transform: translateY(-5px);
-
-						&::after {
-							top: 2px;
-						}
-					}
-
-					.dropdown {
-						position: absolute;
-						width: calc(100% - 60px);
-						max-height: 0;
-						left: 30px;
-						top: 100%;
-						background-color: #FFF;
-						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-						overflow: auto;
-						z-index: 100;
-						transition: max-height 0.25s ease-out;
-
-						menu {
-							width: 100%;
-							border-top: 1px solid $c-light-grey;
-
-							li {
-								display: flex;
-								justify-content: center;
-								align-items: center;
-								width: calc(100% - 60px);
-								min-height: 45px;
-								margin: 0;
-								padding: 5px 30px;
-								text-align: center;
-
-								a {
-									display: block;
-									position: static;
-									width: 100%;
-									color: $c-dark-grey;
-									font-size: $t-mid-small;
-									line-height: 1.5em;
-									transform: none;
-								}
+							a {
+								display: block;
 
 								&:hover {
-									background-color: $c-light-3;
+									text-decoration: none;
 								}
+							}
+
+							button {
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
+								position: relative;
+								width: 100%;
+								min-height: 45px;
+								padding: 0;
+								outline: none;
+								border: none;
+								background-color: transparent;
+								font-size: $t-mid-small;
+								line-height: 1.5em;
+								color: $c-dark-grey;
+								font-weight: normal;
+								cursor: pointer;
+								overflow: hidden;
+								padding: 0 30px;
+								text-align: left;
+
+								.count::before {
+									content: none;
+								}
+
+							}
+							button:hover,
+							input[type=text]:hover:not(:focus) {
+								background-color: $c-light-2 !important;
+							}
+
+							input[type=text] {
+								position: relative;
+								width: calc(100% - 60px);
+								height: 38px;
+								padding: 7px 30px 0 30px;
+								border: none;
+								outline: none;
+								background-color: transparent;
+								font-size: $t-mid-small;
+								color: $c-dark-blue;
+								text-align: left;
+								border-bottom: 1px solid #FFF;
+
+								&:focus {
+									border-bottom: 1px solid $c-light-grey;
+								}
+							}
+							label {
+								display: flex;
+								justify-content: space-between;
+								position: absolute;
+								width: calc(100% - 85px);
+								left: 30px;
+								top: 0;
+								font-size: $t-mid-small;
+								line-height: 1.5em;
+								color: $c-light-grey;
+								transform: translateY(10px);
+								transition: transform .25s, font-size .25s;
+								text-align: left;
+
+								.count {
+									position: relative;
+									display: inline-block;
+									font-size: $t-small;
+									margin: 0 0 5px 15px;
+									color: $c-light-grey;
+									text-align: right;
+									
+									&::before {
+										content: none;
+									}
+									&::after {
+										content: '';
+										position: absolute;
+										top: 5px;
+										left: 100%;
+										margin-left: 10px;
+										width: 15px;
+										height: 15px;
+										background: url('../imgs/icons/i-search-sm.svg');
+										border: none;
+									}
+								}
+
+							}
+							input[type=text] + label {
+								pointer-events: none;
+							}
+							input[type=text]:focus + label,
+							input[type=text].has-value + label {
+								font-size: $t-small;
+								line-height: 1.5em;
+								transform: translateY(-5px);
+
+								.count::after {
+									top: 2px;
+								}
+							}
+
+							.dropdown {
+								position: absolute;
+								width: calc(100% - 60px);
+								max-height: 0;
+								left: 30px;
+								transform: translateX(0);
+								top: calc(100% - 1px);
+								background-color: #FFF;
+								box-shadow: 0px 10px 10px rgba(0,0,0,.1);
+								overflow: auto;
+								z-index: 100;
+								transition: max-height 0.25s ease-out;
+
+								menu {
+									width: 100%;
+									border-top: 2px solid $c-dark-blue;
+
+									li {
+										display: flex;
+										justify-content: center;
+										align-items: center;
+										width: calc(100% - 60px);
+										min-height: 45px;
+										margin: 0;
+										padding: 5px 30px;
+										text-align: left;
+
+										a {
+											display: block;
+											position: static;
+											width: 100%;
+											color: $c-dark-grey;
+											font-size: $t-mid-small;
+											line-height: 1.5em;
+											transform: none;
+										}
+
+										&:hover {
+											background-color: $c-light-3;
+										}
+									}
+								}
+							}
+						}
+						/*li:hover,
+						li.active {
+							input[type=text] {
+								border-color: $c-light-2;
+							}
+						}*/
+						li.active {
+							button {
+								font-weight: bold;
+								color: $c-dark-blue;
+
+								.count {
+									font-weight: normal;
+								}
+							}
+							input[type=text] {
+								border-color: $c-dark-blue;
 							}
 						}
 					}
 				}
-				li:hover,
-				li.active {
-					input[type=text] {
-						border-color: $c-light-2;
-					}
-				}
-				li.active {
-					button {
-						font-weight: bold;
-						color: $c-dark-blue;
 
-						.count {
-							font-weight: normal;
+				.btn-group {
+					float: right;
+
+					a {
+						display: block;
+						width: 30px;
+						height: 30px;
+						margin: 15px 15px 0 0;
+						border-radius: 30px;
+						border: 1px solid $c-light-grey;
+						text-align: center;
+
+						i {
+							line-height: 30px;
+							font-size: $t-main;
+							color: $c-light-grey;
 						}
 					}
-					input[type=text] {
+					a.active {
+						background-color: $c-dark-blue;
 						border-color: $c-dark-blue;
+
+						i {
+							color: #FFF;
+						}
 					}
 				}
 			}
-		}
+			.btn-group {
+				margin-right: 15px;
 
-		.btn-group {
-			float: right;
+				a {
+					display: block;
+					width: 40px;
+					height: 40px;
+					border-radius: 40px;
+					border: 1px solid $c-light-grey;
+					text-align: center;
 
-			a {
-				display: block;
-				width: 30px;
-				height: 30px;
-				margin: 15px 15px 0 0;
-				border-radius: 30px;
-				border: 1px solid $c-light-grey;
-				text-align: center;
-
-				i {
-					line-height: 30px;
-					font-size: $t-main;
-					color: $c-light-grey;
+					i {
+						line-height: 40px;
+						font-size: $t-mid;
+						color: $c-light-grey;
+					}
 				}
-			}
-			a.active {
-				background-color: $c-dark-blue;
-				border-color: $c-dark-blue;
+				a.active {
+					background-color: $c-dark-blue;
+					border-color: $c-dark-blue;
 
-				i {
-					color: #FFF;
+					i {
+						color: #FFF;
+					}
 				}
 			}
 		}
@@ -422,7 +499,6 @@ header { /* LEFT COlUMN */
 					margin-top: 31px;
 
 					button {
-						/* width: 100px; */
 						min-height: 45px;
 						margin: 0;
 						padding: 0 30px;
@@ -439,7 +515,7 @@ header { /* LEFT COlUMN */
 						top: calc(100% - 1px);
 						left: 50%;
 						max-height: 0;
-						width: calc(100vw - 60px);
+						width: 450px;
 						background-color: #FFF;
 						overflow: hidden;
 						z-index: 1000;
@@ -451,20 +527,71 @@ header { /* LEFT COlUMN */
 							width: 100%;
 							border-top: 2px solid $c-dark-blue;
 
+							li.filter {
+								position: fixed;
+								height: 60px;
+								width: 100%;
+								background-color: #FFF;
+								border-bottom: 1px solid $c-light-grey;
+								z-index: 100;
+
+								input[type=text] {
+									position: relative;
+									width: calc(100% - 30px);
+									height: 45px;
+									padding: 15px 15px 0 15px;
+									border: none;
+									outline: none;
+									background-color: transparent;
+									font-size: $t-mid-small;
+									color: $c-dark-blue;
+								}
+								label {
+									position: absolute;
+									left: 15px;
+									font-size: $t-mid-small;
+									line-height: 1.5em;
+									color: $c-light-grey;
+									transform: translateY(20px);
+									transition: transform .25s, font-size .25s;
+
+									&::after {
+										content: '';
+										position: absolute;
+										top: 4px;
+										margin-left: 10px;
+										width: 15px;
+										height: 15px;
+										background: url('../imgs/icons/i-search-sm.svg');
+									}
+								}
+								input[type=text] + label {
+									pointer-events: none;
+								}
+								input[type=text]:focus + label,
+								input[type=text].has-value + label {
+									font-size: $t-small;
+									line-height: 1.5em;
+									transform: translateY(5px);
+								}
+							}
+							li.padding {
+								width: 100%;
+								height: 60px;
+							}
 							li {
 								position: relative;
 								background-color: #FFF;
 
 								img {
-									position: absolute;
-									left: 30px;
-									top: 7.5px;
-									vertical-align: text-bottom;
 									width: 30px;
 									height: 30px;
+									margin-right: 10px;
 								}
 
 								button {
+									display: flex;
+									align-items: center;
 									position: relative;
 									width: 100%;
 									height: auto;
@@ -474,21 +601,19 @@ header { /* LEFT COlUMN */
 									background-color: #FFF;
 									border: none;
 									cursor: pointer;
-									text-align: center;
+									text-align: left;
 									color: $c-light-grey;
 
 									label {
+										flex-grow: 1;
 										display: block;
 										width: 100%;
 										cursor: pointer;
 										margin: 10px 0;
 									}
 									.expandable {
-										position: absolute;
-										right: 30px;
-										top: 2px;
 										cursor: pointer;
-										transform: translateY(50%) rotate(90deg);
+										transition: transform .25s;
 									}
 								}
 								button:hover {
@@ -499,18 +624,24 @@ header { /* LEFT COlUMN */
 									justify-content: center;
 									align-items: flex-start;
 									white-space: normal;
-									padding-top: 5px;
-									padding-bottom: 5px;
-									/*height: 60px;*/
+									padding-top: 15px;
+									padding-bottom: 15px;
 
+									label {
+										margin: 0;
+										flex-grow: initial;
+									}
 									.sub {
+										display: block;
+										width: 100%;
 										font-size: $t-small;
+										color: $c-light-grey;
 									}
 								}
 								a {
 									button,
 									button:hover {
-										color: $c-dark-blue;
+										color: $c-dark-grey;
 									}
 								}
 								a:hover {
@@ -536,49 +667,76 @@ header { /* LEFT COlUMN */
 									}
 								}
 								.dropdown {
-									width: calc(100vw - 120px);
+									width: calc(100% - 60px);
 									box-shadow: 0 10px 10px rgba(0, 0, 0, .1);
 
 									ul {
+										border-top: none;
+									}
+								}
+								.dropdown.leaf {
+									button {
+										font-size: $t-mid-small;
+										line-height: 1.5em;
+									}
+								}
+
+								&.open {
+									& > .dropdown {
 										border-top: 1px solid $c-light-grey;
-
-										li {
-											.dropdown {
-												box-shadow: 0 10px 10px rgba(0, 0, 0, .1);
-												width: calc(100vw - 150px);
-
-												button {
-													font-size: $t-mid-small;
-													line-height: 1.5em;
-												}
-											}
-										}
-										li:hover {
-											.dropdown {
-												display: block;
-											}
-										}
-										li:first-child::before {
-											content: '';
-											position: absolute;
-											top: 0;
-											left: 0;
-											width: 100%;
-											height: 1px;
-											background-color: $c-light-grey;
+									}
+									& > button {
+										.expandable {
+											transform: rotate(90deg);
 										}
 									}
 								}
 							}
 							li:hover > button,
-							li:hover > form {
+							li.open > button,
+							li:hover > form,
+							li.open > form {
 								background-color: $c-light-2 !important;
 							}
+							li.status-0 {
+								button {
+									background: repeating-linear-gradient(
+										-45deg,
+										transparent,
+										transparent 3px,
+										rgba(255, 193, 14, .1) 3px,
+										rgba(255, 193, 14, .1) 6px
+									);
+								}
+							}
+							li.status-1 {
+								button {
+									background: repeating-linear-gradient(
+										-45deg,
+										transparent,
+										transparent 3px,
+										rgba(50, 190, 225, .1) 3px,
+										rgba(50, 190, 225, .1) 6px
+									);
+								}
+							}
+							/*li.status-2 {
+								button {
+									background: repeating-linear-gradient(
+										-45deg,
+										transparent,
+										transparent 3px,
+										rgba(150, 150, 150, .1) 3px,
+										rgba(150, 150, 150, .1) 6px
+									);
+								}
+							}*/
 						}
 					}
 				}
 				.create:hover,
-				.create:focus {
+				.create:focus,
+				.create.open {
 					button {
 						background-color: $c-dark-blue;
 						color: #FFF;
@@ -656,63 +814,54 @@ header.open {
 	transform: translateX(0);
 }
 
-#statistics {
+/*#statistics {
 	display: flex;
-	flex-wrap: wrap;
 	justify-content: center;
 	align-items: center;
-	padding-bottom: 30px;
-	margin-bottom: 30px;
-	border-bottom: 1px dotted $c-light-grey;
+	margin: 60px 0;
 
-	.statistic {
-		position: relative;
-		width: 25%;
-		margin: 5px 0;
-		text-align: center;
+	.stat-group {
+		display: flex;
+		flex-wrap: wrap;
+		padding: 0 30px;
 
-		h1 {
-			font-size: $t-main;
-			line-height: 1.5em;
-			color: $c-dark-blue;
-		}
-		p {
-			margin: 0;
-			font-style: normal;
-			font-size: $t-small;
-			line-height: 1.2em;
-			color: $c-dark-blue;
-		}
-		small {
-			font-size: $t-small;
-			line-height: 1.5em;
-			color: $c-light-grey;
-		}
-	}
-	.statistic:first-child {
-		width: 50%;
-		margin: 15px 0;
-
-		h1 {
-			font-size: $t-xlarge;
-			line-height: 1.2em;
-		}
-		p {
-			font-size: $t-main;
-		}
-	}
-	/*.statistic:nth-child(2n  1) {
-		&::after {
-			content: '';
-			position: absolute;
-			left: 100%;
-			top: 0;
-			width: 0;
-			height: 100%;
+		&:nth-child(odd) {
 			border-right: 1px dotted $c-light-grey;
 		}
-	}*/
-}
+
+		.statistic {
+			flex: 50%;
+			position: relative;
+			margin: 5px 0;
+			text-align: center;
+			justify-content: center;
+			align-items: center;
+
+			h1 {
+				font-size: $t-large;
+				line-height: 1.3em;
+				color: $c-dark-blue;
+			}
+			h2 {
+				font-size: $t-mid;
+				line-height: 1.5em;
+				color: $c-dark-blue;
+			}
+			p {
+				margin: 0;
+				font-style: normal;
+				font-size: $t-mid-small;
+				line-height: 1.3em;
+				color: $c-dark-blue;
+			}
+			small {
+				font-size: $t-xsmall;
+				line-height: 1.2em;
+				color: $c-light-grey;
+			}
+		}
+	}
+}*/
 
 nav#filters {
 	display: inline-block;

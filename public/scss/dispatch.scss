@@ -34,7 +34,7 @@
 	@import '_orgfooter.lg';
 }
 /* Medium devices (desktops, 1024px and up) */
-@media screen and (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape) {
+@media screen and (min-width: 1024px) and (max-width: 1199px) {
 	@import '_base.m';
 	@import '_navigate.m';
 	@import '_filter.lg';
@@ -49,7 +49,7 @@
 	@import '_orgfooter.lg';
 }
 /* Medium devices (desktops, 1024px and up) */
-@media screen and (min-width: 1200px) and (max-width: 1365px) and (orientation: landscape) {
+@media screen and (min-width: 1200px) and (max-width: 1365px) {
 	@import '_base.lg';
 	@import '_navigate.lg';
 	@import '_filter.lg';
@@ -64,7 +64,7 @@
 	@import '_orgfooter.lg';
 }
 /* Large devices (desktops, 1024px and up) */
-@media screen and (min-width: 1366px) and (orientation: landscape) {
+@media screen and (min-width: 1366px) {
 	@import '_base.xl';
 	@import '_navigate.xl';
 	@import '_filter.lg';
@@ -79,7 +79,7 @@
 	@import '_orgfooter.lg';
 }
 /* Extra large devices (large desktops, 1200px and up) */
-@media screen and (min-width: 1920px) and (orientation: landscape) {
+@media screen and (min-width: 1920px) {
 	@import '_base.xl';
 	@import '_navigate.xl';
 	@import '_filter.lg';

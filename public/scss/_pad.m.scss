@@ -1866,12 +1866,12 @@ main#reference {
 	pointer-events: none;
 }
 footer {
-	position: relative;
+/*	position: relative;*/
 	width: 100%;
 	clear: both;
 	background-color: $c-light-3;
 	border-top: 1px solid $c-light-2;
-	z-index: 1000;
+/*	z-index: 1000;*/
 
 	.inner {
 		position: relative;

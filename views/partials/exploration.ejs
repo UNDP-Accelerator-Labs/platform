@@ -482,14 +482,14 @@
                 .classed('google-translate-attr', true)
                 .text("<%= vocab['doc-approve'] %>")
                 .on('click', (d) => {
-                    this.setDocAction(d.id, true);
+                    that.setDocAction(d.id, true);
                 });
                 curSel.addElem('button')
                 .classed('exploration-btn-dislike', true)
                 .classed('google-translate-attr', true)
                 .text("<%= vocab['doc-dislike'] %>")
                 .on('click', (d) => {
-                    this.setDocAction(d.id, false);
+                    that.setDocAction(d.id, false);
                 });
             }
 

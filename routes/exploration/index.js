@@ -1,3 +1,5 @@
+const { DB, fixed_uuid } = include('config/');
+
 exports.collection = require('./collection.js');
 exports.consent = require('./consent.js');
 exports.create = require('./create.js');

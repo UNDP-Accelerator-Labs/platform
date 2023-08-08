@@ -43,30 +43,20 @@ function limitPrompt(prompt) {
 module.exports = (req, res) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
-        return res.status(401).json({
-            message: 'must be logged in',
-        });
+        throw new Error('uuid not set');
     }
     const { lang='en' } = req.query || {};
     const timeAgo = new TimeAgo(lang);
     return DB.general.tx(async (t) => {
-        const hasConsent = (await t.one(`
-            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
-        `, [uuid])).confirmed_feature_journey;
-        if (!hasConsent) {
-            return res.status(403).json({
-                message: `${uuid} has to consent to using the journey feature first!`,
-            });
-        }
         const result = await t.result(`
             SELECT id, prompt, created_at, last_access
-            FROM journey
+            FROM exploration
             WHERE uuid = $1
             ORDER BY last_access DESC
         `, [uuid]);
         return res.json({
             uuid,
-            journeys: result.rows.map((row) => ({
+            explorations: result.rows.map((row) => ({
                 id: row.id,
                 prompt: row.prompt,
                 short: limitPrompt(row.prompt),

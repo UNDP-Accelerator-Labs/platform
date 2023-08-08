@@ -13,11 +13,11 @@
 
 	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || ''; //COUNTRY INSTANCE TITLE OR COLLECTION TITLE
 	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}` //DEFAULT PAGE TITLE => ADD COUNTRY NAME TITLE IF IT EXIST
-	
+
 	if (excerpt?.p && excerpt?.img) {
 		if (locals.metadata.site.app_storage) {
 			excerpt.img.src = new URL(`${locals.metadata.site.app_storage}${excerpt.img.src}`).href
-		} 
+		}
 	} else excerpt.img = { src: `${currentpage_url.origin}/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_opaque.png` }
 
 	if (!excerpt?.p) {
@@ -86,19 +86,17 @@
 	var languageAlias = '<%= page_language %>';
 	var googleTranslateElement;
 	var languages= ('<%= languages.map(p=> p.language) %>').split(',');
-	
+
 	function setCookie(key, value, expiry) {
 	  var expires = new Date();
 	  expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
 	  document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
 	}
 	function googleTranslateElementInit() {
-		if(languageAlias !== 'en'){
-			setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
-			setCookie('googtrans', `/en/${languageAlias}`,1);
-		}
+		setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
+		setCookie('googtrans', `/en/${languageAlias}`, 1);
 
-		d3.select("#dummy_lang").style("display", "none");
+		d3.select("#gtranslate-dummy-lang").style("display", "none");
 		new google.translate.TranslateElement({
 		   pageLanguage: 'en',
 		   layout: google.translate.TranslateElement.InlineLayout.SIMPLE
@@ -107,9 +105,11 @@
 	}
 
 	function rewriteUrl(lang, reload = false){
-		var currentUrl = window.location.href;
-		var languagePattern = /\/[a-z]{2,3}\//;
-		var newUrl = currentUrl.replace(languagePattern, "/" + lang + "/");
+		const currentUrl = new URL(window.location);
+		const languagePattern = /^\/[a-z]{2,3}\//;
+		const newPath = currentUrl.pathname.replace(languagePattern, "/" + lang + "/");
+		currentUrl.pathname = newPath;
+		const newUrl = `${currentUrl}`;
 
 		if(reload) window.location.href = newUrl;
 		else window.history.replaceState({}, "", newUrl);
@@ -117,13 +117,15 @@
 
 	//IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
 	//THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
-	function updateDomTree(lang){
-		let value = languages.includes(lang) ? 'no' : 'yes'
-		d3.selectAll(".google-translate-attr")
-  			.attr("translate", value);
+	function updateDomTree(lang) {
+		const isMainLanguage = languages.includes(lang) && lang !== 'en'
+		d3.selectAll('.google-translate-attr')
+  			.classed('notranslate', function() {
+				return d3.select(this).classed('notranslate') || isMainLanguage;
+			});
 	}
 
-	//LISTEN TO CHANGES IN LANGUAGE COOKIES 
+	//LISTEN TO CHANGES IN LANGUAGE COOKIES
 	cookieStore.addEventListener('change', ({changed}) => {
 		for (const {name, value} of changed) {
 			if(name === 'googtrans'){

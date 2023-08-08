@@ -9,6 +9,7 @@
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
+    const explorationVocab = vocabulary['exploration'][language];
 %>
 
 <script type='text/javascript'>
@@ -51,13 +52,6 @@ const Entry = function (_kwargs) {
 			&& d.ongoing_associated_mobilizations === undefined
 			&& d.past_associated_mobilizations === undefined)
 		})
-	this.prefoot = this.inner.addElems('div', 'prefoot', d => {
-		if (display !== 'slideshow') {
-			return [d];
-		} else {
-			return [];
-		}
-	});
 	this.foot = this.inner.addElems('div', 'foot', d => {
 		if (display === 'columns'
 			|| d.img?.length > 0
@@ -804,13 +798,14 @@ const Entry = function (_kwargs) {
 				&& modules.some(d => d.type === 'teams' && rights >= d.rights.write)
 				)
 			) { %>
-				let pinboards = (<%- JSON.stringify(locals.pinboards_list || []) %>).filter((pb) => !pb.is_journey);
+				let pinboards = (<%- JSON.stringify(locals.pinboards_list || []) %>).filter((pb) => !pb.is_exploration);
 
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
-						return _data?.filter((pb) => !pb.is_journey).map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
+						return _data?.filter((pb) => !pb.is_exploration).map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
 					}, (d) => d.id)
 					pin.addElems('label', 'name')
+						.classed('notranslate', true)
 						.attr('title', d => d.title)
 						.html(d => {
 							if (d.title.length > 25) return `${d.title.slice(0, 25)}…`
@@ -827,7 +822,7 @@ const Entry = function (_kwargs) {
 								if (res.pinboards_list.length !== pinboards.length) {
 									location.reload();
 								}
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
 								renderDropdown(d.object_id);
 								renderPinNavigation(res.pinboards_list);
 							<% } %>
@@ -852,7 +847,7 @@ const Entry = function (_kwargs) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
 								renderDropdown(d.object_id);
 								renderPinNavigation(res.pinboards_list);
 							}
@@ -863,13 +858,14 @@ const Entry = function (_kwargs) {
 								if (res.pinboards_list.length !== pinboards.length) {
 									location.reload();
 								}
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
 								renderDropdown(d.object_id);
 								renderPinNavigation(res.pinboards_list);
 							}
 						}
 					})
 					opts.addElems('label', 'title')
+						.classed('notranslate', true)
 						.attr('for', d => `board-${d.id}-object-${d.object_id}`)
 						.html(d => d.title)
 					.addElems('span', 'count')
@@ -881,13 +877,15 @@ const Entry = function (_kwargs) {
 					d3.select('#pinboards-list-lg menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
+						.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_journey ? `Journey: ${d.title}` : d.title)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 					d3.select('#pinboards-list-xs menu')
 						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
+						.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_journey ? `Journey: ${d.title}` : d.title)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 				}
 
 				const pinPbMap = {};
@@ -956,7 +954,7 @@ const Entry = function (_kwargs) {
 								const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
 									pins.call(renderPins, res.pins)
-									pinboards = res.pinboards_list.filter((pb) => !pb.is_journey);
+									pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
 									renderDropdown(d.id);
 									renderPinNavigation(res.pinboards_list);
 								}
@@ -1073,8 +1071,8 @@ const Entry = function (_kwargs) {
 			_sel.addElems('div', 'meta meta-country')
 			.html(d => d.countryname)
 		}.bind(this),
-		journey: (_sel) => {
-			journey.addDocButtons(_sel);
+		exploration: (_sel) => {
+			exploration.addDocButtons(_sel, true);
 		},
 	}
 }

@@ -1,22 +1,39 @@
 <%
-
 	// CREATE ALIASES
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
-
+	let fixedEid = null;
 %>
 
 <% if (locals.stats?.total > 0) { %>
 	<nav id='search-and-filter' class='lg'>
+		<% if (locals.metadata?.user?.uuid) { %>
+		<div class="search-type-menu">
+			<span class="stm stm-select google-translate-attr" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
+			<span class="stm google-translate-attr" id="stm-exploration">
+				<%- vocabulary["search-type-menu"][language]["exploration"] %>
+				<div class="stm-hint stm-hidden google-translate-attr">
+					<%- vocabulary["exploration"][language]["hint"] %>
+				</div>
+			</span>
+		</div>
+		<% } // logged in (uuid) %>
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
+			<input id='form-exploration-id' type='hidden' name='explorationid' value='' />
 			<%
 				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
 				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
 
 				view_params.forEach(d => {
+					if (d === 'explorationid') {
+						query[d].forEach(c => {
+							fixedEid = +c;
+						});
+						return;
+					}
 					query[d].forEach(c => {
 			%>
 				<input type='hidden' name='<%- d %>' value='<%- c %>'>
@@ -26,8 +43,8 @@
 			%>
 
 			<% if (locals.metadata?.user?.uuid) { %>
-			<div class='journey'></div>
-			<% } %>
+			<div class='exploration'></div>
+			<% } // logged in (uuid) %>
 			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
@@ -109,10 +126,10 @@
 							<button id='new-pinboard' type='button'></button>
 							<div class='dropdown'>
 								<menu>
-									<% locals.pinboards_list?.filter((pb) => !pb.is_journey).forEach(d => { %>
+									<% locals.pinboards_list?.filter((pb) => !pb.is_exploration).forEach(d => { %>
 										<li class='pinboard'>
 											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+											<label class='title notranslate' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
 										</li>
 									<% }) %>
 								</menu>
@@ -141,6 +158,22 @@
 <% } %>
 
 <script type='text/javascript'>
+	let curSelectSTM = 'stm-browse';
+	let hasUsedExploration = false;
+
+	function updateExplorationHint() {
+		d3.selectAll('.stm-hint').classed('stm-hidden', () => {
+			if (sessionStorage.explorationHintUserHiddenCount && +sessionStorage.explorationHintUserHiddenCount > 1) {
+				return true;
+			}
+			return curSelectSTM !== 'stm-browse' || hasUsedExploration;
+		})
+	}
+
+	d3.selectAll('#search-field').on('focus', () => {
+		updateExplorationHint();
+	});
+
 	function expandfilters (node) {
 		d3.select(node).toggleClass('close')
 		const filters = node.form.querySelector('.filters')
@@ -280,6 +313,74 @@
 	<% } %>
 
 	<% if (locals.metadata?.user?.uuid) { %>
-		journey.addJourneyMain(d3.select('div.journey'));
-	<% } %>
+		let isExplorationInit = false;
+		const fixedEid = <%- JSON.stringify(fixedEid) %>;
+		const formExplorationId = d3.select('#form-exploration-id');
+		exploration.addExplorationMain(d3.select('div.exploration'), () => {
+			hasUsedExploration = exploration.hasExploration();
+			if (fixedEid) {
+				exploration.updateById(fixedEid);
+			}
+			if (fixedEid || exploration.isVisible()) {
+				doSelectSTM('stm-exploration');
+			}
+			if (!isExplorationInit) {
+				isExplorationInit = true;
+				exploration.triggerIdChange();
+			}
+		});
+		exploration.addIdChangeListener((eid, isVisible) => {
+			formExplorationId.attrs({
+				'value': isVisible ? eid : null,
+			});
+			hasUsedExploration = exploration.hasExploration();
+			if (isExplorationInit) {
+				const oldUrl = `${window.location}`;
+				const newUrl = new URL(window.location);
+				if (eid) {
+					newUrl.searchParams.set('explorationid', +eid);
+				} else {
+					newUrl.searchParams.delete('explorationid');
+				}
+				if (oldUrl !== `${newUrl}`) {
+					window.history.replaceState({}, '', newUrl);
+				}
+			}
+		});
+
+		function doSelectSTM(stm) {
+			curSelectSTM = stm;
+			d3.selectAll('.stm').classed('stm-select', function () {
+				return d3.select(this).attr('id') === curSelectSTM;
+			});
+			const isExploration = curSelectSTM === 'stm-exploration';
+			exploration.setVisible(isExploration);
+			if (isExploration) {
+				updateExplorationHint();
+			} else {
+				exploration.updateById(null);
+			}
+			exploration.triggerIdChange();
+		}
+
+		let onlyHide = false;
+
+		d3.selectAll('.stm').on('click', function () {
+			if (onlyHide) {
+				onlyHide = false;
+				return;
+			}
+			doSelectSTM(d3.select(this).attr('id'));
+		});
+
+		d3.selectAll('.stm-hint').on('click', function (e) {
+			d3.select(this).classed('stm-hidden', true);
+			onlyHide = true;
+			if (sessionStorage.explorationHintUserHiddenCount) {
+				sessionStorage.explorationHintUserHiddenCount = +sessionStorage.explorationHintUserHiddenCount + 1;
+			} else {
+				sessionStorage.explorationHintUserHiddenCount = 1;
+			}
+		});
+	<% } // logged in (uuid) %>
 </script>

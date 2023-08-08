@@ -20,14 +20,14 @@
 			<ul>
 				<% languages.forEach(d => { %>
 					<li id='lang-<%- d.language %>'>
-						<a class='<% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
+						<a class='notranslate <% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
 					</li>
 				<% }) %>
 				<li  class='googletranslator' id="google_translate_element"></li >
-				<li id="dummy_lang"> 
+				<li id="gtranslate-dummy-lang">
 					<a>Select language</a>
 				</li >
-				
+
 			</ul>
 		</li>
 		<li class='user-id'>

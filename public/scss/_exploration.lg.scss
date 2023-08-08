@@ -1,4 +1,10 @@
-div.journey {
+.exploration-info {
+	p, h2 {
+		padding: 5px;
+	}
+}
+
+div.exploration {
 	position: relative;
 	width: 100%;
 	height: 65px;
@@ -17,7 +23,7 @@ div.journey {
 		font-size: 24px;
 		color: $c-dark-blue;
 	}
-	label[for=journey-main] {
+	label[for=exploration-main] {
 		position: absolute;
 		top: 5px;
 		left: 15px;
@@ -67,20 +73,29 @@ div.journey {
 	}
 }
 
-.journey-article-inactive {
+.exploration-article-inactive {
 	filter: opacity(0.4) !important;
 }
-.journey-btn-active {
+.exploration-btn-active {
 	background-color: $c-light-blue !important;
 }
-.journey-btn-active:hover {
+.exploration-btn-active:hover {
 	background-color: $c-mid-blue-semi !important;
 }
-.journey-btn-active:active {
+.exploration-btn-active:active {
 	background-color: $c-mid-blue !important;
 }
 
-.journey-doc {
+.exploration-doc {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: start;
+	height: 51px;
+
+	* {
+		font-size: 12px;
+	}
 	button {
 		display: inline-block;
 		cursor: pointer;
@@ -94,5 +109,27 @@ div.journey {
 	}
 	button:active {
 		background-color: #ccc;
+	}
+	select {
+		width: 100%;
+		height: 24px;
+		box-sizing: border-box;
+	}
+}
+
+.exploration-big {
+	flex-direction: row;
+	justify-content: start;
+	height: 26px;
+	vertical-align: middle;
+
+	span {
+		line-height: 24px;
+		margin-right: 5px;
+	}
+
+	select {
+		width: auto;
+		margin-right: 5px;
 	}
 }

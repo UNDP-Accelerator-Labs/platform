@@ -57,6 +57,8 @@ body:
         - Solution Mapping
         - Experiments
         - Global
+        - All Platforms Except Global
+        - All Platforms
     validations:
       required: true
   - type: dropdown

@@ -57,7 +57,6 @@ input:-webkit-autofill:active  {
 	left: 0;
 	width: 100vw;
 	height: calc(100vh - 30px);
-	overflow: auto;
 	/*background-color: rgba(255,255,255,.75);*/
 	background: repeating-linear-gradient(
 		-45deg,
@@ -71,7 +70,6 @@ input:-webkit-autofill:active  {
 	z-index: 99999;
 
 	.modal {
-
 		.close {
 			float: right;
 			border: none;
@@ -276,7 +274,7 @@ input.toggle:disabled + label::after {
 	left: 0;
 }
 .errormessage {
-	font-size: 12px; 
-	color: red; 
+	font-size: 12px;
+	color: red;
 	padding-top: 10px;
 }

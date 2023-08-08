@@ -1,11 +1,12 @@
 <%
     const language = locals.metadata.page.language;
-    const vocab = vocabulary['journey'][language];
+    const page_language = locals.metadata.page.page_language;
+    const vocab = vocabulary['exploration'][language];
     const own_db = locals.metadata.site.own_db;
-    const journey_info_url = 'https://github.com/UNDP-Accelerator-Labs/platform/blob/master/journey.md';
+    const exploration_info_url = `/${page_language}/exploration-info/`;
 %>
 <script type='text/javascript'>
-    class Journey {
+    class Exploration {
         constructor() {
             this.past = [];
             this.docs = [];
@@ -16,6 +17,7 @@
             this.infoButton = null;
             this.datalist = null;
             this.useFullPromptForSelect = false;
+            this.onIdChange = [];
 
             this.listUpdateActive = false;
             this.listUpdateCbs = [];
@@ -23,14 +25,27 @@
             this.collectionUpdateCbs = [];
 
             this.ownDb = (<%- own_db %>);
-            if (sessionStorage.journeyId) {
-                this.currentId = +sessionStorage.journeyId || null;
+            if (sessionStorage.explorationId) {
+                this.currentId = +sessionStorage.explorationId || null;
             }
-            if (sessionStorage.journeyPrompt) {
-                this.currentPrompt = this.normalizeJourneyPrompt(sessionStorage.journeyPrompt);
+            if (sessionStorage.explorationPrompt) {
+                this.currentPrompt = this.normalizeExplorationPrompt(sessionStorage.explorationPrompt);
             }
+            this.visible = !!this.currentId;
+            this.limitedSpace = true;
             this.consent = true;  // we assume consent was given until an API call says otherwise
         };
+
+        addIdChangeListener(cb) {
+            this.onIdChange.push(cb);
+            this.triggerIdChange();
+        }
+
+        triggerIdChange() {
+            const currentId = this.currentId;
+            const isVisible = this.isVisible();
+            this.onIdChange.forEach((cb) => cb(currentId, isVisible));
+        }
 
         setUseFullPromptForSelect(isUseFull) {
             this.useFullPromptForSelect = isUseFull;
@@ -47,25 +62,25 @@
             return node.value;
         }
 
-        normalizeJourneyPrompt(prompt) {
+        normalizeExplorationPrompt(prompt) {
             if (!prompt) {
                 return '';
             }
             return prompt.replace(/[\s\n\r]+/g, ' ').trim();
         }
 
-        updateCurrentJourney(curId, curPrompt) {
-            const normPrompt = this.normalizeJourneyPrompt(curPrompt);
+        updateCurrentExploration(curId, curPrompt) {
+            const normPrompt = this.normalizeExplorationPrompt(curPrompt);
             this.currentPrompt = normPrompt;
-            if (normPrompt !== sessionStorage.journeyPrompt) {
-                sessionStorage.journeyPrompt = normPrompt;
+            if (normPrompt !== sessionStorage.explorationPrompt) {
+                sessionStorage.explorationPrompt = normPrompt;
                 if (!normPrompt) {
                     curId = null;
                 }
             }
             this.currentId = curId;
-            if (curId !== sessionStorage.journeyId) {
-                sessionStorage.journeyId = +curId || 0;
+            if (curId !== sessionStorage.explorationId) {
+                sessionStorage.explorationId = +curId || 0;
             }
             if (this.mainInput !== null) {
                 const mainInput = this.mainInput.node();
@@ -75,15 +90,16 @@
                     }
                 }
             }
-            this.updateJourneyMainButton(
-                this.getJourneyByPrompt(normPrompt)[0],
+            this.updateExplorationMainButton(
+                this.getExplorationByPrompt(normPrompt)[0],
                 curId);
-            this.updateJourneyDocs();
+            this.updateExplorationDocs();
+            this.triggerIdChange();
         }
 
-        getJourneyById(journeyId) {
+        getExplorationById(explorationId) {
             return this.past.reduce((prev, d) => {
-                if (d['id'] === journeyId) {
+                if (d['id'] === explorationId) {
                     return [d['id'], d['prompt']];
                 }
                 return prev;
@@ -91,12 +107,12 @@
         }
 
         updateById(newId) {
-            const [nextId, nextPrompt] = this.getJourneyById(+newId);
-            this.updateCurrentJourney(nextId, nextPrompt);
+            const [nextId, nextPrompt] = this.getExplorationById(+newId);
+            this.updateCurrentExploration(nextId, nextPrompt);
         }
 
-        getJourneyByPrompt(journeyPrompt) {
-            const prompt = this.normalizeJourneyPrompt(journeyPrompt);
+        getExplorationByPrompt(explorationPrompt) {
+            const prompt = this.normalizeExplorationPrompt(explorationPrompt);
             return this.past.reduce((prev, d) => {
                 if (d['prompt'] === prompt) {
                     return [d['id'], d['prompt']];
@@ -105,19 +121,19 @@
             }, [null, prompt]);
         }
 
-        getShortPrompt(journeyId) {
+        getShortPrompt(explorationId) {
             return this.past.reduce((prev, d) => {
-                if (d['id'] === journeyId) {
+                if (d['id'] === explorationId) {
                     return d['short'];
                 }
                 return prev;
             }, '');
         }
 
-        updateJourneyMainButton(journeyId, currentId) {
+        updateExplorationMainButton(explorationId, currentId) {
             if (this.mainInput !== null) {
                 const value = this.getInputValue();
-                const normPrompt = this.normalizeJourneyPrompt(value);
+                const normPrompt = this.normalizeExplorationPrompt(value);
                 this.mainInput.classed('has-value', !!normPrompt);
             }
         }
@@ -126,11 +142,11 @@
             if (err) {
                 if (err.status === 401) {  // not logged in
                     cb && cb();
-                    this.updateCurrentJourney(null, '');
+                    this.updateCurrentExploration(null, '');
                     return;
                 } else if (err.status === 403) {  // did not consent
                     cb && cb();
-                    this.updateCurrentJourney(null, '');
+                    this.updateCurrentExploration(null, '');
                     this.consent = false;
                     return;
                 }
@@ -138,7 +154,7 @@
             console.error(err);
         }
 
-        updateJourneyList(cb = null) {
+        updateExplorationList(cb = null) {
             if (cb) {
                 this.listUpdateCbs.push(cb);
             }
@@ -146,13 +162,13 @@
                 return;
             }
             this.listUpdateActive = true;
-            GET('/journey/list?lang=<%= language %>', true, true).then((result) => {
+            GET('/exploration/list?lang=<%= language %>', true, true).then((result) => {
                 this.consent = true;
                 this.listUpdateActive = false;
-                const journeys = result['journeys'];
-                this.past = journeys;
-                const [curId, curPrompt] = this.getJourneyById(this.currentId);
-                this.updateCurrentJourney(curId, curPrompt);
+                const explorations = result['explorations'];
+                this.past = explorations;
+                const [curId, curPrompt] = this.getExplorationById(this.currentId);
+                this.updateCurrentExploration(curId, curPrompt);
                 const cbs = this.listUpdateCbs;
                 this.listUpdateCbs = [];
                 cbs.forEach((curCb) => curCb());
@@ -167,22 +183,23 @@
             });
         }
 
-        updateJourneyDatalist(cb = null) {
+        updateExplorationDatalist(cb = null) {
             const datalist = this.datalist;
             if (!datalist) {
                 return;
             }
-            this.updateJourneyList(() => {
-                datalist.addElems('option', 'journey-past-elem', this.past)
+            this.updateExplorationList(() => {
+                datalist.addElems('option', 'exploration-past-elem', this.past)
+                .classed('notranslate', true)
                 .attrs({
-                    'value': (d) => this.normalizeJourneyPrompt(d['prompt']),
+                    'value': (d) => this.normalizeExplorationPrompt(d['prompt']),
                     'label': (d) => `<%= vocab['last_access'] %> ${d['last_access_ago']}`,
                 });
                 cb && cb();
             });
         }
 
-        updateJourneyDocs(cb = null) {
+        updateExplorationDocs(cb = null) {
             if (cb) {
                 this.collectionUpdateCbs.push(cb);
             }
@@ -199,7 +216,7 @@
                 return;
             }
             this.collectionId = curId;
-            GET(`/journey/collection?journey_id=${curId}`, true, true).then((result) => {
+            GET(`/exploration/collection?exploration_id=${curId}`, true, true).then((result) => {
                 if (this.collectionId !== null && this.collectionId !== curId) {
                     return;
                 }
@@ -240,30 +257,30 @@
 
         updatePrompt(userPrompt, allowReport) {
             const currentId = this.currentId;
-            this.updateJourneyDatalist(() => {
-                const [curId, curPrompt] = this.getJourneyByPrompt(userPrompt);
+            this.updateExplorationDatalist(() => {
+                const [curId, curPrompt] = this.getExplorationByPrompt(userPrompt);
                 if (curId !== null && curId === currentId) {
                     if (allowReport) {
-                        this.updateJourneyDocs();
+                        this.updateExplorationDocs();
                     }
                 } else if (curId !== null) {
-                    this.updateCurrentJourney(curId, curPrompt);
+                    this.updateCurrentExploration(curId, curPrompt);
                 } else if (curPrompt) {
-                    PUT(`/journey/create`, {
+                    PUT(`/exploration/create`, {
                         'prompt': curPrompt,
                     }, true, true).then((result) => {
-                        this.updateCurrentJourney(result['journey'], result['prompt']);
-                        this.updateJourneyDatalist();
+                        this.updateCurrentExploration(result['exploration'], result['prompt']);
+                        this.updateExplorationDatalist();
                     }).catch((err) => {
                         this.checkError(err);
                     });
                 } else {
-                    this.updateCurrentJourney(null, '');
+                    this.updateCurrentExploration(null, '');
                 }
             });
         }
 
-        confirmJourneyPrompt(allowReport) {
+        confirmExplorationPrompt(allowReport) {
             const mainInput = this.mainInput;
             if (mainInput === null) {
                 return;
@@ -273,43 +290,28 @@
         }
 
         consentFeature() {
-            const journeyInfoUrl = '<%= journey_info_url %>';
+            const explorationInfoUrl = '<%= exploration_info_url %>';
             const message = `
-                <h2>You need to give consent to use this feature!</h2>
-                <p>
-                    This is an experimental feature!
-                </p>
-                <p>
-                    This feature enables you to easily and serendipitously
-                    create collections that answer questions about the corpus.
-                    The questions and selected documents might be used for
-                    training a machine learning model to improve the results.
-                    All data is anonymized and in no way connected to your account.
-                </p>
-                <p>
-                    <a href="${journeyInfoUrl}" target="_blank">Click here for more information.</a>
-                </p>
-                </p>
-                <p>
-                    Please indicate below that you understood and approve of
-                    the use of the indicated data for further uses.
-                </p>
+                <h2 class="google-translate-attr"><%= vocab['welcome'] %></h2>
+                <p class="google-translate-attr"><%= vocab['explain'] %></p>
+                <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr"><%= vocab['info'] %></a>
+                <p class="google-translate-attr"><%= vocab['indicate'] %></p>
             `;
             renderPromiseModal({
                 message,
                 opts: [
-                    { node: 'button', type: 'button', label: 'I Approve!', resolve: true },
-                    { node: 'button', type: 'button', label: 'Not Okay!', resolve: false },
+                    { node: 'button', type: 'button', label: `<%= vocab['feature-approve'] %>`, resolve: true },
+                    { node: 'button', type: 'button', label: `<%= vocab['feature-reject'] %>`, resolve: false },
                 ],
             }).then((consent) => {
                 if(!consent) {  // not given consent or closed window
                     return;
                 }
-                PUT('/journey/consent', {
+                PUT('/exploration/consent', {
                     consent: 'approve',
                 }, true, true).then((result) => {
                     this.consent = true;
-                    this.updateJourneyDatalist();
+                    this.updateExplorationDatalist();
                 }).catch((err) => {
                     this.checkError(err);
                 });
@@ -321,34 +323,34 @@
                 return;
             }
             const datalist = sel.addElem('datalist').attrs({
-                'id': 'journey-past',
+                'id': 'exploration-past',
             });
             this.datalist = datalist;
         }
 
-        addJourneyMain(sel) {
+        addExplorationMain(sel, cb) {
             const mainInput = sel.addElem('input')
             .attrs({
                 'type': 'text',
-                'id': `journey-main`,
-                'list': 'journey-past',
+                'id': `exploration-main`,
+                'list': 'exploration-past',
             })
             .on('keydown', () => {
                 const evt = d3.event;
                 if (evt.code === 'Enter' || evt.keyCode === 13) {
-                    this.confirmJourneyPrompt(false);
+                    this.confirmExplorationPrompt(false);
                     evt.preventDefault();
                     evt.srcElement.blur();
                 }
             })
             .on('change', () => {
                 const value = this.getInputValue();
-                const normPrompt = this.normalizeJourneyPrompt(value);
-                this.updateJourneyMainButton(
-                    this.getJourneyByPrompt(normPrompt)[0],
+                const normPrompt = this.normalizeExplorationPrompt(value);
+                this.updateExplorationMainButton(
+                    this.getExplorationByPrompt(normPrompt)[0],
                     this.currentId);
             })
-            .on('blur', () => this.confirmJourneyPrompt(false))
+            .on('blur', () => this.confirmExplorationPrompt(false))
             .on('click', () => {
                 const evt = d3.event;
                 if (!this.consent) {
@@ -357,41 +359,57 @@
                 }
             });
             this.mainInput = mainInput;
-            this.updateCurrentJourney(this.currentId, this.currentPrompt);
+            this.updateCurrentExploration(this.currentId, this.currentPrompt);
 
             sel.addElem('label')
+            .classed('google-translate-attr', true)
             .attrs({
-                'for': `journey-main`,
+                'for': `exploration-main`,
             })
             .text("<%= vocab['intro'] %>");
             this.maybeAddDatalist(sel);
-            const journeyInfoUrl = '<%= journey_info_url %>';
+            const explorationInfoUrl = '<%= exploration_info_url %>';
             const infoButton = sel.addElem('a')
             .attrs({
-                'href': journeyInfoUrl,
+                'href': explorationInfoUrl,
                 'target': '_blank',
             })
             .text('ⓘ');
             this.infoButton = infoButton;
 
-            this.updateJourneyDatalist();
+            this.updateExplorationDatalist(cb);
         }
 
-        hasJourney() {
+        hasExploration() {
             return this.past.length > 0;
         }
 
+        isVisible() {
+            return this.visible;
+        }
+
+        setVisible(visible) {
+            const oldVisible = this.visible;
+            this.visible = visible;
+            if (oldVisible !== visible) {
+                this.updateDocs([]);
+            }
+        }
+
         updateDocs(cbs) {
-            const showJourney = this.hasJourney();
-            d3.selectAll('div.journey-doc').styles({
-                'display': showJourney ? null : 'none',
+            d3.selectAll('div.exploration').styles({
+                'display': this.isVisible() ? null : 'none',
             });
-            if (!showJourney) {
+            const showExploration = this.hasExploration() && this.isVisible();
+            d3.selectAll('div.exploration-doc').styles({
+                'display': showExploration ? null : 'none',
+            });
+            if (!showExploration) {
                 return;
             }
             const useFull = this.useFullPromptForSelect;
-            d3.selectAll('div.journey-doc span select.journey-short')
-            .addElems('option', 'journey-short-list', [
+            d3.selectAll('div.exploration-doc select.exploration-short')
+            .addElems('option', 'exploration-short-list', [
                 {
                     id: null,
                     prompt: `<%= vocab['select'] %>`,
@@ -401,78 +419,106 @@
             ]).attrs({
                 'value': (d) => `${d['id']}`,
             })
+            .classed('notranslate', (d) => d['id'] !== null)
             .text((d) => useFull ? d['prompt'] : d['short']);
             const currentId = this.currentId;
-            d3.selectAll('div.journey-doc span select.journey-short')
+            d3.selectAll('div.exploration-doc select.exploration-short')
             .each(function () {
                 d3.select(this).node().value = `${currentId}`;
             })
-            d3.selectAll('button.journey-btn-approve').classed('journey-btn-active', (d) => {
+            d3.selectAll('button.exploration-btn-approve').classed('exploration-btn-active', (d) => {
                 return this.isDocApprove(d.id);
             }).styles({
                 'display': (d) => currentId ? null : 'none',
             });
-            d3.selectAll('button.journey-btn-dislike').classed('journey-btn-active', (d) => {
+            d3.selectAll('button.exploration-btn-dislike').classed('exploration-btn-active', (d) => {
                 return this.isDocDislike(d.id);
             }).styles({
                 'display': (d) => currentId ? null : 'none',
             });
-            d3.selectAll('span.journey-colon').styles({
-                'display': (d) => currentId ? null : 'none',
-            });
-            d3.selectAll('article.pad').classed('journey-article-inactive', (d) => {
+            if (this.limitedSpace) {
+                d3.selectAll('span.exploration-title').styles({
+                    'display': (d) => currentId ? null : 'none',
+                });
+            }
+            d3.selectAll('article.pad').classed('exploration-article-inactive', (d) => {
                 return this.isDocDislike(d.id);
             });
             cbs.forEach((curCb) => curCb());
         }
 
         setDocAction(docId, isApprove) {
-            const journeyId = this.currentId;
-            if (!journeyId) {
+            const explorationId = this.currentId;
+            if (!explorationId) {
                 return;
             }
             const action = isApprove ? (
                 this.isDocApprove(docId) ? 'neutral' : 'approve') : (
                 this.isDocDislike(docId) ? 'neutral' : 'dislike');
-            PUT('/journey/doc', {
+            PUT('/exploration/doc', {
                 'pad': docId,
                 'action': action,
-                'journey': journeyId,
+                'exploration': explorationId,
             }, true, true).then((result) => {
-                this.updateJourneyDocs();
+                this.updateExplorationDocs();
             }).catch((err) => {
                 this.checkError(err);
             });
         }
 
-        addDocButtons(sel) {
-            const doc = sel.addElems('div', 'journey-doc');
-            const docSpan = doc.addElem('span');
-            docSpan.addElem('span').text("<%= vocab['doc-begin'] %> ");
+        addDocButtons(sel, hasLimitedSpace) {
+            const doc = sel.addElems('div', 'exploration-doc');
             const that = this;
-            docSpan.addElem('select').classed('journey-short', true)
-            .on('change', function() {
-                const curId = d3.select(this)?.node()?.value;
-                if (curId !== null) {
-                    that.updateById(+curId);
-                }
-            });
-            docSpan.addElem('span').text(": ").classed('journey-colon', true);
-            doc.addElem('button')
-            .classed('journey-btn-approve', true)
-            .text("<%= vocab['doc-approve'] %>")
-            .on('click', (d) => {
-                this.setDocAction(d.id, true);
-            });
-            doc.addElem('button')
-            .classed('journey-btn-dislike', true)
-            .text("<%= vocab['doc-dislike'] %>")
-            .on('click', (d) => {
-                this.setDocAction(d.id, false);
-            });
-            this.updateJourneyDocs();
-        }
-    } // Journey
 
-    const journey = new Journey();
+            function addTitle(curSel) {
+                curSel.addElem('span')
+                .text("<%= vocab['doc-begin'] %>: ")
+                .classed('exploration-title', true)
+                .classed('google-translate-attr', true);
+            }
+
+            function addButtons(curSel) {
+                curSel.addElem('button')
+                .classed('exploration-btn-approve', true)
+                .classed('google-translate-attr', true)
+                .text("<%= vocab['doc-approve'] %>")
+                .on('click', (d) => {
+                    that.setDocAction(d.id, true);
+                });
+                curSel.addElem('button')
+                .classed('exploration-btn-dislike', true)
+                .classed('google-translate-attr', true)
+                .text("<%= vocab['doc-dislike'] %>")
+                .on('click', (d) => {
+                    that.setDocAction(d.id, false);
+                });
+            }
+
+            function addSelect(curSel) {
+                curSel.addElem('select').classed('exploration-short', true)
+                .on('change', function() {
+                    const curId = d3.select(this)?.node()?.value;
+                    if (curId !== null) {
+                        that.updateById(+curId);
+                    }
+                });
+            }
+
+            if (hasLimitedSpace) {
+                const docSpan = doc.addElem('span');
+                addTitle(docSpan);
+                addButtons(docSpan);
+                addSelect(doc);
+            } else {
+                addTitle(doc);
+                addSelect(doc);
+                addButtons(doc);
+                doc.classed('exploration-big', true);
+            }
+            this.limitedSpace = hasLimitedSpace;
+            this.updateExplorationDocs();
+        }
+    } // Exploration
+
+    const exploration = new Exploration();
 </script>

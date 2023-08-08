@@ -3,18 +3,16 @@ const { DB, fixed_uuid } = include('config/');
 module.exports = (req, res) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
-        return res.status(401).json({
-            message: 'must be logged in',
-        });
+        throw new Error('uuid not set');
     }
     if (req.method === 'GET') {
         DB.general.one(`
-            SELECT confirmed_feature_journey FROM users WHERE uuid = $1
+            SELECT confirmed_feature_exploration FROM users WHERE uuid = $1
         `, [uuid]).then((row) => {
             res.json({
                 'uuid': uuid,
-                'feature': 'journey',
-                'consent': row.confirmed_feature_journey,
+                'feature': 'exploration',
+                'consent': row.confirmed_feature_exploration,
             });
         }).catch((err) => {
             console.log(err);
@@ -31,12 +29,12 @@ module.exports = (req, res) => {
         }
         DB.general.none(`
             UPDATE users
-            SET confirmed_feature_journey = NOW()
+            SET confirmed_feature_exploration = NOW()
             WHERE uuid = $1
         `, [uuid]).then(() => {
             res.json({
                 'uuid': uuid,
-                'feature': 'journey',
+                'feature': 'exploration',
                 'consent': true,
             });
         }).catch((err) => {

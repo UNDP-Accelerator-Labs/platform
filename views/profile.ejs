@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<% 
+<%
 	// CREATE ALIASES
 	const modules = locals.metadata.site.modules
 	const rights = locals.metadata.user.rights
@@ -11,7 +11,7 @@
 <html lang='<%- language %>'>
 <head>
 
-<%- include ('partials/head.ejs') %> 
+<%- include ('partials/head.ejs') %>
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
 	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
@@ -24,17 +24,17 @@
 
 <body>
 
-<%- include ('partials/translations.ejs') %> 
-<%- include ('partials/menu-languages.ejs') %> 
+<%- include ('partials/translations.ejs') %>
+<%- include ('partials/menu-languages.ejs') %>
 
 <div class='main-content'>
 <header>
 	<div class='inner'>
-		<%- include ('partials/menu-logo.ejs') %> 
+		<%- include ('partials/menu-logo.ejs') %>
 	</div>
 </header>
 
-<%# include ('partials/modals.ejs') %> 
+<%# include ('partials/modals.ejs') %>
 
 <div class='fact-sheet'>
 	<main id='profile'>
@@ -284,7 +284,7 @@
 											<div class='pins'>
 												<% locals.data?.teams.forEach(d => { %>
 													<div class='pin tag'>
-														<label class='name'><%- d.name %></label>
+														<label class='name notranslate'><%- d.name %></label>
 														<label class='close' data-id='<%- d.id %>' data-name='teams' onclick='rmPin(this)'>x</label>
 													</div>
 												<% }) %>
@@ -300,7 +300,7 @@
 											<div class='pins'>
 												<% locals.data?.teams.forEach(d => { %>
 													<div class='pin tag'>
-														<label class='name'><%- d.name %></label>
+														<label class='name notranslate'><%- d.name %></label>
 													</div>
 												<% }) %>
 											</div>
@@ -377,7 +377,7 @@
 </div>
 
 <footer></footer>
-<%- include ('./partials/footer.ejs') %> 
+<%- include ('./partials/footer.ejs') %>
 
 <script type='text/javascript'>
 	function toggleOptions (node, options) {
@@ -397,8 +397,8 @@
 			.html('<%- vocabulary["other languages"][language] %>')
 		const input = li.addElem('div', 'select')
 		input.addElem('input')
-			.attrs({ 
-				'type': 'text', 
+			.attrs({
+				'type': 'text',
 				'id': 'secondary-languages',
 				'autocomplete': 'secondary-languages'
 			})
@@ -484,12 +484,12 @@
 
 		// GENERIC BLUR FUNCTION
 		d3.selectAll('input[type=text]:not([name="api-token"]), input[type=email], input[type=password]')
-		.on('blur.fixlabel', function () { 
+		.on('blur.fixlabel', function () {
 			fixLabel(this)
 			partialSave()
 		}).each(function () { fixLabel(this) })
 	}
-	
+
 	function initDropdowns () {
 		const selects = d3.selectAll('.select')
 		selects.selectAll('input[type=text]')
@@ -501,7 +501,7 @@
 				.classed('hide', function () {
 					return !this.textContent.trim().toLowerCase()
 						.includes(node.value.trim().toLowerCase())
-					
+
 					&& (!dropdown.selectAll('menu li input:checked').size() || !Array.from(dropdown.selectAll('menu li input:checked').nodes())
 						.every(sel => {
 							return node.value.trim().toLowerCase().split(',')
@@ -513,14 +513,14 @@
 			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')
 			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 
-			dropdown.selectAll('label').on('mousedown', function () { 
+			dropdown.selectAll('label').on('mousedown', function () {
 				d3.event.preventDefault()
 			})
 		}).on('blur', function () {
 			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')
 			dropdown.node().style.maxHeight = null
 		})
-		
+
 		selects.selectAll('input[type=radio]')
 		.on('change', function () {
 			const node = this
@@ -554,6 +554,7 @@
 				const pin = d3.select('.pinboard-group .pinboard .pins')
 					.addElem('div', 'pin tag')
 				pin.addElem('label', 'name')
+					.classed('notranslate', true)
 					.html(this.dataset.label)
 				pin.addElem('div', 'close')
 					.attrs({ 'data-name': this.name, 'data-id': this.value })
@@ -580,8 +581,8 @@
 		// CHECK WHETHER GOOD TO SAVE
 		const metastatus = d3.select('.meta-status').classed('status-0 status-1', false)
 
-		if (d3.selectAll('input:required').filter(function () { 
-			return !(this.validity.valid && !this.classList.contains('error')) 
+		if (d3.selectAll('input:required').filter(function () {
+			return !(this.validity.valid && !this.classList.contains('error'))
 		}).size() === 0) {
 			metastatus.classed('status-1', true)
 			.select('button').attr('disabled', null)

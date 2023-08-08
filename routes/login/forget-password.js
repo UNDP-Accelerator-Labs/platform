@@ -4,7 +4,7 @@ const { datastructures } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
 const { isPasswordSecure } = require('./password-requirement')
 
- // Function to send password reset email
+// Function to send password reset email
 async function sendResetEmail(email, html) {
   sendEmail({
     from: 'no-reply@acclab-platform.org',
@@ -14,8 +14,8 @@ async function sendResetEmail(email, html) {
   });
 }
 
- // Generate and send password reset token
- exports.forgetPassword = async (req, res, next) => {
+// Generate and send password reset token
+exports.forgetPassword = async (req, res, next) => {
   const { email } = req.body;
    // Check if the provided email exists in the database
   const user = await DB.general.oneOrNone(`
@@ -68,7 +68,7 @@ function verifyTokenFields(decoded, res) {
   return true;
 }
 
- // Reset password page
+// Reset password page
 exports.getResetToken = async (req, res, next) => {
   const { token } = req.params;
   req.session.errormessage = '';
@@ -139,4 +139,3 @@ exports.updatePassword = async (req, res, next) => {
     }
   });
 };
-

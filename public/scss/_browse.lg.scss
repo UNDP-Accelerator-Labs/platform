@@ -8,7 +8,7 @@ div.public-page-header {
 
 		&.expand {
 			width: 100vw;
-			margin-left: calc((100% - 100vw) / 2);
+			margin-left: calc(100% - 100vw + 15px);
 		}
 
 		div.slides {
@@ -330,7 +330,7 @@ div.public-page-panel {
 		}
 		h1.site-title.map-overlay {
 			position: absolute;
-			right: 0;
+			left: 0;
 			top: 0;
 			margin: calc(-#{$t-xxlarge} * 1.2) 0 1em 0;
 			z-index: 1000;
@@ -456,9 +456,13 @@ div.public-page-panel {
 	&.blue {
 		width: 100vw;
 		padding: 90px 0;
-		margin-left: calc((100% - 100vw) / 2);
+		margin-left: calc(100% - 100vw + 15px);
 		background-color: $c-mid-blue;
 		color: #FFF;
+
+		& > .inner {
+			margin: 0 15px 0 auto;
+		}
 
 		a {
 			color: $c-light-green;

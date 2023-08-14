@@ -31,7 +31,8 @@ module.exports = (req, res) => {
 						UPDATE pads
 						SET date = NOW(),
 							status = 1,
-							source = $1::INT
+							source = $1::INT,
+							version = version || $2::TEXT
 						WHERE id = $2::INT
 					;`, [ id, result.id ]))
 					

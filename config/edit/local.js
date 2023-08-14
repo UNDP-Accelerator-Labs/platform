@@ -106,4 +106,4 @@ exports.followup_count = 1
 exports.browse_display = 'columns'
 exports.view_display = 'page'
 	// OPTIONS: 'mosaic', 'carousel'
-exports.welcome_module = 'carousel'
+exports.welcome_module = 'mosaic'

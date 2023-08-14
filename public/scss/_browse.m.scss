@@ -132,7 +132,7 @@ div.public-page-header {
 		/* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 		div.slides {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, 150px);
+			grid-template-columns: repeat(6, 150px);
 			grid-auto-rows: 1fr;
 			column-gap: 5px;
 			row-gap: 5px;

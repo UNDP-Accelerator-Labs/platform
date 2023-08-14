@@ -171,6 +171,7 @@
 			<!-- TO DO: TRANSLATE -->
 			<ul class='columns'>
 			<% locals.pinboards.forEach(d => { %>
+				<% console.log(d) %>
 				<li>
 					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
 					<small><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>

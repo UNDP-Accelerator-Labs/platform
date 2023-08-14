@@ -127,12 +127,13 @@ div.public-page-header {
 		&.expand {
 			width: 100vw;
 			margin-left: calc((100% - 100vw) / 2);
+			margin-top: 50px;
 		}
 
 		/* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 		div.slides {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, 150px);
+			grid-template-columns: repeat(5, 150px);
 			grid-auto-rows: 1fr;
 			column-gap: 5px;
 			row-gap: 5px;

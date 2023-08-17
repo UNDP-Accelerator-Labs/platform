@@ -1,11 +1,13 @@
 <%
 	const slides = locals.sample_images
 	const language = locals.metadata.page.language
+	const uuid = locals.metadata.user.uuid
 %>
 
 <div class='slides'>
-	<div class='blank-area'>
-		<h1 class='xs sm m'>Solutions mapping</h1>
+	<% if (uuid) { %><div class='blank-area sidebar'>
+	<% } else { %><div class='blank-area'><% } %>
+		<h1 class='xs sm m'><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
 	</div>
 </div>
 
@@ -14,9 +16,16 @@
 		let slides = <%- JSON.stringify(slides) %>
 		if (!mediaSize) var mediaSize = getMediaSize()
 		if (mediaSize === 'xs') slides = slides.slice(0, 11)
-		if (mediaSize === 'sm') slides = slides.slice(0, 21)
-		if (mediaSize === 'm') slides = slides.slice(0, 26)
-		if (mediaSize === 'lg') slides = slides.slice(0, 31)
+		else if (mediaSize === 'sm') slides = slides.slice(0, 21)
+		else if (mediaSize === 'm') slides = slides.slice(0, 26)
+		else if (mediaSize === 'lg') {
+			<% if (uuid) { %> slides = slides.slice(0, 30)
+			<% } else { %> slides = slides.slice(0, 33)
+			<% } %>
+		} else {
+			<% if (uuid) { %> slides = slides.slice(0, 40)
+			<% } %>
+		}
 
 		const container = d3.select('div.slides')
 		const vignette = container.addElems('div', 'slide', slides)

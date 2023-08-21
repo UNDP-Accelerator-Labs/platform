@@ -313,3 +313,16 @@ ALTER TABLE IF EXISTS public.users
     ADD COLUMN confirmed_feature_exploration timestamp with time zone;
 ALTER TABLE IF EXISTS public.pinboard_contributions
     ADD COLUMN is_included boolean NOT NULL DEFAULT true;
+
+-- viewer stat table
+CREATE TABLE IF NOT EXISTS public.page_stats
+(
+	pad INT NOT NULL,
+	db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	page_url text COLLATE pg_catalog."default",
+	country VARCHAR(3),
+	views INT DEFAULT 0,
+	reads INT DEFAULT 0,
+	CONSTRAINT page_stats_pkey PRIMARY KEY (pad, db),
+	CONSTRAINT page_country_key UNIQUE (pad, db, page_url, country)
+);

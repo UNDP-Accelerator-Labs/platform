@@ -152,8 +152,8 @@ module.exports = async (req, res) => {
 				batch.push(DB.general.any(`
 					SELECT p.id, p.title, mobilization_db as mdb, mobilization as mid,
 						CASE WHEN EXISTS (
-							SELECT 1 FROM journey WHERE linked_pinboard = p.id
-						) THEN TRUE ELSE FALSE END AS is_journey
+							SELECT 1 FROM exploration WHERE linked_pinboard = p.id
+						) THEN TRUE ELSE FALSE END AS is_exploration
 					FROM pinboards p
 					WHERE $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = p.id)
 					GROUP BY p.id
@@ -184,8 +184,8 @@ module.exports = async (req, res) => {
 							ELSE FALSE
 						END AS editable,
 						CASE WHEN EXISTS (
-							SELECT 1 FROM journey WHERE linked_pinboard = p.id
-						) THEN TRUE ELSE FALSE END AS is_journey
+							SELECT 1 FROM exploration WHERE linked_pinboard = p.id
+						) THEN TRUE ELSE FALSE END AS is_exploration
 					FROM pinboards p
 
 					INNER JOIN pinboard_contributors pc
@@ -252,7 +252,7 @@ module.exports = async (req, res) => {
 			}
 
 
-			
+
 			const excerpt = pinboard_out?.status > 2 ? { title: pinboard_out.title, txt: pinboard_out.description, p: true } : null
 
 			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard_out?.slideshow && (!pinboard_out?.editable || activity === 'preview') ? 'slideshow' : display, mscale, excerpt })

@@ -20,6 +20,10 @@ const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array')
 
+function stripExplorationId(url) {
+	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
+}
+
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
@@ -65,6 +69,7 @@ exports.pagemetadata = (_kwargs) => {
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
 	const language = checklanguage(params?.language || session.language || this.sessiondata())
+	const page_language = params?.language;
 
 	const parsedQuery = {}
 	for (let key in query) {
@@ -155,8 +160,8 @@ exports.pagemetadata = (_kwargs) => {
 				const pinboard_stats = await DB.general.any(`
 					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size,
 						CASE WHEN EXISTS (
-							SELECT 1 FROM journey WHERE linked_pinboard = pb.id
-						) THEN TRUE ELSE FALSE END AS is_journey
+							SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
+						) THEN TRUE ELSE FALSE END AS is_exploration
 
 					FROM pinboards pb
 					INNER JOIN pinboard_contributions pc
@@ -248,11 +253,12 @@ exports.pagemetadata = (_kwargs) => {
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,
+				page_language,
 				public,
 				excerpt: excerpt || { title: res?.locals.instance_vars?.title || title, txt: res?.locals.instance_vars?.description || description, p: false },
 
 				path,
-				referer: headers.referer,
+				referer: stripExplorationId(headers.referer),
 				currentpage_url,
 				activity,
 				object,

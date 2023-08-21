@@ -196,8 +196,8 @@ module.exports = async (req, res) => {
 			return (await DB.general.any(`
 				SELECT pb.id, pb.title, pb.date, pb.owner,
 					CASE WHEN EXISTS (
-						SELECT 1 FROM journey WHERE linked_pinboard = pb.id
-					) THEN TRUE ELSE FALSE END AS is_journey
+						SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
+					) THEN TRUE ELSE FALSE END AS is_exploration
 				FROM pinboards pb
 				WHERE pb.status > 2
 			;`, [ full_filters ])).map(pbRow => ({

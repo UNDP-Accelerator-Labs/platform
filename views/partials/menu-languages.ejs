@@ -12,7 +12,7 @@
 %>
 
 <nav id='languages'>
-	<menu>
+	<menu class="google-translate-attr">
 		<li class='home-btn lg'>
 			<a href='<%= app_suite_url %>'>Accelerator Labs Suite</a>
 		</li>
@@ -20,9 +20,14 @@
 			<ul>
 				<% languages.forEach(d => { %>
 					<li id='lang-<%- d.language %>'>
-						<a class='<% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
+						<a class='notranslate <% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
 					</li>
 				<% }) %>
+				<li  class='googletranslator' id="google_translate_element"></li >
+				<li id="gtranslate-dummy-lang">
+					<a>Select language</a>
+				</li >
+
 			</ul>
 		</li>
 		<li class='user-id'>

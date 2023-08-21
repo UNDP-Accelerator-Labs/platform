@@ -141,6 +141,8 @@ app.route('/:language/print/:object/:space')
 
 app.get('/:language/analyse/:object', routes.dispatch.analyse) // TO DO
 
+app.get('/:language/exploration-info', routes.render.explorationInfo)
+
 app.post('/check/:object', routes.process.check)
 
 app.post('/save/:object', routes.process.save)
@@ -149,12 +151,34 @@ app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
 app.post('/validate', routes.process.validate)
 
-app.put('/journey/create', routes.process.journeyCreate);
-app.get('/journey/list', routes.process.journeyList);
-app.put('/journey/doc', routes.process.journeyDoc);
-app.get('/journey/collection', routes.process.journeyCollection);
-app.get('/journey/consent', routes.process.journeyConsent);
-app.put('/journey/consent', routes.process.journeyConsent);
+app.put(
+	'/exploration/create',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationCreate);
+app.get(
+	'/exploration/list',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationList);
+app.put(
+	'/exploration/doc',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationDoc);
+app.get(
+	'/exploration/collection',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsentCheck,
+	routes.process.explorationCollection);
+app.get(
+	'/exploration/consent',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsent);
+app.put(
+	'/exploration/consent',
+	routes.process.explorationLoginCheck,
+	routes.process.explorationConsent);
 
 app.route('/publish/:object')
 	.get(routes.process.publish)

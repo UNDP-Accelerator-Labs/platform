@@ -2,6 +2,8 @@
 
 @import '_base';
 
+@import 'google-translate';
+
 /* Small devices (landscape phones, 480px and up) */
 @media (max-width: 480px) {
 /*@media (max-width: 480px) and (orientation: portrait) {*/
@@ -17,7 +19,7 @@
 	@import '_browse.xs';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
-	@import '_journey.lg';
+	@import '_exploration.lg';
 }
 /* Medium devices (tablets, 768px and up) */
 @media (max-width: 768px) {
@@ -33,7 +35,7 @@
 	@import '_browse.xs';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
-	@import '_journey.lg';
+	@import '_exploration.lg';
 }
 /* Large devices (desktops, 1024px and up) */
 @media (max-width: 1024px) {
@@ -50,7 +52,7 @@
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
 	@import '_base.print';
-	@import '_journey.lg';
+	@import '_exploration.lg';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -68,12 +70,12 @@
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
 	@import '_base.print';
-	@import '_journey.lg';
+	@import '_exploration.lg';
 }
 
 @media print {
 	@import '_base.print';
-	@import '_journey.print';
+	@import '_exploration.print';
 
 	@page {
 		size: A4 portrait;

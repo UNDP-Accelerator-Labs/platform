@@ -4,7 +4,15 @@ const filter = require('../filter')
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
-	const { filters } = req.body
+	const [ f_space, order, page, full_filters ] = await filter(req, res)
+
+	let full_filters_query;
+	if(req.body.filters){
+		full_filters_query = req.body.filters
+	}
+	else {
+		full_filters_query = full_filters
+	}
 
 	return conn.task(t => {
 		const batch1 = []
@@ -34,7 +42,7 @@ module.exports = async kwargs => {
                         ) clusters
                         GROUP BY (clusters.cid)
                         ORDER BY clusters.cid
-                    ;`, [ d * 1000, filters ])
+                    ;`, [ d * 1000, full_filters_query ])
                     .then(results => results.map(d => d.json))
                     .catch(err => console.log(err)))
                 })
@@ -55,7 +63,7 @@ module.exports = async kwargs => {
                             $1:raw
                     ) AS points
                     GROUP BY (points.geo)
-                ;`, [ filters ])
+                ;`, [ full_filters_query ])
                 .then(results => results.map(d => d.json))
                 .catch(err => console.log(err)))
             } else if (map) {
@@ -64,7 +72,7 @@ module.exports = async kwargs => {
                     SELECT p.id AS pad, p.owner FROM pads p
                     WHERE p.id NOT IN (SELECT review FROM reviews)
                         $1:raw
-                ;`, [ filters ])
+                ;`, [ full_filters_query ])
                 .then(results => {
                     if (results.length) {
                         const columns = Object.keys(results[0])

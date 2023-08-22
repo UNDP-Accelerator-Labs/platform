@@ -10,17 +10,20 @@ module.exports = async kwargs => {
 	const { object } = req.params || {}
 
 	const { uuid, rights, collaborators } = req.session || {}
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { uuid, rights, collaborators } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
+
+	let full_filters_query;
+	if(req.body.filters){
+		full_filters_query = req.body.filters
+	}
+	else {
+		full_filters_query = full_filters
+	}
 
 	return conn.task(t => {
 		const batch = []
@@ -42,7 +45,7 @@ module.exports = async kwargs => {
 				$1:raw
 			GROUP BY p.status
 			ORDER BY p.status
-		;`, [ full_filters ]).then(d => { return { filtered: d } })
+		;`, [ full_filters_query ]).then(d => { return { filtered: d } })
 		.catch(err => console.log(err)))
 		// GET PADS COUNT, ACCORDING TO FILTERS BUT WITHOUT STATUS
 		batch.push(t.any(`
@@ -55,7 +58,7 @@ module.exports = async kwargs => {
 			GROUP BY p.status
 			ORDER BY p.status
 		;`, [
-			full_filters
+			full_filters_query
 			.replace(/(AND\s)?p\.status IN \([\'\d\,\s]+\)(\sAND\s)?/g, '$2')
 			.replace(/\(\s*AND/g, '(')
 		]).then(d => { return { persistent: d } })
@@ -113,7 +116,7 @@ module.exports = async kwargs => {
 			SELECT COUNT (DISTINCT (p.owner))::INT FROM pads p
 			WHERE p.id NOT IN (SELECT review FROM reviews)
 				$1:raw
-		;`, [ full_filters ], d => d.count).then(d => { return { contributors: d } })
+		;`, [ full_filters_query ], d => d.count).then(d => { return { contributors: d } })
 		.catch(err => console.log(err)))
 		// GET A COUNT OF TAGS
 		batch.push(t.any(`
@@ -124,7 +127,7 @@ module.exports = async kwargs => {
 						$1:raw
 				)
 			GROUP BY type
-		;`, [ full_filters ]).then(d => { return { tags: d } })
+		;`, [ full_filters_query ]).then(d => { return { tags: d } })
 		.catch(err => console.log(err)))
 
 		return t.batch(batch)

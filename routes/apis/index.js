@@ -6,7 +6,9 @@ const statistics = require('./statistics/')
 const tokens = require('./tokens/')
 const jwt = require('jsonwebtoken')
 
-module.exports = (req, res) => {
+const load = include('routes/browse/pads/load/')
+
+module.exports = async (req, res) => {
 	const { action, object } = req.params || {}
 	const { output, render } = Object.keys(req.body)?.length ? req.body : Object.keys(req.query)?.length ? req.query : {}
 
@@ -26,6 +28,7 @@ module.exports = (req, res) => {
 		} else res.redirect('/module-error')
 	} else if (action === 'fetch') {
 		if (object === 'pads') {
+			console.log('api here')
 			if (output === 'csv') pads.xlsx(req, res)
 			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
 			else res.redirect('/module-error')
@@ -33,6 +36,14 @@ module.exports = (req, res) => {
 		else if (object === 'contributors') contributors.json(req, res)
 		else if (object === 'tags') tags(req, res)
 		else if (object === 'statistics') statistics(req, res)
+		else if (object === 'global'){
+			const data = await load.global({req, res});
+			res.json(data)
+		}
+		else if (object === 'global-data'){
+			const data = await load.global_data({req, res});
+			res.json(data)
+		}
 		else res.redirect('/module-error')
 	} else if (action === 'request') {
 		if (object === 'token') tokens.generate(req, res)

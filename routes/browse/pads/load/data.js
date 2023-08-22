@@ -6,13 +6,20 @@ const filter = require('../filter')
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
-	const { object } = req.params || {}
+	// const { object } = req.params || {}
 
-	const { uuid, rights, collaborators } = req.session || {}
+	const { uuid, rights, collaborators } = req.session || req.headers || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	let full_filters_query;
+	if(req.body.filters){
+		full_filters_query = req.body.filters
+	}
+	else {
+		full_filters_query = full_filters
+	}
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
@@ -29,7 +36,7 @@ module.exports = async kwargs => {
 				AND p.id NOT IN (SELECT review FROM reviews)
 			$2:raw
 			LIMIT $3 OFFSET $4
-		;`, [ full_filters, order, page_content_limit, (page - 1) * page_content_limit ])
+		;`, [ full_filters_query, order, page_content_limit, (page - 1) * page_content_limit ])
 		.then(async pads => {
 			pads = pads.map(d => d.id)
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])

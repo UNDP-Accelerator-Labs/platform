@@ -3,7 +3,7 @@ const nodeMailer = require('nodemailer')
 const sgMail = require('@sendgrid/mail');
 
 module.exports = (kwargs) => {
-	const { SENDGRID_API_KEY, SENDER_IDENTITY } = process.env;
+	const { SENDGRID_API_KEY, SENDER_IDENTITY, EMAIL_REPLY_RECIPEINT } = process.env;
 	sgMail.setApiKey(SENDGRID_API_KEY);
 
 	let { to, subject, html } = kwargs
@@ -18,6 +18,7 @@ module.exports = (kwargs) => {
 		from: `${app_title} <${SENDER_IDENTITY}>`,
 		subject,
 		html,
+		replyTo: EMAIL_REPLY_RECIPEINT
 		};
 
 		return new Promise(resolve => {

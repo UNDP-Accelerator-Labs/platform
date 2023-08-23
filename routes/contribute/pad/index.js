@@ -1,4 +1,4 @@
-const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
+const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
 const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -15,7 +15,7 @@ module.exports = (req, res) => {
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
 		return check_authorization({ connection: t, id, template, mobilization, source, uuid, rights, collaborators, public })
-		.then(result => {
+		.then(async result => {
 			const { authorized, redirect } = result
 
 			if (!authorized) {
@@ -137,6 +137,35 @@ module.exports = (req, res) => {
 						const data = await join.users(result, [ language, 'owner' ])
 						return data
 					}).catch(err => console.log(err)))
+				}
+
+				if (id && !uuid) {
+					console.log(`HI PAD ${id} ${req.session.user_country}`)
+					if (!req.session.user_country) {
+						// TODO compute country from ip
+						const user_ip = req.ip;
+						console.log(`GET COUNTRY FOR ${user_ip}`);
+						req.session.user_country = 'NUL';
+					}
+					const user_country = req.session.user_country;
+					const page_url = req.originalUrl;
+					const ownId = await ownDB();
+					await DB.general.tx(async gt => {
+						const page_stats = [];
+
+						function addStat(padId, padDb, url, country) {
+							page_stats.push(gt.any(`
+							INSERT INTO page_stats (pad, db, page_url, country, view_count)
+							VALUES ($1, $2, $3, $4, 1)
+							ON CONFLICT ON CONSTRAINT page_country_key DO UPDATE SET view_count = EXCLUDED.view_count + 1
+							`, [padId, padDb, url, country]));
+						}
+
+						addStat(id, ownId, null, null);
+						addStat(id, ownId, page_url, user_country);
+
+						await gt.batch(page_stats);
+					});
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

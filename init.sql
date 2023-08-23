@@ -317,12 +317,11 @@ ALTER TABLE IF EXISTS public.pinboard_contributions
 -- viewer stat table
 CREATE TABLE IF NOT EXISTS public.page_stats
 (
-	pad INT NOT NULL,
+	pad INT,
 	db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	page_url text COLLATE pg_catalog."default",
 	country VARCHAR(3),
-	views INT DEFAULT 0,
-	reads INT DEFAULT 0,
-	CONSTRAINT page_stats_pkey PRIMARY KEY (pad, db),
+	view_count INT DEFAULT 0,
+	read_count INT DEFAULT 0,
 	CONSTRAINT page_country_key UNIQUE (pad, db, page_url, country)
 );

@@ -11,7 +11,11 @@ const ipCountry = async (req) => {
             try {
                 // free account at ipinfo.io allows 50k requests per month
                 const resp = await fetch(`https://ipinfo.io/${user_ip}/country?token=${ipInfoToken}`);
-                country = `${await resp.text()}`;
+                if (resp.ok) {
+                    country = `${await resp.text()}`;
+                } else {
+                    console.log(`IP GEOLOCATION API ERROR: ${await resp.text()}`);
+                }
             } catch(e) {
                 // ignore errors
                 console.log(`IP GEOLOCATION API ERROR: ${e}`);

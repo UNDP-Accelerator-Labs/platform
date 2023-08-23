@@ -7,7 +7,7 @@ nav#languages {
 	font-size: $t-small;
 	background-color: $c-dark-blue;
 	text-align: center;
-	z-index: 10000;
+	z-index: 100000;
 
 	menu {
 		display: flex;
@@ -78,7 +78,7 @@ button#expand-nav {
 	border: 1px solid $c-light-2;
 	outline: none;
 	background-color: #FFF;
-	z-index: 10000;
+	z-index: 100000;
 	box-shadow: 0 0 10px rgba(0,0,0,.25);
 	cursor: pointer;
 

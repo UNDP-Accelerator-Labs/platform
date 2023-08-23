@@ -526,12 +526,14 @@
 	// THIS IS FOR MOBILE DISPLAY
 	if (['xs', 'sm', 'm'].includes(mediaSize)) {
 		d3.select('.create').selectAll('button')
-		// .on('touchend', function () {
-		// 	this.focus()
-		// })
 		.on('click', function () {
 			const dropdown = d3.select(this.nextElementSibling)
 			if (dropdown.node() && dropdown.classed('dropdown')) {
+				const { top } = this.getBoundingClientRect()
+				const viewheight = window.innerHeight
+				if (!mediaSize) var mediaSize = getMediaSize()
+				if (mediaSize === 'xs' && top + 300 >= viewheight) dropdown.classed('dropup', true)
+				
 				if (dropdown.node().style.maxHeight) {
 					dropdown.node().style.maxHeight = null
 					dropdown.node().style.overflow = null

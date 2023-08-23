@@ -82,7 +82,7 @@
 <% } %>
 
 <div class='sticky-container'>
-	<div class='main-content sticky'>
+	<div class='main-content sticky<% if (mapscale !== "full-screen") { %> force-height<% } %>'>
 		<header>
 			<% if (!is_intropage) { %><div class='inner'>
 			<% } else { %><div class='inner fixed'><% } %>
@@ -97,9 +97,9 @@
 			<% if (!publicpage
 				&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
 				&& pagedisplay !== 'slideshow'
-				&& !(locals.metadata.page.map && mapscale === 'full-screen')
+				// && !(locals.metadata.page.map && mapscale === 'full-screen')
 			) { %>
-				<nav class='tabs <% if (mapscale === "full-screen") { %>no-bg<% } %>'>
+				<nav class='tabs<% if (mapscale === "full-screen") { %> fill-screen<% } %>'>
 					<div class='inner'>
 						<div class='xs sm'>
 							<div class='spaces'>
@@ -407,7 +407,7 @@
 				</div>
 
 				<% if (!logged) { %>
-					<div class='public-page-panel'>
+					<div class='public-page-panel sm-padding'>
 						<div class='inner'>
 							<nav class='enter'>
 								<a href='/login'><button type='button' class='highlight'><%- vocabulary['log in'][language] %></button></a>
@@ -470,7 +470,7 @@
 		.each(function (d) {
 			const section = d3.select(this)
 			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
-			if (mediaSize === 'xs') {
+			if (mediaSize === 'xs' && '<%- object %>' === 'pads') {
 				section.classed('columns', true)
 				d.data.forEach(c => section.call(renderVignette, { data: c, display: 'columns' }))
 			} else {
@@ -484,7 +484,6 @@
 
 	function renderVignette (_section, _kwargs) {
 		const { data, display } = _kwargs
-		console.log(data)
 
 		const entry = new Entry({
 			parent: _section,

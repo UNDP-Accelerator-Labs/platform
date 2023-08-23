@@ -81,11 +81,17 @@
 			}
 		}
 		.footer-column.center {
-			width: calc(300px * 3 + 15px * 2);
-			padding: 0 15px;
+			flex: calc(300px * 3 + 15px * 2) 0 0;
 		}
-		// .footer-column.right {
-		// }
+		.footer-column.right {
+			& > .inner {
+				padding-top: 0;
+
+				h3 {
+					margin-top: 0;
+				}
+			}
+		}
 	}
 	.footer-row.signature {
 		padding: 0 45px;

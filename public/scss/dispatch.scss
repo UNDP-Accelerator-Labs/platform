@@ -8,7 +8,8 @@
 	@import '_base.xs';
 	@import '_navigate.xs';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map';
+	@import '_map.xs';
 	@import '_modals.lg';
 
 	@import '_login.lg';
@@ -23,11 +24,12 @@
 	@import '_base.sm';
 	@import '_navigate.sm';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map';
+	@import '_map.sm';
 	@import '_modals.lg';
 
 	@import '_login.lg';
-	@import '_pad.xs';
+	@import '_pad.sm';
 	@import '_profile.xs';
 	@import '_browse.sm';
 	@import '_mobilize.lg';
@@ -38,6 +40,7 @@
 	@import '_base.m';
 	@import '_navigate.m';
 	@import '_filter.lg';
+	@import '_map';
 	@import '_map.m';
 	@import '_modals.lg';
 
@@ -53,6 +56,7 @@
 	@import '_base.lg';
 	@import '_navigate.lg';
 	@import '_filter.lg';
+	@import '_map';
 	@import '_map.lg';
 	@import '_modals.lg';
 
@@ -76,14 +80,14 @@
 	@import '_profile.lg';
 	@import '_browse.xl';
 	@import '_mobilize.lg';
-	@import '_orgfooter.lg';
+	@import '_orgfooter.xl';
 }
 /* Extra large devices (large desktops, 1200px and up) */
 @media screen and (min-width: 1920px) {
 	@import '_base.xl';
 	@import '_navigate.xl';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map.xl';
 	@import '_modals.lg';
 
 	@import '_login.lg';
@@ -92,7 +96,7 @@
 	@import '_import.lg';
 	@import '_browse.xl';
 	@import '_mobilize.lg';
-	@import '_orgfooter.lg';
+	@import '_orgfooter.xl';
 }
 
 @media print {

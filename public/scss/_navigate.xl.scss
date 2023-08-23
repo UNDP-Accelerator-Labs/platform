@@ -731,147 +731,123 @@ header {
 .sidebar {
 	display: block;
 	flex: 1 1 0;
-	/*float: right;*/
 	top: 0;
-	vertical-align: top;  // FIXME: vertical-align is ignored due to display block
-	/*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
-	/* min-height: 100vh; */
-}
-.sidebar > .inner {
-	position: sticky;
-	/*width: calc((100vw - (300px * 3 + 15px * 4)) / 2);*/
-	top: 0;
-	height: 100vh;
+	
+	& > .inner {
+		position: sticky;
+		top: 0px;
+		height: 100vh;
 
-	#statistics {
-		display: flex;
-		flex-wrap: wrap;
-		padding: 45px 30px 15px 5px;
+		#statistics {
+			display: flex;
+			flex-direction: column;
+			padding: 45px 45px 0 15px;
 
-		.stat-group {
-			.statistic {
-				display: inline-block;
-				position: relative;
-				width: 50%;
-				margin: 15px 0;
-				text-align: center;
+			.stat-group {
+				display: flex;
+				flex-wrap: wrap;
+				flex: 1 1 0;
+				align-items: center;
+				justify-content: center;
+				gap: 15px 15px;
+				padding: 15px 0;
 
-				h1 {
-					font-size: $t-large;
-					line-height: 1.5em;
-					color: $c-dark-blue;
-				}
-				p {
-					margin: 0;
-					font-style: normal;
-					font-size: $t-mid-small;
-					line-height: 1.5em;
-					color: $c-dark-blue;
-				}
-				small {
-					font-size: $t-small;
-					line-height: 1.5em;
-					color: $c-light-grey;
-				}
-			}
-			.statistic:first-child {
-				width: 100%;
-				margin: 15px 0;
+				.statistic {
+					flex: calc(50% - 15px) 0 0;
+					align-self: flex-start;
+					text-align: center;
 
-				h1 {
-					font-size: $t-xlarge;
-					line-height: 1.2em;
-				}
-				p {
-					font-size: $t-main;
-				}
-			}
-			.statistic:nth-child(2n) {
-				&::after {
-					content: '';
-					position: absolute;
-					left: 100%;
-					top: 0;
-					width: 0;
-					height: 100%;
-					border-right: 1px dotted $c-light-grey;
+					h1 {
+						font-size: $t-xlarge;
+						line-height: 1.2em;
+						margin-bottom: 0;
+					}
+					h2 {
+						font-size: $t-large;
+						line-height: 1.2em;
+					}
+					small {
+						font-size: $t-small;
+						line-height: 1.2em;
+						color: $c-light-grey;
+					}
 				}
 			}
 		}
-	}
 
-	#filters {
-		overflow: auto;
+		#filters {
+			overflow: auto;
 
-		.inner {
-			padding: 30px;
+			.inner {
+				padding: 30px;
 
-			p {
-				padding: 10px 0 5px 0;
-				font-size: $t-main;
-				font-style: italic;
-				color: $c-light-grey;
-			}
-			.active-filters {
-				width: 100%;
-				display: flex;
-				flex-wrap: wrap;
-
-				.tag {
-					display: inline-block;
-					height: calc(#{$t-small} * 1.5);
-					padding: 0;
-					margin: 2.5px;
-					font-size: $t-small;
-					line-height: 1.5em;
-					border: 1px solid $c-light-grey;
+				p {
+					padding: 10px 0 5px 0;
+					font-size: $t-main;
+					font-style: italic;
 					color: $c-light-grey;
-					white-space: nowrap;
+				}
+				.active-filters {
+					width: 100%;
+					display: flex;
+					flex-wrap: wrap;
 
-					label {
-						cursor: pointer;
-						vertical-align: top;
-					}
-					.type {
-						font-size: $t-xsmall;
-						padding-right: 5px;
-						margin: 0 0 0 5px;
-						border-right: 1px dotted $c-light-grey;
-					}
-					.name {
-						margin: 0 5px 0 5px;
-						white-space: nowrap;
-						color: $c-dark-grey;
-					}
-					.close {
+					.tag {
 						display: inline-block;
-						position: relative;
-						width: calc(#{$t-small} * 1.5);
 						height: calc(#{$t-small} * 1.5);
-						background-color: $c-light-grey;
-						float: none;
-						transform: none;
 						padding: 0;
+						margin: 2.5px;
+						font-size: $t-small;
+						line-height: 1.5em;
+						border: 1px solid $c-light-grey;
+						color: $c-light-grey;
+						white-space: nowrap;
 
-						&::before {
-							content: '';
-							position: absolute;
-							height: 100%;
-							width: 0;
-							left: 50%;
-							border-left: 1px solid #FFF;
-							transform: rotate(45deg);
-							transform-origin: center;
+						label {
+							cursor: pointer;
+							vertical-align: top;
 						}
-						&::after {
-							content: '';
-							position: absolute;
-							height: 100%;
-							width: 0;
-							left: 50%;
-							border-left: 1px solid #FFF;
-							transform: rotate(-45deg);
-							transform-origin: center;
+						.type {
+							font-size: $t-xsmall;
+							padding-right: 5px;
+							margin: 0 0 0 5px;
+							border-right: 1px dotted $c-light-grey;
+						}
+						.name {
+							margin: 0 5px 0 5px;
+							white-space: nowrap;
+							color: $c-dark-grey;
+						}
+						.close {
+							display: inline-block;
+							position: relative;
+							width: calc(#{$t-small} * 1.5);
+							height: calc(#{$t-small} * 1.5);
+							background-color: $c-light-grey;
+							float: none;
+							transform: none;
+							padding: 0;
+
+							&::before {
+								content: '';
+								position: absolute;
+								height: 100%;
+								width: 0;
+								left: 50%;
+								border-left: 1px solid #FFF;
+								transform: rotate(45deg);
+								transform-origin: center;
+							}
+							&::after {
+								content: '';
+								position: absolute;
+								height: 100%;
+								width: 0;
+								left: 50%;
+								border-left: 1px solid #FFF;
+								transform: rotate(-45deg);
+								transform-origin: center;
+							}
 						}
 					}
 				}

@@ -400,6 +400,7 @@ div.public-page-panel {
 			.stat-group:nth-child(2) {
 				flex: 70%;
 				border-left: 1px dotted $c-light-grey;
+				gap: 15px;
 			}
 		}
 		.map-container {
@@ -509,6 +510,22 @@ div.browse {
 		padding: 5px 14px 15px 14px;
 		border: 1px dotted $c-light-grey;
 		margin-bottom: 0;
+
+		&.anchor-bottom {
+			position: fixed;
+			width: 100%;
+			max-height: calc(100vh - 30px);
+			min-height: 160px;
+			left: 0;
+			bottom: 0;
+			margin: 0;
+			z-index: 100;
+			background-color: #FFF;
+			border: none;
+			border-top: 1px solid $c-mid-grey;
+			box-sizing: border-box;
+			overflow: auto;
+		}
 
 		form {
 			display: flex;
@@ -721,7 +738,7 @@ div.browse {
 				float: right;
 				width: 30px;
 				height: 30px;
-				margin: 15px 15px 0 0;
+				margin: 15px 15px 0 auto;
 				background-color: transparent;
 				outline: none;
 				border: none;
@@ -1183,7 +1200,8 @@ div.browse {
 			}
 		}
 		.outer {
-			margin-top: 30px;
+			/* margin-top: 30px; */
+			margin-top: 0px;
 			color: $c-light-grey;
 			font-size: $t-mid-small;
 
@@ -1204,15 +1222,25 @@ div.browse {
 	main .inner,
 	.public-page-panel .inner {
 		section {
+			margin-bottom: 30px;
+
 			.layout {
 				margin-top: 15px;
 
 				article {
 					position: relative;
 					display: flex;
-					padding: 15px 0 0 0;
-					border-bottom-left-radius: 5px;
-					border-bottom-right-radius: 5px;
+					padding: 15px 0 15px 15px;
+					margin-bottom: 15px;
+					border: 1px solid transparent;
+					box-sizing: border-box;
+					transition: box-shadow .25s;
+
+					&:hover {
+						background-color: transparent;
+						box-shadow: 0 5px 0 rgba(0,0,0,.1);
+						border: 1px solid $c-mid-grey;
+					}
 
 					.inner {
 						display: flex;
@@ -1228,7 +1256,7 @@ div.browse {
 							.meta-group {
 								display: flex;
 								justify-content: space-between;
-								align-items: flex-end;
+								align-items: flex-start;
 
 								.meta-data {
 									margin-bottom: 0;
@@ -1245,7 +1273,7 @@ div.browse {
 									}
 								}
 								.btn-group {
-									margin-bottom: 5px;
+									margin: -16px -1px 0 0;
 
 									form {
 										position: relative;
@@ -1630,14 +1658,16 @@ div.browse {
 							}
 							.meta-group {
 								display: flex;
-								justify-content: space-around;
-								align-items: center;
-								width: 300px;
-								height: calc(100% - 15px);
-								padding-bottom: 15px;
+								justify-content: center;
+								align-items: flex-start;
+								gap: 15px;
+								min-width: 300px;
+								height: 100%;
+								padding: 15px 15px 0 0;
+								box-sizing: border-box;
 
 								.meta-stats {
-									margin: auto 5px;
+									flex: calc(33% - 15px) 0 0;
 
 									a {
 										h1 {
@@ -1682,6 +1712,8 @@ div.browse {
 						.pinboard-group {
 							width: 100%;
 							margin-top: 5px;
+							padding-right: 15px;
+							box-sizing: border-box;
 
 							.add {
 								position: relative;
@@ -1689,7 +1721,6 @@ div.browse {
 
 								input[type=text] {
 									position: relative;
-									/*width: calc(100% - 20px);*/
 									width: 100%;
 									height: 30px;
 									padding: 0;
@@ -1697,7 +1728,7 @@ div.browse {
 									border: none;
 									outline: none;
 									background-color: transparent;
-									border-bottom: 1px dotted $c-light-grey;
+									border-bottom: 1px dotted transparent;
 									font-size: $t-small;
 									color: $c-dark-blue;
 								}
@@ -1750,6 +1781,12 @@ div.browse {
 									overflow: auto;
 									z-index: 10;
 									transition: max-height 0.25s ease-out;
+
+									&.dropup {
+										top: auto;
+										bottom: 100%;
+										box-shadow: 0px -10px 10px rgba(0,0,0,.1);
+									}
 
 									menu {
 										width: 100%;
@@ -1861,10 +1898,8 @@ div.browse {
 							position: relative;
 							z-index: 1;
 							width: 0;
-							height: calc(100% + 15px);
-							/*padding: 15px 0 0 0;*/
+							height: calc(100% + 30px);
 							margin-top: -15px;
-							/*border-bottom: 1px dotted $c-light-grey;*/
 							transition: width .25s;
 							overflow: hidden;
 
@@ -1939,14 +1974,11 @@ div.browse {
 						transition: opacity .15s;
 					}*/
 				}
-				article:hover {
-					background-color: $c-light-3;
-				}
-				article:not(.pad):not(.review):not(.contributor) {
+				/*article:not(.pad):not(.review):not(.contributor) {
 					border-bottom: 1px dotted $c-light-grey;
 					padding-top: 15px;
 					padding-bottom: 15px;
-				}
+				}*/
 				article.status--1 {
 					filter: grayscale(1);
 					background: repeating-linear-gradient(
@@ -1974,6 +2006,9 @@ div.browse {
 						rgba(50, 190, 225, .1) 3px,
 						rgba(50, 190, 225, .1) 6px
 					);
+				}
+				article.status-2 {
+					margin-bottom: 30px;
 				}
 				article.mobilization.status-0 {
 					background: repeating-linear-gradient(
@@ -2074,7 +2109,7 @@ div.browse {
 			.layout.columns {
 				display: grid;
 				grid-template-columns: repeat(3, 300px);
-				grid-gap: 15px;
+				grid-gap: 30px 15px;
 
 				article {
 					flex-direction: column;
@@ -2082,9 +2117,16 @@ div.browse {
 					height: 100%;
 					vertical-align: top;
 					grid-column: span 1;
-					padding-top: 0;
-					padding-bottom: 0;
+					padding: 0 0 15px 0;
 					border-bottom: none;
+					box-sizing: border-box;
+					border: 1px solid transparent;
+					transition: box-shadow .25s;
+
+					&:hover {
+						box-shadow: 0 5px 0 rgba(0,0,0,.1);
+						border: 1px solid $c-mid-grey;
+					}
 
 					.inner {
 						display: block;
@@ -2094,6 +2136,7 @@ div.browse {
 
 							.btn-group {
 								text-align: left;
+								margin: -1px 0 0 -1px;
 
 								form {
 									position: relative;
@@ -2190,85 +2233,12 @@ div.browse {
 							}
 							.media-img {
 								position: relative;
-								width: 300px;
-								height: 200px;
+								width: calc(300px - 2px);
+								height: auto;
 								margin-bottom: 10px;
 								display: flex;
 								align-items: flex-end;
 
-								.bookmark {
-									display: none;
-									justify-content: center;
-									align-items: center;
-									position: absolute;
-									width: 30px;
-									height: 90px;
-									top: -10px;
-									right: 10px;
-									background-color: $c-mid-blue;
-									font-size: $t-small;
-									line-height: 1.5em;
-									text-align: center;
-									color: #FFF;
-									z-index: 100;
-									transform: translateY(-10px);
-									transform-origin: top center;
-									transition: transform .15s ease-out, background-color .25s;
-									cursor: pointer;
-
-									.label {
-										transform: rotate(-90deg);
-									}
-								}
-								.bookmark::before {
-									content: '';
-									position: absolute;
-									right: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-left: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark::after {
-									content: '';
-									position: absolute;
-									left: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-right: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark:hover,
-								.bookmark.active {
-									display: flex;
-									transform: translateY(0);
-									background-color: $c-dark-blue;
-								}
-								.bookmark:hover::before,
-								.bookmark:hover::after,
-								.bookmark.active::before,
-								.bookmark.active::after {
-									border-top-color: $c-dark-blue;
-								}
-								.bookmark.active {
-									transform: translateY(0)scaleY(.5);
-
-									.label {
-										display: none;
-									}
-								}
-								.bookmark.active::before,
-								.bookmark.active::after {
-									transform: translateY(90px)scaleY(2);
-								}
 								a {
 									display: block;
 									position: relative;
@@ -2280,7 +2250,8 @@ div.browse {
 										display: block;
 										width: 100%;
 										background-color: $c-light-2;
-										height: 100%;
+										height: auto;
+										min-height: 200px;
 										font-size: $t-small;
 										line-height: 1.5em;
 										line-height: 200px;
@@ -2292,7 +2263,8 @@ div.browse {
 						.body {
 							display: block;
 							width: 100%;
-							padding: 0;
+							padding: 0 15px;
+							box-sizing: border-box;
 
 							.meta-data {
 								margin: 0 0 5px 0;
@@ -2374,9 +2346,11 @@ div.browse {
 						}
 					}
 					.outer {
+						top: 15px;
 						height: 0;
 						transition: height .25s;
 						overflow: hidden;
+						margin-top: 0;
 
 						.inner {
 							width: 100%;
@@ -2395,6 +2369,14 @@ div.browse {
 					.outer.expand {
 						height: calc(55px * 2 + 15px * 2);
 					}
+				}
+				.engagement-group {
+					padding: 0 10px;
+					box-sizing: border-box;
+				}
+				.pinboard-group {
+					padding: 0 15px;
+					box-sizing: border-box;
 				}
 			}
 		}
@@ -2498,6 +2480,7 @@ div.browse.slideshow {
 							.head {
 								flex: unset;
 								position: static;
+								
 								.meta-group {
 									position: relative;
 									z-index: 10;
@@ -2621,8 +2604,6 @@ div.browse.slideshow {
 						}
 					}
 					article:hover {
-						background-color: transparent;
-
 						.inner {
 							.head {
 								.meta-group {

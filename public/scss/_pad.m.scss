@@ -24,7 +24,7 @@ div.document {
 	position: relative;
 	display: block;
 	width: calc(300px * 3 + 15px * 2 - 90px - 2px);
-	padding: 45px 60px 0 60px;
+	padding: 30px 60px 0 60px;
 	background-color: #FFF;
 	border-left: 1px solid $c-light-2;
 	border-right: 1px solid $c-light-2;
@@ -373,7 +373,7 @@ div.document {
 					outline: none;
 					border-bottom: 1px solid transparent;
 					font-size: $t-xlarge;
-					line-height: 1.3em;
+					line-height: 1.2em;
 					font-weight: 700;
 				}
 				.title:focus {
@@ -434,7 +434,6 @@ div.document {
 							border-bottom: 1px solid transparent;
 						}
 						h1:focus {
-							/*border-bottom-color: $c-mid-yellow;*/
 							border-bottom-color: $c-light-2;
 						}
 					}
@@ -1866,12 +1865,10 @@ main#reference {
 	pointer-events: none;
 }
 footer {
-/*	position: relative;*/
 	width: 100%;
 	clear: both;
 	background-color: $c-light-3;
 	border-top: 1px solid $c-light-2;
-/*	z-index: 1000;*/
 
 	.inner {
 		position: relative;
@@ -2240,11 +2237,9 @@ div.display-option.split-screen.right {
 	text-align: right;
 }
 
-
-
 .media-input-group {
 	position: sticky;
-	top: 105px;
+	top: 90px;
 	width: 60px;
 	max-height: 80vh;
 	margin-left: -61px;

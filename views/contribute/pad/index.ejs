@@ -171,7 +171,7 @@
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
 					<div class='btn-group'>
 						<% if (editing) { %>
-							<div class='save xs'>
+							<div class='save xs sm'>
 								<form>
 									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][language] %></button>
 								</form>
@@ -395,7 +395,7 @@
 		</div>
 	</main>
 </div>
-<div class='sidebar m lg xl xxl'>
+<div class='sidebar xs sm m lg xl xxl'>
 	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
 	{ %>
 		<button class='input-toolbox xs sm'><i class='material-icons'>edit</i></button>
@@ -439,7 +439,7 @@
 		</div>
 		<script type='text/javascript'>
 			if (!mediaSize) var mediaSize = getMediaSize()
-			if (mediaSize === 'xs') {
+			if (['xs', 'sm'].includes(mediaSize)) {
 				d3.select('button.input-toolbox')
 				.on('touchend, click', function () {
 					d3.select(this).toggleClass('highlight')
@@ -1056,7 +1056,7 @@
 				window.sessionStorage.removeItem('changed-content')
 
 				if (!mediaSize) var mediaSize = getMediaSize()
-				if (mediaSize === 'xs') {
+				if (['xs', 'sm'].includes(mediaSize)) {
 					const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 					save_btn.select('button')
 						.html('<%- vocabulary["changes saved"][language] %>')

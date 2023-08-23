@@ -70,8 +70,6 @@ nav#languages {
 nav.tabs {
 	position: fixed;
 	top: 30px;
-	/*width: calc(55% - 30px);*/
-	/*min-width: calc(300px * 3 + 15px * 2);*/
 	width: calc(300px * 3 + 15px * 2);
 	height: 75px;
 	margin-left: -15px;
@@ -289,6 +287,257 @@ nav.tabs {
 		}
 	}
 }
+/* THE FOLLOWING IS THE SAME AS THE nav.tabs IN _navigate.m */
+nav.tabs.fill-screen {
+	position: fixed;
+	top: 30px;
+	width: 100%;
+	height: 60px;
+	left: 0;
+	margin-left: 0;
+	border-bottom: 1px solid $c-dark-blue;
+	background-color: #FFF;
+	z-index: 100;
+
+	.inner {
+		width: 100%;
+
+		div.m {
+
+			menu,
+			ul {
+				display: flex;
+				justify-content: center;
+				width: 100%;
+				padding-bottom: 15px;
+				scroll-snap-type: x mandatory;
+				overflow: auto;
+
+				li {
+					position: static;
+					display: inline-block;
+					vertical-align: top;
+					margin: 15px 0 0 0;
+					scroll-snap-align: start;
+
+					a {
+						display: block;
+					}
+
+					button {
+						position: relative;
+						height: 45px;
+						padding: 7px 10px 0 10px;
+						outline: none;
+						border: none;
+						background-color: transparent;
+						font-size: $t-mid-small;
+						color: $c-light-grey;
+						cursor: pointer;
+						overflow: hidden;
+						white-space: nowrap;
+
+						.count {
+							position: relative;
+							display: inline-block;
+							font-size: $t-small;
+							margin: 0 0 5px 15px;
+							color: $c-light-grey;
+						}
+						.count::before {
+							content: '';
+							position: absolute;
+							height: 20px;
+							width: 0;
+							left: -10px;
+							top: -2px;
+							border-left: 1px dotted $c-light-grey;
+						}
+						&::after {
+							content: '';
+							position: absolute;
+							bottom: 0;
+							left: 0;
+							width: 100%;
+							height: 3px;
+							background-color: $c-light-2;
+							transform: translateY(3px);
+							transition: transform .15s;
+						}
+					}
+
+					.inner {
+						position: relative;
+
+						input[type=text] {
+							position: relative;
+							min-width: 100px;
+							height: 38px;
+							padding: 4.5px 15px 0 15px;
+							border: none;
+							outline: none;
+							background-color: transparent;
+							border-bottom: 3px solid transparent;
+							font-size: $t-mid-small;
+							color: $c-dark-blue;
+						}
+						label {
+							position: absolute;
+							left: 15px;
+							font-size: $t-mid-small;
+							line-height: 1.5em;
+							color: $c-light-grey;
+							transform: translateY(13.5px);
+							transition: transform .25s, font-size .25s;
+
+
+							.count {
+								position: relative;
+								display: inline-block;
+								font-size: $t-small;
+								margin: 0 0 5px 15px;
+								color: $c-light-grey;
+							}
+							.count::before {
+								content: '';
+								position: absolute;
+								vertical-align: middle;
+								height: 20px;
+								width: 0;
+								left: -10px;
+								top: 0;
+								border-left: 1px dotted $c-light-grey;
+							}
+
+							&::after {
+								content: '';
+								position: absolute;
+								top: 4px;
+								left: 100%;
+								margin-left: 10px;
+								width: 15px;
+								height: 15px;
+								background: url('../imgs/icons/i-search-sm.svg');
+							}
+						}
+						input[type=text] + label {
+							width: calc(100% - 50px);
+							pointer-events: none;
+							white-space: nowrap;
+						}
+						input[type=text]:focus + label,
+						input[type=text].has-value + label {
+							font-size: $t-small;
+							line-height: 1.5em;
+							transform: translateY(-5px);
+
+							&::after {
+								top: 2px;
+							}
+						}
+					}
+
+					.dropdown {
+						position: absolute;
+						max-height: 0;
+						max-width: 300px;
+						top: calc(100%);
+						background-color: #FFF;
+						box-shadow: 0px 10px 10px rgba(0,0,0,.1);
+						overflow: auto;
+						border-top: 1px solid $c-dark-blue;
+						z-index: 100;
+						transition: max-height 0.25s ease-out;
+
+						menu {
+							display: block;
+							width: 100%;
+							padding-bottom: 0;
+							scroll-snap-type: y mandatory;
+
+							li {
+								width: 100%;
+								margin: 0;
+
+								a {
+									display: block;
+									position: static;
+									padding: 5px 20px 5px 15px;
+									color: $c-dark-grey;
+									font-size: $t-mid-small;
+									line-height: 1.5em;
+									transform: none;
+									text-align: left;
+									/*white-space: nowrap;*/
+								}
+
+								&:hover {
+									background-color: $c-light-3;
+								}
+							}
+						}
+					}
+				}
+				li:hover,
+				li.active {
+					button {
+						&::after {
+							transform: translateY(0);
+						}
+					}
+					input[type=text] {
+						border-color: $c-light-2;
+					}
+				}
+				li.active {
+					button {
+						font-weight: bold;
+						color: $c-dark-blue;
+
+						.count {
+							font-weight: normal;
+						}
+						&::after {
+							background-color: $c-dark-blue;
+						}
+					}
+					input[type=text] {
+						border-color: $c-dark-blue;
+					}
+				}
+			}
+		}
+
+		.btn-group {
+			float: right;
+
+			a {
+				display: block;
+				width: 30px;
+				height: 30px;
+				margin: 15px 15px 0 0;
+				border-radius: 30px;
+				border: 1px solid $c-light-grey;
+				text-align: center;
+
+				i {
+					line-height: 30px;
+					font-size: $t-main;
+					color: $c-light-grey;
+				}
+			}
+			a.active {
+				background-color: $c-dark-blue;
+				border-color: $c-dark-blue;
+
+				i {
+					color: #FFF;
+				}
+			}
+		}
+	}
+}
+
 header {
 	display: block;
 	flex: 1 1 0;

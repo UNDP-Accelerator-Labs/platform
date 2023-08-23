@@ -1,15 +1,21 @@
 <%
-
 	// CREATE ALIASES
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
+	const logged = locals.metadata.user.uuid !== null
 
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
 %>
 
 <% if (locals.stats?.total > 0) { %>
-	<nav id='search-and-filter' class='xs sm m lg xl xxl'>
+	<nav id='search-and-filter' class='xs sm m lg xl xxl<% if (mapscale === "full-screen") { %> anchor-bottom<% } %>'>
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
 			<%
@@ -96,34 +102,36 @@
 				</div>
 			<% } %>
 
-			<% if (object === 'pads') { %>
-				<div class='global-actions'>
-					<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
-					<% if (space !== 'pinned') { %>
-						<div class='add filter pinboards'>
-							<input type='text' id='pin-all'>
-							<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
-							<button id='new-pinboard' type='button'></button>
-							<div class='dropdown'>
-								<menu>
-									<% locals.pinboards_list?.forEach(d => { %>
-										<li class='pinboard'>
-											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
-										</li>
-									<% }) %>
-								</menu>
+			<% if (logged) { %>
+				<% if (object === 'pads') { %>
+					<div class='global-actions'>
+						<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
+						<% if (space !== 'pinned') { %>
+							<div class='add filter pinboards'>
+								<input type='text' id='pin-all'>
+								<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
+								<button id='new-pinboard' type='button'></button>
+								<div class='dropdown'>
+									<menu>
+										<% locals.pinboards_list?.forEach(d => { %>
+											<li class='pinboard'>
+												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
+												<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+											</li>
+										<% }) %>
+									</menu>
+								</div>
 							</div>
-						</div>
-					<% } %>
+						<% } %>
 
-					<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
-				</div>
-			<% } else if (object === 'contributors') { %>
-				<div class='global-actions'>
-					<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
-					<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
-				</div>
+						<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+					</div>
+				<% } else if (object === 'contributors') { %>
+					<div class='global-actions'>
+						<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+						<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
+					</div>
+				<% } %>
 			<% } %>
 
 			<% if (locals.filters_menu?.length) { %>
@@ -197,6 +205,11 @@
 			})
 	}).on('focus', function () {
 		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+		const { top } = this.getBoundingClientRect()
+		const viewheight = window.innerHeight
+		if (!mediaSize) var mediaSize = getMediaSize()
+		if (mediaSize === 'xs' && top + 300 >= viewheight) dropdown.classed('dropup', true)
+
 		const filters = d3.select(this).findAncestor('filters')
 		if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 		if (filters) filters.node().style.overflow = 'visible'

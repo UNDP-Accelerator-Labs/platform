@@ -470,6 +470,7 @@ exports.process.pin = require('./engage/').pin
 
 exports.process.engage = require('./engage/').engage
 exports.process.comment = require('./engage/').comment
+exports.process.pagestats = require('./engage/').pagestats
 
 exports.process.request = require('./request/')
 exports.process.accept = require('./accept/').accept

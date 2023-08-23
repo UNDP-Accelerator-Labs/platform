@@ -1,5 +1,5 @@
-const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers } = include('routes/helpers/')
+const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -140,33 +140,10 @@ module.exports = (req, res) => {
 				}
 
 				if (id && !uuid) {
-					console.log(`HI PAD ${id} ${req.session.user_country}`)
-					if (!req.session.user_country) {
-						// TODO compute country from ip
-						const user_ip = req.ip;
-						console.log(`GET COUNTRY FOR ${user_ip}`);
-						req.session.user_country = 'NUL';
-					}
-					const user_country = req.session.user_country;
+					const user_country = await pagestats.ipCountry(req);
 					const page_url = req.originalUrl;
-					const ownId = await ownDB();
-					await DB.general.tx(async gt => {
-						const page_stats = [];
-
-						function addStat(padId, padDb, url, country) {
-							page_stats.push(gt.any(`
-							INSERT INTO page_stats (pad, db, page_url, country, view_count)
-							VALUES ($1, $2, $3, $4, 1)
-							ON CONFLICT ON CONSTRAINT page_stats_pkey DO UPDATE SET view_count = EXCLUDED.view_count + 1
-							`, [padId ?? 0, padDb ?? 0, url ?? '', country ?? '']));
-						}
-
-						addStat(id, ownId, null, null);
-						addStat(id, ownId, page_url, user_country);
-
-						await gt.batch(page_stats);
-					});
-					req.session.read_url = page_url;
+					await pagestats.recordView(id, page_url, user_country, true);
+					await pagestats.storeReadpage(req, id, page_url);
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

@@ -149,6 +149,7 @@ app.post('/save/:object', routes.process.save)
 app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
+app.post('/pagestats', routes.process.pagestats)
 app.post('/validate', routes.process.validate)
 
 app.put(

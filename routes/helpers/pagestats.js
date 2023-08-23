@@ -1,20 +1,23 @@
+const { default: fetch } = require("node-fetch");
+
 const { DB, ownDB } = include('config/')
 const ipInfoToken = process.env.IPINFO_TOKEN;
 
 const ipCountry = async (req) => {
-    if (!req.session.user_country) {
+    if (!req.session.user_country || req.session.user_country === 'NUL') {
         const user_ip = req.ip;
         let country = 'NUL';
         if (ipInfoToken) {
             try {
                 // free account at ipinfo.io allows 50k requests per month
-                const resp = await fetch(`ipinfo.io/${user_ip}/country?token=${ipInfoToken}`);
+                const resp = await fetch(`https://ipinfo.io/${user_ip}/country?token=${ipInfoToken}`);
                 country = `${await resp.text()}`;
-            } catch(_) {
+            } catch(e) {
                 // ignore errors
+                console.log(`IP GEOLOCATION API ERROR: ${e}`);
             }
             if (country.length > 3) {
-                console.log(`encountered invaldi country ${country}`);
+                console.log(`IP GEOLOCATION API ERROR: encountered invalid country ${country}`);
                 country = 'NUL';
             }
         }

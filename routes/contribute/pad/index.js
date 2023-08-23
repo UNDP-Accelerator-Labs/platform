@@ -157,8 +157,8 @@ module.exports = (req, res) => {
 							page_stats.push(gt.any(`
 							INSERT INTO page_stats (pad, db, page_url, country, view_count)
 							VALUES ($1, $2, $3, $4, 1)
-							ON CONFLICT ON CONSTRAINT page_country_key DO UPDATE SET view_count = EXCLUDED.view_count + 1
-							`, [padId, padDb, url, country]));
+							ON CONFLICT ON CONSTRAINT page_stats_pkey DO UPDATE SET view_count = EXCLUDED.view_count + 1
+							`, [padId ?? 0, padDb ?? 0, url ?? '', country ?? '']));
 						}
 
 						addStat(id, ownId, null, null);
@@ -166,6 +166,7 @@ module.exports = (req, res) => {
 
 						await gt.batch(page_stats);
 					});
+					req.session.read_url = page_url;
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

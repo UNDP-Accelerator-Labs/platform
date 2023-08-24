@@ -1,4 +1,5 @@
 const { app_storage, app_title_short } = include('config/')
+const jwt = require('jsonwebtoken')
 
 exports.getImg = (_json = {}, _unique = true) => {
 	if (_json?.sections) {
@@ -145,4 +146,22 @@ function extractItem (d = {}, section = null, group = null) {
 			}).flat()
 		}
 	}
+}
+
+
+exports.verifyApiAccessToken = async (req) => {
+	const token = req.headers['api-access-token']
+	
+	jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
+		if(decoded) {
+		  if (decoded.username || decoded.language || decoded.country) {
+			Object.assign(req.session, decoded)
+			return true
+		  }
+
+		  else return false
+		} else {
+			return false
+		}
+	  });
 }

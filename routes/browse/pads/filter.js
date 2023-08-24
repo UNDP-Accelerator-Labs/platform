@@ -2,13 +2,13 @@ const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('
 const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	const { uuid, country, rights, collaborators, public } = req.session || {}
-
+	let { uuid, country, rights, collaborators, public } = req.session || {}
+	
 	let { space, object, instance } = req.params || {}
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
-	const language = checklanguage(req.params?.language || req.session.language)
+	let language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1

@@ -15,8 +15,6 @@ module.exports = async kwargs => {
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
-	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
-
 	let full_filters_query;
 	if(req.body.filters){
 		full_filters_query = req.body.filters
@@ -24,6 +22,8 @@ module.exports = async kwargs => {
 	else {
 		full_filters_query = full_filters
 	}
+
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	return conn.task(t => {
 		const batch = []

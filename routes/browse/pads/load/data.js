@@ -14,6 +14,7 @@ module.exports = async kwargs => {
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 	let full_filters_query;
+
 	if(req.body.filters){
 		full_filters_query = req.body.filters
 	}

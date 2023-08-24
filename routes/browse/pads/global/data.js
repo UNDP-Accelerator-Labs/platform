@@ -1,11 +1,12 @@
 const { DB } = include('config/')
 const load = require('../load/')
 const { array } = include('routes/helpers/')
+const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
-	const { filters } = req.body
+	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
 	return conn.task(t => {
 		const batch = []
@@ -15,7 +16,7 @@ module.exports = async kwargs => {
                 ON p.id = mob.pad
             WHERE p.id NOT IN (SELECT review FROM reviews)
                 $1:raw
-        ;`, [ filters ])
+        ;`, [ full_filters ])
         .catch(err => console.log(err)))
 
         batch.push(load.filters_menu({ connection: t, req, res, }))

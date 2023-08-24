@@ -13,14 +13,6 @@ module.exports = async kwargs => {
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
-	let full_filters_query;
-	if(req.body.filters){
-		full_filters_query = req.body.filters
-	}
-	else {
-		full_filters_query = full_filters
-	}
-
 	return conn.task(t => {
 		const batch = []
 		// GET CONTRBIUTOR BREAKDOWN
@@ -35,7 +27,7 @@ module.exports = async kwargs => {
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
 					GROUP BY owner
-				;`, [ full_filters_query ])
+				;`, [ full_filters ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -56,7 +48,7 @@ module.exports = async kwargs => {
 					FROM pads p
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
-				;`, [ full_filters_query ])
+				;`, [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
 					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
@@ -83,7 +75,7 @@ module.exports = async kwargs => {
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
 					GROUP BY t.id
-				;`, [ full_filters_query ]).then(results => { 
+				;`, [ full_filters ]).then(results => { 
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
 					const templates = results.map(d => {
 						const obj = {}
@@ -118,7 +110,7 @@ module.exports = async kwargs => {
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
-				;`, [ uuid, full_filters_query ]).then(results => { 
+				;`, [ uuid, full_filters ]).then(results => { 
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)
@@ -142,7 +134,7 @@ module.exports = async kwargs => {
 						AND p.id NOT IN (SELECT review FROM reviews)
 						$2:raw
 					GROUP BY (tag_id, t.type)
-				;`, [ d.label, full_filters_query ]).then(async results => { 
+				;`, [ d.label, full_filters ]).then(async results => { 
 					const tags = await join.tags(results, [ language, 'id', d.label, d.type ])
 
 					if (d.type === 'index') {

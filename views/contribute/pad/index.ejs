@@ -83,13 +83,12 @@
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
 <div class='main-content'>
-<% if (!pagedisplay.includes('adjacent')) { %>
-	<header>
-		<div class='inner'>
-			<%- include ('../../partials/menu-logo.ejs') %>
-		</div>
-	</header>
-<% } %>
+<header<% if (pagedisplay === 'slideshow' || pagedisplay.includes('adjacent')) { %> class='folded'<% } %>>
+	<div class='inner'>
+		<%- include ('../../partials/menu-logo.ejs') %>
+	</div>
+</header>
+
 
 <div class='filler m'></div>
 
@@ -1366,13 +1365,11 @@
 			d3.selectAll('.media-layout').classed('focus', false)
 
 			const section = d3.select('main#pad div.inner div.body')
-				// .insertElem(sibling || ':last-child', 'section', `media-layout layout ${activity}`)
 				.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
 				.classed('repeat', repeat || false)
 				// .classed('focus', focus && !templated)
 				.datum({ type: 'section', title, lead, structure, items, repeat, group })
 			.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
-			// .addElems('div', 'inner')
 
 			// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
 			if (title || lead) {

@@ -473,8 +473,8 @@
 			const section = d3.select(this)
 			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
 			if (mediaSize === 'xs' && '<%- object %>' === 'pads') {
-				section.classed('columns', true)
-				d.data.forEach(c => section.call(renderVignette, { data: c, display: 'columns' }))
+				section.classed('<%- pagedisplay === "slideshow" ? pagedisplay : "columns" %>', true)
+				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay === "slideshow" ? pagedisplay : "columns" %>' }))
 			} else {
 				section.classed('<%- pagedisplay %>', true)
 				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay %>' }))

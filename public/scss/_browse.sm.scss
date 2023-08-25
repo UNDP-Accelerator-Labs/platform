@@ -2344,7 +2344,7 @@ div.browse.slideshow {
 							width: 100vw;
 							height: 100%;
 							box-sizing: border-box;
-							padding: 0 calc((100vw - (300px * 2 + 15px * 1)) / 2) 0 calc((100vw - (300px * 2 + 15px * 1)) / 2);
+							padding: 0 60px 0 60px;
 
 							.head {
 								flex: unset;
@@ -2352,9 +2352,8 @@ div.browse.slideshow {
 								
 								.meta-group {
 									position: relative;
+									padding: 0 60px;
 									z-index: 10;
-								}
-								.meta-group {
 									opacity: 0;
 									transition: opacity 1s;
 
@@ -2406,6 +2405,7 @@ div.browse.slideshow {
 								position: relative;
 								flex: unset;
 								margin-bottom: 0;
+								padding: 0 60px;
 								z-index: 10;
 								opacity: 0;
 								transition: opacity 1s;

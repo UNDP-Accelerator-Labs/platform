@@ -241,7 +241,7 @@ div.document {
 				top: 30px;
 				width: calc(100% + 120px);
 				margin: 0 0 0 -60px;
-				z-index: 100;
+				z-index: 10000;
 
 				.btn-group {
 					height: 30px;
@@ -1685,10 +1685,6 @@ div.document {
 	}
 }
 div.document.slideshow {
-	/*position: absolute;
-	top: 30px;
-	left: 0;
-	width: 100vw;*/
 	width: calc(300px * 3 + 15px * 2);
 	position: static;
 	padding: 0 15px;
@@ -1698,9 +1694,6 @@ div.document.slideshow {
 	height: calc(100vh - 30px);
 
 	main#pad {
-		/*position: relative;
-		height: 100%;*/
-
 		position: absolute;
 		width: 100%;
 		height: 100%;

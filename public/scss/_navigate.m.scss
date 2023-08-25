@@ -459,7 +459,7 @@ header { /* LEFT COlUMN */
 							border-top: 2px solid $c-dark-blue;
 
 							li.filter {
-								position: fixed;
+								position: absolute;
 								height: 45px;
 								width: 100%;
 								background-color: #FFF;
@@ -743,6 +743,41 @@ header { /* LEFT COlUMN */
 				}
 			}
 		}
+		nav.pagination {
+			margin-bottom: 60px;
+			width: 100%;
+			pointer-events: all;
+
+			.inner {
+				display: initial;
+				position: static;
+
+				ul {
+					text-align: center;
+
+					li {
+						display: inline-block;
+						margin: 0 5px;
+
+						a.page-link.active {
+							font-weight: 700;
+							text-decoration: underline;
+						}
+					}
+					li.disabled {
+						color: $c-light-grey;
+					}
+				}
+				ul.padded {
+					padding: 0 45px;
+				}
+			}
+
+			img {
+				width: 180px;
+				height: auto;
+			}
+		}
 	}
 }
 header.open {
@@ -854,6 +889,6 @@ nav#filters {
 }
 .sidebar {
 	display: block;
-	flex: 1 1 0;
+	flex: 1 1;
 	top: 0;
 }

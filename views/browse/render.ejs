@@ -947,12 +947,13 @@ const Entry = function (_kwargs) {
 						newpin.select('button').node().click()
 					}
 				}).on('focus', function (d) {
-					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
+					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards?.some(b => b.id === c.id) ? true : null }))
 					// RENDER THE DROPDOWN
 					newpin.call(renderPinOptions, data)
 
 					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-					const { top } = this.getBoundingClientRect()
+					let { top, height } = this.getBoundingClientRect()
+					top = top + height
 					const viewheight = window.innerHeight
 					if (!mediaSize) var mediaSize = getMediaSize()
 					if (mediaSize === 'xs') {

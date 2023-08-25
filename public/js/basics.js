@@ -11,9 +11,8 @@ function getMediaSize () {
 	// https://www.w3schools.com/howto/howto_js_media_queries.asp
 	// console.log(window.navigator)
 	// console.log(window.navigator.Agent)
-
 	return [{ label: 'xs', size: 767 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }, { label: 'xl', size: 1366 }, { label: 'xxl', size: 1920 }]
-	.findLast(d => {
+	.reverse().find(d => {
 		if (d.label === 'xs') return window.matchMedia(`(max-width: ${d.size}px)`).matches
 		else return window.matchMedia(`(min-width: ${d.size}px)`).matches
 	})?.label

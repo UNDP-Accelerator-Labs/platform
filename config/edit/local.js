@@ -103,7 +103,7 @@ exports.lazyload = false
 exports.page_content_limit = 25
 exports.followup_count = 1
 	// OPTIONS: 'columns', 'rows'
-exports.browse_display = 'rows'
+exports.browse_display = 'columns'
 exports.view_display = 'page'
 	// OPTIONS: 'mosaic', 'carousel'
-exports.welcome_module = 'mosaic'
+exports.welcome_module = 'carousel'

@@ -134,8 +134,7 @@ div.public-page-header {
 			display: grid;
 			grid-template-columns: repeat(7, 150px);
 			grid-auto-rows: 1fr;
-			column-gap: 5px;
-			row-gap: 5px;
+			grid-gap: 5px;
 			align-items: center;
 			justify-content: center;
 			grid-column-start: 3;
@@ -320,9 +319,26 @@ div.public-page-panel {
 		padding: 0;
 	}
 
+	&.blue {
+		width: 100vw;
+		padding: 90px 0;
+		margin-left: calc(100% - 100vw + 15px);
+		background-color: $c-mid-blue;
+		color: #FFF;
+
+		& > .inner {
+			margin: 0 30px 0 auto;
+			width: calc(300px * 3 + 15px * 4);
+		}
+
+		a {
+			color: $c-light-green;
+		}
+	}
+
 	& > .inner {
 		position: relative;
-		width: calc(300px * 3 + 15px * 2);
+		width: 100%;
 		margin: auto;
 
 		h1.site-title {
@@ -365,21 +381,20 @@ div.public-page-panel {
 			color: $c-light-grey;
 		}
 		#statistics {
-			display: flex;
+			display: grid;
+			grid-gap: 15px;
+			grid-template-columns: 3fr 7fr;
 			margin: 30px 0;
-			align-items: center;
 
 			.stat-group {
-				display: flex;
-				flex: 30%;
+				display: grid;
+				grid-gap: 30px;
+				grid-auto-flow: column;
+				justify-content: center;
 				align-items: center;
-				padding: 0 30px;
 
 				.statistic {
-					flex: 1 1 0;
-					align-self: flex-start;
 					text-align: center;
-					margin: 0 15px;
 
 					h1 {
 						font-size: $t-xxlarge;
@@ -398,9 +413,7 @@ div.public-page-panel {
 				}
 			}
 			.stat-group:nth-child(2) {
-				flex: 70%;
-				border-left: 1px dotted $c-light-grey;
-				gap: 15px;
+/*				border-left: 1px dotted $c-light-grey;*/
 			}
 		}
 		.map-container {
@@ -438,13 +451,12 @@ div.public-page-panel {
 			}
 		}
 		ul.columns {
-			display: flex;
-			flex-flow: wrap;
+			display: grid;
 			align-items: center;
-			gap: 15px 15px;
+			grid-gap: 15px;
+			grid-template-columns: repeat(4, 1fr);
 
 			li {
-				flex: calc((100% - 15px * (4 - 1)) / 4) 0 0;
 				font-size: $t-main;
 				line-height: 1.3em;
 
@@ -457,32 +469,16 @@ div.public-page-panel {
 			}
 		}
 	}
-
-	&.blue {
-		width: 100vw;
-		padding: 90px 0;
-		margin-left: calc(100% - 100vw + 15px);
-		background-color: $c-mid-blue;
-		color: #FFF;
-
-		& > .inner {
-			margin: 0 15px 0 auto;
-		}
-
-		a {
-			color: $c-light-green;
-		}
-	}
 }
 
 div.main-content {
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr calc(300px * 3 + 15px * 3 + 45px);
 	min-height: 100vh;
 }
 
 div.browse {
 	display: block;
-	width: calc(300px * 3 + 15px * 2);
 	padding: 0 15px;
 	background-color: #FFF;
 	min-height: calc(100vh - 120px);
@@ -524,7 +520,7 @@ div.browse {
 			border: none;
 			border-top: 1px solid $c-mid-grey;
 			box-sizing: border-box;
-			overflow: auto;
+			overflow: visible;
 		}
 
 		form {
@@ -803,7 +799,7 @@ div.browse {
 				transition: max-height 0.25s ease-out;
 
 				section {
-					flex: 1 1 0;
+					flex: 1 1;
 					margin-top: 15px;
 					padding: 0 7.5px;
 
@@ -845,6 +841,12 @@ div.browse {
 							overflow: auto;
 							z-index: 100;
 							transition: max-height 0.25s ease-out;
+
+							&.dropup {
+								top: auto;
+								bottom: 100%;
+								box-shadow: 0px -10px 10px rgba(0,0,0,.1);
+							}
 
 							menu {
 								width: 100%;
@@ -1057,10 +1059,11 @@ div.browse {
 				z-index: 100;
 
 				form {
-					display: flex;
+					display: grid;
+					grid-template-columns: 7fr 3fr;
+					grid-gap: 15px;
 
 					.opts {
-						flex-grow: 1;
 						list-style: none;
 
 						li {
@@ -1097,10 +1100,12 @@ div.browse {
 						}
 					}
 					.btn-group {
-						height: 30px;
-						padding: 15px 0;
+						display: grid;
+						grid-gap: 5px;
+						grid-auto-flow: column;
+						min-height: 30px;
 						margin: 0 0 0 auto;
-						text-align: right;
+						justify-content: right;
 
 						button {
 							height: 30px;
@@ -1243,20 +1248,21 @@ div.browse {
 					}
 
 					.inner {
-						display: flex;
-						flex-flow: row wrap;
-						flex-grow: 1;
+						display: grid;
+						grid-column-gap: 30px;
+						grid-template-columns: 1fr 300px;
+						width: 100%;
 						transition: width .25s;
 
 						.head {
-							flex: 0 0 100%;
+							grid-column: 1 / span 2;
 							margin-top: 0;
 							margin-bottom: 0;
 
 							.meta-group {
-								display: flex;
-								justify-content: space-between;
-								align-items: flex-start;
+								display: grid;
+								grid-gap: 30px;
+								grid-template-columns: 1fr 300px;
 
 								.meta-data {
 									margin-bottom: 0;
@@ -1273,12 +1279,14 @@ div.browse {
 									}
 								}
 								.btn-group {
-									margin: -16px -1px 0 0;
+									display: grid;
+									grid-gap: 5px;
+									grid-auto-flow: column;
+									margin: -16px -1px 0 auto;
+									justify-content: right;
 
 									form {
 										position: relative;
-										display: inline-block;
-										margin: 0 2px;
 
 										button {
 											min-height: 30px;
@@ -1376,10 +1384,6 @@ div.browse {
 							}
 						}
 						.body {
-							flex: 0 0 calc(100% - 330px);
-							padding-right: 30px;
-							/*padding-bottom: 10px;*/
-
 							.meta, .media {
 								margin: 5px 0;
 							}
@@ -1548,7 +1552,7 @@ div.browse {
 							}
 						}
 						.body.full-width {
-							flex: 0 0 100%;
+							grid-column: 1 / span 2;
 
 							.media-title {
 								width: calc(100% - 330px);
@@ -1564,79 +1568,6 @@ div.browse {
 								display: flex;
 								align-items: flex-end;
 
-								.bookmark {
-									display: none;
-									justify-content: center;
-									align-items: center;
-									position: absolute;
-									width: 30px;
-									height: 90px;
-									top: -10px;
-									right: 10px;
-									background-color: $c-mid-blue;
-									font-size: $t-small;
-									line-height: 1.5em;
-									text-align: center;
-									color: #FFF;
-									z-index: 100;
-									transform: translateY(-10px);
-									transform-origin: top center;
-									transition: transform .15s ease-out, background-color .25s;
-									cursor: pointer;
-
-									.label {
-										transform: rotate(-90deg);
-									}
-								}
-								.bookmark::before {
-									content: '';
-									position: absolute;
-									right: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-left: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark::after {
-									content: '';
-									position: absolute;
-									left: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-right: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark:hover,
-								.bookmark.active {
-									display: flex;
-									transform: translateY(0);
-									background-color: $c-dark-blue;
-								}
-								.bookmark:hover::before,
-								.bookmark:hover::after,
-								.bookmark.active::before,
-								.bookmark.active::after {
-									border-top-color: $c-dark-blue;
-								}
-								.bookmark.active {
-									transform: translateY(0)scaleY(.5);
-
-									.label {
-										display: none;
-									}
-								}
-								.bookmark.active::before,
-								.bookmark.active::after {
-									transform: translateY(90px)scaleY(2);
-								}
 								a {
 									display: block;
 									position: relative;
@@ -1657,18 +1588,15 @@ div.browse {
 								}
 							}
 							.meta-group {
-								display: flex;
-								justify-content: center;
-								align-items: flex-start;
-								gap: 15px;
-								min-width: 300px;
+								display: grid;
+								grid-gap: 15px;
+								grid-auto-flow: column;
 								height: 100%;
 								padding: 15px 15px 0 0;
 								box-sizing: border-box;
+								justify-content: right;
 
 								.meta-stats {
-									flex: calc(33% - 15px) 0 0;
-
 									a {
 										h1 {
 											text-align: center;
@@ -1710,7 +1638,7 @@ div.browse {
 							}
 						}
 						.pinboard-group {
-							width: 100%;
+							grid-column: 1 / span 2;
 							margin-top: 5px;
 							padding-right: 15px;
 							box-sizing: border-box;
@@ -1846,7 +1774,6 @@ div.browse {
 								}
 								.type {
 									flex-shrink: 0;
-									/*font-size: $t-xsmall;*/
 								}
 								.name {
 									flex-grow: 1;
@@ -2112,7 +2039,6 @@ div.browse {
 				grid-gap: 30px 15px;
 
 				article {
-					flex-direction: column;
 					width: 100%;
 					height: 100%;
 					vertical-align: top;
@@ -2138,13 +2064,18 @@ div.browse {
 								text-align: left;
 								margin: -1px 0 0 -1px;
 
+								display: grid;
+								grid-gap: 5px;
+								grid-template-columns: repeat(4, 1fr);
+								justify-content: left;
+								width: calc(100% + 2px);
+
 								form {
 									position: relative;
-									display: inline-block;
-									margin: 0 2px;
 
 									button {
 										min-height: 30px;
+										width: 100%;
 										padding: 0 10px;
 										border: 1px solid $c-light-grey;
 										outline: none;
@@ -2386,10 +2317,6 @@ div.browse.public {
 	padding-top: 90px;
 }
 div.browse.slideshow {
-	/*position: absolute;
-	top: 30px;
-	left: 0;
-	width: 100vw;*/
 	padding: 0 15px;
 	margin: 0;
 	border: none;
@@ -2451,9 +2378,10 @@ div.browse.slideshow {
 				height: 100%;
 
 				.layout {
-					display: flex;
+					display: grid;
+					grid-gap: 0;
+					grid-auto-flow: column;
 					position: relative;
-					flex-flow: row nowrap;
 					height: 100%;
 					scroll-snap-type: x mandatory;
 					overflow: auto;
@@ -2465,6 +2393,7 @@ div.browse.slideshow {
 						height: 100%;
 						scroll-snap-align: center;
 						padding: 0;
+						border: none;
 
 						.inner {
 							display: flex;
@@ -2473,9 +2402,9 @@ div.browse.slideshow {
 							flex-direction: column;
 							flex: none;
 							width: 100vw;
-							max-height: 100%;
+							height: 100%;
 							box-sizing: border-box;
-							padding: 0 calc((100vw - (300px * 2 + 15px * 1)) / 2) 30px calc((100vw - (300px * 2 + 15px * 1)) / 2);
+							padding: 0 calc((100vw - (300px * 2 + 15px * 1)) / 2) 0 calc((100vw - (300px * 2 + 15px * 1)) / 2);
 
 							.head {
 								flex: unset;
@@ -2502,7 +2431,7 @@ div.browse.slideshow {
 								}
 								.media-img {
 									position: absolute;
-									top: 0;
+									top: 30px;
 									left: 0;
 									width: 100vw;
 									height: calc(100vh - 30px);

@@ -9,6 +9,7 @@
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
 	const uuid = locals.metadata.user.uuid
+	const pagedisplay = locals.metadata.page.display
 
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -515,7 +516,7 @@
 	<% }) %>
 	</menu>
 </nav>
-<nav class='pagination lg xl xxl'>
+<nav class='pagination <% if (pagedisplay === "slideshow") { %>xs sm m <% } %>lg xl xxl'>
 	<% if ((activity === 'browse' || locals.instance_vars?.activity === 'browse') && mapscale !== 'full-screen') { %>
 		<%- include('../browse/modules/pagination') %>
 	<% } %>
@@ -529,11 +530,12 @@
 		.on('click', function () {
 			const dropdown = d3.select(this.nextElementSibling)
 			if (dropdown.node() && dropdown.classed('dropdown')) {
-				const { top } = this.getBoundingClientRect()
+				let { top, height } = this.getBoundingClientRect()
+				top = top + height
 				const viewheight = window.innerHeight
 				if (!mediaSize) var mediaSize = getMediaSize()
 				if (mediaSize === 'xs' && top + 300 >= viewheight) dropdown.classed('dropup', true)
-				
+
 				if (dropdown.node().style.maxHeight) {
 					dropdown.node().style.maxHeight = null
 					dropdown.node().style.overflow = null

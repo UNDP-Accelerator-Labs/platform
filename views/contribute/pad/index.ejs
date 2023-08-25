@@ -1539,6 +1539,15 @@
 			left: i * slidewidth,
 			behavior: 'smooth'
 		})
+
+		if (editing) {
+			main.selectAll('.focus').classed('focus', false)
+			const containers = main.selectAll('.media-container, .meta-container')
+			containers.selectAll('.inset')
+				.style('max-height', null)
+			d3.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
+		}
+
 		return idx = i
 	}
 

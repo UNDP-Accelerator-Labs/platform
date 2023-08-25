@@ -135,8 +135,7 @@ div.public-page-header {
 			display: grid;
 			grid-template-columns: repeat(3, 150px);
 			grid-auto-rows: 1fr;
-			column-gap: 5px;
-			row-gap: 5px;
+			grid-gap: 5px;
 			align-items: center;
 			justify-content: center;
 			grid-column-start: 3;
@@ -390,26 +389,25 @@ div.public-page-panel {
 			color: $c-light-grey;
 		}
 		#statistics {
-			display: flex;
-			flex-direction: column;
-			margin: 0 0 30px 0;
-			padding: 0 15px;
-			box-sizing: border-box;
-			align-items: center;
-			width: 100vw;
 			margin-left: calc((100% - 100vw) / 2);
+			margin: 0 0 30px 0;
+			padding: 0 30px;
 
 			.stat-group {
-				display: flex;
-				flex-wrap: wrap;
-				flex: 50% 0 0;
+				display: grid;
+				grid-gap: 30px;
+				grid-template-columns: 1fr 1fr;
+				justify-content: center;
 				align-items: center;
-				gap: 15px 15px;
-				padding: 15px 0;
+				margin: 30px 0;
+
+				&:first-child {
+					.statistic {
+						grid-column: 1 / span 2;
+					}
+				}
 
 				.statistic {
-					flex: calc(50% - 7.5px) 1 0;
-					align-self: flex-start;
 					text-align: center;
 
 					h1 {
@@ -428,9 +426,6 @@ div.public-page-panel {
 					}
 				}
 			}
-			/*.stat-group:nth-child(2) {
-				border-top: 1px dotted $c-light-grey;
-			}*/
 		}
 		.map-container {
 			width: calc(100% + (100vw - 100%) / 2);
@@ -467,13 +462,12 @@ div.public-page-panel {
 			}
 		}
 		ul.columns {
-			display: flex;
-			flex-flow: wrap;
+			display: grid;
 			align-items: center;
-			gap: 15px 15px;
+			grid-gap: 15px;
+			grid-template-columns: repeat(2, 1fr);
 
 			li {
-				flex: calc((100% - 15px * (2 - 1)) / 2) 0 0;
 				font-size: $t-main;
 				line-height: 1.3em;
 
@@ -988,6 +982,18 @@ div.browse {
 					line-height: 1.5em;
 					cursor: pointer;
 				}
+				.status {
+					display: block;
+					width: 100%;
+
+					menu {
+						margin: auto;
+
+						input.toggle + label {
+							background-color: #FFF;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1075,18 +1081,21 @@ div.browse {
 				z-index: 100;
 
 				form {
-					display: flex;
+					display: grid;
+					grid-template-columns: 7fr 3fr;
+					grid-gap: 15px;
 
 					.opts {
-						flex-grow: 1;
+						display: grid;
+						grid-template-columns: repeat(3, 1fr);
+						grid-gap: 15px;
+
 						list-style: none;
+						justify-content: center;
 
 						li {
 							display: inline-block;
 							vertical-align: top;
-							padding-right: 15px;
-							margin-right: 15px;
-							border-right: 1px dotted $c-light-grey;
 
 							p {
 								display: inline-block;
@@ -1115,10 +1124,13 @@ div.browse {
 						}
 					}
 					.btn-group {
-						height: 30px;
-						padding: 15px 0;
+						display: grid;
+						grid-gap: 5px;
+						grid-template-columns: repeat(2, 1fr);
+						min-height: 30px;
 						margin: 0 0 0 auto;
-						text-align: right;
+						justify-content: right;
+						align-content: start;
 
 						button {
 							height: 30px;
@@ -1221,32 +1233,24 @@ div.browse {
 					article {
 						position: relative;
 						display: flex;
-						padding: 15px;
+						padding: 15px 0 15px 15px;
 						margin-bottom: 15px;
-						border: 1px solid transparent;
+						box-shadow: 0 10px 0px rgba(0,0,0,.1);
 						box-sizing: border-box;
-						transition: box-shadow .25s;
-
-						&:hover {
-							background-color: transparent;
-							box-shadow: 0 5px 0 rgba(0,0,0,.1);
-							border: 1px solid $c-mid-grey;
-						}
+						border: 1px solid $c-mid-grey;
 
 						.inner {
-							display: flex;
-							flex-flow: row wrap;
-							flex-grow: 1;
+							width: 100%;
 							transition: width .25s;
 
 							.head {
-								flex: 0 0 100%;
+								margin-top: 0;
 								margin-bottom: 0;
 
 								.meta-group {
-									display: flex;
-									justify-content: space-between;
-									align-items: flex-start;
+									display: grid;
+									grid-gap: 30px;
+									grid-template-columns: repeat(2, 1fr);
 
 									.meta-data {
 										margin-bottom: 0;
@@ -1263,20 +1267,19 @@ div.browse {
 										}
 									}
 									.btn-group {
-										display: flex;
-										gap: 5px;
-										align-items: flex-start;
-										justify-content: flex-end;
-										flex-wrap: wrap;
-										margin: -16px -1px 0 0;
+										display: grid;
+										grid-gap: 5px;
+										grid-template-columns: repeat(2, 1fr);
+										margin: -16px -1px 0 auto;
+										justify-content: right;
+										align-content: start;
 
 										form {
 											position: relative;
-											display: inline-block;
-											margin: 0 2px;
 
 											button {
-												height: 30px;
+												min-height: 30px;
+												width: 100%;
 												padding: 0 10px;
 												border: 1px solid $c-light-grey;
 												outline: none;
@@ -1307,7 +1310,6 @@ div.browse {
 											}
 											.dropdown {
 												position: absolute;
-												/*width: 100%;*/
 												min-width: 200px;
 												max-height: 0;
 												left: 0;
@@ -1348,7 +1350,7 @@ div.browse {
 								}
 							}
 							.body {
-								flex: 100% 0 0;
+								padding-right: 15px;
 
 								.meta, .media {
 									margin: 10px 0;
@@ -1505,15 +1507,13 @@ div.browse {
 								}
 							}
 							.body.full-width {
-								flex: 100% 0 0;
+								grid-column: 1 / span 2;
 
 								.media-title {
 									width: calc(100% - 330px);
 								}
 							}
 							.foot {
-								flex: 100% 0 0;
-
 								.media-img {
 									position: relative;
 									width: 300px;
@@ -1541,17 +1541,15 @@ div.browse {
 									}
 								}
 								.meta-group {
-									display: flex;
-									flex-wrap: wrap;
-									justify-content: center;
-									align-items: flex-start;
-									gap: 15px;
-									padding: 15px 0;
+									display: grid;
+									grid-gap: 15px;
+									grid-auto-flow: column;
+									height: 100%;
+									padding: 15px 15px 15px 0;
 									box-sizing: border-box;
+									justify-content: center;
 
 									.meta-stats {
-										flex: calc(33% - 15px) 0 0;
-
 										a {
 											h1 {
 												text-align: center;
@@ -1727,7 +1725,6 @@ div.browse {
 									}
 									.type {
 										flex-shrink: 0;
-										/*font-size: $t-xsmall;*/
 									}
 									.name {
 										flex-grow: 1;
@@ -1978,7 +1975,6 @@ div.browse {
 				}
 				.layout.columns {
 					article {
-						flex-direction: column;
 						width: 100%;
 						height: 100%;
 						vertical-align: top;
@@ -2000,13 +1996,18 @@ div.browse {
 									margin: -1px 0 15px -1px;
 									text-align: left;
 
+									display: grid;
+									grid-gap: 5px;
+									grid-template-columns: repeat(3, 1fr);
+									justify-content: left;
+									width: calc(100% + 2px);
+
 									form {
 										position: relative;
-										display: inline-block;
-										margin: 0 2px;
 
 										button {
 											min-height: 45px;
+											width: 100%;
 											padding: 0 15px;
 											border: 1px solid $c-light-grey;
 											outline: none;
@@ -2221,11 +2222,11 @@ div.browse {
 							height: calc(55px * 2 + 15px * 2);
 						}
 					}
-					article:not(.pad) {
+					/*article:not(.pad) {
 						border-bottom: 1px dotted $c-light-grey;
 						padding-bottom: 15px;
 						margin-bottom: 15px;
-					}
+					}*/
 					.engagement-group {
 						padding: 0 10px;
 						box-sizing: border-box;

@@ -11,34 +11,34 @@ module.exports = async (req, res) => {
 	let language = checklanguage(req.params?.language || req.session.language);
 	page = page ? +page : 1;
 
-	// const { filters } = req.body
-	// if (filters) {
-	// 	const {
-	// 		uuid: buuid, country: bcountry, rights: brights, language: blanguage, space: bspace, object: bobject, instance: binstance, pads: bpads, templates: btemplates, mobilizations: bmobilizations,
-	// 		search: bsearch, status: bstatus, contributors: bcontributors, countries: bcountries, teams: bteams, pinboard: bpinboard, methods: bmethods, page: bpage, nodes: bnodes
-	// 	} = filters;
+	const { filters } = req.body
+	if (filters) {
+		const {
+			uuid: buuid, country: bcountry, rights: brights, language: blanguage, space: bspace, object: bobject, instance: binstance, pads: bpads, templates: btemplates, mobilizations: bmobilizations,
+			search: bsearch, status: bstatus, contributors: bcontributors, countries: bcountries, teams: bteams, pinboard: bpinboard, methods: bmethods, page: bpage, nodes: bnodes
+		} = filters;
 
-	// 	// Override the variables with the values from req.body.filters if provided
-	// 	uuid = buuid || uuid;
-	// 	country = bcountry || country;
-	// 	rights = brights || rights;
-	// 	collaborators = bcontributors || collaborators;
-	// 	space = bspace || space;
-	// 	object = bobject || object;
-	// 	instance = binstance || instance;
-	// 	search = bsearch || search;
-	// 	status = bstatus || status;
-	// 	countries = bcountries || countries;
-	// 	teams = bteams || teams;
-	// 	pads = bpads || pads;
-	// 	templates = btemplates || templates;
-	// 	mobilizations = bmobilizations || mobilizations;
-	// 	pinboard = bpinboard || pinboard;
-	// 	methods = bmethods || methods;
-	// 	page = bpage || page;
-	// 	language = blanguage || language;
-	// 	nodes = bnodes || nodes;
-	// }
+		// Override the variables with the values from req.body.filters if provided
+		uuid = buuid || uuid;
+		country = bcountry || country;
+		rights = brights || rights;
+		collaborators = bcontributors || collaborators;
+		space = bspace || space;
+		object = bobject || object;
+		instance = binstance || instance;
+		search = bsearch || search;
+		status = bstatus || status;
+		countries = bcountries || countries;
+		teams = bteams || teams;
+		pads = bpads || pads;
+		templates = btemplates || templates;
+		mobilizations = bmobilizations || mobilizations;
+		pinboard = bpinboard || pinboard;
+		methods = bmethods || methods;
+		page = bpage || page;
+		language = blanguage || language;
+		nodes = bnodes || nodes;
+	}
 
 	let collaborators_ids = safeArr((req.body.filters?.collaborators_ids || collaborators).map(d => d.uuid), req.body.filters?.uuid ?? uuid ?? DEFAULT_UUID);
 

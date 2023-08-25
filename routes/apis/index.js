@@ -38,31 +38,21 @@ module.exports = async (req, res, next) => {
 		else if (object === 'tags') tags(req, res)
 		else if (object === 'statistics') statistics(req, res)
 		else if (object === 'global'){
-			if(parsers.verifyApiAccessToken(req)){
-				const data = await load.global({req, res});
-				return res.json(data)
-			}
-			return res.status(400).send('Unauthorized access.')
-			
+			const data = await load.global({req, res});
+			return res.json(data)
 		}
 		else if (object === 'global-data'){
-			if(parsers.verifyApiAccessToken(req)){
-				const data = await load.global_data({req, res});
-				return res.json(data)
-			}
-			return res.status(400).send('Unauthorized access.')
+			const data = await load.global_data({req, res});
+			return res.json(data)
 		}
 		else if (object === 'pin'){
-			if(parsers.verifyApiAccessToken(req)){
-				const { action: body_action , object: body_object } = req.body || {}
-				const { rights } = req.session || {}
+			const { action: body_action , object: body_object } = req.body || {}
+			const { rights } = req.session || {}
 
-				if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
-					if (body_action === 'insert') return engage.pin(req, res)
-					else if (body_action === 'delete') return engage.unpin(req, res)
-				}
+			if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
+				if (body_action === 'insert') return engage.pin(req, res)
+				else if (body_action === 'delete') return engage.unpin(req, res)
 			}
-			return res.status(400).send('Unauthorized access.')
 		}
 		else res.redirect('/module-error')
 	} else if (action === 'request') {

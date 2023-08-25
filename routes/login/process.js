@@ -4,15 +4,23 @@ const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
+	//x-access-token-global => THE JWT SIGN PARAMS IS DIFFERENT IN GLOBAL PLATFORM ESP BECAUSE OF THE HOST PARAMETER.
+	const global_platform_token = req.headers['x-access-token-global']
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
 	const { path, ip: ownIp } = req || {}
 
-	if (token) {
+	if (token || global_platform_token) {
 		// VERIFY TOKEN
 		let tobj;
 		try {
-			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+			tobj = {}
+			if(token){
+				tobj =jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+			}
+			else if(global_platform_token){
+				tobj =jwt.verify(global_platform_token, process.env.APP_SECRET, { audience: 'global:user'})
+			}
 		} catch(_) {
 			tobj = {};
 			if (redirectPath) {
@@ -20,7 +28,7 @@ module.exports = (req, res, next) => {
 				return;
 			}
 		}
-		const { uuid, rights, ip, acceptedorigins } = tobj;
+		const { uuid, rights, ip, acceptedorigins, aud } = tobj;
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
 			res.redirect(redirectPath)
 		} else if (acceptedorigins && !acceptedorigins.includes(referer)) {
@@ -73,7 +81,6 @@ module.exports = (req, res, next) => {
 						// NOTE: THIS DOES THE SAME AS routes/redirect/browse
 						let { read, write } = modules.find(d => d.type === 'pads')?.rights
 						if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-						console.log('check write', write)
 
 						if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
 						else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
@@ -81,6 +88,10 @@ module.exports = (req, res, next) => {
 					}
 				})
 			}).catch(err => console.log(err))
+		} else if ( uuid == null && aud=== 'global:user') {
+			//SET SESSION INFO FOR GLOBAL PLATFORM USER WHO ARE NOT LOGGED IN BUT WANTS TO BROWSE PUBLIC CONTENTS
+			Object.assign(req.session, datastructures.sessiondata(tobj))
+			next()
 		} else res.redirect('/login')
 	} else {
 		const { username, password, originalUrl } = req.body || {}

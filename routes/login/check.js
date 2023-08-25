@@ -5,17 +5,16 @@ const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
+	const global_platform_token = req.headers['x-access-token-global']
 	const { uuid } = req.session || {}
 	
 	const cookies = parseCookies(req)
 	let sid = cookies[`${app_suite}-session`]
 	if (sid) sid = sid.split(':')[1].split('.')[0]
-	console.log(cookies)
-	console.log(sid)
 
 
 	if (uuid) next() // A USER IS LOGGED
-	else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
+	else if (token || global_platform_token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
 	else { 
 		Object.assign(req.session, datastructures.sessiondata({ public: true }))
 		next()

@@ -13,17 +13,38 @@
 		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
 		else mapscale = 'contain'
 	}
+
+	let fixedEid = null;
 %>
 
 <% if (locals.stats?.total > 0) { %>
 	<nav id='search-and-filter' class='xs sm m lg xl xxl<% if (mapscale === "full-screen") { %> anchor-bottom<% } %>'>
+		<% if (logged) { %>
+			<div class="search-type-menu">
+				<span class="stm stm-select google-translate-attr" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
+				<span class="stm google-translate-attr" id="stm-exploration">
+					<%- vocabulary["search-type-menu"][language]["exploration"] %>
+					<div class="stm-hint stm-hidden google-translate-attr">
+						<%- vocabulary["exploration"][language]["hint"] %>
+					</div>
+				</span>
+			</div>
+		<% } // logged in (uuid) %>
+
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
+			<input id='form-exploration-id' type='hidden' name='explorationid' value='' />
 			<%
 				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
 				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
 
 				view_params.forEach(d => {
+					if (d === 'explorationid') {
+						query[d].forEach(c => {
+							fixedEid = +c;
+						});
+						return;
+					}
 					query[d].forEach(c => {
 			%>
 				<input type='hidden' name='<%- d %>' value='<%- c %>'>
@@ -32,7 +53,10 @@
 				})
 			%>
 
-			<div class='search'>
+			<% if (locals.metadata?.user?.uuid) { %>
+			<div class='exploration'></div>
+			<% } // logged in (uuid) %>
+			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
 				<% } else { %>
@@ -47,11 +71,11 @@
 					<% locals.filters_menu?.forEach(d => { %>
 						<section>
 							<% for (let key in d) { %>
-								<div class='filter'>
+								<div class='filter google-translate-attr'>
 									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
 									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 									<div class='dropdown'>
-										<menu>
+										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
 												<li>
 													<% if (c.equivalents?.length) { %>
@@ -82,14 +106,14 @@
 					<% }) %>
 
 					<div class='break'></div>
-					<button type='submit' class='submit-filters'>
+					<button type='submit' class='submit-filters google-translate-attr'>
 						<%- vocabulary['apply filters'][language] %>
 					</button>
 				</div>
 			<% } %>
 
 			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
-				<div class='status xs sm m lg xl'>
+				<div class='status xs sm m lg xl google-translate-attr'>
 					<menu>
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
@@ -117,16 +141,16 @@
 					<div class='global-actions'>
 						<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
 						<% if (space !== 'pinned') { %>
-							<div class='add filter pinboards'>
+							<div class='add filter pinboards google-translate-attr'>
 								<input type='text' id='pin-all'>
 								<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
 								<button id='new-pinboard' type='button'></button>
 								<div class='dropdown'>
 									<menu>
-										<% locals.pinboards_list?.forEach(d => { %>
+										<% locals.pinboards_list?.filter(pb => !pb.is_exploration).forEach(d => { %>
 											<li class='pinboard'>
 												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-												<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+												<label class='title notranslate' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
 											</li>
 										<% }) %>
 									</menu>
@@ -138,7 +162,7 @@
 					</div>
 				<% } else if (object === 'contributors') { %>
 					<div class='global-actions'>
-						<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+						<button type='button' class='download m lg xl xxl google-translate-attr' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
 						<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
 					</div>
 				<% } %>
@@ -152,10 +176,26 @@
 		</form>
 	</nav>
 <% } else { %>
-	<nav><p><%- vocabulary['no entries'][language] %></p></nav>
+	<nav><p class="google-translate-attr"><%- vocabulary['no entries'][language] %></p></nav>
 <% } %>
 
 <script type='text/javascript'>
+	let curSelectSTM = 'stm-browse';
+	let hasUsedExploration = false;
+
+	function updateExplorationHint() {
+		d3.selectAll('.stm-hint').classed('stm-hidden', () => {
+			if (sessionStorage.explorationHintUserHiddenCount && +sessionStorage.explorationHintUserHiddenCount > 1) {
+				return true;
+			}
+			return curSelectSTM !== 'stm-browse' || hasUsedExploration;
+		})
+	}
+
+	d3.selectAll('#search-field').on('focus', () => {
+		updateExplorationHint();
+	});
+
 	function expandfilters (node) {
 		d3.select(node).toggleClass('close')
 		const filters = node.form.querySelector('.filters')
@@ -175,7 +215,7 @@
 		const sel = d3.select(node)
 		const filter = sel.findAncestor('filter')
 		let taggroup = d3.select(filter.node().nextElementSibling)
-		
+
 		if (!taggroup.node() || !taggroup.classed('active-filters')) {
 			taggroup = d3.select(filter.node().parentNode)
 			.insertElem(_ => filter.node().nextElementSibling, 'div', 'active-filters')
@@ -305,4 +345,76 @@
 			}
 		})
 	<% } %>
+
+	<% if (locals.metadata?.user?.uuid) { %>
+		let isExplorationInit = false;
+		const fixedEid = <%- JSON.stringify(fixedEid) %>;
+		const formExplorationId = d3.select('#form-exploration-id');
+		exploration.addExplorationMain(d3.select('div.exploration'), () => {
+			hasUsedExploration = exploration.hasExploration();
+			if (fixedEid) {
+				exploration.updateById(fixedEid);
+			}
+			if (fixedEid || exploration.isVisible()) {
+				doSelectSTM('stm-exploration');
+			}
+			if (!isExplorationInit) {
+				isExplorationInit = true;
+				exploration.triggerIdChange();
+			}
+		});
+		exploration.addIdChangeListener((eid, isVisible) => {
+			formExplorationId.attrs({
+				'value': isVisible ? eid : null,
+			});
+			hasUsedExploration = exploration.hasExploration();
+			if (isExplorationInit) {
+				const oldUrl = `${window.location}`;
+				const newUrl = new URL(window.location);
+				if (eid) {
+					newUrl.searchParams.set('explorationid', +eid);
+				} else {
+					newUrl.searchParams.delete('explorationid');
+				}
+				if (oldUrl !== `${newUrl}`) {
+					window.history.replaceState({}, '', newUrl);
+				}
+			}
+		});
+
+		function doSelectSTM(stm) {
+			curSelectSTM = stm;
+			d3.selectAll('.stm').classed('stm-select', function () {
+				return d3.select(this).attr('id') === curSelectSTM;
+			});
+			const isExploration = curSelectSTM === 'stm-exploration';
+			exploration.setVisible(isExploration);
+			if (isExploration) {
+				updateExplorationHint();
+			} else {
+				exploration.updateById(null);
+			}
+			exploration.triggerIdChange();
+		}
+
+		let onlyHide = false;
+
+		d3.selectAll('.stm').on('click', function () {
+			if (onlyHide) {
+				onlyHide = false;
+				return;
+			}
+			doSelectSTM(d3.select(this).attr('id'));
+		});
+
+		d3.selectAll('.stm-hint').on('click', function (e) {
+			d3.select(this).classed('stm-hidden', true);
+			onlyHide = true;
+			if (sessionStorage.explorationHintUserHiddenCount) {
+				sessionStorage.explorationHintUserHiddenCount = +sessionStorage.explorationHintUserHiddenCount + 1;
+			} else {
+				sessionStorage.explorationHintUserHiddenCount = 1;
+			}
+		});
+	<% } // logged in (uuid) %>
 </script>

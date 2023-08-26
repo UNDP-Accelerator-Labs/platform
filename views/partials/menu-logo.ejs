@@ -31,10 +31,12 @@
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
-		<div class='logo-container'>
-			<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
-			<div class='filler'></div>
-		</div>
+		<a href='/'>
+			<div class='logo-container'>
+				<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
+				<div class='filler'></div>
+			</div>
+		</a>
 
 		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
@@ -45,7 +47,7 @@
 
 							<% if (rights >= Math.min(minwritepads ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
 								<li>
-									<button>
+									<button class="google-translate-attr">
 										<img src='/imgs/icons/i-pad.svg'>
 										<label><%- vocabulary['pad'][language](false).capitalize() %></label>
 										<span class='expandable'>></span>
@@ -54,7 +56,7 @@
 										<ul>
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
 											<!-- THE ISSUE HERE IS WE WANT TO PREVENT USERS OF THE experiments AND action plans PLATFORMS FROM CREATING BLANK PADS -->
-												<li>
+												<li class="google-translate-attr">
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
 															<label><%- vocabulary['blank pad'][language] %></label>
@@ -64,7 +66,7 @@
 											<% } // rights %>
 											<% if (rights >= (writepads.templated ?? writepads) ?? Infinity) { %>
 												<% if (locals.metadata.menu.templates?.length > 0) { %>
-													<li>
+													<li class="google-translate-attr">
 														<button>
 															<label><%- vocabulary['templated pad'][language] %></label>
 															<span class='expandable'>></span>
@@ -109,7 +111,7 @@
 												<% } // locals.metadata.menu.templates 0 %>
 											<% } // rights %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
-												<li>
+												<li class="google-translate-attr">
 													<button>
 														<label><%- vocabulary['campaign pad'][language] %></label>
 														<span class='expandable'>></span>
@@ -150,7 +152,7 @@
 											<!-- <%# if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)	|| locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %> -->
 
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
-												<li class='lg xl xxl'>
+												<li class='lg xl xxl google-translate-attr'>
 													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
 													</a>
@@ -163,7 +165,7 @@
 						<% } %>
 						<% if (modules?.some(d => d.type === 'templates')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'templates')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-template.svg'>
 										<label><%- vocabulary['template'][language](false, false).capitalize() %></label>
@@ -279,7 +281,7 @@
 						<% } %>
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'contributors')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'contributors')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<a href='/<%- language %>/contribute/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
@@ -292,7 +294,7 @@
 
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'mobilizations')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-mobilization.svg'>
 										<label><%- vocabulary['mobilization'][language](false).capitalize() %></label>
@@ -459,7 +461,7 @@
 						<% } %>
 						<% if (locals.metadata?.site?.modules?.includes('analyses')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'analyses')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<button>
 										<label><%- vocabulary['analyse']?.[language](false, false)?.capitalize() || 'Analysis' %></label>
 										<span class='expandable'>></span>
@@ -472,7 +474,7 @@
 				</div>
 			</div>
 		<% } %>
-		<h1><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+		<h1 ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
 		<% if (!publicpage) { %>
 			<h2>
 				<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
@@ -481,14 +483,14 @@
 		<% } %>
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
-			<div class='save lg xl xxl hide'>
+			<div class='save lg xl xxl hide google-translate-attr'>
 				<button><%- vocabulary['save'][language] %></button>
 			</div>
 		<% } %>
 	</div>
 </nav>
 <nav id='modules'>
-	<menu>
+	<menu class="google-translate-attr">
 	<% modules.filter(d => {
 		let { write } = d.rights
 		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
@@ -508,7 +510,7 @@
 			<% } else if (d.type === 'contributors') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } else if (d.type === 'reviews') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary[d.type.slice(0, -1)]?.[language](false, true)?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary["my reviews"][language]?.capitalize() %></a>
 			<% } else { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } %>

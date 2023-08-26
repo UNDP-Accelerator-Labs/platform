@@ -8,6 +8,7 @@ exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/'
+exports.app_suite_url = 'https://acclabs.azurewebsites.net/'
 
 // DESIRED MODULES
 exports.modules = [

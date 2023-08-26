@@ -6,9 +6,10 @@
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
+    const explorationVocab = vocabulary['exploration'][language];
 %>
 
-<menu>
+<menu class="google-translate-attr">
 	<% if (object === 'reviews') { %>
 		<li class='<% if (space === "pending") { %>active<% } %>'>
 			<a href='./pending'>
@@ -55,15 +56,15 @@
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %></label>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %></label>
 				</div>
 
-				<div id='pinboards-list' class='dropdown'>
+				<div id='pinboards-list-xs' class='dropdown'>
 					<menu>
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>'><%- d.title %></a>
+								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span></a>
 							</li>
 						<% }) %>
 					</menu>
@@ -109,15 +110,15 @@
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
 				</div>
 
-				<div id='pinboards-list' class='dropdown'>
+				<div id='pinboards-list-lg' class='dropdown'>
 					<menu>
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>'><%- d.title %></a>
+								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span></a>
 							</li>
 						<% }) %>
 					</menu>

@@ -30,7 +30,7 @@
 	// 	&& mapscale !== 'full-screen'
 	// 	&& locals.metadata.page.id === 1
 	// 	&& slides?.length > 0)
-	
+
 	const is_intropage = false
 	const welcome_module = locals.metadata.site.welcome_module
 %>
@@ -48,6 +48,7 @@
 <%- include ('../partials/menu-languages.ejs') %>
 <%- include ('../partials/modals.ejs') %>
 
+<%- include ('../partials/exploration.ejs') %>
 <%- include ('./modules/download.ejs') %>
 <%- include('./render.ejs') %>
 
@@ -103,7 +104,7 @@
 					<div class='inner'>
 						<div class='xs sm'>
 							<div class='spaces'>
-								<button class='space'><%- vocabulary['spaces'][language] %></button>
+								<button class='space google-translate-attr'><%- vocabulary['spaces'][language] %></button>
 								<div class='dropdown'>
 									<%- include('./modules/tabs.ejs') %>
 								</div>
@@ -211,7 +212,7 @@
 							<div class='meta-status status-<%- locals.pinboard.status || 0 %>'>
 								<form id='pinboard-display-opts' method='GET' action='/publish/pinboards'>
 									<input type='hidden' name='id' value='<%- locals.pinboard.id %>'>
-									<menu class='opts'>
+									<menu class='opts google-translate-attr'>
 										<li>
 											<p class='<% if (locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['slideshow'][language] %>: </p>
 											<input type='checkbox' class='toggle' id='display-slideshow' value='true' name='slideshow' onchange='toggleOptions(this)' <% if (locals.pinboard.slideshow) { %>checked<% } %> <% if (locals.pinboard.display_map) { %>disabled<% } %>>
@@ -237,7 +238,7 @@
 											</ul>
 										</li>
 									</menu>
-									<div class='btn-group'>
+									<div class='btn-group google-translate-attr'>
 										<button type='button' onclick='openPreview()'><%- vocabulary['preview'][language] %></button>
 
 										<button type='button' onclick='setShareOptions()'>Share</button>
@@ -314,7 +315,7 @@
 							</div>
 						<% } %>
 
-						<div class='head'>
+						<div class='head google-translate-attr'>
 							<% if (activity !== 'preview' && locals.pinboard.editable) { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave()' contenteditable><%- locals.pinboard.title %></div>
 								<div class='description' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave()' contenteditable><%- (locals.pinboard.description) %></div>
@@ -385,7 +386,7 @@
 						<%- include ('./modules/map') %>
 					<% } else { %>
 						<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.pads?.length === 0) { %>
-							<small class='no-results m lg xl xxl'>
+							<small class='no-results m lg xl xxl google-translate-attr'>
 								<%- vocabulary['pads to display'][language](0) %>
 							</small>
 						<% } %>
@@ -399,7 +400,7 @@
 							</div>
 						</div>
 						<% if (locals.stats?.filtered === 0) { %>
-							<small class='no-results xs'>
+							<small class='no-results xs google-translate-attr'>
 								<%- vocabulary['pads to display'][language](0) %>
 							</small>
 						<% } %>
@@ -409,7 +410,7 @@
 				<% if (!logged) { %>
 					<div class='public-page-panel sm-padding'>
 						<div class='inner'>
-							<nav class='enter'>
+							<nav class='enter google-translate-attr'>
 								<a href='/login'><button type='button' class='highlight'><%- vocabulary['log in'][language] %></button></a>
 								<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 								<!-- TO DO: TRANSLATE -->
@@ -420,7 +421,7 @@
 
 				<div class='outer lg xl xxl'>
 					<% if (pages > 1 && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
-						<p class='nav-info'>&larr; <%- vocabulary['navigate here'][language] %></p>
+						<p class='nav-info google-translate-attr'>&larr; <%- vocabulary['navigate here'][language] %></p>
 					<% } %>
 				</div>
 				<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
@@ -515,6 +516,7 @@
 			render.pin(entry.foot)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
+			render.exploration(entry.foot)
 		} else if (display === 'slideshow') {
 			render.img(entry.head)
 			render.owner(entry.metagroup)
@@ -538,6 +540,7 @@
 			render.pin(entry.inner)
 			render.delete(entry.outer)
 			render.unpublish(entry.outer)
+			render.exploration(entry.foot)
 		}
 	}
 
@@ -704,8 +707,6 @@
 			renderSections(<%- JSON.stringify(locals.sections) %>)
 		<% } %>
 	}
-
 </script>
-
 </body>
 </html>

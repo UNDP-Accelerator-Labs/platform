@@ -74,6 +74,9 @@
 	}
 </script>
 <%- include('./render.ejs') %>
+<% if (locals.metadata?.user?.uuid) { %>
+	<%- include ('../../partials/exploration.ejs') %>
+<% } %>
 </head>
 
 <body>
@@ -129,7 +132,7 @@
 	&& (locals.data.owner === locals.metadata.user.uuid || locals.data.reviews.some(d => d.owner === locals.metadata.user.uuid))
 ){ %>
 	<% if (pagedisplay === 'adjacent-reviews') { %>
-		<div class='display-option display-reviews split-screen right lg xl xxl'><a>
+		<div class='display-option display-reviews split-screen right lg xl xxl google-translate-attr'><a>
 			<button><%- vocabulary['hide reviews'][language] %></button>
 		</a></div>
 		<div id='reviews' class='document split-screen right lg xl xxl'>
@@ -149,7 +152,7 @@
 			d3.select('div.display-reviews a').attr('href', `?${queryparams.toString()}`)
 		</script>
 	<% } else { %>
-		<div class='display-option display-reviews lg xl xxl <% if (locals.source) { %>split-screen right<% } %>'><a>
+		<div class='display-option display-reviews lg xl xxl google-translate-attr<% if (locals.source) { %> split-screen right<% } %>'><a>
 			<button><%- vocabulary['display reviews'][language] %></button>
 		</a></div>
 		<script type='text/javascript'>
@@ -170,7 +173,7 @@
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
 					<div class='btn-group'>
 						<% if (editing) { %>
-							<div class='save xs sm'>
+							<div class='save xs sm google-translate-attr'>
 								<form>
 									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][language] %></button>
 								</form>
@@ -199,7 +202,7 @@
 										}
 									</script>
 								<% } else { %>
-									<button type='button' class='publish' disabled><%- vocabulary['publish'][language] %></button>
+									<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
 							<% } else { %>
 								<% if (object === 'review') { %>
@@ -207,9 +210,9 @@
 									<button type='submit' class='publish' name='status' value='2'><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
 									<!-- TO DO: INTERCEPT AND partialSave -->
-									<button type='submit' class='publish' name='status' value='1'><%- vocabulary['submit'][language] %></button>
+									<button type='submit' class='publish google-translate-attr' name='status' value='1'><%- vocabulary['submit'][language] %></button>
 								<% } else { %>
-									<button type='button' class='publish'><%- vocabulary['publish'][language] %></button>
+									<button type='button' class='publish google-translate-attr'><%- vocabulary['publish'][language] %></button>
 								<% } %>
 							<% } %>
 							<% if (object !== 'review' && !publicpage) { %>
@@ -217,14 +220,14 @@
 									<menu class='opts'>
 										<% if (modules.some(d => d.type === 'reviews')) { %>
 											<% if (locals.data?.status === 1) { %>
-												<li class='opt'>
+												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='2'>
 														<%- vocabulary['object status'][language](object, 2, false) %>
 													</button>
 												</li>
 											<% } %>
 											<% if (locals.data?.status <= 2 && locals.data?.review_status === 0) { %>
-												<li class='opt'>
+												<li class='opt google-translate-attr'>
 													<button type='button' name='review_status' value='1' onclick='selectReviewLanguage.call(this)'>
 														<%- vocabulary['submit for review'][language] %>
 													</button>
@@ -232,14 +235,14 @@
 											<% } %>
 										<% } else { %>
 											<% if (locals.data?.status === 1) { %>
-												<li class='opt'>
+												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='2'>
 														<%- vocabulary['internally'][language] %>
 													</button>
 												</li>
 											<% } %>
 											<% if (locals.data?.status <= 2 && locals.data?.publishable) { %>
-												<li class='opt'>
+												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='3'>
 														<%- vocabulary['externally'][language] %>
 													</button>
@@ -292,11 +295,11 @@
 									<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
 									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
 									<% if (locals.data?.status === 0 || !locals.data?.status) { %>
-										<button type='submit' class='generate-pdf' disabled>
+										<button type='submit' class='generate-pdf google-translate-attr' disabled>
 											<%- vocabulary['generate file'][language]('.pdf') %>
 										</button>
 									<% } else if (locals.data?.status > 0) { %>
-										<button type='submit' class='generate-pdf'>
+										<button type='submit' class='generate-pdf google-translate-attr'>
 											<%- vocabulary['generate file'][language]('.pdf') %>
 										</button>
 									<% } %>
@@ -337,25 +340,25 @@
 				<div class='head'>
 					<% if (object !== 'review' && !locals.data?.is_review) { %>
 						<% if (locals.metadata.page.referer?.includes('browse/pads')) { %>
-							<a href='<%- locals.metadata.page.referer %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+							<a href='<%- locals.metadata.page.referer %>' class='return google-translate-attr'><%- vocabulary['back to browse'][language] %></a>
 						<% } else { %>
-							<a href='<%- `/${language}/browse/pads/private` %>' class='return'><%- vocabulary['back to browse'][language] %></a>
+							<a href='<%- `/${language}/browse/pads/private` %>' class='return google-translate-attr'><%- vocabulary['back to browse'][language] %></a>
 						<% } %>
 						<% if (editing) { %>
-							<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
+							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onblur='partialSave("title")' contenteditable></div>
 						<% } else { %>
-							<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'></div>
+							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>'></div>
 						<% } %>
 						<!-- TO DO: FIX THIS: FOR SOME REASON NOTHING WORKS HERE WHEN IN REVIEW MODE -->
 						<% if (!anonymized) { %>
 							<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
 								<% if (activity === 'edit') { %>
-									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
+									<div class='contributor google-translate-attr'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
 									<div class='meta meta-country'><%- locals.data?.country %></div>
-									<div class='meta meta-date'><%- vocabulary['date'][language](locals.data?.date) %></div>
+									<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](locals.data?.date) %></div>
 								<% } else { %>
 									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
-									<div class='meta meta-date'><%- vocabulary['date'][language](locals.data?.date) %></div>
+									<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](locals.data?.date) %></div>
 								<% } %>
 							<% } %>
 						<% } %>
@@ -365,7 +368,7 @@
 						<% } else { %>
 							<a href='<%- `/${language}/browse/reviews/ongoing` %>' class='return'><%- vocabulary['back to reviews'][language] %></a>
 						<% } %>
-						<div class='title'>
+						<div class='title google-translate-attr'>
 							<%- vocabulary['review'][language](false, false) %> #<%- locals.data?.review_idx %>
 						</div>
 					<% } %>
@@ -376,7 +379,7 @@
 					<section class='description-layout layout view'><!-- THIS IS ALWAYS IN VIEW MODE IF DISPLAYED -->
 						<% if (!publicpage) { %>
 							<div class='meta-container template-container'>
-								<div class='meta meta-template'>
+								<div class='meta meta-template google-translate-attr'>
 									<i><%- vocabulary['pad based on'][language] %> </i>
 									<a href='/<%- language %>/view/template?id=<%- locals.display_template.id %>'>
 									<%- locals.display_template.title %></a>
@@ -391,6 +394,9 @@
 					</section>
 				<% } %>
 			</div>
+			<% if (locals.metadata?.user?.uuid) { %>
+			<div class='exploration-local'></div>
+			<% } %>
 		</div>
 	</main>
 </div>
@@ -426,7 +432,7 @@
 				<% } %>
 				<% if (!templated || ![null, undefined].includes(locals.display_template.medium)) { %>
 					<% metafields.forEach(d => { %>
-						<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
+						<button class='labeled google-translate-attr' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
 							<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
 							<label class='lg xl xxl'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
 						</button>
@@ -500,8 +506,8 @@
 	) { %>
 		<div class='inner'>
 			<% if (pagedisplay !== 'slideshow') { %>
-				<h2><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>
-				<form action='/comment' method='POST'>
+				<h2 class="google-translate-attr"><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>
+				<form class="google-translate-attr" action='/comment' method='POST'>
 					<input type='hidden' name='id' value='<%- locals.data?.id %>'>
 					<input type='hidden' name='object' value='<%- object %>'>
 					<textarea id='input-media-comment' name='message' onkeyup='adjustarea(this)' data-placeholder='test' onchange='fixLabel(this)' onfocus='changeLabel(this, true)' onblur='changeLabel(this, false)' required></textarea>
@@ -517,14 +523,14 @@
 							<div class='head'>
 								<div class='meta meta-data'>
 									<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- d.ownername %></a></div>
-									<div class='meta meta-date'><%- vocabulary['date'][language](d.date) %></div>
+									<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](d.date) %></div>
 								</div>
 							</div>
 							<div class='body'>
 								<%- d.message %>
 							</div>
 							<div class='foot'>
-								<button type='button' class='expand-collapsed <% if (d.replies?.length > 0) { %>wide<% }%>'>
+								<button type='button' class='expand-collapsed google-translate-attr <% if (d.replies?.length > 0) { %>wide<% }%>'>
 									<% if (d.replies?.length > 0) { %><%- vocabulary['expand replies'][language](d.replies.length) %>
 									<%} else { %><%- vocabulary['reply'][language](true) %><%} %>
 								</button>
@@ -536,7 +542,7 @@
 												<div class='head'>
 													<div class='meta meta-data'>
 														<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
-														<div class='meta meta-date'><%- vocabulary['date'][language](c.date) %></div>
+														<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](c.date) %></div>
 													</div>
 												</div>
 												<div class='body'>
@@ -552,8 +558,8 @@
 										<input type='hidden' name='source' value='<%- d.id %>'>
 										<textarea id='input-media-comment' name='message' onkeyup='adjustarea(this)' data-placeholder='test' onchange='fixLabel(this)' onfocus='changeLabel(this, true)' onblur='changeLabel(this, false)' required></textarea>
 										<!-- <label for='input-media-comment' data-label='Jeremy'>Reply publicly</label> -->
-										<label for='input-media-comment'><%- vocabulary['reply publicly'][language] %></label>
-										<div class='btn-group'>
+										<label for='input-media-comment google-translate-attr'><%- vocabulary['reply publicly'][language] %></label>
+										<div class='btn-group google-translate-attr'>
 											<button type='submit' disabled><%- vocabulary['reply'][language](true) %></button>
 										</div>
 									</form>
@@ -611,6 +617,18 @@
 			// chead.addElems('div', 'meta meta-date').html(new Date(Date.now()).toString())
 
 			// comments.addElems('div', 'body').html(d => d)
+			<% if (locals.metadata?.user?.uuid) { %>
+				exploration.setUseFullPromptForSelect(true);
+				exploration.updateExplorationList(() => {
+					const docBtn = d3.select('div.exploration-local');
+					const data = { id: <%- locals.data?.id %> };
+					if (data.id) {
+						docBtn.data([data]);
+						exploration.setVisible(true);
+						exploration.addDocButtons(docBtn, false);
+					}
+				});
+			<% } %>
 		</script>
 	<% } else if (pagedisplay === 'slideshow') { %>
 		<div class='inner'>
@@ -777,8 +795,6 @@
 			// datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
 			datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
 			datum.has_content = datum.txt?.trim()?.length > 0
-			console.log(JSON.stringify(datum.txt))
-			console.log(JSON.stringify(datum.txt).trim())
 			items.push(datum)
 		}
 		else if (datum.type === 'embed') {
@@ -1311,7 +1327,10 @@
 
 		if (data.sections) {
 			data.sections.forEach(async d => {
-				if (!editing) d.items = d.items.filter(c => c.has_content) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
+				if (!editing) d.items = d.items.filter(c => {
+					if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
+					else return c.has_content
+				}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
 				<% if (pagedisplay === 'slideshow') { %>
 					await addSlides({ data: d, lang: '<%- language %>' }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
 				<% } else { %>

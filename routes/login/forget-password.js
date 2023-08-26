@@ -2,8 +2,9 @@ const sendEmail = require('../helpers').email
 const { DB } = include('config/')
 const { datastructures } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
+const { isPasswordSecure } = require('./password-requirement')
 
- // Function to send password reset email
+// Function to send password reset email
 async function sendResetEmail(email, html) {
   sendEmail({
     from: 'no-reply@acclab-platform.org',
@@ -13,8 +14,8 @@ async function sendResetEmail(email, html) {
   });
 }
 
- // Generate and send password reset token
- exports.forgetPassword = async (req, res, next) => {
+// Generate and send password reset token
+exports.forgetPassword = async (req, res, next) => {
   const { email } = req.body;
    // Check if the provided email exists in the database
   const user = await DB.general.oneOrNone(`
@@ -67,11 +68,10 @@ function verifyTokenFields(decoded, res) {
   return true;
 }
 
- // Reset password page
+// Reset password page
 exports.getResetToken = async (req, res, next) => {
   const { token } = req.params;
   req.session.errormessage = '';
-
   jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
     if(decoded) {
       if (!verifyTokenFields(decoded, res)) {
@@ -117,22 +117,14 @@ exports.updatePassword = async (req, res, next) => {
         }
 
         let checkPass = isPasswordSecure(password)
-        if(Object.keys(checkPass).some((key) => !checkPass[key])){
-            const msgs = {
-              'pw-length': 'Password is too short!',
-              'pw-upper': 'Password requires at least one uppercase letter!',
-              'pw-lower': 'Password requires at least one lowercase letter!',
-              'pw-number': 'Password requires at least one numberal!',
-              'pw-special': 'Password requires at least one of the special characters: !@#$%^&*()',
-              'pw-common': 'Password cannot be a commonly used password!',
-            };
-            req.session.errormessage = Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]).join('\n');
+        if(checkPass.length){
+          req.session.errormessage = checkPass;
 
-            const { errormessage, successmessage } = req.session || {}
-            const metadata = await datastructures.pagemetadata({ req, res })
-            let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+          const { errormessage, successmessage } = req.session || {}
+          const metadata = await datastructures.pagemetadata({ req, res })
+          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
 
-            return res.render('reset-password', data );
+          return res.render('reset-password', data );
         }
 
         // Update the password and clear the reset token
@@ -147,22 +139,3 @@ exports.updatePassword = async (req, res, next) => {
     }
   });
 };
-
-
-const isPasswordSecure = (password) => {
-  // Check complexity (contains at least one uppercase, lowercase, number, and special character)
-  const uppercaseRegex = /[A-Z]/;
-  const lowercaseRegex = /[a-z]/;
-  const numberRegex = /[0-9]/;
-  const specialCharRegex = /[!@#$%^&*\(\)]/;
-  // Check against common passwords (optional)
-  const commonPasswords = ['password', '123456', 'qwerty'];
-  return {
-    'pw-length': !(password.length < 8),  // Check length
-    'pw-upper': uppercaseRegex.test(password),
-    'pw-lower': lowercaseRegex.test(password),
-    'pw-number': numberRegex.test(password),
-    'pw-special': specialCharRegex.test(password),
-    'pw-common': !commonPasswords.includes(password),
-  };
-}

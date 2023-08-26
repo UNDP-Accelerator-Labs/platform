@@ -14,7 +14,7 @@ html, body {
 
 .modal {
 	width: 300px;
-	margin-bottom: 75px;
+	flex-shrink: 1;
 
 	.close {
 		padding: 5px 10px;
@@ -24,6 +24,12 @@ html, body {
 		clear: both;
 		padding: 15px 15px 5px 15px;
 		background-color: #FFF;
+		overflow-y: auto;
+		max-height: 85vh;
+
+		* {
+			padding: 5px;
+		}
 
 		.headline {
 			margin-bottom: 15px;

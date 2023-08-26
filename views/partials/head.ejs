@@ -1,46 +1,56 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
-	const title = locals.metadata?.page?.title
-	const description = locals.metadata?.site?.description[language]
+	const languages = locals.metadata.site.languages
+	const page_language = locals.metadata.page.page_language
+	const excerpt = locals.metadata.page.excerpt
 
-	const site_title = locals?.data?.publishable ? locals?.data?.title : null
+	const currentpage_url = new URL(locals.metadata.page.currentpage_url?.replace('/edit/', '/view/'))
+	const currentpage_query = new URLSearchParams(currentpage_url.search)
+	if (excerpt?.p) currentpage_query.append('ogp', true)
+	const querylength = [...new Set(currentpage_query.keys())].length
+	const url = `${currentpage_url.origin}${currentpage_url.pathname}${querylength ? `?${currentpage_query.toString()}` : ''}`
 
-	const site_description = locals?.data?.publishable ? locals?.data?.sections?.[0]?.items?.find(c => c?.type === 'txt'  && c?.txt?.length)?.txt : null;
-	const img = locals?.data?.publishable ? locals?.data?.sections[0]?.items?.find(c => c?.type === 'img' && c?.src?.length )?.src : null
+	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || ''; //COUNTRY INSTANCE TITLE OR COLLECTION TITLE
+	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}` //DEFAULT PAGE TITLE => ADD COUNTRY NAME TITLE IF IT EXIST
+
+	if (excerpt?.p && excerpt?.img) {
+		if (locals.metadata.site.app_storage) {
+			excerpt.img.src = new URL(`${locals.metadata.site.app_storage}${excerpt.img.src}`).href
+		}
+	} else excerpt.img = { src: `${currentpage_url.origin}/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_opaque.png` }
+
+	if (!excerpt?.p) {
+		excerpt.txt = excerpt.txt[language]
+	}
 
 	let ogp_locale = 'en_US'
-
-	if(language == 'fr'){
-		ogp_locale = 'fr_FR'
-	}
-	else if (language == 'es'){
-		ogp_locale = 'es_ES'
-	}
-	else if(language == 'pt'){
-		ogp_locale = 'pt_PT'
-	}
-
+	if(language == 'fr') ogp_locale = 'fr_FR'
+	else if (language == 'es') ogp_locale = 'es_ES'
+	else if(language == 'pt') ogp_locale = 'pt_PT'
 %>
-
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
 <meta name='apple-mobile-web-app-capable' content='yes'>
 <meta names='apple-mobile-web-app-status-bar-style' content='black-translucent'>
-<meta name="theme-color" content="#16a0d6e7"/>
+<meta name='theme-color' content='#16a0d6e7'/>
 
-<!-- OGP tags -->
-<meta property="og:title" content="<%= title %>">
-<meta property="og:description" content="<%= site_description ?? description %>">
+<!-- Facebook Meta Tags -->
+<meta property="og:url" content="<%= url %>" >
+<meta property="og:type" content="website">
+<meta property="og:title" content="<%= excerpt.title %>">
+<meta property="og:description" content="<%= excerpt.txt %>">
+<meta property="og:image" content="<%= excerpt.img.src %>">
 <meta property="og:locale" content="<%= ogp_locale %>">
-<meta property="og:site_name" content="<%= site_title ?? title %>">
+<meta property="og:image:width" content="<%= excerpt.img.width %>" />
+<meta property="og:image:height" content="<%=  excerpt.img.height %>" />
 
-<meta property="og:image" content="<%= img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
-<meta property="og:image:secure_url" content="<%= img ?? 'https://undp-accelerator-labs.github.io/national_innovation_ecosystems_toolkit/public/imgs/UNDP_accelerator_labs_logo_vertical_color_RGB.png' %>"/>
-<meta property="og:image:width" content="400" />
-
-<meta property="og:image:alt" content="UNDP Accelerator Labs" />
-
+<!-- Twitter Meta Tags -->
+<meta property="twitter:url" content="<%= url %>" >
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= excerpt.title %>">
+<meta name="twitter:description" content="<%= excerpt.txt %>">
+<meta name="twitter:image" content="<%= excerpt.img.src %>">
 
 <title><%- title %></title>
 
@@ -59,6 +69,8 @@
 <script type='text/javascript' src='/js/basics.js'></script>
 <script type='text/javascript' src='/js/upload.js'></script>
 
+<!-- Google Translate CDN -->
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <!-- <script src = '/socket.io/socket.io.js'></script> -->
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
@@ -71,3 +83,62 @@
 <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined'>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel='stylesheet' type='text/css' href='/css/dispatch.css'>
+
+<script type="text/javascript">
+	var languageAlias = '<%= page_language %>';
+	var googleTranslateElement;
+	var languages= ('<%= languages.map(p=> p.language) %>').split(',');
+
+	function setCookie(key, value, expiry) {
+	  var expires = new Date();
+	  expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
+	  document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+	}
+	function googleTranslateElementInit() {
+		setCookie('GoogleAccountsLocale_session', `${languageAlias}`);
+		setCookie('googtrans', `/en/${languageAlias}`, 1);
+
+		d3.select("#gtranslate-dummy-lang").style("display", "none");
+		new google.translate.TranslateElement({
+		   pageLanguage: 'en',
+		   layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+		}, 'google_translate_element');
+
+	}
+
+	function rewriteUrl(lang, reload = false){
+		const currentUrl = new URL(window.location);
+		const languagePattern = /^\/[a-z]{2,3}\//;
+		const newPath = currentUrl.pathname.replace(languagePattern, "/" + lang + "/");
+		currentUrl.pathname = newPath;
+		const newUrl = `${currentUrl}`;
+
+		if(reload) window.location.href = newUrl;
+		else window.history.replaceState({}, "", newUrl);
+	}
+
+	//IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
+	//THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
+	function updateDomTree(lang) {
+		const isMainLanguage = languages.includes(lang) && lang !== 'en'
+		d3.selectAll('.google-translate-attr')
+  			.classed('notranslate', function() {
+				return d3.select(this).classed('notranslate') || isMainLanguage;
+			});
+	}
+
+	//LISTEN TO CHANGES IN LANGUAGE COOKIES
+	cookieStore.addEventListener('change', ({changed}) => {
+		for (const {name, value} of changed) {
+			if(name === 'googtrans'){
+				var lang = value?.split('/')[2]
+				updateDomTree(lang)
+				rewriteUrl(lang)
+			}
+		}
+		if(!changed.length){
+			rewriteUrl('en', true);
+		}
+	});
+
+</script>

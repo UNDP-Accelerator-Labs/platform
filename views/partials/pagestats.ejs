@@ -1,7 +1,36 @@
 <%
     const object = locals.metadata.page.object;
+    const originalUrl = locals.metadata.page.originalUrl;
     const uuid = locals.metadata.user.uuid;
+    const { id, readCount } = locals.data;
 %>
-<script>
+<% if (object === 'pad' && id) { %>
+<script type="text/javascript" defer>
+    <% if (!uuid) { %>
+        const recordRead = () => {
+            POST('/pagestats', { pad_id: <%= id %>, page_url: '<%= originalUrl %>' }).then(() => {
+                // done
+            }).catch((e) => {
+                console.log(e);
+            });
+        };
 
+        setTimeout(recordRead, 10000);
+    <% } // is logged out %>
+    setTimeout(() => {
+        d3.selectAll('.engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+        const readsIcons = () => {
+            d3.selectAll('.engagement-reads-icon').attr('src', () => {
+                return Math.random() < 0.01 ? '/imgs/icons/i-eye-closed.svg' : '/imgs/icons/i-eye.svg';
+            });
+            setTimeout(() => {
+                d3.selectAll('.engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+                setTimeout(readsIcons, 800);
+            }, 200);
+        };
+        setTimeout(readsIcons, 2000);
+        d3.selectAll('.engagement-reads-count').text('<%= readCount %>');
+        d3.selectAll('.engagement-reads').style('display', null);
+    }, 100);
 </script>
+<% } // is pad and has id %>

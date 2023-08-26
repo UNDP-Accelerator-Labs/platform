@@ -1,5 +1,5 @@
-const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
+const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, fuzzNumber, convertNum } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -134,6 +134,13 @@ module.exports = (req, res) => {
 							}
 							result.reviews.sort((a, b) => a.id - b.id)
 						}
+						const ownId = await ownDB();
+						const readCount = await DB.general.any(`
+							SELECT read_count AS rc
+							FROM page_stats
+							WHERE pad = $1::INT AND db = $2 AND page_url = '' AND country = ''
+						`, [id, ownId]);
+						result.readCount = convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
 						const data = await join.users(result, [ language, 'owner' ])
 						return data
 					}).catch(err => console.log(err)))

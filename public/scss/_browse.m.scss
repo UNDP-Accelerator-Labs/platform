@@ -1577,22 +1577,6 @@ div.browse {
 							}
 						}
 					}
-					.engagement-reads-icon {
-						max-width: 28px;
-						height: 28px;
-						vertical-align: middle;
-						user-select: none;
-						pointer-events: none;
-						opacity: 0.6;
-					}
-					.engagement-reads-count {
-						margin-left: 5px;
-						font-size: 0.9em;
-						color: $c-mid-grey;
-						vertical-align: middle;
-						user-select: none;
-						pointer-events: none;
-					}
 					.engagement-group {
 						margin-top: 10px;
 
@@ -2177,4 +2161,21 @@ footer {
 		}
 	}
 
+}
+
+.engagement-reads-icon {
+	max-width: 28px;
+	height: 28px;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+	opacity: 0.6;
+}
+.engagement-reads-count {
+	margin-left: 5px;
+	font-size: 0.9em;
+	color: $c-mid-grey;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
 }

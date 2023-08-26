@@ -7,7 +7,7 @@ const ipCountry = async (req) => {
     if (!req.session.user_country || req.session.user_country === 'NUL') {
         const user_ip = req.ip;
         let country = 'NUL';
-        if (ipInfoToken) {
+        if (ipInfoToken && !['127.0.0.0', '::1'].includes(user_ip)) {
             try {
                 // free account at ipinfo.io allows 50k requests per month
                 const resp = await fetch(`https://ipinfo.io/${user_ip}/country?token=${ipInfoToken}`);
@@ -69,10 +69,10 @@ exports.storeReadpage = async (req, id, page_url) => {
 
 exports.recordReadpage = async (req, id, page_url) => {
     const ownId = await ownDB();
-    const user_country = await ipCountry();
+    const user_country = await ipCountry(req);
     const {read_pad, read_db, read_url} = req.session;
-    if (read_pad === id && read_db === ownId && read_url === page_url) {
-        await recordView(read_pad, read_url, user_country);
+    if (+read_pad === +id && +read_db === +ownId && read_url === page_url) {
+        await recordView(read_pad, read_url, user_country, false);
         req.session.read_pad = undefined;
         req.session.read_db = undefined;
         req.session.read_url = undefined;

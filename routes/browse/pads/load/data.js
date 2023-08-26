@@ -36,10 +36,10 @@ module.exports = async kwargs => {
 
 			const ownId = await ownDB();
 			const readMap = new Map((await DB.general.any(`
-				SELECT pad, view_count -- read_count
+				SELECT pad, read_count AS rc
 				FROM page_stats
 				WHERE pad IN $1:raw AND db = $2 AND page_url = '' AND country = ''
-			`, [padlist, ownId])).map(row => [row.pad, row.view_count]));
+			`, [padlist, ownId])).map(row => [row.pad, row.rc]));
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW

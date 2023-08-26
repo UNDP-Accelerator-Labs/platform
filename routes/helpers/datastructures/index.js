@@ -260,6 +260,7 @@ exports.pagemetadata = (_kwargs) => {
 				path,
 				referer: stripExplorationId(headers.referer),
 				currentpage_url,
+				originalUrl: req.originalUrl,
 				activity,
 				object,
 				space,

@@ -802,41 +802,8 @@ const Entry = function (_kwargs) {
 			};
 			setTimeout(readsIcons, 2000);
 
-			const convertMap = [
-				[1000, 'K'],
-				[1000, 'M'],
-			];
-
-			function convertNum(v) {
-				if (v < 1) {
-					return '0';
-				}
-				let ix = 0;
-				let postfix = '';
-				while (ix < convertMap.length) {
-					const [divisor, name] = convertMap[ix];
-					if (v < divisor) {
-						break;
-					}
-					v /= divisor;
-					postfix = name;
-					ix += 1;
-				}
-				return `${v > 100 ? v.toFixed(0) : v.toFixed(1).replace(/\.?0*$/, '')}${postfix}`;
-			}
-
 			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
-				let count = +d.readCount ? +d.readCount : 0;
-				if (count > 0) {
-					let rand = 1.0;
-					let rng = 6;
-					while (rng > 0) {
-						rand += 2.0 * (Math.random() - 0.5);
-						rng -= 1;
-					}
-					count = Math.round(Math.max(1, count * (1 + 0.1 * rand / 6)));
-				}
-				return convertNum(count);
+				return d.readCount ?? '0';
 			});
 		}.bind(this),
 		pin: function (_sel) {

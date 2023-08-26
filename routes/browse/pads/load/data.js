@@ -1,5 +1,5 @@
 const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, fuzzNumber, convertNum } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -68,7 +68,7 @@ module.exports = async kwargs => {
 					d.sdgs = parsers.getSDGs(d)
 					d.tags = parsers.getTags(d)
 					d.txt = parsers.getTxt(d)
-					d.readCount = readMap.get(d.id);
+					d.readCount = convertNum(fuzzNumber(readMap.get(d.id)));
 					delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
 				})
 				return results

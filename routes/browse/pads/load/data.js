@@ -34,6 +34,12 @@ module.exports = async kwargs => {
 			pads = pads.map(d => d.id)
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 
+			const ownId = await ownDB();
+			const readMap = new Map((await DB.general.any(`
+				SELECT pad, view_count -- read_count
+				FROM page_stats
+				WHERE pad IN $1:raw AND db = $2 AND page_url = '' AND country = ''
+			`, [padlist, ownId])).map(row => [row.pad, row.view_count]));
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
@@ -62,6 +68,7 @@ module.exports = async kwargs => {
 					d.sdgs = parsers.getSDGs(d)
 					d.tags = parsers.getTags(d)
 					d.txt = parsers.getTxt(d)
+					d.readCount = readMap.get(d.id);
 					delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
 				})
 				return results
@@ -104,7 +111,6 @@ module.exports = async kwargs => {
 				GROUP BY (mc.pad, m.title, m.pad_limit)
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// PINBOARD INFORMATION
-			const ownId = await ownDB();
 			const padToPinboards = new Map();
 			(await DB.general.any(`
 				SELECT

@@ -808,6 +808,9 @@ const Entry = function (_kwargs) {
 			];
 
 			function convertNum(v) {
+				if (v < 1) {
+					return '0';
+				}
 				let ix = 0;
 				let postfix = '';
 				while (ix < convertMap.length) {
@@ -823,7 +826,6 @@ const Entry = function (_kwargs) {
 			}
 
 			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
-				console.log(d);
 				let count = +d.readCount ? +d.readCount : 0;
 				if (count > 0) {
 					let rand = 1.0;
@@ -834,7 +836,7 @@ const Entry = function (_kwargs) {
 					}
 					count = Math.round(Math.max(1, count * (1 + 0.1 * rand / 6)));
 				}
-				return count > 0 ? convertNum(count) : '0';
+				return convertNum(count);
 			});
 		}.bind(this),
 		pin: function (_sel) {

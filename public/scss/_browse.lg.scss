@@ -2057,6 +2057,23 @@ div.browse {
 						}
 					}
 				}
+				.engagement-reads-icon {
+					max-width: 30px;
+					height: 1.5em;
+					vertical-align: middle;
+					user-select: none;
+					pointer-events: none;
+					transform: translateY(7px);
+					opacity: 0.6;
+				}
+				.engagement-reads-count {
+					margin-left: 5px;
+					font-size: 0.9em;
+					color: $c-mid-grey;
+					vertical-align: middle;
+					user-select: none;
+					pointer-events: none;
+				}
 				.engagement-group {
 					margin-top: 10px;
 

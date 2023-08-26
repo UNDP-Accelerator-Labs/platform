@@ -789,6 +789,53 @@ const Entry = function (_kwargs) {
 					})
 				<% }) %>
 			<% } %>
+			const readsCounter = _sel.addElems('span', 'engagement-reads');
+			readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+			const readsIcons = () => {
+				d3.selectAll('.engagement-reads-icon').attr('src', () => {
+					return Math.random() < 0.01 ? '/imgs/icons/i-eye-closed.svg' : '/imgs/icons/i-eye.svg';
+				});
+				setTimeout(() => {
+					d3.selectAll('.engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+					setTimeout(readsIcons, 2000);
+				}, 200);
+			};
+			setTimeout(readsIcons, 2000);
+
+			const convertMap = [
+				[1000, 'K'],
+				[1000, 'M'],
+			];
+
+			function convertNum(v) {
+				let ix = 0;
+				let postfix = '';
+				while (ix < convertMap.length) {
+					const [divisor, name] = convertMap[ix];
+					if (v < divisor) {
+						break;
+					}
+					v /= divisor;
+					postfix = name;
+					ix += 1;
+				}
+				return `${v > 100 ? v.toFixed(0) : v.toFixed(1).replace(/\.?0*$/, '')}${postfix}`;
+			}
+
+			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
+				console.log(d);
+				let count = +d.readCount ? +d.readCount : 0;
+				if (count > 0) {
+					let rand = 1.0;
+					let rng = 6;
+					while (rng > 0) {
+						rand += 2.0 * (Math.random() - 0.5);
+						rng -= 1;
+					}
+					count = Math.round(Math.max(1, count * (1 + 0.1 * rand / 6)));
+				}
+				return count > 0 ? convertNum(count) : '0';
+			});
 		}.bind(this),
 		pin: function (_sel) {
 			<% if ((object === 'pads'

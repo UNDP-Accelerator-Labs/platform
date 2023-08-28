@@ -26,6 +26,7 @@ module.exports = async kwargs => {
 		
 		batch.push(t.task(t1 => {
 			const batch1 = []
+			// GET CONTRIBUTOR BREAKDOWN
 			if (['private', 'curated'].includes(space)) {
 				batch1.push(t1.any(`
 					SELECT COUNT (DISTINCT (id))::INT, owner
@@ -33,7 +34,7 @@ module.exports = async kwargs => {
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
 					GROUP BY owner
-				;`, [ full_filters ])
+				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -54,7 +55,7 @@ module.exports = async kwargs => {
 					FROM pads p
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
-				;`, [ full_filters ])
+				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
 					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
@@ -72,7 +73,6 @@ module.exports = async kwargs => {
 			} else batch1.push(null)
 			
 			// GET TEMPLATE BREAKDOWN
-			// if (modules.includes('templates')) {
 			if (modules.some(d => d.type === 'templates')) {
 				batch1.push(t1.any(`
 					SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
@@ -81,7 +81,8 @@ module.exports = async kwargs => {
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
 					GROUP BY t.id
-				;`, [ full_filters ]).then(results => { 
+				;`, [ f_space ]) // [ full_filters ])
+				.then(results => { 
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
 					const templates = results.map(d => {
 						const obj = {}
@@ -116,7 +117,8 @@ module.exports = async kwargs => {
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
-				;`, [ uuid, full_filters ]).then(results => { 
+				;`, [ uuid, f_space ]) // [ uuid, full_filters ])
+				.then(results => { 
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)
@@ -140,7 +142,8 @@ module.exports = async kwargs => {
 						AND p.id NOT IN (SELECT review FROM reviews)
 						$2:raw
 					GROUP BY (tag_id, t.type)
-				;`, [ d.label, full_filters ]).then(async results => { 
+				;`, [ d.label, f_space ]) // [ d.label, full_filters ])
+				.then(async results => { 
 					const tags = await join.tags(results, [ language, 'id', d.label, d.type ])
 
 					if (d.type === 'index') {
@@ -171,8 +174,8 @@ module.exports = async kwargs => {
 						AND p.id NOT IN (SELECT review FROM reviews)
 						$2:raw
 					GROUP BY (m.name, m.value, m.key)
-				;`, [ d.label, full_filters ]).then(results => {
-
+				;`, [ d.label, f_space ]) // [ d.label, full_filters ])
+				.then(results => {
 					results.sort((a, b) => {
 						if (Number.isInteger(a?.id) && Number.isInteger(b?.id)) return a?.id - b?.id
 						else return a?.name?.localeCompare(b?.name)

@@ -368,6 +368,12 @@ module.exports = async (req, res) => {
 								// NOTE THIS id IS COMMON TO ALL WORKBOOKS (IF SEVERAL ARE GENERATED)
 								d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
 
+								d.snippet = parsers.getTxt(d)?.[0]
+								if (app_storage) {
+									const vignette_path = parsers.getImg(d, true)?.[0]
+									if (vignette_path) d.vignette = path.join(app_storage, vignette_path)
+									else d.vignette = null
+								}
 								// FIGURE OUT WHICH CONTENT STRUCTURE TO KEEP
 								if (!use_templates) {
 									d.content = d.full_text?.replace(/<[^>]*>/g, '')
@@ -393,6 +399,7 @@ module.exports = async (req, res) => {
 									}
 								}
 								delete d.img
+								
 								if (single_sheet && include_locations) {
 									const pad_locations = locations.filter(c => c.pad_id === d.pad_id)
 									for (let i = 0; i < max_locations; i ++) {

@@ -27,7 +27,7 @@ module.exports = async kwargs => {
 					WHERE TRUE
 						$1:raw
 					GROUP BY owner
-				;`, [ full_filters ])//[ req.session.collaborators.map(d => d.uuid) ])
+				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -48,7 +48,7 @@ module.exports = async kwargs => {
 					FROM templates t
 					WHERE TRUE
 						$1:raw
-				;`, [ full_filters ])
+				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
 					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
@@ -88,7 +88,8 @@ module.exports = async kwargs => {
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
-				;`, [ uuid, f_space ]).then(results => {
+				;`, [ uuid, f_space ])
+				.then(results => {
 				// ;`, [ participations.map(d => d.id), f_space ]).then(results => {
 					return results.length ? { mobilizations: results } : null
 				}))

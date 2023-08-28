@@ -171,7 +171,7 @@
 			<!-- TO DO: TRANSLATE -->
 			<ul class='columns'>
 			<% locals.pinboards.forEach(d => { %>
-				<li >
+				<li>
 					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
 					<small class="google-translate-attr"><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>
 					<small class='contributor google-translate-attr'><%- vocabulary['curation credit'][language](d.owner, 'Bob', 'contributors') %></small>
@@ -181,7 +181,7 @@
 		</div>
 	</div>
 </div>
-<div class='sidebar'></div>
+<div class='sidebar xl xxl'></div>
 </div>
 
 <%- include ('./partials/footer.ejs') %>

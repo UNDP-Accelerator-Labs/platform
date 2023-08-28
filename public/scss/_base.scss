@@ -19,9 +19,7 @@
 	margin: 0;
 	padding: 0;
 }
-// body {
-// 	/*background-color: #F3F3F3;*/
-// }
+
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
 	font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
 	color: $c-dark-blue;
@@ -277,4 +275,13 @@ input.toggle:disabled + label::after {
 	font-size: 12px;
 	color: red;
 	padding-top: 10px;
+}
+
+/* GOOGLE TRANSLATE BASIC STYLING */
+li.googletranslator {
+	.skiptranslate {
+		.goog-te-gadget-simple {
+			border: none;
+		}
+	}
 }

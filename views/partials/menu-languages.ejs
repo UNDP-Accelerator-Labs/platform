@@ -1,19 +1,28 @@
 <%
 	// CREATE ALIASES
-	const publicpage = locals.metadata.page.public
 	const activity = locals.metadata.page.activity
+	const publicpage = locals.metadata.page.public
+	const space = locals.metadata.page.space
 	const is_public = locals.metadata.page.public || activity === 'preview'
 	const languages = locals.metadata.site.languages
 	const language = locals.metadata.page.language
 	const username = locals.metadata.user.name
 	const uuid = locals.metadata.user.uuid
+	const pagedisplay = locals.metadata.page.display
 	const app_suite_url = locals.metadata.site.app_suite_url
 
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
 %>
 
 <nav id='languages'>
-	<menu class="google-translate-attr">
-		<li class='home-btn lg'>
+	<menu class='google-translate-attr'>
+		<!-- TO DO: PASS THIS FROM CONFIG FILE (THERE MIGHT NOT ALWAYS BE A SUITE) -->
+		<li class='home-btn lg xl xxl'>
 			<a href='<%= app_suite_url %>'>Accelerator Labs Suite</a>
 		</li>
 		<li class='options'>
@@ -39,7 +48,7 @@
 		</li>
 	</menu>
 </nav>
-<button id='expand-nav' class='expand-filters xs' onclick='expandmenu(this)'>
+<button id='expand-nav' class='expand-filters xs sm m<% if (mapscale === "full-screen" || pagedisplay === "slideshow" || pagedisplay.includes("adjacent")) { %> lg xl<% } %>' onclick='expandmenu(this)'>
 	<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
 </button>
 

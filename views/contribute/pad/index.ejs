@@ -397,9 +397,9 @@
 			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='exploration-local'></div>
 			<% } else { %>
-			<div class='engagement-reads' style='display: none;'>
-				<img class='engagement-reads-icon' />
-				<span class='engagement-reads-count'></span>
+			<div class='engagement-reads'>
+				<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+				<span class='engagement-reads-count'><%= locals.data.readCount %></span>
 			</div>
 			<% } %>
 		</div>

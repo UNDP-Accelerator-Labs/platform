@@ -791,16 +791,7 @@ const Entry = function (_kwargs) {
 			<% } %>
 			const readsCounter = _sel.addElems('span', 'engagement-reads');
 			readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
-			const readsIcons = () => {
-				d3.selectAll('.engagement-reads-icon').attr('src', () => {
-					return Math.random() < 0.01 ? '/imgs/icons/i-eye-closed.svg' : '/imgs/icons/i-eye.svg';
-				});
-				setTimeout(() => {
-					d3.selectAll('.engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
-					setTimeout(readsIcons, 800);
-				}, 200);
-			};
-			setTimeout(readsIcons, 2000);
+			ensureIcon('.engagement-reads-icon', '/imgs/icons/i-eye.svg', '/imgs/icons/i-eye-closed.svg', 200, 2000);
 
 			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
 				return d.readCount ?? '0';

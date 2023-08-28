@@ -18,16 +18,13 @@ div.hashed {
 div.document {
 	position: relative;
 	display: block;
-	width: calc(300px * 3 + 15px * 2 - 90px - 2px);
-	padding: 30px 60px 0 60px;
+	float: left;
+	width: calc(100vw - 120px);
+	padding: 45px 60px 0 60px;
 	background-color: #FFF;
-	border-left: 1px solid $c-light-2;
-	border-right: 1px solid $c-light-2;
+	min-height: calc(100vh - 45px);
 
-	main,
-	main#pad, main#reference,
-	main#template,
-	main#mobilization {
+	main {
 
 		.engagement-input-group {
 			position: fixed;
@@ -179,13 +176,12 @@ div.document {
 				flex-direction: column;
 				justify-content: center;
 				width: 100%;
-				min-height: calc(100vh - 150px);
+				min-height: calc(100vh - 215px);
 				margin-bottom: 90px;
 				padding-bottom: 60px;
 				border-bottom: 1px dotted $c-light-grey;
 
 				h1 {
-					/*margin-bottom: 30px;*/
 					font-size: $t-mid;
 					line-height: 1.5em;
 				}
@@ -238,17 +234,36 @@ div.document {
 			}
 			.meta-status {
 				position: sticky;
-				top: 30px;
-				width: calc(100% + 120px);
-				margin: 0 0 0 -60px;
+				top: 45px;
+				width: 100vw;
+				margin: 0 0 45px -60px;
 				z-index: 10000;
 
 				.btn-group {
-					height: 30px;
-					padding: 15px 10px 15px 0;
+					height: 45px;
+					padding: 10px 0;
 					margin: 0 0 0 auto;
-					text-align: right;
+					text-align: center;
 					z-index: 100;
+
+					.save {
+						display: inline-block;
+						margin: 0 5px 0 5px;
+
+						button {
+							background-color: $c-light-blue;
+							padding:  0 15px;
+							border-color: $c-light-blue;
+							color: #FFF;
+						}
+					}
+					.save.saved {
+						button {
+							background-color: $c-mid-blue;
+							border-color: $c-mid-blue;
+							color: #FFF;
+						}
+					}
 
 					form {
 						position: relative;
@@ -256,8 +271,8 @@ div.document {
 						margin: 0 5px 0 5px;
 
 						button {
-							min-height: 30px;
-							padding: 0 10px;
+							min-height: 45px;
+							padding: 0 15px;
 							border: 1px solid $c-dark-blue;
 							outline: none;
 							background-color: transparent;
@@ -300,11 +315,9 @@ div.document {
 									list-style: none;
 
 									button {
-										width: 100%;
 										padding: 5px 10px;
 										border: none;
 										color: $c-light-grey;
-										font-size: $t-small;
 										white-space: nowrap;
 									}
 								}
@@ -351,7 +364,7 @@ div.document {
 			.head {
 				position: relative;
 				width: 100%;
-				margin: 30px 0;
+				margin-bottom: 15px;
 
 				.return {
 					display: block;
@@ -372,7 +385,6 @@ div.document {
 					font-weight: 700;
 				}
 				.title:focus {
-					/*border-bottom-color: $c-light-yellow;*/
 					border-bottom-color: $c-light-2;
 				}
 				.contributor {
@@ -406,14 +418,13 @@ div.document {
 			.body {
 				width: 100%;
 				padding-bottom: 60px;
-				/*transform: translateZ(0);*/
 
 				.layout {
 					display: inline-block;
 					clear: both;
 					position: relative;
 					width: 100%;
-					margin: 15px 0 30px 0;
+					margin: 0 0 30px 0;
 					transition: background-color .25s;
 
 					.section-header {
@@ -429,27 +440,9 @@ div.document {
 							border-bottom: 1px solid transparent;
 						}
 						h1:focus {
-							/*border-bottom-color: $c-mid-yellow;*/
 							border-bottom-color: $c-light-2;
 						}
 					}
-
-					/*.input-type {
-						display: block;
-						text-align: center;
-
-						label {
-							position: absolute;
-							bottom: 100%;
-							left: 0;
-							padding: 5px 10px;
-							outline: none;
-							background-color: $c-light-yellow;
-							font-size: $t-small;
-							line-height: 1.5em;
-							white-space: nowrap;
-						}
-					}*/
 					.placement-opts {
 						position: absolute;
 						display: none;
@@ -475,9 +468,9 @@ div.document {
 					}
 					.required {
 						position: absolute;
-						left: -45px;
-						top: 35px;
-						width: 30px;
+						left: -60px;
+						top: 55px;
+						width: 60px;
 						text-align: center;
 
 						input {
@@ -499,13 +492,13 @@ div.document {
 						clear: both;
 						position: relative;
 						width: 100%;
-						margin-bottom: 15px;
+						/*margin-bottom: 10px;*/
 
 						.opts {
 							display: flex;
 							justify-content: space-between;
 							width: 100%;
-							height: 30px;
+							height: 45px;
 							border-bottom: 1px solid transparent;
 
 							.opt-group {
@@ -513,13 +506,12 @@ div.document {
 
 								.opt {
 									position: relative;
-									width: 30px;
-									height: 30px;
+									width: 45px;
+									height: 45px;
 									border: none;
 									outline: none;
 									background-color: transparent;
 									cursor: pointer;
-									color: $c-mid-grey;
 
 									i {
 										font-size: $t-main;
@@ -589,7 +581,6 @@ div.document {
 									margin-right: 0;
 								}
 								.opt.active {
-									/*background-color: $c-light-yellow;*/
 									background-color: $c-light-2;
 								}
 								.opt.color.active::after {
@@ -605,14 +596,14 @@ div.document {
 								label {
 									position: absolute;
 									left: 0;
-									height: 30px;
+									/*top: 15px;*/
+									height: 45px;
 									padding: 0 10px;
 									/*background-color: $c-light-yellow;*/
 									background-color: $c-light-2;
 									font-size: $t-small;
-									line-height: 30px;
+									line-height: 45px;
 									white-space: nowrap;
-									color: $c-mid-grey;
 								}
 							}
 						}
@@ -664,6 +655,7 @@ div.document {
 						.meta {
 							clear: both;
 							position: relative;
+							padding: 10px 0;
 							outline: none;
 							color: $c-dark-grey;
 						}
@@ -919,10 +911,11 @@ div.document {
 									cursor: pointer;
 								}
 							}*/
+
 							.tag {
 								display: inline-block;
 								border: none;
-								padding: 0 15px;
+								padding: 5px 15px;
 								margin: 0 5px 5px 0;
 								background-color: $c-light-2;
 								border-radius: calc(#{$t-mid-small} * 2);
@@ -1039,13 +1032,11 @@ div.document {
 									height: 50px;
 									margin: 15px 0 0 10px;
 									border: none;
-									/*border-bottom: 1px solid $c-dark-1;*/
 									border-bottom: 1px solid $c-dark-blue;
 									outline: none;
 									background-color: transparent;
 									font-size: $t-large;
 									line-height: 1.5em;
-									/*color: #FFF;*/
 								}
 								input[type=text]:focus + label,
 								input[type=text].has-value + label {
@@ -1064,10 +1055,9 @@ div.document {
 									position: absolute;
 									top: 5px;
 									left: 10px;
-									font-size: $t-main;
+									font-size: $t-mid-small;
 									line-height: 1.5em;
-									/*color: #FFF;*/
-									transform: translateY(calc(#{$t-main}));
+									transform: translateY(22.5px);
 									transition: transform .25s, font-size .25s;
 								}
 								button {
@@ -1108,7 +1098,7 @@ div.document {
 							.inset-sdgs {
 								display: grid;
 								grid-gap: 15px;
-								grid-template-columns: repeat(6, 1fr);
+								grid-template-columns: repeat(3, 1fr);
 
 								.tag {
 									transition: background-color .25s;
@@ -1141,14 +1131,14 @@ div.document {
 
 								.tag {
 									display: inline-block;
-									padding: 0 5px;
-									margin: 0 2.5px 2.5px 0;
+									margin: 0 5px 5px 0;
+									padding: 0 10px;
 									border: 1px solid $c-light-grey;
-									border-radius: calc(#{$t-small} * 1.5);
+									border-radius: calc(#{$t-mid-small} * 2);
 									color: $c-light-grey;
-									font-size: $t-small;
-									line-height: 1.5em;
-									transition: background-color .1s;
+									font-size: $t-mid-small;
+									line-height: 2em;
+									transition: background-color .25s;
 									cursor: pointer;
 
 									input {
@@ -1264,6 +1254,9 @@ div.document {
 					.group-container {
 						position: relative;
 
+						.required {
+							left: -45px;
+						}
 						.media-group {
 							margin-bottom: 15px;
 						}
@@ -1405,7 +1398,7 @@ div.document {
 					}
 				}
 				.description-layout {
-					margin-top: 10px;
+					margin-top: 0;
 					padding-bottom: 30px;
 					clear: both;
 					/*border-top-color: $c-light-yellow;*/
@@ -1489,196 +1482,161 @@ div.document {
 				.layout.animate-in {
 					animation: slide-down 1s;
 				}
-			}
-			// .foot {
-			// }
-		}
-	}
-	.media-input-group {
-		position: fixed;
-		top: 0;
-		left: calc((100vw - (300px * 3 + 15px * 5)) / 2 + (300px * 3 + 15px * 2 - 30px) + 1px);
-		max-height: 80vh;
-		transform: translateY(90px);
-		border-top: 1px solid $c-light-2;
-		border-left: 1px solid $c-light-2;
-		border-bottom: 1px solid $c-light-2;
-		z-index: 1000;
-
-		.inner {
-			max-height: 80vh;
-			overflow: hidden;
-			background-color: #FFF;
-
-			.btn-group {
-				display: flex;
-				flex-direction: column;
-				outline: none;
-				margin: 10px 0;
-				background-color: #FFF;
-
-				input {
-					display: none;
-				}
-				label,
-				button {
-					position: relative;
-					display: block;
-					float: left;
-					width: 44px;
-					height: 45px;
-					margin: 0 7px;
+				.input-toolbox {
+					position: fixed;
+					bottom: 15px;
+					right: 15px;
+					width: 75px;
+					height: 75px;
+					border-radius: 75px;
+					border: 1px solid $c-light-2;
 					outline: none;
-					border: none;
-					border-radius: 45px;
-					background-color: transparent;
-					font-size: $t-main;
-					line-height: 45px;
-					text-align: center;
-					color: $c-mid-grey;
-					-webkit-touch-callout: none;
-					-webkit-user-select: none;
-					-khtml-user-select: none;
-					-moz-user-select: none;
-					-ms-user-select: none;
-					user-select: none;
-					transition: background-color .25s;
-					cursor: pointer;
-
-					label {
-						content: attr(title);
-						position: absolute;
-						top: 0;
-						left: 100%;
-						min-height: 45px;
-						width: 0;
-						margin: 0 0 0 7.5px;
-						background-color: $c-light-2;
-						border-radius: 0;
-						font-size: $t-small;
-						text-align: left;
-						overflow: hidden;
-						white-space: nowrap;
-						transition: padding .25s, width .25s;
-
-						span {
-							padding: 0 10px;
-						}
-					}
-
-					i {
-						font-size: $t-mid;
-						line-height: 45px;
-					}
-
-					img {
-						width: 20px;
-						vertical-align: middle;
-					}
+					background-color: #FFF;
+					box-shadow: 0 0 10px rgba(0,0,0,.25);
+					z-index: 1001;
 				}
-				label:hover,
-				button:hover {
-					background-color: $c-light-2;
-				}
-				label.highlight,
-				button.highlight {
-					background-color: $c-dark-1;
+				.input-toolbox.highlight {
+					background-color: $c-dark-blue;
 					color: #FFF;
 				}
-				input:disabled,
-				button:disabled {
-					pointer-events: none;
-					color: $c-light-2;
+				.media-input-group {
+					position: fixed;
+					bottom: 105px;
+					right: 22.5px;
+					max-height: 0;
+					z-index: 1000;
+					transition: max-height .25s;
+					box-shadow: 0 0 10px rgba(0,0,0,.1);
+					background-color: #FFF;
+					overflow: auto;
 
-					img {
-						filter: brightness(2);
+					.inner {
+
+						.btn-group {
+							outline: none;
+
+							input {
+								display: none;
+							}
+							form {
+								position: relative;
+								display: block;
+								width: 60px;
+								height: 45px;
+							}
+							label,
+							button {
+								position: relative;
+								display: block;
+								width: 45px;
+								height: 45px;
+								margin: 0 7.5px;
+								outline: none;
+								border: none;
+								border-radius: 45px;
+								background-color: transparent;
+								font-size: $t-main;
+								line-height: 45px;
+								text-align: center;
+								color: $c-mid-grey;
+								-webkit-touch-callout: none;
+								-webkit-user-select: none;
+								-khtml-user-select: none;
+								-moz-user-select: none;
+								-ms-user-select: none;
+								user-select: none;
+								transition: background-color .25s;
+								cursor: pointer;
+
+								label {
+									content: attr(title);
+									position: absolute;
+									top: 0;
+									left: 100%;
+									min-height: 45px;
+									width: 0;
+									margin: 0 0 0 7.5px;
+									background-color: $c-light-2;
+									border-radius: 0;
+									font-size: $t-small;
+									text-align: left;
+									overflow: hidden;
+									white-space: nowrap;
+									transition: padding .25s, width .25s;
+
+									span {
+										padding: 0 10px;
+									}
+								}
+
+								i {
+									font-size: $t-mid;
+									line-height: 45px;
+								}
+
+								img {
+									width: 20px;
+									vertical-align: middle;
+								}
+							}
+							label:hover,
+							button:hover {
+								background-color: $c-light-2;
+							}
+							label.highlight,
+							button.highlight {
+								background-color: $c-dark-1;
+								color: #FFF;
+							}
+							input:disabled,
+							button:disabled {
+								pointer-events: none;
+								color: $c-light-2;
+
+								img {
+									filter: brightness(2);
+								}
+							}
+							.vertical-separator {
+								width: 60px;
+								height: 0px;
+								border-top: 1px solid $c-light-2;
+								margin: 10px 0;
+							}
+						}
 					}
 				}
-				.vertical-separator {
-					width: 59px;
-					height: 0px;
-					/*border-top: 1px dotted $c-light-grey;*/
-					border-top: 1px solid $c-light-2;
-					margin: 10px 0;
+				.input-group.inline {
+					position: static;
+					margin-top: 10px;
+					padding-bottom: 0;
+
+					.inner {
+						.btn-group {
+
+							.vertical-separator {
+								margin: 5px 15px;
+							}
+						}
+					}
 				}
-			}
-		}
-		button.scroll-up,
-		button.scroll-down {
-			position: absolute;
-			display: block;
-			height: 30px;
-			width: 100%;
-			border-radius: 0;
-			margin: 0;
-			background-color: $c-light-2;
-			outline: none;
-			border: none;
-			line-height: 30px;
-			z-index: 1000;
-			cursor: pointer;
+				.input-group.fixed {
+					position: absolute;
+					height: 100%;
+					padding-bottom: 0;
+					pointer-events: none;
+					z-index: 100;
 
-			label {
-				display: block;
-				width: 30px;
-				height: 30px;
-				margin: 0 0 0 15px;
-				line-height: 26px;
-				text-align: center;
-				font-size: $t-mid;
-				transform-origin: center;
-				cursor: pointer;
-				color: $c-mid-grey;
-			}
-		}
-		button.scroll-up {
-			top: 0px;
+					.inner {
+						.btn-group {
+							display: flex;
+							align-items: center;
 
-			label {
-				transform: rotate(-90deg);
-			}
-		}
-		button.scroll-down {
-			bottom: 0px;
-
-			label {
-				transform: rotate(90deg);
-			}
-		}
-	}
-	.input-group.overflowing {
-		.inner {
-			.btn-group {
-				margin: 40px 0;
-			}
-		}
-	}
-	.input-group.inline {
-		.inner {
-			.btn-group {
-				position: static;
-				margin-top: 10px;
-				padding-bottom: 0;
-
-				.vertical-separator {
-					margin: 5px 15px;
-				}
-			}
-		}
-	}
-	.input-group.fixed {
-		.inner {
-			.btn-group {
-				display: flex;
-				align-items: center;
-				position: absolute;
-				height: 100%;
-				padding-bottom: 0;
-				pointer-events: none;
-				z-index: 100;
-
-				label {
-					pointer-events: all;
+							label {
+								pointer-events: all;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1691,16 +1649,17 @@ div.document.slideshow {
 	margin: 0;
 	border: none;
 	min-height: 0;
-	height: calc(100vh - 30px);
+	height: calc(100vh - 45px);
+	margin-top: 45px;
 	box-sizing: border-box;
 
 	main#pad {
 		position: absolute;
 		width: 100%;
-		height: 100%;
+		height: calc(100% - 45px);
 		left: 0;
 		padding-bottom: 0;
-	
+
 		& > .inner {
 			display: grid;
 			grid-gap: 0;
@@ -1760,18 +1719,19 @@ div.document.slideshow {
 				width: 100vw !important;
 				max-height: 100%;
 				box-sizing: border-box;
-				padding: 0 calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2) 60px calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2);
+				padding: 0 60px 60px 60px;
 				scroll-snap-align: center;
 				overflow-x: visible;
-				overflow-y: scroll;
+				overflow-y: auto;
+				box-sizing: border-box;
 
 				div.required {
-					left: calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2 - 45px);
+					left: 0;
 				}
 				.opts {
 					.opt-group {
 						label {
-							left: calc((100vw - (300px * 3 + 15px * 2 - 90px)) / 2) !important;
+							left: 60px;
 						}
 					}
 				}
@@ -1783,8 +1743,9 @@ div.document.slideshow {
 
 			div.body {
 				position: relative;
-				display: flex;
-				flex-flow: row nowrap;
+				display: grid;
+				grid-gap: 0;
+				grid-auto-flow: column;
 				width: 100%;
 				height: 100%;
 				padding: 0;
@@ -1800,6 +1761,9 @@ div.document.slideshow {
 				.media-input-group {
 					left: auto;
 					right: 60px;
+				}
+				.input-group.fixed {
+					height: auto;
 				}
 			}
 
@@ -1853,23 +1817,19 @@ footer.slideshow {
 main#reference {
 	pointer-events: none;
 }
+
 footer {
-	position: relative;
-	width: 100%;
+	width: 100vw;
 	clear: both;
 	background-color: $c-light-3;
 	border-top: 1px solid $c-light-2;
-	z-index: 1000;
 
 	.inner {
 		position: relative;
 		display: block;
-		width: calc(300px * 3 + 15px * 2 - 210px - 2px);
+		width: calc(100% - 60px);
 		margin: 0 auto;
-		padding: 30px 60px 30px 60px;
-		border-left: 1px solid #FFF;
-		border-right: 1px solid #FFF;
-		transform: translateX(1px);
+		padding: 30px;
 
 		h2 {
 			font-size: $t-main;
@@ -1882,10 +1842,8 @@ footer {
 
 			textarea {
 				position: relative;
-				display: block;
 				width: calc(100% - 30px);
-				/*min-height: $t-main;*/
-				min-height: calc(#{$t-main} * 1.5);
+				min-height: $t-main;
 				height: 1px;
 				padding: 10px 15px;
 				border: none;
@@ -1992,7 +1950,7 @@ footer {
 				.foot {
 					button.expand-collapsed {
 						background-color: transparent;
-						height: 15px;
+						height: 45px;
 						border: none;
 						outline: none;
 						color: $c-mid-grey;
@@ -2004,7 +1962,7 @@ footer {
 					button.expand-collapsed.wide {
 						position: relative;
 						width: 100%;
-						height: 30px;
+						height: 45px;
 						margin: 10px 0 0 0;
 
 						background: repeating-linear-gradient(
@@ -2103,22 +2061,8 @@ footer {
 		}
 	}
 }
-.document.offset {
-	padding-top: 50px;
 
-	main {
-		.inner {
-			.meta-status {
-				top: 50px !important;
-			}
-			.media-input-group {
-				top: 20px !important;
-			}
-		}
-	}
-}
-div#source,
-div#reviews {
+div#source {
 	position: fixed;
 	height: 100vh;
 	background: repeating-linear-gradient(
@@ -2145,50 +2089,18 @@ div#reviews {
 			}
 		}
 	}
-	.review {
-		position: relative;
-		width: 100%;
-	}
-	.review:not(:last-child) {
-		&::after {
-			content: '';
-			position: absolute;
-			left: -60px;
-			bottom: 0;
-			width: calc(100% + 120px);
-			height: 0;
-			border-bottom: 1px solid $c-light-grey;
-		}
-	}
 }
 .document.split-screen {
 	width: calc(50% - 120px);
 	border: none;
-}
-.document.split-screen.right {
-	margin-left: 50%;
 
 	.media-input-group {
 		left: auto !important;
 		right: 0 !important;
 	}
-
-	main {
-		.inner {
-			button.scroll-nav {
-				width: 50% !important;
-				left: 50% !important;
-			}
-		}
-	}
 }
-.document.split-screen.left {
-	margin-left: 0;
-
-	.media-input-group {
-		left: auto !important;
-		right: 50% !important;
-	}
+.document.split-screen.right {
+	margin-left: 50%;
 }
 div.display-option {
 	position: fixed;
@@ -2218,207 +2130,9 @@ div.display-option {
 	}
 }
 div.display-option.split-screen {
-	pointer-events: none;
 	a {
-		border-left: 1px solid #FFF;
-		pointer-events: all;
 		button {
 			width: 50%;
-		}
-	}
-}
-div.display-option.split-screen.right {
-	text-align: right;
-}
-
-
-
-.media-input-group {
-	position: sticky;
-	top: 90px;
-	width: 60px;
-	max-height: 80vh;
-	margin-left: -61px;
-	border-top: 1px solid $c-light-2;
-	border-left: 1px solid $c-light-2;
-	border-bottom: 1px solid $c-light-2;
-	z-index: 1000;
-
-	.inner {
-		max-height: 80vh;
-		overflow: hidden;
-		background-color: #FFF;
-
-		.btn-group {
-			display: flex;
-			flex-direction: column;
-			outline: none;
-			margin: 10px 0;
-			background-color: #FFF;
-
-			input {
-				display: none;
-			}
-			label,
-			button {
-				position: relative;
-				display: block;
-				float: left;
-				width: 44px;
-				height: 45px;
-				margin: 0 7px;
-				outline: none;
-				border: none;
-				border-radius: 45px;
-				background-color: transparent;
-				font-size: $t-main;
-				line-height: 45px;
-				text-align: center;
-				color: $c-mid-grey;
-				-webkit-touch-callout: none;
-				-webkit-user-select: none;
-				-khtml-user-select: none;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-				transition: background-color .25s;
-				cursor: pointer;
-
-				label {
-					content: attr(title);
-					position: absolute;
-					top: 0;
-					left: 100%;
-					min-height: 45px;
-					width: 0;
-					margin: 0 0 0 7.5px;
-					background-color: $c-light-2;
-					border-radius: 0;
-					font-size: $t-small;
-					text-align: left;
-					overflow: hidden;
-					white-space: nowrap;
-					transition: padding .25s, width .25s;
-
-					span {
-						padding: 0 10px;
-					}
-				}
-
-				i {
-					font-size: $t-mid;
-					line-height: 45px;
-				}
-
-				img {
-					width: 20px;
-					vertical-align: middle;
-				}
-			}
-			label:hover,
-			button:hover {
-				background-color: $c-light-2;
-			}
-			label.highlight,
-			button.highlight {
-				background-color: $c-dark-1;
-				color: #FFF;
-			}
-			input:disabled,
-			button:disabled {
-				pointer-events: none;
-				color: $c-light-2;
-
-				img {
-					filter: brightness(2);
-				}
-			}
-			.vertical-separator {
-				width: 59px;
-				height: 0px;
-				/*border-top: 1px dotted $c-light-grey;*/
-				border-top: 1px solid $c-light-2;
-				margin: 10px 0;
-			}
-		}
-	}
-	button.scroll-up,
-	button.scroll-down {
-		position: absolute;
-		display: block;
-		height: 30px;
-		width: 100%;
-		border-radius: 0;
-		margin: 0;
-		background-color: $c-light-2;
-		outline: none;
-		border: none;
-		line-height: 30px;
-		z-index: 1000;
-		cursor: pointer;
-
-		label {
-			display: block;
-			width: 30px;
-			height: 30px;
-			margin: 0 0 0 15px;
-			line-height: 26px;
-			text-align: center;
-			font-size: $t-mid;
-			transform-origin: center;
-			cursor: pointer;
-			color: $c-mid-grey;
-		}
-	}
-	button.scroll-up {
-		top: 0px;
-
-		label {
-			transform: rotate(-90deg);
-		}
-	}
-	button.scroll-down {
-		bottom: 0px;
-
-		label {
-			transform: rotate(90deg);
-		}
-	}
-}
-.input-group.overflowing {
-	.inner {
-		.btn-group {
-			margin: 40px 0;
-		}
-	}
-}
-.input-group.inline {
-	.inner {
-		.btn-group {
-			position: static;
-			margin-top: 10px;
-			padding-bottom: 0;
-
-			.vertical-separator {
-				margin: 5px 15px;
-			}
-		}
-	}
-}
-.input-group.fixed {
-	.inner {
-		.btn-group {
-			display: flex;
-			align-items: center;
-			position: absolute;
-			height: 100%;
-			padding-bottom: 0;
-			pointer-events: none;
-			z-index: 100;
-
-			label {
-				pointer-events: all;
-			}
 		}
 	}
 }

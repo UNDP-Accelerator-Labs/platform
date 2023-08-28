@@ -15,6 +15,11 @@ div.hashed {
 		rgba(150, 150, 150, .1) 6px
 	);
 }
+div.filler {
+	display: block;
+	flex: 1 1;
+	pointer-events: none;
+}
 div.document {
 	position: relative;
 	display: block;
@@ -429,7 +434,6 @@ div.document {
 							border-bottom: 1px solid transparent;
 						}
 						h1:focus {
-							/*border-bottom-color: $c-mid-yellow;*/
 							border-bottom-color: $c-light-2;
 						}
 					}
@@ -1854,22 +1858,17 @@ main#reference {
 	pointer-events: none;
 }
 footer {
-	position: relative;
 	width: 100%;
 	clear: both;
 	background-color: $c-light-3;
 	border-top: 1px solid $c-light-2;
-	z-index: 1000;
 
 	.inner {
 		position: relative;
 		display: block;
-		width: calc(300px * 3 + 15px * 2 - 210px - 2px);
+		width: calc(100% - 60px);
 		margin: 0 auto;
-		padding: 30px 60px 30px 60px;
-		border-left: 1px solid #FFF;
-		border-right: 1px solid #FFF;
-		transform: translateX(1px);
+		padding: 30px;
 
 		h2 {
 			font-size: $t-main;
@@ -2230,8 +2229,6 @@ div.display-option.split-screen {
 div.display-option.split-screen.right {
 	text-align: right;
 }
-
-
 
 .media-input-group {
 	position: sticky;

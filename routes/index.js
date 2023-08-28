@@ -839,12 +839,12 @@ exports.api.datasources = (req, res) => {
 }
 
 exports.notfound = async(req, res) => {
-	const metadata = await datastructures.pagemetadata({ req, res })
+	const metadata = await helpers.datastructures.pagemetadata({ req, res })
 	res.render('error-404', metadata)
 }
 
 exports.error = async(req, res) => {
-	const metadata = await datastructures.pagemetadata({ req, res })
+	const metadata = await helpers.datastructures.pagemetadata({ req, res })
 	res.render('error-500', metadata)
 }
 

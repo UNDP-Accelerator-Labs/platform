@@ -130,7 +130,12 @@ module.exports = async (req, res) => {
 						d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
 
 						// GET SNIPPET
-						d.snippet = parsers.getTxt(d, false)
+						d.snippet = parsers.getTxt(d)?.[0]
+						if (app_storage) {
+							const vignette_path = parsers.getImg(d, true)?.[0]
+							if (vignette_path) d.vignette = path.join(app_storage, vignette_path)
+							else d.vignette = null
+						}
 						// SET TAGS WITH NAMES
 						if (include_tags) {
 							const nest = array.nest.call(d.tags, { key: 'type' })

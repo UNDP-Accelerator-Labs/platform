@@ -27,7 +27,7 @@ module.exports = async kwargs => {
 					WHERE TRUE
 						$1:raw
 					GROUP BY owner
-				;`, [ full_filters ])
+				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
@@ -48,7 +48,7 @@ module.exports = async kwargs => {
 					FROM pads p
 					WHERE TRUE
 						$1:raw
-				;`, [ full_filters ])
+				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
 					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
@@ -67,7 +67,6 @@ module.exports = async kwargs => {
 			} else batch1.push(null)
 			
 			// GET TEMPLATE BREAKDOWN
-			// if (modules.includes('templates')) {
 			if (modules.some(d => d.type === 'templates')) {
 				batch1.push(t1.any(`
 					SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
@@ -76,7 +75,8 @@ module.exports = async kwargs => {
 					WHERE TRUE 
 						$1:raw
 					GROUP BY t.id
-				;`, [ full_filters ]).then(results => { 
+				;`, [ f_space ]) // [ full_filters ])
+				.then(results => { 
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
 					const templates = results.map(d => {
 						const obj = {}
@@ -110,7 +110,8 @@ module.exports = async kwargs => {
 						$2:raw
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
-				;`, [ uuid, full_filters ]).then(results => { 
+				;`, [ uuid, f_space ]) // [ uuid, full_filters ])
+				.then(results => { 
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)
@@ -131,7 +132,8 @@ module.exports = async kwargs => {
 					WHERE t.type = $1
 						$2:raw
 					GROUP BY tag_id
-				;`, [ d.label, full_filters ]).then(async results => { 
+				;`, [ d.label, f_space ]) // [ d.label, full_filters ])
+				.then(async results => { 
 					const tags = await join.tags(results, [ language, 'id', d.label, d.type ])
 					// if (d.label.toLowerCase() === 'sdgs') {
 					if (d.type === 'index') {

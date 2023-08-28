@@ -3,6 +3,7 @@
 	const modules = locals.metadata.site.modules
 	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
+	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
     const explorationVocab = vocabulary['exploration'][language];
@@ -84,7 +85,7 @@
 			return d.type === object && rights >= write
 		})) { %>
 			<li class='<% if (space === "private") { %>active<% } %>'>
-				<a href='./private'>
+				<a onclick='redirect("./private")'>
 					<button><%- vocabulary['space'][language](object, 'private') %>
 						<div class='count'><%- locals.stats?.private %></div>
 					</button>
@@ -96,7 +97,7 @@
 			&& locals.stats?.curated > 0
 		) { %>
 			<li class='<% if (space === "curated") { %>active<% } %>'>
-				<a href='./curated'>
+				<a onclick='redirect("./curated")'>
 					<button><%- vocabulary['space'][language](object, 'curated') %>
 						<div class='count'><%- locals.stats?.curated %></div>
 					</button>
@@ -125,7 +126,7 @@
 			</li>
 		<% } %>
 		<li class='<% if (space === "shared") { %>active<% } %>'>
-			<a href='./shared'>
+			<a onclick='redirect("./shared")'>
 				<button><%- vocabulary['space'][language](object, 'shared') %>
 					<div class='count'><%- locals.stats?.shared %></div>
 				</button>
@@ -144,7 +145,7 @@
 		<% } %>
 		<% if (!['reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
-				<a href='./public'>
+				<a onclick='redirect("./public")'>
 					<button><%- vocabulary['space'][language](object, 'public') %>
 						<div class='count'><%- locals.stats?.public %></div>
 					</button>
@@ -180,3 +181,16 @@
 	updateTab('<%- locals.pinboard.title %>')
 </script>
 <% } %>
+<script type='text/javascript'>
+	function redirect (location) {
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
+		
+		filter_keys.push('search')
+		for (const key of queryparams.keys()) {
+			if (!filter_keys.includes(key)) queryparams.delete(key)
+		}		
+		return window.location = `${location}?${queryparams.toString()}`
+	}
+</script>

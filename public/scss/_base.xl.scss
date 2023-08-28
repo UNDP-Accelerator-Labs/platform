@@ -4,10 +4,10 @@ html, body {
 	font-size: $t-main;
 	line-height: 1.3em;
 }
-.xs:not(.lg),
-.sm:not(.lg),
-.lg:not(.lg),
-.xl:not(.lg) {
+.xs:not(.xl),
+.sm:not(.xl),
+.m:not(.xl),
+.xl:not(.xl) {
 	display: none !important;
 }
 

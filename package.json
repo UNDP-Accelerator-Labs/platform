@@ -18,8 +18,8 @@
     "archiver": "^5.1.0",
     "connect-pg-simple": "^6.1.0",
     "cors": "^2.8.5",
-    "d3-selection-multi": "^1.0.1",
     "d3": "^5.15.0",
+    "d3-selection-multi": "^1.0.1",
     "docx": "^7.8.2",
     "ejs": "^3.0.1",
     "express-session": "^1.17.0",
@@ -38,6 +38,7 @@
     "path": "^0.12.7",
     "pg-promise": "^10.4.3",
     "request": "^2.88.2",
+    "smoothscroll-polyfill": "^0.4.4",
     "uuid": "^8.3.2",
     "xlsx": "^0.18.5"
   },
@@ -49,8 +50,8 @@
     "html-pdf-node": "^1.0.8",
     "html2pdf.js": "^0.10.1",
     "nodemon": "^2.0.22",
-    "pagedjs-cli": "^0.3.3",
     "pagedjs": "^0.4.0",
+    "pagedjs-cli": "^0.3.3",
     "pdfkit": "^0.13.0",
     "sass": "^1.62.1",
     "socket.io": "^4.5.4"

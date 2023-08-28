@@ -402,8 +402,10 @@ const Entry = function (_kwargs) {
 					const source = d.img[0]
 				<% } %>
 
-				if (display === 'slideshow') img.src = source.replace('uploads/sm/', 'uploads/')
-				else img.src = source
+				if (!mediaSize) var mediaSize = getMediaSize()
+				if (display === 'slideshow' || mediaSize === 'xs') {
+					img.src = source.replace('uploads/sm/', 'uploads/')
+				} else img.src = source
 			})
 		}.bind(this),
 		stats: function (_sel) {
@@ -564,8 +566,12 @@ const Entry = function (_kwargs) {
 				.addElems('a', 'tag-link', d => d)
 				.attr('href', d => `?${d.type}=${d.id}`)
 			.addElems('div', 'tag')
+				.attr('title', d => d.name.capitalize())
 				.addElems('label')
-				.html(d => d.name.capitalize())
+				.html(d => {
+					if (d.name.length > 25) return `${d.name.slice(0, 25).capitalize()}…`
+					else return d.name.capitalize()
+				})
 		}.bind(this),
 		metainfo: function (_sel) {
 			const { source, is_followup, is_forward, is_copy, is_child, version_depth } = _sel.datum()
@@ -899,7 +905,7 @@ const Entry = function (_kwargs) {
 
 				const renderDropdown = (pid) => {
 					const d = pinPbMap[pid];
-					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
+					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards?.some(b => b.id === c.id) ? true : null }))
 					// RENDER THE DROPDOWN
 					newpin.call(renderPinOptions, data)
 				};
@@ -924,6 +930,18 @@ const Entry = function (_kwargs) {
 					renderDropdown(d.id);
 
 					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+					let { top, height } = this.getBoundingClientRect()
+					top = top + height
+					const viewheight = window.innerHeight
+					if (!mediaSize) var mediaSize = getMediaSize()
+					if (mediaSize === 'xs') {
+						const { height: padding } = d3.select('#search-and-filter').node().getBoundingClientRect()
+						if (!padding) padding = 0
+						if (top + 300 >= viewheight - padding) dropdown.classed('dropup', true)
+						else dropdown.classed('dropup', false)
+					} else if (top + 300 >= viewheight) dropdown.classed('dropup', true)
+					else dropdown.classed('dropup', false)
+
 					dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 
 					dropdown.selectAll('li').on('mousedown', function () {

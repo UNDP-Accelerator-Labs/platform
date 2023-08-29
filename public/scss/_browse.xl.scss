@@ -8,7 +8,7 @@ div.public-page-header {
 
 		&.expand {
 			width: 100vw;
-			margin-left: calc(100% - 100vw + 15px);
+			margin-left: calc((100% - 100vw) / 2);
 		}
 
 		div.slides {
@@ -126,13 +126,13 @@ div.public-page-header {
 
 		&.expand {
 			width: 100vw;
-			margin-left: calc(100% - 100vw + 15px);
+			margin-left: calc((100% - 100vw) / 2);
 		}
 
 		/* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 		div.slides {
 			display: grid;
-			grid-template-columns: repeat(7, 150px);
+			grid-template-columns: repeat(10, 150px);
 			grid-auto-rows: 1fr;
 			grid-gap: 5px;
 			align-items: center;
@@ -152,10 +152,10 @@ div.public-page-header {
 			}
 
 			div.blank-area {
-				grid-area: 1 / 1 / 3 / 2;
+				grid-area: 1 / 1 / 3 / 3;
 
 				&.sidebar {
-					grid-area: 1 / 1 / 6 / 2;					
+					grid-area: 1 / 1 / 6 / 3;
 				}
 			}
 
@@ -315,19 +315,14 @@ div.public-page-panel {
 	min-height: 90px;
 	padding: 90px 0;
 
-	&.sm-padding {
-		padding: 0;
-	}
-
 	&.blue {
 		width: 100vw;
 		padding: 90px 0;
-		margin-left: calc(100% - 100vw + 15px);
+		margin-left: calc((100% - 100vw) / 2);
 		background-color: $c-mid-blue;
 		color: #FFF;
 
 		& > .inner {
-			margin: 0 30px 0 auto;
 			width: calc(300px * 3 + 15px * 4);
 		}
 
@@ -350,7 +345,7 @@ div.public-page-panel {
 		}
 		h1.site-title.map-overlay {
 			position: absolute;
-			left: 0;
+			right: 0;
 			top: 0;
 			margin: calc(-#{$t-xxlarge} * 1.2) 0 1em 0;
 			z-index: 1000;
@@ -405,15 +400,10 @@ div.public-page-panel {
 						font-size: $t-xlarge;
 						line-height: 1.2em;
 					}
-					small {
-						font-size: $t-small;
-						line-height: 1.2em;
-						color: $c-light-grey;
-					}
 				}
 			}
 			.stat-group:nth-child(2) {
-/*				border-left: 1px dotted $c-light-grey;*/
+				border-left: 1px dotted $c-light-grey;
 			}
 		}
 		.map-container {
@@ -473,7 +463,7 @@ div.public-page-panel {
 
 div.main-content {
 	display: grid;
-	grid-template-columns: 1fr calc(300px * 3 + 15px * 3 + 45px);
+	grid-template-columns: 1fr calc(300px * 3 + 15px * 4) 1fr;
 	min-height: 100vh;
 }
 
@@ -485,14 +475,6 @@ div.browse {
 
 	&:not(.home) {
 		padding-top: 120px;
-		padding-right: 45px;
-	}
-
-	h1.instance-title {
-		font-size: $t-xlarge;
-		line-height: 1.2em;
-		margin-bottom: 30px;
-		text-align: center;
 	}
 
 	h1.instance-title {
@@ -505,7 +487,6 @@ div.browse {
 	nav#search-and-filter {
 		padding: 0 14px 15px 14px;
 		border: 1px dotted $c-light-grey;
-		margin-bottom: 0;
 
 		&.anchor-bottom {
 			position: fixed;
@@ -1259,7 +1240,7 @@ div.browse {
 			}
 		}
 		.outer {
-			/* margin-top: 30px; */
+			/* margin-top: 30px;*/
 			margin-top: 0px;
 			color: $c-light-grey;
 			font-size: $t-mid-small;
@@ -1380,7 +1361,6 @@ div.browse {
 											top: calc(100% - 1px);
 											background-color: #FFF;
 											box-shadow: 0px 10px 10px rgba(0,0,0,.1);
-											/*transform: translateX(-50%);*/
 											overflow: hidden;
 											z-index: 10;
 											transition: max-height 0.15s ease-out;
@@ -1942,23 +1922,11 @@ div.browse {
 							width: 120px;
 						}
 					}
-					/*&::after {
-						content: '';
-						position: absolute;
-						width: 100%;
-						height: 100%;
-						left: 0;
-						top: 0;
-						background-color: rgba(100,100,100,.1);
-						opacity: 0;
-						pointer-events: none;
-						transition: opacity .15s;
-					}*/
 				}
 				/*article:not(.pad):not(.review):not(.contributor) {
-					border-bottom: 1px dotted $c-light-grey;
 					padding-top: 15px;
 					padding-bottom: 15px;
+					margin-bottom: 30px;
 				}*/
 				article.status--1 {
 					filter: grayscale(1);
@@ -2057,7 +2025,7 @@ div.browse {
 					}
 				}
 				.engagement-group {
-					margin-top: 10px;
+					margin: 10px 0 0 -7px;
 
 					.engagement {
 						display: inline-block;
@@ -2356,6 +2324,7 @@ div.browse {
 					}
 				}
 				.engagement-group {
+					margin: 10px 0 0 -2px;
 					padding: 0 10px;
 					box-sizing: border-box;
 				}
@@ -2463,7 +2432,6 @@ div.browse.slideshow {
 							.head {
 								flex: unset;
 								position: static;
-								
 								.meta-group {
 									position: relative;
 									z-index: 10;

@@ -83,8 +83,8 @@
 <% } %>
 
 <div class='sticky-container'>
-	<div class='main-content sticky'>
-		<header>
+	<div class='main-content <% if (mapscale !== "full-screen") { %> force-height<% } %>'>
+		<header<% if (mapscale === 'full-screen' || pagedisplay === 'slideshow') { %> class='folded'<% } %>>
 			<% if (!is_intropage) { %><div class='inner'>
 			<% } else { %><div class='inner fixed'><% } %>
 				<%- include ('../partials/menu-logo.ejs') %>
@@ -98,14 +98,16 @@
 			<% if (!publicpage
 				&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
 				&& pagedisplay !== 'slideshow'
-				&& !(locals.metadata.page.map && mapscale === 'full-screen')
+				// && !(locals.metadata.page.map && mapscale === 'full-screen')
 			) { %>
-				<nav class='tabs <% if (mapscale === "full-screen") { %>no-bg<% } %>'>
+				<nav class='tabs<% if (mapscale === "full-screen") { %> fill-screen<% } %>'>
 					<div class='inner'>
-						<div class='xs sm m'>
-							<button class='space google-translate-attr'><%- vocabulary['spaces'][language] %></button>
-							<div class='dropdown'>
-								<%- include('./modules/tabs.ejs') %>
+						<div class='xs sm'>
+							<div class='spaces'>
+								<button class='space google-translate-attr'><%- vocabulary['spaces'][language] %></button>
+								<div class='dropdown'>
+									<%- include('./modules/tabs.ejs') %>
+								</div>
 							</div>
 							<% if (object === 'pads') { %>
 								<div class='btn-group map-scale'>
@@ -115,7 +117,7 @@
 								</div>
 							<% } %>
 						</div>
-						<div class='lg'><%- include('./modules/tabs.ejs') %></div>
+						<div class='m lg xl xxl'><%- include('./modules/tabs.ejs') %></div>
 					</div>
 					<script type='text/javascript'>
 						if (!mediaSize) var mediaSize = getMediaSize()
@@ -131,29 +133,72 @@
 								activetab.remove()
 							}
 
-							button.on('touchend', function () { this.focus() })
-							.on('focus', function () {
+							// button.on('touchend', function () { this.focus() })
+							// .on('focus', function () {
+							// 	const dropdown = d3.select(this.nextElementSibling)
+							// 	if (dropdown.node()) {
+							// 		if (dropdown.node().style.maxHeight) {
+							// 			dropdown.node().style.maxHeight = null
+							// 			dropdown.node().style.overflow = null
+							// 		} else {
+							// 			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+							// 			setTimeout(_ => {
+							// 				dropdown.node().style.overflow = 'visible'
+							// 			}, 250)
+							// 		}
+							// 	}
+							// }).on('blur', function () {
+							// 	if (!d3.event.relatedTarget || !d3.select(d3.event.relatedTarget).hasAncestor(this.nextElementSibling)) {
+							// 		const dropdown = d3.select(this.nextElementSibling)
+							// 		if (dropdown.node()) {
+							// 			dropdown.node().style.maxHeight = null
+							// 			dropdown.node().style.overflow = null
+							// 		}
+							// 	}
+							// })
+
+							button.on('click', function () {
 								const dropdown = d3.select(this.nextElementSibling)
-								if (dropdown.node()) {
+								if (dropdown.node() && dropdown.classed('dropdown')) {
 									if (dropdown.node().style.maxHeight) {
 										dropdown.node().style.maxHeight = null
 										dropdown.node().style.overflow = null
+										d3.select('nav.tabs .inner .spaces')?.classed('open', false)
+										dropdown.findAncestor('li')?.classed('open', false)
 									} else {
+										// COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
+										if (d3.select(this).hasAncestor('dropdown')) {
+											const parent_dropdown = d3.select(this).findAncestor('dropdown')
+											parent_dropdown.selectAll('.dropdown')
+											.each(function () {
+												this.style.maxHeight = null
+												this.style.overflow = null
+												d3.select(this).findAncestor('li')?.classed('open', false)
+											})
+										}
+
 										dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 										setTimeout(_ => {
-											dropdown.node().style.overflow = 'visible'
+											if (dropdown.select('.dropdown').size() > 0) dropdown.node().style.overflow = 'visible'
+											else dropdown.node().style.overflow = 'scroll'
 										}, 250)
-									}
-								}
-							}).on('blur', function () {
-								if (!d3.event.relatedTarget || !d3.select(d3.event.relatedTarget).hasAncestor(this.nextElementSibling)) {
-									const dropdown = d3.select(this.nextElementSibling)
-									if (dropdown.node()) {
-										dropdown.node().style.maxHeight = null
-										dropdown.node().style.overflow = null
+										d3.select('nav.tabs .inner .spaces')?.classed('open', true)
+										dropdown.findAncestor('li')?.classed('open', true)
 									}
 								}
 							})
+
+							window.addEventListener('mouseup', function (e) {
+								if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('spaces')) {
+									d3.selectAll('nav.tabs .inner .open').classed('open', false)
+									.selectAll('.dropdown')
+									.each(function () {
+										this.style.maxHeight = null
+										this.style.overflow = null
+									})
+								}
+							})
+
 						}
 					</script>
 				</nav>
@@ -330,26 +375,29 @@
 
 					<!-- MAP -->
 					<% if (
-						(locals.metadata.page.map
+						((locals.metadata.page.map 
 							&& locals.stats?.filtered > 0)
 						&& !(space === 'pinned'
 							&& (!locals.pinboard?.editable || activity === 'preview')
 							&& !locals.pinboard?.display_map)
-						&& pagedisplay !== 'slideshow'
+						&& pagedisplay !== 'slideshow')
+						|| locals.metadata.page.map && mapscale === 'full-screen'
 					) { %>
 						<%- include ('./modules/map') %>
 					<% } else { %>
 						<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.pads?.length === 0) { %>
-							<small class='no-results lg google-translate-attr'>
+							<small class='no-results m lg xl xxl google-translate-attr'>
 								<%- vocabulary['pads to display'][language](0) %>
 							</small>
 						<% } %>
 					<% } %>
 
 					<!-- STATISTICS IN MOBILE VIEW -->
-					<% if (mapscale !== 'full-screen') { %>
-						<div class='xs'>
-							<%- include ('./modules/statistics.ejs') %>
+					<% if (mapscale !== 'full-screen' && pagedisplay !== "slideshow") { %>
+						<div class='public-page-panel sm-padding xs sm m lg'>
+							<div class='inner'>
+								<%- include ('./modules/statistics.ejs') %>
+							</div>
 						</div>
 						<% if (locals.stats?.filtered === 0) { %>
 							<small class='no-results xs google-translate-attr'>
@@ -359,22 +407,19 @@
 					<% } %>
 				</div>
 
-				<div class='public-page-panel'>
-					<div class='inner'>
-						<nav class='enter google-translate-attr'>
-							<!-- <a href='/<%- language %>/browse/pads/public'>
-								<button type='button' class='highlight'><%- vocabulary['browse publications'][language] %></button>
-							</a> -->
-							<% if (!logged) { %>
+				<% if (!logged) { %>
+					<div class='public-page-panel sm-padding'>
+						<div class='inner'>
+							<nav class='enter google-translate-attr'>
 								<a href='/login'><button type='button' class='highlight'><%- vocabulary['log in'][language] %></button></a>
 								<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 								<!-- TO DO: TRANSLATE -->
-							<% } %>
-						</nav>
+							</nav>
+						</div>
 					</div>
-				</div>
+				<% } %>
 
-				<div class='outer'>
+				<div class='outer lg xl xxl'>
 					<% if (pages > 1 && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
 						<p class='nav-info google-translate-attr'>&larr; <%- vocabulary['navigate here'][language] %></p>
 					<% } %>
@@ -383,10 +428,10 @@
 			</main>
 		</div>
 
-		<div class='sidebar lg'>
+		<div class='sidebar xl xxl'>
 			<div class='inner'>
 				<%# if (pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
-				<% if (mapscale !== 'full-screen') { %>
+				<% if (mapscale !== 'full-screen' && pagedisplay !== "slideshow") { %>
 					<%- include ('./modules/statistics.ejs') %>
 					<%- include ('../partials/filters.ejs') %>
 				<% } %>
@@ -395,17 +440,19 @@
 	</div>
 </div>
 
-<% if (pagedisplay !== 'slideshow') { %><footer>
-<% } else { %><footer class='slideshow'><% } %>
-	<nav class='pagination xs sm m'>
-		<% if (activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
-	</nav>
-	<% if (pagedisplay === 'slideshow') { %>
+<% if (pagedisplay !== 'slideshow') { %>
+	<footer>
+		<nav class='pagination xs sm m'>
+			<% if (activity === 'browse') { %><%- include('./modules/pagination') %><% } %>
+		</nav>
+	</footer>
+<% } else { %>
+	<footer class='slideshow'>
 		<div class='inner'>
 			<div class='dots'></div>
 		</div>
-	<% } %>
-</footer>
+	</footer>
+<% } %>
 
 
 <%- include ('../partials/footer.ejs') %>
@@ -426,9 +473,9 @@
 		.each(function (d) {
 			const section = d3.select(this)
 			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
-			if (mediaSize === 'xs') {
-				section.classed('columns', true)
-				d.data.forEach(c => section.call(renderVignette, { data: c, display: 'columns' }))
+			if (mediaSize === 'xs' && '<%- object %>' === 'pads') {
+				section.classed('<%- pagedisplay === "slideshow" ? pagedisplay : "columns" %>', true)
+				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay === "slideshow" ? pagedisplay : "columns" %>' }))
 			} else {
 				section.classed('<%- pagedisplay %>', true)
 				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay %>' }))

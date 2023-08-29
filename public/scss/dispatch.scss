@@ -1,16 +1,18 @@
 /* https://www.freecodecamp.org/news/css-media-queries-breakpoints-media-types-standard-resolutions-and-more/ */
-
+/* https://www.browserstack.com/guide/ideal-screen-sizes-for-responsive-design */
 @import '_base';
+@import '_base.print';
 
 @import 'google-translate';
 
-/* Small devices (landscape phones, 480px and up) */
-@media (max-width: 480px) {
-/*@media (max-width: 480px) and (orientation: portrait) {*/
+
+/* Extra small devices */
+@media screen and (max-width: 767px) {
 	@import '_base.xs';
 	@import '_navigate.xs';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map';
+	@import '_map.xs';
 	@import '_modals.lg';
 
 	@import '_login.lg';
@@ -21,54 +23,96 @@
 	@import '_orgfooter.lg';
 	@import '_exploration.lg';
 }
-/* Medium devices (tablets, 768px and up) */
-@media (max-width: 768px) {
-	@import '_base.xs';
-	@import '_navigate.xs';
+/* Small devices */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+	@import '_base.sm';
+	@import '_navigate.sm';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map';
+	@import '_map.sm';
 	@import '_modals.lg';
 
 	@import '_login.lg';
-	@import '_pad.xs';
+	@import '_pad.sm';
 	@import '_profile.xs';
-	@import '_browse.xs';
+	@import '_browse.sm';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
 	@import '_exploration.lg';
 }
-/* Large devices (desktops, 1024px and up) */
-@media (max-width: 1024px) {
+/* Medium devices */
+@media screen and (min-width: 1024px) and (max-width: 1199px) {
 	@import '_base.m';
 	@import '_navigate.m';
 	@import '_filter.lg';
-	@import '_map.lg';
+	@import '_map';
+	@import '_map.m';
 	@import '_modals.lg';
 
 	@import '_login.lg';
-	@import '_pad.xs';
-	@import '_profile.xs';
+	@import '_pad.m';
+	@import '_profile.lg';
 	@import '_browse.m';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
 	@import '_base.print';
 	@import '_exploration.lg';
 }
-/* Extra large devices (large desktops, 1200px and up) */
-@media (min-width: 1200px) {
+/* Large devices */
+@media screen and (min-width: 1200px) and (max-width: 1365px) {
 	@import '_base.lg';
 	@import '_navigate.lg';
 	@import '_filter.lg';
+	@import '_map';
 	@import '_map.lg';
 	@import '_modals.lg';
 
 	@import '_login.lg';
 	@import '_pad.lg';
 	@import '_profile.lg';
+	@import '_import';
 	@import '_import.lg';
 	@import '_browse.lg';
 	@import '_mobilize.lg';
 	@import '_orgfooter.lg';
+	@import '_base.print';
+	@import '_exploration.lg';
+}
+/* Extra large devices */
+@media screen and (min-width: 1366px) {
+	@import '_base.xl';
+	@import '_navigate.xl';
+	@import '_filter.lg';
+	@import '_map';
+	@import '_map.xl';
+	@import '_modals.lg';
+
+	@import '_login.lg';
+	@import '_pad.lg';
+	@import '_profile.lg';
+	@import '_import';
+	@import '_browse.xl';
+	@import '_mobilize.lg';
+	@import '_orgfooter.xl';
+	@import '_base.print';
+	@import '_exploration.lg';
+}
+/* Extra extra large devices */
+@media screen and (min-width: 1920px) {
+	@import '_base.xl';
+	@import '_navigate.xl';
+	@import '_filter.lg';
+	@import '_map';
+	@import '_map.xl';
+	@import '_modals.lg';
+
+	@import '_login.lg';
+	@import '_pad.lg';
+	@import '_profile.lg';
+	@import '_import';
+	@import '_browse.xl';
+	@import '_mobilize.lg';
+	@import '_orgfooter.xl';
 	@import '_base.print';
 	@import '_exploration.lg';
 }

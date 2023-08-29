@@ -27,7 +27,7 @@
 <%- include ('partials/menu-languages.ejs') %> 
 
 
-<div class='main-content'>
+<div class='main-content import'>
 	<header>
 		<div class='inner'>
 			<%- include ('partials/menu-logo.ejs') %> 
@@ -135,6 +135,8 @@
 </div>
 
 <script type='text/javascript'>
+	const publicpage = false // THIS IS FOR THE PAD PREVIEW
+
 	const pagebody = d3.select('body')
 	const searchForm = pagebody.select('form#contribute')
 	const main = d3.select('div.table main')
@@ -168,19 +170,18 @@
 				const media = workbook.keys.filter(k => k.includes('media/image'))
 
 				images = media.map((m, i) => {
-					const name = workbook.files[m].name.split('media/')[1]
-					const buffer = workbook.files[m]._data.getContent()
+					const name = workbook.files[m].name // .split('media/')[1]
+					const buffer = workbook.files[m].content.buffer // workbook.files[m]._data?.getContent()
 					
 					const blob = new Blob([buffer], {'type': 'image/png'})
 					const urlCreator = window.URL || window.webkitURL
 					const imageUrl = urlCreator.createObjectURL(blob)
-					return { id: name.extractDigits(), type: 'img', src: imageUrl }	
+					return { id: name?.extractDigits(), type: 'img', src: imageUrl }	
 				})
 			}
 			workbook.SheetNames.forEach((s, i) => {
 				const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], { defval: null })
 
-				console.log(json)
 				let keys = Object.keys(json[0])
 				if (images.length) {
 					// WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
@@ -293,7 +294,6 @@
 				// CHECK IF KEY IS UNIQUE OR GROUPED
 				if (Array.isArray(d)) {
 					const obj = {}
-					console.log(d)
 					obj.key = `Group [${d.join(', ')}]`
 					const prefix = seekPrefix(d)
 
@@ -787,8 +787,7 @@
 										if (typeof a === 'string' && typeof b === 'string') return a?.localeCompare(b)
 										else return a - b
 									}).join(', ')
-								} else item.txt = c.entries[i]
-								console.log(item)
+								} else item.txt = c.entries[i] ?? ''
 								item.has_content = item.txt?.toString().trim()?.length > 0
 							}
 							// item.type = c.type
@@ -799,7 +798,7 @@
 						}
 						if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('embed')) {
 							if (!structureOnly) {
-								item.html = c.entries[i]
+								item.html = c.entries[i] ?? ''
 								item.has_content = item.html?.trim()?.length > 0
 							}
 							// item.type = c.type

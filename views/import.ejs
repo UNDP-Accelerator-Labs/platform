@@ -119,11 +119,13 @@
 					<div class='btn-group'>
 						<form>
 							<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
+								<!-- TO DO: TRANSLATE -->
 								<i class='material-icons'>layers</i>
 							</button>
 						</form>
 						<form>
 							<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
+								<!-- TO DO: TRANSLATE -->
 								<i class='material-icons'>delete_forever</i>
 							</button>
 						</form>
@@ -360,7 +362,7 @@
 		})
 		Promise.all(cols).then(data => renderTable(data))
 	}
-	function renderTable (cols) {
+	function renderTable (cols, update = false) {
 		body.select('.btn-group').classed('hide', false)
 		const table = body.addElems('div', 'table-container')
 			.addElems('table', 'xls-preview', [cols])
@@ -375,7 +377,7 @@
 		const selectCols = moduleHead.addElems('tr', 'column-selection')
 		selectCols.addElems('th', 'selection', d => d)
 			.classed('selected left right top bottom disabled', false)
-			.attr('title', 'Select column.')
+			.attr('title', 'Select column.') // TO DO: TRANSLATE
 		.on('click', function (d, i) {
 			const evt = d3.event
 			const node = this
@@ -558,11 +560,12 @@
 			return obj
 		}).attrs({ 
 			'value': d => d.value,
-			'selected': function (d) {
-				const type = d3.select(this).findAncestor('type').datum().type
-				if (type === d.value) return true
-				else return null
-			}, 'disabled': d => d.disabled
+			// 'selected': function (d) {
+			// 	const type = d3.select(this).findAncestor('type').datum().type
+			// 	if (type === d.value) return true
+			// 	else return null
+			// }, 
+			'disabled': d => d.disabled
 		}).html(d => d.label)
 
 		const metaOpts = columntypes.addElems('optgroup', 'group-meta')
@@ -611,18 +614,23 @@
 			return obj
 		}).attrs({
 			'value': d => d.value,
-			'selected': function (d) {
-				const type = d3.select(this).findAncestor('type').datum().type
-				if (type === d.value) return true
-				else return null
-			}, 'disabled': d => d.disabled
+			// 'selected': function (d) {
+			// 	const type = d3.select(this).findAncestor('type').datum().type
+			// 	if (type === d.value) return true
+			// 	else return null
+			// }, 
+			'disabled': d => d.disabled
 		}).html(d => {
 			if (d.limit) return `${d.label} (limited to ${d.limit})` // TO DO: TRANSLATION
 			else return d.label
 		})
 
+		columntypes.each(function (d) { 
+			this.value = d.type
+		})
+
 		// IMMEDIATELY DISABLE OPTIONS ACCORDING TO INFERRED TYPES
-		columntypes.each(function (d) { this.dispatchEvent(new Event('change')) }) 
+		if (!update) columntypes.each(function (d) { this.dispatchEvent(new Event('change')) }) 
 
 		// RENDER THE TABLE BODY
 		const show = 5 // THIS IS TO LIMIT THE NUMBER OF ROWS DISPLAYED
@@ -1196,7 +1204,8 @@
 			d3.selectAll('div.media-container, div.meta-container').each(d => neworder.push(d.instruction))
 
 			neworder = neworder.map(d => cols.find(c => c.key === d))
-			renderTable(neworder)
+			
+			renderTable(neworder, true)
 
 			modal.remove()
 			screen.classed('hide', true)

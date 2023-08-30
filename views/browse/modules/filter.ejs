@@ -182,6 +182,7 @@
 <script type='text/javascript'>
 	let curSelectSTM = 'stm-browse';
 	let hasUsedExploration = false;
+	if (!mediaSize) var mediaSize = getMediaSize()
 
 	function updateExplorationHint() {
 		d3.selectAll('.stm-hint').classed('stm-hidden', () => {
@@ -268,16 +269,23 @@
 		if (top + 300 >= viewheight) dropdown.classed('dropup', true)
 
 		const filters = d3.select(this).findAncestor('filters')
+		
 		if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
-		if (filters) filters.node().style.overflow = 'visible'
+		if (filters.node()) filters.node().style.overflow = 'visible'
+
+		if (mediaSize === 'xs') d3.select(this).findAncestor('filter').classed('expand', true)
 
 		dropdown.selectAll('label, a').on('mousedown', function () {
 			d3.event.preventDefault()
 			// this.previousElementSibling.setAttribute('checked', '')
 		})
 	}).on('blur', function () {
-		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+		const filter = d3.select(this).findAncestor('filter')
+		const dropdown = filter.select('.dropdown')
 		if (dropdown.node()) dropdown.node().style.maxHeight = null
+		if (mediaSize === 'xs') {
+			setTimeout(_ => filter.classed('expand', false), 250)
+		}
 	})
 
 	// PIN ALL SEARCH BAR
@@ -307,16 +315,30 @@
 				d3.select('#new-pinboard').node().click()
 			}
 		}).on('focus', function (d) {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+			const filters = d3.select('#search-and-filter')
+			const filter = d3.select(this).findAncestor('filter')
+			const dropdown = filter.select('.dropdown')
+			if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+			if (filters.node()) filters.node().style.overflow = 'visible'
+
+			if (mediaSize === 'xs') filter.classed('expand', true)
 
 			dropdown.selectAll('li').on('mousedown', function () {
 				d3.event.preventDefault()
 			})
 		}).on('blur', function () {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = null
+			const filters = d3.select('#search-and-filter')
+			const filter = d3.select(this).findAncestor('filter')
+			const dropdown = filter.select('.dropdown')
+			
+			if (dropdown.node()) dropdown.node().style.maxHeight = null
+			if (filters.node) filters.node().style.overflow = 'auto'
+
 			fixLabel(this) // THIS IS NOT WORKING
+
+			if (mediaSize === 'xs') {
+				setTimeout(_ => filter.classed('expand', false), 250)
+			}
 		})
 
 		d3.select('#new-pinboard')

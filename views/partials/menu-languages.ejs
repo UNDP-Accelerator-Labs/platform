@@ -28,7 +28,7 @@
 		<li class='options'>
 			<ul>
 				<% languages.forEach(d => { %>
-					<li id='lang-<%- d.language %>'>
+					<li id='lang-<%- d.language %>' class='sm m lg xl xxl'>
 						<a class='notranslate <% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
 					</li>
 				<% }) %>

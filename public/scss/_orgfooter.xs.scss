@@ -11,18 +11,14 @@
 	z-index: 10000;
 
 	.footer-row {
-		display: grid;
-		grid-gap: 0;
-		grid-template-columns: 1fr calc(300px * 3 + 15px * 3 + 45px);
 		width: 100%;
 		margin-bottom: 1rem;
 
 		.footer-column {
-			display: block;
-
 			.footer-img {
-				max-width: 100%;
+				width: calc(100% + 60px);
 				height: auto;
+				margin-left: -30px;
 			}
 			h3 {
 				font-weight: bold;
@@ -35,13 +31,13 @@
 				.logo {
 					display: block;
 					height: 125px;
-					margin: 0 auto 15px auto;
-					padding-right: 60px
+					margin: 0 auto 15px 45px;
 				}
 				small {
 					display: block;
 					font-size: $t-small;
-					text-align: center;
+					text-align: left;
+					margin-left: 45px;
 				}
 
 			}
@@ -74,22 +70,31 @@
 			}
 		}
 
-		
-
 		.footer-column.left {
 			.inner {
 				padding-top: 30px;
 			}
 		}
 		.footer-column.center {
-			padding: 0 15px;
 			& > .inner {
-				padding-left: 0px;
+				padding-top: 30px;
+
+				h3 {
+					margin-top: 0;
+				}
+			}
+		}
+		.footer-column.right {
+			& > .inner {
+				padding-top: 0;
+
+				h3 {
+					margin-top: 0;
+				}
 			}
 		}
 	}
 	.footer-row.signature {
-		display: block;
 		padding: 0 45px;
 
 		.inner {

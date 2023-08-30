@@ -730,7 +730,11 @@ const Entry = function (_kwargs) {
 						.addElems('a')
 							.attrs({ 'href': d => `/forward/<%- object.slice(0, -1) %>?id=${d.source}&mobilization=${d.id}` }) // TO DO: CHECK THIS WORKS
 							.addElems('button')
-							.html(d => d.title)
+							.html(d => {
+								if (!mediaSize) var mediaSize = getMediaSize()
+								if (mediaSize === 'xs' && d.title.length > 25) return `${d.title.slice(0, 25)}…`
+								else return d.title
+							})
 						.on('click', function (d) {
 							const sel = d3.select(this)
 							const li = sel.findAncestor('forward-option')
@@ -929,16 +933,20 @@ const Entry = function (_kwargs) {
 				}).on('focus', function (d) {
 					renderDropdown(d.id);
 
-					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+					const filter = d3.select(this).findAncestor('filter')
+					const dropdown = filter.select('.dropdown')
 					let { top, height } = this.getBoundingClientRect()
 					top = top + height
 					const viewheight = window.innerHeight
 					if (!mediaSize) var mediaSize = getMediaSize()
 					if (mediaSize === 'xs') {
-						const { height: padding } = d3.select('#search-and-filter').node().getBoundingClientRect()
-						if (!padding) padding = 0
-						if (top + 300 >= viewheight - padding) dropdown.classed('dropup', true)
-						else dropdown.classed('dropup', false)
+						// const { height: padding } = d3.select('#search-and-filter').node().getBoundingClientRect()
+						// if (!padding) padding = 0
+						// if (top + 300 >= viewheight - padding) dropdown.classed('dropup', true)
+						// else dropdown.classed('dropup', false)
+
+						filter.classed('expand', true)
+
 					} else if (top + 300 >= viewheight) dropdown.classed('dropup', true)
 					else dropdown.classed('dropup', false)
 
@@ -948,9 +956,14 @@ const Entry = function (_kwargs) {
 						d3.event.preventDefault()
 					})
 				}).on('blur', function () {
-					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+					const filter = d3.select(this).findAncestor('filter')
+					const dropdown = filter.select('.dropdown')
 					dropdown.node().style.maxHeight = null
 					fixLabel(this)
+
+					if (mediaSize === 'xs') {
+						setTimeout(_ => filter.classed('expand', false), 250)
+					}
 				})
 
 				newpin.addElems('label')

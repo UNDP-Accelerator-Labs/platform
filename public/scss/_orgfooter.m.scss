@@ -13,7 +13,7 @@
 	.footer-row {
 		display: grid;
 		grid-gap: 0;
-		grid-template-columns: 1fr calc(300px * 3 + 15px * 3 + 45px);
+		grid-template-columns: 2fr 8fr;
 		width: 100%;
 		margin-bottom: 1rem;
 
@@ -35,8 +35,7 @@
 				.logo {
 					display: block;
 					height: 125px;
-					margin: 0 auto 15px auto;
-					padding-right: 60px
+					margin: 0 auto 15px 45px;
 				}
 				small {
 					display: block;
@@ -83,8 +82,10 @@
 		}
 		.footer-column.center {
 			padding: 0 15px;
+			
 			& > .inner {
-				padding-left: 0px;
+				padding-left: 30px;
+				padding-right: 30px;
 			}
 		}
 	}

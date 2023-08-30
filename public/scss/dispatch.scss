@@ -20,7 +20,7 @@
 	@import '_profile.xs';
 	@import '_browse.xs';
 	@import '_mobilize.lg';
-	@import '_orgfooter.lg';
+	@import '_orgfooter.xs';
 	@import '_exploration.lg';
 }
 /* Small devices */
@@ -37,7 +37,7 @@
 	@import '_profile.xs';
 	@import '_browse.sm';
 	@import '_mobilize.lg';
-	@import '_orgfooter.lg';
+	@import '_orgfooter.sm';
 	@import '_exploration.lg';
 }
 /* Medium devices */
@@ -52,9 +52,11 @@
 	@import '_login.lg';
 	@import '_pad.m';
 	@import '_profile.lg';
+	@import '_import';
+	@import '_import.m';
 	@import '_browse.m';
 	@import '_mobilize.lg';
-	@import '_orgfooter.lg';
+	@import '_orgfooter.m';
 	@import '_base.print';
 	@import '_exploration.lg';
 }

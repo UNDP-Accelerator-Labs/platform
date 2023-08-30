@@ -85,15 +85,16 @@
 <%- include ('../../partials/menu-languages.ejs') %>
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
-<div class='main-content'>
+<div class='main-content<% if (pagedisplay.includes("adjacent")) { %> adjacent<% } %>'>
 <header<% if (pagedisplay === 'slideshow' || pagedisplay.includes('adjacent')) { %> class='folded'<% } %>>
 	<div class='inner'>
 		<%- include ('../../partials/menu-logo.ejs') %>
 	</div>
 </header>
 
-
-<div class='filler m'></div>
+<% if (!pagedisplay.includes('adjacent')) { %>
+	<div class='filler m'></div>
+<% } %>
 
 <%- include ('../../partials/modals.ejs') %>
 
@@ -104,7 +105,7 @@
 				<button><%- vocabulary['hide source'][language] %></button>
 			</a></div>
 		<% } %>
-		<div id='source' class='document split-screen lg xl xxl'></div>
+		<div id='source' class='document split-screen m lg xl xxl'></div>
 		<script type='text/javascript'>
 			loadHTML('../view/pad?id=<%- locals.source %><% if (object === "review" || locals.data?.is_review) { %>&anonymize=true<% } %>', '#pad', '#source')
 
@@ -115,7 +116,7 @@
 			d3.select('div.display-source a').attr('href', `?${queryparams.toString()}`)
 		</script>
 	<% } else { %>
-		<div class='display-option display-source lg xl xxl <% if (locals.data?.reviews?.length > 0) { %>split-screen<% } %>'><a>
+		<div class='display-option display-source m lg xl xxl <% if (locals.data?.reviews?.length > 0) { %>split-screen<% } %>'><a>
 			<button><%- vocabulary['display source'][language] %></button>
 		</a></div>
 		<script type='text/javascript'>
@@ -400,6 +401,9 @@
 		</div>
 	</main>
 </div>
+<% console.log(pagedisplay) %>
+<% console.log(!pagedisplay.includes('adjacent')) %>
+<% if (!pagedisplay.includes('adjacent')) { %>
 <div class='sidebar xs sm m lg xl xxl'>
 	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
 	{ %>
@@ -496,6 +500,7 @@
 		</script>
 	<% } %>
 </div>
+<% } %>
 </div>
 
 <% if (pagedisplay !== 'slideshow') { %><footer>

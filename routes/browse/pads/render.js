@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	if (public && !(['public', 'pinned'].includes(space) || instance)) res.redirect('/login')
-	else if (rights < modules.find(d => d.type === 'pads')?.rights.read && !(space === 'public' || instance)) res.redirect(`./public`)
+	else if (rights < modules.find(d => d.type === 'pads')?.rights.read && !(['public', 'pinned'].includes(space) || instance)) res.redirect(`./public`)
 	else {
 		let { mscale, display, pinboard } = req.query || {}
 		const path = req.path.substring(1).split('/')

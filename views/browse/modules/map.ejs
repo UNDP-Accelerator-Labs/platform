@@ -15,7 +15,7 @@
 	}
 %>
 
-<div class='map-container<% if (mapscale !== "full-screen") { %> lg<% } %> <%- mapscale %>'>
+<div class='map-container<% if (mapscale !== "full-screen") { %> m lg xl xxl<% } %> <%- mapscale %>'>
 	<div id='map'>
 	</div>
 	<!-- <% if (locals.session_data?.logged) { %>
@@ -28,7 +28,7 @@
 		!(space === 'pinned'
 		&& (!locals.pinboard?.editable || activity === 'preview'))
 	) { %>
-		<div class='btn-group map-scale lg'>
+		<div class='btn-group map-scale xs sm m lg xl xxl'>
 			<a class='mscale'>
 				<i class='material-icons'>
 					<% if (mapscale === 'contain') { %>
@@ -108,6 +108,17 @@ if (drawMap) {
 			section.classList.add('<%- object %>')
 			const body = d3.select(section)
 				.addElems('div', 'layout columns', [data])
+				.on('scroll', function () {
+					const slide = d3.select(this).select('article')
+					const slidewidth = slide.node().clientWidth || slide.node().offsetWidth || slide.node().scrollWidth || 300
+					if (this.scrollLeft % slidewidth === 0) {
+						idx = Math.round(this.scrollLeft / slidewidth)
+						d3.selectAll('.dot').classed('highlight', (d, i) => i === idx)
+						d3.selectAll('button.slide-nav').classed('hide', d => {
+							return (d.class === 'prev' && idx === 0) || (d.class === 'next' && idx === slides.size() - 1)
+						})
+					}
+				})
 			.each(function (d) {
 				const section = d3.select(this)
 

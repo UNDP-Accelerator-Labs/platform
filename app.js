@@ -25,7 +25,7 @@ app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, './public')))
 app.use('/scripts', express.static(path.join(__dirname, './node_modules')))
 app.use('/config', express.static(path.join(__dirname, './config')))
-app.use(bodyparser.json({ limit: '50mb' }))
+app.use(bodyparser.json({ limit: '50mb' }))	
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 
 if (process.env.NODE_ENV === 'production') {
@@ -234,6 +234,7 @@ app.route('/api/datasources') // TO DO: THIS SHOULD BE DEPRECATED
 app.route('/:language/:instance')
 	.get(routes.check.login, routes.dispatch.browse)
 
+app.get('/module-error', routes.error)
 app.get('*', routes.notfound)
 
 // RUN THE SERVER

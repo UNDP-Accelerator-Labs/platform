@@ -1,0 +1,67 @@
+.main-content.import {
+	display: grid;
+	grid-gap: 0;
+	grid-template-columns: 0 1fr 0;
+
+	.table {
+		width: 100vw;
+
+		.import-module {
+			width: 100%;
+
+			.head {
+				width: 100%;
+			}
+		}
+	}
+}
+
+.table-sidebar {
+	position: relative;
+	z-index: 1000;
+	pointer-events: none;
+
+	& > .inner {
+		width: 0;
+		float: right;
+		background-color: #FFF;
+
+		.media-input-group {
+			position: fixed;
+			pointer-events: all;
+			top: calc(50vh - 60px);
+		}
+	}
+}
+
+.modal.pad-preview {
+	align-self: flex-start;
+	width: auto;
+	margin: 0;
+
+	.close {
+		position: sticky;
+		top: 0px;
+	}
+
+	.document {
+		float: none;
+		height: calc(100vh - 30px);
+		margin: auto;
+		overflow: auto;
+		box-sizing: border-box;
+
+		main {
+			padding: 0;
+			margin: 0 auto;
+
+			.inner {
+				border-top: 0;
+				box-shadow: none;
+				max-height: none;
+				overflow-y: unset;
+			}
+		}
+	}
+
+}

@@ -839,8 +839,14 @@ exports.api.datasources = (req, res) => {
 	}
 }
 
-exports.notfound = (req, res) => {
-	res.send(`${req.originalUrl} is not the route that you are looking for`)
+exports.notfound = async(req, res) => {
+	const metadata = await helpers.datastructures.pagemetadata({ req, res })
+	res.render('error-404', metadata)
+}
+
+exports.error = async(req, res) => {
+	const metadata = await helpers.datastructures.pagemetadata({ req, res })
+	res.render('error-500', metadata)
 }
 
 String.prototype.simplify = function () {

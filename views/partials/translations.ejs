@@ -498,10 +498,10 @@
 			"pt": "Conecte-se"
 		},
 		"logged in": {
-			"en": (user, uuid) => "You are logged in as <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
-			"fr": (user, uuid) => "Vous êtes identifé.e en tant que <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
-			"es": (user, uuid) => "Has iniciado sesión como <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
-			"pt": (user, uuid) => "Você está logado como <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>"
+			"en": (user, uuid) => "<span class='sm m lg xl xxl'>You are logged in as </span><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"fr": (user, uuid) => "<span class='sm m lg xl xxl'>Vous êtes identifé.e en tant que </small><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"es": (user, uuid) => "<span class='sm m lg xl xxl'>Has iniciado sesión como </small><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"pt": (user, uuid) => "<span class='sm m lg xl xxl'>Você está logado como </small><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>"
 		},
 		"log out": {
 			"en": "Log out",
@@ -2927,16 +2927,16 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
 		"showing range": { // USED
 			"en": (min, max) => {
-				return "Showing range [ " + min + " – " + max + " ]"
+				return "Showing range [&nbsp;" + min + " – " + max + "&nbsp;]"
 			},
 			"fr": (min, max) => {
-				return "Affichant l’intervale [ " + min + " – " + max + " ]"
+				return "Affichant l’intervale [&nbsp;" + min + " – " + max + "&nbsp;]"
 			},
 			"es": (min, max) => {
-				return "Mostrando rango [ " + min + " – " + max + " ]"
+				return "Mostrando rango [&nbsp;" + min + " – " + max + "&nbsp;]"
 			},
 			"pt": (min, max) => {
-				return "Mostrando alcance [ " + min + " – " + max + " ]"
+				return "Mostrando alcance [&nbsp;" + min + " – " + max + "&nbsp;]"
 			}
 		},
 		"showing letter": { // USED

@@ -545,9 +545,10 @@ div.browse {
 			}
 			.stm-hint {
 				display: inline-block;
-				position: absolute;
-				transform: translate(-3px, -15px);
+				/*position: absolute;
+				transform: translate(-3px, -15px);*/
 				padding: 0 5px;
+				margin-left: 5px;
 				border-radius: 5px;
 				border-bottom-left-radius: 0;
 				color: $c-dark-grey;

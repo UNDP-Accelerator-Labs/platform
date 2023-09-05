@@ -6,8 +6,10 @@ html, body {
 }
 .xs:not(.lg),
 .sm:not(.lg),
+.m:not(.lg),
 .lg:not(.lg),
-.xl:not(.lg) {
+.xl:not(.lg),
+.xxl:not(.lg) {
 	display: none !important;
 }
 

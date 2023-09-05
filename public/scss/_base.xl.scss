@@ -7,7 +7,8 @@ html, body {
 .xs:not(.xl),
 .sm:not(.xl),
 .m:not(.xl),
-.xl:not(.xl) {
+.lg:not(.xl),
+.xxl:not(.xl) {
 	display: none !important;
 }
 

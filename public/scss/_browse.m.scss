@@ -557,6 +557,7 @@ div.browse {
 				position: absolute;
 				transform: translate(-3px, -15px);
 				padding: 0 5px;
+				margin-left: 5px;
 				border-radius: 5px;
 				border-bottom-left-radius: 0;
 				color: $c-dark-grey;
@@ -565,6 +566,7 @@ div.browse {
 				cursor: pointer;
 				user-select: none;
 				pointer-events: all;
+				white-space: nowrap;
 			}
 			.stm-hidden {
 				display: none;
@@ -1026,7 +1028,7 @@ div.browse {
 			}
 		}
 	}
-	
+
 	nav:not(.tabs) {
 		width: 100%;
 		margin: 0 0 30px -15px;
@@ -2424,7 +2426,7 @@ div.browse.slideshow {
 							.head {
 								flex: unset;
 								position: static;
-								
+
 								.meta-group {
 									position: relative;
 									z-index: 10;

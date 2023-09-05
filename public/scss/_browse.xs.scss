@@ -1,6 +1,6 @@
 div.public-page-header {
 	min-height: 100vh;
-	
+
 	div.carousel {
 		position: relative;
 		width: 100%;
@@ -564,16 +564,19 @@ div.browse {
 			.stm-hint {
 				display: inline-block;
 				position: absolute;
-				transform: translate(-3px, -15px);
+				transform: translate(-3px, 15px);
 				padding: 0 5px;
+				margin-left: 5px;
 				border-radius: 5px;
-				border-bottom-left-radius: 0;
+				border-top-left-radius: 0;
 				color: $c-dark-grey;
 				background-color: $c-mid-yellow;
 				z-index: 1;
 				cursor: pointer;
 				user-select: none;
 				pointer-events: all;
+				width: max-content;
+				max-width: 40vw;
 			}
 			.stm-hidden {
 				display: none;
@@ -2578,7 +2581,7 @@ div.browse.slideshow {
 							.head {
 								flex: unset;
 								position: static;
-								
+
 								.meta-group {
 									position: relative;
 									padding: 0 15px;

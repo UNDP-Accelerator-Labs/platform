@@ -271,7 +271,7 @@
 		const filters = d3.select(this).findAncestor('filters')
 		
 		if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
-		if (filters.node()) filters.node().style.overflow = 'visible'
+		if (filters?.node()) filters.node().style.overflow = 'visible'
 
 		if (mediaSize === 'xs') d3.select(this).findAncestor('filter').classed('expand', true)
 

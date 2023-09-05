@@ -8,7 +8,8 @@ html, body {
 .sm:not(.xs),
 .m:not(.xs),
 .lg:not(.xs),
-.xl:not(.xs) {
+.xl:not(.xs),
+.xxl:not(.xs) {
 	display: none !important;
 }
 

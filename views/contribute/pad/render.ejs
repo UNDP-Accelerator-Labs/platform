@@ -976,7 +976,11 @@ function addImg (kwargs) {
 	if (src) {
 		const img = new Image()
 		img.onload = function () {
-			media.media.addElems('img').attrs({ 'class': d => d.scale, 'src': d => this.src })
+			media.media.addElems('img')
+			.attrs({ 
+				'class': d => d.scale, 
+				'src': d => this.src 
+			}).on('click', d => renderImgZoom({ src: this.src }))
 		}
 		img.onerror = function (err) {
 			if (err) console.log(err)

@@ -14,10 +14,11 @@ const filter = include('routes/browse/pads/filter')
 
 module.exports = async (req, res) => {
 	const { action } = req.params || {}
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments, transpose_locations } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
 	if (typeof include_data === 'string') include_data = JSON.parse(include_data)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
+	if (typeof transpose_locations === 'string') transpose_locations = JSON.parse(transpose_locations)
 	if (action === 'fetch') include_data = true
 
 	const pw = req.session.email || null
@@ -362,7 +363,7 @@ module.exports = async (req, res) => {
 								var headers = flat_content.find(d => Object.keys(d).length === Math.max(...content_lengths))
 								headers = Object.keys(headers).filter(c => c !== 'pad_id')
 							}
-
+							const modifiedValues = [];
 							pad_group.values.forEach(d => {
 								// ANONYMIZE CONTRIBUTORS
 								// NOTE THIS id IS COMMON TO ALL WORKBOOKS (IF SEVERAL ARE GENERATED)
@@ -403,14 +404,26 @@ module.exports = async (req, res) => {
 								if (single_sheet && include_locations) {
 									const pad_locations = locations.filter(c => c.pad_id === d.pad_id)
 									for (let i = 0; i < max_locations; i ++) {
-										if (pad_locations[i]) {
+										//ADD A NEW ROW WITH SINGLE LAT/LNG WHEN transpose_locations IS TRUE
+										if(transpose_locations && pad_locations[i]){
+											const { lat, lng } = pad_locations[i]
+											const modifiedRow = { ...d };
+											modifiedRow[`location-lat`] = lat;
+											modifiedRow[`location-lng`] = lng;
+											modifiedValues.push(modifiedRow);
+										}
+										else if (pad_locations[i]) {
 											const { lat, lng } = pad_locations[i]
 											d[`location-${i + 1}-lat`] = lat
 											d[`location-${i + 1}-lng`] = lng
 										}
 									}
-								}
+								} 
 							})
+
+							if(transpose_locations){
+								pad_group.values = modifiedValues;
+							}
 
 							const data_sheet = XLSX.utils.json_to_sheet(pad_group.values)
 							XLSX.utils.book_append_sheet(wb, data_sheet, 'data-main')

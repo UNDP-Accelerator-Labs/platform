@@ -30,7 +30,8 @@ module.exports = async kwargs => {
 					OR $2 > 2)
 					$3:raw
 				GROUP BY t.id
-			;`, [ uuid, rights, f_space ]).then(results => { 
+			;`, [ uuid, rights, f_space ])
+			.then(results => { 
 				// THIS NEEDS SOME CLEANING FOR THE FRONTEND
 				const templates = results.map(d => {
 					const obj = {}

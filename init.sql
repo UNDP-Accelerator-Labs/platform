@@ -136,7 +136,7 @@ CREATE TABLE mobilizations (
 	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	owner uuid,
 	template INT REFERENCES templates(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	status INT DEFAULT 1, 
+	status INT DEFAULT 1,
 	public BOOLEAN DEFAULT FALSE,
 	start_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	end_date TIMESTAMPTZ,
@@ -146,7 +146,7 @@ CREATE TABLE mobilizations (
 	pad_limit INT DEFAULT 1,
 	description TEXT,
 	language VARCHAR(9),
-	collection INT REFERENCES pinboards(id),
+	old_collection INT,
 	version ltree
 );
 CREATE INDEX version_idx ON mobilizations USING GIST (version);
@@ -163,8 +163,21 @@ CREATE TABLE mobilization_contributions (
 	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE extern_db (
+	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	db VARCHAR(20) UNIQUE NOT NULL,
+	url_prefix TEXT NOT NULL
+);
+INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://acclabs-actionlearningplans.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('exp', 'https://acclabs-experiments.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://acclabs.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://acclabs-solutionsmapping.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://acclabs.azurewebsites.net/');
+
 CREATE TABLE pinboards (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+	old_id INT,
+	old_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	title VARCHAR(99),
 	description TEXT,
 	-- host INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -176,24 +189,26 @@ CREATE TABLE pinboards (
 	display_fullscreen BOOLEAN DEFAULT FALSE,
 	slideshow BOOLEAN DEFAULT FALSE,
 	"date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	mobilization INT REFERENCES mobilizations(id) ON UPDATE CASCADE ON DELETE CASCADE -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
+	mobilization_db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	mobilization INT  -- THIS IS TO CONNECT A PINBOARD DIRECTLY TO A MOBILIZATION
 );
+-- for migrating
+ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner, old_db);
+ALTER TABLE pinboards DROP CONSTRAINT IF EXISTS unique_pinboard_owner;
 ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner);
 
 CREATE TABLE pinboard_contributors (
-	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-	-- contributor INT REFERENCES contributors(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	participant uuid,
-	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE	
+	participant uuid NOT NULL,
+	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
+	PRIMARY KEY (participant, pinboard)
 );
-ALTER TABLE pinboard_contributors ADD CONSTRAINT unique_pinboard_contributor UNIQUE (participant, pinboard);
 
 CREATE TABLE pinboard_contributions (
-	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-	pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
+	pad INT NOT NULL,
+	db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	PRIMARY KEY (pad, db, pinboard)
 );
-ALTER TABLE pinboard_contributions ADD CONSTRAINT unique_pad_pinboard UNIQUE (pad, pinboard);
 
 CREATE TABLE tagging (
 	id SERIAL PRIMARY KEY UNIQUE NOT NULL,
@@ -279,3 +294,22 @@ CREATE TABLE "session" (
 WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
+-- exploration tables
+CREATE TABLE IF NOT EXISTS public.exploration
+(
+    id SERIAL UNIQUE NOT NULL,
+    uuid uuid NOT NULL,
+    prompt text COLLATE pg_catalog."default" NOT NULL,
+    last_access timestamp with time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    linked_pinboard INT UNIQUE NOT NULL REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT exploration_pkey PRIMARY KEY (id, uuid, prompt),
+    CONSTRAINT id_key UNIQUE (id),
+	CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)
+);
+CREATE INDEX idx_linked_pinboard ON exploration (linked_pinboard);
+ALTER TABLE IF EXISTS public.users
+    ADD COLUMN confirmed_feature_exploration timestamp with time zone;
+ALTER TABLE IF EXISTS public.pinboard_contributions
+    ADD COLUMN is_included boolean NOT NULL DEFAULT true;

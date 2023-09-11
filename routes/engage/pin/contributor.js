@@ -35,7 +35,6 @@ exports.pin = (req, res) => {
 
 					batch.push(
 						t.none(insertmember(id, object_id))
-						// .then(_ => t.none(updatestatus(id, object_id)))
 						.catch(err => console.log(err))
 					)
 
@@ -59,7 +58,6 @@ exports.pin = (req, res) => {
 		if (object_id) {
 			return DB.general.tx(t => {
 				return t.none(insertmember(board_id, object_id))
-				// .then(_ => t.none(updatestatus(board_id, object_id)))
 				.then(_ => {
 					const batch = []
 					batch.push(t.any(retrievepins(object_id)))
@@ -86,7 +84,6 @@ exports.unpin = (req, res) => {
 	if (object_id) {
 		return DB.general.tx(t => {
 			return t.none(removemember(board_id, object_id))
-			// .then(_ => t.none(updatestatus(board_id, object_id)))
 			.then(_ => {
 				return t.none(`
 					DELETE FROM teams
@@ -126,25 +123,9 @@ function removemember (_id, _object_id) {
 		;`, [ _id, _object_id ])
 	}
 }
-// TO DO: FINISH HERE
-function updatestatus (_id, _object_id) {
-	if (_object_id) {
-		return DB.pgp.as.format(`
-			UPDATE pinboards
-			SET status = (SELECT GREATEST (
-				LEAST ((SELECT COALESCE(MAX (p.status), 0) FROM pads p
-				INNER JOIN pinboard_contributions pc
-					ON pc.pad = p.id
-				WHERE pc.pinboard = $1::INT), 1)
-				, status)
-			)
-			WHERE id = $1::INT
-		;`, [ _id ])
-	}
-}
 function retrievepins (_object_id) {
 	return DB.pgp.as.format(`
-		SELECT t.id, t.name AS title FROM teams t
+		SELECT t.id, t.name AS title, FALSE AS is_exploration FROM teams t
 		INNER JOIN team_members tm
 			ON tm.team = t.id
 		WHERE tm.member = $1
@@ -152,7 +133,7 @@ function retrievepins (_object_id) {
 }
 function retrievepinboards (_hosts) {
 	return DB.pgp.as.format(`
-		SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count FROM teams t
+		SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, FALSE AS is_exploration FROM teams t
 		INNER JOIN team_members tm
 			ON tm.team = t.id
 		WHERE t.host IN ($1:csv)

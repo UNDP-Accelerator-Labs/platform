@@ -32,7 +32,8 @@ module.exports = kwargs => {
 			COALESCE(
 			(SELECT json_agg(json_build_object(
 					'id', t.id,
-					'title', t.name
+					'title', t.name,
+					'is_exploration', FALSE
 				)) FROM teams t
 				INNER JOIN team_members tm
 					ON tm.team = t.id

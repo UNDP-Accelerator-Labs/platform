@@ -24,7 +24,7 @@ module.exports = async kwargs => {
 				WHERE TRUE 
 					$1:raw
 				GROUP BY u.position
-			;`, [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
+			;`, [ f_space ]) // [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
 			.then(results => {
 				return { positions: results }
 			}))
@@ -38,7 +38,7 @@ module.exports = async kwargs => {
 					$2:raw
 				GROUP BY (u.iso3, cn.name)
 				ORDER BY cn.name
-			;`, [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
+			;`, [ language, f_space ]) // [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
 			.then(results => { 
 				return results.length ? { countries: results } : null
 			}))
@@ -49,7 +49,7 @@ module.exports = async kwargs => {
 				WHERE TRUE 
 					$1:raw
 				GROUP BY u.rights
-			;`, [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
+			;`, [ f_space ]) // [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
 			.then(results => { 
 				return results.length ? { rights: results } : null
 			}))

@@ -498,10 +498,10 @@
 			"pt": "Conecte-se"
 		},
 		"logged in": {
-			"en": (user, uuid) => "You are logged in as <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
-			"fr": (user, uuid) => "Vous êtes identifé.e en tant que <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
-			"es": (user, uuid) => "Has iniciado sesión como <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
-			"pt": (user, uuid) => "Você está logado como <a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>"
+			"en": (user, uuid) => "<span class='sm m lg xl xxl'>You are logged in as </span><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"fr": (user, uuid) => "<span class='sm m lg xl xxl'>Vous êtes identifé.e en tant que </small><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"es": (user, uuid) => "<span class='sm m lg xl xxl'>Has iniciado sesión como </small><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>",
+			"pt": (user, uuid) => "<span class='sm m lg xl xxl'>Você está logado como </small><a href='/en/edit/contributor?id=" + uuid + "'><u>" + user + "</u></a>"
 		},
 		"log out": {
 			"en": "Log out",
@@ -1035,6 +1035,243 @@
 				if (person) return "Procurando por alguém?"
 				else return "Procurando por algo?"
 			}
+		},
+		"search-type-menu": {
+			"en": {
+				"browse": "Browse",
+				"exploration": "Explore",
+			},
+			"fr": {
+				"browse": "Parcourir",
+				"exploration": "Explorer",
+			},
+			"es": {
+				"browse": "Navegar",
+				"exploration": "Explorar",
+			},
+			"pt": {
+				"browse": "Navegar",
+				"exploration": "Explorar",
+			},
+		},
+		"exploration": {
+			"en": {
+				"intro": "Start your exploration by describing the goal in a few sentences!",
+				"last_access": "Last accessed:",
+				"doc-begin": "Exploration",
+				"doc-approve": "Relevant",
+				"doc-dislike": "Unrelated",
+				"doc-help": "Documents selected for your collection will show up here!",
+				"select": "Select an exploration…",
+				"exploration": "Exploration",
+				"hint": "Make this search an exploration!",
+				"welcome": "Search with explorations!",
+				"explain": `
+					Explorations enable you to easily and serendipitously
+					create collections that answer your questions about the corpus.
+					The questions and selected documents might be used for
+					training a machine learning model to improve search results.
+					All data will be anonymized and in no way connected to your account when used in this way.
+				`,
+				"info": "Click here for more information.",
+				"indicate": `
+					Please indicate below that you understood
+					and approve of the use of the indicated data for further uses.
+				`,
+				"feature-approve": "I Approve!",
+				"feature-reject": "Not Okay!",
+				"full-info": `
+<h2>Exploration Feature and Data Usage</h2>
+<p>
+Explorations are a special type of collection that is tightly integrated with browsing the platform.
+You can select relevant pads for an exploration, which adds them to the collection.
+You can also indicate that a pad is not relevant for an exploration,
+which will make the pad translucent when it appears in search results.
+This way, you can quickly see which pads might be of interest when doing multiple
+queries for building a collection featuring a certain topic.
+In the future, we plan to let the exploration description prioritize
+relevant pads in your searches. Therefore, it is best to describe what you are
+looking for in detail when naming an exploration.
+</p><p>
+For the above-mentioned suggestion feature, we might collect questions and corresponding documents
+for potentially training machine learning models.
+When doing so, the data will be anonymized and any connection to a user or account will be removed prior to training.
+</p><p>
+The goal of the project is to create a language model that can suggest documents
+based on questions prompted by a user. As we improve the model, initial suggestions
+for the exploration feature will be provided by the latest model.
+</p><p>
+If you have any questions or concerns feel free to contact the team or open an
+<a href="https://github.com/UNDP-Accelerator-Labs/platform/issues">issue</a>.
+</p>
+				`,
+			},
+			"fr": {
+				"intro": "Commencez votre exploration en décrivant l’objectif en quelques phrases!",
+				"last_access": "Dernier accès:",
+				"doc-begin": "Exploration",
+				"doc-approve": "Pertinente",
+				"doc-dislike": "Non Pertinente",
+				"doc-help": "Les documents sélectionnés pour votre collection apparaîtront ici!",
+				"select": "Choisissez une exploration…",
+				"exploration": "Exploration",
+				"hint": "Faites de cette recherche une exploration!",
+				"welcome": "Recherchez avec des explorations!",
+				"explain": `
+					Les explorations vous permettent de créer facilement et
+					de manière aléatoire des collections qui répondent à vos
+					questions sur le corpus. Les questions et les documents
+					sélectionnés peuvent être utilisés pour former un modèle
+					d'apprentissage automatique pour améliorer les résultats
+					de recherche. Toutes les données seront anonymisées et en
+					aucun cas connectées à votre compte lorsqu'elles sont
+					utilisées de cette manière.
+				`,
+				"info": "Cliquez ici pour plus d'informations.",
+				"indicate": `
+					Veuillez indiquer ci-dessous que vous avez compris et
+					approuvez l'utilisation des données indiquées à d'autres fins.
+				`,
+				"feature-approve": "J'approuve!",
+				"feature-reject": "Pas d'accord!",
+				"full-info": `
+<h2>Fonctionnalité Exploration et utilisation des données</h2>
+<p>
+Les explorations sont un type spécial de collection étroitement intégré à la
+navigation sur la plateforme. Vous pouvez sélectionner des pads pertinents pour
+une exploration, ce qui les ajoute à la collection. Vous pouvez également
+indiquer qu’un pad n’est pas pertinent pour une exploration, ce qui rend le pad
+translucide lorsqu’il apparaît dans les résultats de recherche. De cette façon,
+vous pouvez rapidement voir quels pads pourraient être intéressants lorsque vous
+effectuez plusieurs requêtes pour construire une collection présentant un certain
+sujet. À l’avenir, nous prévoyons de laisser la description de l’exploration
+prioriser les pads pertinents dans vos recherches. Il est donc préférable de
+décrire en détail ce que vous recherchez lorsque vous nommez une exploration.
+</p><p>
+Pour la fonctionnalité de suggestion mentionnée ci-dessus, nous pourrions
+collecter des questions et des documents correspondants pour potentiellement
+former des modèles d’apprentissage automatique. Lorsque nous le faisons, les
+données seront anonymisées et toute connexion à un utilisateur ou à un compte
+sera supprimée avant la formation.
+</p><p>
+Le but du projet est de créer un modèle de langage qui peut suggérer des
+documents basé sur les questions posées par un utilisateur. À mesure que nous
+améliorons le modèle, des suggestions initiales pour la fonctionnalité
+d’exploration seront fournies par le dernier modèle.
+</p><p>
+Si vous avez des questions ou des préoccupations, n'hésitez pas à contacter l'équipe ou à ouvrir une
+<a href="https://github.com/UNDP-Accelerator-Labs/platform/issues">issue</a>.
+</p>
+				`,
+			},
+			"es": {
+				"intro": "¡Comience su exploración describiendo la meta en unas pocas oraciones!",
+				"last_access": "Último acceso:",
+				"doc-begin": "Exploración",
+				"doc-approve": "Importante",
+				"doc-dislike": "Irrelevante",
+				"doc-help": "¡Los documentos seleccionados para su colección aparecerán aquí!",
+				"select": "Elige una exploración…",
+				"exploration": "Exploración",
+				"hint": "¡Haz de esta búsqueda una exploración!",
+				"welcome": "¡Busca con exploraciones!",
+				"explain": `
+					Las exploraciones le permiten crear colecciones que respondan
+					a sus preguntas sobre el corpus de manera fácil y serendipitosa.
+					Las preguntas y los documentos seleccionados pueden usarse
+					para entrenar un modelo de aprendizaje automático para mejorar
+					los resultados de la búsqueda. Todos los datos se anonimizarán
+					y de ninguna manera estarán conectados a su cuenta
+					cuando se usen de esta manera.
+				`,
+				"info": "Haga clic aquí para obtener más información.",
+				"indicate": `
+					Indique a continuación que entendió y aprueba el uso
+					de los datos indicados para otros fines.
+				`,
+				"feature-approve": "¡Aprobar!",
+				"feature-reject": "¡No está bien!",
+				"full-info": `
+<h2>Característica de exploración y uso de datos</h2>
+<p>
+Las exploraciones son un tipo especial de colección que está estrechamente
+integrada con la navegación en la plataforma. Puede seleccionar almohadillas
+relevantes para una exploración, lo que las agrega a la colección.
+También puede indicar que una almohadilla no es relevante para una exploración,
+lo que hará que la almohadilla sea translúcida cuando aparezca en los resultados
+de búsqueda. De esta manera, puede ver rápidamente qué almohadillas podrían ser
+de interés al hacer múltiples consultas para construir una colección con un tema
+determinado. En el futuro, planeamos permitir que la descripción de la
+exploración priorice almohadillas relevantes en sus búsquedas. Por lo tanto,
+es mejor describir lo que está buscando en detalle al nombrar una exploración.
+</p><p>
+Para la función de sugerencia mencionada anteriormente, podríamos recopilar
+preguntas y documentos correspondientes para potencialmente entrenar modelos
+de aprendizaje automático. Al hacerlo, los datos se anonimizarán y cualquier
+conexión con un usuario o cuenta se eliminará antes del entrenamiento.
+</p><p>
+El objetivo del proyecto es crear un modelo de lenguaje que pueda sugerir
+documentos basado en preguntas formuladas por un usuario. A medida que mejoramos
+el modelo, las sugerencias iniciales para la función de exploración serán
+proporcionadas por el último modelo.
+</p><p>
+Si tiene alguna pregunta o inquietud, no dude en ponerse en contacto con el equipo o abrir un
+<a href="https://github.com/UNDP-Accelerator-Labs/platform/issues">problema</a>.
+</p>
+				`,
+			},
+			"pt": {
+				"intro": "Comece sua exploração descrevendo o objetivo em poucas frases!",
+				"last_access": "Último acesso:",
+				"doc-begin": "Exploração",
+				"doc-approve": "Relevante",
+				"doc-dislike": "Desinteressante",
+				"doc-help": "Os documentos selecionados para sua coleção aparecerão aqui!",
+				"select": "Escolha uma exploração…",
+				"exploration": "Exploração",
+				"hint": "Faça desta busca uma exploração!",
+				"welcome": "Pesquise com explorações!",
+				"explain": `
+					As explorações permitem que você crie coleções facilmente e de forma serendipitosa
+					que respondam às suas perguntas sobre o corpus.
+					As perguntas e os documentos selecionados podem ser usados para
+					treinar um modelo de aprendizado de máquina para melhorar os resultados da pesquisa.
+					Todos os dados serão anonimizados e de forma alguma conectados à sua conta quando usados dessa maneira.
+				`,
+				"info": "Clique aqui para mais informações.",
+				"indicate": `
+					Por favor, indique abaixo que você entendeu
+					e aprova o uso dos dados indicados para outros fins.
+				`,
+				"feature-approve": "Eu aprovo!",
+				"feature-reject": "Não está bem!",
+				"full-info": `
+<h2>Recurso de exploração e uso de dados</h2>
+<p>
+As explorações são um tipo especial de coleção que está intimamente integrado
+à navegação na plataforma. Você pode selecionar blocos relevantes para uma
+exploração, o que os adiciona à coleção. Você também pode indicar que um bloco
+não é relevante para uma exploração, o que tornará o bloco translúcido quando
+aparecer nos resultados da pesquisa. Dessa forma, você pode ver rapidamente
+quais blocos podem ser de interesse ao fazer várias consultas para construir
+uma coleção com um determinado tópico. No futuro, planejamos permitir que a
+descrição da exploração priorize blocos relevantes em suas pesquisas.
+Portanto, é melhor descrever o que você está procurando em detalhes ao nomear uma exploração.
+</p><p>
+Para a função de sugestão mencionada acima, podemos coletar perguntas e
+documentos correspondentes para potencialmente treinar modelos de aprendizado
+de máquina. Ao fazer isso, os dados serão anonimizados e qualquer conexão com
+um usuário ou conta será removida antes do treinamento.
+</p><p>
+O objetivo do projeto é criar um modelo de linguagem que possa sugerir
+documentos com base em perguntas feitas por um usuário. À medida que melhoramos
+o modelo, as sugestões iniciais para o recurso de exploração serão fornecidas pelo último modelo.
+</p><p>
+Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar em contato com a equipe ou abrir um
+<a href="https://github.com/UNDP-Accelerator-Labs/platform/issues">problema</a>.
+</p>
+				`,
+			},
 		},
 		"search or add": {
 			"en": "Looking for something or want to add it?",
@@ -2499,7 +2736,7 @@
 			"pt": "Outros idiomas fluentes"
 		},
 		"add other languages": { // USED
-			"en": "Add other fluent lanugages",
+			"en": "Add other fluent languages",
 			"fr": "Ajouter d'autres langues courantes",
 			"es": "Agregar otros idiomas fluidos",
 			"pt": "Adicionar outros idiomas fluentes"
@@ -2690,16 +2927,16 @@
 
 		"showing range": { // USED
 			"en": (min, max) => {
-				return "Showing range [ " + min + " – " + max + " ]"
+				return "Showing range [&nbsp;" + min + " – " + max + "&nbsp;]"
 			},
 			"fr": (min, max) => {
-				return "Affichant l’intervale [ " + min + " – " + max + " ]"
+				return "Affichant l’intervale [&nbsp;" + min + " – " + max + "&nbsp;]"
 			},
 			"es": (min, max) => {
-				return "Mostrando rango [ " + min + " – " + max + " ]"
+				return "Mostrando rango [&nbsp;" + min + " – " + max + "&nbsp;]"
 			},
 			"pt": (min, max) => {
-				return "Mostrando alcance [ " + min + " – " + max + " ]"
+				return "Mostrando alcance [&nbsp;" + min + " – " + max + "&nbsp;]"
 			}
 		},
 		"showing letter": { // USED
@@ -2917,6 +3154,12 @@
 					}
 				}
 			}
+		},
+		"my reviews" : { // USED
+			"en": "My Reviews",
+			"fr": "Mes Relectures",
+			"es": "Mi Reseñas",
+			"pt": "Meu Comentários"
 		},
 		"display filters": { // USED
 			"en": "Display the filters",

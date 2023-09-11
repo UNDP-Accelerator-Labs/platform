@@ -22,8 +22,6 @@ if (!exports.public) { exports.public = {} }
 if (!exports.private) { exports.private = {} }
 if (!exports.dispatch) { exports.dispatch = {} }
 
-
-
 exports.forwardGeocoding = require('./helpers/geo/').forwardcode.render
 // (req, res) => {
 // 	const { locations, list } = req.body || {}
@@ -130,9 +128,6 @@ exports.reverseGeocoding = require('./helpers/geo/').reversecode.render
 // 	})
 // }
 
-
-
-
 exports.process.callapi = (req, res) => {
 	const { uri, method, key, expect } = req.body || {}
 	const headers = {
@@ -182,6 +177,13 @@ exports.process.updatePassword = require('./login/').updatePassword
 exports.dispatch.browse = require('./browse/')
 
 exports.dispatch.print = require('./print/')
+
+exports.render.explorationInfo = async (req, res) => {
+	const { originalUrl } = req || {};
+	const metadata = await helpers.datastructures.pagemetadata({ req, res });
+	const data = Object.assign(metadata, { originalUrl });
+	return res.render('exploration-info', data);
+}
 
 /* =============================================================== */
 /* ========================= MOBILIZE ============================ */
@@ -259,15 +261,21 @@ exports.process.upload = (req, res) => {
 	const { uuid } = req.session || {}
 
 	const fls = req.files
-	console.log(fls)
-	const promises = fls.map(f => {
+	const maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
 
+	const promises = fls.map(f => {
 		// TO DO: MOVE THIS DOWN TO THE if NO app_storage
 		const basedir = path.join(__dirname, `../public/uploads/`)
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
 		const dir = path.join(basedir, uuid)
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 		const source = path.join(__dirname, `../${f.path}`)
+
+		// Check if the file size exceeds the maximum allowed size
+		if (f.size > maxFileSizeBytes) {
+			fs.unlinkSync(source); // Delete the uploaded file
+			return Promise.resolve({ status: 403, message: f.originalname + ' file size exceeds the maximum allowed size.' });
+		}
 
 		return new Promise(async resolve => {
 			if (['image/png', 'image/jpg', 'image/jpeg', 'image/jfif', 'image/gif', 'application/octet-stream'].includes(f.mimetype)) { // octet-streram IS FOR IMAGE URLs
@@ -472,6 +480,14 @@ exports.process.comment = require('./engage/').comment
 exports.process.request = require('./request/')
 exports.process.accept = require('./accept/').accept
 exports.process.decline = require('./accept/').decline
+
+exports.process.explorationCreate = require('./exploration').create;
+exports.process.explorationList = require('./exploration').list;
+exports.process.explorationDoc = require('./exploration').doc;
+exports.process.explorationCollection = require('./exploration').collection;
+exports.process.explorationConsent = require('./exploration').consent;
+exports.process.explorationLoginCheck = require('./exploration').loginCheck;
+exports.process.explorationConsentCheck = require('./exploration').consentCheck;
 
 // THIS IS DEPRECATED
 exports.process.download = (req, res) => {
@@ -803,6 +819,7 @@ exports.api.methods = (req, res) => {
 	;`).then(results => res.status(200).json(results))
 	.catch(err => res.status(500).send(err))
 }
+// TO DO: this api is deprecated
 exports.api.datasources = (req, res) => {
 	if (req.method === 'GET') {
 		DB.general.any(`
@@ -827,8 +844,14 @@ exports.api.datasources = (req, res) => {
 	}
 }
 
-exports.notfound = (req, res) => {
-	res.send(`${req.originalUrl} is not the route that you are looking for`)
+exports.notfound = async(req, res) => {
+	const metadata = await helpers.datastructures.pagemetadata({ req, res })
+	res.render('error-404', metadata)
+}
+
+exports.error = async(req, res) => {
+	const metadata = await helpers.datastructures.pagemetadata({ req, res })
+	res.render('error-500', metadata)
 }
 
 String.prototype.simplify = function () {

@@ -3,10 +3,10 @@ const { DB } = include('config/')
 module.exports = (req, res) => {
 	const { name, type } = req.body || {}
 	const { uuid } = req.session || {}
-	
+
 	if (type !== 'sdgs') { // TECHNICALLY THIS SHOULD NOT HAPPEN BECAUSE sdgs CANNOT BE opencoded AS PER THE config
 		DB.general.tx(gt => {
-			return gt.one(`
+			return gt.oneOrNone(`
 				INSERT INTO tags (name, type, contributor)
 				VALUES ($1, $2, $3)
 				ON CONFLICT ON CONSTRAINT name_type_key

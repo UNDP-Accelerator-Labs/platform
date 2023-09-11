@@ -1,4 +1,6 @@
-exports.getImg = (_json = {}, _unique = true) => { 
+const { app_storage, app_title_short } = include('config/')
+
+exports.getImg = (_json = {}, _unique = true) => {
 	if (_json?.sections) {
 		const media = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items.flat() : b).flat()).flat()
 		const img = media.filter(c => c.type === 'img' && c.src).map(d => {
@@ -14,7 +16,7 @@ exports.getImg = (_json = {}, _unique = true) => {
 			else return `/${d.replace('uploads', 'uploads/sm')}`
 		})
 		const results = img?.concat(mosaic, embed)
-		
+
 		if (_unique) return [results[0]].filter(d => d)
 		else return results.filter(d => d)
 
@@ -64,7 +66,7 @@ exports.getReviewScore = function (_json = {}) {
 		return score ?? null
 	} else return null
 }
-exports.getAttachments = (_json = {}) => { 
+exports.getAttachments = (_json = {}) => {
 	if (_json?.sections) {
 		const meta = _json.sections.map(c => c.items?.map(b => b.type === 'group' ? b.items : b)).flat(3)
 		const attachments = meta.filter(c => c.type === 'attachment' && c.srcs?.filter(b => b).length > 0)
@@ -76,6 +78,9 @@ exports.getAttachments = (_json = {}) => {
 		return attachments
 	} else return []
 }
+
+
+
 exports.regexQuery = require('./search.js').sqlregex
 
 exports.isURL = function (str = '') {
@@ -107,7 +112,7 @@ function extractItem (d = {}, section = null, group = null) {
 	if (['skills', 'methods'].includes(d.type)) return { key: d.instruction, value: d.tags.length ? d.tags.map(c => c.name).join(', ') : null, section: section, group: group }
 	if (d.type === 'datasources') return { key: d.instruction, value: d.tags.length ? d.tags.map(c => c.name).join(', ') : null, section: section, group: group }
 
-	if (d.type === 'group') { 
+	if (d.type === 'group') {
 		if (d.repeat) { // THIS IS A REPEAT GROUP
 			const grouped_items = []
 			for (let i = 0; i < d.repeat; i ++) {
@@ -126,7 +131,7 @@ function extractItem (d = {}, section = null, group = null) {
 						}
 						return obj
 					})
-				}				
+				}
 				grouped_items.push(items.map(c => { // THESE ARE THE ITEMS IN EACH REPEAT GROUP
 					return extractItem(c, section, `${d.instruction} #${i + 1}`)
 				}).flat())

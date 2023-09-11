@@ -8,7 +8,7 @@
 %>
 
 <div id='filters'>
-	<div class='inner'>
+	<div class='inner google-translate-attr'>
 		<% if (query.search?.length) { %>
 			<p><%- vocabulary['search terms'][language] %></p>
 			<div class='filters-group search-filters'>
@@ -67,7 +67,7 @@
 		const filter_form = d3.select('nav#search-and-filter')
 		filter_form.select('input#search-field').node().value = null
 
-		filter_form.select('button.submit-filters').node().click()
+		filter_form.select('form').node().submit()
 	})
 	d3.selectAll('div#filters div.filters-group:not(.search-filters) div.tag label.close')
 	.on('click', function () {
@@ -85,7 +85,7 @@
 			d3.select(filter.parentNode).selectAll('input[type=hidden]:not(:disabled)').attr('disabled', true)
 		}
 
-		filter_form.select('button.submit-filters').node().click()
+		filter_form.select('form').node().submit()
 	})
 
 </script>

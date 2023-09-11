@@ -15,7 +15,7 @@ module.exports = (req, res) => {
 
 		if (status) {
 			if (id) {
-				batch.push(t.none(`
+				batch.push(DB.general.none(`
 					UPDATE pinboards
 						SET status = $1::INT
 					WHERE id = $2::INT
@@ -25,12 +25,12 @@ module.exports = (req, res) => {
 				;`, [ status, id, collaborators_ids, rights ]))
 			} else { // PUBLISH ALL
 				// THIS SHOULD NOT HAPPEN FOR pinboards
-				batch.push(t.none(`
+				batch.push(DB.general.none(`
 					UPDATE pinboards
 						SET status = $1::INT
 					WHERE id IN (
 						SELECT id FROM pinboards
-						WHERE status >= 1 
+						WHERE status >= 1
 							AND (owner IN ($2:csv)
 							OR $3 > 2)
 						LIMIT $4

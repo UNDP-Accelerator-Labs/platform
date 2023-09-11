@@ -9,9 +9,11 @@ if ('serviceWorker' in navigator) {
 
 function getMediaSize () {
 	// https://www.w3schools.com/howto/howto_js_media_queries.asp
-	return [{ label: 'xs', size: 480 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }]
-	.find(d => {
-		if (d.label !== 'lg') return window.matchMedia(`(max-width: ${d.size}px)`).matches
+	// console.log(window.navigator)
+	// console.log(window.navigator.Agent)
+	return [{ label: 'xs', size: 767 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }, { label: 'xl', size: 1366 }, { label: 'xxl', size: 1920 }]
+	.reverse().find(d => {
+		if (d.label === 'xs') return window.matchMedia(`(max-width: ${d.size}px)`).matches
 		else return window.matchMedia(`(min-width: ${d.size}px)`).matches
 	})?.label
 }

@@ -40,7 +40,7 @@ d3.selection.prototype.moveToFront = function() {
 		this.parentNode.appendChild(this)
 	})
 }
-d3.selection.prototype.moveToBack = function() { 
+d3.selection.prototype.moveToBack = function() {
 	// CREDIT: https://stackoverflow.com/questions/14167863/how-can-i-bring-a-circle-to-the-front-with-d3
 	return this.each(function() {
 		const firstChild = this.parentNode.firstChild

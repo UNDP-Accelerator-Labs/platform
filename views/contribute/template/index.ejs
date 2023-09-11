@@ -13,7 +13,7 @@
 <html lang='<%- language %>'>
 <head>
 
-<%- include ('../../partials/head.ejs') %> 
+<%- include ('../../partials/head.ejs') %>
 
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
 	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
@@ -29,16 +29,16 @@
 <body>
 
 
-<% include ('../../partials/translations.ejs') %> 
+<% include ('../../partials/translations.ejs') %>
 
-<%- include ('../../partials/menu-languages.ejs') %> 
-<%- include ('../../partials/modals.ejs') %> 
+<%- include ('../../partials/menu-languages.ejs') %>
+<%- include ('../../partials/modals.ejs') %>
 
 
 <div class='main-content'>
 <header>
 	<div class='inner'>
-		<%- include ('../../partials/menu-logo.ejs') %> 
+		<%- include ('../../partials/menu-logo.ejs') %>
 	</div>
 </header>
 
@@ -59,7 +59,7 @@
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
 					<div class='btn-group'>
 						<% if (['contribute', 'edit'].includes(activity)) { %>
-							<div class='save xs'>
+							<div class='save xs google-translate-attr'>
 								<form>
 									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][language] %></button>
 								</form>
@@ -68,9 +68,9 @@
 						<form method='GET' action='/publish/templates'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
 							<% if ((locals.data?.status ?? 0) !== 1) { %>
-								<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['publish'][language] %></button>
+								<button type='submit' class='publish google-translate-attr' name='status' value='2' disabled><%- vocabulary['publish'][language] %></button>
 							<% } else { %>
-								<button type='submit' class='publish' name='status' value='2'><%- vocabulary['publish'][language] %></button>
+								<button type='submit' class='publish google-translate-attr' name='status' value='2'><%- vocabulary['publish'][language] %></button>
 							<% } %>
 						</form>
 						<% if (!publicpage) { %>
@@ -79,7 +79,7 @@
 							<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
 							<!-- TO DO: REMOVE if (false) TO REACTIVATE THIS -->
 							<% if (false) { %>
-								<form class='lg' method='POST' action='/generate/pdf'>
+								<form class='lg xl xxl' method='POST' action='/generate/pdf'>
 									<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
 									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
 									<% if (locals.data?.status === 0 || !locals.data?.status) { %><button type='submit' class='generate-pdf' disabled>Generate PDF</button>
@@ -92,7 +92,7 @@
 				</div>
 			<% } %>
 
-			<div class='head'>
+			<div class='head google-translate-attr'>
 				<% if (locals.metadata.page.referer?.includes('browse/templates')) { %>
 					<a href='<%- locals.metadata.page.referer %>' class='return'><%- vocabulary['back to browse'][language] %></a>
 				<% } else { %>
@@ -112,7 +112,7 @@
 				<% } %>
 			</div>
 			<div class='body'>
-				<section class='description-layout layout <%- activity %>'>
+				<section class='description-layout layout google-translate-attr <%- activity %>'>
 					<div class='input-type'>
 						<label><%- vocabulary['description'][language] %></label>
 					</div>
@@ -133,18 +133,18 @@
 	</main>
 </div>
 
-<div class='sidebar lg'>
+<div class='sidebar xs sm m lg xl xxl'>
 	<% if (['contribute', 'edit'].includes(activity)) { %>
 		<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
 		<div class='media-input-group input-group' tabindex='1'>
-			<button class='scroll-up m lg'><label>&rsaquo;</label></button>
+			<button class='scroll-up m lg xl xxl'><label>&rsaquo;</label></button>
 			<div class='inner'>
 				<div class='btn-group'>
 				<% if (!review_template) { %>
 					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
 					<button id='input-media-repeat-section' title='Add a repetitive section.'><i class='material-icons'>loop</i></button>
 				<% } %>
-				
+
 				<button id='input-meta-group' title='Add a group of inputs.'><i class='material-icons'>dynamic_form</i></button>
 				<div class='vertical-separator'></div>
 				<button id='input-media-txt' title='Request a description. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
@@ -156,11 +156,11 @@
 					<button id='input-media-drawing' title='Request a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
 				<% } %>
 				<button id='input-media-embed' title='Request a link or embedded HMTL code. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
-				
-				<% if (!review_template) { %>	
+
+				<% if (!review_template) { %>
 					<div class='vertical-separator'></div>
 					<% locals.metadata.site.metafields.forEach(d => { %>
-						<button class='labeled' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
+						<button class='labeled google-translate-attr' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
 							<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
 							<label>
 								<span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span>
@@ -170,7 +170,7 @@
 				<% } %>
 				</div>
 			</div>
-			<button class='scroll-down m lg'><label>&rsaquo;</label></button>
+			<button class='scroll-down m lg xl xxl'><label>&rsaquo;</label></button>
 		</div>
 		<script type='text/javascript'>
 			if (!mediaSize) var mediaSize = getMediaSize()
@@ -178,7 +178,7 @@
 				d3.select('button.input-toolbox')
 				.on('touchend, click', function () {
 					d3.select(this).toggleClass('highlight')
-					d3.select('.media-input-group').node().focus() 
+					d3.select('.media-input-group').node().focus()
 				})
 				d3.select('.media-input-group').on('touchend', function () { this.focus() })
 				.on('focus', function () {
@@ -200,7 +200,7 @@
 				const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
 
 				sel.classed('overflowing', scrollheight > (height + buttonheight))
-				
+
 				sel.select('button.scroll-up')
 					.classed('hide', scrollheight <= (height + buttonheight))
 				.on('click', function () {
@@ -230,8 +230,8 @@
 <footer>
 	<% if (locals.data?.status >= 2) { %>
 		<div class='inner'>
-			<h2><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>
-			<form action='/comment' method='POST'>
+			<h2 class="google-translate-attr"><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>
+			<form class="google-translate-attr" action='/comment' method='POST'>
 				<input type='hidden' name='id' value='<%- locals.data?.id %>'>
 				<input type='hidden' name='object' value='<%- object %>'>
 				<textarea id='input-media-comment' name='message' onkeyup='adjustarea(this)' data-placeholder='test' onchange='fixLabel(this)' onfocus='changeLabel(this, true)' onblur='changeLabel(this, false)' required></textarea>
@@ -245,7 +245,7 @@
 				<% locals.comments?.forEach(d => { %>
 					<li class='comment'>
 						<div class='head'>
-							<div class='meta meta-data'>
+							<div class='meta meta-data google-translate-attr'>
 								<div class='meta meta-contributor'><a href='../browse/templates/shared?contributors=<%- d.contributor %>'><%- d.ownername %></a></div>
 								<div class='meta meta-date'><%- vocabulary['date'][language](d.date) %></div>
 							</div>
@@ -254,7 +254,7 @@
 							<%- d.message %>
 						</div>
 						<div class='foot'>
-							<button type='button' class='expand-collapsed <% if (d.replies?.length > 0) { %>wide<% }%>'>
+							<button type='button' class='expand-collapsed google-translate-attr <% if (d.replies?.length > 0) { %>wide<% }%>'>
 								<% if (d.replies?.length > 0) { %><%- vocabulary['expand replies'][language](d.replies.length) %>
 								<%} else { %><%- vocabulary['reply'][language](true) %><%} %>
 							</button>
@@ -266,7 +266,7 @@
 											<div class='head'>
 												<div class='meta meta-data'>
 													<div class='meta meta-contributor'><a href='../browse/templates/shared?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
-													<div class='meta meta-date'><%- vocabulary['date'][language](c.date) %></div>
+													<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](c.date) %></div>
 												</div>
 											</div>
 											<div class='body'>
@@ -282,8 +282,8 @@
 									<input type='hidden' name='source' value='<%- d.id %>'>
 									<textarea id='input-media-comment' name='message' onkeyup='adjustarea(this)' data-placeholder='test' onchange='fixLabel(this)' onfocus='changeLabel(this, true)' onblur='changeLabel(this, false)' required></textarea>
 									<!-- <label for='input-media-comment' data-label='Jeremy'>Reply publicly</label> -->
-									<label for='input-media-comment'><%- vocabulary['reply publicly'][language] %></label>
-									<div class='btn-group'>
+									<label class="google-translate-attr" for='input-media-comment'><%- vocabulary['reply publicly'][language] %></label>
+									<div class='btn-group google-translate-attr'>
 										<button type='submit' disabled><%- vocabulary['reply'][language](true) %></button>
 									</div>
 								</form>
@@ -305,7 +305,7 @@
 				}
 			}
 
-			function adjustarea(node) { 
+			function adjustarea(node) {
 				node.style.height = `${ node.scrollHeight - 20 }px` // WE HAVE A 2x10px PADDING IN THE CSS
 				const submit = d3.select(node.parentNode).select('button[type=submit]').node()
 				submit.disabled = node.value.trim().length === 0
@@ -322,7 +322,7 @@
 </footer>
 <% } %>
 
-<%- include ('../../partials/footer.ejs') %> 
+<%- include ('../../partials/footer.ejs') %>
 
 <script type='text/javascript'>
 	const metafields = <%- JSON.stringify(locals.metadata.site.metafields || {}) %>
@@ -359,7 +359,7 @@
 		addImg({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
-	
+
 	d3.select('.media-input-group #input-media-drawing')
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
@@ -375,7 +375,7 @@
 		addTxt({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
-	
+
 	d3.select('.media-input-group #input-media-embed')
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
@@ -383,7 +383,7 @@
 		addEmbed({ lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
-	
+
 	d3.select('.media-input-group #input-media-checklist')
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
@@ -408,14 +408,14 @@
 			d3.select(this).select('label').style('width', 0)
 		}).on('mousedown', function () {
 			this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling || null
-		}).on('click', function () { 
-			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required, options: d.options || null } 
+		}).on('click', function () {
+			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required, options: d.options || null }
 			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'radiolist') addRadiolist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			// THE FOLLOWING ARE ALWAYS META
-			if (d.type === 'tag') addTags({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })	
+			if (d.type === 'tag') addTags({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			else if (d.type === 'index') addIndexes({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			else if (d.type === 'location') addLocations({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			else if (d.type === 'attachment') addAttachment({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
@@ -426,7 +426,7 @@
 	})
 
 	const taglists = <%- JSON.stringify(locals.tags || {}) %>;
-	let status = <%- locals.data?.status || 0 %>;	
+	let status = <%- locals.data?.status || 0 %>;
 
 	let activity = '<%- activity %>';
 	// let published = false
@@ -448,7 +448,7 @@
 			this.blur()
 		}
 	})
-	
+
 	let keyTrack = []
 	window.addEventListener('keydown', function (e) {
 		e = e || event
@@ -456,9 +456,9 @@
 
 		if (editing) {
 			// SHIFT + ENTER LEAVES THE FOCUSED CELL
-			if (keyTrack.includes(16) && e.keyCode === 13 
+			if (keyTrack.includes(16) && e.keyCode === 13
 				&& main.selectAll('.media-container.focus, .meta-container.focus').size()
-			) { 	
+			) {
 				e.preventDefault()
 				main.selectAll('.media-container, .meta-container').classed('focus', false)
 					.selectAll('.media-title, .media-txt, .media-embed, .media-checklist .list-item, .media-checklist .instruction, .media-radiolist .list-item, .media-radiolist .instruction, .meta-checklist .instruction')
@@ -470,7 +470,7 @@
 			if (
 				![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
-				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
+				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() ||
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
 				&& !d3.select('.modal').node()
 			) {
@@ -490,7 +490,7 @@
 			if (
 				![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 				&& !(main.selectAll('.layout.focus *:focus').size())
-				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() || 
+				&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() ||
 					main.selectAll('.media-container *:focus, .meta-container *:focus').size())
 				&& !d3.select('.modal').node() // THIS IS IF WE ADD THE MODAL FOR SELECTING A COHORT
 			) {
@@ -524,15 +524,15 @@
 						|| d3.select(e.srcElement).classed('meta')
 						|| d3.select(e.srcElement).classed('title')
 					) && !(
-					[e.srcElement.nodeName, e.srcElement.tagName].map(d => d.toLowerCase()).includes('input') 
+					[e.srcElement.nodeName, e.srcElement.tagName].map(d => d.toLowerCase()).includes('input')
 					&& (
-						d3.select(e.srcElement).findAncestor('search')?.node() 
+						d3.select(e.srcElement).findAncestor('search')?.node()
 						|| d3.select(e.srcElement).findAncestor('filter-or-add')?.node()
 						)
 					)
 				) {
-					switchButtons('<%- language %>') 
-					// THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS 
+					switchButtons('<%- language %>')
+					// THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS
 				}
 			}
 		}
@@ -553,7 +553,7 @@
 					.classed('focus', false)
 			}
 			const containers = main.selectAll('.media-container, .meta-container')
-				.filter(function () { 
+				.filter(function () {
 					if (media) return this !== media.node()
 					else if (meta) return this !== meta.node()
 					else if (d3.select(this).classed('group-container focus') && inputgroup) return false
@@ -637,7 +637,7 @@
 		// COLLECT TITLE
 		const title = head.select('.title').node().innerText
 		if (title.length > 99) title = `${title.slice(0, 98)}…`
-			
+
 		const description = descriptionLayout.select('.media-container .media-txt').node()['outerText' || 'textContent' || 'innerText']
 		const slideshow = descriptionLayout.select('.input-slideshow #slideshow-status').node()?.checked || false
 
@@ -651,13 +651,13 @@
 			sel.selectAll('.media-container, .meta-container')
 			.each(function (c) {
 				const sel = d3.select(this)
-				const ingroup = sel.findAncestor('group-container')	
+				const ingroup = sel.findAncestor('group-container')
 				// GROUPS
 				if (c.type === 'group') {
 					const groupitems = []
 					sel.selectAll('.media-group-items .media-container, .media-group-items .meta-container')
-					.each(function (b) { 
-						retrieveItems(d3.select(this), b, groupitems) 
+					.each(function (b) {
+						retrieveItems(d3.select(this), b, groupitems)
 					})
 					c.instruction = sel.select('.media-group').node()['outerText' || 'textContent' || 'innerText']
 					c.structure = groupitems
@@ -705,13 +705,13 @@
 			${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
 				.filter(d => d.type === 'radiolist')
 				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
-		
+
 		// COMPILE THE CONTENT
 		content.title = title // ALWAYS SAVE THE TITLE
 		content.slideshow = slideshow // ALWAYS SAVE THE SLIDESHOW OPTION
 		if (!attr || attr === 'description') content.description = description
-		if (!attr || ['lead', 'media', 'meta'].includes(attr) 
-		|| sections.map(d => d.structure).flat().unique('type', true).includes(attr)) { 
+		if (!attr || ['lead', 'media', 'meta'].includes(attr)
+		|| sections.map(d => d.structure).flat().unique('type', true).includes(attr)) {
 			content.sections = JSON.stringify(sections)
 		}
 		// ALWAYS SEND fullTxt
@@ -720,7 +720,7 @@
 		// ALWAYS SEND status
 		const completion = []
 		completion.push(title?.trim().length > 0)
-		
+
 		<% if (!review_template) { %>
 			metafields.filter(d => d.required).forEach(d => {
 				completion.push(sections.map(c => c.structure)?.flat().some(c => c.name === d.label))
@@ -763,7 +763,7 @@
 		.then(res => {
 			// ADD THE NOTIFICATION
 			window.sessionStorage.removeItem('changed-content')
-			
+
 			if (!mediaSize) var mediaSize = getMediaSize()
 			if (mediaSize === 'xs') {
 				const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
@@ -787,7 +787,7 @@
 					menu_logo.selectAll('div.save').classed('hide', true)
 				}, 1000)
 			}
-			
+
 			// CHANGE THE URL TO INCLUDE THE PAD ID
 			if (!id) { // INSERT
 				queryparams.append('id', res.object)

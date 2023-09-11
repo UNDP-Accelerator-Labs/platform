@@ -3,11 +3,13 @@
 	const modules = locals.metadata.site.modules
 	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
+	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
+    const explorationVocab = vocabulary['exploration'][language];
 %>
 
-<menu>
+<menu class="google-translate-attr">
 	<% if (object === 'reviews') { %>
 		<li class='<% if (space === "pending") { %>active<% } %>'>
 			<a href='./pending'>
@@ -54,15 +56,15 @@
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %></label>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %></label>
 				</div>
 
-				<div id='pinboards-list' class='dropdown'>
+				<div id='pinboards-list-xs' class='dropdown'>
 					<menu>
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>'><%- d.title %></a>
+								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span></a>
 							</li>
 						<% }) %>
 					</menu>
@@ -83,7 +85,7 @@
 			return d.type === object && rights >= write
 		})) { %>
 			<li class='<% if (space === "private") { %>active<% } %>'>
-				<a href='./private'>
+				<a onclick='redirect("./private")'>
 					<button><%- vocabulary['space'][language](object, 'private') %>
 						<div class='count'><%- locals.stats?.private %></div>
 					</button>
@@ -95,7 +97,7 @@
 			&& locals.stats?.curated > 0
 		) { %>
 			<li class='<% if (space === "curated") { %>active<% } %>'>
-				<a href='./curated'>
+				<a onclick='redirect("./curated")'>
 					<button><%- vocabulary['space'][language](object, 'curated') %>
 						<div class='count'><%- locals.stats?.curated %></div>
 					</button>
@@ -108,15 +110,15 @@
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards'><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
 				</div>
 
-				<div id='pinboards-list' class='dropdown'>
+				<div id='pinboards-list-lg' class='dropdown'>
 					<menu>
 						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
 						.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>'><%- d.title %></a>
+								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span></a>
 							</li>
 						<% }) %>
 					</menu>
@@ -124,7 +126,7 @@
 			</li>
 		<% } %>
 		<li class='<% if (space === "shared") { %>active<% } %>'>
-			<a href='./shared'>
+			<a onclick='redirect("./shared")'>
 				<button><%- vocabulary['space'][language](object, 'shared') %>
 					<div class='count'><%- locals.stats?.shared %></div>
 				</button>
@@ -143,7 +145,7 @@
 		<% } %>
 		<% if (!['reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
-				<a href='./public'>
+				<a onclick='redirect("./public")'>
 					<button><%- vocabulary['space'][language](object, 'public') %>
 						<div class='count'><%- locals.stats?.public %></div>
 					</button>
@@ -179,3 +181,16 @@
 	updateTab('<%- locals.pinboard.title %>')
 </script>
 <% } %>
+<script type='text/javascript'>
+	function redirect (location) {
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
+		
+		filter_keys.push('search')
+		for (const key of queryparams.keys()) {
+			if (!filter_keys.includes(key)) queryparams.delete(key)
+		}		
+		return window.location = `${location}?${queryparams.toString()}`
+	}
+</script>

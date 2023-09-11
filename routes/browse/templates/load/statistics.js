@@ -39,7 +39,7 @@ module.exports = async kwargs => {
 				$1:raw
 			GROUP BY t.status
 			ORDER BY t.status
-		;`, [ full_filters.replace(/(AND\s)?t.status IN \([\'\d\,\s]+\)(\sAND\s)?/g, '') ]).then(d => { return { persistent: d } }))
+		;`, [ full_filters.replace(/(AND\s)?t.status IN \([\'\d\,\s]+\)(\sAND\s)?/g, '$2') ]).then(d => { return { persistent: d } }))
 		// GET PRIVATE TEMPLATES COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (t.id))::INT FROM templates t

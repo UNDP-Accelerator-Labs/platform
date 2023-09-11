@@ -9,6 +9,7 @@
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
+    const explorationVocab = vocabulary['exploration'][language];
 %>
 
 <script type='text/javascript'>
@@ -21,16 +22,16 @@ const Entry = function (_kwargs) {
 
 	this.container = parent.addElem('article', '<%- object.slice(0, -1) %><% if (pagedisplay === "slideshow") { %> slide<% } %>')
 		.datum(data)
-	.each(function (d) { 
+	.each(function (d) {
 		d3.select(this).classed(`status-${d.status}`, true)
 	})
 
 	this.inner = this.container.addElems('div', 'inner')
 		.classed('centered', d => {
 			return (display === 'slideshow'
-			&& d.img?.length === 0 
-			&& d.items === undefined 
-			&& d.contributors === undefined 
+			&& d.img?.length === 0
+			&& d.items === undefined
+			&& d.contributors === undefined
 			&& d.private_associated_pads === undefined
 			&& d.associated_pads === undefined
 			&& d.ongoing_associated_mobilizations === undefined
@@ -43,9 +44,9 @@ const Entry = function (_kwargs) {
 	this.body = this.inner.addElems('div', 'body')
 		.classed('full-width', d => {
 			return (display !== 'columns'
-			&& d.img?.length === 0 
-			&& d.items === undefined 
-			&& d.contributors === undefined 
+			&& d.img?.length === 0
+			&& d.items === undefined
+			&& d.contributors === undefined
 			&& d.private_associated_pads === undefined
 			&& d.associated_pads === undefined
 			&& d.ongoing_associated_mobilizations === undefined
@@ -53,9 +54,9 @@ const Entry = function (_kwargs) {
 		})
 	this.foot = this.inner.addElems('div', 'foot', d => {
 		if (display === 'columns'
-			|| d.img?.length > 0 
-			|| d.items !== undefined 
-			|| d.contributors !== undefined 
+			|| d.img?.length > 0
+			|| d.items !== undefined
+			|| d.contributors !== undefined
 			|| d.private_associated_pads !== undefined
 			|| d.associated_pads !== undefined
 			|| d.ongoing_associated_mobilizations !== undefined
@@ -72,8 +73,8 @@ const Entry = function (_kwargs) {
 			metainfo.addElems('div', 'meta meta-contributor')
 				.addElems('a', 'contributor-name')
 				.attr('href', d => {
-					<% if ((['pads', 'templates', 'files'].includes(object) && ['private', 'curated'].includes(space)) 
-						|| object === 'mobilizations') 
+					<% if ((['pads', 'templates', 'files'].includes(object) && ['private', 'curated'].includes(space))
+						|| object === 'mobilizations')
 					{ %>
 						return `?contributors=${d.owner}`
 					<% } else if (object === 'reviews') { %>
@@ -82,8 +83,8 @@ const Entry = function (_kwargs) {
 						return `?countries=${d.iso3}`
 					<% } %>
 				}).html(d => {
-					<% if ((['pads', 'templates', 'files'].includes(object) && ['private', 'curated'].includes(space)) 
-						|| object === 'mobilizations') 
+					<% if ((['pads', 'templates', 'files'].includes(object) && ['private', 'curated'].includes(space))
+						|| object === 'mobilizations')
 					{ %>
 						return d.ownername || '<%- vocabulary["anonymous contributor"][language] %>'
 					<% } else if (object === 'reviews' && space === 'private') { %>
@@ -117,11 +118,11 @@ const Entry = function (_kwargs) {
 				})
 		}.bind(this),
 		actions: function (_sel) {
-			<% 
+			<%
 				let { write } = modules.find(d => d.type === object)?.rights
 				if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-				
-				if (rights >= (write ?? Infinity)) 
+
+				if (rights >= (write ?? Infinity))
 			{ %>
 				_sel.addElems('div', 'btn-group')
 				.addElems('form', 'actions', d => {
@@ -149,9 +150,9 @@ const Entry = function (_kwargs) {
 							<% } %>
 
 							if (publish_dropdown.length > 0) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'button', value: d.id, disabled: !(d.editable && [1, 2].includes(d.status) && (d.available_publications === undefined || d.available_publications > 0)), classname: 'publish', label: '<%- vocabulary["publish"][language] %>', dropdown: publish_dropdown, inputs: [{ name: 'id', value: d.id }, { name: 'title', value: d.title }] })
-							
+
 							// if (d.status > 1) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
-							
+
 							if (d.status > 1) opts.push({ node: 'button', type: 'button', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', fn: unpublishArticles })
 						}
 					<% } else if (object === 'templates') { %>
@@ -168,25 +169,25 @@ const Entry = function (_kwargs) {
 						<% if (space === 'pending') { %>
 							if (!d.is_review) {
 								if (d.reviewers < <%- modules.find(d => d.type === 'reviews')?.reviewers %>) {
-									opts.push({ 
-										action: '/accept/review', 
-										method: 'GET', 
-										node: 'button', 
-										type: 'submit', 
+									opts.push({
+										action: '/accept/review',
+										method: 'GET',
+										node: 'button',
+										type: 'submit',
 										classname: 'accept',
 										label: '<%- vocabulary["accept"][language] %>',
 										value: d.id,
 										inputs: [{ name: 'template', value: d.review_template }]
 									})
 									if (!d.required) {
-										opts.push({ 
-											action: '/decline/review', 
-											method: 'GET', 
-											node: 'button', 
-											type: 'submit', 
+										opts.push({
+											action: '/decline/review',
+											method: 'GET',
+											node: 'button',
+											type: 'submit',
 											classname: 'decline',
 											label: '<%- vocabulary["decline"][language] %>',
-											value: d.id 
+											value: d.id
 										})
 									}
 								}
@@ -211,29 +212,29 @@ const Entry = function (_kwargs) {
 					<% } %>
 
 					return opts
-				}).attrs({ 
-					'action': d => d.action, 
+				}).attrs({
+					'action': d => d.action,
 					'method': d => d.method,
 					'target': d => d.target || null
 				}).each(function (d) {
 					const sel = d3.select(this)
 					sel.addElems('input', 'get-value', d.inputs || [])
-						.attrs({ 
-							'type': 'hidden', 
-							'name': c => c.name, 
-							'value': c => c.value 
+						.attrs({
+							'type': 'hidden',
+							'name': c => c.name,
+							'value': c => c.value
 						})
 
 					sel.addElems(d.node, 'btn-overlay', [d])
 						.classed(d.classname.toLowerCase(), true)
 						.attrs({
-							'type': c => c.type, 
+							'type': c => c.type,
 							'name': c => c.name || 'id',
 							'value': c => c.value,
-							'disabled': c => c.disabled || null 
+							'disabled': c => c.disabled || null
 						}).html(c => c.label)
-					.on('click', function (c) { 
-						c.fn?.call(this) || null 
+					.on('click', function (c) {
+						c.fn?.call(this) || null
 						this.focus()
 					}).on('focus', _ => {
 						const dropdown = sel.select('.dropdown')
@@ -253,9 +254,9 @@ const Entry = function (_kwargs) {
 						.addElems('li', 'opt', d.dropdown)
 						.addElems('button')
 							.classed('highlight', c => c.highlight || false)
-							.attrs({ 
-								'type': c => c.fn ? 'button' : 'submit', 
-								'name': c => c.name, 
+							.attrs({
+								'type': c => c.fn ? 'button' : 'submit',
+								'name': c => c.name,
 								'value': c => c.value,
 								'disabled': c => (c.disabled && !c.highlight) || null
 							}).html(c => c.label)
@@ -277,11 +278,11 @@ const Entry = function (_kwargs) {
 					}) // TO DO: IMPROVE THIS
 					const formdata = { action: '/request/review', method: 'POST' }
 					const message = '<%- vocabulary["select review language"][language] %>'
-					
+
 					const opts = []
 					opts.push({ node: 'select', name: 'language', label: '<%- vocabulary["select language"][language](false) %>', options: target_opts, fn: updateReviewerList })
 					opts.push({ node: 'select', name: 'reviewers', label: '<%- vocabulary["select reviewers"][language] %>', options: reviewer_opts, classname: 'reviewer-list hide', fn: countReviewers })
-					
+
 					inputs.forEach(d => {
 						opts.push({ node: 'input', type: 'hidden', name: d.name, value: d.value })
 					})
@@ -298,14 +299,14 @@ const Entry = function (_kwargs) {
 					const list = reviewer_list.selectAll('.dropdown menu li')
 					const button = form.select('button[type=submit]')
 					button.node().disabled = false
-					
+
 					reviewer_list.classed('hide', false)
 					list.classed('persistent-hide', function () {
 						return !d3.select(this).classed(language)
 					}) // THIS CANNOT BE A SIMPLE hide CALSS AS IT CONFLICTS WITH THE SEARCH OPERATIONS (BECAUSE IT ALSO USES THE class='hide')
 					.select('input')
-					.each(function () { 
-						this.disabled = !d3.select(this.parentNode).classed(language) 
+					.each(function () {
+						this.disabled = !d3.select(this.parentNode).classed(language)
 					})
 				}
 				function countReviewers (d) {
@@ -355,11 +356,11 @@ const Entry = function (_kwargs) {
 					// opts.push({ node: 'input', type: 'date', name: 'invite', value: `${yyyy}-${mm}-${dd}` })
 					opts.push({ node: 'input', type: 'date', name: 'date', value: `${yyyy}-${mm}-${dd}` })
 					// opts.push({ node: 'input', type: 'email', name: 'email' })
-				
+
 					// SET WHETHER TO EXCLUDE OR TO REMOVE RIGHTS
 					// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'revoke', placeholder: 'Remove user rights', checked: true, default: true }) // TO DO: TRANSLATE
 					// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'delete', placeholder: 'Exclude from platform and suite', checked: false, default: true }) // TO DO: TRANSLATE
-					
+
 					opts.push({ node: 'input', type: 'hidden', name: 'id', value: value })
 
 					opts.push({ node: 'button', type: 'submit', label: '<%- vocabulary["revoke"][language] %>' })
@@ -370,14 +371,14 @@ const Entry = function (_kwargs) {
 		img: function (_sel) {
 			_sel.addElems('div', 'media media-img', d => d.img?.length ? [d] : [])
 				.addElems('a', 'pad-link')
-				.attrs({ 
+				.attrs({
 					'href': d => {
 						const queryparams = new URLSearchParams()
 						if (d.id) queryparams.set('id', d.id)
 						if (d.source) queryparams.set('source', d.source)
 						if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
 						if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
-					
+
 						<% if (object === 'reviews') { %>
 							if (!d.is_review && d.reviews?.length > 0) {
 								queryparams.set('display', 'adjacent-reviews')
@@ -394,15 +395,17 @@ const Entry = function (_kwargs) {
 				const node = this
 				const img = new Image()
 				img.onload = function () { node.src = this.src }
-				
+
 				<% if (locals.metadata.site.app_storage) { %>
 					const source = new URL(`<%- locals.metadata.site.app_storage %>${d.img[0]}`).href
 				<% } else { %>
 					const source = d.img[0]
 				<% } %>
 
-				if (display === 'slideshow') img.src = source.replace('uploads/sm/', 'uploads/')
-				else img.src = source
+				if (!mediaSize) var mediaSize = getMediaSize()
+				if (display === 'slideshow' || mediaSize === 'xs') {
+					img.src = source.replace('uploads/sm/', 'uploads/')
+				} else img.src = source
 			})
 		}.bind(this),
 		stats: function (_sel) {
@@ -477,14 +480,14 @@ const Entry = function (_kwargs) {
 		title: function (_sel) {
 			const title = _sel.addElems('div', 'media media-title')
 				.addElems('a', 'pad-link')
-				.attrs({ 
+				.attrs({
 					'href': d => {
 						const queryparams = new URLSearchParams()
 						if (d.id) queryparams.set('id', d.id)
 						if (d.source) queryparams.set('source', d.source)
 						if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
 						if (d.is_review && d.review_template) queryparams.set('template', d.review_template)
-						
+
 						<% if (object === 'reviews') { %>
 							if (!d.is_review && d.reviews?.length > 0) {
 								queryparams.set('display', 'adjacent-reviews')
@@ -516,11 +519,11 @@ const Entry = function (_kwargs) {
 				if (d.txt) {
 					if (!Array.isArray(d.txt)) d.txt = [d.txt]
 					return d.txt.map(c => {
-						return { 
-							id: d.id, 
-							editable: d.editable, 
-							source: d.source, 
-							is_followup: d.is_followup, 
+						return {
+							id: d.id,
+							editable: d.editable,
+							source: d.source,
+							is_followup: d.is_followup,
 							is_review: d.is_review,
 							reviews: d.reviews,
 							txt: c.split(/\n\n+/)[0]
@@ -528,14 +531,14 @@ const Entry = function (_kwargs) {
 					})
 				} else return []
 			}).addElems('a', 'pad-link')
-				.attrs({ 
+				.attrs({
 					'href': d => {
 						const queryparams = new URLSearchParams()
 						if (d.id) queryparams.set('id', d.id)
 						if (d.source) queryparams.set('source', d.source)
 						if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
 						if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
-						
+
 						<% if (object === 'reviews') { %>
 							if (!d.is_review && d.reviews?.length > 0) {
 								queryparams.set('display', 'adjacent-reviews')
@@ -563,8 +566,12 @@ const Entry = function (_kwargs) {
 				.addElems('a', 'tag-link', d => d)
 				.attr('href', d => `?${d.type}=${d.id}`)
 			.addElems('div', 'tag')
+				.attr('title', d => d.name.capitalize())
 				.addElems('label')
-				.html(d => d.name.capitalize())
+				.html(d => {
+					if (d.name.length > 25) return `${d.name.slice(0, 25).capitalize()}…`
+					else return d.name.capitalize()
+				})
 		}.bind(this),
 		metainfo: function (_sel) {
 			const { source, is_followup, is_forward, is_copy, is_child, version_depth } = _sel.datum()
@@ -641,7 +648,7 @@ const Entry = function (_kwargs) {
 			.addElems('a')
 				.attr('href', d => `?mobilizations=${d.mobilization}`)
 				.html(d => d.mobilization_title?.length > 25 ? `${d.mobilization_title.slice(0, 25)}…` : d.mobilization_title)
-			
+
 			<% if (object === 'mobilizations') { %>
 				_sel.addElems('div', 'meta meta-public', d => d.public ? [d] : [])
 					.html('<i><%- vocabulary["public mobilization"][language] %></i> ')
@@ -651,7 +658,7 @@ const Entry = function (_kwargs) {
 				.attr('title', d => d.template_title)
 				.html('<i><%- vocabulary["template"][language](false, false) %>:</i> ')
 			.addElems('a')
-				.attrs({ 
+				.attrs({
 					'href': d => `/<%- language %>/view/template?id=${d.template}`
 					//'target': '_blank'
 				}).html(d => d.template_title?.length > 25 ? `${d.template_title.slice(0, 25)}…` : d.template_title)
@@ -723,7 +730,11 @@ const Entry = function (_kwargs) {
 						.addElems('a')
 							.attrs({ 'href': d => `/forward/<%- object.slice(0, -1) %>?id=${d.source}&mobilization=${d.id}` }) // TO DO: CHECK THIS WORKS
 							.addElems('button')
-							.html(d => d.title)
+							.html(d => {
+								if (!mediaSize) var mediaSize = getMediaSize()
+								if (mediaSize === 'xs' && d.title.length > 25) return `${d.title.slice(0, 25)}…`
+								else return d.title
+							})
 						.on('click', function (d) {
 							const sel = d3.select(this)
 							const li = sel.findAncestor('forward-option')
@@ -735,9 +746,9 @@ const Entry = function (_kwargs) {
 			}
 		}.bind(this),
 		engagement: function (_sel) {
-			<% if (!['mobilizations', 'contributors', 'reviews'].includes(object) 
-				&& !publicpage 
-				&& locals.metadata.site.engagementtypes?.length) 
+			<% if (!['mobilizations', 'contributors', 'reviews'].includes(object)
+				&& !publicpage
+				&& locals.metadata.site.engagementtypes?.length)
 			{ %>
 				const engagementgroup = _sel.addElems('div', 'engagement-group', d => d.status > 1 ? [d] : [])
 
@@ -747,7 +758,7 @@ const Entry = function (_kwargs) {
 					.each(function (d) {
 						<% if (e === 'like') { %>
 							this.disabled = d.disliked
-						<% } else if (e === 'dislike') { %> 
+						<% } else if (e === 'dislike') { %>
 							this.disabled = d.liked
 						<% } %>
 						const sel = d3.select(this)
@@ -780,7 +791,7 @@ const Entry = function (_kwargs) {
 
 								<% if (e === 'like') { %>
 									engagementgroup.select('button.engagement-dislike').attr('disabled', res.active)
-								<% } else if (e === 'dislike') { %> 
+								<% } else if (e === 'dislike') { %>
 									engagementgroup.select('button.engagement-like').attr('disabled', res.active)
 								<% } %>
 							}
@@ -790,20 +801,21 @@ const Entry = function (_kwargs) {
 			<% } %>
 		}.bind(this),
 		pin: function (_sel) {
-			<% if ((object === 'pads' 
+			<% if ((object === 'pads'
 				&& modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)
 				) || (
 				object === 'contributors'
 				&& modules.some(d => d.type === 'teams' && rights >= d.rights.write)
 				)
 			) { %>
-				const pinboards = <%- JSON.stringify(locals.pinboards_list || []) %>
+				let pinboards = (<%- JSON.stringify(locals.pinboards_list || []) %>).filter((pb) => !pb.is_exploration);
 
 				function renderPins (_group, _data) {
 					const pin = _group.addElems('div', 'pin tag', d => {
-						return _data?.map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
-					})
+						return _data?.filter((pb) => !pb.is_exploration).map(c => Object.assign(Object.assign({}, c), { object_id: d.id })) || []
+					}, (d) => d.id)
 					pin.addElems('label', 'name')
+						.classed('notranslate', true)
 						.attr('title', d => d.title)
 						.html(d => {
 							if (d.title.length > 25) return `${d.title.slice(0, 25)}…`
@@ -817,33 +829,12 @@ const Entry = function (_kwargs) {
 								location.reload()
 							<% } else { %>
 								pins.call(renderPins, res.pins)
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard')
-								.filter(c => c.id === d.id)
-								.each(function (c) {
-									// c.count -= 1
-									const sel = d3.select(this)
-									if (c.count === 0) { // IF NOT ASSOCIATED TO A MOBILIZATION
-										sel.remove()
-										// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-										renderPinNavigation(res.pinboards_list)
-									} else {
-										if (d.object_id === c.object_id) {
-											d.checked = null
-											sel.select('input').attr('checked', d.checked)
-											sel.select('input').node().checked = false
-										}
-										// sel.select('.count').html(c.count)
-									}
-								})
-
-								// DECREMENT THE NUMBER OF PINNED PADS FOR THE SELECTED BOARD
-								pinboards.find(b => b.id === d.id).count -= 1
-								// RESET THE MENU
-								d3.select(this).findAncestor('pinboard-group')
-								.each(function (b) {
-									b.pinboards = b.pinboards.filter(a => a.id !== d.id)
-								})
+								if (res.pinboards_list.length !== pinboards.length) {
+									location.reload();
+								}
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
+								renderDropdown(d.object_id);
+								renderPinNavigation(res.pinboards_list);
 							<% } %>
 						}
 					})
@@ -851,7 +842,7 @@ const Entry = function (_kwargs) {
 				function renderPinOptions (_input, _data) {
 					const dropdown = _input.addElems('div', 'dropdown')
 						.addElems('menu')
-					const opts = dropdown.addElems('li', 'pinboard', _data)
+					const opts = dropdown.addElems('li', 'pinboard', _data, (d) => d.id)
 					opts.addElems('input')
 						.attrs({
 							'id': d => `board-${d.id}-object-${d.object_id}`,
@@ -866,64 +857,63 @@ const Entry = function (_kwargs) {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								
-								pinboards.find(b => b.id === d.id).count += 1
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard .count')
-									.filter(c => c.id === d.id)
-								.html(c => c.count += 1)
-
-								sel.findAncestor('pinboard-group')
-								.each(function (c) {
-									c.pinboards.push({ id: d.id, title: d.title })
-								})
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
+								renderDropdown(d.object_id);
+								renderPinNavigation(res.pinboards_list);
 							}
 						} else {
 							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 							if (res.status === 200) {
 								pins.call(renderPins, res.pins)
-								d3.selectAll('.pinboard-group .dropdown')
-									.selectAll('.pinboard').filter(c => c.id === d.id)
-								.each(function (c) {
-									c.count -= 1
-									pinboards.find(b => b.id === d.id).count -= 1
-
-									const sel = d3.select(this)
-									if (c.count === 0) {
-										sel.remove()
-										// ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-										renderPinNavigation(res.pinboards_list)
-									} else {
-										if (d.object_id === c.object_id) {
-											d.checked = null
-											sel.select('input').attr('checked', d.checked)
-											sel.select('input').node().checked = false
-										}
-										sel.select('.count').html(c.count)
-									}
-								})
+								if (res.pinboards_list.length !== pinboards.length) {
+									location.reload();
+								}
+								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
+								renderDropdown(d.object_id);
+								renderPinNavigation(res.pinboards_list);
 							}
 						}
 					})
 					opts.addElems('label', 'title')
+						.classed('notranslate', true)
 						.attr('for', d => `board-${d.id}-object-${d.object_id}`)
 						.html(d => d.title)
 					.addElems('span', 'count')
 						.html(d => d.count)
 				}
 				function renderPinNavigation (_data) {
-					d3.select('#pinboards-list menu')
-						.addElems('li', null, _data)
+					// NOTE: d can be undefined here for elements that were
+					// added through ejs instead of d3
+					d3.select('#pinboards-list-lg menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1)
 					.addElems('a')
+						.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.title)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
+					d3.select('#pinboards-list-xs menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1)
+					.addElems('a')
+						.classed('notranslate', true)
+						.attr('href', d => `./pinned?pinboard=${d.id}`)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
 				}
 
+				const pinPbMap = {};
 				const pingroup = _sel.addElems('div', 'pinboard-group')
-				const pins = pingroup.addElems('div', 'pins')
-				.each(function (d) { d3.select(this).call(renderPins, d.pinboards) })
-				
+				const pins = pingroup.addElems('div', 'pins').each(function(d) {
+					pinPbMap[d.id] = d;
+					d3.select(this).call(renderPins, d.pinboards);
+				})
+
 				const newpin = pingroup.addElems('div', 'add filter')
+
+				const renderDropdown = (pid) => {
+					const d = pinPbMap[pid];
+					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards?.some(b => b.id === c.id) ? true : null }))
+					// RENDER THE DROPDOWN
+					newpin.call(renderPinOptions, data)
+				};
+
 				newpin.addElems('input')
 					.attrs({ 'type': 'text', 'id': 'new-pinboard' })
 				.on('keyup', function (d) {
@@ -941,20 +931,39 @@ const Entry = function (_kwargs) {
 						newpin.select('button').node().click()
 					}
 				}).on('focus', function (d) {
-					const data = pinboards.map(c => Object.assign(Object.assign({}, c), { object_id: d.id, checked: d.pinboards.map(b => b.id).includes(c.id) ? true : null }))
-					// RENDER THE DROPDOWN
-					newpin.call(renderPinOptions, data)
+					renderDropdown(d.id);
 
-					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+					const filter = d3.select(this).findAncestor('filter')
+					const dropdown = filter.select('.dropdown')
+					let { top, height } = this.getBoundingClientRect()
+					top = top + height
+					const viewheight = window.innerHeight
+					if (!mediaSize) var mediaSize = getMediaSize()
+					if (mediaSize === 'xs') {
+						// const { height: padding } = d3.select('#search-and-filter').node().getBoundingClientRect()
+						// if (!padding) padding = 0
+						// if (top + 300 >= viewheight - padding) dropdown.classed('dropup', true)
+						// else dropdown.classed('dropup', false)
+
+						filter.classed('expand', true)
+
+					} else if (top + 300 >= viewheight) dropdown.classed('dropup', true)
+					else dropdown.classed('dropup', false)
+
 					dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 
-					dropdown.selectAll('li').on('mousedown', function () { 
+					dropdown.selectAll('li').on('mousedown', function () {
 						d3.event.preventDefault()
 					})
 				}).on('blur', function () {
-					const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+					const filter = d3.select(this).findAncestor('filter')
+					const dropdown = filter.select('.dropdown')
 					dropdown.node().style.maxHeight = null
 					fixLabel(this)
+
+					if (mediaSize === 'xs') {
+						setTimeout(_ => filter.classed('expand', false), 250)
+					}
 				})
 
 				newpin.addElems('label')
@@ -974,10 +983,12 @@ const Entry = function (_kwargs) {
 
 							if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
 								const res = await POST('/pin', { board_id: existingBoard.datum().id, object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
-								if (res.status === 200) pins.call(renderPins, res.pins)
-								d3.selectAll('.pinboard-group .dropdown').selectAll('.pinboard .count')
-									.filter(c => c.id === d.id)
-									.html(c => c.count += 1)
+								if (res.status === 200) {
+									pins.call(renderPins, res.pins)
+									pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
+									renderDropdown(d.id);
+									renderPinNavigation(res.pinboards_list);
+								}
 							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
@@ -986,9 +997,9 @@ const Entry = function (_kwargs) {
 									// pins.call(renderPins, res.pins)
 									// // ADD THE NEW PINBOARD TO ALL LISTS
 									// d3.selectAll('.pinboard-group').selectAll('.add.filter')
-									// .each(function (c) { 
+									// .each(function (c) {
 									// 	const data = res.pinboards_list.map(b => Object.assign(Object.assign({}, b), { object_id: c.id, checked: c.pinboards.map(a => a.id).includes(b.id) ? true : null }))
-									// 	d3.select(this).call(renderPinOptions, data) 
+									// 	d3.select(this).call(renderPinOptions, data)
 									// })
 									// // ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
 									// renderPinNavigation(res.pinboards_list)
@@ -1064,7 +1075,7 @@ const Entry = function (_kwargs) {
 		contributor: function (_sel) { // THIS DOES NOT SEEM TO BE USED
 			const name = _sel.addElems('div', 'media media-name')
 				.addElems('a', 'pad-link')
-				.attrs({ 
+				.attrs({
 					'href': d => {
 						let query = `id=${d.uuid}`
 						if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${query}`
@@ -1081,7 +1092,7 @@ const Entry = function (_kwargs) {
 			name.addElems('span')
 				.html(d => d.name || '[<%- vocabulary[`untitled ${object.slice(0, -1)}`]?.[language] %>]')
 
-			
+
 			_sel.addElems('div', 'meta meta-email')
 			.html(d => d.email)
 
@@ -1090,7 +1101,10 @@ const Entry = function (_kwargs) {
 
 			_sel.addElems('div', 'meta meta-country')
 			.html(d => d.countryname)
-		}.bind(this)
+		}.bind(this),
+		exploration: (_sel) => {
+			exploration.addDocButtons(_sel, true);
+		},
 	}
 }
 
@@ -1105,12 +1119,12 @@ async function confirmRemoval (action) {
 		let message = ''
 		if (action === 'delete') message = '<%- vocabulary["what pads to delete"][language] %>'
 		else if (action === 'unpublish') message = '<%- vocabulary["what pads to unpublish"][language] %>'
-		
+
 		const opts = [
 			{ node: 'button', type: 'button', label: '<%- vocabulary["all selected"][language] %>', resolve: _ => d3.selectAll('article .outer.expand').data().map(d => d.id) },
-			{ 
-				node: 'button', 
-				type: 'button', 
+			{
+				node: 'button',
+				type: 'button',
 				label: Function(`"use strict";return (<%- vocabulary["only pad"][language] %>)`)()(datum.title),
 				resolve: [ datum.id ]
 			}

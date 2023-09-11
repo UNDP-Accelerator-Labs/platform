@@ -19,9 +19,7 @@
 	margin: 0;
 	padding: 0;
 }
-// body {
-// 	/*background-color: #F3F3F3;*/
-// }
+
 body, text, textarea, input[type=text], button, *:empty:not(:focus):before {
 	font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
 	color: $c-dark-blue;
@@ -57,7 +55,6 @@ input:-webkit-autofill:active  {
 	left: 0;
 	width: 100vw;
 	height: calc(100vh - 30px);
-	overflow: auto;
 	/*background-color: rgba(255,255,255,.75);*/
 	background: repeating-linear-gradient(
 		-45deg,
@@ -71,7 +68,6 @@ input:-webkit-autofill:active  {
 	z-index: 99999;
 
 	.modal {
-
 		.close {
 			float: right;
 			border: none;
@@ -275,6 +271,50 @@ input.toggle:disabled + label::after {
 	top: 0;
 	left: 0;
 }
-/*.fixed {
-	position: fixed !important;
-}*/
+.errormessage {
+	font-size: 12px;
+	color: red;
+	padding-top: 10px;
+}
+
+.btn-1 {
+    display: inline-block;
+    line-height: initial;
+	font-size: .875rem;
+    font-weight: 700;
+    height: 2.5rem;
+    padding: 0 0.8rem;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    transition-duration: 50ms;
+    transition-timing-function: ease-in;
+    white-space: nowrap;
+	letter-spacing: 0;
+    cursor: pointer;
+}
+.btn-1-secondary {
+    background-color: transparent;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #005687 !important;
+    color: #005687 !important;
+}
+.btn-1 a {
+	color: #005687 !important;
+}
+.pt-40 {
+	padding-top: 40px;
+}
+.pb-20 {
+	padding-bottom: 20px;
+}
+
+/* GOOGLE TRANSLATE BASIC STYLING */
+li.googletranslator {
+	.skiptranslate {
+		.goog-te-gadget-simple {
+			border: none;
+		}
+	}
+}

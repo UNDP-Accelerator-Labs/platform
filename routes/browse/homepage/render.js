@@ -175,7 +175,7 @@ module.exports = async (req, res) => {
 			const pads = new Map();
 			(await DB.general.any(`
 				SELECT pb.id, pc.pad FROM pinboards pb
-				INNER JOIN pinboard_contributions pc
+				INNER JOIN pinboard_contributions pc	
 					ON pc.pinboard = pb.id
 				WHERE pb.status > 2 AND pc.db = $1 AND pc.is_included = true
 			`, [ ownId ])).forEach(row => {

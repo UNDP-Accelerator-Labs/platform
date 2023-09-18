@@ -594,9 +594,18 @@ function uploadImg (kwargs) {
 		body: new FormData(form)
 	}).then(res => res.json())
 	.then(json => {
-		const notification = d3.select('body').addElem('div', 'notification')
+		let notification = null
+		const uploaderr = json?.filter(msg => msg.status != 200 && msg.message)
+		if(uploaderr.length){
+			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html('<%- vocabulary["image upload success"][language] %>')
+			.html(uploaderr[0].message  + '<i class="material-icons">done</i>')
+		}
+		else {
+			notification = d3.select('body').addElem('div', 'notification')
+				.addElem('div')
+				.html('<%- vocabulary["image upload success"][language] %>')
+		}
 		setTimeout(_ => notification.remove(), 4000)
 
 		if (editing) {
@@ -673,11 +682,19 @@ function uploadVideo (kwargs) {
 	}).then(res => res.json())
 	.then(json => {
 		ellipsis.remove()
-		const notification = d3.select('body').addElem('div', 'notification')
+		let notification = null
+		const uploaderr = json?.filter(msg => msg.status != 200 && msg.message)
+		if(uploaderr.length){
+			notification = d3.select('body').addElem('div', 'notification')
+			.addElem('div')
+			.html(uploaderr[0].message  + '<i class="material-icons">done</i>')
+		}
+		else {
+			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
 			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons">done</i>')
+		}
 		setTimeout(_ => notification.remove(), 4000)
-
 		if (editing) {
 			if (!publicpage) switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)

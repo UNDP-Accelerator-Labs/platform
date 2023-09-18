@@ -80,17 +80,17 @@
 												<li>
 													<% if (c.equivalents?.length) { %>
 														<% c.equivalents.filter(b => b !== c.id).forEach(b => { %>
-															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id.toString())) { %>disabled<% } %>>
+															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id?.toString())) { %>disabled<% } %>>
 														<% }) %>
 													<% } %>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this); toggletag(this, <%- JSON.stringify(c) %>)'>
+													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id?.toString())) { %>checked<% } %> onchange='addequivalents(this); toggletag(this, <%- JSON.stringify(c) %>)'>
 													<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 												</li>
 											<% }) %>
 										</menu>
 									</div>
 								</div>
-								<% const active_filters = d[key].filter(c => query?.[key]?.includes(c.id.toString()))
+								<% const active_filters = d[key].filter(c => query?.[key]?.includes(c.id?.toString()))
 								if (active_filters.length) { %>
 									<div class='active-filters'>
 										<% active_filters.forEach(c => { %>

@@ -167,21 +167,22 @@
 	<div class='public-page-panel'>
 		<div class='inner'>
 			<h3 class="google-translate-attr"><%- vocabulary['browse collections'][language] %></h3>
-			<p class='description'>Collections are curated by contributors.</p>
+			<p class='description'>Collections are curated by our community members.</p>
 			<!-- TO DO: TRANSLATE -->
 			<ul class='columns'>
-			<% locals.pinboards.forEach(d => { %>
-				<li >
+			<% locals.pinboards.filter(d => logged ? true : d.count > 0).forEach(d => { %>
+				<li>
 					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
+					<!-- TO DO: FIX THIS -->
 					<small class="google-translate-attr"><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>
-					<small class='contributor google-translate-attr'><%- vocabulary['curation credit'][language](d.owner, 'Bob', 'contributors') %></small>
+					<small class='contributor google-translate-attr'><%- vocabulary['curation credit'][language](d.owner, d.ownername, 'contributors') %></small>
 				</li>
 			<% }) %>
 			</ul>
 		</div>
 	</div>
 </div>
-<div class='sidebar'></div>
+<div class='sidebar xl xxl'></div>
 </div>
 
 <%- include ('./partials/footer.ejs') %>

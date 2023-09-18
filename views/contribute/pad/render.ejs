@@ -563,6 +563,7 @@ function addLoader (sel) {
 
 function populateSection (data, lang = 'en', section) {
 	// MEDIA
+	console.log(data)
 	return new Promise(async resolve => {
 		if (data.type === 'title' && publicpage) addTitle({ data, lang, section })
 		if (data.type === 'img') addImg({ data, lang, section })
@@ -593,9 +594,18 @@ function uploadImg (kwargs) {
 		body: new FormData(form)
 	}).then(res => res.json())
 	.then(json => {
-		const notification = d3.select('body').addElem('div', 'notification')
+		let notification = null
+		const uploaderr = json?.filter(msg => msg.status != 200 && msg.message)
+		if(uploaderr.length){
+			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html('<%- vocabulary["image upload success"][language] %>')
+			.html(uploaderr[0].message  + '<i class="material-icons">done</i>')
+		}
+		else {
+			notification = d3.select('body').addElem('div', 'notification')
+				.addElem('div')
+				.html('<%- vocabulary["image upload success"][language] %>')
+		}
 		setTimeout(_ => notification.remove(), 4000)
 
 		if (editing) {
@@ -672,11 +682,19 @@ function uploadVideo (kwargs) {
 	}).then(res => res.json())
 	.then(json => {
 		ellipsis.remove()
-		const notification = d3.select('body').addElem('div', 'notification')
+		let notification = null
+		const uploaderr = json?.filter(msg => msg.status != 200 && msg.message)
+		if(uploaderr.length){
+			notification = d3.select('body').addElem('div', 'notification')
+			.addElem('div')
+			.html(uploaderr[0].message  + '<i class="material-icons">done</i>')
+		}
+		else {
+			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
 			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons">done</i>')
+		}
 		setTimeout(_ => notification.remove(), 4000)
-
 		if (editing) {
 			if (!publicpage) switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)
@@ -1454,7 +1472,7 @@ function addTxt (kwargs) {
 	if (!is_excerpt) is_excerpt = false
 	required = required ?? false
 
-	if (!editing && txt?.toString().trim().length === 0) return null
+	if (!editing && activity !== 'preview' && txt?.toString().trim().length === 0) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
@@ -1566,7 +1584,7 @@ function addTxt (kwargs) {
 				return d.value - this.innerText.length
 			})
 		}
-	}).addElems('p', null, d => d.txt.split('\n').filter(c => c))
+	}).addElems('p', null, d => d.txt?.toString().split('\n').filter(c => c))
 	.html(d => {
 		// return d.txt.replace(/\r?\n/g, '<br/>')
 		return d.URLsToLinks()
@@ -1585,7 +1603,7 @@ function addEmbed (kwargs) {
 	if (!src) src = null
 	required = required ?? false
 
-	if (!editing && (html?.trim().length === 0 || src?.length === 0)) return null
+	if (!editing && activity !== 'preview' && (html?.trim().length === 0 || src?.length === 0)) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
@@ -1722,7 +1740,7 @@ function addChecklist (kwargs) {
 	}
 	required = required ?? false
 
-	if (!editing && options?.length === 0) return null
+	if (!editing && activity !== 'preview' && options?.length === 0) return null
 
 	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -1910,7 +1928,7 @@ function addRadiolist (kwargs) {
 	}
 	required = required ?? false
 
-	if (!editing && options?.length === 0) return null
+	if (!editing && activity !== 'preview' && options?.length === 0) return null
 
 	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -2086,7 +2104,7 @@ function addLocations (kwargs) {
 	let dragging = false
 	required = required ?? false
 
-	if (!editing && centerpoints?.length === 0) return null
+	if (!editing && activity !== 'preview' && centerpoints?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2321,7 +2339,7 @@ function addIndexes (kwargs) {
 		tags.sort((a, b) => a.key - b.key)
 		required = required ?? false
 
-		if (!editing && tags?.length === 0) return null
+		if (!editing && activity !== 'preview' && tags?.length === 0) return null
 
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 		if (input) input.disabled = true
@@ -2367,7 +2385,7 @@ async function addTags (kwargs) {
 	if (!tags) tags = []
 	required = required ?? false
 
-	if (!editing && tags?.length === 0) return null
+	if (!editing && activity !== 'preview' && tags?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2409,7 +2427,7 @@ async function addAttachment (kwargs) {
 	if (!srcs) srcs = []
 	required = required ?? false
 
-	if (!editing && srcs?.length === 0) return null
+	if (!editing && activity !== 'preview' && srcs?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2532,7 +2550,7 @@ function addGroup (kwargs) {
 	if (!items) items = []
 	if (!values) values = []
 
-	if (!editing && items?.length === 0) return null
+	if (!editing && activity !== 'preview' && items?.length === 0) return null
 
 	if (editing && !items.length && templated) items.push(JSON.parse(JSON.stringify(structure)))
 

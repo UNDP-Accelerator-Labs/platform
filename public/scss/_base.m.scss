@@ -4,11 +4,20 @@ html, body {
 	font-size: $t-main;
 	line-height: 1.3em;
 }
-
-.lg {
+.xs:not(.m),
+.sm:not(.m),
+.lg:not(.m),
+.xl:not(.m),
+.xxl:not(.m) {
 	display: none !important;
 }
 
+
+.no-bg {
+	background-color: transparent !important;
+}
+
+/* TBD: WHERE IS THIS INTRODUCED */
 .modal {
 	width: 350px;
 	flex-shrink: 1;

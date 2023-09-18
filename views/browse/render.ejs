@@ -371,23 +371,27 @@ const Entry = function (_kwargs) {
 		img: function (_sel) {
 			_sel.addElems('div', 'media media-img', d => d.img?.length ? [d] : [])
 				.addElems('a', 'pad-link')
-				.attrs({
-					'href': d => {
-						const queryparams = new URLSearchParams()
-						if (d.id) queryparams.set('id', d.id)
-						if (d.source) queryparams.set('source', d.source)
-						if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
-						if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
+				// .attrs({
+				// 	'href': d => {
+				// 		const queryparams = new URLSearchParams()
+				// 		if (d.id) queryparams.set('id', d.id)
+				// 		if (d.source) queryparams.set('source', d.source)
+				// 		if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
+				// 		if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
 
-						<% if (object === 'reviews') { %>
-							if (!d.is_review && d.reviews?.length > 0) {
-								queryparams.set('display', 'adjacent-reviews')
-								return `/<%- language %>/view/pad?${queryparams.toString()}`
-							}
-						<% } %>
-						if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-					}//, 'target': '_blank'
+				// 		<% if (object === 'reviews') { %>
+				// 			if (!d.is_review && d.reviews?.length > 0) {
+				// 				queryparams.set('display', 'adjacent-reviews')
+				// 				return `/<%- language %>/view/pad?${queryparams.toString()}`
+				// 			}
+				// 		<% } %>
+				// 		if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+				// 		else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+				// 	}
+				// })
+				.on('click', d => {
+					// THIS ENLARGES THE IMAGE INSTED OF OPENING THE PAD
+					renderImgZoom({ src: d.img.map(c => c.replace('/sm/', '/'))[0] })
 				})
 			.addElems('img', 'vignette')
 				.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })

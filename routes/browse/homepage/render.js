@@ -186,23 +186,25 @@ module.exports = async (req, res) => {
 			const pbids = [...pads.keys()];
 			const counts = await t.batch(pbids.map((pbid) => {
 				return t.one(`
-					SELECT COUNT(*) AS count
+					SELECT COUNT(*)::INT AS count
 					FROM pads p
 					WHERE p.id IN ($2:csv)
 						$1:raw
 				`, [ full_filters, safeArr(pads.get(pbid), -1) ]);
 			}));
-			const countMap = new Map(pbids.map((pbid, index) => [pbid, counts[index]]));
+			const countMap = new Map(pbids.map((pbid, index) => [ pbid, counts[index] ]));
 			return (await DB.general.any(`
-				SELECT pb.id, pb.title, pb.date, pb.owner,
+				SELECT pb.id, pb.title, pb.date, pb.owner, u.name AS ownername,
 					CASE WHEN EXISTS (
 						SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
 					) THEN TRUE ELSE FALSE END AS is_exploration
 				FROM pinboards pb
+				INNER JOIN users u
+					ON u.uuid = pb.owner
 				WHERE pb.status > 2
 			;`, [ full_filters ])).map(pbRow => ({
 				...pbRow,
-				count: countMap.get(pbRow.id),
+				count: countMap.get(pbRow.id)?.count ?? 0,
 			}));
 		}).catch(err => console.log(err)));
 

@@ -85,13 +85,15 @@
 <%- include ('../../partials/menu-languages.ejs') %>
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
-<div class='main-content'>
+<div class='main-content<% if (pagedisplay.includes("adjacent")) { %> adjacent<% } %>'>
+<header<% if (pagedisplay === 'slideshow' || pagedisplay.includes('adjacent')) { %> class='folded'<% } %>>
+	<div class='inner'>
+		<%- include ('../../partials/menu-logo.ejs') %>
+	</div>
+</header>
+
 <% if (!pagedisplay.includes('adjacent')) { %>
-	<header>
-		<div class='inner'>
-			<%- include ('../../partials/menu-logo.ejs') %>
-		</div>
-	</header>
+	<div class='filler m'></div>
 <% } %>
 
 <%- include ('../../partials/modals.ejs') %>
@@ -99,11 +101,11 @@
 <% if (locals.source) { %>
 	<% if (pagedisplay === 'adjacent-source') { %>
 		<% if (object !== 'review' && !locals.data?.is_review) { %>
-			<div class='display-option display-source split-screen lg'><a>
+			<div class='display-option display-source split-screen lg xl xxl'><a>
 				<button><%- vocabulary['hide source'][language] %></button>
 			</a></div>
 		<% } %>
-		<div id='source' class='document split-screen lg'></div>
+		<div id='source' class='document split-screen m lg xl xxl'></div>
 		<script type='text/javascript'>
 			loadHTML('../view/pad?id=<%- locals.source %><% if (object === "review" || locals.data?.is_review) { %>&anonymize=true<% } %>', '#pad', '#source')
 
@@ -114,7 +116,7 @@
 			d3.select('div.display-source a').attr('href', `?${queryparams.toString()}`)
 		</script>
 	<% } else { %>
-		<div class='display-option display-source lg <% if (locals.data?.reviews?.length > 0) { %>split-screen<% } %>'><a>
+		<div class='display-option display-source m lg xl xxl <% if (locals.data?.reviews?.length > 0) { %>split-screen<% } %>'><a>
 			<button><%- vocabulary['display source'][language] %></button>
 		</a></div>
 		<script type='text/javascript'>
@@ -131,10 +133,10 @@
 	&& (locals.data.owner === locals.metadata.user.uuid || locals.data.reviews.some(d => d.owner === locals.metadata.user.uuid))
 ){ %>
 	<% if (pagedisplay === 'adjacent-reviews') { %>
-		<div class='display-option display-reviews split-screen right lg google-translate-attr'><a>
+		<div class='display-option display-reviews split-screen right lg xl xxl google-translate-attr'><a>
 			<button><%- vocabulary['hide reviews'][language] %></button>
 		</a></div>
-		<div id='reviews' class='document split-screen right lg'>
+		<div id='reviews' class='document split-screen right lg xl xxl'>
 			<% locals.data.reviews.forEach((d, i) => { %>
 				<div id='review-<%- i %>' class='review'></div>
 			<% }) %>
@@ -151,7 +153,7 @@
 			d3.select('div.display-reviews a').attr('href', `?${queryparams.toString()}`)
 		</script>
 	<% } else { %>
-		<div class='display-option display-reviews lg google-translate-attr <% if (locals.source) { %>split-screen right<% } %>'><a>
+		<div class='display-option display-reviews lg xl xxl google-translate-attr<% if (locals.source) { %> split-screen right<% } %>'><a>
 			<button><%- vocabulary['display reviews'][language] %></button>
 		</a></div>
 		<script type='text/javascript'>
@@ -172,7 +174,7 @@
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
 					<div class='btn-group'>
 						<% if (editing) { %>
-							<div class='save xs google-translate-attr'>
+							<div class='save xs sm google-translate-attr'>
 								<form>
 									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][language] %></button>
 								</form>
@@ -290,7 +292,7 @@
 							<!-- AS ESSENTIALLY THIS IS PUBLISHING THE PAD -->
 							<!-- TO DO: REMOVE if (false) TO REACTIVATE THIS -->
 							<% if (false) { %>
-								<form class='lg' method='POST' action='/generate/pdf'>
+								<form class='lg xl xxl' method='POST' action='/generate/pdf'>
 									<input type='hidden' name='id' value='<%- locals.metadata?.page?.query?.id?.[0] %>'>
 									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
 									<% if (locals.data?.status === 0 || !locals.data?.status) { %>
@@ -399,12 +401,15 @@
 		</div>
 	</main>
 </div>
-<div class='sidebar lg'>
+<% console.log(pagedisplay) %>
+<% console.log(!pagedisplay.includes('adjacent')) %>
+<% if (!pagedisplay.includes('adjacent')) { %>
+<div class='sidebar xs sm m lg xl xxl'>
 	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
 	{ %>
-		<button class='input-toolbox xs'><i class='material-icons'>edit</i></button>
+		<button class='input-toolbox xs sm'><i class='material-icons'>edit</i></button>
 		<div class='media-input-group input-group' tabindex=1>
-			<% if (!templated) { %><button class='scroll-up m lg'><label>&rsaquo;</label></button><% } %>
+			<% if (!templated) { %><button class='scroll-up m lg xl xxl'><label>&rsaquo;</label></button><% } %>
 			<div class='inner'>
 				<div class='btn-group'>
 				<% if (!templated) { %>
@@ -433,17 +438,17 @@
 					<% metafields.forEach(d => { %>
 						<button class='labeled google-translate-attr' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
 							<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
-							<label class='lg'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
+							<label class='lg xl xxl'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
 						</button>
 					<% }) %>
 				<% } %>
 				</div>
 			</div>
-			<% if (!templated) { %><button class='scroll-down m lg'><label>&rsaquo;</label></button><% } %>
+			<% if (!templated) { %><button class='scroll-down m lg xl xxl'><label>&rsaquo;</label></button><% } %>
 		</div>
 		<script type='text/javascript'>
 			if (!mediaSize) var mediaSize = getMediaSize()
-			if (mediaSize === 'xs') {
+			if (['xs', 'sm'].includes(mediaSize)) {
 				d3.select('button.input-toolbox')
 				.on('touchend, click', function () {
 					d3.select(this).toggleClass('highlight')
@@ -495,6 +500,7 @@
 		</script>
 	<% } %>
 </div>
+<% } %>
 </div>
 
 <% if (pagedisplay !== 'slideshow') { %><footer>
@@ -1070,7 +1076,7 @@
 				window.sessionStorage.removeItem('changed-content')
 
 				if (!mediaSize) var mediaSize = getMediaSize()
-				if (mediaSize === 'xs') {
+				if (['xs', 'sm'].includes(mediaSize)) {
 					const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 					save_btn.select('button')
 						.html('<%- vocabulary["changes saved"][language] %>')
@@ -1383,13 +1389,11 @@
 			d3.selectAll('.media-layout').classed('focus', false)
 
 			const section = d3.select('main#pad div.inner div.body')
-				// .insertElem(sibling || ':last-child', 'section', `media-layout layout ${activity}`)
 				.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
 				.classed('repeat', repeat || false)
 				// .classed('focus', focus && !templated)
 				.datum({ type: 'section', title, lead, structure, items, repeat, group })
 			.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
-			// .addElems('div', 'inner')
 
 			// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
 			if (title || lead) {
@@ -1556,6 +1560,15 @@
 			left: i * slidewidth,
 			behavior: 'smooth'
 		})
+
+		if (editing) {
+			main.selectAll('.focus').classed('focus', false)
+			const containers = main.selectAll('.media-container, .meta-container')
+			containers.selectAll('.inset')
+				.style('max-height', null)
+			d3.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
+		}
+
 		return idx = i
 	}
 

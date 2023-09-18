@@ -4,11 +4,15 @@ html, body {
 	font-size: $t-main;
 	line-height: 1.3em;
 }
-.xs,
-.sm,
-.m {
-	display: none;
+.xs:not(.lg),
+.sm:not(.lg),
+.m:not(.lg),
+.lg:not(.lg),
+.xl:not(.lg),
+.xxl:not(.lg) {
+	display: none !important;
 }
+
 .no-bg {
 	background-color: transparent !important;
 }

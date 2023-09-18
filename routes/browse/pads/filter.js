@@ -2,9 +2,10 @@ const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('
 const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	let { uuid, country, rights, collaborators, public } = req.session || {};
-	let { space, object, instance } = req.params || {};
-	if (!space) space = req.body?.space;
+	const { uuid, country, rights, collaborators, public } = req.session || {}
+
+	let { space, object, instance } = req.params || {}
+	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 

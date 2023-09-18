@@ -4,6 +4,7 @@ const contributors = require('./contributors/')
 const tags = require('./tags/')
 const statistics = require('./statistics/')
 const tokens = require('./tokens/')
+const locations = require('./locations/')
 const jwt = require('jsonwebtoken')
 const { modules } = include('config/')
 const engage  = include('routes/engage/pin/pad')
@@ -37,6 +38,7 @@ module.exports = async (req, res, next) => {
 		else if (object === 'contributors') contributors.json(req, res)
 		else if (object === 'tags') tags(req, res)
 		else if (object === 'statistics') statistics(req, res)
+
 		else if (object === 'global'){
 			const data = await load.global({req, res});
 			return res.json(data)
@@ -54,6 +56,9 @@ module.exports = async (req, res, next) => {
 				else if (body_action === 'delete') return engage.unpin(req, res)
 			}
 		}
+
+		else if (object === 'countries') locations.countries(req, res)
+		else if (object === 'regions') locations.regions(req, res)
 		else res.redirect('/module-error')
 	} else if (action === 'request') {
 		if (object === 'token') tokens.generate(req, res)

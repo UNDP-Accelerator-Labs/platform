@@ -31,7 +31,7 @@ module.exports = (kwargs) => {
 					resolve({ status: 200, message: `Message sent!` })
 				  });
 			} else {
-				console.log('should not send email because not in prodcution')
+				console.log('should not send email because not in production')
 				resolve(null)
 			}
 		})

@@ -389,9 +389,10 @@ const Entry = function (_kwargs) {
 				// 		else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 				// 	}
 				// })
-				.on('click', d => {
+				.on('click', function (d) {
 					// THIS ENLARGES THE IMAGE INSTED OF OPENING THE PAD
-					renderImgZoom({ src: d.img.map(c => c.replace('/sm/', '/'))[0] })
+					const img = d3.select(this).select('img').node().src
+					renderImgZoom({ src: img.replace('/sm/', '/') })
 				})
 			.addElems('img', 'vignette')
 				.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })

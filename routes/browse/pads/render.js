@@ -156,9 +156,10 @@ module.exports = async (req, res) => {
 						) THEN TRUE ELSE FALSE END AS is_exploration
 					FROM pinboards p
 					WHERE $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = p.id)
+					AND EXISTS (SELECT 1 FROM pinboard_contributions WHERE pinboard = p.id AND db = $1 AND is_included = true)
 					GROUP BY p.id
 					ORDER BY p.title
-				;`, [ uuid ]).then(rows => {
+				;`, [ uuid, ownId ]).then(rows => {
 					return rows.map((row) => {
 						let count = 0;
 						if (pcounts.has(row.id)) {

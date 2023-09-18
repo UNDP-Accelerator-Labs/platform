@@ -399,9 +399,9 @@ div.public-page-panel {
 					}
 				}
 			}
-			.stat-group:nth-child(2) {
-/*				border-left: 1px dotted $c-light-grey;*/
-			}
+// 			.stat-group:nth-child(2) {
+// /*				border-left: 1px dotted $c-light-grey;*/
+// 			}
 		}
 		.map-container {
 			width: calc(100% + (100vw - 100%) / 2);
@@ -2655,5 +2655,21 @@ footer {
 			height: auto;
 		}
 	}
+}
 
+.engagement-reads-icon {
+	max-width: 28px;
+	height: 28px;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+	opacity: 0.6;
+}
+.engagement-reads-count {
+	margin-left: 5px;
+	font-size: 0.9em;
+	color: $c-mid-grey;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
 }

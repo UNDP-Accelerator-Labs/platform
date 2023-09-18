@@ -3,11 +3,12 @@
     const originalUrl = locals.metadata.page.originalUrl;
     const uuid = locals.metadata.user.uuid;
     const { id } = locals.data;
+    const readTime = 3000;  // time it takes to register a read in milliseconds
 %>
 <% if (object === 'pad' && id) { %>
 <script type="text/javascript" defer>
     <% if (!uuid) { %>
-        const totalTime = 10000;
+        const totalTime = <%- readTime %>;
         let startTime = performance.now();
         let currentProgress = 0;
         let active = true;

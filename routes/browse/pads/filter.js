@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
 	const { uuid, country, rights, collaborators, public } = req.session || {}
 
 	let { space, object, instance } = req.params || {}
-	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)

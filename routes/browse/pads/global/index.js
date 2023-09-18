@@ -13,8 +13,7 @@ module.exports = async kwargs => {
         batch.push(load.filters_menu({ connection: t, req, res, }))
         batch.push(load.statistics({ connection: t, req, res, })) 
         batch.push(load.map_data({ connection: t, req, res, })) 
-        batch.push(load.pinboard_list({ connection: t, req, res, })) 
-            
+        
         return t.batch(batch)
         .catch(err => console.log(err))
 	})

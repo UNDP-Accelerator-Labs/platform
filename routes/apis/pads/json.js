@@ -167,8 +167,8 @@ module.exports = async (req, res) => {
 									} else {
 										if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 											// return path.join(app_storage, c)
-											return new URL(c, app_storage)
-										} else return new URL(c, host)
+											return new URL(c, app_storage)?.href
+										} else return new URL(c, host)?.href
 										// } else return path.join(host, c)
 									}
 								}

@@ -378,6 +378,46 @@
 		}
 	}
 
+	function renderImgZoom (data) {
+		const { src } = data
+
+		d3.select('nav.filter').classed('open', false)
+		d3.selectAll('div.screen').classed('hide', true)
+		const screen = d3.select('div.screen')
+			.classed('hide', false)
+			.classed('dark', true)
+		
+		const modal = screen.addElems('div', 'modal')
+		modal.addElems('button', 'close inlaid')
+		.on('click', function () {
+			modal.remove()
+			screen.classed('hide', true)
+				.classed('dark', false)
+		}).html('Close') // TO DO: TRANSLATE
+
+		const inner = modal.addElems('div', 'inner unpadded')
+		inner.addElems('img', 'zoom', src ? [src] : [])
+			.attr('loading', 'lazy')
+			.each(function (d) {
+				const sel = d3.select(this)
+				const node = this
+				const img = new Image()
+				img.onload = function () { 
+					node.src = this.src
+					let width = Math.min(this.naturalWidth, window.innerWidth)
+					const excessiveheight = ((width / this.naturalWidth) * this.naturalHeight) > (window.innerHeight - 60)
+
+					if (!excessiveheight) sel.findAncestor('modal').style('width', `${width}px`)
+					else {
+						const ratio = (window.innerHeight - 60) / ((width / this.naturalWidth) * this.naturalHeight)
+						console.log(ratio)
+						sel.findAncestor('modal').style('width', `${width * ratio}px`)
+					}
+				}
+				img.src = d
+			})
+	}
+
 	window.addEventListener('keyup', function (e) {
 		e = e || event
 		if (e.key === 'Escape' || e.keyCode === 27) {

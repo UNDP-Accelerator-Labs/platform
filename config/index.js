@@ -34,6 +34,8 @@ exports.app_suite_secret = app_suite_secret
 exports.app_description = app_description
 exports.app_storage = process.env.AZURE_STORAGE_CONNECTION_STRING ? new URL(app_title_short, app_storage).href : undefined // TO DO: UPDATE THIS WITH THE CORRECT CONTAINER
 
+console.log(app_storage)
+
 exports.colors = colors
 
 // DESIRED MODULES

@@ -371,7 +371,8 @@ module.exports = async (req, res) => {
 								d.snippet = parsers.getTxt(d)?.[0]
 								if (app_storage) {
 									const vignette_path = parsers.getImg(d, true)?.[0]
-									if (vignette_path) d.vignette = path.join(app_storage, vignette_path)
+									// if (vignette_path) d.vignette = path.join(app_storage, vignette_path)
+									if (vignette_path) d.vignette = new URL(vignette_path, app_storage)?.href
 									else d.vignette = null
 								}
 								// FIGURE OUT WHICH CONTENT STRUCTURE TO KEEP

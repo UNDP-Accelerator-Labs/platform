@@ -5,7 +5,7 @@ const ipInfoToken = process.env.IPINFO_TOKEN;
 
 const ipCountry = async (req) => {
     if (!req.session.user_country || req.session.user_country === 'NUL') {
-        const user_ip = req.ip;
+        const user_ip = `${req.ip}`.replace(/:[0-9][0-9]+$/, '');
         let country = 'NUL';
         if (ipInfoToken && !['127.0.0.0', '::1'].includes(user_ip)) {
             try {

@@ -22,15 +22,12 @@ const app = express()
 app.use(cors());
 
 app.set('view engine', 'ejs')
+app.set('trust proxy', true) // trust leftmost proxy
 app.use(express.static(path.join(__dirname, './public')))
 app.use('/scripts', express.static(path.join(__dirname, './node_modules')))
 app.use('/config', express.static(path.join(__dirname, './config')))
 app.use(bodyparser.json({ limit: '50mb' }))
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
-
-if (process.env.NODE_ENV === 'production') {
-	app.set('trust proxy', true) // trust leftmost proxy
-}
 
 const cookie = {
 	httpOnly: true, // THIS IS ACTUALLY DEFAULT

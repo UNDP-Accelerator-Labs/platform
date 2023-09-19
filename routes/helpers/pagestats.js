@@ -14,11 +14,11 @@ const ipCountry = async (req) => {
                 if (resp.ok) {
                     country = `${await resp.text()}`;
                 } else {
-                    console.log(`IP GEOLOCATION API ERROR: ${await resp.text()}`);
+                    console.log(`IP GEOLOCATION API ERROR FOR IP ${user_ip}: ${await resp.text()}`);
                 }
             } catch(e) {
                 // ignore errors
-                console.log(`IP GEOLOCATION API ERROR: ${e}`);
+                console.log(`IP GEOLOCATION API ERROR FOR IP ${user_ip}: ${e}`);
             }
             if (country.length > 3) {
                 console.log(`IP GEOLOCATION API ERROR: encountered invalid country ${country}`);

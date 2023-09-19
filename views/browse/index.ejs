@@ -189,7 +189,6 @@
 							})
 
 							window.addEventListener('mouseup', function (e) {
-								console.log('here')
 								if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('spaces')) {
 									d3.selectAll('nav.tabs .inner .open').classed('open', false)
 									.selectAll('.dropdown')
@@ -376,7 +375,7 @@
 
 					<!-- MAP -->
 					<% if (
-						((locals.metadata.page.map 
+						((locals.metadata.page.map
 							&& locals.stats?.filtered > 0)
 						&& !(space === 'pinned'
 							&& (!locals.pinboard?.editable || activity === 'preview')

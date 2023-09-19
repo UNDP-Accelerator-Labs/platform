@@ -16,7 +16,7 @@ exports.modules = [
 	{ type: 'pinboards', rights: { read: 0, write: 1 } },
 	{ type: 'templates', rights: { read: 2, write: 3 } },
 	// { type: 'files', rights: { read: 0, write: 1 } },
-	{ type: 'reviews', rights: { read: 1, write: 1, coordinate: 3 }, reviewers: 2 },
+	{ type: 'reviews', rights: { read: 1, write: 1, coordinate: 3 }, reviewers: 1 },
 	// { type: 'mobilizations', rights: { read: 2, write: 2 } },
 	{ type: 'contributors', rights: { read: 2, write: 2 } },
 	{ type: 'teams', rights: { read: 2, write: 2 } }

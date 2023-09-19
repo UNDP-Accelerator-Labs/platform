@@ -92,6 +92,8 @@ div.exploration {
 	justify-content: space-between;
 	align-items: start;
 	height: 51px;
+	padding-left: 15px;
+	padding-right: 15px;
 
 	* {
 		font-size: 12px;
@@ -132,4 +134,8 @@ div.exploration {
 		width: auto;
 		margin-right: 5px;
 	}
+}
+
+.exploration-local {
+	padding-left: 15px;
 }

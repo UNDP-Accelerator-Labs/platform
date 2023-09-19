@@ -305,6 +305,12 @@ nav.tabs {
 									transform: none;
 									text-align: left;
 									/*white-space: nowrap;*/
+
+									.count {
+										float: right;
+										text-align: right;
+										color: $c-light-grey;
+									}
 								}
 
 								&:hover {
@@ -1052,7 +1058,7 @@ header {
 .sidebar {
 	display: block;
 	top: 0;
-	
+
 	& > .inner {
 		position: sticky;
 		top: 0px;

@@ -144,3 +144,20 @@ function multiSelection (sel, targets) {
 		}
 	}
 }
+let ensureIconRegistered = false;
+function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
+	if (ensureIconRegistered) {
+		return;
+	}
+	const iconUpdate = () => {
+		d3.selectAll(classSel).attr('src', () => {
+			return Math.random() < 0.01 ? altName : name;
+		});
+		setTimeout(() => {
+			d3.selectAll(classSel).attr('src', name);
+			setTimeout(iconUpdate, timingTotal - timingShort);
+		}, timingShort);
+	};
+	setTimeout(iconUpdate, timingTotal);
+	ensureIconRegistered = true;
+}

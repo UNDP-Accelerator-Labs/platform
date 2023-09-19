@@ -287,7 +287,7 @@ nav.tabs {
 									margin: 0 0 5px 15px;
 									color: $c-light-grey;
 									text-align: right;
-									
+
 									&::before {
 										content: none;
 									}
@@ -353,6 +353,12 @@ nav.tabs {
 											font-size: $t-mid-small;
 											line-height: 1.5em;
 											transform: none;
+
+											.count {
+												float: right;
+												text-align: right;
+												color: $c-light-grey;
+											}
 										}
 
 										&:hover {

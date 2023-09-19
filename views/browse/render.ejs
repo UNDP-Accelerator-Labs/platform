@@ -804,6 +804,13 @@ const Entry = function (_kwargs) {
 					})
 				<% }) %>
 			<% } %>
+			const readsCounter = _sel.addElems('span', 'engagement-reads');
+			readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+			ensureIcon('.engagement-reads-icon', '/imgs/icons/i-eye.svg', '/imgs/icons/i-eye-closed.svg', 200, 2000);
+
+			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
+				return d.readCount ?? '0';
+			});
 		}.bind(this),
 		pin: function (_sel) {
 			<% if ((object === 'pads'
@@ -889,18 +896,22 @@ const Entry = function (_kwargs) {
 				function renderPinNavigation (_data) {
 					// NOTE: d can be undefined here for elements that were
 					// added through ejs instead of d3
-					d3.select('#pinboards-list-lg menu')
-						.addElems('li', null, _data, (d) => d ? d.id : -1)
-					.addElems('a')
-						.classed('notranslate', true)
+					const lglis = d3.select('#pinboards-list-lg menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1);
+					const lgas = lglis.addElems('a');
+					lgas.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
-					d3.select('#pinboards-list-xs menu')
-						.addElems('li', null, _data, (d) => d ? d.id : -1)
-					.addElems('a')
-						.classed('notranslate', true)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title);
+					lgas.addElems('span', 'count')
+						.html(d => d.count);
+					const xslis = d3.select('#pinboards-list-xs menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1);
+					const xsas = xslis.addElems('a');
+					xsas.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title);
+					xsas.addElems('span', 'count')
+						.html(d => d.count);
 				}
 
 				const pinPbMap = {};

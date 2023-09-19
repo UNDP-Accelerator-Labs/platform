@@ -1,5 +1,5 @@
-const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers } = include('routes/helpers/')
+const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, fuzzNumber, convertNum } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -15,7 +15,7 @@ module.exports = (req, res) => {
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
 		return check_authorization({ connection: t, id, template, mobilization, source, uuid, rights, collaborators, public })
-		.then(result => {
+		.then(async result => {
 			const { authorized, redirect } = result
 
 			if (!authorized) {
@@ -134,9 +134,23 @@ module.exports = (req, res) => {
 							}
 							result.reviews.sort((a, b) => a.id - b.id)
 						}
+						const ownId = await ownDB();
+						const readCount = await DB.general.any(`
+							SELECT read_count AS rc
+							FROM page_stats
+							WHERE pad = $1::INT AND db = $2 AND page_url = '' AND country = ''
+						`, [id, ownId]);
+						result.readCount = convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
 						const data = await join.users(result, [ language, 'owner' ])
 						return data
 					}).catch(err => console.log(err)))
+				}
+
+				if (id && !uuid) {
+					const user_country = await pagestats.ipCountry(req);
+					const page_url = req.originalUrl;
+					await pagestats.recordView(id, page_url, user_country, true);
+					await pagestats.storeReadpage(req, id, page_url);
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

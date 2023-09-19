@@ -2237,7 +2237,8 @@ div.browse {
 						border: 1px solid $c-mid-grey;
 
 						.inner {
-							display: block;
+							display: flex;
+							flex-direction: column;
 
 							.head {
 								display: block;
@@ -2801,6 +2802,27 @@ nav.pagination {
 		height: auto;
 	}
 }
+
 div.sticky-container + footer {
 	padding-bottom: 185px;
+}
+
+.engagement-reads {
+	padding-left: 15px;
+	flex-grow: 1;
+}
+.engagement-reads-icon {
+	max-width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+}
+.engagement-reads-count {
+	margin-left: 5px;
+	font-size: 0.9em;
+	color: $c-mid-grey;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
 }

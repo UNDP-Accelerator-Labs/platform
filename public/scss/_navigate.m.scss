@@ -306,6 +306,12 @@ nav.tabs {
 									transform: none;
 									text-align: left;
 									/*white-space: nowrap;*/
+
+									.count {
+										float: right;
+										text-align: right;
+										color: $c-light-grey;
+									}
 								}
 
 								&:hover {

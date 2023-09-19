@@ -29,7 +29,7 @@ app.use(bodyparser.json({ limit: '50mb' }))
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
 
 if (process.env.NODE_ENV === 'production') {
-	app.set('trust proxy', 1) // trust first proxy
+	app.set('trust proxy', true) // trust leftmost proxy
 }
 
 const cookie = {

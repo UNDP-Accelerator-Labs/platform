@@ -29,6 +29,11 @@
 		&& locals.metadata.page.id === 1
 		&& slides?.length > 0)
 	const welcome_module = locals.metadata.site.welcome_module
+
+	function simplifyNumber (num) {
+		if (num > 1000) return `${Math.floor(num / 100) / 10}K+`
+		else return num
+	}
 %>
 <html lang='<%- language %>'>
 <head>
@@ -92,26 +97,26 @@
 			<div id='statistics'>
 				<div class='stat-group'>
 					<div class='statistic'>
-						<h1><%- locals.stats?.total %></h1>
+						<h1><%- simplifyNumber(locals.stats?.total) %></h1>
 						<p class="google-translate-attr"><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.total !== 1)?.capitalize() || object.capitalize() %></p>
 					</div>
 				</div>
 				<div class='stat-group'>
 					<% if (locals.stats?.contributors) { %>
 						<div class='statistic'>
-							<h2><%- locals.stats?.contributors %></h2>
+							<h2><%- simplifyNumber(locals.stats?.contributors) %></h2>
 							<p class="google-translate-attr"><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
 						</div>
 					<% } %>
 					<% if (locals.metadata.page.map && locals.stats?.total > 0) { %>
 						<div class='statistic'>
-							<h2><%- locals.clusters[locals.clusters.length - 1]?.length %></h2>
+							<h2><%- simplifyNumber(locals.clusters[locals.clusters.length - 1]?.length) %></h2>
 							<p class="google-translate-attr"><%- vocabulary['distinct locations'][language](locals.clusters[locals.clusters.length - 1]?.length !== 1) %></p>
 						</div>
 					<% } %>
 					<% locals.stats?.tags?.forEach(d => { %>
 						<div class='statistic'>
-							<h2><%- d.count %></h2>
+							<h2><%- simplifyNumber(d.count) %></h2>
 							<p class="google-translate-attr"><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || d.type.capitalize() %></p>
 						</div>
 					<% }) %>

@@ -1,12 +1,11 @@
-<?xml version="1.0"?>
-
-<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN' 'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
-<svg fill-opacity="1" xmlns:xlink="http://www.w3.org/1999/xlink" color-rendering="auto" color-interpolation="auto" text-rendering="auto" stroke="black" stroke-linecap="square" stroke-miterlimit="10" shape-rendering="auto" stroke-opacity="1" fill="black" stroke-dasharray="none" font-weight="normal" stroke-width="1" xmlns="http://www.w3.org/2000/svg" font-family="&apos;Dialog&apos;" font-style="normal" stroke-linejoin="miter" font-size="12" stroke-dashoffset="0" image-rendering="auto" viewBox="0 190 280 160">
-  <!--Unicode Character 'EYE' (U+1F441)-->
-  <defs id="genericDefs" />
-  <g>
-    <g>
-      <path d="M283.9219 271.9688 Q262.8281 310.0781 225.1406 330.1875 Q189.1406 349.4531 144.1406 349.4531 Q99 349.4531 63.1406 330.1875 Q25.4531 310.0781 4.0781 271.9688 Q25.5938 290.7188 63 310.6094 Q98.8594 330.3438 144.1406 330.3438 Q189.2812 330.3438 225.1406 310.6094 Q262.8281 290.7188 283.9219 271.9688 Z" fill="none" />
-    </g>
-  </g>
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 30 30" width="30" height="30" style="enable-background:new 0 0 30 30;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+    .st0{fill:none;stroke:#121212;stroke-width:0.5;}
+    .st1{fill:#121212;}
+</style>
+  </defs>
+  <path class="st0" d="M 23.6 17.2 C 23.6 17.2 24.2 17.06 24 15.86 M 11 19.3 C 14 20.1 15.5 19.9 17.1 19.7 C 18.7 19.5 20.588 18.658 21.588 18.058 C 22.488 17.558 23.3 17.1 23.8 17.2 C 24 17.2 24.6 17.6 25.5 17.7 C 26.2 17.8 26.9 17.8 26.9 17.5 M 26.9 17.2 C 26 17.1 25.3 17.1 24.7 16.5 C 23.8 15.7 23.841 15.823 22.521 16.047 C 21.201 16.271 20.339 17.336 18.767 18.015 C 16.092 19.171 14.561 18.797 12.544 18.558 C 11.763 18.465 10.714 18.143 9.614 18.088 C 8.986 17.865 8.172 17.628 6.92 17.358 C 6.82 17.358 6.5 17.3 6.4 17.3 C 4.4 17.9 3 18 3 18 C 3 18 3.587 18.076 4.788 17.706 C 5.268 17.559 5.797 17.438 6.671 17.334 C 6.76 17.324 7.2 17.478 8.444 17.741 C 9.482 17.961 10.866 18.296 11.315 18.348 C 12.452 18.478 13.905 18.849 15.007 18.792 C 16.674 18.705 18.731 18.482 20.261 17.111 C 20.584 16.822 22.52 15.902 23.309 15.884 C 24.211 15.864 24.364 16.619 25.045 16.837 C 26.318 17.244 26.966 17.202 26.9 17.2 Z"/>
+  <path class="st0" d="M 25.6 17.8 C 24.9 17.8 24.1 17.7 23.5 18 C 22.9 18.3 19.5 20.2 17 20.4 C 15.5 20.6 13.8 20.5 12.4 20.4 C 11.5 20.3 10.5 20 9.8 19.8 C 7.9 19.2 5.8 18 5.2 17.6"/>
 </svg>

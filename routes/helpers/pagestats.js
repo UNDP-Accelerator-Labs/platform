@@ -12,7 +12,7 @@ const ipCountry = async (req) => {
                 // free account at ipinfo.io allows 50k requests per month
                 const resp = await fetch(`https://ipinfo.io/${user_ip}/country?token=${ipInfoToken}`);
                 if (resp.ok) {
-                    country = `${await resp.text()}`;
+                    country = `${await resp.text()}`.trim();
                 } else {
                     console.log(`IP GEOLOCATION API ERROR FOR IP ${user_ip}: ${await resp.text()}`);
                 }

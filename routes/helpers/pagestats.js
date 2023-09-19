@@ -5,20 +5,20 @@ const ipInfoToken = process.env.IPINFO_TOKEN;
 
 const ipCountry = async (req) => {
     if (!req.session.user_country || req.session.user_country === 'NUL') {
-        const user_ip = req.ip;
+        const user_ip = `${req.ip}`.replace(/:[0-9][0-9]+$/, '');
         let country = 'NUL';
         if (ipInfoToken && !['127.0.0.0', '::1'].includes(user_ip)) {
             try {
                 // free account at ipinfo.io allows 50k requests per month
                 const resp = await fetch(`https://ipinfo.io/${user_ip}/country?token=${ipInfoToken}`);
                 if (resp.ok) {
-                    country = `${await resp.text()}`;
+                    country = `${await resp.text()}`.trim();
                 } else {
-                    console.log(`IP GEOLOCATION API ERROR: ${await resp.text()}`);
+                    console.log(`IP GEOLOCATION API ERROR FOR IP ${user_ip}: ${await resp.text()}`);
                 }
             } catch(e) {
                 // ignore errors
-                console.log(`IP GEOLOCATION API ERROR: ${e}`);
+                console.log(`IP GEOLOCATION API ERROR FOR IP ${user_ip}: ${e}`);
             }
             if (country.length > 3) {
                 console.log(`IP GEOLOCATION API ERROR: encountered invalid country ${country}`);

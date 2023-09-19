@@ -22,15 +22,12 @@ const app = express()
 app.use(cors());
 
 app.set('view engine', 'ejs')
+app.set('trust proxy', true) // trust leftmost proxy
 app.use(express.static(path.join(__dirname, './public')))
 app.use('/scripts', express.static(path.join(__dirname, './node_modules')))
 app.use('/config', express.static(path.join(__dirname, './config')))
-app.use(bodyparser.json({ limit: '50mb' }))	
+app.use(bodyparser.json({ limit: '50mb' }))
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }))
-
-if (process.env.NODE_ENV === 'production') {
-	app.set('trust proxy', 1) // trust first proxy
-}
 
 const cookie = {
 	httpOnly: true, // THIS IS ACTUALLY DEFAULT
@@ -76,6 +73,7 @@ function getVersionString() {
 				versionObj = {
 					'name': lines[0] || 'no version available',
 					'commit': lines[1] || 'unknown',
+					'date': lines[2] || 'unknown',
 					'app': `${app_id}`,
 				};
 			}
@@ -90,6 +88,7 @@ app.get('/version/', (req, res) => {
 		res.status(500).send({
 			'name': 'error while reading version',
 			'commit': 'unknown',
+			'date': 'unknown',
 			'app': `${app_id}`,
 		})
 	});

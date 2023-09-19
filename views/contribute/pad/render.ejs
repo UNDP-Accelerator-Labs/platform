@@ -563,7 +563,6 @@ function addLoader (sel) {
 
 function populateSection (data, lang = 'en', section) {
 	// MEDIA
-	console.log(data)
 	return new Promise(async resolve => {
 		if (data.type === 'title' && publicpage) addTitle({ data, lang, section })
 		if (data.type === 'img') addImg({ data, lang, section })
@@ -994,9 +993,9 @@ function addImg (kwargs) {
 		const img = new Image()
 		img.onload = function () {
 			media.media.addElems('img')
-			.attrs({ 
-				'class': d => d.scale, 
-				'src': d => this.src 
+			.attrs({
+				'class': d => d.scale,
+				'src': d => this.src
 			}).on('click', d => renderImgZoom({ src: this.src }))
 		}
 		img.onerror = function (err) {

@@ -1588,7 +1588,10 @@ div.browse {
 							}
 						}
 						.foot {
-							align-self: top;
+							display: flex;
+							flex-direction: column;
+							justify-content: end;
+							flex-grow: 1;
 
 							.media-img {
 								position: relative;
@@ -2072,7 +2075,8 @@ div.browse {
 					}
 
 					.inner {
-						display: block;
+						display: flex;
+						flex-direction: column;
 
 						.head {
 							display: block;
@@ -2645,8 +2649,11 @@ footer {
 	}
 }
 
-.engagement-reads-icon {
+.engagement-reads {
 	padding-left: 15px;
+	flex-grow: 1;
+}
+.engagement-reads-icon {
 	max-width: 20px;
 	height: 20px;
 	vertical-align: middle;

@@ -2235,7 +2235,8 @@ div.browse {
 						border: 1px solid $c-mid-grey;
 
 						.inner {
-							display: block;
+							display: flex;
+							flex-direction: column;
 
 							.head {
 								display: block;
@@ -2804,8 +2805,11 @@ div.sticky-container + footer {
 	padding-bottom: 185px;
 }
 
-.engagement-reads-icon {
+.engagement-reads {
 	padding-left: 15px;
+	flex-grow: 1;
+}
+.engagement-reads-icon {
 	max-width: 20px;
 	height: 20px;
 	vertical-align: middle;

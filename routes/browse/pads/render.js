@@ -154,7 +154,7 @@ module.exports = async (req, res) => {
 						CASE WHEN EXISTS (
 							SELECT 1 FROM exploration WHERE linked_pinboard = p.id
 						) THEN TRUE ELSE FALSE END AS is_exploration,
-						COUNT(SELECT 1 FROM pinboard_contributions WHERE pinboard = p.id AND db = $1 AND is_included = true) as count
+						(SELECT COUNT(*) FROM pinboard_contributions WHERE pinboard = p.id AND db = $2 AND is_included = true) as count
 					FROM pinboards p
 					WHERE $1 IN (SELECT participant FROM pinboard_contributors WHERE pinboard = p.id)
 					GROUP BY p.id

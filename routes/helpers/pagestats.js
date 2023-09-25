@@ -31,49 +31,52 @@ const ipCountry = async (req) => {
 };
 exports.ipCountry = ipCountry;
 
-const recordView = async (id, page_url, user_country, is_view) => {
-    const ownId = await ownDB();
+const recordView = async (doc_id, doc_type, page_url, user_country, user_rights, is_view) => {
+    const ownId = ['pad'].includes(doc_type) ? (await ownDB()) : 0;
     await DB.general.tx(async gt => {
         const page_stats = [];
 
-        function addStat(padId, padDb, url, country) {
+        function addStat(docId, docType, docDb, url, country, rights) {
             if (is_view) {
                 page_stats.push(gt.any(`
-                INSERT INTO page_stats (pad, db, page_url, country, view_count)
-                VALUES ($1, $2, $3, $4, 1)
+                INSERT INTO page_stats (doc_id, doc_type, db, page_url, viewer_country, viewer_rights, view_count)
+                VALUES ($1, $2, $3, $4, $5, $6, 1)
                 ON CONFLICT ON CONSTRAINT page_stats_pkey DO UPDATE SET view_count = page_stats.view_count + 1
-                `, [padId ?? 0, padDb ?? 0, url ?? '', country ?? '']));
+                `, [docId ?? 0, docType ?? '', docDb ?? 0, url ?? '', country ?? '', rights ?? -1]));
             } else {
                 page_stats.push(gt.any(`
-                INSERT INTO page_stats (pad, db, page_url, country, read_count)
-                VALUES ($1, $2, $3, $4, 1)
+                INSERT INTO page_stats (doc_id, doc_type, db, page_url, viewer_country, viewer_rights, view_count)
+                VALUES ($1, $2, $3, $4, $5, $6, 1)
                 ON CONFLICT ON CONSTRAINT page_stats_pkey DO UPDATE SET read_count = page_stats.read_count + 1
-                `, [padId ?? 0, padDb ?? 0, url ?? '', country ?? '']));
+                `, [docId ?? 0, docType ?? '', docDb ?? 0, url ?? '', country ?? '', rights ?? -1]));
             }
         }
 
-        addStat(id, ownId, null, null);
-        addStat(id, ownId, page_url, user_country);
+        addStat(doc_id, doc_type, ownId, null, null, null);
+        addStat(doc_id, doc_type, ownId, page_url, user_country, user_rights);
 
         await gt.batch(page_stats);
     });
 };
 exports.recordView = recordView;
 
-exports.storeReadpage = async (req, id, page_url) => {
+exports.storeReadpage = async (req, doc_id, doc_type, page_url) => {
     const ownId = await ownDB();
-    req.session.read_pad = id;
+    req.session.read_doc_id = doc_id;
+    req.session.read_doc_type = doc_type;
     req.session.read_db = ownId;
     req.session.read_url = page_url;
 };
 
-exports.recordReadpage = async (req, id, page_url) => {
+exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
+    const { rights: user_rights } = req.session || {};
     const ownId = await ownDB();
     const user_country = await ipCountry(req);
-    const {read_pad, read_db, read_url} = req.session;
-    if (+read_pad === +id && +read_db === +ownId && read_url === page_url) {
-        await recordView(read_pad, read_url, user_country, false);
-        req.session.read_pad = undefined;
+    const {read_doc_id, read_doc_type, read_db, read_url} = req.session;
+    if (+read_doc_id === +doc_id && read_doc_type === doc_type && +read_db === +ownId && read_url === page_url) {
+        await recordView(doc_id, doc_type, read_url, user_country, user_rights, false);
+        req.session.read_doc_id = undefined;
+        req.session.read_doc_type = undefined;
         req.session.read_db = undefined;
         req.session.read_url = undefined;
     }

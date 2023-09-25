@@ -36,9 +36,9 @@ module.exports = async kwargs => {
 
 			const ownId = await ownDB();
 			const readMap = new Map((await DB.general.any(`
-				SELECT pad, read_count AS rc
+				SELECT doc_id, read_count AS rc
 				FROM page_stats
-				WHERE pad IN $1:raw AND db = $2 AND page_url = '' AND country = ''
+				WHERE doc_id IN $1:raw AND doc_type = 'pad' AND db = $2 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
 			`, [padlist, ownId])).map(row => [row.pad, row.rc]));
 			const batch = []
 

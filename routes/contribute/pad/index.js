@@ -138,7 +138,7 @@ module.exports = (req, res) => {
 						const readCount = await DB.general.any(`
 							SELECT read_count AS rc
 							FROM page_stats
-							WHERE pad = $1::INT AND db = $2 AND page_url = '' AND country = ''
+							WHERE doc_id = $1::INT AND doc_type = 'pad' AND db = $2 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
 						`, [id, ownId]);
 						result.readCount = convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
 						const data = await join.users(result, [ language, 'owner' ])
@@ -146,11 +146,11 @@ module.exports = (req, res) => {
 					}).catch(err => console.log(err)))
 				}
 
-				if (id && !uuid) {
+				if (id) {
 					const user_country = await pagestats.ipCountry(req);
 					const page_url = req.originalUrl;
-					await pagestats.recordView(id, page_url, user_country, true);
-					await pagestats.storeReadpage(req, id, page_url);
+					await pagestats.recordView(id, 'pad', page_url, user_country, rights, true);
+					await pagestats.storeReadpage(req, id, 'pad', page_url);
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

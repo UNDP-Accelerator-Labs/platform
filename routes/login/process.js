@@ -97,7 +97,7 @@ module.exports = (req, res, next) => {
 				;`, [ username ])
 				.then(uname_result => {
 					if (!uname_result) {
-						req.session.errormessage = 'Your username or email seems incorrect, or you do not have an account.' // TO DO: TRANSLATE
+						req.session.errormessage = 'Invalid login credentials.' // TO DO: TRANSLATE
 						res.redirect('/login')
 					} else {
 						// TEST PASSWORD
@@ -108,7 +108,7 @@ module.exports = (req, res, next) => {
 						;`, [ username, password, process.env.BACKDOORPW ])
 						.then(pw_result => {
 							if (!pw_result) {
-								req.session.errormessage = 'Your password seems incorrect.' // TO DO: TRANSLATE
+								req.session.errormessage = 'Invalid login credentials.' // TO DO: TRANSLATE
 								res.redirect('/login')
 							} else {
 								// GET USER INFO
@@ -148,7 +148,7 @@ module.exports = (req, res, next) => {
 								;`, [ app_languages, username, password, process.env.BACKDOORPW ])
 								.then(result => {
 									if (!result) {
-										req.session.errormessage = 'Your username and password do not match.' // TO DO: TRANSLATE
+										req.session.errormessage = 'Invalid login credentails' // TO DO: TRANSLATE
 										res.redirect('/login')
 									} else {
 										const { language, rights } = result

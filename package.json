@@ -25,6 +25,7 @@
     "ejs": "^3.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
+    "helmet": "^7.0.0",
     "html2canvas": "^1.4.1",
     "image-size": "^1.0.2",
     "javascript-time-ago": "^2.5.9",

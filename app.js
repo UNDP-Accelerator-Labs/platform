@@ -12,14 +12,13 @@ const pgSession = require('connect-pg-simple')(session)
 const multer = require('multer')
 const upload = multer({ dest: './tmp' })
 const fs = require('fs')
-const cors = require('cors');
+const helmet = require('helmet');
 
 const { spawn } = require('child_process')
 
 const app = express()
 
-// Enable CORS for all routes
-app.use(cors());
+app.use(helmet());
 
 app.set('view engine', 'ejs')
 app.set('trust proxy', true) // trust leftmost proxy

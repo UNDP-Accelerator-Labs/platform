@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, userrights } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
@@ -190,10 +190,10 @@ module.exports = (req, res) => {
 	}
 }
 
-function check_authorization (_kwargs) {
+async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { uuid, id, rights, collaborators } = _kwargs
-
+	const { uuid, id, collaborators } = _kwargs
+	const rights = await userrights({ uuid })
 	const { read, write } = modules.find(d => d.type === 'templates')?.rights
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 

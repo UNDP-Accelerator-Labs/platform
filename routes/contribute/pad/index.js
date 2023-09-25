@@ -1,5 +1,5 @@
 const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, fuzzNumber, convertNum } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, fuzzNumber, convertNum, userrights } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -256,7 +256,9 @@ module.exports = (req, res) => {
 
 async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { id, template, mobilization, source, uuid, rights, collaborators, public } = _kwargs
+	const { id, template, mobilization, source, uuid, collaborators, public } = _kwargs
+
+	const rights = await userrights({ uuid })
 
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 	if (typeof write === 'object') {

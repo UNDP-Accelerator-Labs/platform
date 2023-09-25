@@ -46,9 +46,9 @@ module.exports = async (req, res) => {
 									if (result) return { object: 'pads', space: 'pinned', pinboard: result?.id, title: result?.title, description: result?.description }
 									else return res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
 								}).catch(err => console.log(err))
-							} else return { object: 'pads', space: 'public', teams: [result?.id], title: result?.name }
+							} else return { object: 'pads', space: 'public', teams: [ result?.id ], title: result?.name }
 						}).catch(err => console.log(err))
-					} else return { object: 'pads', space: 'public', countries: [result?.iso3], title: result?.name }
+					} else return { object: 'pads', space: uuid ? 'all' : 'public', countries: [ result?.iso3 ], title: result?.name }
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err)) || {}; // avoiding server crash by setting vars to empty object -- this will still crash somewhere below but it will not bring down the whole server
 
@@ -83,6 +83,7 @@ module.exports = async (req, res) => {
 			AND p.id IN (SELECT pad FROM review_requests)
 		`, [ collaborators_ids, rights ])
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'pinned') {
 			if (public) {
 				if (pinboard) {

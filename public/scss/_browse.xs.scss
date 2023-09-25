@@ -509,6 +509,17 @@ div.browse {
 	&.home {
 		padding-top: 45px;
 	}
+	&.public,
+	&.instance {
+		padding: 60px 15px 0 15px;
+	}
+
+	h1.instance-title {
+		font-size: $t-xlarge;
+		line-height: 1.2em;
+		margin-bottom: 30px;
+		text-align: center;
+	}
 
 	nav#search-and-filter {
 		padding: 0 15px 15px 15px;
@@ -2769,11 +2780,6 @@ footer.slideshow {
 			}
 		}
 	}
-}
-
-
-div.browse.public {
-	padding: 60px 15px 0 15px;
 }
 nav.pagination {
 	width: 100%;

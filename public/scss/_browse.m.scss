@@ -487,6 +487,10 @@ div.browse {
 	&:not(.home) {
 		padding-top: 105px;
 	}
+	&.public,
+	&.instance {
+		padding-top: 90px;
+	}
 
 	h1.instance-title {
 		font-size: $t-xlarge;
@@ -2341,9 +2345,6 @@ div.browse {
 			}
 		}
 	}
-}
-div.browse.public {
-	padding-top: 90px;
 }
 div.browse.slideshow {
 	padding: 0 15px;

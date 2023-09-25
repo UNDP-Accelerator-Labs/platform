@@ -110,6 +110,13 @@
 						<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
 					<% } %>
 				<% } %>
+				<!-- TO DO: ADD OTHER STATS -->
+				<div class='engagement-group page-stats'>
+					<button class='engagement engagement-reads'>
+						<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+						<span class='engagement-reads-count'><%= locals.data.readCount %></span>
+					</button>
+				</div>
 			</div>
 			<div class='body'>
 				<section class='description-layout layout google-translate-attr <%- activity %>'>

@@ -1639,6 +1639,40 @@ div.document {
 					}
 				}
 			}
+			.engagement-group {
+				margin: 10px 0 0 -7px;
+
+				&.page-stats {
+					margin-top: 0;
+				}
+
+				.engagement {
+					display: inline-block;
+					border: none;
+					outline: none;
+					background-color: transparent;
+
+					img {
+						vertical-align: middle;
+						width: 30px;
+						height: 30px;
+						cursor: pointer;
+					}
+					span {
+						display: inline-block;
+						margin-right: 5px;
+						text-align: center;
+						font-size: $t-small;
+						color: $c-light-grey;
+					}
+				}
+				.engagement:disabled {
+					img {
+						cursor: initial;
+						opacity: .5;
+					}
+				}
+			}
 		}
 	}
 }

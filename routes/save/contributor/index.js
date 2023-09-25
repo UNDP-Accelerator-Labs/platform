@@ -5,7 +5,7 @@ const { isPasswordSecure } = require('../../login')
 module.exports = (req, res) => {
 	const { referer } = req?.headers || {}
 	const { path } = req;
-	const { uuid, username } = req.session || {}
+	const { uuid, rights: session_rights, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
@@ -81,32 +81,42 @@ module.exports = (req, res) => {
 			const batch = []
 			let update_pw = ''
 			if (password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
-			batch.push(t.none(`
-				UPDATE users
-				SET name = $1,
-					email = $2,
-					position = $3,
-					$4:raw
-					iso3 = $5,
-					language = $6,
-					secondary_languages = $7,
-					rights = $8,
-					notifications = $9,
-					reviewer = $10
-				WHERE uuid = $11
-			;`, [ 
-				/* $1 */ name, 
-				/* $2 */ email, 
-				/* $3 */ position, 
-				/* $4 */ update_pw, 
-				/* $5 */ iso3, 
-				/* $6 */ language, 
-				/* $7 */ JSON.stringify(secondary_languages || []), 
-				/* $8 */ rights, 
-				/* $9 */ notifications || false, 
-				/* $10 */ reviewer || false, 
-				/* $11 */ id
-			]))
+			
+			// CHECK IF THE CURRENT USER HAS THE RIGHT TO CHANGE VALUES
+			batch.push(t.any(`
+				SELECT host FROM cohorts
+				WHERE contributor = $1
+			`, [ id ]).then(results => {
+				let update_rights = ''
+				if (results.some(d => d.host === uuid) || session_rights > 2) {
+					return t.none(`
+						UPDATE users
+						SET name = $1,
+							email = $2,
+							position = $3,
+							$4:raw
+							iso3 = $5,
+							language = $6,
+							secondary_languages = $7,
+							rights = $8,
+							notifications = $9,
+							reviewer = $10
+						WHERE uuid = $11
+					;`, [ 
+						/* $1 */ name, 
+						/* $2 */ email, 
+						/* $3 */ position, 
+						/* $4 */ update_pw, 
+						/* $5 */ iso3, 
+						/* $6 */ language, 
+						/* $7 */ JSON.stringify(secondary_languages || []), 
+						/* $8 */ rights, 
+						/* $9 */ notifications || false, 
+						/* $10 */ reviewer || false, 
+						/* $11 */ id
+					])
+				} else return null
+			}).catch(err => console.log(err)))
 
 			if (teams?.length > 0) {
 				teams.forEach(d => {

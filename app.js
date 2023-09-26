@@ -35,6 +35,11 @@ app.use(
   })
 );
 
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "same-origin");
+  next();
+});
+
 app.set("view engine", "ejs");
 app.set("trust proxy", true); // trust leftmost proxy
 app.use(express.static(path.join(__dirname, "./public")));
@@ -100,6 +105,11 @@ function containsHTMLorScriptTags(input) {
   }
 
   return false;
+}
+
+function setAccessControlAllowOrigin(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
 }
 
 app.use(checkInputForHTML);
@@ -291,8 +301,8 @@ app.post("/reverseGeocoding", routes.reverseGeocoding); // UPDATE TO geocode/for
 // API
 app
   .route("/apis/:action/:object")
-  .get(routes.check.login, routes.dispatch.apis)
-  .post(routes.check.login, routes.dispatch.apis);
+  .get(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis)
+  .post(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis);
 
 app.get("/api/skills", routes.api.skills); // TO DO: THIS SHOULD BE DEPRECATED
 app.get("/api/methods", routes.api.methods); // TO DO: THIS SHOULD BE DEPRECATED

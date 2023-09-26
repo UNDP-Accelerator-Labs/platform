@@ -2,7 +2,7 @@
     const object = locals.metadata.page.object;
     const originalUrl = locals.metadata.page.originalUrl;
     const uuid = locals.metadata.user.uuid;
-    const { id } = locals.data;
+    const id = locals.data?.id;
     const readTime = 3000;  // time it takes to register a read in milliseconds
 %>
 <% if (object === 'pad' && id) { %>

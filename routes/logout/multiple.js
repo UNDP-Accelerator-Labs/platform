@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 	if (!app) {
 		// REMOVE ALL UNLABELED SESSIONS
 		await DB.general.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' IS NULL;`, [ uuid ])
-	} else if (app === 'all') {
+	} else if (app.toLowerCase() === 'all') {
 		// REMOVE ALL SESSIONS FOR CURRENT USER
 		await DB.general.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
 	} else {

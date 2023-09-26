@@ -6,12 +6,13 @@ const jwt = require('jsonwebtoken')
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { uuid } = req.session || {}
+	req.session.sessions = null
 	
 	const cookies = parseCookies(req)
 	let sid = cookies[`${app_suite}-session`]
 	if (sid) sid = sid.split(':')[1].split('.')[0]
-	console.log(cookies)
-	console.log(sid)
+	// console.log(cookies)
+	// console.log(sid)
 
 
 	if (uuid) next() // A USER IS LOGGED

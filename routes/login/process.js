@@ -73,7 +73,6 @@ module.exports = (req, res, next) => {
 						// NOTE: THIS DOES THE SAME AS routes/redirect/browse
 						let { read, write } = modules.find(d => d.type === 'pads')?.rights
 						if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-						console.log('check write', write)
 
 						if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
 						else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
@@ -146,12 +145,12 @@ module.exports = (req, res, next) => {
 									WHERE (u.name = $2 OR u.email = $2)
 										AND (u.password = CRYPT($3, u.password) OR $3 = $4)
 								;`, [ app_languages, username, password, process.env.BACKDOORPW ])
-								.then(result => {
+								.then(async result => {
 									if (!result) {
 										req.session.errormessage = 'Your username and password do not match.' // TO DO: TRANSLATE
 										res.redirect('/login')
 									} else {
-										const { language, rights } = result
+										const { uuid, language, rights } = result
 										Object.assign(req.session, datastructures.sessiondata(result))
 
 										if(redirectPath) {

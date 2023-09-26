@@ -15,8 +15,9 @@
 	@import '_map.xs';
 	@import '_modals.lg';
 
-	@import '_login.lg';
+	@import '_login';
 	@import '_pad.xs';
+	@import '_profile';
 	@import '_profile.xs';
 	@import '_browse.xs';
 	@import '_mobilize.lg';
@@ -32,9 +33,10 @@
 	@import '_map.sm';
 	@import '_modals.lg';
 
-	@import '_login.lg';
+	@import '_login';
 	@import '_pad.sm';
-	@import '_profile.xs';
+	@import '_profile';
+	@import '_profile.sm';
 	@import '_browse.sm';
 	@import '_mobilize.lg';
 	@import '_orgfooter.sm';
@@ -49,9 +51,9 @@
 	@import '_map.m';
 	@import '_modals.lg';
 
-	@import '_login.lg';
+	@import '_login';
 	@import '_pad.m';
-	@import '_profile.lg';
+	@import '_profile';
 	@import '_import';
 	@import '_import.m';
 	@import '_browse.m';
@@ -69,8 +71,9 @@
 	@import '_map.lg';
 	@import '_modals.lg';
 
-	@import '_login.lg';
+	@import '_login';
 	@import '_pad.lg';
+	@import '_profile';
 	@import '_profile.lg';
 	@import '_import';
 	@import '_import.lg';
@@ -89,9 +92,9 @@
 	@import '_map.xl';
 	@import '_modals.lg';
 
-	@import '_login.lg';
+	@import '_login';
 	@import '_pad.xl';
-	@import '_profile.lg';
+	@import '_profile';
 	@import '_import';
 	@import '_browse.xl';
 	@import '_mobilize.lg';
@@ -108,9 +111,9 @@
 	@import '_map.xl';
 	@import '_modals.lg';
 
-	@import '_login.lg';
+	@import '_login';
 	@import '_pad.xl';
-	@import '_profile.lg';
+	@import '_profile';
 	@import '_import';
 	@import '_browse.xl';
 	@import '_mobilize.lg';

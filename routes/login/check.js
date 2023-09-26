@@ -14,9 +14,6 @@ module.exports = async (req, res, next) => {
 	// console.log(cookies)
 	// console.log(sid)
 
-	// 	const user = await DB.general.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [uuid])
-	//  console.log('user ', user)
-
 	if (uuid) next() // A USER IS LOGGED
 	else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
 	else { 

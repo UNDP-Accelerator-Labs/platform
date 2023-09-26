@@ -35,7 +35,6 @@ module.exports = async kwargs => {
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 
 			const ownId = await ownDB();
-			const readMap = await pagestats.getReadCountBulk(padlist, 'pad');
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
@@ -58,13 +57,13 @@ module.exports = async kwargs => {
 				FROM pads p
 				WHERE p.id IN $1:raw
 			;`, [ padlist, collaborators_ids, rights ])
-			.then(results => {
+			.then(async results => {
+				await pagestats.putReadCount('pad', results, d => d.id);
 				results.forEach(d => {
 					d.img = parsers.getImg(d)
 					d.sdgs = parsers.getSDGs(d)
 					d.tags = parsers.getTags(d)
 					d.txt = parsers.getTxt(d)
-					d.readCount = readMap.get(d.id);
 					delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
 				})
 				return results

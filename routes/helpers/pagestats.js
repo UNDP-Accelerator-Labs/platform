@@ -110,7 +110,7 @@ exports.getReadCount = async (doc_id, doc_type) => {
     return convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
 };
 
-exports.getReadCountBulk = async (doc_query, doc_type) => {
+const getReadCountBulk = async (doc_query, doc_type) => {
     const ownId = await ownIdFor(doc_type);
     const readMap = new Map((await DB.general.any(`
         SELECT doc_id, read_count AS rc
@@ -118,4 +118,15 @@ exports.getReadCountBulk = async (doc_query, doc_type) => {
         WHERE doc_id IN $1:raw AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
     `, [doc_query, doc_type, ownId])).map(row => [row.doc_id, convertNum(fuzzNumber(row.rc))]));
     return readMap;
-}
+};
+
+exports.putReadCount = async (doc_type, arr, id_fun) => {
+    if (!arr || !arr.length) {
+        return;
+    }
+    const ids = arr.map(id_fun);
+    const readMap = await getReadCountBulk(DB.pgp.as.format(`($1:csv)`, [ ids ]), doc_type);
+    arr.forEach(d => {
+        d.readCount = readMap.get(id_fun(d));
+    });
+};

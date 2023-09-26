@@ -96,11 +96,7 @@ module.exports = async kwargs => {
 			d.items = d.sections?.map(d => d.structure)?.flat().length || 0
 			delete d.sections
 		})
-		const templateIds = safeArr([...new Set(results.map(d => d.id)).values()], -1);
-		const readMap = await pagestats.getReadCountBulk(DB.pgp.as.format(`($1:csv)`, [ templateIds ]), 'template');
-		results.forEach(d => {
-			d.readCount = readMap.get(d.id);
-		});
+		await pagestats.putReadCount('template', results, d => d.id);
 		const data = await join.users(results, [ language, 'owner' ])
 
 		return {

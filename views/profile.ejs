@@ -49,6 +49,32 @@
 			</div>
 			<div class='head'>
 				<div class='title google-translate-attr'><%- vocabulary['contributor profile'][language] %></div>
+				<% if (locals.sessions?.length) { %>
+					<div class='alert session-alert'>
+						<p>This account is logged on multiple applications, browsers, or devices.</p>
+						<!-- TO DO: TRANSLATE -->
+						<form action='/logout/multiple' method='POST'>
+							<table>
+								<thead>
+									<th>Application</th>
+									<th>Session count</th>
+									<th></th>
+								</thead>
+								<tbody>
+									<% locals.sessions.forEach(d => { %>
+									<tr>
+										<td><%- d.key ? d.key : 'Undefined' %></td>
+										<!-- TO DO: TRANSLATE undefined -->
+										<td><%- d.count %></td>
+										<td><button type='submit' name='app' value='<%- d.key %>'>Log out of all sessions</button></td>
+										<!-- TO DO: TRANSLATE -->
+									</tr>
+									<% }) %>
+								</tbody>
+							</table>
+						</form>
+					</div>
+				<% } %>
 			</div>
 			<div class='body'>
 				<form action='/save/contributor' method='POST' id='profile-form' autocomplete='off'>

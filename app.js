@@ -104,7 +104,9 @@ app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.login)
 app.get('/transfer', routes.process.login)
-app.get('/logout', routes.process.logout)
+app.route('/logout/:session')
+	.get(routes.process.logout)
+	.post(routes.process.logout)
 
 app.route('/reset/:token')
 	.get(routes.redirect.browse, routes.render.login)

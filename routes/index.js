@@ -161,7 +161,6 @@ exports.process.callapi = (req, res) => {
 exports.check.login = require('./login/').check
 exports.render.login = require('./login/').render
 exports.process.login = require('./login/').process
-exports.process.logout = require('./login/').logout
 exports.redirect.home = require('./redirect/').home
 exports.redirect.browse = require('./redirect/').browse
 
@@ -170,6 +169,8 @@ exports.dispatch.public = require('./browse/homepage').render //require('./login
 exports.process.forgetPassword = require('./login/').forgetPassword
 exports.process.getResetToken = require('./login/').getResetToken
 exports.process.updatePassword = require('./login/').updatePassword
+
+exports.process.logout = require('./logout/')
 
 /* =============================================================== */
 /* =========================== BROWSE ============================ */

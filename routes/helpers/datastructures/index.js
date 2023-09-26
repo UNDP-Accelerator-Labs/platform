@@ -45,6 +45,7 @@ exports.sessiondata = _data => {
 		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
+	obj.app = title
 
 	return obj
 }

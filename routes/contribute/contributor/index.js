@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
-const { checklanguage, datastructures } = include('routes/helpers/')
+const { checklanguage, datastructures, array } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
@@ -99,14 +99,26 @@ module.exports = async (req, res) => {
 							.catch(err => console.log(err))
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
+					// GET MULTI-SESSION INFO
+					if (id) batch.push(t.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ id ]))
+					else batch.push(null)
 
 
 					return t.batch(batch)
 					.then(async results => {
-						const [ countries, languages, teams, data ] = results
+						let [ countries, languages, teams, data, sessions ] = results
+
+						if (sessions) {
+							// EXTRACT SESSION DATA
+							sessions = array.nest.call(sessions.map(d => d.sess), { key: 'app' })
+								.map(d => {
+									const { values, ...data } = d
+									return data
+								})
+						}
 						
 						const metadata = await datastructures.pagemetadata({ req })
-						return Object.assign(metadata, { data, countries, languages, teams, reset_errormessage: reset_message })
+						return Object.assign(metadata, { data, countries, languages, teams, sessions, reset_errormessage: reset_message })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}

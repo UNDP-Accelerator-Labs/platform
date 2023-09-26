@@ -809,7 +809,7 @@ const Entry = function (_kwargs) {
 			ensureIcon('.engagement-reads-icon', '/imgs/icons/i-eye.svg', '/imgs/icons/i-eye-closed.svg', 200, 2000);
 
 			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
-				return d.readCount ?? '0';
+				return d.readCount ?? '-';
 			});
 		}.bind(this),
 		pin: function (_sel) {

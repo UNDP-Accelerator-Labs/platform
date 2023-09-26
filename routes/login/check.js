@@ -1,18 +1,21 @@
 const { app_suite } = include('config/')
 const { datastructures } = include('routes/helpers/')
+const { DB } = require('../../config/db/index.js')
 const processlogin = require('./process.js')
 const jwt = require('jsonwebtoken')
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { uuid } = req.session || {}
 	
 	const cookies = parseCookies(req)
 	let sid = cookies[`${app_suite}-session`]
 	if (sid) sid = sid.split(':')[1].split('.')[0]
-	console.log(cookies)
-	console.log(sid)
+	// console.log(cookies)
+	// console.log(sid)
 
+	// 	const user = await DB.general.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [uuid])
+	//  console.log('user ', user)
 
 	if (uuid) next() // A USER IS LOGGED
 	else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED

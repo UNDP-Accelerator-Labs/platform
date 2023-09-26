@@ -15,8 +15,6 @@ const upload = multer({ dest: "./tmp" });
 const fs = require("fs");
 const helmet = require("helmet");
 
-const { spawn } = require("child_process");
-
 const app = express();
 app.disable("x-powered-by");
 
@@ -31,7 +29,6 @@ app.use(
       },
     },
     xPoweredBy: false,
-    xXssProtection: false,
     strictTransportSecurity: {
       maxAge: 123456,
     },
@@ -67,6 +64,45 @@ const sessionMiddleware = session({
 });
 
 app.use(sessionMiddleware);
+
+function checkInputForHTML(req, res, next) {
+  const { body, params, query } = req;
+  if (containsHTMLorScriptTags(body)) {
+    return res.status(500).redirect("/module-error");
+  }
+
+  if (containsHTMLorScriptTags(params)) {
+    console.log("params ");
+    return res.status(500).redirect("/module-error");
+  }
+
+  if (containsHTMLorScriptTags(query)) {
+    console.log("params ");
+    return res.status(500).redirect("/module-error");
+  }
+  next();
+}
+
+// Helper function to recursively check if input contains HTML or script tags
+function containsHTMLorScriptTags(input) {
+  if (typeof input === "string") {
+    const regex =
+      /<\s*(?:script|\/script|style|\/style|html|head|body|\/html|\/head|\/body)[^>]*>/gi;
+    return regex.test(input);
+  }
+
+  if (typeof input === "object") {
+    for (const key in input) {
+      if (containsHTMLorScriptTags(input[key])) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+app.use(checkInputForHTML);
 
 const routes = require("./routes/");
 

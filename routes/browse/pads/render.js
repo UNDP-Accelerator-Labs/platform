@@ -1,5 +1,5 @@
 const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
-const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
+const { array, datastructures, checklanguage, join, parsers, pagestats } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
 
@@ -197,6 +197,8 @@ module.exports = async (req, res) => {
 				;`, [ uuid, rights, pinboard ])
 				.then(async result => {
 					const data = await join.users(result, [ language, 'owner' ])
+					data.readCount = await pagestats.getReadCount(pinboard, 'pinboard');
+					await pagestats.recordRender(req, pinboard, 'pinboard');
 					return data
 				}).catch(err => console.log(err)))
 			} else batch.push(null)
@@ -231,7 +233,7 @@ module.exports = async (req, res) => {
 				clusters,
 				pinboards_list,
 				pinboard_out,
-				sample_images
+				sample_images,
 			] = await t.batch(batch);
 			// const { sections, pads } = data
 			const { sections } = data
@@ -251,8 +253,6 @@ module.exports = async (req, res) => {
 				contributors: statistics.contributors,
 				tags: statistics.tags
 			}
-
-
 
 			const excerpt = pinboard_out?.status > 2 ? { title: pinboard_out.title, txt: pinboard_out.description, p: true } : null
 

@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS public.page_stats
 (
     doc_id INT,  -- 0 as null
     doc_type VARCHAR(19),  -- empty string as null
-    db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,  -- 0 as null
+    db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
     page_url text COLLATE pg_catalog."default",  -- empty string as null
     viewer_country VARCHAR(3),  -- empty string as null
     viewer_rights SMALLINT,  -- -1 as null

@@ -38,6 +38,10 @@
 <head>
 
 <%- include ('../partials/head.ejs') %>
+<% if (locals.pinboard?.id) { %>
+	<% locals.pagestats = { docType: 'pinboard', id: locals.pinboard.id }; %>
+	<%- include('../partials/pagestats.ejs') %>
+<% } %>
 
 </head>
 
@@ -328,7 +332,12 @@
 								<% } %>
 							<% } %>
 						</div>
-
+						<% if (locals.pinboard?.id) { %>
+							<div class='engagement-reads'>
+								<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+								<span class='engagement-reads-count'><%= locals.pinboard.readCount %></span>
+							</div>
+						<% } %>
 
 						<script type='text/javascript'>
 							function checkForEnter (evt, node) {

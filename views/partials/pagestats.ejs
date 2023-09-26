@@ -1,15 +1,11 @@
 <%
-    const object = locals.metadata.page.object;
+    const pagestats = locals.pagestats ?? {};
     const originalUrl = locals.metadata.page.originalUrl;
-    const { id } = locals.data;
+    const { id, docType } = pagestats;
     const readTime = 6000;  // time it takes to register a read in milliseconds
-    const docMap = {
-        'pad': 'pad',
-        'template': 'template',
-    };
-    const docType = docMap[`${object}`];
+    const docTypes = ['pad', 'template', 'pinboard'];
 %>
-<% if (docType && id) { %>
+<% if (docTypes.includes(docType) && id) { %>
 <script type="text/javascript" defer>
     const totalTime = <%- readTime %>;
     const docId = <%= id %>;

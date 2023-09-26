@@ -1,7 +1,7 @@
 const { default: fetch } = require("node-fetch");
 const { convertNum, fuzzNumber } = require('./numfmt.js');
 
-const { DB, ownDB } = include('config/')
+const { DB, ownDB, globalDB } = include('config/')
 const ipInfoToken = process.env.IPINFO_TOKEN;
 
 const ipCountry = async (req) => {
@@ -32,7 +32,7 @@ const ipCountry = async (req) => {
 };
 
 const ownIdFor = async (doc_type) => {
-    return ['pad', 'template'].includes(doc_type) ? (await ownDB()) : 0;
+    return ['pad', 'template'].includes(doc_type) ? (await ownDB()) : (await globalDB());
 };
 
 const recordView = async (doc_id, doc_type, page_url, user_country, user_rights, is_view) => {
@@ -107,7 +107,6 @@ exports.getReadCount = async (doc_id, doc_type) => {
         FROM page_stats
         WHERE doc_id = $1::INT AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
     `, [doc_id, doc_type, ownId]);
-    console.log("foooo", doc_id, doc_type, ownId);
     return convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
 };
 

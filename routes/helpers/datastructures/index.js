@@ -250,6 +250,9 @@ exports.pagemetadata = (_kwargs) => {
 			page: {
 				title,
 				instance_title: res?.locals.instance_vars?.title || null,
+				instanceReadCount: res?.locals.instance_vars?.readCount || null,
+				instanceDocType: res?.locals.instance_vars?.docType || null,
+				instanceId: res?.locals.instance_vars?.instanceId || null,
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,

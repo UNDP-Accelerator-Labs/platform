@@ -38,7 +38,13 @@
 <head>
 
 <%- include ('../partials/head.ejs') %>
-<% if (locals.pinboard?.id) { %>
+<% let alreadyPagestats = false; %>
+<% if (locals.metadata?.page?.instanceId && locals.metadata?.page?.instanceDocType) { %>
+	<% locals.pagestats = { docType: locals.metadata.page.instanceDocType, id: locals.metadata.page.instanceId }; %>
+	<%- include('../partials/pagestats.ejs') %>
+	<% alreadyPagestats = true; %>
+<% } %>
+<% if (!alreadyPagestats && locals.pinboard?.id) { %>
 	<% locals.pagestats = { docType: 'pinboard', id: locals.pinboard.id }; %>
 	<%- include('../partials/pagestats.ejs') %>
 <% } %>
@@ -98,6 +104,12 @@
 		<div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %>'>
 			<% if (locals.metadata.page.instance_title) { %>
 				<h1 class='instance-title'><%- locals.metadata.page.instance_title %></h1>
+			<% } %>
+			<% if (locals.metadata?.page?.instanceId && locals.metadata?.page?.instanceDocType) { %>
+			<div class='engagement-reads'>
+				<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+				<span class='engagement-reads-count'><%= locals.metadata.page.instanceReadCount ?? '-' %></span>
+			</div>
 			<% } %>
 			<% if (!publicpage
 				&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
@@ -332,7 +344,7 @@
 								<% } %>
 							<% } %>
 						</div>
-						<% if (locals.pinboard?.id) { %>
+						<% if (!alreadyPagestats && locals.pinboard?.id) { %>
 							<div class='engagement-reads'>
 								<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
 								<span class='engagement-reads-count'><%= locals.pinboard.readCount ?? '-' %></span>

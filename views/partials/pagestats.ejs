@@ -3,7 +3,7 @@
     const originalUrl = locals.metadata.page.originalUrl;
     const { id, docType } = pagestats;
     const readTime = 6000;  // time it takes to register a read in milliseconds
-    const docTypes = ['pad', 'template', 'pinboard'];
+    const docTypes = ['pad', 'template', 'pinboard', 'team', 'country'];
 %>
 <% if (docTypes.includes(docType) && id) { %>
 <script type="text/javascript" defer>

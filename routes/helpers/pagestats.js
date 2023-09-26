@@ -1,4 +1,5 @@
 const { default: fetch } = require("node-fetch");
+const { convertNum, fuzzNumber } = require('./numfmt.js');
 
 const { DB, ownDB } = include('config/')
 const ipInfoToken = process.env.IPINFO_TOKEN;
@@ -29,10 +30,13 @@ const ipCountry = async (req) => {
     }
     return req.session.user_country;
 };
-exports.ipCountry = ipCountry;
+
+const ownIdFor = async (doc_type) => {
+    return ['pad', 'template'].includes(doc_type) ? (await ownDB()) : 0;
+};
 
 const recordView = async (doc_id, doc_type, page_url, user_country, user_rights, is_view) => {
-    const ownId = ['pad'].includes(doc_type) ? (await ownDB()) : 0;
+    const ownId = await ownIdFor(doc_type);
     await DB.general.tx(async gt => {
         const page_stats = [];
 
@@ -58,10 +62,18 @@ const recordView = async (doc_id, doc_type, page_url, user_country, user_rights,
         await gt.batch(page_stats);
     });
 };
-exports.recordView = recordView;
+exports.recordRender = async (req, doc_id, doc_type) => {
+    const { originalUrl } = req;
+    const { uuid, rights } = req.session || {};
+    const user_country = await ipCountry(req);
+    const page_url = originalUrl;
+    const user_rights = uuid ? rights : -1;
+    await recordView(doc_id, doc_type, page_url, user_country, user_rights, true);
+    await storeReadpage(req, doc_id, doc_type, page_url);
+}
 
-exports.storeReadpage = async (req, doc_id, doc_type, page_url) => {
-    const ownId = await ownDB();
+const storeReadpage = async (req, doc_id, doc_type, page_url) => {
+    const ownId = await ownIdFor(doc_type);
     req.session.read_doc_id = doc_id;
     req.session.read_doc_type = doc_type;
     req.session.read_db = ownId;
@@ -69,8 +81,9 @@ exports.storeReadpage = async (req, doc_id, doc_type, page_url) => {
 };
 
 exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
-    const { rights: user_rights } = req.session || {};
-    const ownId = await ownDB();
+    const { uuid, rights } = req.session || {};
+    const user_rights = uuid ? rights : -1;
+    const ownId = await ownIdFor(doc_type);
     const user_country = await ipCountry(req);
     const {read_doc_id, read_doc_type, read_db, read_url} = req.session;
     if (+read_doc_id === +doc_id && read_doc_type === doc_type && +read_db === +ownId && read_url === page_url) {
@@ -79,5 +92,31 @@ exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
         req.session.read_doc_type = undefined;
         req.session.read_db = undefined;
         req.session.read_url = undefined;
+    } else {
+        throw new Error(
+            `mismatching base: ${read_doc_id}===${doc_id} `
+            + `${read_doc_type}===${doc_type} ${read_db}===${ownId} `
+            + `${read_url}===${page_url}`)
     }
 };
+
+exports.getReadCount = async (doc_id, doc_type) => {
+    const ownId = await ownIdFor(doc_type);
+    const readCount = await DB.general.any(`
+        SELECT read_count AS rc
+        FROM page_stats
+        WHERE doc_id = $1::INT AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
+    `, [doc_id, doc_type, ownId]);
+    console.log("foooo", doc_id, doc_type, ownId);
+    return convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
+};
+
+exports.getReadCountBulk = async (doc_query, doc_type) => {
+    const ownId = await ownIdFor(doc_type);
+    const readMap = new Map((await DB.general.any(`
+        SELECT doc_id, read_count AS rc
+        FROM page_stats
+        WHERE doc_id IN $1:raw AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
+    `, [doc_query, doc_type, ownId])).map(row => [row.doc_id, convertNum(fuzzNumber(row.rc))]));
+    return readMap;
+}

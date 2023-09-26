@@ -1,5 +1,5 @@
 const { page_content_limit, modules, engagementtypes, DB } = include('config/')
-const { checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -96,6 +96,11 @@ module.exports = async kwargs => {
 			d.items = d.sections?.map(d => d.structure)?.flat().length || 0
 			delete d.sections
 		})
+		const templateIds = safeArr([...new Set(results.map(d => d.id)).values()], -1);
+		const readMap = await pagestats.getReadCountBulk(DB.pgp.as.format(`($1:csv)`, [ templateIds ]), 'template');
+		results.forEach(d => {
+			d.readCount = readMap.get(d.id);
+		});
 		const data = await join.users(results, [ language, 'owner' ])
 
 		return {

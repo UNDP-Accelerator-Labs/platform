@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
@@ -21,7 +21,7 @@ module.exports = (req, res) => {
 		DB.conn.tx(t => {
 			// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A TEMPLATE
 			return check_authorization({ connection: t, uuid, id, rights, collaborators })
-			.then(result => {
+			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
 					if (referer) return res.redirect(referer)
@@ -94,9 +94,14 @@ module.exports = (req, res) => {
 
 							WHERE t.id = $3
 						;`, [ engagement.cases, uuid, +id ]).then(async results => {
+							results.readCount = await pagestats.getReadCount(id, 'template');
 							const data = await join.users(results, [ language, 'owner' ])
 							return data
 						}))
+					}
+
+					if (id) {
+						await pagestats.recordRender(req, id, 'template');
 					}
 
 					if (id && engagementtypes?.length > 0) { // GET THE ENGAGEMENT METRICS

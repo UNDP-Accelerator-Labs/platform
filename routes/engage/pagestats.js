@@ -24,8 +24,8 @@ module.exports = (req, res) => {
         });
     }).catch((e) => {
         console.log(e);
-        return res.status(500).json({
-            message: 'internal error',
+        return res.status(200).json({
+            message: 'read not recorded (check logs)',
         });
     });
 };

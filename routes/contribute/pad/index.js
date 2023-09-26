@@ -1,5 +1,5 @@
 const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, fuzzNumber, convertNum } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -134,23 +134,14 @@ module.exports = (req, res) => {
 							}
 							result.reviews.sort((a, b) => a.id - b.id)
 						}
-						const ownId = await ownDB();
-						const readCount = await DB.general.any(`
-							SELECT read_count AS rc
-							FROM page_stats
-							WHERE doc_id = $1::INT AND doc_type = 'pad' AND db = $2 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
-						`, [id, ownId]);
-						result.readCount = convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
+						result.readCount = await pagestats.getReadCount(id, 'pad');
 						const data = await join.users(result, [ language, 'owner' ])
 						return data
 					}).catch(err => console.log(err)))
 				}
 
 				if (id) {
-					const user_country = await pagestats.ipCountry(req);
-					const page_url = req.originalUrl;
-					await pagestats.recordView(id, 'pad', page_url, user_country, rights, true);
-					await pagestats.storeReadpage(req, id, 'pad', page_url);
+					await pagestats.recordRender(req, id, 'pad');
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

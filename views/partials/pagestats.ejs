@@ -2,14 +2,19 @@
     const object = locals.metadata.page.object;
     const originalUrl = locals.metadata.page.originalUrl;
     const { id } = locals.data;
-    const readTime = 5000;  // time it takes to register a read in milliseconds
-    const docType = {
+    const readTime = 6000;  // time it takes to register a read in milliseconds
+    const docMap = {
         'pad': 'pad',
-    }[object];
+        'template': 'template',
+    };
+    const docType = docMap[`${object}`];
 %>
 <% if (docType && id) { %>
 <script type="text/javascript" defer>
     const totalTime = <%- readTime %>;
+    const docId = <%= id %>;
+    const docType = '<%= docType %>';
+    const pageURL = '<%= originalUrl %>';
     let startTime = performance.now();
     let currentProgress = 0;
     let active = true;
@@ -20,7 +25,7 @@
             currentProgress += performance.now() - startTime;
             startTime = performance.now();
             if (currentProgress >= totalTime) {
-                POST('/pagestats', { doc_id: <%= id %>, doc_type: <%= docType %>, page_url: '<%= originalUrl %>' }).then(() => {
+                POST('/pagestats', { doc_id: docId, doc_type: docType, page_url: pageURL }).then(() => {
                     // done
                 }).catch((e) => {
                     console.log(e);

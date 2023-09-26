@@ -23,6 +23,7 @@
 	crossorigin=''></script>
 
 <%- include('./render.ejs') %>
+<%- include('../../partials/pagestats.ejs') %>
 
 </head>
 
@@ -110,6 +111,10 @@
 						<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
 					<% } %>
 				<% } %>
+				<div class='engagement-reads'>
+					<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+					<span class='engagement-reads-count'><%= locals.data.readCount %></span>
+				</div>
 			</div>
 			<div class='body'>
 				<section class='description-layout layout google-translate-attr <%- activity %>'>

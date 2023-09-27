@@ -227,11 +227,9 @@ exports.pagemetadata = (_kwargs) => {
 		} else batch.push(null)
 		let hasJustLoggedIn = false;
 		try {
-			if (headers.referer) {
-				hasJustLoggedIn = (
-					new URL(headers.referer).pathname === '/login'
-					|| object === 'contributor');
-			}
+			hasJustLoggedIn = (
+				object === 'contributor'
+				|| new URL(headers.referer).pathname === '/login');
 		} catch (_) {
 			// ignore issues here
 		}

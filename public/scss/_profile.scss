@@ -196,7 +196,17 @@
 								.pinboard-group {
 									display: inline-block;
 									position: relative;
-									width: 50%;
+									width: 30%;
+
+									margin: 0 auto 15px auto;
+									padding: 10px 15px;
+									border: 1px dotted #969696;
+									border-top: none;
+									box-sizing: border-box;
+
+									&.margin-left {
+										margin-left: calc(30% + 30px);
+									}
 
 									.pinboard {
 										/*display: flex;
@@ -245,9 +255,6 @@
 										}
 									}
 								}
-								.pinboard-group.margin-left {
-									margin-left: calc(30% + 15px);
-								}
 
 								input[type=text],
 								input[type=email],
@@ -262,6 +269,10 @@
 									font-size: $t-mid-small;
 									color: $c-dark-blue;
 									border-bottom: 1px solid $c-light-grey;
+
+									&:disabled {
+										color: $c-light-grey;
+									}
 								}
 								input[type=text] + label,
 								input[type=email] + label,

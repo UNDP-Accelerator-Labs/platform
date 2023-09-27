@@ -389,6 +389,8 @@
 <%- include ('./partials/footer.ejs') %>
 
 <script type='text/javascript'>
+	if (!mediaSize) var mediaSize = getMediaSize()
+
 	function toggleOptions (node, options) {
 		for (const label of node.labels) {
 			d3.select(label).attr('data-content', node.checked ? options[0] : options[1])
@@ -519,15 +521,24 @@
 						}))
 				})
 		}).on('focus', function () {
-			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')
+			const select = d3.select(this).findAncestor('select')
+			const dropdown = select.select('.dropdown')
 			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 
 			dropdown.selectAll('label').on('mousedown', function () {
 				d3.event.preventDefault()
 			})
+
+			if (mediaSize === 'xs') select.classed('expand', true)
+
 		}).on('blur', function () {
-			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')
+			const select = d3.select(this).findAncestor('select')
+			const dropdown = select.select('.dropdown')
 			dropdown.node().style.maxHeight = null
+
+			if (mediaSize === 'xs') {
+				setTimeout(_ => select.classed('expand', false), 250)
+			}
 		})
 
 		selects.selectAll('input[type=radio]')

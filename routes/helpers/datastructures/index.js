@@ -229,7 +229,7 @@ exports.pagemetadata = (_kwargs) => {
 		try {
 			hasJustLoggedIn = (
 				object === 'contributor'
-				|| (new URL(headers.referer).pathname === '/login'));
+				|| (new URL(headers.referrer || headers.referer).pathname === '/login'));
 		} catch (e) {
 			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, e);
 		}

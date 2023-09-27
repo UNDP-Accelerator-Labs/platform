@@ -229,9 +229,9 @@ exports.pagemetadata = (_kwargs) => {
 		try {
 			hasJustLoggedIn = (
 				object === 'contributor'
-				|| new URL(headers.referer).pathname === '/login');
-		} catch (_) {
-			// ignore issues here
+				|| (new URL(headers.referer).pathname === '/login'));
+		} catch (e) {
+			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, e);
 		}
 		if (hasJustLoggedIn) {
 			// GET MULTI-SESSION INFO

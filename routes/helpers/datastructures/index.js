@@ -231,7 +231,7 @@ exports.pagemetadata = (_kwargs) => {
 				object === 'contributor'
 				|| (new URL(headers.referrer || headers.referer).pathname === '/login'));
 		} catch (e) {
-			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, e);
+			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, object, e);
 		}
 		if (hasJustLoggedIn) {
 			// GET MULTI-SESSION INFO

@@ -167,5 +167,12 @@ function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
 	ensureIconRegistered = true;
 }
 window.addEventListener('load', () => {
-	ensureIcon('.engagement-reads-icon', '/imgs/icons/i-eye.svg', '/imgs/icons/i-eye-closed.svg', 200, 2000);
+	let eye_icon = '/imgs/icons/i-eye';
+    if (!mediaSize) {
+		var mediaSize = getMediaSize();
+	}
+    if (mediaSize === 'xs') {
+		eye_icon = '/imgs/icons/i-eye-sm';
+	}
+    ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
 });

@@ -805,7 +805,8 @@ const Entry = function (_kwargs) {
 				<% }) %>
 			<% } %>
 			<% if (['pads', 'templates'].includes(object)) { %>
-				const readsCounter = _sel.addElems('span', 'engagement-reads');
+				const readsCounter = _sel.addElems('span', 'engagement-group page-stats')
+					.addElems('button', 'engagement engagement-reads')
 				readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
 				readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
 					return d.readCount ?? '0';

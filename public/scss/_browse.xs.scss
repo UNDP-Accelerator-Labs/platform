@@ -2193,6 +2193,10 @@ div.browse {
 					.engagement-group {
 						margin-top: 10px;
 
+						&.page-stats {
+							margin-top: 0;
+						}
+
 						.engagement {
 							display: inline-block;
 							border: none;
@@ -2211,6 +2215,10 @@ div.browse {
 								text-align: center;
 								font-size: $t-small;
 								color: $c-light-grey;
+								user-select: none;
+							}
+							&.engagement-reads {
+								pointer-events: none;
 							}
 						}
 						.engagement:disabled {
@@ -2479,6 +2487,7 @@ div.browse {
 						margin-bottom: 15px;
 					}*/
 					.engagement-group {
+						margin-top: 0;
 						padding: 0 10px;
 						box-sizing: border-box;
 					}
@@ -2807,7 +2816,7 @@ div.sticky-container + footer {
 	padding-bottom: 185px;
 }
 
-.engagement-reads {
+/*.engagement-reads {
 	padding-left: 15px;
 	flex-grow: 1;
 }
@@ -2825,4 +2834,4 @@ div.sticky-container + footer {
 	vertical-align: middle;
 	user-select: none;
 	pointer-events: none;
-}
+}*/

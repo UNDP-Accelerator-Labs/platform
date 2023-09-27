@@ -78,7 +78,7 @@ module.exports = async (req, res) => {
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err));
 			if (!vars) {
-				return res.redirect('/login');
+				return null;  // force a redirect in render
 			}
 			if (vars.instanceId && vars.docType) {
 				vars.readCount = await pagestats.getReadCount(vars.instanceId, vars.docType);

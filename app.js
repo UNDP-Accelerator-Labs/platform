@@ -66,6 +66,7 @@ function getVersionString() {
 				versionObj = {
 					'name': 'no version available',
 					'commit': 'unknown',
+					'date': 'unknown',
 					'app': `${app_id}`,
 				};
 			} else {
@@ -244,6 +245,7 @@ app.listen(process.env.PORT || 2000, _ => {
 	getVersionString().then(vo => {
 		console.log('name', vo.name);
 		console.log('commit', vo.commit);
+		console.log('deployed', vo.date);
 		console.log('app_id', app_id);
 	}).catch(err => console.log(err));
 })

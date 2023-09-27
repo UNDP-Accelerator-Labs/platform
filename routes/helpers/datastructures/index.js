@@ -52,7 +52,7 @@ exports.sessiondata = _data => {
 exports.sessionsummary = _kwargs => {
 	const conn = _kwargs.connection || DB.general
 	const { uuid } = _kwargs
-	
+
 	return new Promise(resolve => {
 		if (uuid) {
 			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
@@ -225,10 +225,22 @@ exports.pagemetadata = (_kwargs) => {
 				});
 			}).catch(err => console.log(err)));
 		} else batch.push(null)
-		if (new URL(headers.referer).pathname === '/login' || object === 'contributor') {
+		let hasJustLoggedIn = false;
+		try {
+			if (headers.referer) {
+				hasJustLoggedIn = (
+					new URL(headers.referer).pathname === '/login'
+					|| object === 'contributor');
+			}
+		} catch (_) {
+			// ignore issues here
+		}
+		if (hasJustLoggedIn) {
 			// GET MULTI-SESSION INFO
-			batch.push(this.sessionsummary({ uuid }))
-		} else batch.push(null)
+			batch.push(this.sessionsummary({ uuid }));
+		} else {
+			batch.push(null);
+		}
 
 		return t.batch(batch)
 		.catch(err => console.log(err))

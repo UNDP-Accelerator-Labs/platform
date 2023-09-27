@@ -21,7 +21,11 @@ module.exports = async (req, res) => {
 		if (instance) pinboard = res.locals.instance_vars?.pinboard
 
 		// GET FILTERS
-		const [ f_space, order, page, full_filters ] = await filter(req, res)
+		const filter_result = await filter(req, res);
+		if (!filter_result) {
+			return res.redirect('/login');
+		}
+		const [ f_space, order, page, full_filters ] = filter_result;
 
 		DB.conn.tx(async t => {
 			const batch = []

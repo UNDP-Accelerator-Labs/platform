@@ -42,16 +42,9 @@ module.exports = async (req, res) => {
 										AND status >= 2
 									LIMIT 1
 								;`, [ decodeURI(instance) ])  // CHECK WHETHER THE instance IS A PINBOARD: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
-								.then(result => {
+								.then(async result => {
 									if (!result) {
-										// FIXME: this render cannot work here since metadata is not defined yet!
-										return res.render(
-											'login',
-											{
-												title: `${app_title} | Login`,
-												originalUrl: req.originalUrl,
-												errormessage: req.session.errormessage,
-											})
+										return null;
 									}
 									return {
 										object: 'pads',
@@ -83,7 +76,10 @@ module.exports = async (req, res) => {
 						docType: 'country',
 					};
 				}).catch(err => console.log(err))
-			}).catch(err => console.log(err)) || {}; // avoiding server crash by setting vars to empty object -- this will still crash somewhere below but it will not bring down the whole server
+			}).catch(err => console.log(err));
+			if (!vars) {
+				return res.redirect('/login');
+			}
 			if (vars.instanceId && vars.docType) {
 				vars.readCount = await pagestats.getReadCount(vars.instanceId, vars.docType);
 				await pagestats.recordRender(req, vars.instanceId, vars.docType);

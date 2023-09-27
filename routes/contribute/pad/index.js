@@ -135,13 +135,14 @@ module.exports = (req, res) => {
 							result.reviews.sort((a, b) => a.id - b.id)
 						}
 						result.readCount = await pagestats.getReadCount(id, 'pad');
+						if (result.status >= 2) {
+							await pagestats.recordRender(req, id, 'pad');
+						} else {
+							result.readCount = '-';  // we're not recording so we don't imply we do
+						}
 						const data = await join.users(result, [ language, 'owner' ])
 						return data
 					}).catch(err => console.log(err)))
-				}
-
-				if (id) {
-					await pagestats.recordRender(req, id, 'pad');
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

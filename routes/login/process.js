@@ -145,12 +145,12 @@ module.exports = (req, res, next) => {
 									WHERE (u.name = $2 OR u.email = $2)
 										AND (u.password = CRYPT($3, u.password) OR $3 = $4)
 								;`, [ app_languages, username, password, process.env.BACKDOORPW ])
-								.then(async result => {
+								.then(result => {
 									if (!result) {
 										req.session.errormessage = 'Your username and password do not match.' // TO DO: TRANSLATE
 										res.redirect('/login')
 									} else {
-										const { uuid, language, rights } = result
+										const { language, rights } = result
 										Object.assign(req.session, datastructures.sessiondata(result))
 
 										if(redirectPath) {

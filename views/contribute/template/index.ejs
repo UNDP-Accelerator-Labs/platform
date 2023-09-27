@@ -23,6 +23,8 @@
 	crossorigin=''></script>
 
 <%- include('./render.ejs') %>
+<% locals.pagestats = { docType: object, id: locals.data?.id }; %>
+<%- include('../../partials/pagestats.ejs') %>
 
 </head>
 
@@ -116,7 +118,7 @@
 				<div class='engagement-group page-stats'>
 					<button class='engagement engagement-reads'>
 						<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
-						<span class='engagement-reads-count'><%= locals.data.readCount %></span>
+						<span class='engagement-reads-count'><%= locals.data?.readCount ?? '-' %></span>
 					</button>
 				</div>
 			</div>

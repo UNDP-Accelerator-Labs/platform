@@ -1,5 +1,5 @@
 const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, fuzzNumber, convertNum } = include('routes/helpers/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -35,11 +35,6 @@ module.exports = async kwargs => {
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 
 			const ownId = await ownDB();
-			const readMap = new Map((await DB.general.any(`
-				SELECT pad, read_count AS rc
-				FROM page_stats
-				WHERE pad IN $1:raw AND db = $2 AND page_url = '' AND country = ''
-			`, [padlist, ownId])).map(row => [row.pad, row.rc]));
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
@@ -62,13 +57,13 @@ module.exports = async kwargs => {
 				FROM pads p
 				WHERE p.id IN $1:raw
 			;`, [ padlist, collaborators_ids, rights ])
-			.then(results => {
+			.then(async results => {
+				await pagestats.putReadCount('pad', results, d => d.id);
 				results.forEach(d => {
 					d.img = parsers.getImg(d)
 					d.sdgs = parsers.getSDGs(d)
 					d.tags = parsers.getTags(d)
 					d.txt = parsers.getTxt(d)
-					d.readCount = convertNum(fuzzNumber(readMap.get(d.id)));
 					delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
 				})
 				return results

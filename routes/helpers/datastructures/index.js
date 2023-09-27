@@ -52,7 +52,7 @@ exports.sessiondata = _data => {
 exports.sessionsummary = _kwargs => {
 	const conn = _kwargs.connection || DB.general
 	const { uuid } = _kwargs
-	
+
 	return new Promise(resolve => {
 		if (uuid) {
 			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
@@ -225,10 +225,20 @@ exports.pagemetadata = (_kwargs) => {
 				});
 			}).catch(err => console.log(err)));
 		} else batch.push(null)
-		if (new URL(headers.referer).pathname === '/login' || object === 'contributor') {
+		let hasJustLoggedIn = false;
+		try {
+			hasJustLoggedIn = (
+				object === 'contributor'
+				|| (new URL(headers.referrer || headers.referer).pathname === '/login'));
+		} catch (e) {
+			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, object, e);
+		}
+		if (hasJustLoggedIn) {
 			// GET MULTI-SESSION INFO
-			batch.push(this.sessionsummary({ uuid }))
-		} else batch.push(null)
+			batch.push(this.sessionsummary({ uuid }));
+		} else {
+			batch.push(null);
+		}
 
 		return t.batch(batch)
 		.catch(err => console.log(err))
@@ -279,6 +289,9 @@ exports.pagemetadata = (_kwargs) => {
 			page: {
 				title,
 				instance_title: res?.locals.instance_vars?.title || null,
+				instanceReadCount: res?.locals.instance_vars?.readCount || null,
+				instanceDocType: res?.locals.instance_vars?.docType || null,
+				instanceId: res?.locals.instance_vars?.instanceId || null,
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,

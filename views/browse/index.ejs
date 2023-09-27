@@ -106,9 +106,11 @@
 				<h1 class='instance-title'><%- locals.metadata.page.instance_title %></h1>
 			<% } %>
 			<% if (locals.metadata?.page?.instanceId && locals.metadata?.page?.instanceDocType) { %>
-			<div class='engagement-reads'>
-				<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
-				<span class='engagement-reads-count'><%= locals.metadata.page.instanceReadCount ?? '-' %></span>
+			<div class='engagement-group page-stats'>
+				<button class='engagement engagement-reads'>
+					<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+					<span class='engagement-reads-count'><%= locals.metadata.page.instanceReadCount ?? '-' %></span>
+				</button>
 			</div>
 			<% } %>
 			<% if (!publicpage
@@ -347,9 +349,11 @@
 							<% } %>
 						</div>
 						<% if (!alreadyPagestats && locals.pinboard?.id) { %>
-							<div class='engagement-reads'>
-								<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
-								<span class='engagement-reads-count'><%= locals.pinboard.readCount ?? '-' %></span>
+							<div class='engagement-group page-stats'>
+								<button class='engagement engagement-reads'>
+									<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+									<span class='engagement-reads-count'><%= locals.pinboard.readCount ?? '-' %></span>
+								</button>
 							</div>
 						<% } %>
 

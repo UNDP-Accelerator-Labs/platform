@@ -15,22 +15,8 @@ div.hashed {
 		rgba(150, 150, 150, .1) 6px
 	);
 }
-div.filler {
-	display: block;
-	flex: 1 1;
-	pointer-events: none;
-}
-div.main-content {
-	&.fit {
-		display: grid;
-		grid-gap: 0;
-		grid-template-columns: 1fr auto 1fr;
-	}
-	&.adjacent {
-		display: grid;
-		grid-gap: 0;
-		grid-template-columns: repeat(2, 1fr);
-	}
+div.main-content.adjacent {
+	grid-template-columns: repeat(2, 1fr);
 }
 div.document {
 	position: relative;
@@ -446,6 +432,7 @@ div.document {
 							border-bottom: 1px solid transparent;
 						}
 						h1:focus {
+							/*border-bottom-color: $c-mid-yellow;*/
 							border-bottom-color: $c-light-2;
 						}
 					}
@@ -1508,6 +1495,7 @@ div.document {
 			}
 			// .foot {
 			// }
+
 			.engagement-group {
 				margin: 10px 0 0 -7px;
 
@@ -1908,14 +1896,14 @@ main#reference {
 	pointer-events: none;
 }
 footer {
+	position: relative;
 	width: 100%;
 	clear: both;
 	background-color: $c-light-3;
 	border-top: 1px solid $c-light-2;
+	z-index: 1000;
 
 	.inner {
-		/*padding: 30px;*/
-
 		position: relative;
 		display: block;
 		width: calc(300px * 3 + 15px * 2 - 210px - 2px);
@@ -2297,6 +2285,8 @@ div.display-option.split-screen {
 div.display-option.split-screen.right {
 	text-align: right;
 }
+
+
 
 .media-input-group {
 	position: sticky;

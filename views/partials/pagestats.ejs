@@ -2,7 +2,7 @@
     const object = locals.metadata.page.object;
     const originalUrl = locals.metadata.page.originalUrl;
     const uuid = locals.metadata.user.uuid;
-    const { id } = locals.data;
+    const id = locals.data?.id;
     const readTime = 3000;  // time it takes to register a read in milliseconds
 %>
 <% if (object === 'pad' && id) { %>
@@ -48,6 +48,9 @@
 
         setTimeout(recordRead, 1000);
     <% } // is logged out %>
-    ensureIcon('.engagement-reads-icon', '/imgs/icons/i-eye.svg', '/imgs/icons/i-eye-closed.svg', 200, 2000);
+    let eye_icon = '/imgs/icons/i-eye'
+    if (!mediaSize) var mediaSize = getMediaSize()
+    if (mediaSize === 'xs') eye_icon = '/imgs/icons/i-eye-sm'
+    ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
 </script>
 <% } // is pad and has id %>

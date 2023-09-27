@@ -206,6 +206,8 @@
 
 			<main>
 				<div class='inner'>
+					<!-- MULTI-SESSION ALERT -->
+					<%- include('../partials/sessions-alert') %>
 					<!-- (IF PINBOARD SPACE) PINBOARD TITLE -->
 					<% if (space === 'pinned' && locals.pinboard && pagedisplay !== 'slideshow') { %>
 						<% if (activity !== 'preview' && object === 'pads' && locals.pinboard.editable) { %>

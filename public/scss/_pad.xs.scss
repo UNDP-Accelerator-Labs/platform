@@ -31,66 +31,6 @@ div.document {
 			width: 225px;
 			margin: 0 0 0 -225px;
 
-			.bookmark {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				position: absolute;
-				width: 66px;
-				height: 90px;
-				top: -60px;
-				right: 20px;
-				transform-origin: top center;
-				transition: transform .25s ease-out;
-				background-color: $c-light-1;
-				font-size: $t-small;
-				line-height: 1.5em;
-				text-align: center;
-				color: #FFF;
-				text-align: center;
-				z-index: 100;
-				cursor: pointer;
-				transition: background-color .25s;
-
-				div {
-					transform: rotate(-90deg);
-				}
-			}
-			.bookmark::before {
-				content: '';
-				position: absolute;
-				right: 0;
-				top: 0;
-				transform: translateY(90px);
-				width: 0;
-				height: 0;
-				border-top: 7px solid $c-light-1;
-				border-left: 33px solid transparent;
-				transition: border-top-color .25s;
-			}
-			.bookmark::after {
-				content: '';
-				position: absolute;
-				left: 0;
-				top: 0;
-				transform: translateY(90px);
-				width: 0;
-				height: 0;
-				border-top: 7px solid $c-light-1;
-				border-right: 33px solid transparent;
-				transition: border-top-color .25s;
-			}
-			.bookmark:hover,
-			.bookmark.active {
-				background-color: $c-mid-2;
-			}
-			.bookmark:hover::before,
-			.bookmark:hover::after,
-			.bookmark.active::before,
-			.bookmark.active::after {
-				border-top-color: $c-mid-2;
-			}
-
 			ul {
 				padding: 5px 10px;
 				margin: 65px 20px 0 0;
@@ -1482,6 +1422,44 @@ div.document {
 				}
 				.layout.animate-in {
 					animation: slide-down 1s;
+				}
+			}
+			.engagement-group {
+				margin: 10px 0 0 -7px;
+
+				&.page-stats {
+					margin-top: 0;
+				}
+
+				.engagement {
+					display: inline-block;
+					border: none;
+					outline: none;
+					background-color: transparent;
+
+					img {
+						vertical-align: middle;
+						width: 45px;
+						height: 45px;
+						cursor: pointer;
+					}
+					span {
+						display: inline-block;
+						margin-right: 5px;
+						text-align: center;
+						font-size: $t-small;
+						color: $c-light-grey;
+						user-select: none;
+					}
+					&.engagement-reads {
+						pointer-events: none;
+					}
+				}
+				.engagement:disabled {
+					img {
+						cursor: initial;
+						opacity: .5;
+					}
 				}
 			}
 		}

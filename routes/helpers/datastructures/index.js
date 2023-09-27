@@ -69,7 +69,7 @@ exports.pagemetadata = (_kwargs) => {
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
 	const language = checklanguage(params?.language || session.language || this.sessiondata())
-	const page_language = params?.language | 'en';
+	const page_language = params?.language || 'en';
 
 	const parsedQuery = {}
 	for (let key in query) {

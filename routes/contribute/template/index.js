@@ -1,5 +1,5 @@
-const { modules, engagementtypes, metafields, DB, ownDB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, fuzzNumber, convertNum } = include('routes/helpers/')
+const { modules, engagementtypes, metafields, DB } = include('config/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
@@ -94,14 +94,6 @@ module.exports = (req, res) => {
 
 							WHERE t.id = $3
 						;`, [ engagement.cases, uuid, +id ]).then(async results => {
-							// TO DO: COMPLETE THIS ONCE WE HAVE A object_type COLUMN IN read_count
-							const ownId = await ownDB();
-							const readCount = await DB.general.any(`
-								SELECT read_count AS rc
-								FROM page_stats
-								WHERE pad = $1::INT AND db = $2 AND page_url = '' AND country = ''
-							`, [id, ownId]);
-							result.readCount = convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
 							const data = await join.users(results, [ language, 'owner' ])
 							return data
 						}))

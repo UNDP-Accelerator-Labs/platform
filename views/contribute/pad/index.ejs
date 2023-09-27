@@ -375,6 +375,13 @@
 							<%- vocabulary['review'][language](false, false) %> #<%- locals.data?.review_idx %>
 						</div>
 					<% } %>
+					<!-- TO DO: ADD OTHER STATS -->
+					<div class='engagement-group page-stats'>
+						<button class='engagement engagement-reads'>
+							<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+							<span class='engagement-reads-count'><%= locals.data?.readCount ?? '-' %></span>
+						</button>
+					</div>
 				</div>
 			<% } %>
 			<div class='body'>
@@ -396,10 +403,6 @@
 						</div>
 					</section>
 				<% } %>
-			</div>
-			<div class='engagement-reads'>
-				<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
-				<span class='engagement-reads-count'><%= locals.data?.readCount ?? '-' %></span>
 			</div>
 			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='exploration-local'></div>

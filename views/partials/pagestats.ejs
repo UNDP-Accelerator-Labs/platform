@@ -1,9 +1,15 @@
 <%
     const pagestats = locals.pagestats ?? {};
     const originalUrl = locals.metadata.page.originalUrl;
+<<<<<<< HEAD
     const { id, docType } = pagestats;
     const readTime = 6000;  // time it takes to register a read in milliseconds
     const docTypes = ['pad', 'template', 'pinboard', 'team', 'country'];
+=======
+    const uuid = locals.metadata.user.uuid;
+    const id = locals.data?.id;
+    const readTime = 3000;  // time it takes to register a read in milliseconds
+>>>>>>> 4541525050a9ab8ad2fc557f45592b63acc442d3
 %>
 <% if (docTypes.includes(docType) && id) { %>
 <script type="text/javascript" defer>
@@ -47,7 +53,6 @@
             active = true;
         }
     });
-
     setTimeout(recordRead, 1000);
 </script>
 <% } // is allowed type and has id %>

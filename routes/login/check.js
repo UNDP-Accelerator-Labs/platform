@@ -1,6 +1,5 @@
 const { app_suite } = include('config/')
 const { datastructures } = include('routes/helpers/')
-const { DB } = require('../../config/db/index.js')
 const processlogin = require('./process.js')
 const jwt = require('jsonwebtoken')
 

@@ -987,9 +987,9 @@
 								if (!structureOnly) {
 									if (Array.isArray(c.entries[i])) {
 										item.srcs = c.entries[i].filter(b => ![null, undefined].includes(b)).map(b => b.trim())
-									} else {
+									} else if (c.entries[i]) {
 										item.srcs = [c.entries[i].trim()]
-									}
+									} else item.srcs = []
 									item.has_content = item?.srcs?.length > 0
 								}
 								item.type = metafields.find(b => b.label === c.type)?.type
@@ -1315,7 +1315,9 @@
 		// 3) SAVE PADS
 		pads.forEach(d => d.sections = JSON.stringify(d.sections))
 		// const results = await POST('/storeImport', { pads, template, mobilization })
+		addGlobalLoader()
 		const results = await POST('/upload/xlsx', { pads, template, mobilization })
+		rmGlobalLoader()
 		window.location.href = `/<%- locals.metadata.page.language %>/browse/pads/private`
 
 		return false

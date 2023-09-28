@@ -150,9 +150,14 @@ function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
 		return;
 	}
 	const iconUpdate = () => {
+		let anyIcons = false;
 		d3.selectAll(classSel).attr('src', () => {
+			anyIcons = true;
 			return Math.random() < 0.01 ? altName : name;
 		});
+		if (!anyIcons) {
+			return;
+		}
 		setTimeout(() => {
 			d3.selectAll(classSel).attr('src', name);
 			setTimeout(iconUpdate, timingTotal - timingShort);
@@ -161,3 +166,13 @@ function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
 	setTimeout(iconUpdate, timingTotal);
 	ensureIconRegistered = true;
 }
+window.addEventListener('load', () => {
+	let eye_icon = '/imgs/icons/i-eye';
+    if (!mediaSize) {
+		var mediaSize = getMediaSize();
+	}
+    if (mediaSize === 'xs') {
+		eye_icon = '/imgs/icons/i-eye-sm';
+	}
+    ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
+});

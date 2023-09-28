@@ -879,9 +879,10 @@ nav#filters {
 
 .sidebar {
 	.input-toolbox {
-		position: fixed;
-		bottom: 15px;
-		right: 15px;
+		position: sticky;
+		bottom: 0;
+		left: calc(100% - 75px);
+		transform: translate(-15px, -15px);
 		width: 75px;
 		height: 75px;
 		border-radius: 75px;

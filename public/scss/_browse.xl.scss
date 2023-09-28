@@ -2033,6 +2033,10 @@ div.browse {
 				.engagement-group {
 					margin: 10px 0 0 -7px;
 
+					&.page-stats {
+						margin-top: 0;
+					}
+
 					.engagement {
 						display: inline-block;
 						border: none;
@@ -2051,6 +2055,10 @@ div.browse {
 							text-align: center;
 							font-size: $t-small;
 							color: $c-light-grey;
+							user-select: none;
+						}
+						&.engagement-reads {
+							pointer-events: none;
 						}
 					}
 					.engagement:disabled {
@@ -2334,7 +2342,8 @@ div.browse {
 					}
 				}
 				.engagement-group {
-					margin: 10px 0 0 -2px;
+/*					margin: 10px 0 0 -2px;*/
+					margin: 0 0 0 -2px;
 					padding: 0 10px;
 					box-sizing: border-box;
 				}
@@ -2625,7 +2634,7 @@ footer {
 	border: none;
 }
 
-.engagement-reads {
+/*.engagement-reads {
 	padding-left: 15px;
 	flex-grow: 1;
 }
@@ -2644,3 +2653,4 @@ footer {
 	user-select: none;
 	pointer-events: none;
 }
+*/

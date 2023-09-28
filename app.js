@@ -163,70 +163,63 @@ app.get("/version/", (req, res) => {
 });
 
 // PUBLIC VIEWS
-app.get("/", routes.redirect.home, routes.dispatch.public);
-app.get("/:language/home", routes.dispatch.public);
+app.get('/', routes.redirect.home, routes.dispatch.public)
+app.get('/:language/home', routes.dispatch.public)
 
-app
-  .route("/login") // TO DO: UPDATE FOR GET TO PASS LANGUAGE
-  // .get(routes.redirect.home, routes.render.login)
-  .get(routes.redirect.browse, routes.render.login)
-  .post(routes.process.login);
-app.get("/transfer", routes.process.login);
-app.get("/logout", routes.process.logout);
 
-app.route("/reset/:token").get(routes.redirect.browse, routes.render.login);
+app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
+	// .get(routes.redirect.home, routes.render.login)
+	.get(routes.redirect.browse, routes.render.login)
+	.post(routes.process.login)
+app.get('/transfer', routes.process.login)
+app.route('/logout/:session')
+	.get(routes.process.logout)
+	.post(routes.process.logout)
 
-app
-  .route("/forget-password")
-  .get(routes.redirect.browse, routes.render.login)
-  .post(routes.process.forgetPassword);
+app.route('/reset/:token')
+	.get(routes.redirect.browse, routes.render.login)
 
-app
-  .route("/reset-password")
-  .get(routes.redirect.browse, routes.render.login)
-  .post(routes.process.updatePassword);
+app.route('/forget-password')
+	.get(routes.redirect.browse, routes.render.login)
+	.post(routes.process.forgetPassword)
 
-app
-  .route("/:language/contribute/:object")
-  .get(routes.check.login, routes.dispatch.contribute);
-app
-  .route("/:language/edit/:object")
-  .get(routes.check.login, routes.dispatch.contribute);
-app
-  .route("/:language/view/:object")
-  .get(routes.check.login, routes.dispatch.contribute);
-app
-  .route("/:language/import/:object")
-  .get(routes.check.login, routes.render.import);
-app
-  .route("/:language/mobilize/:object")
-  .get(routes.check.login, routes.dispatch.mobilize);
+app.route('/reset-password')
+	.get(routes.redirect.browse, routes.render.login)
+	.post(routes.process.updatePassword)
 
-app
-  .route("/:language/browse/:object/:space")
-  .get(routes.check.login, routes.dispatch.browse)
-  .post(routes.check.login, routes.dispatch.browse);
+app.route('/:language/contribute/:object')
+	.get(routes.check.login, routes.dispatch.contribute)
+app.route('/:language/edit/:object')
+	.get(routes.check.login, routes.dispatch.contribute)
+app.route('/:language/view/:object')
+	.get(routes.check.login, routes.dispatch.contribute)
+app.route('/:language/import/:object')
+	.get(routes.check.login, routes.render.import)
+app.route('/:language/mobilize/:object')
+	.get(routes.check.login, routes.dispatch.mobilize)
 
-app
-  .route("/:language/preview/:object/:space")
-  .get(routes.check.login, routes.dispatch.browse);
+app.route('/:language/browse/:object/:space')
+	.get(routes.check.login, routes.dispatch.browse)
+	.post(routes.check.login, routes.dispatch.browse)
 
-app
-  .route("/:language/print/:object/:space")
-  .get(routes.check.login, routes.dispatch.print);
+app.route('/:language/preview/:object/:space')
+	.get(routes.check.login, routes.dispatch.browse)
 
-app.get("/:language/analyse/:object", routes.dispatch.analyse); // TO DO
+app.route('/:language/print/:object/:space')
+	.get(routes.check.login, routes.dispatch.print)
 
-app.get("/:language/exploration-info", routes.render.explorationInfo);
+app.get('/:language/analyse/:object', routes.dispatch.analyse) // TO DO
 
-app.post("/check/:object", routes.process.check);
+app.get('/:language/exploration-info', routes.render.explorationInfo)
 
-app.post("/save/:object", routes.process.save);
-app.post("/pin", routes.process.pin);
-app.post("/engage", routes.process.engage);
-app.post("/comment", routes.process.comment);
-app.post("/pagestats", routes.process.pagestats);
-app.post("/validate", routes.process.validate);
+app.post('/check/:object', routes.process.check)
+
+app.post('/save/:object', routes.process.save)
+app.post('/pin', routes.process.pin)
+app.post('/engage', routes.process.engage)
+app.post('/comment', routes.process.comment)
+app.post('/pagestats', routes.process.pagestats)
+app.post('/validate', routes.process.validate)
 
 app.put(
   "/exploration/create",
@@ -322,16 +315,16 @@ app.get("/module-error", routes.error);
 app.get("*", routes.notfound);
 
 // RUN THE SERVER
-app.listen(process.env.PORT || 2000, (_) => {
-  console.log(`the app is running on port ${process.env.PORT || 2000}`);
-  getVersionString()
-    .then((vo) => {
-      console.log("name", vo.name);
-      console.log("commit", vo.commit);
-      console.log("app_id", app_id);
-    })
-    .catch((err) => console.log(err));
-});
+app.listen(process.env.PORT || 2000, _ => {
+	console.log(`the app is running on port ${process.env.PORT || 2000}`)
+	getVersionString().then(vo => {
+		console.log('name', vo.name);
+		console.log('commit', vo.commit);
+		console.log('deployed', vo.date);
+		console.log('app_id', app_id);
+	}).catch(err => console.log(err));
+})
+
 
 // INITIATE ALL CRON JOBS
 const cron = require("node-cron");

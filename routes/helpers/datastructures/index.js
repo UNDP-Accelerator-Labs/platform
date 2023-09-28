@@ -45,8 +45,32 @@ exports.sessiondata = _data => {
 		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
+	obj.app = title
 
 	return obj
+}
+exports.sessionsummary = _kwargs => {
+	const conn = _kwargs.connection || DB.general
+	const { uuid } = _kwargs
+
+	return new Promise(resolve => {
+		if (uuid) {
+			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
+			.then(sessions => {
+				if (sessions) {
+					// EXTRACT SESSION DATA
+					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'app' })
+						.map(d => {
+							const { values, ...data } = d
+							return data
+						})
+					const total = array.sum.call(sessions, 'count')
+					sessions.push({ key: 'All', count: total })
+					resolve(sessions)
+				}
+			}).catch(err => console.log(err))
+		} else resolve(null)
+	})
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
@@ -64,7 +88,7 @@ exports.pagemetadata = (_kwargs) => {
 	}
 
 	if (session.uuid) { // USER IS LOGGED IN
-		var { uuid, username: name, country, rights, collaborators, public } = session || {}
+		var { uuid, username: name, country, rights, collaborators, public, errormessage, sessions } = session || {}
 	} else { // PUBLIC/ NO SESSION
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
@@ -201,11 +225,25 @@ exports.pagemetadata = (_kwargs) => {
 				});
 			}).catch(err => console.log(err)));
 		} else batch.push(null)
+		let hasJustLoggedIn = false;
+		try {
+			hasJustLoggedIn = (
+				object === 'contributor'
+				|| (new URL(headers.referrer || headers.referer).pathname === '/login'));
+		} catch (e) {
+			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, object, e);
+		}
+		if (hasJustLoggedIn) {
+			// GET MULTI-SESSION INFO
+			batch.push(this.sessionsummary({ uuid }));
+		} else {
+			batch.push(null);
+		}
 
 		return t.batch(batch)
 		.catch(err => console.log(err))
 	}).then(async results => {
-		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards ] = results
+		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards, sessions ] = results
 		let [ languages, speakers ] = languagedata
 
 		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
@@ -245,11 +283,15 @@ exports.pagemetadata = (_kwargs) => {
 				uuid,
 				name,
 				country,
-				rights
+				rights,
+				sessions
 			},
 			page: {
 				title,
 				instance_title: res?.locals.instance_vars?.title || null,
+				instanceReadCount: res?.locals.instance_vars?.readCount || null,
+				instanceDocType: res?.locals.instance_vars?.docType || null,
+				instanceId: res?.locals.instance_vars?.instanceId || null,
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,
@@ -270,7 +312,9 @@ exports.pagemetadata = (_kwargs) => {
 				map: map || false,
 				mscale: mscale || 'contain',
 				display: display || browse_display,
-				page_content_limit
+				page_content_limit,
+
+				errormessage
 			},
 			menu: {
 				templates,

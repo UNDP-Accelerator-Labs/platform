@@ -24,4 +24,4 @@ exports.public = (req, res) => {
 	// return require('./browse/homepage').render
 }
 
-exports.logout = require('./logout.js')
+// exports.logout = require('./logout.js')

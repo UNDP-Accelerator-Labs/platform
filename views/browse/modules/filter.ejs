@@ -19,7 +19,7 @@
 
 <% if (locals.stats?.total > 0) { %>
 	<nav id='search-and-filter' class='xs sm m lg xl xxl<% if (mapscale === "full-screen") { %> anchor-bottom<% } %>'>
-		<% if (logged) { %>
+		<% if (logged && object === 'pads') { %>
 			<div class="search-type-menu">
 				<span class="stm stm-select google-translate-attr" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
 				<span class="stm google-translate-attr" id="stm-exploration">
@@ -33,9 +33,10 @@
 
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
+			<% if (object === 'pads') { %>
 			<input id='form-exploration-id' type='hidden' name='explorationid' value='' />
 			<%
-				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
+				const menu_keys = (locals.filters_menu ?? []).map(d => Object.keys(d)).flat()
 				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
 
 				view_params.forEach(d => {
@@ -56,6 +57,7 @@
 			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='exploration'></div>
 			<% } // logged in (uuid) %>
+			<% } // object is pads %>
 			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
@@ -228,9 +230,9 @@
 			tag.addElems('label', 'name')
 			.attr('title', Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown'][language]))
 			.html(_ => {
-				if (Number.isInteger(d.name)) return d.name 
+				if (Number.isInteger(d.name)) return d.name
 				else if (d.name) {
-					if (d.name.length > 15) return `${d.name.slice(0, 15).capitalize()}…` 
+					if (d.name.length > 15) return `${d.name.slice(0, 15).capitalize()}…`
 					else return d.name.capitalize()
 				} else return vocabulary['unknown'][language]
 			})
@@ -269,7 +271,7 @@
 		if (top + 300 >= viewheight) dropdown.classed('dropup', true)
 
 		const filters = d3.select(this).findAncestor('filters')
-		
+
 		if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 		if (filters?.node()) filters.node().style.overflow = 'visible'
 
@@ -330,7 +332,7 @@
 			const filters = d3.select('#search-and-filter')
 			const filter = d3.select(this).findAncestor('filter')
 			const dropdown = filter.select('.dropdown')
-			
+
 			if (dropdown.node()) dropdown.node().style.maxHeight = null
 			if (filters.node) filters.node().style.overflow = 'auto'
 

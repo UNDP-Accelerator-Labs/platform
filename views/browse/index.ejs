@@ -38,6 +38,16 @@
 <head>
 
 <%- include ('../partials/head.ejs') %>
+<% let alreadyPagestats = false; %>
+<% if (locals.metadata?.page?.instanceId && locals.metadata?.page?.instanceDocType) { %>
+	<% locals.pagestats = { docType: locals.metadata.page.instanceDocType, id: locals.metadata.page.instanceId }; %>
+	<%- include('../partials/pagestats.ejs') %>
+	<% alreadyPagestats = true; %>
+<% } %>
+<% if (!alreadyPagestats && locals.pinboard?.id) { %>
+	<% locals.pagestats = { docType: 'pinboard', id: locals.pinboard.id }; %>
+	<%- include('../partials/pagestats.ejs') %>
+<% } %>
 
 </head>
 
@@ -94,6 +104,14 @@
 		<div class='browse <%- pagedisplay %><% if (publicpage) { %> public<% } %>'>
 			<% if (locals.metadata.page.instance_title) { %>
 				<h1 class='instance-title'><%- locals.metadata.page.instance_title %></h1>
+			<% } %>
+			<% if (locals.metadata?.page?.instanceId && locals.metadata?.page?.instanceDocType) { %>
+			<div class='engagement-group page-stats'>
+				<button class='engagement engagement-reads'>
+					<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+					<span class='engagement-reads-count'><%= locals.metadata.page.instanceReadCount ?? '-' %></span>
+				</button>
+			</div>
 			<% } %>
 			<% if (!publicpage
 				&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
@@ -189,7 +207,6 @@
 							})
 
 							window.addEventListener('mouseup', function (e) {
-								console.log('here')
 								if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('spaces')) {
 									d3.selectAll('nav.tabs .inner .open').classed('open', false)
 									.selectAll('.dropdown')
@@ -207,6 +224,8 @@
 
 			<main>
 				<div class='inner'>
+					<!-- MULTI-SESSION ALERT -->
+					<%- include('../partials/sessions-alert') %>
 					<!-- (IF PINBOARD SPACE) PINBOARD TITLE -->
 					<% if (space === 'pinned' && locals.pinboard && pagedisplay !== 'slideshow') { %>
 						<% if (activity !== 'preview' && object === 'pads' && locals.pinboard.editable) { %>
@@ -329,7 +348,14 @@
 								<% } %>
 							<% } %>
 						</div>
-
+						<% if (!alreadyPagestats && locals.pinboard?.id) { %>
+							<div class='engagement-group page-stats'>
+								<button class='engagement engagement-reads'>
+									<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+									<span class='engagement-reads-count'><%= locals.pinboard.readCount ?? '-' %></span>
+								</button>
+							</div>
+						<% } %>
 
 						<script type='text/javascript'>
 							function checkForEnter (evt, node) {
@@ -376,7 +402,7 @@
 
 					<!-- MAP -->
 					<% if (
-						((locals.metadata.page.map 
+						((locals.metadata.page.map
 							&& locals.stats?.filtered > 0)
 						&& !(space === 'pinned'
 							&& (!locals.pinboard?.editable || activity === 'preview')

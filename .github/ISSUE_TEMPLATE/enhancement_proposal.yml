@@ -40,6 +40,14 @@ body:
     validations:
       required: false
   - type: textarea
+    id: beneficial
+    attributes:
+      label: Risks
+      description: What are potential risks associated with this proposal.
+      placeholder: What are the risks?
+    validations:
+      required: false
+  - type: textarea
     id: relevant-info
     attributes:
       label: Add any other relevant details

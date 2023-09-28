@@ -1,5 +1,5 @@
-const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers } = include('routes/helpers/')
+const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, userrights } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -15,7 +15,7 @@ module.exports = (req, res) => {
 	DB.conn.tx(t => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
 		return check_authorization({ connection: t, id, template, mobilization, source, uuid, rights, collaborators, public })
-		.then(result => {
+		.then(async result => {
 			const { authorized, redirect } = result
 
 			if (!authorized) {
@@ -134,6 +134,12 @@ module.exports = (req, res) => {
 							}
 							result.reviews.sort((a, b) => a.id - b.id)
 						}
+						result.readCount = await pagestats.getReadCount(id, 'pad');
+						if (result.status >= 2) {
+							await pagestats.recordRender(req, id, 'pad');
+						} else {
+							result.readCount = '-';  // we're not recording so we don't imply we do
+						}
 						const data = await join.users(result, [ language, 'owner' ])
 						return data
 					}).catch(err => console.log(err)))
@@ -242,7 +248,9 @@ module.exports = (req, res) => {
 
 async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { id, template, mobilization, source, uuid, rights, collaborators, public } = _kwargs
+	const { id, template, mobilization, source, uuid, collaborators, public } = _kwargs
+
+	const rights = await userrights({ uuid })
 
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 	if (typeof write === 'object') {

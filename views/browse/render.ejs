@@ -371,23 +371,28 @@ const Entry = function (_kwargs) {
 		img: function (_sel) {
 			_sel.addElems('div', 'media media-img', d => d.img?.length ? [d] : [])
 				.addElems('a', 'pad-link')
-				.attrs({
-					'href': d => {
-						const queryparams = new URLSearchParams()
-						if (d.id) queryparams.set('id', d.id)
-						if (d.source) queryparams.set('source', d.source)
-						if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
-						if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
+				// .attrs({
+				// 	'href': d => {
+				// 		const queryparams = new URLSearchParams()
+				// 		if (d.id) queryparams.set('id', d.id)
+				// 		if (d.source) queryparams.set('source', d.source)
+				// 		if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
+				// 		if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
 
-						<% if (object === 'reviews') { %>
-							if (!d.is_review && d.reviews?.length > 0) {
-								queryparams.set('display', 'adjacent-reviews')
-								return `/<%- language %>/view/pad?${queryparams.toString()}`
-							}
-						<% } %>
-						if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-						else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-					}//, 'target': '_blank'
+				// 		<% if (object === 'reviews') { %>
+				// 			if (!d.is_review && d.reviews?.length > 0) {
+				// 				queryparams.set('display', 'adjacent-reviews')
+				// 				return `/<%- language %>/view/pad?${queryparams.toString()}`
+				// 			}
+				// 		<% } %>
+				// 		if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+				// 		else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
+				// 	}
+				// })
+				.on('click', function (d) {
+					// THIS ENLARGES THE IMAGE INSTED OF OPENING THE PAD
+					const img = d3.select(this).select('img').node().src
+					renderImgZoom({ src: img.replace('/sm/', '/') })
 				})
 			.addElems('img', 'vignette')
 				.attrs({ 'loading': 'lazy', 'alt': _ => '<%- vocabulary["missing image"][language] %>' })
@@ -799,6 +804,14 @@ const Entry = function (_kwargs) {
 					})
 				<% }) %>
 			<% } %>
+			<% if (['pads', 'templates'].includes(object)) { %>
+				const readsCounter = _sel.addElems('span', 'engagement-group page-stats')
+					.addElems('button', 'engagement engagement-reads')
+				readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+				readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
+					return d.readCount ?? '0';
+				});
+			<% } %>
 		}.bind(this),
 		pin: function (_sel) {
 			<% if ((object === 'pads'
@@ -884,18 +897,22 @@ const Entry = function (_kwargs) {
 				function renderPinNavigation (_data) {
 					// NOTE: d can be undefined here for elements that were
 					// added through ejs instead of d3
-					d3.select('#pinboards-list-lg menu')
-						.addElems('li', null, _data, (d) => d ? d.id : -1)
-					.addElems('a')
-						.classed('notranslate', true)
+					const lglis = d3.select('#pinboards-list-lg menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1);
+					const lgas = lglis.addElems('a');
+					lgas.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
-					d3.select('#pinboards-list-xs menu')
-						.addElems('li', null, _data, (d) => d ? d.id : -1)
-					.addElems('a')
-						.classed('notranslate', true)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title);
+					lgas.addElems('span', 'count')
+						.html(d => d.count);
+					const xslis = d3.select('#pinboards-list-xs menu')
+						.addElems('li', null, _data, (d) => d ? d.id : -1);
+					const xsas = xslis.addElems('a');
+					xsas.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title)
+						.html(d => d.is_exploration ? `<%- explorationVocab['exploration'] %>: ${d.title}` : d.title);
+					xsas.addElems('span', 'count')
+						.html(d => d.count);
 				}
 
 				const pinPbMap = {};

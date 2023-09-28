@@ -4,6 +4,7 @@
 	// CREATE ALIASES
 	const modules = locals.metadata.site.modules
 	const rights = locals.metadata.user.rights
+	const uuid = locals.metadata.user.uuid
 	const language = locals.metadata.page.language
 	const editable = !locals.data || locals.data.editable
 %>
@@ -27,14 +28,14 @@
 <%- include ('partials/translations.ejs') %>
 <%- include ('partials/menu-languages.ejs') %>
 
-<div class='main-content'>
+<div class='main-content fit'>
 <header>
 	<div class='inner'>
 		<%- include ('partials/menu-logo.ejs') %>
 	</div>
 </header>
 
-<%# include ('partials/modals.ejs') %>
+<div class='filler m'></div>
 
 <div class='fact-sheet'>
 	<main id='profile'>
@@ -48,6 +49,10 @@
 			</div>
 			<div class='head'>
 				<div class='title google-translate-attr'><%- vocabulary['contributor profile'][language] %></div>
+			
+				<% if (locals.data?.uuid === locals.metadata.user.uuid) { %>
+					<%- include('partials/sessions-alert.ejs') %>
+				<% } %>
 			</div>
 			<div class='body'>
 				<form action='/save/contributor' method='POST' id='profile-form' autocomplete='off'>
@@ -230,30 +235,34 @@
 							<% } %>
 							<!-- IF THIS IS CREATED FOR SOMEONE, SET RIGHTS -->
 							<li>
-								<div class='required'>
-									<label class='active'>*</label>
-								</div>
+								<% if (editable && locals.data?.uuid !== uuid) { %>
+									<div class='required'>
+										<label class='active'>*</label>
+									</div>
+								<% } %>
 								<label class='instruction google-translate-attr'><%- vocabulary['user rights'][language] %></label>
 								<div class='select'>
 									<% if (editable && (!locals.data || locals.data?.rights <= rights)) { %>
-										<input type='text' id='new-rights' value='<%- locals.data?.rights %>'>
+										<input type='text' id='new-rights' value='<%- locals.data?.rights %>'<% if (editable && locals.data?.uuid === uuid) { %> disabled<% } %>>
 										<label for='new-rights' class="google-translate-attr"><%- vocabulary['grant rights'][language] %></label>
-										<div class='dropdown'>
-											<menu>
-												<% for (let i = 0; i <= rights; i ++) { %>
-													<li>
-														<input type='radio' id='rights-<%- i %>' name='rights' value='<%- i %>' data-label='<%- i %>' required <% if (locals.data?.rights === i) { %>checked<% } %>>
-														<label for='rights-<%- i %>'><%- i %></label>
-														<!-- TO DO: DESCRIBE RIGHTS
-															0 - no rights
-															1 - external
-															2 - internal
-															3 - admin
-														-->
-													</li>
-												<% } %>
-											</menu>
-										</div>
+										<% if (editable && locals.data?.uuid !== uuid) { %>
+											<div class='dropdown'>
+												<menu>
+													<% for (let i = 0; i <= rights; i ++) { %>
+														<li>
+															<input type='radio' id='rights-<%- i %>' name='rights' value='<%- i %>' data-label='<%- i %>' required <% if (locals.data?.rights === i) { %>checked<% } %>>
+															<label for='rights-<%- i %>'><%- i %></label>
+															<!-- TO DO: DESCRIBE RIGHTS
+																0 - no rights
+																1 - external
+																2 - internal
+																3 - admin
+															-->
+														</li>
+													<% } %>
+												</menu>
+											</div>
+										<% } %>
 									<% } else { %>
 										<input type='hidden' name='rights' value='<%- locals.data?.rights %>'>
 										<input type='text' id='new-rights' value='<%- locals.data?.rights %>' disabled>
@@ -380,6 +389,8 @@
 <%- include ('./partials/footer.ejs') %>
 
 <script type='text/javascript'>
+	if (!mediaSize) var mediaSize = getMediaSize()
+
 	function toggleOptions (node, options) {
 		for (const label of node.labels) {
 			d3.select(label).attr('data-content', node.checked ? options[0] : options[1])
@@ -510,15 +521,24 @@
 						}))
 				})
 		}).on('focus', function () {
-			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')
+			const select = d3.select(this).findAncestor('select')
+			const dropdown = select.select('.dropdown')
 			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 
 			dropdown.selectAll('label').on('mousedown', function () {
 				d3.event.preventDefault()
 			})
+
+			if (mediaSize === 'xs') select.classed('expand', true)
+
 		}).on('blur', function () {
-			const dropdown = d3.select(this).findAncestor('select').select('.dropdown')
+			const select = d3.select(this).findAncestor('select')
+			const dropdown = select.select('.dropdown')
 			dropdown.node().style.maxHeight = null
+
+			if (mediaSize === 'xs') {
+				setTimeout(_ => select.classed('expand', false), 250)
+			}
 		})
 
 		selects.selectAll('input[type=radio]')

@@ -3,7 +3,7 @@
 const fetch = require('node-fetch')
 
 exports.code = (locations, centerpoint, list = false) => {
-	console.log('pay attention to geocode')
+	console.log('pay attention to forward geocode')
 	return locations.map(l => {
 		return new Promise(resolve => {
 			if (!l || typeof l !== 'string') {

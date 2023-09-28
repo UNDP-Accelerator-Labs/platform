@@ -1,12 +1,12 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
-const { checklanguage, datastructures } = include('routes/helpers/')
+const { checklanguage, datastructures, userrights } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
 
 	if (public) res.redirect('/login')
 	else {
-
+		const { referer } = req.headers || {}
 		const { object } = req.params || {}
 		const { id, reset_message } = req.query || {}
 		const language = checklanguage(req.params?.language || req.session.language)
@@ -100,11 +100,10 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
-
 					return t.batch(batch)
 					.then(async results => {
-						const [ countries, languages, teams, data ] = results
-						
+						let [ countries, languages, teams, data ] = results
+
 						const metadata = await datastructures.pagemetadata({ req })
 						return Object.assign(metadata, { data, countries, languages, teams, reset_errormessage: reset_message })
 					}).then(data => res.render('profile', data))
@@ -115,11 +114,12 @@ module.exports = async (req, res) => {
 	}
 }
 
-function check_authorization (_kwargs) {
+async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.general
-	const { id, uuid, rights, public } = _kwargs
-
+	const { id, uuid, public } = _kwargs
 	const { read, write } = modules.find(d => d.type === 'contributors')?.rights || {}
+
+	const rights = await userrights({uuid})
 
 	if (public) return new Promise(resolve => resolve({ authorized: false }))
 	else if (id) {
@@ -130,7 +130,7 @@ function check_authorization (_kwargs) {
 				AND host = $2
 		;`, [ id, uuid ])
 		.then(result => {
-			if (result) return { authorized: true, redirect: 'view' }
+			if (result) return { authorized: true, redirect: 'view' } // THIS SHOULD ACTUALLY PREVENT EVEN PEOPLE WHO CREATED A THIRD PARTY ACCOUNT FROM CHANGING THE SETTINGS OF THAT ACCOUNT
 			else return { authorized: false }
 		}).catch(err => console.log(err))
 	} else return new Promise(resolve => resolve({ authorized: rights >= write }))

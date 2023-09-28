@@ -2193,6 +2193,10 @@ div.browse {
 					.engagement-group {
 						margin-top: 10px;
 
+						&.page-stats {
+							margin-top: 0;
+						}
+
 						.engagement {
 							display: inline-block;
 							border: none;
@@ -2211,6 +2215,10 @@ div.browse {
 								text-align: center;
 								font-size: $t-small;
 								color: $c-light-grey;
+								user-select: none;
+							}
+							&.engagement-reads {
+								pointer-events: none;
 							}
 						}
 						.engagement:disabled {
@@ -2223,6 +2231,8 @@ div.browse {
 				}
 				.layout.columns {
 					article {
+						display: flex;
+						flex-direction: column;
 						width: 100%;
 						height: 100%;
 						vertical-align: top;
@@ -2235,7 +2245,8 @@ div.browse {
 						border: 1px solid $c-mid-grey;
 
 						.inner {
-							display: block;
+							display: flex;
+							flex-direction: column;
 
 							.head {
 								display: block;
@@ -2476,6 +2487,7 @@ div.browse {
 						margin-bottom: 15px;
 					}*/
 					.engagement-group {
+						margin-top: 0;
 						padding: 0 10px;
 						box-sizing: border-box;
 					}
@@ -2799,3 +2811,27 @@ nav.pagination {
 		height: auto;
 	}
 }
+
+div.sticky-container + footer {
+	padding-bottom: 185px;
+}
+
+/*.engagement-reads {
+	padding-left: 15px;
+	flex-grow: 1;
+}
+.engagement-reads-icon {
+	max-width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+}
+.engagement-reads-count {
+	margin-left: 5px;
+	font-size: 0.9em;
+	color: $c-mid-grey;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+}*/

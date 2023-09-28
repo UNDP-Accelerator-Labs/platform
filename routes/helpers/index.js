@@ -7,6 +7,10 @@ exports.datastructures = require('./datastructures/')
 exports.checklanguage = require('./language/')
 exports.email = require('./email/')
 exports.geo = require('./geo/')
+exports.pagestats = require('./pagestats.js')
+exports.userrights = require('./rights')
+exports.numfmt = require('./numfmt.js')
+exports.loginRateLimiterMiddleware = require('./ratelimiter')
 
 exports.flatObj = function () {
 	// FLATTEN OBJECT: https://stackoverflow.com/questions/31136422/flatten-array-with-objects-into-1-object
@@ -113,3 +117,29 @@ exports.DEFAULT_UUID = '00000000-0000-0000-0000-000000000000';
 // 	Math.min(...nums)    // 1
 // 	Math.max(...nums)    // 3
 // }
+
+exports.shortStringAsNum = (text) => {
+	// converts a short string (up to 4 characters) into a number based on
+	// the ASCII values.
+	// For example the string 'mwi' will become 0x69776D or 6911853 in base 10.
+	// 'm' will become 0x6D or 109.
+	// This function will throw errors on invalid inputs (too long or non-ASCII)
+	// but it handles nullish values by returning null.
+	if (!text) return null;
+	text = `${text}`;
+	if (text.length > 4) {
+		throw new Error(
+			`only short strings can be safely converted to numbers. got '${text}'`);
+	}
+	let res = 0;
+	let mul = 1;
+	for (let ix = 0; ix < text.length; ix += 1) {
+		const cur = text.charCodeAt(ix);
+		if (cur < 0 || cur > 0xff) {
+			throw new Error(`cannot decode non-ASCII characters: ${text}`);
+		}
+		res += cur * mul;
+		mul *= 0x100;
+	}
+	return res;
+};

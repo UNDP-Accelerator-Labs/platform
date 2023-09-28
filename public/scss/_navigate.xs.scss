@@ -13,6 +13,11 @@ nav#languages {
 		display: flex;
 		justify-content: space-between;
 		width: 100%;
+		transition: transform .25s;
+
+		&.squeeze {
+			transform: scaleX(0);
+		}
 
 		li {
 			display: inline-block;
@@ -179,7 +184,7 @@ nav.tabs {
 					font-weight: normal;
 					margin: 0 0 0 15px;
 					color: $c-light-grey;
-					
+
 					&::before {
 						content: '';
 						position: absolute;
@@ -297,7 +302,7 @@ nav.tabs {
 									margin: 0 0 5px 15px;
 									color: $c-light-grey;
 									text-align: right;
-									
+
 									&::before {
 										content: none;
 									}
@@ -365,6 +370,12 @@ nav.tabs {
 											font-size: $t-mid-small;
 											line-height: 1.5em;
 											transform: none;
+
+											.count {
+												float: right;
+												text-align: right;
+												color: $c-light-grey;
+											}
 										}
 
 										&:hover {
@@ -967,9 +978,10 @@ nav#filters {
 
 .sidebar {
 	.input-toolbox {
-		position: fixed;
-		bottom: 15px;
-		right: 15px;
+		position: sticky;
+		bottom: 0;
+		left: calc(100% - 75px);
+		transform: translate(-15px, -15px);
 		width: 75px;
 		height: 75px;
 		border-radius: 75px;

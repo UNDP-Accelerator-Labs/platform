@@ -1,5 +1,5 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, country, rights, collaborators, public } = req.session || {}
@@ -40,16 +40,48 @@ module.exports = async (req, res) => {
 										AND status >= 2
 									LIMIT 1
 								;`, [ decodeURI(instance) ])  // CHECK WHETHER THE instance IS A PINBOARD: THE LIMIT 1 IS BECAUSE THERE IS NO UNIQUE CLAUSE FOR A TEAM NAME
-								.then(result => {
-									if (result) return { object: 'pads', space: 'pinned', pinboard: result?.id, title: result?.title, description: result?.description }
-									else return res.render('login', { title: `${app_title} | Login`, originalUrl: req.originalUrl, errormessage: req.session.errormessage })
+								.then(async result => {
+									if (!result) {
+										return null;
+									}
+									return {
+										object: 'pads',
+										space: 'pinned',
+										pinboard: result?.id,
+										title: result?.title,
+										description: result?.description,
+										instanceId: result?.id,
+										docType: 'pinboard',
+									}
 								}).catch(err => console.log(err))
-							} else return { object: 'pads', space: 'public', teams: [result?.id], title: result?.name }
+							}
+							return {
+								object: 'pads',
+								space: 'public',
+								teams: [result?.id],
+								title: result?.name,
+								instanceId: result?.id,
+								docType: 'team',
+							};
 						}).catch(err => console.log(err))
-					} else return { object: 'pads', space: 'public', countries: [result?.iso3], title: result?.name }
+					}
+					return {
+						object: 'pads',
+						space: 'public',
+						countries: [result?.iso3],
+						title: result?.name,
+						instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
+						docType: 'country',
+					};
 				}).catch(err => console.log(err))
-			}).catch(err => console.log(err)) || {}; // avoiding server crash by setting vars to empty object -- this will still crash somewhere below but it will not bring down the whole server
-
+			}).catch(err => console.log(err));
+			if (!vars) {
+				return null;  // force a redirect in render
+			}
+			if (vars.instanceId && vars.docType) {
+				vars.readCount = await pagestats.getReadCount(vars.instanceId, vars.docType);
+				await pagestats.recordRender(req, vars.instanceId, vars.docType);
+			}
 			space = vars.space
 			pinboard = vars.pinboard
 			teams = vars.teams

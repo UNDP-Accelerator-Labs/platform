@@ -50,8 +50,8 @@
 				</button>
 			</a>
 		</li>
-		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.read)
-			&& locals.pinboards_list?.length)
+		<% const cplist = (locals.pinboards_list ?? []).filter(d => d.id !== locals.pinboard?.id && d.count); %>
+		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.read) && cplist.length)
 		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
@@ -61,8 +61,7 @@
 
 				<div id='pinboards-list-xs' class='dropdown'>
 					<menu>
-						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
-						.forEach(d => { %>
+						<% cplist.forEach(d => { %>
 							<li>
 								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span></a>
 							</li>
@@ -104,21 +103,20 @@
 				</a>
 			</li>
 		<% } %>
-		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read)
-			&& locals.pinboards_list?.length)
+		<% const plist = (locals.pinboards_list ?? []).filter(d => d.id !== locals.pinboard?.id && d.count); %>
+		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read) && plist.length)
 		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
 					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- locals.pinboards_list?.length ?? 0 %></span></label>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- plist.length ?? 0 %></span></label>
 				</div>
 
 				<div id='pinboards-list-lg' class='dropdown'>
 					<menu>
-						<% locals.pinboards_list.filter(d => d.id !== locals.pinboard?.id)
-						.forEach(d => { %>
+						<% plist.forEach(d => { %>
 							<li>
-								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span></a>
+								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span><span class='count'><%- d.count %></span></a>
 							</li>
 						<% }) %>
 					</menu>
@@ -186,11 +184,11 @@
 		const url = new URL(window.location)
 		const queryparams = new URLSearchParams(url.search)
 		const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
-		
+
 		filter_keys.push('search')
 		for (const key of queryparams.keys()) {
 			if (!filter_keys.includes(key)) queryparams.delete(key)
-		}		
+		}
 		return window.location = `${location}?${queryparams.toString()}`
 	}
 </script>

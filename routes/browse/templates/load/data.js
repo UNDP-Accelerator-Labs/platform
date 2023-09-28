@@ -1,5 +1,5 @@
 const { page_content_limit, modules, engagementtypes, DB } = include('config/')
-const { checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -96,6 +96,7 @@ module.exports = async kwargs => {
 			d.items = d.sections?.map(d => d.structure)?.flat().length || 0
 			delete d.sections
 		})
+		await pagestats.putReadCount('template', results, d => d.id);
 		const data = await join.users(results, [ language, 'owner' ])
 
 		return {

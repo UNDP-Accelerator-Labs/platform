@@ -804,13 +804,14 @@ const Entry = function (_kwargs) {
 					})
 				<% }) %>
 			<% } %>
-			const readsCounter = _sel.addElems('span', 'engagement-reads');
-			readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
-			ensureIcon('.engagement-reads-icon', '/imgs/icons/i-eye.svg', '/imgs/icons/i-eye-closed.svg', 200, 2000);
-
-			readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
-				return d.readCount ?? '0';
-			});
+			<% if (['pads', 'templates'].includes(object)) { %>
+				const readsCounter = _sel.addElems('span', 'engagement-group page-stats')
+					.addElems('button', 'engagement engagement-reads')
+				readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
+				readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
+					return d.readCount ?? '0';
+				});
+			<% } %>
 		}.bind(this),
 		pin: function (_sel) {
 			<% if ((object === 'pads'

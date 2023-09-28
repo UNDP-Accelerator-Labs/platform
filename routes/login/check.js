@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken')
 module.exports = async (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { uuid } = req.session || {}
+	req.session.sessions = null
 	
 	const cookies = parseCookies(req)
 	let sid = cookies[`${app_suite}-session`]

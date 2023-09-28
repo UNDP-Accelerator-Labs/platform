@@ -136,6 +136,18 @@ exports.ownDB = async function () {
   return ownDBid;
 };
 
+// global db id
+let globalDBid = null;
+
+exports.globalDB = async function () {
+	if (globalDBid === null) {
+		globalDBid = (await DB.general.one(`
+			SELECT id FROM extern_db WHERE db = $1;
+		`, ['global'])).id;
+	}
+	return globalDBid;
+};
+
 // DISPLAY VARIABLES
 exports.map = map;
 exports.lazyload = lazyload;

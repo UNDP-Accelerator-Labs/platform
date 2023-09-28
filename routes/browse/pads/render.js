@@ -1,5 +1,5 @@
 const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
-const { array, datastructures, checklanguage, join, parsers } = include('routes/helpers/')
+const { array, datastructures, checklanguage, join, parsers, pagestats } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
 
@@ -21,7 +21,11 @@ module.exports = async (req, res) => {
 		if (instance) pinboard = res.locals.instance_vars?.pinboard
 
 		// GET FILTERS
-		const [ f_space, order, page, full_filters ] = await filter(req, res)
+		const filter_result = await filter(req, res);
+		if (!filter_result) {
+			return res.redirect('/login');
+		}
+		const [ f_space, order, page, full_filters ] = filter_result;
 
 		DB.conn.tx(async t => {
 			const batch = []
@@ -197,6 +201,13 @@ module.exports = async (req, res) => {
 				;`, [ uuid, rights, pinboard ])
 				.then(async result => {
 					const data = await join.users(result, [ language, 'owner' ])
+					// NOTE: avoid double counting in the unlikely event that
+					// the pinboard is referenced both through an instance
+					// as well as a direct arg
+					if (!res.locals?.instance_vars?.instanceId && !res.locals?.instance_vars?.docType) {
+						data.readCount = await pagestats.getReadCount(pinboard, 'pinboard');
+						await pagestats.recordRender(req, pinboard, 'pinboard');
+					}
 					return data
 				}).catch(err => console.log(err)))
 			} else batch.push(null)
@@ -231,7 +242,7 @@ module.exports = async (req, res) => {
 				clusters,
 				pinboards_list,
 				pinboard_out,
-				sample_images
+				sample_images,
 			] = await t.batch(batch);
 			// const { sections, pads } = data
 			const { sections } = data
@@ -251,8 +262,6 @@ module.exports = async (req, res) => {
 				contributors: statistics.contributors,
 				tags: statistics.tags
 			}
-
-
 
 			const excerpt = pinboard_out?.status > 2 ? { title: pinboard_out.title, txt: pinboard_out.description, p: true } : null
 

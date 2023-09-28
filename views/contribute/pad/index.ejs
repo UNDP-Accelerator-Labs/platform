@@ -74,6 +74,7 @@
 	}
 </script>
 <%- include('./render.ejs') %>
+<% locals.pagestats = { docType: object, id: locals.data?.id }; %>
 <%- include('../../partials/pagestats.ejs') %>
 <% if (locals.metadata?.user?.uuid) { %>
 	<%- include ('../../partials/exploration.ejs') %>
@@ -86,7 +87,7 @@
 <%- include ('../../partials/menu-languages.ejs') %>
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
-<div class='main-content<% if (pagedisplay.includes("adjacent")) { %> adjacent<% } %>'>
+<div class='main-content<% if (pagedisplay.includes("adjacent")) { %> adjacent<% } else { %> fit<% } %>'>
 <header<% if (pagedisplay === 'slideshow' || pagedisplay.includes('adjacent')) { %> class='folded'<% } %>>
 	<div class='inner'>
 		<%- include ('../../partials/menu-logo.ejs') %>
@@ -374,6 +375,13 @@
 							<%- vocabulary['review'][language](false, false) %> #<%- locals.data?.review_idx %>
 						</div>
 					<% } %>
+					<!-- TO DO: ADD OTHER STATS -->
+					<div class='engagement-group page-stats'>
+						<button class='engagement engagement-reads'>
+							<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
+							<span class='engagement-reads-count'><%= locals.data?.readCount ?? '-' %></span>
+						</button>
+					</div>
 				</div>
 			<% } %>
 			<div class='body'>
@@ -395,10 +403,6 @@
 						</div>
 					</section>
 				<% } %>
-			</div>
-			<div class='engagement-reads'>
-				<img class='engagement-reads-icon' src='/imgs/icons/i-eye.svg' />
-				<span class='engagement-reads-count'><%= locals.data.readCount %></span>
 			</div>
 			<% if (locals.metadata?.user?.uuid) { %>
 			<div class='exploration-local'></div>
@@ -508,12 +512,13 @@
 <% } %>
 </div>
 
-<% if (pagedisplay !== 'slideshow') { %><footer>
-<% } else { %><footer class='slideshow'><% } %>
+<% if (pagedisplay !== 'slideshow') { %><footer class='pad'>
+<% } else { %><footer class='pad slideshow'><% } %>
 	<% if (locals.metadata.site.engagementtypes.includes('comment')
 		&& locals.data?.status >= 2
 		&& !pagedisplay.includes('adjacent')
 	) { %>
+		<div class='filler lg'></div>
 		<div class='inner'>
 			<% if (pagedisplay !== 'slideshow') { %>
 				<h2 class="google-translate-attr"><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>

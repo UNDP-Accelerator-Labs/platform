@@ -5,7 +5,7 @@ const { isPasswordSecure } = require('../../login')
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	const { path } = req;
-	const { uuid, rights: session_rights, username } = req.session || {}
+	const { uuid, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]

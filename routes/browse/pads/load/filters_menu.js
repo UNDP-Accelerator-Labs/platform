@@ -5,15 +5,9 @@ const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	// THIS NEEDS TO BE A TASK
 	const { req, res } = kwargs || {}
 	
-	const { uuid, rights, collaborators } = req.session || {}
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { uuid, rights, collaborators } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
+	const { uuid } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
 	// GET FILTERS

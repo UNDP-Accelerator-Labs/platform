@@ -8,12 +8,10 @@ module.exports = async (req, res) => {
 	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
-	const language = checklanguage(req.params?.language || req.session.language)
 
-	// MAKE SURE WE HAVE PAGINATION INFO
-	if (!page) page = 1
-	else page = +page
-
+	let language = checklanguage(req.params?.language || req.session.language);
+	page = page ? +page : 1;
+	
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (instance) {

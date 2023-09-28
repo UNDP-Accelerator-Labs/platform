@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { datastructures, checklanguage, flatObj, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { datastructures, checklanguage, flatObj, safeArr, DEFAULT_UUID, userrights } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -9,14 +9,9 @@ module.exports = async kwargs => {
 	const { req, res } = kwargs || {}
 	const { object } = req.params || {}
 
-	const { uuid, rights, collaborators } = req.session || {}
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { uuid, rights, collaborators } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
+	const { uuid, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
-
+	const rights = await userrights({uuid})
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 

@@ -1,24 +1,24 @@
 const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, pagestats, userrights } = include('routes/helpers/')
 
 const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
-	const { object } = req.params || {}
+	// const { object } = req.params || {}
 
-	const { uuid, rights, collaborators } = req.session || {}
+	const { uuid, collaborators } = req.session || req.headers || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
-
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	const engagement = engagementsummary({ doctype: 'pad', engagementtypes, uuid })
  	const current_user = DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ])
 
+	const rights = await userrights({uuid})
 	// CONSTRUCT FOLLOW-UPS GRAPH
 	return conn.task(t => {
 		// THE ORDER HERE IS IMPORTANT, THIS IS WHAT ENSURE THE TREE CONSTRUCTION LOOP WORKS

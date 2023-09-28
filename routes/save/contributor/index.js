@@ -74,10 +74,6 @@ module.exports = (req, res) => {
 	} else {
 		DB.general.tx(t => {
 			const batch = []
-			let update_pw = ''
-			if (password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
-			let update_rights = ''
-			if (id !== uuid || session_rights > 2) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
 
 			// CHECK IF THE CURRENT USER HAS THE RIGHT TO CHANGE VALUES
 			batch.push(t.any(`
@@ -87,6 +83,11 @@ module.exports = (req, res) => {
 				WHERE c.contributor = $1
 			`, [ id ]).then(results => {
 				if (id === uuid || results.some(d => d.host === uuid) || session_rights > 2) {
+					let update_pw = ''
+					if ((id === uuid || session_rights > 2) && password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
+					let update_rights = ''
+					if ((results.some(d => d.host === uuid) || session_rights > 2) && ![undefined, null].includes(rights)) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
+
 					return t.none(`
 						UPDATE users
 						SET name = $1,

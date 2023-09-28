@@ -75,7 +75,7 @@ const referrerMiddleware = (req, res, next) => {
 	const { protocol, originalUrl, session, headers } = req;
 	const fullUrl = `${protocol}://${req.get('host')}${originalUrl}`;
 	let referrerOut = headers.referer || headers.referrer;
-	if (!referrerOut && session && fullUrl) {
+	if (session && fullUrl) {
 		let shortHist = session.shortHist ?? [];
 		if (shortHist.length) {
 			referrerOut = shortHist[shortHist.length - 1];
@@ -85,6 +85,7 @@ const referrerMiddleware = (req, res, next) => {
 	}
 	req.headers.referer = referrerOut;
 	req.headers.referrer = referrerOut;
+	console.log('referrerOut', referrerOut, fullUrl);
 	next();
 };
 

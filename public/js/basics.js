@@ -144,6 +144,23 @@ function multiSelection (sel, targets) {
 		}
 	}
 }
+
+function addGlobalLoader () {
+	const nav = d3.select('nav#languages')
+	nav.select('menu').classed('squeeze', true)
+	const loader = nav.addElems('div', 'lds-ellipsis')
+	loader.addElem('div')
+	loader.addElem('div')
+	loader.addElem('div')
+	loader.addElem('div')
+	return loader
+}
+function rmGlobalLoader () {
+	const nav = d3.select('nav#languages')
+	nav.select('.lds-ellipsis').remove()
+	nav.select('menu').classed('squeeze', false)
+}
+
 let ensureIconRegistered = false;
 function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
 	if (ensureIconRegistered) {

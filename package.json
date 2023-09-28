@@ -40,6 +40,7 @@
     "pageres": "^5.2.0",
     "path": "^0.12.7",
     "pg-promise": "^10.4.3",
+    "rate-limiter-flexible": "^3.0.0",
     "request": "^2.88.2",
     "smoothscroll-polyfill": "^0.4.4",
     "uuid": "^8.3.2",

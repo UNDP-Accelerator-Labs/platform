@@ -7,7 +7,7 @@ module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
 	
-	const { uuid, rights, collaborators } = req.session || {}
+	const { uuid } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
 	// GET FILTERS

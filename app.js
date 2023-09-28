@@ -92,7 +92,7 @@ const referrerMiddleware = (req, res, next) => {
 	}
 	req.headers.referer = referrerOut;
 	req.headers.referrer = referrerOut;
-	console.log('referrerOut', referrerOut, fullUrl);
+	// console.log('referrerOut', referrerOut, fullUrl);
 	next();
 };
 

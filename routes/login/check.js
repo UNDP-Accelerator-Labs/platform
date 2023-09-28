@@ -11,9 +11,6 @@ module.exports = (req, res, next) => {
 	const cookies = parseCookies(req)
 	let sid = cookies[`${app_suite}-session`]
 	if (sid) sid = sid.split(':')[1].split('.')[0]
-	// console.log(cookies)
-	// console.log(sid)
-
 
 	if (uuid) next() // A USER IS LOGGED
 	else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED

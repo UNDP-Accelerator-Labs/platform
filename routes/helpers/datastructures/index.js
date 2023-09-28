@@ -93,7 +93,7 @@ exports.pagemetadata = (_kwargs) => {
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
 	const language = checklanguage(params?.language || session.language || this.sessiondata())
-	const page_language = params?.language;
+	const page_language = params?.language || 'en';
 
 	const parsedQuery = {}
 	for (let key in query) {
@@ -225,11 +225,13 @@ exports.pagemetadata = (_kwargs) => {
 				});
 			}).catch(err => console.log(err)));
 		} else batch.push(null)
+		
 		let hasJustLoggedIn = false;
 		try {
+			const referer = headers.referrer || headers.referer
 			hasJustLoggedIn = (
 				object === 'contributor'
-				|| (new URL(headers.referrer || headers.referer).pathname === '/login'));
+				|| (referer && new URL(referer).pathname === '/login'));
 		} catch (e) {
 			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, object, e);
 		}

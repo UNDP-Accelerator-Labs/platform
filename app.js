@@ -16,9 +16,6 @@ const upload = multer({ dest: "./tmp" });
 const fs = require("fs");
 const helmet = require("helmet");
 
-<<<<<<< HEAD
-const app = express()
-=======
 const app = express();
 app.disable("x-powered-by");
 
@@ -38,7 +35,6 @@ app.use(
     },
   })
 );
->>>>>>> master
 
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "same-origin");

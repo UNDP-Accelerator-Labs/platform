@@ -10,7 +10,7 @@ const rateLimiterMiddleware = (req, res, next) => {
   rateLimiter.consume(req.ip)
     .then((rateLimiterRes) => {
         if(rateLimiterRes?.remainingPoints <= 3){
-            req.session.attemptmessage = 'You have ' + rateLimiterRes?.remainingPoints + " attempts remaining."
+            req.session.attemptmessage = 'You have ' + rateLimiterRes?.remainingPoints + ' attempts remaining.' // TO DO: TRANSLATE
         }
       next();
     })

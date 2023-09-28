@@ -225,11 +225,13 @@ exports.pagemetadata = (_kwargs) => {
 				});
 			}).catch(err => console.log(err)));
 		} else batch.push(null)
+		
 		let hasJustLoggedIn = false;
 		try {
+			const referer = headers.referrer || headers.referer
 			hasJustLoggedIn = (
 				object === 'contributor'
-				|| (new URL(headers.referrer || headers.referer).pathname === '/login'));
+				|| (referer && new URL(referer).pathname === '/login'));
 		} catch (e) {
 			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, object, e);
 		}

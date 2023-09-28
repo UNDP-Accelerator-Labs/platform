@@ -49,8 +49,6 @@ app.use("/config", express.static(path.join(__dirname, "./config")));
 app.use(bodyparser.json({ limit: "50mb" }));
 app.use(bodyparser.urlencoded({ limit: "50mb", extended: true }));
 
-app.disable('x-powered-by');
-
 const cookie = {
   httpOnly: true, // THIS IS ACTUALLY DEFAULT
   secure: process.env.NODE_ENV === "production",

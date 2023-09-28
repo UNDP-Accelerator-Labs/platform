@@ -5,10 +5,10 @@ module.exports = async (_kwargs) => {
 	const { uuid } = _kwargs
 
 	const right = await conn.oneOrNone(`
-		SELECT COALESCE(rights, 0) AS rights FROM users
+		SELECT COALESCE(rights, 0)::INT AS rights FROM users
 		WHERE uuid = $1
-	;`, [ uuid ])
+	;`, [ uuid ], d => d.rights)
 
-	const rights = right?.rights ?? 0;
-    return rights;
+	// const rights = right?.rights ?? 0;
+    return right;
 }

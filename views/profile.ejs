@@ -234,41 +234,43 @@
 								</li>
 							<% } %>
 							<!-- IF THIS IS CREATED FOR SOMEONE, SET RIGHTS -->
-							<li>
-								<% if (editable && locals.data?.uuid !== uuid) { %>
-									<div class='required'>
-										<label class='active'>*</label>
-									</div>
-								<% } %>
-								<label class='instruction google-translate-attr'><%- vocabulary['user rights'][language] %></label>
-								<div class='select'>
-									<% if (editable && (!locals.data || locals.data?.rights <= rights)) { %>
-										<input type='text' id='new-rights' value='<%- locals.data?.rights %>'<% if (editable && locals.data?.uuid === uuid) { %> disabled<% } %>>
-										<label for='new-rights' class="google-translate-attr"><%- vocabulary['grant rights'][language] %></label>
-										<% if (editable && locals.data?.uuid !== uuid) { %>
-											<div class='dropdown'>
-												<menu>
-													<% for (let i = 0; i <= rights; i ++) { %>
-														<li>
-															<input type='radio' id='rights-<%- i %>' name='rights' value='<%- i %>' data-label='<%- i %>' required <% if (locals.data?.rights === i) { %>checked<% } %>>
-															<label for='rights-<%- i %>'><%- i %></label>
-															<!-- TO DO: DESCRIBE RIGHTS
-																0 - no rights
-																1 - external
-																2 - internal
-																3 - admin
-															-->
-														</li>
-													<% } %>
-												</menu>
-											</div>
-										<% } %>
-									<% } else { %>
-										<input type='hidden' name='rights' value='<%- locals.data?.rights %>'>
-										<input type='text' id='new-rights' value='<%- locals.data?.rights %>' disabled>
+							<% if (editable && locals.data?.uuid !== uuid) { %>
+								<li>
+									<% if (editable && locals.data?.uuid !== uuid) { %>
+										<div class='required'>
+											<label class='active'>*</label>
+										</div>
 									<% } %>
-								</div>
-							</li>
+									<label class='instruction google-translate-attr'><%- vocabulary['user rights'][language] %></label>
+									<div class='select'>
+										<% if (editable && (!locals.data || locals.data?.rights <= rights)) { %>
+											<input type='text' id='new-rights' value='<%- locals.data?.rights %>'<% if (editable && locals.data?.uuid === uuid) { %> disabled<% } %>>
+											<label for='new-rights' class="google-translate-attr"><%- vocabulary['grant rights'][language] %></label>
+											<% if (editable && locals.data?.uuid !== uuid) { %>
+												<div class='dropdown'>
+													<menu>
+														<% for (let i = 0; i <= rights; i ++) { %>
+															<li>
+																<input type='radio' id='rights-<%- i %>' name='rights' value='<%- i %>' data-label='<%- i %>' required <% if (locals.data?.rights === i) { %>checked<% } %>>
+																<label for='rights-<%- i %>'><%- i %></label>
+																<!-- TO DO: DESCRIBE RIGHTS
+																	0 - no rights
+																	1 - external
+																	2 - internal
+																	3 - admin
+																-->
+															</li>
+														<% } %>
+													</menu>
+												</div>
+											<% } %>
+										<% } else { %>
+											<input type='hidden' name='rights' value='<%- locals.data?.rights %>'>
+											<input type='text' id='new-rights' value='<%- locals.data?.rights %>' disabled>
+										<% } %>
+									</div>
+								</li>
+							<% } %>
 							<% if (!locals.data || locals.data?.host_editor) { %>
 								<li>
 									<label class='instruction google-translate-attr'><%- vocabulary['teams'][language] %></label>

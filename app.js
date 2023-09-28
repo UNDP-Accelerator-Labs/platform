@@ -14,8 +14,6 @@ const upload = multer({ dest: './tmp' })
 const fs = require('fs')
 const cors = require('cors');
 
-const { spawn } = require('child_process')
-
 const app = express()
 
 // Enable CORS for all routes
@@ -49,6 +47,31 @@ const sessionMiddleware = session({
 })
 
 app.use(sessionMiddleware)
+
+const referrerMiddleware = (req, res, next) => {
+	const { originalUrl, session, headers } = req;
+	let referrerOut = headers.referer || headers.referrer;
+	if (!referrerOut && session && originalUrl) {
+		let shortHist = session.shortHist ?? [];
+		let pos = shortHist.length - 1;
+		while (pos >= 0) {
+			referrerOut = shortHist[pos];
+			pos -= 1;
+			if (referrerOut !== originalUrl) {
+				pos = -1;
+			}
+		}
+		if (referrerOut !== originalUrl) {
+			shortHist.push(originalUrl);
+		}
+		req.session.shortHist = shortHist.slice(-2);
+	}
+	req.headers.referer = referrerOut;
+	req.headers.referrer = referrerOut;
+	next();
+};
+
+app.use(referrerMiddleware)
 
 const routes = require('./routes/')
 

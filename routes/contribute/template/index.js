@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, pagestats, userrights } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
@@ -21,7 +21,7 @@ module.exports = (req, res) => {
 		DB.conn.tx(t => {
 			// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A TEMPLATE
 			return check_authorization({ connection: t, uuid, id, rights, collaborators })
-			.then(result => {
+			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
 					if (referer) return res.redirect(referer)
@@ -94,9 +94,17 @@ module.exports = (req, res) => {
 
 							WHERE t.id = $3
 						;`, [ engagement.cases, uuid, +id ]).then(async results => {
+							results.readCount = await pagestats.getReadCount(id, 'template');
 							const data = await join.users(results, [ language, 'owner' ])
 							return data
 						}))
+					}
+
+					if (id) {
+						// NOTE: for now we record views/reads even for unpublished templates
+						// can be changed by moving this block up where readCount is set
+						// and checking the status instead of id
+						await pagestats.recordRender(req, id, 'template');
 					}
 
 					if (id && engagementtypes?.length > 0) { // GET THE ENGAGEMENT METRICS
@@ -190,10 +198,10 @@ module.exports = (req, res) => {
 	}
 }
 
-function check_authorization (_kwargs) {
+async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { uuid, id, rights, collaborators } = _kwargs
-
+	const { uuid, id, collaborators } = _kwargs
+	const rights = await userrights({ uuid })
 	const { read, write } = modules.find(d => d.type === 'templates')?.rights
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 

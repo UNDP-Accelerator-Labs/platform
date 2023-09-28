@@ -133,7 +133,8 @@ module.exports = async (req, res) => {
 						d.snippet = parsers.getTxt(d)?.[0]
 						if (app_storage) {
 							const vignette_path = parsers.getImg(d, true)?.[0]
-							if (vignette_path) d.vignette = path.join(app_storage, vignette_path)
+							// if (vignette_path) d.vignette = path.join(app_storage, vignette_path)
+							if (vignette_path) d.vignette = new URL(vignette_path, app_storage)?.href
 							else d.vignette = null
 						}
 						// SET TAGS WITH NAMES
@@ -165,8 +166,10 @@ module.exports = async (req, res) => {
 										return `images/pad-${d.pad_id}/image-${idx + 1}${path.extname(c)}`
 									} else {
 										if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
-											return path.join(app_storage, c)
-										} else return path.join(host, c)
+											// return path.join(app_storage, c)
+											return new URL(c, app_storage)?.href
+										} else return new URL(c, host)?.href
+										// } else return path.join(host, c)
 									}
 								}
 							})

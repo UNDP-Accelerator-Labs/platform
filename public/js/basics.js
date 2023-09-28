@@ -144,3 +144,52 @@ function multiSelection (sel, targets) {
 		}
 	}
 }
+
+function addGlobalLoader () {
+	const nav = d3.select('nav#languages')
+	nav.select('menu').classed('squeeze', true)
+	const loader = nav.addElems('div', 'lds-ellipsis')
+	loader.addElem('div')
+	loader.addElem('div')
+	loader.addElem('div')
+	loader.addElem('div')
+	return loader
+}
+function rmGlobalLoader () {
+	const nav = d3.select('nav#languages')
+	nav.select('.lds-ellipsis').remove()
+	nav.select('menu').classed('squeeze', false)
+}
+
+let ensureIconRegistered = false;
+function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
+	if (ensureIconRegistered) {
+		return;
+	}
+	const iconUpdate = () => {
+		let anyIcons = false;
+		d3.selectAll(classSel).attr('src', () => {
+			anyIcons = true;
+			return Math.random() < 0.01 ? altName : name;
+		});
+		if (!anyIcons) {
+			return;
+		}
+		setTimeout(() => {
+			d3.selectAll(classSel).attr('src', name);
+			setTimeout(iconUpdate, timingTotal - timingShort);
+		}, timingShort);
+	};
+	setTimeout(iconUpdate, timingTotal);
+	ensureIconRegistered = true;
+}
+window.addEventListener('load', () => {
+	let eye_icon = '/imgs/icons/i-eye';
+    if (!mediaSize) {
+		var mediaSize = getMediaSize();
+	}
+    if (mediaSize === 'xs') {
+		eye_icon = '/imgs/icons/i-eye-sm';
+	}
+    ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
+});

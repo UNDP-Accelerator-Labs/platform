@@ -1,5 +1,5 @@
 const { page_content_limit, followup_count, metafields, modules, engagementtypes, map, ownDB, DB } = include('config/')
-const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -33,6 +33,7 @@ module.exports = async kwargs => {
 			pads = pads.map(d => d.id)
 			padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 
+			const ownId = await ownDB();
 			const batch = []
 
 			// TO DO: ADD IF STATEMENTS FOR DIFFERENT MODULES BELOW
@@ -55,7 +56,8 @@ module.exports = async kwargs => {
 				FROM pads p
 				WHERE p.id IN $1:raw
 			;`, [ padlist, collaborators_ids, rights ])
-			.then(results => {
+			.then(async results => {
+				await pagestats.putReadCount('pad', results, d => d.id);
 				results.forEach(d => {
 					d.img = parsers.getImg(d)
 					d.sdgs = parsers.getSDGs(d)
@@ -103,7 +105,6 @@ module.exports = async kwargs => {
 				GROUP BY (mc.pad, m.title, m.pad_limit)
 			;`, [ padlist ]).catch(err => console.log(err)))
 			// PINBOARD INFORMATION
-			const ownId = await ownDB();
 			const padToPinboards = new Map();
 			(await DB.general.any(`
 				SELECT

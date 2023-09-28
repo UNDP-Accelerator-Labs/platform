@@ -49,20 +49,21 @@ const sessionMiddleware = session({
 app.use(sessionMiddleware)
 
 const referrerMiddleware = (req, res, next) => {
-	const { originalUrl, session, headers } = req;
+	const { protocol, originalUrl, session, headers } = req;
+	const fullUrl = `${protocol}://${req.get('host')}${originalUrl}`;
 	let referrerOut = headers.referer || headers.referrer;
-	if (!referrerOut && session && originalUrl) {
+	if (!referrerOut && session && fullUrl) {
 		let shortHist = session.shortHist ?? [];
 		let pos = shortHist.length - 1;
 		while (pos >= 0) {
 			referrerOut = shortHist[pos];
 			pos -= 1;
-			if (referrerOut !== originalUrl) {
+			if (referrerOut !== fullUrl) {
 				pos = -1;
 			}
 		}
-		if (referrerOut !== originalUrl) {
-			shortHist.push(originalUrl);
+		if (referrerOut !== fullUrl) {
+			shortHist.push(fullUrl);
 		}
 		req.session.shortHist = shortHist.slice(-2);
 	}

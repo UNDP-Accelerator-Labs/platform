@@ -1,9 +1,9 @@
-const { app_title, app_suite, DB } = include('config/')
-const { email: sendemail } = include('routes/helpers/')
+const { app_title, app_suite, app_languages, DB } = include('config/')
+const { email: sendemail, datastructures, userrights } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 
 module.exports = (req, res) => {
-	const { referer } = req?.headers || {}
+	const { referer } = req.headers || {}
 	const { path } = req;
 	const { uuid, rights: session_rights, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
@@ -11,14 +11,12 @@ module.exports = (req, res) => {
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
 
 	if(password.length){
-		
 		let checkPass = isPasswordSecure(password);
 		let extendedUrl =  `&reset_message=${checkPass}`;
 
 		if(referer.includes('/contribute/contributor')){
 			extendedUrl = `?reset_message=${checkPass}`
 		}
-
 		if(checkPass.length){
 			return res.redirect(`${referer}${extendedUrl}`);
         }
@@ -60,16 +58,13 @@ module.exports = (req, res) => {
 				.then(async _ => {
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
-						// return t.one(`SELECT email FROM users WHERE uuid = $1;`, [ uuid ], d => d.email)
-						// .then(async from => {
-							await sendemail({
-								to: email, 
-								bcc: 'myjyby@gmail.com',
-								subject: `[${app_title}] An account has been created for you`,
-								html: `${username} has created an account for you to access the ${app_title} application.`
-							})
-							return result
-						// }).catch(err => console.log(err))
+						await sendemail({
+							to: email, 
+							bcc: 'myjyby@gmail.com',
+							subject: `[${app_title}] An account has been created for you`,
+							html: `${username} has created an account for you to access the ${app_title} application.`
+						})
+						return result
 					} else return result
 				})
 				.catch(err => console.log(err))
@@ -77,18 +72,22 @@ module.exports = (req, res) => {
 		}).then(result => res.redirect(`/${language}/edit/contributor?id=${result}`))
 		.catch(err => console.log(err))
 	} else {
-		DB.general.tx(t => {
+		DB.general.tx(async t => {
 			const batch = []
-			let update_pw = ''
-			if (password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
-			
+			const session_rights = await userrights({ connection: t, uuid })
 			// CHECK IF THE CURRENT USER HAS THE RIGHT TO CHANGE VALUES
 			batch.push(t.any(`
-				SELECT host FROM cohorts
-				WHERE contributor = $1
+				SELECT c.host, u.name FROM cohorts c
+				INNER JOIN users u
+				ON u.uuid = c.host
+				WHERE c.contributor = $1
 			`, [ id ]).then(results => {
-				let update_rights = ''
-				if (results.some(d => d.host === uuid) || session_rights > 2) {
+				if (id === uuid || results.some(d => d.host === uuid) || session_rights > 2) {
+					let update_pw = ''
+					if ((id === uuid || session_rights > 2) && password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
+					let update_rights = ''
+					if ((results.some(d => d.host === uuid) || session_rights > 2) && ![undefined, null].includes(rights)) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
+
 					return t.none(`
 						UPDATE users
 						SET name = $1,
@@ -98,7 +97,7 @@ module.exports = (req, res) => {
 							iso3 = $5,
 							language = $6,
 							secondary_languages = $7,
-							rights = $8,
+							$8:raw
 							notifications = $9,
 							reviewer = $10
 						WHERE uuid = $11
@@ -110,7 +109,7 @@ module.exports = (req, res) => {
 						/* $5 */ iso3, 
 						/* $6 */ language, 
 						/* $7 */ JSON.stringify(secondary_languages || []), 
-						/* $8 */ rights, 
+						/* $8 */ update_rights,
 						/* $9 */ notifications || false, 
 						/* $10 */ reviewer || false, 
 						/* $11 */ id
@@ -141,19 +140,63 @@ module.exports = (req, res) => {
 
 			return t.batch(batch)
 			.then(async _ => {
-				if (id !== uuid) {
-					// return t.one(`SELECT email FROM users WHERE uuid = $1;`, [ uuid ], d => d.email)
-					// .then(async from => {
-						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
-						await sendemail({
-							// from, 
-							to: email,
-							bcc: 'myjyby@gmail.com',
-							subject: `[${app_title}] Your account information has been modified`,
-							html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE 
-						})
+
+				if (password?.trim().length > 0) {
+					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
+					await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [uuid])
+
+				} else {
+					// UPDATE THE SESSION DATA
+					await t.one(`
+						SELECT u.uuid, u.rights, u.name, u.email, u.iso3, c.lng, c.lat, c.bureau,
+
+						CASE WHEN u.language IN ($1:csv)
+							THEN u.language
+							ELSE 'en'
+						END AS language,
+
+						CASE WHEN u.language IN ($1:csv)
+							THEN (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = u.language)
+							ELSE (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = 'en')
+						END AS countryname,
+
+						COALESCE(
+							(SELECT json_agg(DISTINCT(jsonb_build_object(
+								'uuid', u2.uuid,
+								'name', u2.name,
+								'rights', u2.rights
+							))) FROM team_members tm
+							INNER JOIN teams t
+								ON t.id = tm.team
+							INNER JOIN users u2
+								ON u2.uuid = tm.member
+							WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
+						)::TEXT, '[]')::JSONB
+						AS collaborators
+
+						FROM users u
+						INNER JOIN countries c
+							ON u.iso3 = c.iso3
+
+						WHERE uuid = $2
+					;`, [ app_languages, id ])
+					.then(result => {
+						Object.assign(req.session, datastructures.sessiondata(result))
 						return null
-					// }).catch(err => console.log(err))
+					}).catch(err => console.log(err))
+				}
+
+				// SEND EMAIL IF THE CHANGES ARE NOT SELF-TRIGGERED
+				if (id !== uuid) {
+					// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+					await sendemail({
+						// from, 
+						to: email,
+						bcc: 'myjyby@gmail.com',
+						subject: `[${app_title}] Your account information has been modified`,
+						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE 
+					})
+					return null
 				} else return null
 			}).catch(err => console.log(err))
 			.catch(err => console.log(err))

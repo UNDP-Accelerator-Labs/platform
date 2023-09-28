@@ -1449,6 +1449,10 @@ div.document {
 						text-align: center;
 						font-size: $t-small;
 						color: $c-light-grey;
+						user-select: none;
+					}
+					&.engagement-reads {
+						pointer-events: none;
 					}
 				}
 				.engagement:disabled {

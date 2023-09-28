@@ -1,56 +1,52 @@
 <%
-    const object = locals.metadata.page.object;
+    const pagestats = locals.pagestats ?? {};
     const originalUrl = locals.metadata.page.originalUrl;
-    const uuid = locals.metadata.user.uuid;
-    const { id } = locals.data;
-    const readTime = 3000;  // time it takes to register a read in milliseconds
+    const { id, docType } = pagestats;
+    const readTime = 6000;  // time it takes to register a read in milliseconds
+    const docTypes = ['pad', 'template', 'pinboard', 'team', 'country'];
 %>
-<% if (object === 'pad' && id) { %>
+<% if (docTypes.includes(docType) && id) { %>
 <script type="text/javascript" defer>
-    <% if (!uuid) { %>
-        const totalTime = <%- readTime %>;
-        let startTime = performance.now();
-        let currentProgress = 0;
-        let active = true;
-        let done = false;
+    const totalTime = <%- readTime %>;
+    const docId = <%= id %>;
+    const docType = '<%= docType %>';
+    const pageURL = '<%= originalUrl %>';
+    let startTime = performance.now();
+    let currentProgress = 0;
+    let active = true;
+    let done = false;
 
-        const recordRead = () => {
+    const recordRead = () => {
+        if (active) {
+            currentProgress += performance.now() - startTime;
+            startTime = performance.now();
+            if (currentProgress >= totalTime) {
+                POST('/pagestats', { doc_id: docId, doc_type: docType, page_url: pageURL }).then(() => {
+                    // done
+                }).catch((e) => {
+                    console.log(e);
+                });
+                done = true;
+            }
+        }
+        if (!done) {
+            setTimeout(recordRead, Math.max(1, Math.min(totalTime - currentProgress, 1000)));
+        }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
             if (active) {
                 currentProgress += performance.now() - startTime;
+            }
+            active = false;
+        } else {
+            if (!active) {
                 startTime = performance.now();
-                if (currentProgress >= totalTime) {
-                    POST('/pagestats', { pad_id: <%= id %>, page_url: '<%= originalUrl %>' }).then(() => {
-                        // done
-                    }).catch((e) => {
-                        console.log(e);
-                    });
-                    done = true;
-                }
             }
-            if (!done) {
-                setTimeout(recordRead, 1000);
-            }
-        };
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                if (active) {
-                    currentProgress += performance.now() - startTime;
-                }
-                active = false;
-            } else {
-                if (!active) {
-                    startTime = performance.now();
-                }
-                active = true;
-            }
-        });
-
-        setTimeout(recordRead, 1000);
-    <% } // is logged out %>
-    let eye_icon = '/imgs/icons/i-eye'
-    if (!mediaSize) var mediaSize = getMediaSize()
-    if (mediaSize === 'xs') eye_icon = '/imgs/icons/i-eye-sm'
-    ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
+            active = true;
+        }
+    });
+    setTimeout(recordRead, 1000);
 </script>
-<% } // is pad and has id %>
+<% } // is allowed type and has id %>

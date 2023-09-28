@@ -804,15 +804,11 @@ const Entry = function (_kwargs) {
 					})
 				<% }) %>
 			<% } %>
-			<% if (!['mobilizations', 'contributors'].includes(object)) { %>
+
+			<% if (['pads', 'templates'].includes(object)) { %>
 				const readsCounter = _sel.addElems('span', 'engagement-group page-stats')
 					.addElems('button', 'engagement engagement-reads')
 				readsCounter.addElems('img', 'engagement-reads-icon').attr('src', '/imgs/icons/i-eye.svg');
-				let eye_icon = '/imgs/icons/i-eye'
-				if (!mediaSize) var mediaSize = getMediaSize()
-				if (mediaSize === 'xs') eye_icon = '/imgs/icons/i-eye-sm'
-				ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
-
 				readsCounter.addElems('span', 'engagement-reads-count').text((d) => {
 					return d.readCount ?? '0';
 				});

@@ -109,7 +109,7 @@
 
 	}
 
-	function rewriteUrl(lang, reload = false){
+	function rewriteUrl(lang = 'en', reload = false){
 		const currentUrl = new URL(window.location);
 		const languagePattern = /^\/[a-z]{2,3}\//;
 		const newPath = currentUrl.pathname.replace(languagePattern, "/" + lang + "/");

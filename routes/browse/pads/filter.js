@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
 	let language = checklanguage(req.params?.language || req.session.language);
 	page = page ? +page : 1;
 	
-	let collaborators_ids = safeArr((req.body.filters?.collaborators_ids || collaborators).map(d => d.uuid), req.body.filters?.uuid ?? uuid ?? DEFAULT_UUID);
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (instance) {
 		const { instance_vars } = res.locals

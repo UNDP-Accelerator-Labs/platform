@@ -7,7 +7,6 @@ const tokens = require('./tokens/')
 const jwt = require('jsonwebtoken')
 const { modules } = include('config/')
 const engage  = include('routes/engage/pin/pad')
-const { parsers } = include('routes/helpers/')
 const load = include('routes/browse/pads/load/')
 
 module.exports = async (req, res, next) => {

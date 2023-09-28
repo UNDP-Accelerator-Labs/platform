@@ -5,9 +5,6 @@ const tags = require('./tags/')
 const statistics = require('./statistics/')
 const tokens = require('./tokens/')
 const locations = require('./locations/')
-const jwt = require('jsonwebtoken')
-const { modules } = include('config/')
-const engage  = include('routes/engage/pin/pad')
 const load = include('routes/browse/pads/load/')
 
 module.exports = async (req, res, next) => {
@@ -46,16 +43,6 @@ module.exports = async (req, res, next) => {
 			const data = await load.global_data({req, res});
 			return res.json(data)
 		}
-		else if (object === 'pin'){
-			const { action: body_action , object: body_object } = req.body || {}
-			const { rights } = req.session || {}
-
-			if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
-				if (body_action === 'insert') return engage.pin(req, res)
-				else if (body_action === 'delete') return engage.unpin(req, res)
-			}
-		}
-
 		else if (object === 'countries') locations.countries(req, res)
 		else if (object === 'regions') locations.regions(req, res)
 		else res.redirect('/module-error')

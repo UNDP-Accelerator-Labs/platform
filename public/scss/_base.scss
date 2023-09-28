@@ -170,6 +170,18 @@ input.toggle:disabled + label::after {
 	left: 56px;
 	animation: lds-ellipsis3 0.6s infinite;
 }
+nav#languages {
+	.lds-ellipsis {
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%, -33%);
+
+		div {
+			background: #FFF;
+		}
+	}
+}
+
 @keyframes lds-ellipsis1 {
 	0% {
 		transform: scale(0);

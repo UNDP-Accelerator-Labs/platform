@@ -4,6 +4,7 @@ global.rootpath = __dirname;
 
 const { app_id, app_suite, app_suite_secret, DB, csp_links } =
   include("config/");
+const{ loginRateLimiterMiddleware } = include('routes/helpers/')
 const express = require("express");
 const path = require("path");
 const bodyparser = require("body-parser");
@@ -170,7 +171,7 @@ app.get('/:language/home', routes.dispatch.public)
 app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
 	// .get(routes.redirect.home, routes.render.login)
 	.get(routes.redirect.browse, routes.render.login)
-	.post(routes.process.login)
+	.post(loginRateLimiterMiddleware, routes.process.login)
 app.get('/transfer', routes.process.login)
 app.route('/logout/:session')
 	.get(routes.process.logout)

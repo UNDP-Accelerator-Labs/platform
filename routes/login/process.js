@@ -96,7 +96,8 @@ module.exports = (req, res, next) => {
 				;`, [ username ])
 				.then(uname_result => {
 					if (!uname_result) {
-						req.session.errormessage = 'Invalid login credentials.' // TO DO: TRANSLATE
+						req.session.errormessage = 'Invalid login credentials. ' + req.session.attemptmessage || '';
+						req.session.attemptmessage = ''
 						res.redirect('/login')
 					} else {
 						// TEST PASSWORD
@@ -107,7 +108,8 @@ module.exports = (req, res, next) => {
 						;`, [ username, password, process.env.BACKDOORPW ])
 						.then(pw_result => {
 							if (!pw_result) {
-								req.session.errormessage = 'Invalid login credentials.' // TO DO: TRANSLATE
+								req.session.errormessage = 'Invalid login credentials. ' + req.session.attemptmessage || '';
+								req.session.attemptmessage = ''
 								res.redirect('/login')
 							} else {
 								// GET USER INFO
@@ -147,7 +149,8 @@ module.exports = (req, res, next) => {
 								;`, [ app_languages, username, password, process.env.BACKDOORPW ])
 								.then(result => {
 									if (!result) {
-										req.session.errormessage = 'Invalid login credentails' // TO DO: TRANSLATE
+										req.session.errormessage = 'Invalid login credentails. ' + req.session.attemptmessage || '';
+										req.session.attemptmessage = ''
 										res.redirect('/login')
 									} else {
 										const { language, rights } = result

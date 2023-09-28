@@ -10,6 +10,7 @@ exports.geo = require('./geo/')
 exports.pagestats = require('./pagestats.js')
 exports.userrights = require('./rights')
 exports.numfmt = require('./numfmt.js')
+exports.loginRateLimiterMiddleware = require('./ratelimiter')
 
 exports.flatObj = function () {
 	// FLATTEN OBJECT: https://stackoverflow.com/questions/31136422/flatten-array-with-objects-into-1-object

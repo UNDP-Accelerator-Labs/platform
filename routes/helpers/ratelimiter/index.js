@@ -1,20 +1,22 @@
-const { RateLimiterPostgres } = require('rate-limiter-flexible');
-const { DB }  = include('config/')
+const { RateLimiterMemory } = require('rate-limiter-flexible');
 
-const rateLimiter = new RateLimiterPostgres({
-  storeClient: DB.general,
-  keyPrefix: 'middleware',
-  points: 10, // 10 requests
-  duration: 1, // per 1 second by IP
+const rateLimiter = new RateLimiterMemory({
+  points: 10, // Maximum consecutive failed login attempt
+  duration: 60 * 60 * 1, // per 1 hrs by IP
+  blockDuration: 24 * 60 * 60, // Block for 24 hours
 });
 
 const rateLimiterMiddleware = (req, res, next) => {
   rateLimiter.consume(req.ip)
-    .then(() => {
+    .then((rateLimiterRes) => {
+        if(rateLimiterRes?.remainingPoints <= 3){
+            req.session.attemptmessage = 'You have ' + rateLimiterRes?.remainingPoints + " attempts remaining."
+        }
       next();
     })
     .catch((rateLimiterRes) => {
-      res.status(429).send('Too Many Requests');
+        req.session.errormessage = 'Too many failed login requests. Please try again after 24 hours or contact system admin.'
+        res.redirect('/login');
     });
 };
 

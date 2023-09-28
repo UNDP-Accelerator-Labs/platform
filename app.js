@@ -77,10 +77,17 @@ const referrerMiddleware = (req, res, next) => {
 	let referrerOut = headers.referer || headers.referrer;
 	if (session && fullUrl) {
 		let shortHist = session.shortHist ?? [];
-		if (shortHist.length) {
-			referrerOut = shortHist[shortHist.length - 1];
+		let pos = shortHist.length - 1;
+		while (pos >= 0) {
+			referrerOut = shortHist[pos];
+			pos -= 1;
+			if (referrerOut !== fullUrl) {
+				pos = -1;
+			}
 		}
-		shortHist.push(fullUrl);
+		if (referrerOut !== fullUrl) {
+			shortHist.push(fullUrl);
+		}
 		req.session.shortHist = shortHist.slice(-2);
 	}
 	req.headers.referer = referrerOut;

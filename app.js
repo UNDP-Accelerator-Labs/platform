@@ -25,6 +25,7 @@ app.use(
       directives: {
         "img-src": csp_links,
         "script-src": csp_links,
+        "script-src-attr": ["'unsafe-inline'"],
         "style-src": csp_links,
         "connect-src": csp_links
       },
@@ -78,12 +79,10 @@ function checkInputForHTML(req, res, next) {
   }
 
   if (containsHTMLorScriptTags(params)) {
-    console.log("params ");
     return res.status(500).redirect("/module-error");
   }
 
   if (containsHTMLorScriptTags(query)) {
-    console.log("params ");
     return res.status(500).redirect("/module-error");
   }
   next();

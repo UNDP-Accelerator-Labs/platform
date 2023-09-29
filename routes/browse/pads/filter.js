@@ -1,8 +1,11 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, userrights, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	const { uuid, country, rights, collaborators, public } = req.session || {}
+	const { uuid, country, collaborators, public } = req.session || {}
+	const rights = await userrights({ uuid })
+
+	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 
 	let { space, object, instance } = req.params || {}
 	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
@@ -69,7 +72,7 @@ module.exports = async (req, res) => {
 					}
 					return {
 						object: 'pads',
-						space: uuid ? 'all' : 'public',
+						space: rights >= read ? 'all' : 'public',
 						countries: [result?.iso3],
 						title: result?.name,
 						instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters

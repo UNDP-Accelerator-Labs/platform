@@ -26,7 +26,7 @@ app.use(
         "img-src": csp_links,
         "script-src": csp_links,
         "style-src": csp_links,
-        "connect-src": csp_links,
+        "connect-src": csp_links
       },
     },
     xPoweredBy: false,

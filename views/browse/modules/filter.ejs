@@ -15,6 +15,11 @@
 	}
 
 	let fixedEid = null;
+
+	function simplifyNumber (num) {
+		if (num > 1000) return `${Math.floor(num / 100) / 10}K+`
+		else return num
+	}
 %>
 
 <% if (locals.stats?.total > 0) { %>
@@ -120,7 +125,7 @@
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
 								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.some(c => +c === d.status)) { %>checked<% } %>>
-								<label for='status-<%- d.status %>' data-content='<%- d.count %>'></label>
+								<label for='status-<%- d.status %>' data-content='<%- simplifyNumber(d.count) %>'></label>
 								<p>
 									<%- vocabulary['status'][language](object, d.status, d.count) %>
 								</p>

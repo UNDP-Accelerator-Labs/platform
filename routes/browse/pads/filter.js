@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
 	let { space, object, instance } = req.params || {}
 	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
-	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -209,7 +209,8 @@ module.exports = async (req, res) => {
 		})
 
 		// ORDER
-		const order = DB.pgp.as.format(`ORDER BY p.date DESC`)
+		let order = DB.pgp.as.format(`ORDER BY p.date DESC`)
+		if (orderby === 'random') order = DB.pgp.as.format(`ORDER BY RANDOM()`)
 
 		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' AND '), content_filters.filter(d => d).join(' AND ') ]
 			.filter(d => d?.length)

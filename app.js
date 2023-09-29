@@ -25,7 +25,7 @@ app.use(
       directives: {
         "img-src": csp_links,
         "script-src": csp_links,
-        'script-src-attr': ["'unsafe-inline'"],
+        "script-src-attr": ["'unsafe-inline'"],
         "style-src": csp_links,
         "connect-src": csp_links,
       },

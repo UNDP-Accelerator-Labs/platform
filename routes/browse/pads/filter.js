@@ -1,14 +1,19 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, userrights, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	const { uuid, country, rights, collaborators, public } = req.session || {}
+	const { uuid, country, collaborators, public } = req.session || {}
+	const rights = await userrights({ uuid })
+
+	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 
 	let { space, object, instance } = req.params || {}
-	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
-	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
+
+	console.log(space, pinboard)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
@@ -69,7 +74,7 @@ module.exports = async (req, res) => {
 					}
 					return {
 						object: 'pads',
-						space: 'public',
+						space: rights >= read ? 'all' : 'public',
 						countries: [result?.iso3],
 						title: result?.name,
 						instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
@@ -115,6 +120,7 @@ module.exports = async (req, res) => {
 			AND p.id IN (SELECT pad FROM review_requests)
 		`, [ collaborators_ids, rights ])
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'pinned') {
 			if (public) {
 				if (pinboard) {
@@ -208,7 +214,8 @@ module.exports = async (req, res) => {
 		})
 
 		// ORDER
-		const order = DB.pgp.as.format(`ORDER BY p.date DESC`)
+		let order = DB.pgp.as.format(`ORDER BY p.date DESC`)
+		if (orderby === 'random') order = DB.pgp.as.format(`ORDER BY RANDOM()`)
 
 		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' AND '), content_filters.filter(d => d).join(' AND ') ]
 			.filter(d => d?.length)

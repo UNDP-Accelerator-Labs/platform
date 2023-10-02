@@ -74,7 +74,6 @@ module.exports = (req, res) => {
 	} else {
 		DB.general.tx(async t => {
 			const batch = []
-
 			const session_rights = await userrights({ connection: t, uuid })
 			// CHECK IF THE CURRENT USER HAS THE RIGHT TO CHANGE VALUES
 			batch.push(t.any(`

@@ -13,11 +13,11 @@ module.exports = (req, res) => {
 		let checkPass = isPasswordSecure(password);
 		let extendedUrl =  `&reset_message=${checkPass}`;
 
-		if(referer.includes('/contribute/contributor')){
+		if(referer?.includes('/contribute/contributor')){
 			extendedUrl = `?reset_message=${checkPass}`
 		}
 		if(checkPass.length){
-			return res.redirect(`${referer}${extendedUrl}`);
+			return referer ? res.redirect(`${referer}${extendedUrl}`) : res.redirect('/login');
         }
 	}
 	if (!id) {
@@ -26,17 +26,17 @@ module.exports = (req, res) => {
 				INSERT INTO users (name, email, position, password, iso3, language, secondary_languages, rights, notifications, reviewer)
 				VALUES ($1, $2, $3, crypt($4, GEN_SALT('bf', 8)), $5, $6, $7, $8, $9, $10)
 				RETURNING uuid
-			;`, [ 
-				/* $1 */ name, 
-				/* $2 */ email, 
-				/* $3 */ position, 
-				/* $4 */ password, 
-				/* $5 */ iso3, 
-				/* $6 */ language, 
-				/* $7 */ JSON.stringify(secondary_languages || []), 
-				/* $8 */ rights, 
-				/* $9 */ notifications || false, 
-				/* $10 */ reviewer || false 
+			;`, [
+				/* $1 */ name,
+				/* $2 */ email,
+				/* $3 */ position,
+				/* $4 */ password,
+				/* $5 */ iso3,
+				/* $6 */ language,
+				/* $7 */ JSON.stringify(secondary_languages || []),
+				/* $8 */ rights,
+				/* $9 */ notifications || false,
+				/* $10 */ reviewer || false
 			], d => d.uuid)
 			.then(result => {
 				const batch = []
@@ -44,7 +44,7 @@ module.exports = (req, res) => {
 					INSERT INTO cohorts (contributor, host)
 					VALUES ($1, $2)
 				;`, [ result, uuid ]))
-				
+
 				if (teams?.length > 0) {
 					teams.forEach(d => {
 						batch.push(t.none(`
@@ -58,7 +58,7 @@ module.exports = (req, res) => {
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						await sendemail({
-							to: email, 
+							to: email,
 							bcc: 'myjyby@gmail.com',
 							subject: `[${app_title}] An account has been created for you`,
 							html: `${username} has created an account for you to access the ${app_title} application.`
@@ -99,17 +99,17 @@ module.exports = (req, res) => {
 							notifications = $9,
 							reviewer = $10
 						WHERE uuid = $11
-					;`, [ 
-						/* $1 */ name, 
-						/* $2 */ email, 
-						/* $3 */ position, 
-						/* $4 */ update_pw, 
-						/* $5 */ iso3, 
-						/* $6 */ language, 
-						/* $7 */ JSON.stringify(secondary_languages || []), 
+					;`, [
+						/* $1 */ name,
+						/* $2 */ email,
+						/* $3 */ position,
+						/* $4 */ update_pw,
+						/* $5 */ iso3,
+						/* $6 */ language,
+						/* $7 */ JSON.stringify(secondary_languages || []),
 						/* $8 */ update_rights,
-						/* $9 */ notifications || false, 
-						/* $10 */ reviewer || false, 
+						/* $9 */ notifications || false,
+						/* $10 */ reviewer || false,
 						/* $11 */ id
 					])
 				} else return null
@@ -188,11 +188,11 @@ module.exports = (req, res) => {
 				if (id !== uuid) {
 					// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 					await sendemail({
-						// from, 
+						// from,
 						to: email,
 						bcc: 'myjyby@gmail.com',
 						subject: `[${app_title}] Your account information has been modified`,
-						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE 
+						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE
 					})
 					return null
 				} else return null

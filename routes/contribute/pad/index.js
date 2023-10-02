@@ -1,5 +1,4 @@
 const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
-// const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, userrights } = include('routes/helpers/')
 const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
@@ -10,8 +9,6 @@ module.exports = async (req, res) => {
 	const language = checklanguage(req.params?.language || req.session.language)
 	const path = req.path.substring(1).split('/')
 	const activity = path[1]
-
-	// const rights = await userrights({ sid: req.sessionID, uuid })
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 

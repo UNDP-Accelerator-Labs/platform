@@ -1,5 +1,4 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
-// const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, pagestats, userrights } = include('routes/helpers/')
 const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
@@ -14,7 +13,6 @@ module.exports = async (req, res) => {
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
 
-		// const rights = await userrights({ sid: req.sessionID, uuid })
 		const module_rights = modules.find(d => d.type === 'templates')?.rights
 		const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 

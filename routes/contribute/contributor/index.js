@@ -1,11 +1,8 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
 const { checklanguage, datastructures } = include('routes/helpers/')
-// const { checklanguage, datastructures, userrights } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
-
-	// const rights = await userrights({ sid: req.sessionID, uuid })
 
 	if (public) res.redirect('/login')
 	else {

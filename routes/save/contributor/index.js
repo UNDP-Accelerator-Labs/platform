@@ -1,5 +1,4 @@
 const { app_title, app_suite, app_languages, DB } = include('config/')
-// const { email: sendemail, datastructures, userrights } = include('routes/helpers/')
 const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 
@@ -74,8 +73,6 @@ module.exports = (req, res) => {
 	} else {
 		DB.general.tx(async t => {
 			const batch = []
-
-			// const session_rights = await userrights({ connection: t, uuid })
 			// CHECK IF THE CURRENT USER HAS THE RIGHT TO CHANGE VALUES
 			batch.push(t.any(`
 				SELECT c.host, u.name FROM cohorts c

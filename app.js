@@ -206,18 +206,18 @@ app.route('/:language/preview/:object/:space')
 app.route('/:language/print/:object/:space')
 	.get(routes.check.login, routes.dispatch.print)
 
-app.get('/:language/analyse/:object', routes.dispatch.analyse) // TO DO
+app.get('/:language/analyse/:object', routes.check.login, routes.dispatch.analyse) // TO DO
 
-app.get('/:language/exploration-info', routes.render.explorationInfo)
+app.get('/:language/exploration-info', routes.check.login, routes.render.explorationInfo)
 
-app.post('/check/:object', routes.process.check)
+app.post('/check/:object', routes.check.login, routes.process.check)
 
-app.post('/save/:object', routes.process.save)
+app.post('/save/:object', routes.check.login, routes.process.save)
 app.post('/pin', routes.process.pin)
 app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
 app.post('/pagestats', routes.process.pagestats)
-app.post('/validate', routes.process.validate)
+app.post('/validate', routes.process.validate) // THIS DOES NOT SEEM USED
 
 app.put(
   "/exploration/create",
@@ -256,28 +256,28 @@ app.put(
 
 app
   .route("/publish/:object")
-  .get(routes.process.publish)
-  .post(routes.process.publish);
-app.get("/unpublish/:object", routes.process.unpublish);
-app.post("/share/:object", routes.process.share);
-app.get("/forward/:object", routes.process.forward);
-app.get("/delete/:object", routes.process.delete);
+  .get(routes.check.login, routes.process.publish)
+  .post(routes.check.login, routes.process.publish);
+app.get("/unpublish/:object", routes.check.login, routes.process.unpublish);
+app.post("/share/:object", routes.check.login, routes.process.share);
+app.get("/forward/:object", routes.check.login, routes.process.forward);
+app.get("/delete/:object", routes.check.login, routes.process.delete);
 
-app.post("/download/:object", routes.process.download);
+app.post("/download/:object", routes.check.login, routes.process.download);
 
 app
   .route("/request/:object")
-  .get(routes.process.request)
-  .post(routes.process.request);
-app.get("/accept/:object", routes.process.accept);
-app.get("/decline/:object", routes.process.decline);
+  .get(routes.check.login, routes.process.request)
+  .post(routes.check.login, routes.process.request);
+app.get("/accept/:object", routes.check.login, routes.process.accept);
+app.get("/decline/:object", routes.check.login, routes.process.decline);
 
 // app.post('/deploy', routes.process.deploy)
 // app.get('/demobilize', routes.process.demobilize)
 
 // app.post('/intercept/:method', routes.process.intercept)
 
-app.post("/call/api", routes.process.callapi);
+app.post("/call/api", routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
 
 app.post("/upload/img", upload.array("img"), routes.process.upload);
 app.post("/upload/video", upload.array("video"), routes.process.upload);

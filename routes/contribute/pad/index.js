@@ -1,7 +1,8 @@
 const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, userrights } = include('routes/helpers/')
+// const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, userrights } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
 	const { referer } = req.headers || {}
 	const { object } = req.params || {}
 	const { id, template, source, mobilization, display } = req.query || {}
@@ -9,6 +10,8 @@ module.exports = (req, res) => {
 	const language = checklanguage(req.params?.language || req.session.language)
 	const path = req.path.substring(1).split('/')
 	const activity = path[1]
+
+	// const rights = await userrights({ sid: req.sessionID, uuid })
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
@@ -248,9 +251,7 @@ module.exports = (req, res) => {
 
 async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { id, template, mobilization, source, uuid, collaborators, public } = _kwargs
-
-	const rights = await userrights({ uuid })
+	const { id, template, mobilization, source, uuid, rights, collaborators, public } = _kwargs
 
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 	if (typeof write === 'object') {

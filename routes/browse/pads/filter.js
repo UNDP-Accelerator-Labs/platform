@@ -8,10 +8,12 @@ module.exports = async (req, res) => {
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 
 	let { space, object, instance } = req.params || {}
-	if (!space) space = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
+
+	console.log(space, pinboard)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1

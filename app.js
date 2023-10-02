@@ -213,7 +213,7 @@ app.get('/:language/exploration-info', routes.check.login, routes.render.explora
 app.post('/check/:object', routes.check.login, routes.process.check)
 
 app.post('/save/:object', routes.check.login, routes.process.save)
-app.post('/pin', routes.process.pin)
+app.post('/pin', routes.check.login, routes.process.pin)
 app.post('/engage', routes.process.engage)
 app.post('/comment', routes.process.comment)
 app.post('/pagestats', routes.process.pagestats)

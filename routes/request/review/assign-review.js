@@ -1,13 +1,13 @@
+global.include = (path) => require(`../../../${path}`);
+
 const path = require('path')
 const { safeArr, DEFAULT_UUID } = include('routes/helpers')
 
 process.on('message', message => {
-	const { rootpath, id, language, reviewers, tagfocus, uuid, sendemail } = message || {} // sendemail IS PROBABLY NOT NEEDED HERE
+	const { rootpath, id, language, reviewers, tagfocus, uuid } = message || {} 
 
 	console.log(tagfocus)
 	// const tagfocus = 'thematic_areas'
-
-	// console.log(sendemail)
 
 	const { modules, DB } = require(path.join(rootpath, '/config'))
 

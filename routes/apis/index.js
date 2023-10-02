@@ -3,7 +3,6 @@ const files = require('./files/')
 const contributors = require('./contributors/')
 const tags = require('./tags/')
 const statistics = require('./statistics/')
-const tokens = require('./tokens/')
 const locations = require('./locations/')
 const jwt = require('jsonwebtoken')
 
@@ -37,8 +36,5 @@ module.exports = (req, res) => {
 		else if (object === 'countries') locations.countries(req, res)
 		else if (object === 'regions') locations.regions(req, res)
 		else res.redirect('/module-error')
-	} else if (action === 'request') {
-		if (object === 'token') tokens.generate(req, res)
-		else res.redirect('/module-error')
-	}
+	} else res.redirect('/module-error')
 }

@@ -80,7 +80,7 @@
 								</div>
 								<label class='instruction google-translate-attr'><%- vocabulary['email'][language] %></label>
 								<div class='input-group'>
-									<input type='email' id='new-email' name='new_email' autocomplete='new-email' pattern='.+@.+\.\w+' value='<%- locals.data?.email %>' required <% if (!editable) { %>disabled<% } %>>
+									<input type='email' id='new-email' name='new_email' autocomplete='new-email' pattern='.+@.+\.\w+' value='<%- locals.data?.email %>' required <% if (!editable || locals.data?.email) { %>disabled<% } %>>
 									<label for='new-email' class="google-translate-attr"><%- vocabulary['email address'][language] %></label>
 								</div>
 							</li>

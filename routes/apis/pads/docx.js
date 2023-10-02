@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
-	
+
 	// CREATE A tmp FOLDER TO STORE EVERYTHING
 	if (render) {
 		var basedir = path.join(rootpath, '/tmp')
@@ -180,6 +180,7 @@ module.exports = async (req, res) => {
 							// TO DO: FILTER IF URL							
 							await new Promise(resolve1 => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
+									if (err) console.log(err)
 									// TO DO: MIGHT NEED resizeImgBuffer AFTER ALL
 									const { width, height } = resizeImg(buffer)
 									resolve1(arr.push(new Paragraph({
@@ -230,6 +231,7 @@ module.exports = async (req, res) => {
 						await Promise.all(srcs.map(d => {
 							return new Promise(resolve1 => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, d), app_storage).href, function (err, res, buffer) {
+									if (err) console.log(err)
 									const { width, height } = resizeImg(buffer, maxwidth)
 
 									resolve1(children.push(new ImageRun({
@@ -285,8 +287,8 @@ module.exports = async (req, res) => {
 					options = options.filter(d => d.name)
 					options.sort((a, b) => {
 						if (a.name === b.name) return 0
-						else if (!a.name || !a.name.trim().length) return 1
-						else if (!b.name || !b.name.trim().length) return -1
+						else if (!a.name || !a.name?.trim().length) return 1
+						else if (!b.name || !b.name?.trim().length) return -1
 						else return a.id < b.id ? -1 : 1
 					})
 					options.forEach((d, i) => {
@@ -332,19 +334,28 @@ module.exports = async (req, res) => {
 					tags.sort((a, b) => a.key - b.key)
 					const children = []
 					tags.forEach(d => {
-						children.push(new ImageRun({
-							// TO DO: FILTER IF URL
-							data: fs.readFileSync(path.join(rootpath, `public/imgs/${d.type}/${language}/G${d.key || d}-c.png`)),
-							altText: {
-								title: `${d.type}-${d.key}`,
-								description: d.name,
-								name: d.name
-							},
-							transformation: {
-								width: 100,
-								height: 100
-							}
-						}))
+						if (!isNaN(d.key || d) && !Number.isInteger(d.key || d)) {
+							if (d.key) d.key = parseInt(d.key)
+							else d = parseInt(d)
+						}
+						try {
+							children.push(new ImageRun({
+								// TO DO: FILTER IF URL
+								data: fs.readFileSync(path.join(rootpath, `public/imgs/${d.type}/${language}/G${d.key || d}-c.png`)),
+								altText: {
+									title: `${d.type}-${d.key}`,
+									description: d.name,
+									name: d.name
+								},
+								transformation: {
+									width: 100,
+									height: 100
+								}
+							}))
+						} catch (e) {
+							console.log('an error occurred trying to add an index icon')
+							console.log(e)
+						}
 					})
 					arr.push(new Paragraph({ children, style: 'images' }))
 				}
@@ -390,13 +401,19 @@ module.exports = async (req, res) => {
 		}
 
 		function resizeImg (p, maxwidth = 600, maxheight = 900) {
-			let { width, height } = imgsize(p)
-			const ratio = Math.min(maxwidth / width, maxheight / height)
-			if (width > maxwidth || height > maxheight) {
-				width = width * ratio
-				height = height * ratio
+			try {
+				let { width, height } = imgsize(p)
+				const ratio = Math.min(maxwidth / width, maxheight / height)
+				if (width > maxwidth || height > maxheight) {
+					width = width * ratio
+					height = height * ratio
+				}
+				return { width, height }
+			} catch (e) {
+				console.log('an error occurred trying to resize image')
+				console.log(e)
+				return { width: 0, height: 0 }
 			}
-			return { width, height }
 		}
 		function formatTxt (str) {
 			if (str?.length) {

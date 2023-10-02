@@ -373,7 +373,7 @@
 						modal.remove()
 						screen.classed('hide', true)
 					}
-				}).html('<%- vocabulary["save"][locals.metadata.page.language] %>')
+				}).html('<%- vocabulary["save"][language] %>')
 			}
 		}
 	}
@@ -393,7 +393,7 @@
 			modal.remove()
 			screen.classed('hide', true)
 				.classed('dark', false)
-		}).html('Close') // TO DO: TRANSLATE
+		}).html('<%- vocabulary["close"][language] %>')
 
 		const inner = modal.addElems('div', 'inner unpadded')
 		inner.addElems('img', 'zoom', src ? [src] : [])

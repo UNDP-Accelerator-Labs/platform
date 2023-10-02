@@ -120,13 +120,13 @@
 						<form>
 							<button type='button' class='dropdown' title='Group selected columns.' onclick='groupColumns()' ontouchend='groupColumns()'>
 								<!-- TO DO: TRANSLATE -->
-								<i class='material-icons'>layers</i>
+								<i class='material-icons google-translate-attr'>layers</i>
 							</button>
 						</form>
 						<form>
 							<button type='button' class='dropdown' title='Delete selected column(s).' onclick='dropColumns()' ontouchend='dropColumns()'>
 								<!-- TO DO: TRANSLATE -->
-								<i class='material-icons'>delete_forever</i>
+								<i class='material-icons google-translate-attr'>delete_forever</i>
 							</button>
 						</form>
 					</div>
@@ -479,7 +479,7 @@
 					})	
 				})
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html('tab_unselected')
 		
 		const columnheaders = moduleHead.addElems('tr', 'column-names')
@@ -501,7 +501,7 @@
 			.classed('selected left right top bottom', false)
 		datatypes.addElems('label').html(d => d.types)
 		datatypes.addElems('button', 'parse', d => d.types.includes('string') ? [d] : [])
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 			.html('list')
 		.on('click', async function (d) {
 			const message = `Split the string data in this column into a list using <input type='text' name='separator' value=',' minlength=1 maxlength=1> separators.` // TO DO: TRANSLATE

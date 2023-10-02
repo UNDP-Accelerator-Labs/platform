@@ -3,7 +3,7 @@ const { datastructures } = include('routes/helpers/')
 const processlogin = require('./process.js')
 const jwt = require('jsonwebtoken')
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { sessionID: sid } = req || {}
 	const { uuid } = req.session || {}
@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
 	// if (sid) sid = sid.split(':')[1].split('.')[0]
 
 	if (uuid) {
-		DB.general.tx(t => {
+		let cleared = await DB.general.tx(t => {
 			return t.oneOrNone(`
 				SELECT TRUE AS bool FROM session
 				WHERE sid = $1
@@ -25,15 +25,17 @@ module.exports = (req, res, next) => {
 					return t.one(`SELECT COALESCE(rights, 0)::INT AS rights FROM users WHERE uuid = $1;`, [ uuid ], d => d.rights)
 					.then(result => {
 						req.session.rights = result
-						next()
+						return true
 					}).catch(err => console.log(err))
-				} else {
-					req.session.destroy()
-					res.redirect('/login')
-				}
+				} else return false
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 
+		if (cleared === true) next()
+		else {
+			req.session.destroy()
+			res.redirect('/login')
+		}
 	} else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
 	else { 
 		Object.assign(req.session, datastructures.sessiondata({ public: true }))

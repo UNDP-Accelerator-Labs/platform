@@ -182,8 +182,6 @@ module.exports = async (req, res) => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
 									if (err) console.log(err)
 									// TO DO: MIGHT NEED resizeImgBuffer AFTER ALL
-									console.log('res 1')
-									console.log(res)
 									const { width, height } = resizeImg(buffer)
 									resolve1(arr.push(new Paragraph({
 										children: [
@@ -234,8 +232,6 @@ module.exports = async (req, res) => {
 							return new Promise(resolve1 => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, d), app_storage).href, function (err, res, buffer) {
 									if (err) console.log(err)
-									console.log('res 2')
-									console.log(res)
 									const { width, height } = resizeImg(buffer, maxwidth)
 
 									resolve1(children.push(new ImageRun({

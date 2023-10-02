@@ -113,6 +113,15 @@
 					<% }) %>
 
 					<div class='break'></div>
+					<div class='order'>
+						<menu>
+							<li>
+								<input type='checkbox' class='toggle' name='orderby' value='random' id='order-random' <% if (query?.orderby?.includes('random')) { %>checked<% } %>> 
+								<label for='order-random'></label>
+								<p class='google-translate-attr'><%- vocabulary['serendipitous search'][language] %></p>
+							</li>
+						</menu>
+					</div>
 					<button type='submit' class='submit-filters google-translate-attr'>
 						<%- vocabulary['apply filters'][language] %>
 					</button>

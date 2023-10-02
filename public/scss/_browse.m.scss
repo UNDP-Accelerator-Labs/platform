@@ -855,6 +855,7 @@ div.browse {
 				section {
 					flex: 1 1;
 					margin-top: 15px;
+					margin-bottom: 30px;
 					padding: 0 7.5px;
 
 					.filter {
@@ -1016,6 +1017,29 @@ div.browse {
 				.break {
 					flex-basis: 100%;
 					width: 0;
+				}
+				.order {
+					padding: 0 7.5px;
+
+					menu {
+						li {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+
+							input.toggle + label {
+								display: inline-block;
+								margin-top: 0;
+							}
+							/*input.toggle:checked + label {
+								background-color: #FFF;
+							}*/
+							p {
+								display: inline-block;
+								margin: 0 0 0 7.5px;
+							}
+						}
+					}
 				}
 				button.submit-filters {
 					width: calc(100% - 15px);

@@ -3,7 +3,7 @@ const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 
 module.exports = (req, res) => {
-	const { referer } = req.headers || {}
+	let { referer } = req.headers || {}
 	const { uuid, rights: session_rights, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
@@ -13,11 +13,14 @@ module.exports = (req, res) => {
 		let checkPass = isPasswordSecure(password);
 		let extendedUrl =  `&reset_message=${checkPass}`;
 
+		if(!referer) {  // FIXME referer is not set on Azure but we kind of know that we are coming from the contributor page
+			referer = '/en/contribute/contributor';
+		}
 		if(referer?.includes('/contribute/contributor')){
 			extendedUrl = `?reset_message=${checkPass}`
 		}
 		if(checkPass.length){
-			return referer ? res.redirect(`${referer}${extendedUrl}`) : res.redirect('/login');
+			return res.redirect(`${referer}${extendedUrl}`);
         }
 	}
 	if (!id) {

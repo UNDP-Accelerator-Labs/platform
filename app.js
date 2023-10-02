@@ -162,7 +162,7 @@ app.get("/version/", (req, res) => {
 
 // PUBLIC VIEWS
 app.get('/', routes.redirect.home, routes.dispatch.public)
-app.get('/:language/home', routes.dispatch.public)
+app.get('/:language/home', routes.check.login, routes.dispatch.public)
 
 
 app.route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
@@ -214,42 +214,48 @@ app.post('/check/:object', routes.check.login, routes.process.check)
 
 app.post('/save/:object', routes.check.login, routes.process.save)
 app.post('/pin', routes.check.login, routes.process.pin)
-app.post('/engage', routes.process.engage)
-app.post('/comment', routes.process.comment)
-app.post('/pagestats', routes.process.pagestats)
-app.post('/validate', routes.process.validate) // THIS DOES NOT SEEM USED
+app.post('/engage', routes.check.login, routes.process.engage)
+app.post('/comment', routes.check.login, routes.process.comment)
+app.post('/pagestats', routes.check.login, routes.process.pagestats)
+app.post('/validate', routes.check.login, routes.process.validate) // THIS DOES NOT SEEM USED
 
 app.put(
   "/exploration/create",
+  routes.check.login,
   routes.process.explorationLoginCheck,
   routes.process.explorationConsentCheck,
   routes.process.explorationCreate
 );
 app.get(
   "/exploration/list",
+  routes.check.login,
   routes.process.explorationLoginCheck,
   routes.process.explorationConsentCheck,
   routes.process.explorationList
 );
 app.put(
   "/exploration/doc",
+  routes.check.login,
   routes.process.explorationLoginCheck,
   routes.process.explorationConsentCheck,
   routes.process.explorationDoc
 );
 app.get(
   "/exploration/collection",
+  routes.check.login,
   routes.process.explorationLoginCheck,
   routes.process.explorationConsentCheck,
   routes.process.explorationCollection
 );
 app.get(
   "/exploration/consent",
+  routes.check.login,
   routes.process.explorationLoginCheck,
   routes.process.explorationConsent
 );
 app.put(
   "/exploration/consent",
+  routes.check.login,
   routes.process.explorationLoginCheck,
   routes.process.explorationConsent
 );
@@ -279,17 +285,17 @@ app.get("/decline/:object", routes.check.login, routes.process.decline);
 
 app.post("/call/api", routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
 
-app.post("/upload/img", upload.array("img"), routes.process.upload);
-app.post("/upload/video", upload.array("video"), routes.process.upload);
-app.post("/upload/pdf", upload.array("pdf"), routes.process.upload);
+app.post("/upload/img", upload.array("img"), routes.check.login, routes.process.upload);
+app.post("/upload/video", upload.array("video"), routes.check.login, routes.process.upload);
+app.post("/upload/pdf", upload.array("pdf"), routes.check.login, routes.process.upload);
 app.post("/upload/xlsx", routes.check.login, routes.process.import); // TO DO: CHANGE path SCHEMA
 
 app.post("/screenshot", routes.process.screenshot);
 
 // TO DO: UPDATE SCHEMA BELOW
 // app.post('/storeImport', routes.check.login, routes.process.import) // TO DO: CHANGE path SCHEMA
-app.post("/forwardGeocoding", routes.forwardGeocoding); // UPDATE TO geocode/forward
-app.post("/reverseGeocoding", routes.reverseGeocoding); // UPDATE TO geocode/forward
+app.post("/forwardGeocoding", routes.check.login, routes.forwardGeocoding); // UPDATE TO geocode/forward
+app.post("/reverseGeocoding", routes.check.login, routes.reverseGeocoding); // UPDATE TO geocode/forward
 
 // API
 app
@@ -297,12 +303,12 @@ app
   .get(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis)
   .post(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis);
 
-app.get("/api/skills", routes.api.skills); // TO DO: THIS SHOULD BE DEPRECATED
-app.get("/api/methods", routes.api.methods); // TO DO: THIS SHOULD BE DEPRECATED
+app.get("/api/skills", routes.check.login, routes.api.skills); // TO DO: THIS SHOULD BE DEPRECATED
+app.get("/api/methods", routes.check.login, routes.api.methods); // TO DO: THIS SHOULD BE DEPRECATED
 app
   .route("/api/datasources") // TO DO: THIS SHOULD BE DEPRECATED
-  .get(routes.api.datasources)
-  .post(routes.api.datasources);
+  .get(routes.check.login, routes.api.datasources)
+  .post(routes.check.login, routes.api.datasources);
 
 // INSTANCES
 app

@@ -416,30 +416,30 @@
 <div class='sidebar xs sm m lg xl xxl'>
 	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
 	{ %>
-		<button class='input-toolbox xs sm'><i class='material-icons'>edit</i></button>
+		<button class='input-toolbox xs sm'><i class='material-icons google-translate-attr'>edit</i></button>
 		<div class='media-input-group input-group' tabindex=1>
 			<% if (!templated) { %><button class='scroll-up m lg xl xxl'><label>&rsaquo;</label></button><% } %>
 			<div class='inner'>
 				<div class='btn-group'>
 				<% if (!templated) { %>
-					<button id='input-media-section' title='Add a section.'><i class='material-icons'>add_circle</i></button>
+					<button id='input-media-section' title='Add a section.'><i class='material-icons google-translate-attr'>add_circle</i></button>
 
 					<div class='vertical-separator'></div>
 					<!-- TO DO: TRANSLATE title INFO -->
 					<form action='/upload/img' method='POST' enctype='multipart/form-data'>
 						<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' multiple>
-						<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons'>add_photo_alternate</i></label>
+						<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>add_photo_alternate</i></label>
 					</form>
 					<form action='/upload/video' method='POST' enctype='multipart/form-data'>
 						<input type='file' id='input-media-video' name='video' accept='video/mp4,video/x-m4v,video/webm,video/*'>
-						<label for='input-media-video' title='Add a video. You can also use the “v” key as a keyboard shortcut.'><i class='material-icons'>ondemand_video</i></label>
+						<label for='input-media-video' title='Add a video. You can also use the “v” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>ondemand_video</i></label>
 					</form>
 
-					<button id='input-media-drawing' title='Add a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons'>gesture</i></button>
-					<button id='input-media-txt' title='Add a text block. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons'>text_fields</i></button>
-					<button id='input-media-embed' title='Embed a link or HTML code. Simply paste the link to the video to see it displayed. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons'>code</i></button>
-					<button id='input-media-checklist' title='Add a checklist. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons'>check_box</i></button>
-					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons'>radio_button_checked</i></button>
+					<button id='input-media-drawing' title='Add a drawing. You can also use the “d” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>gesture</i></button>
+					<button id='input-media-txt' title='Add a text block. You can also use the “t” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>text_fields</i></button>
+					<button id='input-media-embed' title='Embed a link or HTML code. Simply paste the link to the video to see it displayed. You can also use the “e” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>code</i></button>
+					<button id='input-media-checklist' title='Add a checklist. You can also use the “l” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>check_box</i></button>
+					<button id='input-media-radiolist' title='Add a radiolist. You can also use the “r” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>radio_button_checked</i></button>
 
 					<div class='vertical-separator'></div>
 				<% } %>

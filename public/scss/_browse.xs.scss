@@ -324,7 +324,60 @@ div.public-page-panel {
 
 		& > .inner {
 			#statistics {
+
+				&.expand {
+					position: fixed;
+					top: 50%;
+					transform: translateY(-50%);
+					left: 15px;
+					width: calc(100% - 30px);
+					padding: 0;
+					z-index: 100000;
+					animation: fade-in .25s;
+
+					.close {
+						float: right;
+						border: none;
+						outline: none;
+						background-color: $c-dark-blue;
+						padding: 5px 10px;
+						font-size: $t-small;
+						color: #FFF;
+						cursor: pointer;
+
+						&.inlaid {
+							position: absolute;
+							top: 0;
+							right: 0;
+						}
+					}
+
+					.stat-group {
+						background-color: #FFF;
+						margin: 0;
+						padding: 30px;
+
+						&:first-child {
+							border-top: 2px solid $c-dark-blue;
+							padding-bottom: 0;
+						}
+						&:not(:first-child) {
+							display: grid;
+						}
+
+						.statistic {
+							.expand-stats {
+								display: none;
+							}
+						}
+					}
+				}
+
 				.stat-group {
+					&:not(:first-child) {
+						display: none;
+					}
+
 					.statistic {
 						h1 {
 							font-size: $t-large;
@@ -337,6 +390,21 @@ div.public-page-panel {
 						p {
 							font-size: $t-mid-small;
 							line-height: 1.3em;
+						}
+						.expand-stats {
+							display: block;
+
+							button {
+								width: 45px;
+								height: 45px;
+								margin-top: 5px;
+								font-size: $t-large;
+								color: $c-light-grey;
+								border: none;
+								outline: none;
+								background: url(../imgs/icons/i-add.svg);
+								cursor: pointer;
+							}
 						}
 					}
 				}
@@ -508,6 +576,23 @@ div.browse {
 
 	&.home {
 		padding-top: 45px;
+	}
+	&.public,
+	&.instance {
+		padding: 60px 15px 0 15px;
+	}
+
+	h1.instance-title {
+		margin-top: 15px;
+		display: bloc;
+		font-size: $t-xlarge;
+		line-height: 1.2em;
+		text-align: center;
+
+		& + .engagement-group {
+			display: block;
+			text-align: center;
+		}
 	}
 
 	nav#search-and-filter {
@@ -929,6 +1014,7 @@ div.browse {
 				section {
 					flex-grow: 1;
 					margin-top: 15px;
+					margin-bottom: 30px;
 					padding: 0 7.5px;
 
 					.filter {
@@ -1149,6 +1235,29 @@ div.browse {
 				.break {
 					flex-basis: 100%;
 					width: 0;
+				}
+				.order {
+					padding: 0 7.5px;
+
+					menu {
+						li {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+
+							input.toggle + label {
+								display: inline-block;
+								margin-top: 0;
+							}
+							/*input.toggle:checked + label {
+								background-color: #FFF;
+							}*/
+							p {
+								display: inline-block;
+								margin: 0 0 0 7.5px;
+							}
+						}
+					}
 				}
 				button.submit-filters {
 					width: calc(100% - 15px);
@@ -2773,11 +2882,6 @@ footer.slideshow {
 			}
 		}
 	}
-}
-
-
-div.browse.public {
-	padding: 60px 15px 0 15px;
 }
 nav.pagination {
 	width: 100%;

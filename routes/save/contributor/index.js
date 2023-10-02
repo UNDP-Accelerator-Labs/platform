@@ -1,5 +1,4 @@
 const { app_title, app_suite, app_languages, DB } = include('config/')
-// const { email: sendemail, datastructures, userrights } = include('routes/helpers/')
 const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 

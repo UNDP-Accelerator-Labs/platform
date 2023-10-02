@@ -1,9 +1,8 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers, safeArr, userrights, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	const { uuid, country, collaborators, public } = req.session || {}
-	const rights = await userrights({ uuid })
+	const { uuid, rights, country, collaborators, public } = req.session || {}
 
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 

@@ -13,10 +13,11 @@ module.exports = (req, res) => {
 
 	// SEND THE REVIEW ASSIGNMENT TO A CHILD PROCESS
 	const c_process = fork(path.join(__dirname, 'assign-review.js'))
-	c_process.send({ rootpath, id, language, reviewers, tagfocus, uuid, sendemail })
+	c_process.send({ rootpath, id, language, reviewers, tagfocus, uuid })
 
 	// THE FOLLOWING IS TECHNICALLY NOT NEEDED
 	c_process.on('message', message => {
+		console.log('passing info from child process')
 		message.forEach(d => {
 			// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
 			if (d.notifications) {

@@ -1,11 +1,11 @@
 const { app_title, app_suite, app_languages, DB } = include('config/')
-const { email: sendemail, datastructures, userrights } = include('routes/helpers/')
+// const { email: sendemail, datastructures, userrights } = include('routes/helpers/')
+const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
-	const { path } = req;
-	const { uuid, username } = req.session || {}
+	const { uuid, rights: session_rights, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
@@ -74,7 +74,8 @@ module.exports = (req, res) => {
 	} else {
 		DB.general.tx(async t => {
 			const batch = []
-			const session_rights = await userrights({ connection: t, uuid })
+
+			// const session_rights = await userrights({ connection: t, uuid })
 			// CHECK IF THE CURRENT USER HAS THE RIGHT TO CHANGE VALUES
 			batch.push(t.any(`
 				SELECT c.host, u.name FROM cohorts c

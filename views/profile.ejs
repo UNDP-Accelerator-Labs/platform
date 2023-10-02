@@ -357,7 +357,7 @@
 					</div>
 					<script type='text/javascript'>
 						async function requestToken (node) {
-							const token = await POST('/apis/request/token')
+							const token = await POST('/request/token')
 							if (token) {
 								const inputgroup = d3.select(node)
 								inputgroup.selectAll('.hide')

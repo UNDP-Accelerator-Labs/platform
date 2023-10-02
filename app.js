@@ -15,6 +15,7 @@ const multer = require("multer");
 const upload = multer({ dest: "./tmp" });
 const fs = require("fs");
 const helmet = require("helmet");
+const { xss } = require('express-xss-sanitizer');
 
 const app = express();
 app.disable("x-powered-by");
@@ -49,6 +50,7 @@ app.use("/scripts", express.static(path.join(__dirname, "./node_modules")));
 app.use("/config", express.static(path.join(__dirname, "./config")));
 app.use(bodyparser.json({ limit: "50mb" }));
 app.use(bodyparser.urlencoded({ limit: "50mb", extended: true }));
+app.use(xss());
 
 const cookie = {
   httpOnly: true, // THIS IS ACTUALLY DEFAULT
@@ -56,10 +58,7 @@ const cookie = {
   maxAge: 5 * 1000 * 60 * 60 * 24 * 1, // 5 DAYS
   sameSite: "lax",
 };
-if (app_id === "local") {
-  cookie.domain =
-    process.env.NODE_ENV === "production" ? ".azurewebsites.net" : "localhost";
-}
+
 const sessionMiddleware = session({
   name: `${app_suite}-session`,
   // secret: 'acclabspadspass',
@@ -72,47 +71,10 @@ const sessionMiddleware = session({
 
 app.use(sessionMiddleware);
 
-function checkInputForHTML(req, res, next) {
-  const { body, params, query } = req;
-  if (containsHTMLorScriptTags(body)) {
-    return res.status(500).redirect("/module-error");
-  }
-
-  if (containsHTMLorScriptTags(params)) {
-    return res.status(500).redirect("/module-error");
-  }
-
-  if (containsHTMLorScriptTags(query)) {
-    return res.status(500).redirect("/module-error");
-  }
-  next();
-}
-
-// Helper function to recursively check if input contains HTML or script tags
-function containsHTMLorScriptTags(input) {
-  if (typeof input === "string") {
-    const regex =
-      /<\s*(?:script|\/script|style|\/style|html|head|body|\/html|\/head|\/body)[^>]*>/gi;
-    return regex.test(input);
-  }
-
-  if (typeof input === "object") {
-    for (const key in input) {
-      if (containsHTMLorScriptTags(input[key])) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
 function setAccessControlAllowOrigin(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 }
-
-app.use(checkInputForHTML);
 
 const routes = require("./routes/");
 
@@ -311,6 +273,10 @@ app
 
 app.get("/module-error", routes.error);
 app.get("*", routes.notfound);
+
+app.use((err, req, res, next) => {
+  res.status(500).redirect('/module-error')
+})
 
 // RUN THE SERVER
 app.listen(process.env.PORT || 2000, _ => {

@@ -3,7 +3,6 @@ const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats
 
 module.exports = async (req, res) => {
 	const { uuid, rights, country, collaborators, public } = req.session || {}
-
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 
 	let { space, object, instance } = req.params || {}
@@ -11,8 +10,6 @@ module.exports = async (req, res) => {
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
-
-	console.log(space, pinboard)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1

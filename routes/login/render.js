@@ -16,6 +16,9 @@ module.exports = async (req, res, next) => {
 	else if(path === '/reset-password'){
 		return res.render('reset-password', data)
 	}
+	else if(path === '/confirm-device'){
+		return res.render('confirm-device', data)
+	}
 	else if(token) getResetToken(req, res, next)
 
 	else res.render('login', data)

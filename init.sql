@@ -327,3 +327,23 @@ CREATE TABLE IF NOT EXISTS public.page_stats
     read_count INT DEFAULT 0,
     CONSTRAINT page_stats_pkey PRIMARY KEY (doc_id, doc_type, db, page_url, viewer_country, viewer_rights)
 );
+
+-- User trusted device table
+CREATE TABLE public.trusted_devices (
+  id SERIAL PRIMARY KEY,
+  user_uuid UUID NOT NULL,
+  device_name VARCHAR(255),
+  device_type VARCHAR(255),
+  device_os VARCHAR(255) NOT NULL,
+  device_browser VARCHAR(255) NOT NULL,
+  last_login TIMESTAMP NOT NULL,
+  is_trusted BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE public.device_confirmation_code (
+  id SERIAL PRIMARY KEY,
+  user_uuid UUID NOT NULL,
+  code INTEGER NOT NULL,
+  expiration_time TIMESTAMP NOT NULL
+);

@@ -375,9 +375,13 @@
 					</script>
 				<% } %>
 				<% if (locals.data?.pads > 0) { %>
-					<div class='user-content'>
+					<div class='user-content py-5'>
 						<a href='../browse/pads/public?contributors=<%- locals.data?.uuid %>' target='_blank'><%- vocabulary['browse publications'][language] %></a>
 					</div>
+				<% } %>
+
+				<% if (locals.data?.uuid === locals.metadata.user.uuid) { %>
+					<%- include('partials/trusted-device.ejs') %>
 				<% } %>
 			</div>
 		</div>

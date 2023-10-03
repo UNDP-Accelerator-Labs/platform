@@ -147,6 +147,16 @@ app.route('/reset-password')
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.updatePassword)
 
+app.route('/confirm-device')
+	.get(routes.render.login)
+	.post(routes.process.confirmDevice)
+
+app.route('/resend-otp-code')
+	.get(routes.process.resendCode)
+
+app.route('/remove-trusted-device')
+.post(routes.process.removeDevice)
+
 app.route('/:language/contribute/:object')
 	.get(routes.check.login, routes.dispatch.contribute)
 app.route('/:language/edit/:object')

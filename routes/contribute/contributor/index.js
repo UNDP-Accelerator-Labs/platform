@@ -3,7 +3,7 @@ const { checklanguage, datastructures, userrights } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
-
+	
 	if (public) res.redirect('/login')
 	else {
 		const { referer } = req.headers || {}
@@ -100,12 +100,27 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
+					if(uuid === id){
+						batch.push(t.any(`
+						SELECT *
+						FROM trusted_devices
+						WHERE user_uuid = $1
+						  AND is_trusted = true
+						  AND created_at >= NOW() - INTERVAL '1 year';
+						;`, [ uuid ]))
+					} else batch.push(null)
+
 					return t.batch(batch)
 					.then(async results => {
-						let [ countries, languages, teams, data ] = results
+						let [ countries, languages, teams, data, devices ] = results
 
+						const trusted_devices = devices?.map(p=> ({
+							...p,
+							last_login: new Date(p.last_login)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
+							created_at: new Date(p.created_at)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
+						}))
 						const metadata = await datastructures.pagemetadata({ req })
-						return Object.assign(metadata, { data, countries, languages, teams, reset_errormessage: reset_message })
+						return Object.assign(metadata, { data, countries, languages, teams, reset_errormessage: reset_message, trusted_devices })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}

@@ -44,6 +44,7 @@
     "rate-limiter-flexible": "^3.0.0",
     "request": "^2.88.2",
     "smoothscroll-polyfill": "^0.4.4",
+    "useragent": "^2.3.0",
     "uuid": "^8.3.2",
     "xlsx": "^0.18.5"
   },

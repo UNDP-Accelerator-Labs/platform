@@ -213,9 +213,13 @@ nav#languages {
 	left: 0;
 }
 .errormessage {
-	font-size: 12px;
-	color: red;
-	padding-top: 10px;
+	font-size: $t-small;
+	line-height: 1.3em;
+	color: $c-dark-red;
+
+	&.lead {
+		font-size: $t-main;
+	}
 }
 
 .btn-1 {

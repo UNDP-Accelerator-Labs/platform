@@ -59,8 +59,8 @@
 					<% if (locals.data?.uuid && editable) { %>
 						<input type='hidden' name='id' value='<%- locals.data?.uuid %>'>
 					<% } %>
-					<% if(!locals.data?.uuid && locals.reset_errormessage) { %>
-						<div class="errormessage" ><%- locals.reset_errormessage.replace(/\n/g, '<br>') %></div>
+					<% if(!locals.data?.uuid && locals.errormessage) { %>
+						<p class='lead errormessage' ><%- locals.errormessage.replace(/\n/g, '<br>') %></p>
 					<% } %>
 					<div class='main-info info'>
 						<ul>
@@ -71,7 +71,7 @@
 								<label class='instruction google-translate-attr'><%- vocabulary['name'][language] %></label>
 								<div class='input-group'>
 									<input type='text' id='new-name' name='new_name' autocomplete='new-name' value='<%- locals.data?.name %>' required <% if (!editable) { %>disabled<% } %>>
-									<label for='new-name' class="google-translate-attr"><%- vocabulary['first and last name'][language] %></label>
+									<label for='new-name' class='google-translate-attr'><%- vocabulary['first and last name'][language] %></label>
 								</div>
 							</li>
 							<li>
@@ -91,7 +91,7 @@
 								<label class='instruction google-translate-attr'><%- vocabulary['job title'][language] %></label>
 								<div class='input-group'>
 									<input type='text' id='new-position' name='new_position' autocomplete='new-position' value='<%- locals.data?.position %>' required <% if (!editable) { %>disabled<% } %>>
-									<label for='new-position' class="google-translate-attr"><%- vocabulary['job title'][language] %></label>
+									<label for='new-position' class='google-translate-attr'><%- vocabulary['job title'][language] %></label>
 								</div>
 							</li>
 						</ul>
@@ -99,8 +99,8 @@
 					<% if (editable) { %>
 						<% if (locals.data?.uuid) { %>
 							<button type='button' class='expand-collapsed google-translate-attr' id='reset-password'><%- vocabulary['reset password'][language] %>
-								<% if(locals.reset_errormessage) { %>
-									<div class="errormessage" ><%- locals.reset_errormessage.replace(/\n/g, '<br>') %></div>
+								<% if(locals.errormessage) { %>
+									<p class='lead errormessage' ><%- locals.errormessage.replace(/\n/g, '<br>') %></p>
 								<% } %>
 							</button>
 							<div class='old-password-info info collapsed'>
@@ -112,7 +112,7 @@
 										<label class='instruction google-translate-attr'><%- vocabulary['old password'][language] %></label>
 										<div class='input-group'>
 											<input type='password' id='old-password' name='old_password' autocomplete='old-password' <% if (!locals.data?.uuid) { %>required<% } %> <% if (!editable) { %>disabled<% } %>>
-											<label for='old-password' class="google-translate-attr"><%- vocabulary['password'][language] %></label>
+											<label for='old-password' class='google-translate-attr'><%- vocabulary['password'][language] %></label>
 										</div>
 									</li>
 									<li>
@@ -137,7 +137,7 @@
 									<% } %>
 									<div class='input-group'>
 										<input type='password' id='new-password' name='new_password' autocomplete='new-password' <% if (!locals.data?.uuid) { %>required<% } %> <% if (!editable) { %>disabled<% } %>>
-										<label for='new-password' class="google-translate-attr"><%- vocabulary['password'][language] %></label>
+										<label for='new-password' class='google-translate-attr'><%- vocabulary['password'][language] %></label>
 									</div>
 								</li>
 								<li>
@@ -151,7 +151,7 @@
 									<% } %>
 									<div class='input-group'>
 										<input type='password' id='confirm-password' name='confirm_password' autocomplete='confirm-password' <% if (!locals.data?.uuid) { %>required<% } %> <% if (!editable) { %>disabled<% } %>>
-										<label for='confirm-password' class="google-translate-attr"><%- vocabulary['password'][language] %></label>
+										<label for='confirm-password' class='google-translate-attr'><%- vocabulary['password'][language] %></label>
 									</div>
 								</li>
 							</ul>
@@ -166,7 +166,7 @@
 								<label for='user-country' class='instruction google-translate-attr'><%- vocabulary['country'][language] %></label>
 								<div class='select'>
 									<input type='text' id='new-country' autocomplete='new-country' value='<%- locals.data?.country %>' <% if (!editable) { %>disabled<% } %>>
-									<label for='new-country' class="google-translate-attr"><%- vocabulary['select country'][language] %></label>
+									<label for='new-country' class='google-translate-attr'><%- vocabulary['select country'][language] %></label>
 									<% if (editable) { %>
 										<div class='dropdown'>
 											<menu>
@@ -188,7 +188,7 @@
 								<label class='instruction google-translate-attr'><%- vocabulary['preferred language'][language] %></label>
 								<div class='select'>
 									<input type='text' id='new-language' autocomplete='new-language' value='<%- locals.data?.languagename %>' <% if (!editable) { %>disabled<% } %>>
-									<label for='new-language' class="google-translate-attr"><%- vocabulary['select language'][language]() %></label>
+									<label for='new-language' class='google-translate-attr'><%- vocabulary['select language'][language]() %></label>
 									<% if (editable) { %>
 										<div class='dropdown'>
 											<menu>
@@ -211,7 +211,7 @@
 									<label class='instruction google-translate-attr'><%- vocabulary['other languages'][language] %></label>
 									<div class='select'>
 										<input type='text' id='secondary-languages' autocomplete='secondary-languages' value='<%- locals.languages.filter(d => locals.data?.secondary_languages?.includes(d.language)).map(d => d.name).join(", ") %>' <% if (!editable) { %>disabled<% } %>>
-										<label for='secondary-languages' class="google-translate-attr"><%- vocabulary['select language'][language](true) %></label>
+										<label for='secondary-languages' class='google-translate-attr'><%- vocabulary['select language'][language](true) %></label>
 										<% if (editable) { %>
 											<div class='dropdown'>
 												<menu>
@@ -245,7 +245,7 @@
 									<div class='select'>
 										<% if (editable && (!locals.data || locals.data?.rights <= rights)) { %>
 											<input type='text' id='new-rights' value='<%- locals.data?.rights %>'<% if (editable && locals.data?.uuid === uuid) { %> disabled<% } %>>
-											<label for='new-rights' class="google-translate-attr"><%- vocabulary['grant rights'][language] %></label>
+											<label for='new-rights' class='google-translate-attr'><%- vocabulary['grant rights'][language] %></label>
 											<% if (editable && locals.data?.uuid !== uuid) { %>
 												<div class='dropdown'>
 													<menu>
@@ -276,7 +276,7 @@
 									<label class='instruction google-translate-attr'><%- vocabulary['teams'][language] %></label>
 									<div class='select'>
 										<input type='text' id='new-team' <% if (!editable) { %>disabled<% } %>>
-										<label for='new-team' class="google-translate-attr"><%- vocabulary['assign to teams'][language] %></label>
+										<label for='new-team' class='google-translate-attr'><%- vocabulary['assign to teams'][language] %></label>
 										<% if (editable) { %>
 											<div class='dropdown'>
 												<menu>
@@ -290,7 +290,7 @@
 											</div>
 										<% } %>
 									</div>
-									<div class='pinboard-group margin-left'>
+									<div class='pinboard-group margin-left<% if (!locals.data?.teams.length) { %> hide<% } %>'>
 										<div class='pinboard'>
 											<div class='pins'>
 												<% locals.data?.teams.forEach(d => { %>
@@ -304,7 +304,7 @@
 									</div>
 								</li>
 							<% } else { %>
-								<li class="google-translate-attr">
+								<li class='google-translate-attr'>
 									<label class='instruction'><%- vocabulary['teams'][language] %></label>
 									<div class='pinboard-group'>
 										<div class='pinboard'>
@@ -324,7 +324,7 @@
 					<div class='secondary-info info'>
 						<ul>
 							<% if (modules.some(d => d.type === 'reviews' && rights >= d.rights.write)) { %>
-								<li class="google-translate-attr">
+								<li class='google-translate-attr'>
 									<label class='instruction'><%- vocabulary['accept to review'][language] %></label>
 									<div class='input-group'>
 										<input type='checkbox' id='accept-reviews' name='reviewer' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.reviewer) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
@@ -332,7 +332,7 @@
 									</div>
 								</li>
 							<% } %>
-							<li class="google-translate-attr">
+							<li class='google-translate-attr'>
 								<label class='instruction'><%- vocabulary['email notifications'][language] %></label>
 								<div class='input-group'>
 									<input type='checkbox' id='email-notifications' name='email_notifications' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.notifications) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
@@ -495,8 +495,17 @@
 		d3.selectAll('input[type=password]') // IT IS IMPORTANT THAT THIS COMES BEFORE THE NEXT GENERIC BLUR FUNCTION
 		.on('blur.confirm', function () {
 			const node = this
+			const sel = d3.select(this)
+			const inputgroup = d3.select(this.parentNode)
 			const confirm = d3.selectAll('input[type=password]').filter(function () { return this !== node })
-			d3.selectAll('input[type=password]').classed('error', this.value !== confirm.node().value)
+			if (checkPassword(this.value)?.length && this.name !== 'confirm_password') {
+				sel.classed('error', true)
+				inputgroup.addElems('p', 'errormessage', checkPassword(this.value))
+					.html(d => d)
+			} else {
+				d3.selectAll('input[type=password]').classed('error', this.value !== confirm.node().value)
+				inputgroup.selectAll('p.errormessage').remove()
+			}
 		})
 
 		// GENERIC BLUR FUNCTION
@@ -576,8 +585,9 @@
 		selects.selectAll('input[name=teams]')
 		.on('change', function () {
 			const sel = d3.select(this)
+			const pinboard = d3.select('.pinboard-group').classed('hide', false)
 			if (this.checked) {
-				const pin = d3.select('.pinboard-group .pinboard .pins')
+				const pin = pinboard.select('.pinboard .pins')
 					.addElem('div', 'pin tag')
 				pin.addElem('label', 'name')
 					.classed('notranslate', true)
@@ -600,6 +610,10 @@
 		input.attr('checked', null)
 		input.node().checked = false
 		sel.findAncestor('pin').remove()
+
+		const pinboard = d3.select('.pinboard-group')
+		if (!pinboard.selectAll('.pin').size()) pinboard.classed('hide', true)
+		
 		partialSave()
 	}
 

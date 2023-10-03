@@ -31,6 +31,9 @@ app.use(
         "connect-src": csp_links
       },
     },
+    referrerPolicy: {
+      policy: ["strict-origin-when-cross-origin","same-origin"],
+    },
     xPoweredBy: false,
     strictTransportSecurity: {
       maxAge: 123456,

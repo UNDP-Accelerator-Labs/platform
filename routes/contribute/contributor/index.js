@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 	else {
 		const { referer } = req.headers || {}
 		const { object } = req.params || {}
-		const { id, reset_message } = req.query || {}
+		const { id, errormessage } = req.query || {}
 		const language = checklanguage(req.params?.language || req.session.language)
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
@@ -120,7 +120,8 @@ module.exports = async (req, res) => {
 							created_at: new Date(p.created_at)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
 						}))
 						const metadata = await datastructures.pagemetadata({ req })
-						return Object.assign(metadata, { data, countries, languages, teams, reset_errormessage: reset_message, trusted_devices })
+
+						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}

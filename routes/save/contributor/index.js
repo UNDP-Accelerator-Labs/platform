@@ -9,16 +9,15 @@ module.exports = (req, res) => {
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
 
-	if(password.length){
-		let checkPass = isPasswordSecure(password);
-		let extendedUrl =  `&reset_message=${checkPass}`;
+	const referer_url = new URL(referer)
+	const referer_params = new URLSearchParams(referer_url.search)
 
-		if(referer.includes('/contribute/contributor')){
-			extendedUrl = `?reset_message=${checkPass}`
+	if(password.length) { // THIS SHOULD TECHNICALLY BE HANDLED IN THE FRONT END NOW
+		let message = isPasswordSecure(password);
+		if (message.length) {
+			referer_params.set('errormessage', message);
+			return res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);
 		}
-		if(checkPass.length){
-			return res.redirect(`${referer}${extendedUrl}`);
-        }
 	}
 	if (!id) {
 		DB.general.tx(t => {
@@ -67,8 +66,19 @@ module.exports = (req, res) => {
 					} else return result
 				})
 				.catch(err => console.log(err))
-			}).catch(err => console.log(err))
-		}).then(result => res.redirect(`/${language}/edit/contributor?id=${result}`))
+			}).catch(err => {
+				console.log('There is a non-blocking error. Likely already a user with the same email account')
+				console.log(err)
+				return null
+			})
+		}).then(result => {
+			if (result) res.redirect(`/${language}/edit/contributor?id=${result}`)
+			else { // TELL THE USER TO LOG IN OR USE A DIFFERENT EMAIL
+				const message = 'It seems the email you want to use is already associated with an account. Please use a different email for the new account.' // TO DO: TRANSLATE
+				referer_params.set('errormessage', message)
+				res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);
+			}
+		})
 		.catch(err => console.log(err))
 	} else {
 		DB.general.tx(async t => {

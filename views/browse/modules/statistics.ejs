@@ -21,6 +21,7 @@
 			<% } else if (typeof page === 'string') { %>
 				<small><%- vocabulary['showing letter'][language](locals.stats?.displayed, page) %></small>
 			<% } %>
+			<div class='expand-stats xs'><button onclick='expandstats(this)'></button></div>
 		</div>
 	</div>
 	<% if (locals.stats?.contributors > 0 || (locals.metadata.page.map && locals.stats?.filtered > 0) || locals.stats?.tags?.some(d => d.count > 0)) { %>
@@ -46,3 +47,28 @@
 		</div>
 	<% } %>
 </div>
+<script type='text/javascript'>
+	if (!mediaSize) var mediaSize = getMediaSize()
+	function expandstats (node) {
+		if (mediaSize === 'xs') {
+			const sel = d3.select(node)
+			const statistics = d3.select(sel.findAncestor('stat-group').node().parentNode)
+			
+			d3.select('.screen').classed('hide', false)
+			statistics.classed('expand', true)
+			.addElems('button', 'close inlaid')
+			.on('click', function () {
+				d3.select(this.parentNode).classed('expand', false)
+				d3.select('.screen').classed('hide', true)
+				d3.select(this).remove()
+
+			}).html('<%- vocabulary["close"][language] %>')
+
+			// window.addEventListener('mouseup', _ => {
+			// 	statistics.classed('expand', false)
+			// 	.select('button.close').remove()
+			// 	d3.select('.screen').classed('hide', true)
+			// })
+		} else return null
+	}
+</script>

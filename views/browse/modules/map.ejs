@@ -30,7 +30,7 @@
 	) { %>
 		<div class='btn-group map-scale xs sm m lg xl xxl'>
 			<a class='mscale'>
-				<i class='material-icons'>
+				<i class='material-icons google-translate-attr'>
 					<% if (mapscale === 'contain') { %>
 						open_in_full
 					<% } else { %>
@@ -74,7 +74,7 @@ if (drawMap) {
 			iconAnchor: [0, 24],
 			labelAnchor: [-6, 0],
 			popupAnchor: [0, -36],
-			html: '<i class="material-icons">place</i>'
+			html: '<i class="material-icons google-translate-attr">place</i>'
 		})
 
 		clusters.forEach(d => {

@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
-const { checklanguage, datastructures, userrights } = include('routes/helpers/')
+const { checklanguage, datastructures } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
@@ -129,12 +129,10 @@ module.exports = async (req, res) => {
 	}
 }
 
-async function check_authorization (_kwargs) {
+function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.general
-	const { id, uuid, public } = _kwargs
+	const { id, uuid, rights, public } = _kwargs
 	const { read, write } = modules.find(d => d.type === 'contributors')?.rights || {}
-
-	const rights = await userrights({uuid})
 
 	if (public) return new Promise(resolve => resolve({ authorized: false }))
 	else if (id) {

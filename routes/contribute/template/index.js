@@ -1,13 +1,11 @@
 const { modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, pagestats, userrights } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
 
 	if (public) res.redirect('/login')
 	else {
-		// const conn = kwargs.connection ? kwargs.connection : DB.conn
-		// const { req, res } = kwargs || {}
 		const { referer } = req.headers || {}
 		const { object } = req.params || {}
 		const { id, source } = req.query || {}
@@ -198,10 +196,9 @@ module.exports = (req, res) => {
 	}
 }
 
-async function check_authorization (_kwargs) {
+function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
-	const { uuid, id, collaborators } = _kwargs
-	const rights = await userrights({ uuid })
+	const { uuid, rights, id, collaborators } = _kwargs
 	const { read, write } = modules.find(d => d.type === 'templates')?.rights
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 

@@ -94,7 +94,7 @@ const Media = function (kwargs) {
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 	// ADD REQUIREMENT
@@ -417,7 +417,7 @@ const Taglist = function (kwargs) {
 
 		meta.filter.addElems('button',  'add')
 			.on('click', _ => meta.recode(opencode))
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle_outline')
 	}
 	return meta
@@ -598,7 +598,7 @@ function uploadImg (kwargs) {
 		if(uploaderr.length){
 			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html(uploaderr[0].message  + '<i class="material-icons">done</i>')
+			.html(uploaderr[0].message  + '<i class="material-icons google-translate-attr">done</i>')
 		}
 		else {
 			notification = d3.select('body').addElem('div', 'notification')
@@ -686,12 +686,12 @@ function uploadVideo (kwargs) {
 		if(uploaderr.length){
 			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html(uploaderr[0].message  + '<i class="material-icons">done</i>')
+			.html(uploaderr[0].message  + '<i class="material-icons google-translate-attr">done</i>')
 		}
 		else {
 			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons">done</i>')
+			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons google-translate-attr">done</i>')
 		}
 		setTimeout(_ => notification.remove(), 4000)
 		if (editing) {
@@ -781,7 +781,7 @@ function addSection (kwargs) {
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			}).on('mouseup', _ => d3.event.stopPropagation())
-				.addElems('i', 'material-icons')
+				.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 
 			function rmSection () {
@@ -983,7 +983,7 @@ function addImg (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1042,7 +1042,7 @@ function addImg (kwargs) {
 				d3.select(this).classed('highlight', activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 				.html('add_photo_alternate')
 		}
 	}
@@ -1094,7 +1094,7 @@ function addMosaic (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1140,7 +1140,7 @@ function addMosaic (kwargs) {
 						if (!publicpage) switchButtons(lang)
 						else window.sessionStorage.setItem('changed-content', true)
 					}
-				}).addElems('i', 'material-icons')
+				}).addElems('i', 'material-icons google-translate-attr')
 					.html(d => d.label)
 			}
 		}
@@ -1191,7 +1191,7 @@ function addMosaic (kwargs) {
 				d3.select(this).classed('highlight', activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 				.html('add_photo_alternate')
 		}
 	}
@@ -1243,7 +1243,7 @@ function addVideo (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1279,7 +1279,7 @@ function addVideo (kwargs) {
 				d3.select(this).classed('highlight', activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 				.html('ondemand_video')
 		}
 	}
@@ -1362,7 +1362,7 @@ function addDrawing (kwargs) {
 					group.addElem('label', c.key).html('Brush size: ')
 					.addElems('span', 'size').html(`${opt.node().value}px`)
 				}
-				opt.addElems('i', 'material-icons', b => b.element === 'button' && b.key !== 'color' ? [b] : []).html(b => b.label)
+				opt.addElems('i', 'material-icons google-translate-attr', b => b.element === 'button' && b.key !== 'color' ? [b] : []).html(b => b.label)
 				// opt.addElems('span', 'constraint', b => b.key === 'constraint' ? [b] : [])
 					// .html(b => b.value - txt.length)
 			})
@@ -1560,7 +1560,7 @@ function addTxt (kwargs) {
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		})
-		opts.addElems('i', 'material-icons')
+		opts.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 		opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 			.html(d => d.value - txt.length)
@@ -1641,7 +1641,7 @@ function addEmbed (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1795,7 +1795,7 @@ function addChecklist (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1822,7 +1822,7 @@ function addChecklist (kwargs) {
 				})
 				list.call(addItem)
 			})
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle')
 	}
 
@@ -1859,7 +1859,7 @@ function addChecklist (kwargs) {
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
 			.attr('for', d => `check-item-${checklist_id}-${d.id}`)
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
 		opts.addElems('div', 'grow')
 			.addElems('label',  'list-item')
@@ -1892,7 +1892,7 @@ function addChecklist (kwargs) {
 
 		if (editing && !templated && level !== 'meta') {
 			opts.addElems('div', 'rm')
-				.addElems('i', 'material-icons')
+				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
 			.on('click', function (d) {
 				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
@@ -1983,7 +1983,7 @@ function addRadiolist (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -2010,7 +2010,7 @@ function addRadiolist (kwargs) {
 				})
 				list.call(addItem)
 			})
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle')
 	}
 
@@ -2045,7 +2045,7 @@ function addRadiolist (kwargs) {
 		opts.addElems('div', 'radio')
 			.addElems('label')
 			.attr('for', d => `radio-item-${radiolist_id}-${d.id}`)
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
 		opts.addElems('div', 'grow')
 			.addElems('label', 'list-item')
@@ -2078,7 +2078,7 @@ function addRadiolist (kwargs) {
 
 		if (editing && !templated && level !== 'meta') {
 			opts.addElems('div', 'rm')
-				.addElems('i', 'material-icons')
+				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
 			.on('click', function (d) {
 				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
@@ -2136,7 +2136,7 @@ function addLocations (kwargs) {
 		iconAnchor: [0, 24],
 		labelAnchor: [-6, 0],
 		popupAnchor: [0, -36],
-		html: '<i class="material-icons">place</i>'
+		html: '<i class="material-icons google-translate-attr">place</i>'
 	})
 
 	function rmPin (marker, container) {
@@ -2218,7 +2218,7 @@ function addLocations (kwargs) {
 
 		filter.addElems('button',  'search')
 			.on('click', searchLocation)
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('search')
 
 		async function searchLocation () {
@@ -2370,7 +2370,7 @@ function addIndexes (kwargs) {
 				const opt = list.opts.addElem('div', 'opt-group')
 					.datum({ key: 'constraint', label: 'block', value: constraint })
 					.addElems('button', 'opt active')
-				opt.addElems('i', 'material-icons')
+				opt.addElems('i', 'material-icons google-translate-attr')
 					.html(d => d.label)
 				opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 					.html(d => d.value - tags.length)
@@ -2414,7 +2414,7 @@ async function addTags (kwargs) {
 			const opt = list.opts.addElem('div', 'opt-group')
 				.datum({ key: 'constraint', label: 'block', value: constraint })
 				.addElems('button', 'opt active')
-			opt.addElems('i', 'material-icons')
+			opt.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 				.html(d => d.value - tags.length)
@@ -2454,7 +2454,7 @@ async function addAttachment (kwargs) {
 			const opt = meta.opts.addElem('div', 'opt-group')
 				.datum({ key: 'constraint', label: 'block', value: constraint })
 				.addElems('button', 'opt active')
-			opt.addElems('i', 'material-icons')
+			opt.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 				.html(d => d.value - srcs.length)
@@ -2536,7 +2536,7 @@ async function addAttachment (kwargs) {
 				kwargs.focus = true
 				kwargs.container = meta.container
 				addAttachment(kwargs)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 			.html('badge')
 		}
 	}
@@ -2576,7 +2576,7 @@ function addGroup (kwargs) {
 					}).call(addItems)
 					if (media.container.selectAll('.media-group-items').size() >= repeat) media.media.classed('hide', true)
 				})
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 				.html('add_circle')
 		}
 	}
@@ -2605,7 +2605,7 @@ function addGroup (kwargs) {
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 
 		function rmGroup (sel) { // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS

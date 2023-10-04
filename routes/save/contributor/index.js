@@ -13,9 +13,6 @@ module.exports = (req, res) => {
 		let checkPass = isPasswordSecure(password);
 		let extendedUrl =  `&reset_message=${checkPass}`;
 
-		if(!referer) {  // FIXME referer is not set on Azure but we kind of know that we are coming from the contributor page
-			referer = '/en/contribute/contributor';
-		}
 		if(referer?.includes('/contribute/contributor')){
 			extendedUrl = `?reset_message=${checkPass}`
 		}

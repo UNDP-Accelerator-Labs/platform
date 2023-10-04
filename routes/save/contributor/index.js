@@ -99,6 +99,7 @@ module.exports = (req, res) => {
 					return t.none(`
 						UPDATE users
 						SET name = $1,
+							email = $2
 							position = $3,
 							$4:raw
 							iso3 = $5,
@@ -150,6 +151,15 @@ module.exports = (req, res) => {
 
 				if (password?.trim().length > 0) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
+					await t.none(`
+						UPDATE trusted_devices
+						SET session_sid = NULL
+						WHERE session_sid IN (
+							SELECT sid
+							FROM session
+							WHERE sess ->> 'uuid' = $1
+						);
+						`, [uuid]);
 					await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [uuid])
 
 				} else {

@@ -340,6 +340,8 @@ CREATE TABLE public.trusted_devices (
   is_trusted BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW()
 );
+ALTER TABLE trusted_devices
+ADD COLUMN session_sid VARCHAR(255) REFERENCES session(sid);
 
 CREATE TABLE public.device_confirmation_code (
   id SERIAL PRIMARY KEY,

@@ -58,7 +58,7 @@ app.use(xss());
 const cookie = {
   httpOnly: true, // THIS IS ACTUALLY DEFAULT
   secure: process.env.NODE_ENV === "production",
-  maxAge: 5 * 1000 * 60 * 60 * 24 * 1, // 5 DAYS
+  maxAge: 1 * 1000 * 60 * 60 * 24 * 1, // DEFAULT TO 1 DAY. UPDATE TO 1 YEAR FOR TRUSTED DEVICES
   sameSite: "lax",
 };
 

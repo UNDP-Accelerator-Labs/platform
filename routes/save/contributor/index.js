@@ -99,7 +99,6 @@ module.exports = (req, res) => {
 					return t.none(`
 						UPDATE users
 						SET name = $1,
-							email = $2,
 							position = $3,
 							$4:raw
 							iso3 = $5,

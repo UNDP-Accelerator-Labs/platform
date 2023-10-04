@@ -3,7 +3,7 @@ const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 
 module.exports = (req, res) => {
-	let { referer } = req.headers || {}
+	const { referer } = req.headers || {}
 	const { uuid, rights: session_rights, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
@@ -12,7 +12,7 @@ module.exports = (req, res) => {
 	const referer_url = new URL(referer)
 	const referer_params = new URLSearchParams(referer_url.search)
 
-	if(password.length) { // THIS SHOULD TECHNICALLY BE HANDLED IN THE FRONT END NOW
+	if(password.length) {
 		let message = isPasswordSecure(password);
 		if (message.length) {
 			referer_params.set('errormessage', message);

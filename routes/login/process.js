@@ -134,7 +134,6 @@ module.exports = (req, res, next) => {
 				} else {
 					const { language, rights } = result
 					const device = deviceInfo(req)
-					// result.deviceInfo = device
 
 					let redirecturl;
 					if (redirectPath) {
@@ -153,8 +152,9 @@ module.exports = (req, res, next) => {
 						WHERE user_uuid = $1 
 						AND device_os = $2 
 						AND device_browser = $3 
+						AND device_name = $4 
 						AND is_trusted IS TRUE`,
-						[result.uuid, device.os, device.browser ]
+						[result.uuid, device.os, device.browser, device.device ]
 					).then(deviceResult => {
 						const { sessionID: sid } = req || {}
 						if (deviceResult) {

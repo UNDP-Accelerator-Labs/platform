@@ -1,6 +1,8 @@
 const { app_title, app_suite, app_languages, DB } = include('config/')
 const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
+const { deviceInfo, sendDeviceCode } = require('../../login/device-info')
+const { updateRecord } = require('./confirm-device')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -9,6 +11,7 @@ module.exports = (req, res) => {
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
 
+	let redirect_url;
 	const referer_url = new URL(referer)
 	const referer_params = new URLSearchParams(referer_url.search)
 
@@ -89,39 +92,101 @@ module.exports = (req, res) => {
 				INNER JOIN users u
 				ON u.uuid = c.host
 				WHERE c.contributor = $1
-			`, [ id ]).then(results => {
+			`, [ id ]).then(async results => {
 				if (id === uuid || results.some(d => d.host === uuid) || session_rights > 2) {
 					let update_pw = ''
 					if ((id === uuid || session_rights > 2) && password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
 					let update_rights = ''
 					if ((results.some(d => d.host === uuid) || session_rights > 2) && ![undefined, null].includes(rights)) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
+					
+					const u_user = await t.oneOrNone(`SELECT email, name FROM users WHERE uuid = $1`, [id])
+					//check if email or password is to be edited
+					if(u_user?.email != email || update_pw?.length > 0){
+						// CHECK IF DEVICE IS TRUSTED
+						const device = deviceInfo(req)
+							return t.oneOrNone(`
+								SELECT * FROM trusted_devices 
+								WHERE user_uuid = $1 
+								AND device_os = $2 
+								AND device_browser = $3 
+								AND device_name = $4 
+								AND is_trusted IS TRUE`,
+								[uuid, device.os, device.browser, device.device ]
+							).then(deviceResult => {
+								if (deviceResult) {
+									updateRecord({
+										conn: t,
+										data: [ 
+											/* $1 */ name, 
+											/* $2 */ email, 
+											/* $3 */ position, 
+											/* $4 */ update_pw, 
+											/* $5 */ iso3, 
+											/* $6 */ language, 
+											/* $7 */ JSON.stringify(secondary_languages || []), 
+											/* $8 */ update_rights,
+											/* $9 */ notifications || false, 
+											/* $10 */ reviewer || false, 
+											/* $11 */ id
+										]
+									}).catch(err => res.redirect('/module-error'))
+								} else {
+									req.session.confirm_dev_origins = {	
+										redirecturl : referer || '/login',
+										u_profile : [ 
+											/* $1 */ name, 
+											/* $2 */ email, 
+											/* $3 */ position, 
+											/* $4 */ update_pw, 
+											/* $5 */ iso3, 
+											/* $6 */ language, 
+											/* $7 */ JSON.stringify(secondary_languages || []), 
+											/* $8 */ update_rights,
+											/* $9 */ notifications || false, 
+											/* $10 */ reviewer || false, 
+											/* $11 */ id
+										],
+										uuid: id,
+									}
 
-					return t.none(`
-						UPDATE users
-						SET name = $1,
-							email = $2
-							position = $3,
-							$4:raw
-							iso3 = $5,
-							language = $6,
-							secondary_languages = $7,
-							$8:raw
-							notifications = $9,
-							reviewer = $10
-						WHERE uuid = $11
-					;`, [ 
-						/* $1 */ name, 
-						/* $2 */ email, 
-						/* $3 */ position, 
-						/* $4 */ update_pw, 
-						/* $5 */ iso3, 
-						/* $6 */ language, 
-						/* $7 */ JSON.stringify(secondary_languages || []), 
-						/* $8 */ update_rights,
-						/* $9 */ notifications || false, 
-						/* $10 */ reviewer || false, 
-						/* $11 */ id
-					])
+									// Device is not part of the trusted devices
+									sendDeviceCode({
+										name: u_user?.name, email: u_user?.email, uuid: id, conn: t
+									})
+									.then(()=>{
+										redirect_url = '/confirm-device'
+									}).catch(err => console.log(err))
+								}
+							})
+
+					}
+					else {
+						return t.none(`
+							UPDATE users
+							SET name = $1,
+								position = $3,
+								iso3 = $5,
+								language = $6,
+								secondary_languages = $7,
+								$8:raw
+								notifications = $9,
+								reviewer = $10
+							WHERE uuid = $11
+						;`, [ 
+							/* $1 */ name, 
+							/* $2 */ email, 
+							/* $3 */ position, 
+							/* $4 */ update_pw, 
+							/* $5 */ iso3, 
+							/* $6 */ language, 
+							/* $7 */ JSON.stringify(secondary_languages || []), 
+							/* $8 */ update_rights,
+							/* $9 */ notifications || false, 
+							/* $10 */ reviewer || false, 
+							/* $11 */ id
+						])
+					}
+					
 				} else return null
 			}).catch(err => console.log(err)))
 
@@ -218,7 +283,7 @@ module.exports = (req, res) => {
 			}).catch(err => console.log(err))
 			.catch(err => console.log(err))
 		}).then(_ => {
-			if (referer) res.redirect(referer)
+			if (redirect_url || referer) res.redirect(redirect_url || referer)
 			else res.redirect('/login')
 		}).catch(err => console.log(err))
 	}

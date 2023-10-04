@@ -33,12 +33,12 @@ exports.sendDeviceCode = (_kwarg) => {
         html: `<div>
                     <p>Dear ${name},</p>
                     <br/>
-                    <p>We have noticed that you recently attempted to log in to your account from a new device. 
-                    To ensure the security of your account, we require your confirmation before adding this device to your list of trusted devices.</p>
+                    <p>We have noticed that you recently attempted to log in or update your account from a new device. 
+                    To ensure the security of your account, we require your confirmation before adding this device to your list of trusted devices or update your record.</p>
                     <p>Please confirm this device using the OTP below:</p>
                     <h3>${code}</h3>
                     <p>This OTP will expire in 10 minutes.</p>
-                    <p>If you are receiving this email and did not try to log in to your account, your account might be compromised. Please reset your password or contact system administrators.</p>
+                    <p>If you are receiving this email and did not initiate this request, your account might be compromised. Please reset your password or contact system administrators.</p>
                     <br/>
                     <p>Best regards,</p>
                     <p>AccLab Global Team</p>

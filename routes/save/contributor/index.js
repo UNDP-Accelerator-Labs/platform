@@ -1,20 +1,23 @@
 const { app_title, app_suite, app_languages, DB } = include('config/')
 const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
-const { deviceInfo, sendDeviceCode } = require('../../login/device-info')
+const { deviceInfo, sendDeviceCode, checkDevice } = require('../../login/device-info')
 const { updateRecord } = require('./confirm-device')
 
-module.exports = (req, res) => {
+module.exports =async (req, res) => {
 	const { referer } = req.headers || {}
 	const { uuid, rights: session_rights, username } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
 
+	let logoutAll = false;
+
 	let redirect_url;
 	const referer_url = new URL(referer)
 	const referer_params = new URLSearchParams(referer_url.search)
 
+	const is_trusted = await checkDevice({ req, conn: DB.general })
 	if(password.length) { // THIS SHOULD TECHNICALLY BE HANDLED IN THE FRONT END NOW
 		let message = isPasswordSecure(password);
 		if (message.length) {
@@ -118,6 +121,7 @@ module.exports = (req, res) => {
 								[uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid  ]
 							).then(deviceResult => {
 								if (deviceResult) {
+									logoutAll = true;
 									updateRecord({
 										conn: t,
 										data: [ 
@@ -133,7 +137,8 @@ module.exports = (req, res) => {
 											/* $10 */ reviewer || false, 
 											/* $11 */ id
 										]
-									}).catch(err => res.redirect('/module-error'))
+									})
+									.catch(err => res.redirect('/module-error'))
 								} else {
 									req.session.confirm_dev_origins = {	
 										redirecturl : referer || '/login',
@@ -219,11 +224,10 @@ module.exports = (req, res) => {
 			return t.batch(batch)
 			.then(async _ => {
 
-				if (password?.trim().length > 0) {
+				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
 					await t.none(`
-						UPDATE trusted_devices
-						SET session_sid = NULL
+						DELETE FROM trusted_devices
 						WHERE session_sid IN (
 							SELECT sid
 							FROM session

@@ -24,11 +24,25 @@ exports.confirmDevice = async (req, res, next) => {
       )
       .then((result) => {
         if (result) {
+          //UPDATE PROFILE LOGIC 
           if (u_profile) {
             updateRecord({
               conn: t,
               data: u_profile,
-            }).catch((err) => console.log(err));
+            })
+            .then(async ()=>{
+              await t.none(`
+              DELETE FROM trusted_devices
+              WHERE session_sid IN (
+                SELECT sid
+                FROM session
+                WHERE sess ->> 'uuid' = $1
+              );
+              `, [uuid]);
+              await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [uuid])
+
+            })
+            .catch((err) => console.log(err));
           }
           // Code exists, add device info to the list of trusted devices
           return t.none(
@@ -44,7 +58,7 @@ exports.confirmDevice = async (req, res, next) => {
       .then(() => {
         return t.none(
           `
-              DELETE FROM device_confirmation_code WHERE code = $1 AND user_uuid = $2`,
+              DELETE FROM device_confirmation_code WHERE user_uuid = $2`,
           [otp, uuid]
         );
       })

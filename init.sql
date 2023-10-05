@@ -338,14 +338,13 @@ CREATE TABLE public.trusted_devices (
   device_browser VARCHAR(255) NOT NULL,
   last_login TIMESTAMP NOT NULL,
   is_trusted BOOLEAN NOT NULL DEFAULT true,
+  session_sid VARCHAR(255) REFERENCES session(sid),
+  duuid1 UUID NOT NULL,
+  duuid2 UUID NOT NULL,
+  duuid3 UUID NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
-ALTER TABLE trusted_devices
-ADD COLUMN session_sid VARCHAR(255) REFERENCES session(sid);
-ALTER TABLE public.trusted_devices
-    ADD COLUMN duuid1 UUID,
-    ADD COLUMN duuid2 UUID,
-    ADD COLUMN duuid3 UUID;
+
 
 CREATE TABLE public.device_confirmation_code (
   id SERIAL PRIMARY KEY,

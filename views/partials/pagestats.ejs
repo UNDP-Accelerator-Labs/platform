@@ -1,7 +1,7 @@
 <%
     const pagestats = locals.pagestats ?? {};
     const originalUrl = locals.metadata.page.originalUrl;
-    const { id, docType } = pagestats;
+    const { id, docType } = locals.metadata?.user?.pagestats || {};
     const readTime = 6000;  // time it takes to register a read in milliseconds
     const docTypes = ['pad', 'template', 'pinboard', 'team', 'country'];
 %>

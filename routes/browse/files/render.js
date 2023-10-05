@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
 const load = require('./load/')
 const filter = require('./filter.js')
 
-module.exports = async (req, res) => { 
+module.exports = async (req, res) => {
 	const { public } = req.session || {}
 
 	if (public) res.redirect('/login')
@@ -18,9 +18,9 @@ module.exports = async (req, res) => {
 
 		DB.conn.tx(async t => {
 			// const { pagetitle, path, uuid, username, country, rights, language, query, templates, participations } = await header_data({ connection: t, req: req })
-			
+
 			const batch = []
-			
+
 			// FILES DATA
 			batch.push(load.data({ connection: t, req }))
 			// GET THE FILTERS FOR THE filters_MENU
@@ -33,9 +33,9 @@ module.exports = async (req, res) => {
 
 			return t.batch(batch)
 			.then(async results => {
-				let [ data, 
+				let [ data,
 					filters_menu,
-					statistics, 
+					statistics,
 					// locations
 				] = results
 
@@ -49,18 +49,18 @@ module.exports = async (req, res) => {
 				// 					d.tag_name = sdgs.find(s => +s.key === +d.tag_id)?.name
 				// 				})
 				// 				resolve()
-				// 			}).catch(err => console.log(err))					
+				// 			}).catch(err => console.log(err))
 				// 	} else resolve()
 				// })
-				
-				return { 
+
+				return {
 					metadata : {
 						site: {
 							modules,
 							metafields
 						},
 						page: {
-							title: pagetitle, 
+							title: pagetitle,
 							path,
 							id: page,
 							count: Math.ceil((helpers.array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit),
@@ -81,17 +81,21 @@ module.exports = async (req, res) => {
 							name: username,
 							country,
 							centerpoint: JSON.stringify(req.session.country?.lnglat || {}),
-							rights
+							rights,
+							pagestats: {
+								id: req.session.read_doc_id,
+								docType: req.session.read_doc_type,
+							},
 						}
 					},
-					stats: { 
-						total: helpers.array.sum.call(statistics.total, 'count'), 
-						filtered: helpers.array.sum.call(statistics.filtered, 'count'), 
-						
+					stats: {
+						total: helpers.array.sum.call(statistics.total, 'count'),
+						filtered: helpers.array.sum.call(statistics.filtered, 'count'),
+
 						private: statistics.private,
 						shared: statistics.shared,
 						public: statistics.public,
-						
+
 						displayed: data.count,
 						breakdown: statistics.filtered,
 						persistent_breakdown: statistics.total,
@@ -103,8 +107,8 @@ module.exports = async (req, res) => {
 
 					data: data.data, // STILL NEED THIS FOR THE MAP AND PIE CHARTS. ULTIMATELY REMOVE WHEN NEW EXPLORE VIEW IS CREATED
 					sections: data.sections
-					
-					// locations: JSON.stringify(locations), 
+
+					// locations: JSON.stringify(locations),
 					// clusters: JSON.stringify(clusters)
 				}
 			})

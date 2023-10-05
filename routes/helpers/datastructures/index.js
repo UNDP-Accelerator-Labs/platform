@@ -19,6 +19,7 @@ const {
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array');
+const { checkDevice } = require('../../login/device-info');
 
 function stripExplorationId(url) {
 	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
@@ -50,12 +51,13 @@ exports.sessiondata = _data => {
 
 	return obj
 }
-exports.sessionsummary = _kwargs => {
+exports.sessionsummary = async _kwargs => {
 	const conn = _kwargs.connection || DB.general
-	const { uuid } = _kwargs
+	const { uuid, req } = _kwargs
+	const is_trusted = await checkDevice({ req, conn })
 
 	return new Promise(resolve => {
-		if (uuid) {
+		if (uuid && is_trusted) {
 			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
 			.then(sessions => {
 				if (sessions) {
@@ -65,13 +67,13 @@ exports.sessionsummary = _kwargs => {
 						d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
 					})
 
-					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey' })
+					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
 					.map(d => {
 						const { values, ...data } = d
 						return data
 					})
 					const total = array.sum.call(sessions, 'count')
-					sessions.push({ key: 'All', count: total })
+					sessions.push({ key: 'All', count: total, app: 'All' })
 					resolve(sessions)
 				}
 			}).catch(err => console.log(err))
@@ -243,7 +245,7 @@ exports.pagemetadata = (_kwargs) => {
 		}
 		if (hasJustLoggedIn) {
 			// GET MULTI-SESSION INFO
-			batch.push(this.sessionsummary({ uuid }));
+			batch.push(this.sessionsummary({ uuid, req }));
 		} else {
 			batch.push(null);
 		}

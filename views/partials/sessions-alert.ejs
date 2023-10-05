@@ -21,7 +21,7 @@
 						<td><%- d.key ? d.key : 'Undefined' %></td>
 						<!-- TO DO: TRANSLATE undefined -->
 						<td <% if (d.count > 1 || !d.key) { %>class='highlight'<% } %>><%- d.count %></td>
-						<td><button type='submit' name='app' value='<%- d.key %>'>Log out of <% if (d.key === 'All') { %>all <% } %>sessions</button></td>
+						<td><button type='submit' name='app' value='<%- d.app %>'>Log out of <% if (d.key === 'All') { %>all <% } %>sessions</button></td>
 						<!-- TO DO: TRANSLATE -->
 					</tr>
 					<% }) %>

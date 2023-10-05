@@ -1,3 +1,5 @@
+const { checkDevice } = require("../../login/device-info")
+
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
 const { checklanguage, datastructures } = include('routes/helpers/')
 
@@ -15,7 +17,7 @@ module.exports = async (req, res) => {
 
 		DB.general.tx(async t => {
 			return check_authorization({ connection: t, id, uuid, rights, public })
-			.then(result => {
+			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
 					if (referer) return res.redirect(referer)
@@ -100,7 +102,8 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
-					if(uuid === id){
+					const is_trusted = await checkDevice({ req, conn: t })
+					if(uuid === id && is_trusted){
 						batch.push(t.any(`
 						SELECT *
 						FROM trusted_devices

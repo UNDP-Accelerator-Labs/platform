@@ -154,6 +154,7 @@ module.exports = (req, res) => {
 										name: u_user?.name, email: u_user?.email, uuid: id, conn: t
 									})
 									.then(()=>{
+										req.session.page_message = "This action can ONLY be performed on trusted devices."
 										redirect_url = '/confirm-device'
 									}).catch(err => console.log(err))
 								}

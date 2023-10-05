@@ -10,8 +10,7 @@ module.exports = async (req, res) => {
 		await DB.general.tx(async t => {
 			// Update the trusted_devices table
 			await t.none(`
-			  UPDATE trusted_devices
-			  SET session_sid = NULL
+			DELETE FROM  trusted_devices
 			  WHERE session_sid IN (
 				SELECT sid
 				FROM session
@@ -27,8 +26,7 @@ module.exports = async (req, res) => {
 		await DB.general.tx(async t => {
 			// Update the trusted_devices table
 			await t.none(`
-			  UPDATE trusted_devices
-			  SET session_sid = NULL
+			  DELETE FROM  trusted_devices
 			  WHERE session_sid IN (
 				SELECT sid
 				FROM session
@@ -44,8 +42,7 @@ module.exports = async (req, res) => {
 		await DB.general.tx(async t => {
 			// Update the trusted_devices table
 			await t.none(`
-			  UPDATE trusted_devices
-			  SET session_sid = NULL
+			  DELETE FROM  trusted_devices
 			  WHERE session_sid IN (
 				SELECT sid
 				FROM session

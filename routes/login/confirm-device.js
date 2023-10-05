@@ -67,6 +67,12 @@ exports.confirmDevice = async (req, res, next) => {
           ); // 1 year from now
           req.session.cookie.expires = sessionExpiration;
           req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
+          
+          req.session.page_message = null
+          req.session.device = {
+            ...device,
+            is_trusted : true
+          }
           res.redirect(redirecturl);
           req.session.confirm_dev_origins = null;
         }

@@ -3,12 +3,12 @@ const getResetToken = require('./forget-password').getResetToken
 
 module.exports = async (req, res, next) => {
 	const { originalUrl, path } = req || {}
-	const { errormessage, successmessage } = req.session || {}
+	const { errormessage, successmessage, page_message } = req.session || {}
 
 	const { token } = req.params;
 
 	const metadata = await datastructures.pagemetadata({ req, res })
-	const data = Object.assign(metadata, { originalUrl, errormessage, successmessage })
+	const data = Object.assign(metadata, { originalUrl, errormessage, successmessage, page_message })
 
 	if(path === '/forget-password'){
 		return res.render('forget-password', data)

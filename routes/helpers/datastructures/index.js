@@ -53,11 +53,10 @@ exports.sessiondata = _data => {
 }
 exports.sessionsummary = async _kwargs => {
 	const conn = _kwargs.connection || DB.general
-	const { uuid, req } = _kwargs
-	const is_trusted = await checkDevice({ req, conn })
+	const { uuid } = _kwargs
 
 	return new Promise(resolve => {
-		if (uuid && is_trusted) {
+		if (uuid) {
 			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
 			.then(sessions => {
 				if (sessions) {
@@ -245,7 +244,7 @@ exports.pagemetadata = (_kwargs) => {
 		}
 		if (hasJustLoggedIn) {
 			// GET MULTI-SESSION INFO
-			batch.push(this.sessionsummary({ uuid, req }));
+			batch.push(this.sessionsummary({ uuid }));
 		} else {
 			batch.push(null);
 		}

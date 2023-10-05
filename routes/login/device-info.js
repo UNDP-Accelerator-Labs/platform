@@ -1,4 +1,3 @@
-const sendEmail = require("../helpers").email;
 
 exports.deviceInfo = (req) => {
   const userAgent = req.headers["user-agent"];
@@ -11,9 +10,11 @@ exports.deviceInfo = (req) => {
   return { device, os, browser };
 };
 
-exports.sendDeviceCode = (_kwarg) => {
-  const { conn, uuid, email, name } = _kwarg;
 
+exports.sendDeviceCode = (_kwarg) => {
+  const { email : sendEmail } = include('routes/helpers/')
+  
+  const { conn, uuid, email, name } = _kwarg;
   const code = Math.floor(Math.random() * 1000000);
   const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 

@@ -1,5 +1,3 @@
-const { checkDevice } = require("../../login/device-info")
-
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
 const { checklanguage, datastructures } = include('routes/helpers/')
 
@@ -9,8 +7,8 @@ module.exports = async (req, res) => {
 	if (public) res.redirect('/login')
 	else {
 		const { referer } = req.headers || {}
-		const { object } = req.params || {}
-		const { id, errormessage } = req.query || {}
+		const { id, errormessage, u_errormessage } = req.query || {}
+		
 		const language = checklanguage(req.params?.language || req.session.language)
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
@@ -102,8 +100,7 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
-					const is_trusted = await checkDevice({ req, conn: t })
-					if(uuid === id && is_trusted){
+					if(uuid === id){
 						batch.push(t.any(`
 						SELECT *
 						FROM trusted_devices
@@ -124,7 +121,7 @@ module.exports = async (req, res) => {
 						}))
 						const metadata = await datastructures.pagemetadata({ req })
 
-						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices })
+						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices, u_errormessage })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}

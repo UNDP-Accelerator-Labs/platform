@@ -58,6 +58,9 @@
 					<% if(!locals.data?.uuid && locals.errormessage) { %>
 						<p class='lead errormessage' ><%- locals.errormessage.replace(/\n/g, '<br>') %></p>
 					<% } %>
+					<% if(locals.data?.uuid && locals.u_errormessage) { %>
+						<p class='lead errormessage' ><%- locals.u_errormessage.replace(/\n/g, '<br>') %></p>
+					<% } %>
 					<div class='main-info info'>
 						<ul>
 							<li>

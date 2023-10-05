@@ -117,10 +117,15 @@ exports.removeDevice = async (req, res) => {
   const { referer } = req.headers || {};
   const { uuid, language } = req.session;
 
+  const referer_url = new URL(referer || `/${language}/edit/contributor?id=${uuid}`)
+	const referer_params = new URLSearchParams(referer_url.search)
+
   try {
     await DB.general.tx(async (t) => {
       //ALLOW REMOVE OF DEVICE ONLY FROM TRUSTED DEVICES
       const is_trusted = await checkDevice({req, conn: t})
+      if(!is_trusted) referer_params.set('u_errormessage', 'This action can only be authorized on trusted devices.'); 
+
       if(is_trusted){
         const sid = await t.oneOrNone('SELECT session_sid FROM trusted_devices WHERE id = $1 AND user_uuid = $2', [id, uuid], d => d.session_sid )
   
@@ -129,7 +134,7 @@ exports.removeDevice = async (req, res) => {
       }
 
     });
-    res.redirect(referer || `/${language}/edit/contributor?id=${uuid}`);
+    res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);
   } catch (err) {
     console.log('err ', err)
     res.redirect("/module-error");

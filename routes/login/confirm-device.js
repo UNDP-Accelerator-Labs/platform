@@ -106,17 +106,18 @@ exports.removeDevice = async (req, res) => {
   const { referer } = req.headers || {};
   const { uuid, language } = req.session;
 
-  DB.general
-    .oneOrNone(
-      `
-        DELETE FROM trusted_devices WHERE id = $1 AND user_uuid = $2
-    `,
-      [id, uuid]
-    )
-    .then(() => {
-      res.redirect(referer || `/${language}/edit/contributor?id=${uuid}`);
-    })
-    .catch((err) => {
-      res.redirect("/module-error");
+  try {
+    await DB.general.tx(async (t) => {
+      const sid = await t.oneOrNone('SELECT session_sid FROM trusted_devices WHERE id = $1 AND user_uuid = $2', [id, uuid], d => d.session_sid )
+  
+      await t.none('DELETE FROM trusted_devices WHERE id = $1 AND user_uuid = $2', [id, uuid]);
+      await t.none('DELETE FROM session WHERE sid = $1', [sid]);
     });
+    res.redirect(referer || `/${language}/edit/contributor?id=${uuid}`);
+  } catch (err) {
+    console.log('err ', err)
+    res.redirect("/module-error");
+  }
 };
+
+

@@ -1,14 +1,15 @@
 const { app_languages, modules, app_suite, DB } = include('config/')
 const { datastructures } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
-const deviceInfo = require('./device-info').deviceInfo
-const sendDeviceCode = require('./device-info').sendDeviceCode
+const {deviceInfo, sendDeviceCode } = require('./device-info')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
 	const { path, ip: ownIp } = req || {}
+
+	const { __ucd_app, __puid, __cduid } = req.cookies
 
 	if (token) {
 		// VERIFY TOKEN
@@ -134,7 +135,7 @@ module.exports = (req, res, next) => {
 				} else {
 					const { language, rights } = result
 					const device = deviceInfo(req)
-
+					
 					let redirecturl;
 					if (redirectPath) {
 						redirecturl = redirectPath
@@ -153,8 +154,11 @@ module.exports = (req, res, next) => {
 						AND device_os = $2 
 						AND device_browser = $3 
 						AND device_name = $4 
+						AND duuid1 = $5
+						AND duuid2 = $6
+						AND duuid3 = $7
 						AND is_trusted IS TRUE`,
-						[result.uuid, device.os, device.browser, device.device ]
+						[result.uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid ]
 					).then(deviceResult => {
 						const { sessionID: sid } = req || {}
 						if (deviceResult) {

@@ -99,6 +99,7 @@ module.exports = (req, res) => {
 					let update_rights = ''
 					if ((results.some(d => d.host === uuid) || session_rights > 2) && ![undefined, null].includes(rights)) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
 					
+					const { __ucd_app, __puid, __cduid } = req.cookies
 					const u_user = await t.oneOrNone(`SELECT email, name FROM users WHERE uuid = $1`, [id])
 					//check if email or password is to be edited
 					if(u_user?.email != email || update_pw?.length > 0){
@@ -110,8 +111,11 @@ module.exports = (req, res) => {
 								AND device_os = $2 
 								AND device_browser = $3 
 								AND device_name = $4 
+								AND duuid1 = $5
+								AND duuid2 = $6
+								AND duuid3 = $7
 								AND is_trusted IS TRUE`,
-								[uuid, device.os, device.browser, device.device ]
+								[uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid  ]
 							).then(deviceResult => {
 								if (deviceResult) {
 									updateRecord({

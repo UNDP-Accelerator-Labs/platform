@@ -16,6 +16,7 @@ const upload = multer({ dest: "./tmp" });
 const fs = require("fs");
 const helmet = require("helmet");
 const { xss } = require('express-xss-sanitizer');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 app.disable("x-powered-by");
@@ -73,6 +74,7 @@ const sessionMiddleware = session({
 });
 
 app.use(sessionMiddleware);
+app.use(cookieParser());
 
 function setAccessControlAllowOrigin(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");

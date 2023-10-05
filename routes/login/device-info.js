@@ -46,3 +46,33 @@ exports.sendDeviceCode = (_kwarg) => {
       });
     });
 };
+
+exports.checkDevice = async (_kwarg) => {
+  const { conn, req } = _kwarg;
+  const { uuid } = req.session;
+  const { __ucd_app, __puid, __cduid } = req.cookies;
+  const device = this.deviceInfo(req);
+
+  return conn.oneOrNone(
+    `
+        SELECT * FROM trusted_devices 
+          WHERE user_uuid = $1 
+          AND device_os = $2 
+          AND device_browser = $3 
+          AND device_name = $4 
+          AND duuid1 = $5
+          AND duuid2 = $6
+          AND duuid3 = $7
+          AND is_trusted IS TRUE`,
+    [
+      uuid,
+      device.os,
+      device.browser,
+      device.device,
+      __ucd_app,
+      __puid,
+      __cduid,
+    ],
+    (d) => (d?.id ? true : false)
+  );
+};

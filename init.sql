@@ -342,6 +342,10 @@ CREATE TABLE public.trusted_devices (
 );
 ALTER TABLE trusted_devices
 ADD COLUMN session_sid VARCHAR(255) REFERENCES session(sid);
+ALTER TABLE public.trusted_devices
+    ADD COLUMN duuid1 UUID,
+    ADD COLUMN duuid2 UUID,
+    ADD COLUMN duuid3 UUID;
 
 CREATE TABLE public.device_confirmation_code (
   id SERIAL PRIMARY KEY,

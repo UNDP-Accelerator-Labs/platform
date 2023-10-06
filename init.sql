@@ -336,13 +336,13 @@ CREATE TABLE public.trusted_devices (
   device_type VARCHAR(255),
   device_os VARCHAR(255) NOT NULL,
   device_browser VARCHAR(255) NOT NULL,
-  last_login TIMESTAMP NOT NULL,
+  last_login TIMESTAMP with time zone NOT NULL,
   is_trusted BOOLEAN NOT NULL DEFAULT true,
   session_sid VARCHAR(255) REFERENCES session(sid),
   duuid1 UUID NOT NULL,
   duuid2 UUID NOT NULL,
   duuid3 UUID NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP with time zone DEFAULT NOW()
 );
 
 
@@ -350,5 +350,5 @@ CREATE TABLE public.device_confirmation_code (
   id SERIAL PRIMARY KEY,
   user_uuid UUID NOT NULL,
   code INTEGER NOT NULL,
-  expiration_time TIMESTAMP NOT NULL
+  expiration_time TIMESTAMP with time zone NOT NULL
 );

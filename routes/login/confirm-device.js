@@ -18,13 +18,12 @@ exports.confirmDevice = async (req, res, next) => {
   DB.general.tx((t) => {
     return t
       .oneOrNone(
-        `
-            SELECT * FROM device_confirmation_code WHERE code = $1 AND user_uuid = $2`,
+        `SELECT * FROM device_confirmation_code WHERE code = $1 AND user_uuid = $2 AND expiration_time > NOW()`,
         [otp, uuid]
       )
       .then((result) => {
         if (result) {
-          //UPDATE PROFILE LOGIC 
+          //UPDATE PROFILE LOGIC
           if (u_profile) {
             updateRecord({
               conn: t,
@@ -45,27 +44,28 @@ exports.confirmDevice = async (req, res, next) => {
             .catch((err) => console.log(err));
           }
           // Code exists, add device info to the list of trusted devices
-          return t.none(
-            `
-                  INSERT INTO trusted_devices (user_uuid, device_name, device_os, device_browser, last_login, session_sid, duuid1, duuid2, duuid3, is_trusted)
-                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true)`,
+          return t.none(`
+            INSERT INTO trusted_devices (user_uuid, device_name, device_os, device_browser, last_login, session_sid, duuid1, duuid2, duuid3, is_trusted)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true)`,
             [uuid, device.device, device.os, device.browser, new Date(), sid, deviceGUID1, deviceGUID2, deviceGUID3]
           );
         } else {
-          throw new Error("Invalid OTP");
+          t.none(`DELETE FROM device_confirmation_code WHERE expiration_time <= NOW()`).then(() => {
+            throw new Error("Invalid OTP");
+          }).catch(() => {
+            throw new Error("Invalid OTP");
+          });
         }
       })
       .then(() => {
         return t.none(
-          `
-              DELETE FROM device_confirmation_code WHERE user_uuid = $2`,
+          `DELETE FROM device_confirmation_code WHERE user_uuid = $2`,
           [otp, uuid]
         );
       })
       .then(async () => {
         //LOG OUT USER EVERYWHERE WHEN USER CHANGES PASSWORD
         if (u_profile?.[3].length) {
-
           await t.none(`
 						UPDATE trusted_devices
 						SET session_sid = NULL
@@ -86,17 +86,17 @@ exports.confirmDevice = async (req, res, next) => {
           ); // 1 year from now
           req.session.cookie.expires = sessionExpiration;
           req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
-          
+
           req.session.page_message = null
           req.session.device = {
             ...device,
             is_trusted : true
           }
 
-          res.cookie('__ucd_app', deviceGUID1, { sessionExpiration }); 
-          res.cookie('__puid', deviceGUID2, { sessionExpiration }); 
-          res.cookie('__cduid', deviceGUID3, { sessionExpiration }); 
-          
+          res.cookie('__ucd_app', deviceGUID1, { sessionExpiration });
+          res.cookie('__puid', deviceGUID2, { sessionExpiration });
+          res.cookie('__cduid', deviceGUID3, { sessionExpiration });
+
           res.redirect(redirecturl);
           req.session.confirm_dev_origins = null;
         }
@@ -138,11 +138,11 @@ exports.removeDevice = async (req, res) => {
     await DB.general.tx(async (t) => {
       //ALLOW REMOVE OF DEVICE ONLY FROM TRUSTED DEVICES
       const is_trusted = await checkDevice({req, conn: t})
-      if(!is_trusted) referer_params.set('u_errormessage', 'This action can only be authorized on trusted devices.'); 
+      if(!is_trusted) referer_params.set('u_errormessage', 'This action can only be authorized on trusted devices.');
 
       if(is_trusted){
         const sid = await t.oneOrNone('SELECT session_sid FROM trusted_devices WHERE id = $1 AND user_uuid = $2', [id, uuid], d => d.session_sid )
-  
+
         await t.none('DELETE FROM trusted_devices WHERE id = $1 AND user_uuid = $2', [id, uuid]);
         await t.none('DELETE FROM session WHERE sid = $1', [sid]);
       }

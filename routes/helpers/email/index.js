@@ -3,7 +3,7 @@ const nodeMailer = require('nodemailer')
 const sgMail = require('@sendgrid/mail');
 
 module.exports = (kwargs) => {
-	// if (process.env.NODE_ENV === "local") {
+	if (process.env.NODE_ENV === "production") {
 		const { SENDGRID_API_KEY, SENDER_IDENTITY, EMAIL_REPLY_RECIPEINT } = process.env;
 		sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -23,7 +23,7 @@ module.exports = (kwargs) => {
 			};
 
 			return new Promise(resolve => {
-				// if (process.env.NODE_ENV === 'production') {
+				if (process.env.NODE_ENV === "production") {
 					sgMail.send(msg)
 					.then(() => {}, error => {
 						if (error.response) {
@@ -31,18 +31,16 @@ module.exports = (kwargs) => {
 						}
 						resolve({ status: 200, message: `Message sent!` })
 					  });
-				// } else {
-				// 	console.log('should not send email because not in production')
-				// 	resolve(null)
-				// }
+				} else {
+					console.log('should not send email because not in production')
+					resolve(null)
+				}
 			})
 		} catch (error) {
 			console.error('Error sending email:', error);
 		}
-	// } else {
-	// 	console.log('working locally so no need to send email')
-	// 	return new Promise(resolve => resolve(null))
-	// }
+	} else {
+		console.log('working locally so no need to send email')
+		return new Promise(resolve => resolve(null))
+	}
 }
-
-

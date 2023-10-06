@@ -18,7 +18,8 @@ const {
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
-const array = require('../array')
+const array = require('../array');
+const { checkDevice } = require('../../login/device-info');
 
 function stripExplorationId(url) {
 	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
@@ -27,7 +28,7 @@ function stripExplorationId(url) {
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
-	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
@@ -46,10 +47,11 @@ exports.sessiondata = _data => {
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
 	obj.app = title
+	obj.device = device || {}
 
 	return obj
 }
-exports.sessionsummary = _kwargs => {
+exports.sessionsummary = async _kwargs => {
 	const conn = _kwargs.connection || DB.general
 	const { uuid } = _kwargs
 
@@ -59,13 +61,18 @@ exports.sessionsummary = _kwargs => {
 			.then(sessions => {
 				if (sessions) {
 					// EXTRACT SESSION DATA
-					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'app' })
-						.map(d => {
-							const { values, ...data } = d
-							return data
-						})
+					const sessionsArr = sessions.map(d => d.sess)
+					sessionsArr.forEach(d => {
+						d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
+					})
+
+					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
+					.map(d => {
+						const { values, ...data } = d
+						return data
+					})
 					const total = array.sum.call(sessions, 'count')
-					sessions.push({ key: 'All', count: total })
+					sessions.push({ key: 'All', count: total, app: 'All' })
 					resolve(sessions)
 				}
 			}).catch(err => console.log(err))

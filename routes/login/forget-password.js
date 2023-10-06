@@ -131,6 +131,24 @@ exports.updatePassword = async (req, res, next) => {
           await DB.general.none(`
           UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
         `, [password, decoded.email]);
+
+        //DELETE ALL ACTIVE SESSION
+        await DB.general.tx(t =>{
+            t.none(`
+            DELETE FROM trusted_devices
+            WHERE session_sid IN (
+            SELECT sid
+            FROM session
+            WHERE sess ->> 'email' = $1
+            );
+          `, [decoded.email])
+
+            t.none(`
+            DELETE FROM session WHERE sess ->> 'email' = $1
+          `, [decoded.email])
+
+          }).catch(err => console.log(err))
+
         // Redirect the user to the login page
         res.redirect('/login');
     } else {

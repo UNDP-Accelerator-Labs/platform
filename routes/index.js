@@ -169,6 +169,9 @@ exports.dispatch.public = require('./browse/homepage').render //require('./login
 exports.process.forgetPassword = require('./login/').forgetPassword
 exports.process.getResetToken = require('./login/').getResetToken
 exports.process.updatePassword = require('./login/').updatePassword
+exports.process.confirmDevice = require('./login').confirmDevice
+exports.process.resendCode = require('./login').resendCode
+exports.process.removeDevice = require('./login').removeDevice
 
 exports.process.logout = require('./logout/')
 

@@ -3,7 +3,7 @@ const { DB } = include('config/')
 module.exports = async (req, res) => {
 	const { uuid } = req.session || {}
 	await DB.general.none(`
-		DELETE FROM  trusted_devices
+		DELETE FROM trusted_devices
 		WHERE session_sid IN (
 		SELECT sid
 		FROM session

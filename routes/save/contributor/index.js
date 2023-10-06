@@ -31,17 +31,17 @@ module.exports =async (req, res) => {
 				INSERT INTO users (name, email, position, password, iso3, language, secondary_languages, rights, notifications, reviewer)
 				VALUES ($1, $2, $3, crypt($4, GEN_SALT('bf', 8)), $5, $6, $7, $8, $9, $10)
 				RETURNING uuid
-			;`, [ 
-				/* $1 */ name, 
-				/* $2 */ email, 
-				/* $3 */ position, 
-				/* $4 */ password, 
-				/* $5 */ iso3, 
-				/* $6 */ language, 
-				/* $7 */ JSON.stringify(secondary_languages || []), 
-				/* $8 */ rights, 
-				/* $9 */ notifications || false, 
-				/* $10 */ reviewer || false 
+			;`, [
+				/* $1 */ name,
+				/* $2 */ email,
+				/* $3 */ position,
+				/* $4 */ password,
+				/* $5 */ iso3,
+				/* $6 */ language,
+				/* $7 */ JSON.stringify(secondary_languages || []),
+				/* $8 */ rights,
+				/* $9 */ notifications || false,
+				/* $10 */ reviewer || false
 			], d => d.uuid)
 			.then(result => {
 				const batch = []
@@ -49,7 +49,7 @@ module.exports =async (req, res) => {
 					INSERT INTO cohorts (contributor, host)
 					VALUES ($1, $2)
 				;`, [ result, uuid ]))
-				
+
 				if (teams?.length > 0) {
 					teams.forEach(d => {
 						batch.push(t.none(`
@@ -63,7 +63,7 @@ module.exports =async (req, res) => {
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						await sendemail({
-							to: email, 
+							to: email,
 							bcc: 'myjyby@gmail.com',
 							subject: `[${app_title}] An account has been created for you`,
 							html: `${username} has created an account for you to access the ${app_title} application.`
@@ -101,76 +101,73 @@ module.exports =async (req, res) => {
 					if ((id === uuid || session_rights > 2) && password?.trim().length > 0) update_pw = DB.pgp.as.format(`password = crypt($1, GEN_SALT('bf', 8)),`, [ password ])
 					let update_rights = ''
 					if ((results.some(d => d.host === uuid) || session_rights > 2) && ![undefined, null].includes(rights)) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
-					
+
 					const { __ucd_app, __puid, __cduid } = req.cookies
 					const u_user = await t.oneOrNone(`SELECT email, name FROM users WHERE uuid = $1`, [id])
 					//check if email or password is to be edited
+					// TO DO: FIXME send an email to the new address to confirm that the new address actually exists
 					if(u_user?.email != email || update_pw?.length > 0){
 						// CHECK IF DEVICE IS TRUSTED
 						const device = deviceInfo(req)
-							return t.oneOrNone(`
-								SELECT * FROM trusted_devices 
-								WHERE user_uuid = $1 
-								AND device_os = $2 
-								AND device_browser = $3 
-								AND device_name = $4 
-								AND duuid1 = $5
-								AND duuid2 = $6
-								AND duuid3 = $7
-								AND is_trusted IS TRUE`,
-								[uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid  ]
-							).then(deviceResult => {
-								if (deviceResult) {
-									logoutAll = true;
-									updateRecord({
-										conn: t,
-										data: [ 
-											/* $1 */ name, 
-											/* $2 */ email, 
-											/* $3 */ position, 
-											/* $4 */ update_pw, 
-											/* $5 */ iso3, 
-											/* $6 */ language, 
-											/* $7 */ JSON.stringify(secondary_languages || []), 
-											/* $8 */ update_rights,
-											/* $9 */ notifications || false, 
-											/* $10 */ reviewer || false, 
-											/* $11 */ id
-										]
-									})
-									.catch(err => res.redirect('/module-error'))
-								} else {
-									req.session.confirm_dev_origins = {	
-										redirecturl : referer || '/login',
-										u_profile : [ 
-											/* $1 */ name, 
-											/* $2 */ email, 
-											/* $3 */ position, 
-											/* $4 */ update_pw, 
-											/* $5 */ iso3, 
-											/* $6 */ language, 
-											/* $7 */ JSON.stringify(secondary_languages || []), 
-											/* $8 */ update_rights,
-											/* $9 */ notifications || false, 
-											/* $10 */ reviewer || false, 
-											/* $11 */ id
-										],
-										uuid: id,
-									}
-
-									// Device is not part of the trusted devices
-									sendDeviceCode({
-										name: u_user?.name, email: u_user?.email, uuid: id, conn: t
-									})
-									.then(()=>{
-										req.session.page_message = "This action can be performed exclusively on trusted devices. All active sessions will be terminated, and the user will need to log in again and confirm their trusted devices."
-										redirect_url = '/confirm-device'
-									}).catch(err => console.log(err))
+						return t.oneOrNone(`
+							SELECT * FROM trusted_devices
+							WHERE user_uuid = $1
+							AND device_os = $2
+							AND device_browser = $3
+							AND device_name = $4
+							AND duuid1 = $5
+							AND duuid2 = $6
+							AND duuid3 = $7
+							AND is_trusted IS TRUE`,
+							[uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid  ]
+						).then(deviceResult => {
+							if (deviceResult) {
+								logoutAll = true;
+								updateRecord({
+									conn: t,
+									data: [
+										/* $1 */ name,
+										/* $2 */ email,
+										/* $3 */ position,
+										/* $4 */ update_pw,
+										/* $5 */ iso3,
+										/* $6 */ language,
+										/* $7 */ JSON.stringify(secondary_languages || []),
+										/* $8 */ update_rights,
+										/* $9 */ notifications || false,
+										/* $10 */ reviewer || false,
+										/* $11 */ id
+									]
+								})
+								.catch(err => res.redirect('/module-error'))
+							} else {
+								req.session.confirm_dev_origins = {
+									redirecturl : referer || '/login',
+									u_profile : [
+										/* $1 */ name,
+										/* $2 */ email,
+										/* $3 */ position,
+										/* $4 */ update_pw,
+										/* $5 */ iso3,
+										/* $6 */ language,
+										/* $7 */ JSON.stringify(secondary_languages || []),
+										/* $8 */ update_rights,
+										/* $9 */ notifications || false,
+										/* $10 */ reviewer || false,
+										/* $11 */ id
+									],
+									uuid: id,
 								}
-							})
-
-					}
-					else {
+								// Device is not part of the trusted devices
+								sendDeviceCode({
+									name: u_user?.name, email: u_user?.email, uuid: id, conn: t
+								}).then(()=>{
+									req.session.page_message = "This action can be performed exclusively on trusted devices. All active sessions will be terminated, and the user will need to log in again and confirm their trusted devices."
+									redirect_url = '/confirm-device'
+								}).catch(err => console.log(err))
+							}
+						})
+					} else {
 						return t.none(`
 							UPDATE users
 							SET name = $1,
@@ -182,21 +179,21 @@ module.exports =async (req, res) => {
 								notifications = $9,
 								reviewer = $10
 							WHERE uuid = $11
-						;`, [ 
-							/* $1 */ name, 
-							/* $2 */ email, 
-							/* $3 */ position, 
-							/* $4 */ update_pw, 
-							/* $5 */ iso3, 
-							/* $6 */ language, 
-							/* $7 */ JSON.stringify(secondary_languages || []), 
+						;`, [
+							/* $1 */ name,
+							/* $2 */ email,
+							/* $3 */ position,
+							/* $4 */ update_pw,
+							/* $5 */ iso3,
+							/* $6 */ language,
+							/* $7 */ JSON.stringify(secondary_languages || []),
 							/* $8 */ update_rights,
-							/* $9 */ notifications || false, 
-							/* $10 */ reviewer || false, 
+							/* $9 */ notifications || false,
+							/* $10 */ reviewer || false,
 							/* $11 */ id
 						])
 					}
-					
+
 				} else return null
 			}).catch(err => console.log(err)))
 
@@ -281,11 +278,11 @@ module.exports =async (req, res) => {
 				if (id !== uuid) {
 					// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 					await sendemail({
-						// from, 
+						// from,
 						to: email,
 						bcc: 'myjyby@gmail.com',
 						subject: `[${app_title}] Your account information has been modified`,
-						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE 
+						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE
 					})
 					return null
 				} else return null

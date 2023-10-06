@@ -135,7 +135,7 @@ exports.updatePassword = async (req, res, next) => {
         //DELETE ALL ACTIVE SESSION
         await DB.general.tx(t =>{
             t.none(`
-            DELETE FROM  trusted_devices
+            DELETE FROM trusted_devices
             WHERE session_sid IN (
             SELECT sid
             FROM session

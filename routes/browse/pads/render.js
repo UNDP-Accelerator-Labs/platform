@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
 			// GET PADS COUNT, ACCORDING TO FILTERS: TO DO: MOVE THIS TO load/data.js
 			// THIS IS ONLY FOR THE pin all FUNCTION. CAN PROBABLY BE IMPROVED BASED ON FILTERS
 			batch.push(t.any(`
-				SELECT p.id FROM pads p
+				SELECT DISTINCT p.id FROM pads p
 				LEFT JOIN mobilization_contributions mob
 					ON p.id = mob.pad
 				WHERE p.id NOT IN (SELECT review FROM reviews)

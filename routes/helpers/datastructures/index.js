@@ -232,7 +232,7 @@ exports.pagemetadata = (_kwargs) => {
 				});
 			}).catch(err => console.log(err)));
 		} else batch.push(null)
-		
+
 		let hasJustLoggedIn = false;
 		try {
 			const referer = headers.referrer || headers.referer
@@ -293,14 +293,16 @@ exports.pagemetadata = (_kwargs) => {
 				name,
 				country,
 				rights,
-				sessions
+				sessions,
+				pagestats: {
+					id: session?.read_doc_id,
+					docType: session?.read_doc_type,
+				},
 			},
 			page: {
 				title,
 				instance_title: res?.locals.instance_vars?.title || null,
 				instanceReadCount: res?.locals.instance_vars?.readCount || null,
-				instanceDocType: res?.locals.instance_vars?.docType || null,
-				instanceId: res?.locals.instance_vars?.instanceId || null,
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,
@@ -395,7 +397,7 @@ exports.pagedata = (_req, _data) => {
 			// TO DO: GET THIS FROM SESSION DATA OR FROM this.sessiondata
 			name: username,
 			country,
-			rights
+			rights,
 		},
 		page: {
 			title: pagetitle, // NEED TO FETCH SOMEWHERE

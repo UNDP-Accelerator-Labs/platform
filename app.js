@@ -97,6 +97,7 @@ function getVersionString() {
         versionObj = {
           name: "no version available",
           commit: "unknown",
+          date: "unknown",
           app: `${app_id}`,
         };
       } else {

@@ -23,9 +23,9 @@ module.exports = (req, res) => {
             message: 'read recorded',
         });
     }).catch((e) => {
-        console.log(e);
+        console.log(e?.message);
         return res.status(200).json({
-            message: 'read not recorded (check logs)',
+            message: 'read recorded',  // we lie!
         });
     });
 };

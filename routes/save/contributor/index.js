@@ -18,7 +18,7 @@ module.exports =async (req, res) => {
 	const referer_params = new URLSearchParams(referer_url.search)
 
 	const is_trusted = await checkDevice({ req, conn: DB.general })
-	if(password.length) { // THIS SHOULD TECHNICALLY BE HANDLED IN THE FRONT END NOW
+	if(password.length) {
 		let message = isPasswordSecure(password);
 		if (message.length) {
 			referer_params.set('errormessage', message);
@@ -193,7 +193,6 @@ module.exports =async (req, res) => {
 							/* $11 */ id
 						])
 					}
-
 				} else return null
 			}).catch(err => console.log(err)))
 
@@ -220,7 +219,6 @@ module.exports =async (req, res) => {
 
 			return t.batch(batch)
 			.then(async _ => {
-
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
 					await t.none(`

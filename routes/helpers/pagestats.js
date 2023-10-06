@@ -7,7 +7,7 @@ const ipInfoToken = process.env.IPINFO_TOKEN;
 const ipCountry = async (req) => {
     if (!req.session.user_country || req.session.user_country === 'NUL') {
         const user_ip = `${req.ip}`.replace(/:[0-9][0-9]+$/, '');
-        let country = 'NUL';
+        let country = 'LCL';
         if (ipInfoToken && !['127.0.0.0', '::1'].includes(user_ip)) {
             try {
                 // free account at ipinfo.io allows 50k requests per month
@@ -37,6 +37,7 @@ const ownIdFor = async (doc_type) => {
 
 const recordView = async (doc_id, doc_type, page_url, user_country, user_rights, is_view) => {
     const ownId = await ownIdFor(doc_type);
+    const allowRecord = !(user_country === 'LCL' || (user_rights > 2 && user_country === 'NUL'));
     await DB.general.tx(async gt => {
         const page_stats = [];
 
@@ -56,7 +57,9 @@ const recordView = async (doc_id, doc_type, page_url, user_country, user_rights,
             }
         }
 
-        addStat(doc_id, doc_type, ownId, null, null, null);
+        if (allowRecord) {
+            addStat(doc_id, doc_type, ownId, null, null, null);
+        }
         addStat(doc_id, doc_type, ownId, page_url, user_country, user_rights);
 
         await gt.batch(page_stats);

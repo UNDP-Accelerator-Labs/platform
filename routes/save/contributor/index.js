@@ -219,7 +219,6 @@ module.exports =async (req, res) => {
 
 			return t.batch(batch)
 			.then(async _ => {
-
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
 					await t.none(`

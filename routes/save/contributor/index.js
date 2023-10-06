@@ -163,7 +163,7 @@ module.exports =async (req, res) => {
 										name: u_user?.name, email: u_user?.email, uuid: id, conn: t
 									})
 									.then(()=>{
-										req.session.page_message = "This action can ONLY be performed on trusted devices."
+										req.session.page_message = "This action can be performed exclusively on trusted devices. All active sessions will be terminated, and the user will need to log in again and confirm their trusted devices."
 										redirect_url = '/confirm-device'
 									}).catch(err => console.log(err))
 								}

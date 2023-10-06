@@ -3,19 +3,19 @@ const { checklanguage, datastructures } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
-
+	
 	if (public) res.redirect('/login')
 	else {
 		const { referer } = req.headers || {}
-		const { object } = req.params || {}
-		const { id, errormessage } = req.query || {}
+		const { id, errormessage, u_errormessage } = req.query || {}
+		
 		const language = checklanguage(req.params?.language || req.session.language)
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
 
 		DB.general.tx(async t => {
 			return check_authorization({ connection: t, id, uuid, rights, public })
-			.then(result => {
+			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
 					if (referer) return res.redirect(referer)
@@ -100,12 +100,28 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
+					if(uuid === id){
+						batch.push(t.any(`
+						SELECT *
+						FROM trusted_devices
+						WHERE user_uuid = $1
+						  AND is_trusted = true
+						  AND created_at >= NOW() - INTERVAL '1 year';
+						;`, [ uuid ]))
+					} else batch.push(null)
+
 					return t.batch(batch)
 					.then(async results => {
-						let [ countries, languages, teams, data ] = results
+						let [ countries, languages, teams, data, devices ] = results
 
+						const trusted_devices = devices?.map(p=> ({
+							...p,
+							last_login: new Date(p.last_login)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
+							created_at: new Date(p.created_at)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
+						}))
 						const metadata = await datastructures.pagemetadata({ req })
-						return Object.assign(metadata, { data, countries, languages, teams, errormessage })
+
+						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices, u_errormessage })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}

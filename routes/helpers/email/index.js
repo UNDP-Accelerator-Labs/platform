@@ -23,7 +23,7 @@ module.exports = (kwargs) => {
 			};
 
 			return new Promise(resolve => {
-				if (process.env.NODE_ENV === 'production') {
+				if (process.env.NODE_ENV === "production") {
 					sgMail.send(msg)
 					.then(() => {}, error => {
 						if (error.response) {
@@ -44,5 +44,3 @@ module.exports = (kwargs) => {
 		return new Promise(resolve => resolve(null))
 	}
 }
-
-

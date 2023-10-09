@@ -75,7 +75,7 @@ exports.updateNewEmail = async (req, res, next) => {
       if (!verifyTokenFields(decoded, res)) {
         return res.status(401).send("invalid token");
       }
-      const { email, action, uuid, name } = decoded;
+      const { email, action, uuid, name, old_email } = decoded;
 
       await DB.general
         .tx(async (t) => {
@@ -87,25 +87,13 @@ exports.updateNewEmail = async (req, res, next) => {
         `,
             [email, uuid]
           );
-          await t.none(
-            `
-        UPDATE trusted_devices
-        SET session_sid = NULL
-            WHERE session_sid IN (
-                SELECT sid
-                FROM session
-                WHERE sess ->> 'uuid' = $1
-            );
-            `,
-            [uuid]
-          );
-          await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [
+          await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1;`, [
             uuid,
           ]);
         })
         .then(() => {
           sendEmail({
-            to: email,
+            to: old_email,
             subject: `Email Address Update Notification`,
             html: `
                     <div>

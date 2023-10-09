@@ -107,7 +107,7 @@ module.exports =async (req, res) => {
 							logoutAll = true;
 							//IF EMAIL CHANGES, SEND CONFIRM EMAIL BEFORE UPDATING EMAIL
 							if(u_user?.email != email){
-								confirmEmail({email, name: u_user.name, uuid: id, req })
+								confirmEmail({email, name: u_user.name, uuid: id, old_email: email, req })
 								if(!update_pw && u_user.name == name) logoutAll = false
 								message = 'An email has been sent to your email address. Please confirm the email to proceed with the email update.'
 								req.session.errormessage = message
@@ -190,16 +190,7 @@ module.exports =async (req, res) => {
 			.then(async _ => {
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
-					await t.none(`
-					UPDATE trusted_devices
-					SET session_sid = NULL
-						WHERE session_sid IN (
-							SELECT sid
-							FROM session
-							WHERE sess ->> 'uuid' = $1
-						);
-						`, [uuid]);
-					await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [uuid])
+					await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1;`, [uuid])
 
 				} else {
 					// UPDATE THE SESSION DATA

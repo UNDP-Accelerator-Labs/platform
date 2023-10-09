@@ -15,51 +15,15 @@ module.exports = async (req, res) => {
 	if (!app && is_trusted) {
 		// REMOVE ALL UNLABELED SESSIONS
 			await DB.general.tx(async t => {
-				//DELETE ALL ASSOCIATE DEVICES FOR ALL UNLABELLED SESSION
-				await t.none(`
-				DELETE FROM trusted_devices
-				  WHERE session_sid IN (
-					SELECT sid
-					FROM session
-					WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' IS NULL
-				  );
-				`, [uuid]);
-
-				await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' IS NULL;`, [uuid]);
-
+				await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' IS NULL;`, [uuid]);
 			  });
 	} else if (app.toLowerCase() === 'all' && is_trusted) {
-		// REMOVE ALL SESSIONS FOR CURRENT USER
 			await DB.general.tx(async t => {
-				// Update the trusted_devices table
-				await t.none(`
-				UPDATE trusted_devices
-				SET session_sid = NULL
-				  WHERE session_sid IN (
-					SELECT sid
-					FROM session
-					WHERE sess ->> 'uuid' = $1
-				  );
-				`, [uuid]);
-
-				await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
-
-			  });
+				await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1;`, [ uuid ])
+			 });
 	} else if( is_trusted ) {
-		// REMOVE SESSIONS IN A GIVEN APPLICATION
 			await DB.general.tx(async t => {
-				// Update the trusted_devices table
-				await t.none(`
-				UPDATE trusted_devices
-				SET session_sid = NULL
-				  WHERE session_sid IN (
-					SELECT sid
-					FROM session
-					WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' = $2
-				  );
-				`, [uuid, app])
-
-				await t.none(`DELETE FROM session WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' = $2 AND sess -> 'device' ->> 'is_trusted' = $3;`, [ uuid, app, trust_device ])
+				await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1 AND sess ->> 'app' = $2 AND sess -> 'device' ->> 'is_trusted' = $3;`, [ uuid, app, trust_device ])
 
 			  }).catch(err =>console.log(err));
 	}

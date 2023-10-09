@@ -56,6 +56,7 @@ exports.checkDevice = async (_kwarg) => {
   const { uuid } = req.session;
   const { __ucd_app, __puid, __cduid } = req.cookies;
   const device = this.deviceInfo(req);
+  const { sessionID: sid } = req || {}
 
   return conn.oneOrNone(
     `
@@ -67,6 +68,7 @@ exports.checkDevice = async (_kwarg) => {
           AND duuid1 = $5
           AND duuid2 = $6
           AND duuid3 = $7
+          AND session_sid = $8
           AND is_trusted IS TRUE`,
     [
       uuid,
@@ -76,6 +78,7 @@ exports.checkDevice = async (_kwarg) => {
       __ucd_app,
       __puid,
       __cduid,
+      sid
     ],
     (d) => (d?.id ? true : false)
   );

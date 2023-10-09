@@ -138,7 +138,7 @@ exports.removeDevice = async (req, res) => {
           "DELETE FROM trusted_devices WHERE id = $1 AND user_uuid = $2",
           [id, uuid]
         );
-        await t.none("DELETE FROM session WHERE sid = $1", [sid]);
+        await t.none("UPDATE session SET sess = NULL WHERE sid = $1", [sid]);
       }
     });
     res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);

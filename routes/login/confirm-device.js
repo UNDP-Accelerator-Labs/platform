@@ -14,6 +14,8 @@ exports.confirmDevice = async (req, res, next) => {
 
   req.session.errormessage = "";
   const device = deviceInfo(req);
+
+  if(!confirm_dev_origins) return res.redirect("/module-error")
   DB.general
     .tx((t) => {
       return t

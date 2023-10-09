@@ -11,13 +11,18 @@ exports.multijoin = function (args = []) {
 	})
 }
 exports.users = (data, args = []) => {
+	// TO DO: THIS WILL NEED TO BE INTEGRATED WITH THE locations FUNCTION TO GET APPROPRIATE LOCATION NAME
+
 	const [ lang, key ] = args
 	if (!key) key = 'owner'
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const uuids = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
 		return DB.general.any(`
-			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, cn.name AS country FROM users u
+			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, 
+				cn.name AS country 
+
+			FROM users u
 			INNER JOIN country_names cn
 				ON u.iso3 = cn.iso3
 			WHERE u.uuid IN ($2:csv)
@@ -109,11 +114,58 @@ exports.tags = (data, args = []) => {
 		// ;`, [ key, tagname, data.map(d => d[key]), lang ])
 	} else return new Promise(resolve => resolve(data))
 }
-exports.locations = (data, args = []) => {
-	const [ lang, key ] = args
+exports.locations = (data, kwargs) => {
+	const conn = kwargs.connection || DB.general
+	const { lang, key } = kwargs
 	if (!key) key = 'iso3'
-
+	
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
+		const iso3s = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
 		
+		return conn.task(async t => {
+			const adm0_column = await geo.adm0_name({ connection: t, language: lang })
+
+			const batch = []
+
+			// TO DO: INCLUDE lat AND lng CENTROIDS TOO
+
+			// GET ONLY THE RELEVANT SUBUNITS
+			// THE su_a3 <> adm0_a3 IS IMPORTANT TO AVOID DUPLICATES IN THE END
+			batch.push(t.any(`
+				SELECT su_a3 AS $1:name, $2:name AS country FROM adm0_subunits
+				WHERE su_a3 IN ($3:csv)
+					AND su_a3 <> adm0_a3
+			;`, [ key, adm0_column, iso3s ]).catch(err => console.log(err)))
+
+			batch.push(t.any(`
+				SELECT adm0_a3 AS $1:name, $2:name AS country FROM adm0_subunits
+				WHERE adm0_a3 IN ($3:csv)
+			;`, [ key, adm0_column, iso3s ]).catch(err => console.log(err)))
+
+			return t.batch(batch)
+			.then(results => {
+				const [ su_a3, adm0_a3 ] = results
+				const locations = su_a3.concat(adm0_a3)
+
+				if (Array.isArray(data)) return this.multijoin.call(data, [ locations, key ])
+				else return this.joinObj.call(data, locations[0])
+
+			}).catch(err => console.log(err))
+		})
+
+
+
+		return DB.general.tx(async t => {
+			const adm0_column = await geo.adm0_name({ connection: t, language: lang })
+			return t.any(`
+				SELECT adm0_a3 AS $1:name, $2:name AS country FROM adm0
+				WHERE adm0_a3 IN ($3:csv)
+			;`, [ key, adm0_column, iso3s ])
+		}).then(locationnames => {
+			if (Array.isArray(data)) return this.multijoin.call(data, [ locationnames, key ])
+			else return this.joinObj.call(data, locationnames[0])
+		}).catch(err => console.log(err))
+	
 	} else return new Promise(resolve => resolve(data))
+
 }

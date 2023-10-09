@@ -29,13 +29,12 @@ exports.confirmDevice = async (req, res, next) => {
             return t.none(
               `
             INSERT INTO trusted_devices (user_uuid, device_name, device_os, device_browser, last_login, session_sid, duuid1, duuid2, duuid3, is_trusted)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true)`,
+            VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, true)`,
               [
                 uuid,
                 device.device,
                 device.os,
                 device.browser,
-                new Date(),
                 sid,
                 deviceGUID1,
                 deviceGUID2,

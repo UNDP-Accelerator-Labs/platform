@@ -74,7 +74,7 @@ const sessionMiddleware = session({
 });
 
 app.use(sessionMiddleware);
-app.use(cookieParser());
+app.use(cookieParser(`${app_suite}-${app_suite_secret}-pass`))
 
 function setAccessControlAllowOrigin(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");

@@ -5,15 +5,26 @@
         "commonjs": true,
         "es2021": true
     },
-    "extends": "google",
+    "extends": [
+        "google",
+        "prettier"
+    ],
     "overrides": [
     ],
     "parserOptions": {
         "ecmaVersion": "latest"
     },
     "rules": {
+        "camelcase": "off",
+        "max-len": "off",
+        "require-jsdoc": "off"
     },
     "plugins": [
         "ejs-js"
+    ],
+    "ignorePatterns": [
+        "/public/*",
+        "/routes/*",
+        "/views/*"
     ]
 }

@@ -31,7 +31,7 @@ exports.users = (data, args = []) => {
 }
 exports.tags = (data, args = []) => {
 	const [ lang, key, tagname, tagtype ] = args
-	if (!key) return false
+	if (!key) return new Promise(resolve => resolve(data))
 
 	if (data?.length) {
 		return DB.general.tx(t => {
@@ -107,5 +107,13 @@ exports.tags = (data, args = []) => {
 		// 		AND id IN ($3:csv)
 		// 		AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
 		// ;`, [ key, tagname, data.map(d => d[key]), lang ])
+	} else return new Promise(resolve => resolve(data))
+}
+exports.locations = (data, args = []) => {
+	const [ lang, key ] = args
+	if (!key) key = 'iso3'
+
+	if ((Array.isArray(data) && data.length) || data?.[key]) {
+		
 	} else return new Promise(resolve => resolve(data))
 }

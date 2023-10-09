@@ -1,22 +1,56 @@
 <%
-
 	// CREATE ALIASES
+	const activity = locals.metadata.page.activity
 	const object = locals.metadata.page.object
 	const space = locals.metadata.page.space
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
+	const logged = locals.metadata.user.uuid !== null
 
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
+
+	let fixedEid = null;
+
+	function simplifyNumber (num) {
+		if (num > 1000) return `${Math.floor(num / 100) / 10}K+`
+		else return num
+	}
 %>
 
 <% if (locals.stats?.total > 0) { %>
-	<nav id='search-and-filter' class='lg'>
+	<nav id='search-and-filter' class='xs sm m lg xl xxl<% if (mapscale === "full-screen") { %> anchor-bottom<% } %>'>
+		<% if (logged && object === 'pads') { %>
+			<div class="search-type-menu">
+				<span class="stm stm-select google-translate-attr" id="stm-browse"><%- vocabulary["search-type-menu"][language]["browse"] %></span>
+				<span class="stm google-translate-attr" id="stm-exploration">
+					<%- vocabulary["search-type-menu"][language]["exploration"] %>
+					<div class="stm-hint stm-hidden google-translate-attr">
+						<%- vocabulary["exploration"][language]["hint"] %>
+					</div>
+				</span>
+			</div>
+		<% } // logged in (uuid) %>
+
 		<form autocomplete='off'>
 			<!-- ADD ALL EXISTING HEADER QUERIES THAT ARE NOT IN THE MENU (THIS IS FOR PERSISTENCE OF VIEW PARAMETERS) -->
+			<% if (object === 'pads') { %>
+			<input id='form-exploration-id' type='hidden' name='explorationid' value='' />
 			<%
-				const menu_keys = locals.filters_menu.map(d => Object.keys(d)).flat()
+				const menu_keys = (locals.filters_menu ?? []).map(d => Object.keys(d)).flat()
 				const view_params = Object.keys(query).filter(key => !menu_keys.includes(key) && !['search', 'status'].includes(key))
 
 				view_params.forEach(d => {
+					if (d === 'explorationid') {
+						query[d].forEach(c => {
+							fixedEid = +c;
+						});
+						return;
+					}
 					query[d].forEach(c => {
 			%>
 				<input type='hidden' name='<%- d %>' value='<%- c %>'>
@@ -25,7 +59,11 @@
 				})
 			%>
 
-			<div class='search'>
+			<% if (locals.metadata?.user?.uuid) { %>
+			<div class='exploration'></div>
+			<% } // logged in (uuid) %>
+			<% } // object is pads %>
+			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
 					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
 				<% } else { %>
@@ -40,31 +78,31 @@
 					<% locals.filters_menu?.forEach(d => { %>
 						<section>
 							<% for (let key in d) { %>
-								<div class='filter'>
+								<div class='filter google-translate-attr'>
 									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
 									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 									<div class='dropdown'>
-										<menu>
+										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
 												<li>
 													<% if (c.equivalents?.length) { %>
 														<% c.equivalents.filter(b => b !== c.id).forEach(b => { %>
-															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id.toString())) { %>disabled<% } %>>
+															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id?.toString())) { %>disabled<% } %>>
 														<% }) %>
 													<% } %>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id.toString())) { %>checked<% } %> onchange='addequivalents(this); toggletag(this, <%- JSON.stringify(c) %>)'>
+													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id?.toString())) { %>checked<% } %> onchange='addequivalents(this); toggletag(this, <%- JSON.stringify(c) %>)'>
 													<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 												</li>
 											<% }) %>
 										</menu>
 									</div>
 								</div>
-								<% const active_filters = d[key].filter(c => query?.[key]?.includes(c.id.toString()))
+								<% const active_filters = d[key].filter(c => query?.[key]?.includes(c.id?.toString()))
 								if (active_filters.length) { %>
 									<div class='active-filters'>
 										<% active_filters.forEach(c => { %>
 											<div class='tag' data-id='<%- c.id %>'>
-												<label class='name'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %></label>
+												<label class='name' title='<%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary["unknown"][language]) %>'><%- Number.isInteger(c.name) ? c.name : ((c.name?.length > 15 ? `${c.name.slice(0, 15).capitalize()}…` : c.name.capitalize()) || vocabulary['unknown'][language]) %></label>
 												<label class='close' onclick='rmtag(this, <%- JSON.stringify(c) %>)'></label>
 											</div>
 										<% }) %>
@@ -73,20 +111,30 @@
 							<% } %>
 						</section>
 					<% }) %>
+
 					<div class='break'></div>
-					<button type='submit' class='submit-filters'>
+					<div class='order'>
+						<menu>
+							<li>
+								<input type='checkbox' class='toggle' name='orderby' value='random' id='order-random' <% if (query?.orderby?.includes('random')) { %>checked<% } %>> 
+								<label for='order-random'></label>
+								<p class='google-translate-attr'><%- vocabulary['serendipitous search'][language] %></p>
+							</li>
+						</menu>
+					</div>
+					<button type='submit' class='submit-filters google-translate-attr'>
 						<%- vocabulary['apply filters'][language] %>
 					</button>
 				</div>
 			<% } %>
 
 			<% if (locals.stats?.persistent_breakdown?.length > 1) { %>
-				<div class='status'>
+				<div class='status xs sm m lg xl google-translate-attr'>
 					<menu>
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
-								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.map(d => +d).includes(d.status)) { %>checked<% } %>>
-								<label for='status-<%- d.status %>' data-content='<%- d.count %>'></label>
+								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.some(c => +c === d.status)) { %>checked<% } %>>
+								<label for='status-<%- d.status %>' data-content='<%- simplifyNumber(d.count) %>'></label>
 								<p>
 									<%- vocabulary['status'][language](object, d.status, d.count) %>
 								</p>
@@ -94,36 +142,46 @@
 						<% }) %>
 					</menu>
 				</div>
+				<script type='text/javascript'>
+					if (!mediaSize) var mediaSize = getMediaSize()
+					const status_toggles = d3.select('#search-and-filter form .status').node()
+					if (mediaSize === 'xs') {
+						const parent = d3.select('#search-and-filter form .filters').node()
+						parent.appendChild(status_toggles)
+					}
+				</script>
 			<% } %>
 
-			<% if (object === 'pads') { %>
-				<div class='global-actions'>
-					<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
-					<% if (space !== 'pinned') { %>
-						<div class='add filter pinboards'>
-							<input type='text' id='pin-all'>
-							<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
-							<button id='new-pinboard' type='button'></button>
-							<div class='dropdown'>
-								<menu>
-									<% locals.pinboards_list?.forEach(d => { %>
-										<li class='pinboard'>
-											<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
-											<label class='title' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
-										</li>
-									<% }) %>
-								</menu>
+			<% if (logged) { %>
+				<% if (object === 'pads') { %>
+					<div class='global-actions'>
+						<!-- TO DO: RESTRICT IF THE PAGE IS PUBLIC/ THE USER IS NOT LOGGED IN -->
+						<% if (space !== 'pinned') { %>
+							<div class='add filter pinboards google-translate-attr'>
+								<input type='text' id='pin-all'>
+								<label for='pin-all'><%- vocabulary["add all to collection"][language](locals.stats?.filtered ?? 0) %></label>
+								<button id='new-pinboard' type='button'></button>
+								<div class='dropdown'>
+									<menu>
+										<% locals.pinboards_list?.filter(pb => !pb.is_exploration).forEach(d => { %>
+											<li class='pinboard'>
+												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
+												<label class='title notranslate' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
+											</li>
+										<% }) %>
+									</menu>
+								</div>
 							</div>
-						</div>
-					<% } %>
+						<% } %>
 
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
-				</div>
-			<% } else if (object === 'contributors') { %>
-				<div class='global-actions'>
-					<button type='button' class='download lg' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
-					<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
-				</div>
+						<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+					</div>
+				<% } else if (object === 'contributors') { %>
+					<div class='global-actions'>
+						<button type='button' class='download m lg xl xxl google-translate-attr' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+						<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
+					</div>
+				<% } %>
 			<% } %>
 
 			<% if (locals.filters_menu?.length) { %>
@@ -134,10 +192,27 @@
 		</form>
 	</nav>
 <% } else { %>
-	<nav><p><%- vocabulary['no entries'][language] %></p></nav>
+	<nav><p class="google-translate-attr"><%- vocabulary['no entries'][language] %></p></nav>
 <% } %>
 
 <script type='text/javascript'>
+	let curSelectSTM = 'stm-browse';
+	let hasUsedExploration = false;
+	if (!mediaSize) var mediaSize = getMediaSize()
+
+	function updateExplorationHint() {
+		d3.selectAll('.stm-hint').classed('stm-hidden', () => {
+			if (sessionStorage.explorationHintUserHiddenCount && +sessionStorage.explorationHintUserHiddenCount > 1) {
+				return true;
+			}
+			return curSelectSTM !== 'stm-browse' || hasUsedExploration;
+		})
+	}
+
+	d3.selectAll('#search-field').on('focus', () => {
+		updateExplorationHint();
+	});
+
 	function expandfilters (node) {
 		d3.select(node).toggleClass('close')
 		const filters = node.form.querySelector('.filters')
@@ -157,7 +232,7 @@
 		const sel = d3.select(node)
 		const filter = sel.findAncestor('filter')
 		let taggroup = d3.select(filter.node().nextElementSibling)
-		
+
 		if (!taggroup.node() || !taggroup.classed('active-filters')) {
 			taggroup = d3.select(filter.node().parentNode)
 			.insertElem(_ => filter.node().nextElementSibling, 'div', 'active-filters')
@@ -167,7 +242,14 @@
 			const tag = taggroup.addElem('div', 'tag')
 			.attr('data-id', d.id)
 			tag.addElems('label', 'name')
-			.html(Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown'][language]))
+			.attr('title', Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown'][language]))
+			.html(_ => {
+				if (Number.isInteger(d.name)) return d.name
+				else if (d.name) {
+					if (d.name.length > 15) return `${d.name.slice(0, 15).capitalize()}…`
+					else return d.name.capitalize()
+				} else return vocabulary['unknown'][language]
+			})
 			tag.addElems('label', 'close')
 			.on('click', function () { rmtag(this, d) })
 		} else {
@@ -197,17 +279,29 @@
 			})
 	}).on('focus', function () {
 		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+		let { top, height } = this.getBoundingClientRect()
+		top = top + height
+		const viewheight = window.innerHeight
+		if (top + 300 >= viewheight) dropdown.classed('dropup', true)
+
 		const filters = d3.select(this).findAncestor('filters')
+
 		if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
-		if (filters) filters.node().style.overflow = 'visible'
+		if (filters?.node()) filters.node().style.overflow = 'visible'
+
+		if (mediaSize === 'xs') d3.select(this).findAncestor('filter').classed('expand', true)
 
 		dropdown.selectAll('label, a').on('mousedown', function () {
 			d3.event.preventDefault()
 			// this.previousElementSibling.setAttribute('checked', '')
 		})
 	}).on('blur', function () {
-		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
+		const filter = d3.select(this).findAncestor('filter')
+		const dropdown = filter.select('.dropdown')
 		if (dropdown.node()) dropdown.node().style.maxHeight = null
+		if (mediaSize === 'xs') {
+			setTimeout(_ => filter.classed('expand', false), 250)
+		}
 	})
 
 	// PIN ALL SEARCH BAR
@@ -237,16 +331,30 @@
 				d3.select('#new-pinboard').node().click()
 			}
 		}).on('focus', function (d) {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+			const filters = d3.select('#search-and-filter')
+			const filter = d3.select(this).findAncestor('filter')
+			const dropdown = filter.select('.dropdown')
+			if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+			if (filters.node()) filters.node().style.overflow = 'visible'
+
+			if (mediaSize === 'xs') filter.classed('expand', true)
 
 			dropdown.selectAll('li').on('mousedown', function () {
 				d3.event.preventDefault()
 			})
 		}).on('blur', function () {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = null
+			const filters = d3.select('#search-and-filter')
+			const filter = d3.select(this).findAncestor('filter')
+			const dropdown = filter.select('.dropdown')
+
+			if (dropdown.node()) dropdown.node().style.maxHeight = null
+			if (filters.node) filters.node().style.overflow = 'auto'
+
 			fixLabel(this) // THIS IS NOT WORKING
+
+			if (mediaSize === 'xs') {
+				setTimeout(_ => filter.classed('expand', false), 250)
+			}
 		})
 
 		d3.select('#new-pinboard')
@@ -275,4 +383,76 @@
 			}
 		})
 	<% } %>
+
+	<% if (locals.metadata?.user?.uuid) { %>
+		let isExplorationInit = false;
+		const fixedEid = <%- JSON.stringify(fixedEid) %>;
+		const formExplorationId = d3.select('#form-exploration-id');
+		exploration.addExplorationMain(d3.select('div.exploration'), () => {
+			hasUsedExploration = exploration.hasExploration();
+			if (fixedEid) {
+				exploration.updateById(fixedEid);
+			}
+			if (fixedEid || exploration.isVisible()) {
+				doSelectSTM('stm-exploration');
+			}
+			if (!isExplorationInit) {
+				isExplorationInit = true;
+				exploration.triggerIdChange();
+			}
+		});
+		exploration.addIdChangeListener((eid, isVisible) => {
+			formExplorationId.attrs({
+				'value': isVisible ? eid : null,
+			});
+			hasUsedExploration = exploration.hasExploration();
+			if (isExplorationInit) {
+				const oldUrl = `${window.location}`;
+				const newUrl = new URL(window.location);
+				if (eid) {
+					newUrl.searchParams.set('explorationid', +eid);
+				} else {
+					newUrl.searchParams.delete('explorationid');
+				}
+				if (oldUrl !== `${newUrl}`) {
+					window.history.replaceState({}, '', newUrl);
+				}
+			}
+		});
+
+		function doSelectSTM(stm) {
+			curSelectSTM = stm;
+			d3.selectAll('.stm').classed('stm-select', function () {
+				return d3.select(this).attr('id') === curSelectSTM;
+			});
+			const isExploration = curSelectSTM === 'stm-exploration';
+			exploration.setVisible(isExploration);
+			if (isExploration) {
+				updateExplorationHint();
+			} else {
+				exploration.updateById(null);
+			}
+			exploration.triggerIdChange();
+		}
+
+		let onlyHide = false;
+
+		d3.selectAll('.stm').on('click', function () {
+			if (onlyHide) {
+				onlyHide = false;
+				return;
+			}
+			doSelectSTM(d3.select(this).attr('id'));
+		});
+
+		d3.selectAll('.stm-hint').on('click', function (e) {
+			d3.select(this).classed('stm-hidden', true);
+			onlyHide = true;
+			if (sessionStorage.explorationHintUserHiddenCount) {
+				sessionStorage.explorationHintUserHiddenCount = +sessionStorage.explorationHintUserHiddenCount + 1;
+			} else {
+				sessionStorage.explorationHintUserHiddenCount = 1;
+			}
+		});
+	<% } // logged in (uuid) %>
 </script>

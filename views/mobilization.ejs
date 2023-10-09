@@ -37,11 +37,11 @@
 				<% if (locals.metadata.page.activity === 'edit') { %>
 					<a href='<%- locals.metadata.page.referer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.language] %></a>
 				<% } %>
-				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>' onblur='partialSave("title")' contenteditable><%- locals.mobilization.title %></div>
+				<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>' onblur='partialSave("title")' contenteditable><%- locals.mobilization.title %></div>
 			<% } else { %>
 				<a href='<%- locals.metadata.page.referer || "/en/browse/mobilizations/ongoing" %>' class='return'><%- vocabulary['back to browse'][locals.metadata.page.language] %></a>
-				<div class='title' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>'><%- locals.mobilization.title %></div>
-				<div class='contributor'><%- vocabulary['host credit'][locals.metadata.page.language](locals.mobilization.host, locals.mobilization.hostname) %></div>
+				<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled template"][locals.metadata.page.language] %>'><%- locals.mobilization.title %></div>
+				<div class='contributor google-translate-attr'><%- vocabulary['host credit'][locals.metadata.page.language](locals.mobilization.host, locals.mobilization.hostname) %></div>
 			<% } %>
 		</div>
 		

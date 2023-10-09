@@ -9,9 +9,11 @@ if ('serviceWorker' in navigator) {
 
 function getMediaSize () {
 	// https://www.w3schools.com/howto/howto_js_media_queries.asp
-	return [{ label: 'xs', size: 480 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }]
-	.find(d => {
-		if (d.label !== 'lg') return window.matchMedia(`(max-width: ${d.size}px)`).matches
+	// console.log(window.navigator)
+	// console.log(window.navigator.Agent)
+	return [{ label: 'xs', size: 767 }, { label: 'sm', size: 768 }, { label: 'm', size: 1024 }, { label: 'lg', size: 1200 }, { label: 'xl', size: 1366 }, { label: 'xxl', size: 1920 }]
+	.reverse().find(d => {
+		if (d.label === 'xs') return window.matchMedia(`(max-width: ${d.size}px)`).matches
 		else return window.matchMedia(`(min-width: ${d.size}px)`).matches
 	})?.label
 }
@@ -141,4 +143,82 @@ function multiSelection (sel, targets) {
 			})
 		}
 	}
+}
+
+function addGlobalLoader () {
+	const nav = d3.select('nav#languages')
+	nav.select('menu').classed('squeeze', true)
+	const loader = nav.addElems('div', 'lds-ellipsis')
+	loader.addElem('div')
+	loader.addElem('div')
+	loader.addElem('div')
+	loader.addElem('div')
+	return loader
+}
+function rmGlobalLoader () {
+	const nav = d3.select('nav#languages')
+	nav.select('.lds-ellipsis').remove()
+	nav.select('menu').classed('squeeze', false)
+}
+
+let ensureIconRegistered = false;
+function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
+	if (ensureIconRegistered) {
+		return;
+	}
+	const iconUpdate = () => {
+		let anyIcons = false;
+		d3.selectAll(classSel).attr('src', () => {
+			anyIcons = true;
+			return Math.random() < 0.01 ? altName : name;
+		});
+		if (!anyIcons) {
+			return;
+		}
+		setTimeout(() => {
+			d3.selectAll(classSel).attr('src', name);
+			setTimeout(iconUpdate, timingTotal - timingShort);
+		}, timingShort);
+	};
+	setTimeout(iconUpdate, timingTotal);
+	ensureIconRegistered = true;
+}
+window.addEventListener('load', () => {
+	let eye_icon = '/imgs/icons/i-eye';
+    if (!mediaSize) {
+		var mediaSize = getMediaSize();
+	}
+    if (mediaSize === 'xs') {
+		eye_icon = '/imgs/icons/i-eye-sm';
+	}
+    ensureIcon('.engagement-reads-icon', `${eye_icon}.svg`, `${eye_icon}-closed.svg`, 200, 2000);
+});
+
+function checkPassword (password) {
+	// THIS REPLICATES THE BACKEND password-requirements.js FILE
+	const minlength = 8
+	const uppercaseRegex = /[A-Z]/;
+	const lowercaseRegex = /[a-z]/;
+	const numberRegex = /[0-9]/;
+	const specialCharRegex = /[!@#$%^&*\(\)]/;
+	// Check against common passwords (optional)
+	const commonPasswords = ['password', '123456', 'qwerty', 'azerty'];
+	const checkPass = {
+		'pw-length': !(password.length < minlength),
+		'pw-upper': uppercaseRegex.test(password),
+		'pw-lower': lowercaseRegex.test(password),
+		'pw-number': numberRegex.test(password),
+		'pw-special': specialCharRegex.test(password),
+		'pw-common': !commonPasswords.includes(password),
+	};
+
+	const msgs = {
+		'pw-length': `Password should be at least ${minlength} characters long`,
+		'pw-upper': 'Password requires at least one uppercase letter',
+		'pw-lower': 'Password requires at least one lowercase letter',
+		'pw-number': 'Password requires at least one numeral',
+		'pw-special': 'Password requires at least one of the following special characters: !@#$%^&*()',
+		'pw-common': 'Password cannot be a commonly used password',
+	};
+	return Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]);
 }

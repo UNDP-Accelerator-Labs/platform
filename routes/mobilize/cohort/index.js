@@ -1,19 +1,18 @@
-const { modules, DB } = include('config/')
-const { checklanguage, join, datastructures } = include('routes/helpers/')
+const { modules, ownDB, DB } = include('config/')
+const { checklanguage, join, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { object } = req.params || {}
-	const { public, id: source, copy, child, pinboard } = req.query || {} 
+	const { public, id: source, copy, child, pinboard } = req.query || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	const module_rights = modules.find(d => d.type === 'mobilizations')?.rights
-	let collaborators_ids = collaborators.map(d => d.uuid) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
-	if (!collaborators_ids.length) collaborators_ids = [ uuid ]
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (module_rights?.write ?? Infinity)).map(d => d.uuid)
 
-	DB.conn.tx(async t => {		
+	DB.conn.tx(async t => {
 		const batch = []
-		
+
 		if (public) { // NO NEED FOR A COHORT
 			batch.push(null)
 		} else { // DETERMINE WHAT TYPE OF COHORT IS NEEDED
@@ -41,20 +40,21 @@ module.exports = (req, res) => {
 					})
 				}).catch(err => console.log(err)))
 			} else if (pinboard) {
-				batch.push(t.any(`
-					SELECT DISTINCT (p.owner) AS id FROM pinboard_contributions pc
-					INNER JOIN pads p
-						ON pc.pad = p.id
-					WHERE pc.pinboard = $1
-				;`, [ pinboard ])
-				.then(async results => {
+				batch.push(ownDB().then(async ownId => {
+					const padlist = (await DB.general.any(`
+						SELECT pc.pad FROM pinboard_contributions pc
+						WHERE pc.pinboard = $1 AND pc.db = $2 AND pc.is_included = true
+					;`, [ pinboard, ownId ])).map((row) => row.pad);
+					const results = await t.any(`
+						SELECT DISTINCT (p.owner) AS id FROM pads p WHERE p.id IN ($1:csv)
+					`, [ safeArr(padlist, -1) ]);
 					const data = await join.users(results, [ language, 'id' ])
 					data.sort((a, b) => a.country?.localeCompare(b.country))
-				
+
 					let { write } = modules.find(d => d.type === 'pads')?.rights
 					if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 					console.log('check write', write)
-					
+
 					return data.filter(d => d.rights >= write)
 					// TO DO: NEW write STRUCTURE
 					// THIS IS IN THE CASE OF A DEEP DIVE CAMPAIGN, IDENTIFY USERS WHO STILL HAVE AUTHORING RIGHTS
@@ -83,9 +83,9 @@ module.exports = (req, res) => {
 				}
 			}
 		}
-		
-		// GET FROM THE query WHETHER THIS IS A COPY: 
-		// IF IT IS A COPY, THEN GET ONLY THE TEMPLATE USED IN THE source 
+
+		// GET FROM THE query WHETHER THIS IS A COPY:
+		// IF IT IS A COPY, THEN GET ONLY THE TEMPLATE USED IN THE source
 		if (copy === 'true') {
 			batch.push(t.one(`
 				SELECT id FROM templates
@@ -93,22 +93,22 @@ module.exports = (req, res) => {
 			;`, [ source ]))
 		} else {
 			batch.push(t.any(`
-				SELECT t.id, t.title, t.status, t.owner, 
-					COALESCE(ce.count, 0)::INT AS applications 
+				SELECT t.id, t.title, t.status, t.owner,
+					COALESCE(ce.count, 0)::INT AS applications
 				FROM templates t
 
 				LEFT JOIN (
 					SELECT COUNT (id), template FROM mobilizations
 					GROUP BY template
 				) ce ON ce.template = t.id
-				
+
 				WHERE ((t.owner IN ($1:csv) OR $2 > 2) AND t.status >= 1)
 					OR t.status = 2
 			;`, [ collaborators_ids, rights ])
 			.then(async results => {
 				const data = await join.users(results, [ language, 'owner' ])
 				return data
-			})) 
+			}))
 		}
 
 		if (source) { // THIS IS EITHER A FOLLOW UP OR A COPY
@@ -118,21 +118,21 @@ module.exports = (req, res) => {
 				WHERE id = $1::INT
 			;`, [ source ]))
 		} else batch.push(null)
-		
+
 		return t.batch(batch)
 		.then(async results => {
 			const [ cohort, templates, sourceinfo ] = results
-			
+
 			const metadata = await datastructures.pagemetadata({ connection: t, req })
 			return Object.assign(metadata, { cohort, templates, sourceinfo })
 
-			// return { 
+			// return {
 			// 	metadata : {
 			// 		site: {
 			// 			modules
 			// 		},
 			// 		page: {
-			// 			title: pagetitle, 
+			// 			title: pagetitle,
 			// 			path,
 			// 			referer: originalUrl,
 			// 			// id: page,

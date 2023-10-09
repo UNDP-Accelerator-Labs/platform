@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-exports.generate = async (req, res) => {
+module.exports = (req, res) => {
 	const { uuid, rights } = req.session || {}
 	const { host } = req.headers || {}
 	if (uuid) {

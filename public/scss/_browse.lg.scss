@@ -2,13 +2,14 @@ div.public-page-header {
 	min-height: 100vh;
 
 	div.carousel {
+		position: relative;
 		width: 100%;
 		min-height: 100vh;
 		left: 0;
 
 		&.expand {
 			width: 100vw;
-			margin-left: calc((100% - 100vw) / 2);
+			margin-left: calc(100% - 100vw + 15px);
 		}
 
 		div.slides {
@@ -126,16 +127,15 @@ div.public-page-header {
 
 		&.expand {
 			width: 100vw;
-			margin-left: calc((100% - 100vw) / 2);
+			margin-left: calc(100% - 100vw + 15px);
 		}
 
 		/* INSPIRED BY: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
 		div.slides {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, 150px);
+			grid-template-columns: repeat(7, 150px);
 			grid-auto-rows: 1fr;
-			column-gap: 5px;
-			row-gap: 5px;
+			grid-gap: 5px;
 			align-items: center;
 			justify-content: center;
 			grid-column-start: 3;
@@ -153,7 +153,11 @@ div.public-page-header {
 			}
 
 			div.blank-area {
-				grid-area: 1 / 1 / 3 / 3;
+				grid-area: 1 / 1 / 3 / 2;
+
+				&.sidebar {
+					grid-area: 1 / 1 / 6 / 2;
+				}
 			}
 
 			div.slide {
@@ -312,9 +316,30 @@ div.public-page-panel {
 	min-height: 90px;
 	padding: 90px 0;
 
+	&.sm-padding {
+		padding: 0;
+	}
+
+	&.blue {
+		width: 100vw;
+		padding: 90px 0;
+		margin-left: calc(100% - 100vw + 15px);
+		background-color: $c-mid-blue;
+		color: #FFF;
+
+		& > .inner {
+			margin: 0 30px 0 auto;
+			width: calc(300px * 3 + 15px * 4);
+		}
+
+		a {
+			color: $c-light-green;
+		}
+	}
+
 	& > .inner {
 		position: relative;
-		width: calc(300px * 3 + 15px * 2);
+		width: 100%;
 		margin: auto;
 
 		h1.site-title {
@@ -326,7 +351,7 @@ div.public-page-panel {
 		}
 		h1.site-title.map-overlay {
 			position: absolute;
-			right: 0;
+			left: 0;
 			top: 0;
 			margin: calc(-#{$t-xxlarge} * 1.2) 0 1em 0;
 			z-index: 1000;
@@ -357,20 +382,20 @@ div.public-page-panel {
 			color: $c-light-grey;
 		}
 		#statistics {
-			display: flex;
+			display: grid;
+			grid-gap: 15px;
+			grid-template-columns: 3fr 7fr;
 			margin: 30px 0;
 
 			.stat-group {
-				display: flex;
-				flex: 1 1 0;
+				display: grid;
+				grid-gap: 30px;
+				grid-auto-flow: column;
+				justify-content: center;
 				align-items: center;
-				margin: 0 30px;
 
 				.statistic {
-					flex: 1 1 0;
-					align-self: flex-start;
 					text-align: center;
-					margin: 0 15px;
 
 					h1 {
 						font-size: $t-xxlarge;
@@ -381,11 +406,16 @@ div.public-page-panel {
 						font-size: $t-xlarge;
 						line-height: 1.2em;
 					}
+					small {
+						font-size: $t-small;
+						line-height: 1.2em;
+						color: $c-light-grey;
+					}
 				}
 			}
-			.stat-group:first-child {
-				border-right: 1px dotted $c-light-grey;
-			}
+// 			.stat-group:nth-child(2) {
+// /*				border-left: 1px dotted $c-light-grey;*/
+// 			}
 		}
 		.map-container {
 			width: calc(100% + (100vw - 100%) / 2);
@@ -400,6 +430,9 @@ div.public-page-panel {
 			text-align: center;
 			margin: 60px 0;
 
+			a:hover {
+				text-decoration: none;
+			}
 			button {
 				min-height: 45px;
 				padding: 0 15px;
@@ -419,15 +452,12 @@ div.public-page-panel {
 			}
 		}
 		ul.columns {
-			display: flex;
-			flex-flow: wrap;
+			display: grid;
 			align-items: center;
+			grid-gap: 15px;
+			grid-template-columns: repeat(4, 1fr);
 
 			li {
-				width: calc((300px * 3 + 15px * 2) / 4);
-				margin: .25em 0;
-				padding-right: 15px;
-				box-sizing: border-box;
 				font-size: $t-main;
 				line-height: 1.3em;
 
@@ -440,39 +470,119 @@ div.public-page-panel {
 			}
 		}
 	}
-
-	&.blue {
-		width: 100vw;
-		padding: 90px 0;
-		margin-left: calc((100% - 100vw) / 2);
-		background-color: $c-mid-blue;
-		color: #FFF;
-
-		a {
-			color: $c-light-green;
-		}
-	}
 }
 
 div.main-content {
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr calc(300px * 3 + 15px * 3 + 45px);
 	min-height: 100vh;
 }
 
 div.browse {
 	display: block;
-	width: calc(300px * 3 + 15px * 2);
 	padding: 0 15px;
 	background-color: #FFF;
 	min-height: calc(100vh - 120px);
 
 	&:not(.home) {
 		padding-top: 120px;
+		padding-right: 45px;
+	}
+	&.public,
+	&.instance {
+		padding-top: 90px;
+	}
+
+	h1.instance-title {
+		font-size: $t-xlarge;
+		line-height: 1.2em;
+		margin-bottom: 30px;
+		text-align: center;
+	}
+
+	h1.instance-title {
+		font-size: $t-xlarge;
+		line-height: 1.2em;
+		margin-bottom: 30px;
+		text-align: center;
 	}
 
 	nav#search-and-filter {
-		padding: 5px 14px 15px 14px;
+		padding: 0 14px 15px 14px;
 		border: 1px dotted $c-light-grey;
+		margin-bottom: 0;
+
+		&.anchor-bottom {
+			position: fixed;
+			width: 100%;
+			max-height: calc(100vh - 30px);
+			min-height: 180px;
+			left: 0;
+			bottom: 0;
+			margin: 0;
+			z-index: 100;
+			background-color: #FFF;
+			border: none;
+			border-top: 1px solid $c-mid-grey;
+			box-sizing: border-box;
+			overflow: visible;
+		}
+
+		.search-type-menu {
+			display: flex;
+			padding: 0;
+			margin: 0;
+			font-size: $t-mid-small;
+			line-height: 1.5em;
+			border-bottom: 1px dotted $c-light-grey;
+			user-select: none;
+
+			.stm {
+				position: relative;
+				color: $c-light-grey;
+				border-right: 1px dotted $c-light-grey;
+				cursor: pointer;
+				padding: 5px 15px;
+				user-select: none;
+			}
+			.stm:not(.stm-select):hover {
+				color: $c-mid-grey;
+			}
+			.stm-select {
+				color: $c-dark-blue;
+				font-weight: bold;
+				cursor: auto;
+
+				&::after {
+					content: "";
+					position: absolute;
+					left: 0;
+					top: 100%;
+					width: 100%;
+					height: 2px;
+					background-color: #FFF;
+				}
+			}
+			.stm-hint {
+				display: inline-block;
+				position: absolute;
+				transform: translate(-3px, -15px);
+				padding: 0 5px;
+				margin-left: 5px;
+				border-radius: 5px;
+				border-bottom-left-radius: 0;
+				color: $c-dark-grey;
+				background-color: $c-mid-yellow;
+				z-index: 1;
+				cursor: pointer;
+				user-select: none;
+				pointer-events: all;
+				white-space: nowrap;
+			}
+			.stm-hidden {
+				display: none;
+			}
+		}
 
 		form {
 			display: flex;
@@ -685,7 +795,7 @@ div.browse {
 				float: right;
 				width: 30px;
 				height: 30px;
-				margin: 15px 15px 0 0;
+				margin: 15px 15px 0 auto;
 				background-color: transparent;
 				outline: none;
 				border: none;
@@ -750,7 +860,7 @@ div.browse {
 				transition: max-height 0.25s ease-out;
 
 				section {
-					flex: 1 1 0;
+					flex: 1 1;
 					margin-top: 15px;
 					padding: 0 7.5px;
 
@@ -792,6 +902,12 @@ div.browse {
 							overflow: auto;
 							z-index: 100;
 							transition: max-height 0.25s ease-out;
+
+							&.dropup {
+								top: auto;
+								bottom: 100%;
+								box-shadow: 0px -10px 10px rgba(0,0,0,.1);
+							}
 
 							menu {
 								width: 100%;
@@ -908,6 +1024,29 @@ div.browse {
 					flex-basis: 100%;
 					width: 0;
 				}
+				.order {
+					padding: 0 7.5px;
+
+					menu {
+						li {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+
+							input.toggle + label {
+								display: inline-block;
+								margin-top: 0;
+							}
+							/*input.toggle:checked + label {
+								background-color: #FFF;
+							}*/
+							p {
+								display: inline-block;
+								margin: 0 0 0 7.5px;
+							}
+						}
+					}
+				}
 				button.submit-filters {
 					width: calc(100% - 15px);
 					height: 30px;
@@ -1004,10 +1143,11 @@ div.browse {
 				z-index: 100;
 
 				form {
-					display: flex;
+					display: grid;
+					grid-template-columns: 7fr 3fr;
+					grid-gap: 15px;
 
 					.opts {
-						flex-grow: 1;
 						list-style: none;
 
 						li {
@@ -1044,10 +1184,12 @@ div.browse {
 						}
 					}
 					.btn-group {
-						height: 30px;
-						padding: 15px 0;
+						display: grid;
+						grid-gap: 5px;
+						grid-auto-flow: column;
+						min-height: 30px;
 						margin: 0 0 0 auto;
-						text-align: right;
+						justify-content: right;
 
 						button {
 							height: 30px;
@@ -1147,7 +1289,7 @@ div.browse {
 			}
 		}
 		.outer {
-			/* margin-top: 30px;*/
+			/* margin-top: 30px; */
 			margin-top: 0px;
 			color: $c-light-grey;
 			font-size: $t-mid-small;
@@ -1169,31 +1311,42 @@ div.browse {
 	main .inner,
 	.public-page-panel .inner {
 		section {
+			margin-bottom: 30px;
+
 			.layout {
 				margin-top: 15px;
 
 				article {
 					position: relative;
 					display: flex;
-					padding: 15px 0 0 0;
-					border-bottom-left-radius: 5px;
-					border-bottom-right-radius: 5px;
+					padding: 15px 0 15px 15px;
+					margin-bottom: 15px;
+					border: 1px solid transparent;
+					box-sizing: border-box;
+					transition: box-shadow .25s;
+
+					&:hover {
+						background-color: transparent;
+						box-shadow: 0 5px 0 rgba(0,0,0,.1);
+						border: 1px solid $c-mid-grey;
+					}
 
 					.inner {
-						display: flex;
-						flex-flow: row wrap;
-						flex-grow: 1;
+						display: grid;
+						grid-column-gap: 30px;
+						grid-template-columns: 1fr 300px;
+						width: 100%;
 						transition: width .25s;
 
 						.head {
-							flex: 0 0 100%;
+							grid-column: 1 / span 2;
 							margin-top: 0;
 							margin-bottom: 0;
 
 							.meta-group {
-								display: flex;
-								justify-content: space-between;
-								align-items: flex-end;
+								display: grid;
+								grid-gap: 30px;
+								grid-template-columns: 1fr 300px;
 
 								.meta-data {
 									margin-bottom: 0;
@@ -1210,12 +1363,14 @@ div.browse {
 									}
 								}
 								.btn-group {
-									margin-bottom: 5px;
+									display: grid;
+									grid-gap: 5px;
+									grid-auto-flow: column;
+									margin: -16px -1px 0 auto;
+									justify-content: right;
 
 									form {
 										position: relative;
-										display: inline-block;
-										margin: 0 2px;
 
 										button {
 											min-height: 30px;
@@ -1313,10 +1468,6 @@ div.browse {
 							}
 						}
 						.body {
-							flex: 0 0 calc(100% - 330px);
-							padding-right: 30px;
-							/*padding-bottom: 10px;*/
-
 							.meta, .media {
 								margin: 5px 0;
 							}
@@ -1485,14 +1636,17 @@ div.browse {
 							}
 						}
 						.body.full-width {
-							flex: 0 0 100%;
+							grid-column: 1 / span 2;
 
 							.media-title {
 								width: calc(100% - 330px);
 							}
 						}
 						.foot {
-							align-self: top;
+							display: flex;
+							flex-direction: column;
+							justify-content: end;
+							flex-grow: 1;
 
 							.media-img {
 								position: relative;
@@ -1501,79 +1655,6 @@ div.browse {
 								display: flex;
 								align-items: flex-end;
 
-								.bookmark {
-									display: none;
-									justify-content: center;
-									align-items: center;
-									position: absolute;
-									width: 30px;
-									height: 90px;
-									top: -10px;
-									right: 10px;
-									background-color: $c-mid-blue;
-									font-size: $t-small;
-									line-height: 1.5em;
-									text-align: center;
-									color: #FFF;
-									z-index: 100;
-									transform: translateY(-10px);
-									transform-origin: top center;
-									transition: transform .15s ease-out, background-color .25s;
-									cursor: pointer;
-
-									.label {
-										transform: rotate(-90deg);
-									}
-								}
-								.bookmark::before {
-									content: '';
-									position: absolute;
-									right: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-left: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark::after {
-									content: '';
-									position: absolute;
-									left: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-right: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark:hover,
-								.bookmark.active {
-									display: flex;
-									transform: translateY(0);
-									background-color: $c-dark-blue;
-								}
-								.bookmark:hover::before,
-								.bookmark:hover::after,
-								.bookmark.active::before,
-								.bookmark.active::after {
-									border-top-color: $c-dark-blue;
-								}
-								.bookmark.active {
-									transform: translateY(0)scaleY(.5);
-
-									.label {
-										display: none;
-									}
-								}
-								.bookmark.active::before,
-								.bookmark.active::after {
-									transform: translateY(90px)scaleY(2);
-								}
 								a {
 									display: block;
 									position: relative;
@@ -1594,16 +1675,15 @@ div.browse {
 								}
 							}
 							.meta-group {
-								display: flex;
-								justify-content: space-around;
-								align-items: center;
-								width: 300px;
-								height: calc(100% - 15px);
-								padding-bottom: 15px;
+								display: grid;
+								grid-gap: 15px;
+								grid-auto-flow: column;
+								height: 100%;
+								padding: 15px 15px 0 0;
+								box-sizing: border-box;
+								justify-content: right;
 
 								.meta-stats {
-									margin: auto 5px;
-
 									a {
 										h1 {
 											text-align: center;
@@ -1645,8 +1725,10 @@ div.browse {
 							}
 						}
 						.pinboard-group {
-							width: 100%;
+							grid-column: 1 / span 2;
 							margin-top: 5px;
+							padding-right: 15px;
+							box-sizing: border-box;
 
 							.add {
 								position: relative;
@@ -1654,7 +1736,6 @@ div.browse {
 
 								input[type=text] {
 									position: relative;
-									/*width: calc(100% - 20px);*/
 									width: 100%;
 									height: 30px;
 									padding: 0;
@@ -1662,7 +1743,7 @@ div.browse {
 									border: none;
 									outline: none;
 									background-color: transparent;
-									border-bottom: 1px dotted $c-light-grey;
+									border-bottom: 1px dotted transparent;
 									font-size: $t-small;
 									color: $c-dark-blue;
 								}
@@ -1715,6 +1796,12 @@ div.browse {
 									overflow: auto;
 									z-index: 10;
 									transition: max-height 0.25s ease-out;
+
+									&.dropup {
+										top: auto;
+										bottom: 100%;
+										box-shadow: 0px -10px 10px rgba(0,0,0,.1);
+									}
 
 									menu {
 										width: 100%;
@@ -1774,7 +1861,6 @@ div.browse {
 								}
 								.type {
 									flex-shrink: 0;
-									/*font-size: $t-xsmall;*/
 								}
 								.name {
 									flex-grow: 1;
@@ -1826,10 +1912,8 @@ div.browse {
 							position: relative;
 							z-index: 1;
 							width: 0;
-							height: calc(100% + 15px);
-							/*padding: 15px 0 0 0;*/
+							height: calc(100% + 30px);
 							margin-top: -15px;
-							/*border-bottom: 1px dotted $c-light-grey;*/
 							transition: width .25s;
 							overflow: hidden;
 
@@ -1904,14 +1988,11 @@ div.browse {
 						transition: opacity .15s;
 					}*/
 				}
-				article:hover {
-					background-color: $c-light-3;
-				}
-				article:not(.pad):not(.review):not(.contributor) {
+				/*article:not(.pad):not(.review):not(.contributor) {
 					border-bottom: 1px dotted $c-light-grey;
 					padding-top: 15px;
 					padding-bottom: 15px;
-				}
+				}*/
 				article.status--1 {
 					filter: grayscale(1);
 					background: repeating-linear-gradient(
@@ -1939,6 +2020,9 @@ div.browse {
 						rgba(50, 190, 225, .1) 3px,
 						rgba(50, 190, 225, .1) 6px
 					);
+				}
+				article.status-2 {
+					margin-bottom: 30px;
 				}
 				article.mobilization.status-0 {
 					background: repeating-linear-gradient(
@@ -2008,6 +2092,10 @@ div.browse {
 				.engagement-group {
 					margin-top: 10px;
 
+					&.page-stats {
+						margin-top: 0;
+					}
+
 					.engagement {
 						display: inline-block;
 						border: none;
@@ -2026,6 +2114,10 @@ div.browse {
 							text-align: center;
 							font-size: $t-small;
 							color: $c-light-grey;
+							user-select: none;
+						}
+						&.engagement-reads {
+							pointer-events: none;
 						}
 					}
 					.engagement:disabled {
@@ -2039,34 +2131,50 @@ div.browse {
 			.layout.columns {
 				display: grid;
 				grid-template-columns: repeat(3, 300px);
-				grid-gap: 15px;
+				grid-gap: 30px 15px;
 
 				article {
+					display: flex;
 					flex-direction: column;
 					width: 100%;
 					height: 100%;
 					vertical-align: top;
 					grid-column: span 1;
-					padding-top: 0;
-					padding-bottom: 0;
+					padding: 0 0 15px 0;
 					border-bottom: none;
+					box-sizing: border-box;
+					border: 1px solid transparent;
+					transition: box-shadow .25s;
+
+					&:hover {
+						box-shadow: 0 5px 0 rgba(0,0,0,.1);
+						border: 1px solid $c-mid-grey;
+					}
 
 					.inner {
-						display: block;
+						display: flex;
+						flex-direction: column;
+						height: 100%;
 
 						.head {
 							display: block;
 
 							.btn-group {
 								text-align: left;
+								margin: -1px 0 0 -1px;
+
+								display: grid;
+								grid-gap: 5px;
+								grid-template-columns: repeat(4, 1fr);
+								justify-content: left;
+								width: calc(100% + 2px);
 
 								form {
 									position: relative;
-									display: inline-block;
-									margin: 0 2px;
 
 									button {
 										min-height: 30px;
+										width: 100%;
 										padding: 0 10px;
 										border: 1px solid $c-light-grey;
 										outline: none;
@@ -2155,85 +2263,12 @@ div.browse {
 							}
 							.media-img {
 								position: relative;
-								width: 300px;
-								height: 200px;
+								width: calc(300px - 2px);
+								height: auto;
 								margin-bottom: 10px;
 								display: flex;
 								align-items: flex-end;
 
-								.bookmark {
-									display: none;
-									justify-content: center;
-									align-items: center;
-									position: absolute;
-									width: 30px;
-									height: 90px;
-									top: -10px;
-									right: 10px;
-									background-color: $c-mid-blue;
-									font-size: $t-small;
-									line-height: 1.5em;
-									text-align: center;
-									color: #FFF;
-									z-index: 100;
-									transform: translateY(-10px);
-									transform-origin: top center;
-									transition: transform .15s ease-out, background-color .25s;
-									cursor: pointer;
-
-									.label {
-										transform: rotate(-90deg);
-									}
-								}
-								.bookmark::before {
-									content: '';
-									position: absolute;
-									right: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-left: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark::after {
-									content: '';
-									position: absolute;
-									left: 0;
-									top: 0;
-									transform: translateY(90px);
-									width: 0;
-									height: 0;
-									border-top: 7px solid $c-mid-blue;
-									border-right: 15px solid transparent;
-									transform-origin: top center;
-									transition: transform .15s ease-out, border-top-color .25s;
-								}
-								.bookmark:hover,
-								.bookmark.active {
-									display: flex;
-									transform: translateY(0);
-									background-color: $c-dark-blue;
-								}
-								.bookmark:hover::before,
-								.bookmark:hover::after,
-								.bookmark.active::before,
-								.bookmark.active::after {
-									border-top-color: $c-dark-blue;
-								}
-								.bookmark.active {
-									transform: translateY(0)scaleY(.5);
-
-									.label {
-										display: none;
-									}
-								}
-								.bookmark.active::before,
-								.bookmark.active::after {
-									transform: translateY(90px)scaleY(2);
-								}
 								a {
 									display: block;
 									position: relative;
@@ -2245,7 +2280,8 @@ div.browse {
 										display: block;
 										width: 100%;
 										background-color: $c-light-2;
-										height: 100%;
+										height: auto;
+										min-height: 200px;
 										font-size: $t-small;
 										line-height: 1.5em;
 										line-height: 200px;
@@ -2257,7 +2293,8 @@ div.browse {
 						.body {
 							display: block;
 							width: 100%;
-							padding: 0;
+							padding: 0 15px;
+							box-sizing: border-box;
 
 							.meta-data {
 								margin: 0 0 5px 0;
@@ -2339,9 +2376,11 @@ div.browse {
 						}
 					}
 					.outer {
+						top: 15px;
 						height: 0;
 						transition: height .25s;
 						overflow: hidden;
+						margin-top: 0;
 
 						.inner {
 							width: 100%;
@@ -2361,18 +2400,20 @@ div.browse {
 						height: calc(55px * 2 + 15px * 2);
 					}
 				}
+				.engagement-group {
+					margin-top: 0;
+					padding: 0 10px;
+					box-sizing: border-box;
+				}
+				.pinboard-group {
+					padding: 0 15px;
+					box-sizing: border-box;
+				}
 			}
 		}
 	}
 }
-div.browse.public {
-	padding-top: 90px;
-}
 div.browse.slideshow {
-	/*position: absolute;
-	top: 30px;
-	left: 0;
-	width: 100vw;*/
 	padding: 0 15px;
 	margin: 0;
 	border: none;
@@ -2434,9 +2475,10 @@ div.browse.slideshow {
 				height: 100%;
 
 				.layout {
-					display: flex;
+					display: grid;
+					grid-gap: 0;
+					grid-auto-flow: column;
 					position: relative;
-					flex-flow: row nowrap;
 					height: 100%;
 					scroll-snap-type: x mandatory;
 					overflow: auto;
@@ -2448,6 +2490,7 @@ div.browse.slideshow {
 						height: 100%;
 						scroll-snap-align: center;
 						padding: 0;
+						border: none;
 
 						.inner {
 							display: flex;
@@ -2456,13 +2499,14 @@ div.browse.slideshow {
 							flex-direction: column;
 							flex: none;
 							width: 100vw;
-							max-height: 100%;
+							height: 100%;
 							box-sizing: border-box;
-							padding: 0 calc((100vw - (300px * 2 + 15px * 1)) / 2) 30px calc((100vw - (300px * 2 + 15px * 1)) / 2);
+							padding: 0 calc((100vw - (300px * 2 + 15px * 1)) / 2) 0 calc((100vw - (300px * 2 + 15px * 1)) / 2);
 
 							.head {
 								flex: unset;
 								position: static;
+
 								.meta-group {
 									position: relative;
 									z-index: 10;
@@ -2484,7 +2528,7 @@ div.browse.slideshow {
 								}
 								.media-img {
 									position: absolute;
-									top: 0;
+									top: 30px;
 									left: 0;
 									width: 100vw;
 									height: calc(100vh - 30px);
@@ -2586,8 +2630,6 @@ div.browse.slideshow {
 						}
 					}
 					article:hover {
-						background-color: transparent;
-
 						.inner {
 							.head {
 								.meta-group {
@@ -2647,3 +2689,24 @@ footer.slideshow {
 footer {
 	border: none;
 }
+
+/*.engagement-reads {
+	padding-left: 15px;
+	flex-grow: 1;
+}
+.engagement-reads-icon {
+	max-width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+}
+.engagement-reads-count {
+	margin-left: 5px;
+	font-size: 0.9em;
+	color: $c-mid-grey;
+	vertical-align: middle;
+	user-select: none;
+	pointer-events: none;
+}
+*/

@@ -14,7 +14,7 @@ module.exports = (req, res) => {
 	if (modules.some(d => d.type === `${object}s`)) {
 		const { read, write } = modules.find(d => d.type === `${object}s`).rights
 
-		if (object === 'pad' && (rights >= write || public)) pad(req, res) // THE || uuid IS FOR PUBLIC ACCESS DURING MOBILIZATIONS
+		if (object === 'pad' && (rights >= write.templated || public)) pad(req, res) // HERE WE ASSUME ALL FORWARDED PADS ARE TEMPLATED BECAUSE PART OF A MOBILIZATION
 		// else if (object === 'template' && rights >= modules.find(d => d.type === 'templates').rights.write) template.create(req, res)
 		// else if (object === 'mobilization' && rights >= modules.find(d => d.type === 'mobilizations').rights.write) mobilization.create(req, res)
 		// else res.redirect(`/${language}/browse/${object}s/public`)

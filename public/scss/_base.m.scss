@@ -4,14 +4,23 @@ html, body {
 	font-size: $t-main;
 	line-height: 1.3em;
 }
-
-.lg {
+.xs:not(.m),
+.sm:not(.m),
+.lg:not(.m),
+.xl:not(.m),
+.xxl:not(.m) {
 	display: none !important;
 }
 
+
+.no-bg {
+	background-color: transparent !important;
+}
+
+/* TBD: WHERE IS THIS INTRODUCED */
 .modal {
-	width: 300px;
-	margin-bottom: 75px;
+	width: 350px;
+	flex-shrink: 1;
 
 	.close {
 		padding: 5px 10px;
@@ -21,6 +30,8 @@ html, body {
 		clear: both;
 		padding: 15px 15px 5px 15px;
 		background-color: #FFF;
+		max-height: 85vh;
+		overflow-y: auto;
 
 		.headline {
 			margin-bottom: 15px;
@@ -32,6 +43,10 @@ html, body {
 		.message {
 			margin-bottom: 15px;
 			font-size: $t-main;
+
+			* {
+				padding: 5px;
+			}
 
 			input[type=text],
 			input[type=number] {

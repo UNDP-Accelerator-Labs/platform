@@ -43,10 +43,20 @@ String.prototype.isURL = function () {
 	// 	'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
 	// 	'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
 	// 	'(\\#[-a-z\\d_]*)?$', 'i') // extension
-	const url = new RegExp(`(?<!:)(${b}(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`, 'ig')
-	if (this.valueOf().trim().match(url)?.length <= 1) {
-		return !!url.test(encodeURI(this.valueOf().trim()))
-	} else return false
+	try {
+		// THIS SHOULD WORK FOR CHROME
+		const url = new RegExp(`(?<!:)(${b}(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`, 'ig')
+		if (this.valueOf().trim().match(url)?.length <= 1) {
+			return !!url.test(encodeURI(this.valueOf().trim()))
+		} else return false
+	} catch (err) {
+		// THIS IS FOR SAFARI THAT DOES NOT SUPPORT LOOK BEHIND
+		console.log(err)
+		const url = new RegExp(`(:)?(${b}(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`, 'ig')
+		if (this.valueOf().trim().match(url)?.length <= 1) {
+			return !!encodeURI(this.valueOf().trim()).match(url).every(d => d.charAt(0) !== ':')
+		} else return false
+	}
 }
 String.prototype.isBlob = function () {
 	const blob = new RegExp('^blob\:')

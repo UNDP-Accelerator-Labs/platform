@@ -5,6 +5,7 @@
 	const language = locals.metadata.page.language
 	const anonymized = locals.metadata.page.query?.anonymize?.includes('true')
 	const render = locals.metadata.page.query?.render?.includes('true')
+	const page_content_limit = locals.metadata.page.page_content_limit
 %>
 <html lang='<%- language %>'>
 <head>
@@ -28,33 +29,92 @@
 
 
 <script type='text/javascript'>
-	const centerpoint = <%- JSON.stringify(locals.metadata.user.country.lnglat || {}) %>
+	const centerpoint = <%- JSON.stringify(locals.metadata.user.country.lnglat || {}) %>;
 
 	// POPULATE THE PAGE
 	let data = <%- JSON.stringify(locals.data || {}) %>;
 	if (!Array.isArray(data)) data = [data]
 
-	Promise.all(renderCards(data))
-	.then(results => {
-		console.log('done rendering')
+	const chunks = data.chunk(<%- (page_content_limit || 25) %>)
+	const { jsPDF } = window.jspdf
 
-		<% if (render) { %>
-			const { width: orwidth, height: orheight, imgdata: orimgdata } = results[0]
-			const { jsPDF } = window.jspdf
-			const pdf = new jsPDF({ unit: 'px', format: [ orwidth, orheight ], hotfixes: ['px_scaling'] })
-			pdf.addImage(orimgdata, 'png', 0, 0, orwidth, orheight)
-			results.shift()
-			results.forEach((d, i) => {
-				const { width, height, imgdata } = d
-				pdf.addPage([ width, height ])
-				pdf.addImage(imgdata, 'png', 0, 0, width, height)
-			})
-			pdf.save('pads-cards-compilation.pdf')
-			window.close()
-		<% } %>
+	async function download () {
+		for (let i = 0; i < chunks.length; i++) {
+			const results = await Promise.all(renderCards(chunks[i]))
+			
+			<% if (render) { %>
+				const { width: orwidth, height: orheight, imgdata: orimgdata } = results[0]
+			
+				const pdf = new jsPDF({ unit: 'px', format: [ orwidth, orheight ], hotfixes: ['px_scaling'] })
+				pdf.addImage(orimgdata, 'png', 0, 0, orwidth, orheight)
+				results.shift()
 
-		return null
-	})
+				results.forEach((d, i) => {
+					const { width, height, imgdata } = d
+					pdf.addPage([ width, height ])
+					pdf.addImage(imgdata, 'png', 0, 0, width, height)
+				})
+				pdf.save(`pads-cards-compilation-${i}.pdf`)
+			<% } %>
+			d3.select('div.document').html('')
+		}
+		window.close()
+	}
+	download()
+
+
+	// Promise.all(data.chunk(20).map((d, i) => {
+	// 	return new Promise(resolve => {
+	// 		console.log(d)
+	// 		return Promise.all(renderCards(d))
+	// 		.then(results => {
+	// 			console.log(`done rendering ${i * 20}`)
+
+	// 			<% if (render) { %>
+	// 				// const { width: orwidth, height: orheight, imgdata: orimgdata } = results[0]
+	// 				// const { jsPDF } = window.jspdf
+	// 				// const pdf = new jsPDF({ unit: 'px', format: [ orwidth, orheight ], hotfixes: ['px_scaling'] })
+	// 				// pdf.addImage(orimgdata, 'png', 0, 0, orwidth, orheight)
+	// 				// results.shift()
+	// 				// results.forEach((d, i) => {
+	// 				// 	const { width, height, imgdata } = d
+	// 				// 	pdf.addPage([ width, height ])
+	// 				// 	pdf.addImage(imgdata, 'png', 0, 0, width, height)
+	// 				// })
+	// 				// pdf.save('pads-cards-compilation.pdf')
+	// 				// window.close()
+	// 			<% } %>
+
+	// 			d3.select('div.document').html('')
+
+	// 			resolve(null)
+	// 		}).catch(err => console.log(err))
+	// 	})
+	// })).then(results => {
+	// 	console.log(results)
+	// }).catch(err => console.log(err))
+
+	// Promise.all(renderCards(data))
+	// .then(results => {
+	// 	console.log('done rendering')
+
+	// 	<% if (render) { %>
+	// 		const { width: orwidth, height: orheight, imgdata: orimgdata } = results[0]
+	// 		const { jsPDF } = window.jspdf
+	// 		const pdf = new jsPDF({ unit: 'px', format: [ orwidth, orheight ], hotfixes: ['px_scaling'] })
+	// 		pdf.addImage(orimgdata, 'png', 0, 0, orwidth, orheight)
+	// 		results.shift()
+	// 		results.forEach((d, i) => {
+	// 			const { width, height, imgdata } = d
+	// 			pdf.addPage([ width, height ])
+	// 			pdf.addImage(imgdata, 'png', 0, 0, width, height)
+	// 		})
+	// 		pdf.save('pads-cards-compilation.pdf')
+	// 		window.close()
+	// 	<% } %>
+
+	// 	return null
+	// })
 
 	function renderCards (cards) {
 		return cards.map((data, i) => {
@@ -72,24 +132,36 @@
 					blob.onload = function () {
 						imgnode.node().src = this.src
 
-						html2canvas(article.node())
+						html2canvas(article.node(), { useCORS: true, allowTaint: true, scale: 1 })
 						.then(canvas => {
 							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
 							let imgdata = canvas.toDataURL('image/png')
 							imgdata.replace(/^data:image\/png/, 'data:application/octet-stream')
 							
-							// const download = article.addElems('a')
-							// 	.attr('download', `card-${i + 1}.png`)
-							// 	.attr('href', imgdata)
-							// .on('click', _ => article.remove())
-							// .html('download')
-
 							const { width, height } = canvas
 							resolve({ imgdata, width, height })
 							
 						}).catch(err => console.log(err))
 					}
-					blob.src = img
+					blob.onerror = function () {
+						html2canvas(article.node(), { scale: 1 })
+						.then(canvas => {
+							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
+							let imgdata = canvas.toDataURL('image/png')
+							imgdata.replace(/^data:image\/png/, 'data:application/octet-stream')
+							
+							const { width, height } = canvas
+							resolve({ imgdata, width, height })
+						}).catch(err => console.log(err))
+					}
+					
+					<% if (locals.metadata.site.app_storage) { %>
+						const source = new URL(`<%- locals.metadata.site.app_storage %>${img[0]}`).href
+					<% } else { %>
+						const source = img[0]
+					<% } %>
+					// blob.src = img
+					blob.src = source
 				}
 				
 				article.addElem('small', 'media media-source')

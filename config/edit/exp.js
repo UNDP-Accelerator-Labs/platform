@@ -1,6 +1,6 @@
 //// EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'UNDP Accelerator Labs, Experiments'
+exports.app_title = 'Experiments'
 exports.app_title_short = 'experiments'
 exports.app_suite = 'acclab_platform'
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret'
@@ -8,6 +8,7 @@ exports.app_languages = ['en', 'fr', 'es', 'pt']
 exports.app_description = require('./translations.js').translations['app description']
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/'
+exports.app_suite_url = 'https://acclabs.azurewebsites.net/'
 
 // DESIRED MODULES
 exports.modules = [
@@ -15,7 +16,7 @@ exports.modules = [
 	{ type: 'pinboards', rights: { read: 0, write: 1 } },
 	{ type: 'templates', rights: { read: 2, write: 3 } },
 	// { type: 'files', rights: { read: 0, write: 1 } },
-	{ type: 'reviews', rights: { read: 1, write: 1, coordinate: 3 }, reviewers: 2 },
+	{ type: 'reviews', rights: { read: 1, write: 1, coordinate: 3 }, reviewers: 1 },
 	// { type: 'mobilizations', rights: { read: 2, write: 2 } },
 	{ type: 'contributors', rights: { read: 2, write: 2 } },
 	{ type: 'teams', rights: { read: 2, write: 2 } }

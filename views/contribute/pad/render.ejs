@@ -94,7 +94,7 @@ const Media = function (kwargs) {
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 	// ADD REQUIREMENT
@@ -417,7 +417,7 @@ const Taglist = function (kwargs) {
 
 		meta.filter.addElems('button',  'add')
 			.on('click', _ => meta.recode(opencode))
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle_outline')
 	}
 	return meta
@@ -593,9 +593,18 @@ function uploadImg (kwargs) {
 		body: new FormData(form)
 	}).then(res => res.json())
 	.then(json => {
-		const notification = d3.select('body').addElem('div', 'notification')
+		let notification = null
+		const uploaderr = json?.filter(msg => msg.status != 200 && msg.message)
+		if(uploaderr.length){
+			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html('<%- vocabulary["image upload success"][language] %>')
+			.html(uploaderr[0].message  + '<i class="material-icons google-translate-attr">done</i>')
+		}
+		else {
+			notification = d3.select('body').addElem('div', 'notification')
+				.addElem('div')
+				.html('<%- vocabulary["image upload success"][language] %>')
+		}
 		setTimeout(_ => notification.remove(), 4000)
 
 		if (editing) {
@@ -672,11 +681,19 @@ function uploadVideo (kwargs) {
 	}).then(res => res.json())
 	.then(json => {
 		ellipsis.remove()
-		const notification = d3.select('body').addElem('div', 'notification')
+		let notification = null
+		const uploaderr = json?.filter(msg => msg.status != 200 && msg.message)
+		if(uploaderr.length){
+			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons">done</i>')
+			.html(uploaderr[0].message  + '<i class="material-icons google-translate-attr">done</i>')
+		}
+		else {
+			notification = d3.select('body').addElem('div', 'notification')
+			.addElem('div')
+			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons google-translate-attr">done</i>')
+		}
 		setTimeout(_ => notification.remove(), 4000)
-
 		if (editing) {
 			if (!publicpage) switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)
@@ -764,7 +781,7 @@ function addSection (kwargs) {
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			}).on('mouseup', _ => d3.event.stopPropagation())
-				.addElems('i', 'material-icons')
+				.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 
 			function rmSection () {
@@ -966,7 +983,7 @@ function addImg (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -975,7 +992,11 @@ function addImg (kwargs) {
 	if (src) {
 		const img = new Image()
 		img.onload = function () {
-			media.media.addElems('img').attrs({ 'class': d => d.scale, 'src': d => this.src })
+			media.media.addElems('img')
+			.attrs({
+				'class': d => d.scale,
+				'src': d => this.src
+			}).on('click', d => renderImgZoom({ src: this.src }))
 		}
 		img.onerror = function (err) {
 			if (err) console.log(err)
@@ -1021,7 +1042,7 @@ function addImg (kwargs) {
 				d3.select(this).classed('highlight', activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 				.html('add_photo_alternate')
 		}
 	}
@@ -1073,7 +1094,7 @@ function addMosaic (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1119,7 +1140,7 @@ function addMosaic (kwargs) {
 						if (!publicpage) switchButtons(lang)
 						else window.sessionStorage.setItem('changed-content', true)
 					}
-				}).addElems('i', 'material-icons')
+				}).addElems('i', 'material-icons google-translate-attr')
 					.html(d => d.label)
 			}
 		}
@@ -1170,7 +1191,7 @@ function addMosaic (kwargs) {
 				d3.select(this).classed('highlight', activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 				.html('add_photo_alternate')
 		}
 	}
@@ -1222,7 +1243,7 @@ function addVideo (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1258,7 +1279,7 @@ function addVideo (kwargs) {
 				d3.select(this).classed('highlight', activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 				.html('ondemand_video')
 		}
 	}
@@ -1341,7 +1362,7 @@ function addDrawing (kwargs) {
 					group.addElem('label', c.key).html('Brush size: ')
 					.addElems('span', 'size').html(`${opt.node().value}px`)
 				}
-				opt.addElems('i', 'material-icons', b => b.element === 'button' && b.key !== 'color' ? [b] : []).html(b => b.label)
+				opt.addElems('i', 'material-icons google-translate-attr', b => b.element === 'button' && b.key !== 'color' ? [b] : []).html(b => b.label)
 				// opt.addElems('span', 'constraint', b => b.key === 'constraint' ? [b] : [])
 					// .html(b => b.value - txt.length)
 			})
@@ -1454,7 +1475,7 @@ function addTxt (kwargs) {
 	if (!is_excerpt) is_excerpt = false
 	required = required ?? false
 
-	if (!editing && txt?.toString().trim().length === 0) return null
+	if (!editing && activity !== 'preview' && txt?.toString().trim().length === 0) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
@@ -1539,7 +1560,7 @@ function addTxt (kwargs) {
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		})
-		opts.addElems('i', 'material-icons')
+		opts.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 		opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 			.html(d => d.value - txt.length)
@@ -1566,7 +1587,7 @@ function addTxt (kwargs) {
 				return d.value - this.innerText.length
 			})
 		}
-	}).addElems('p', null, d => d.txt.split('\n').filter(c => c))
+	}).addElems('p', null, d => d.txt?.toString().split('\n').filter(c => c))
 	.html(d => {
 		// return d.txt.replace(/\r?\n/g, '<br/>')
 		return d.URLsToLinks()
@@ -1585,7 +1606,7 @@ function addEmbed (kwargs) {
 	if (!src) src = null
 	required = required ?? false
 
-	if (!editing && (html?.trim().length === 0 || src?.length === 0)) return null
+	if (!editing && activity !== 'preview' && (html?.trim().length === 0 || src?.length === 0)) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
@@ -1620,7 +1641,7 @@ function addEmbed (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1722,7 +1743,7 @@ function addChecklist (kwargs) {
 	}
 	required = required ?? false
 
-	if (!editing && options?.length === 0) return null
+	if (!editing && activity !== 'preview' && options?.length === 0) return null
 
 	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -1774,7 +1795,7 @@ function addChecklist (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1801,7 +1822,7 @@ function addChecklist (kwargs) {
 				})
 				list.call(addItem)
 			})
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle')
 	}
 
@@ -1838,7 +1859,7 @@ function addChecklist (kwargs) {
 		opts.addElems('div', 'checkbox')
 			.addElems('label')
 			.attr('for', d => `check-item-${checklist_id}-${d.id}`)
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
 		opts.addElems('div', 'grow')
 			.addElems('label',  'list-item')
@@ -1871,7 +1892,7 @@ function addChecklist (kwargs) {
 
 		if (editing && !templated && level !== 'meta') {
 			opts.addElems('div', 'rm')
-				.addElems('i', 'material-icons')
+				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
 			.on('click', function (d) {
 				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
@@ -1910,7 +1931,7 @@ function addRadiolist (kwargs) {
 	}
 	required = required ?? false
 
-	if (!editing && options?.length === 0) return null
+	if (!editing && activity !== 'preview' && options?.length === 0) return null
 
 	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
@@ -1962,7 +1983,7 @@ function addRadiolist (kwargs) {
 				if (!publicpage) switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
-		}).addElems('i', 'material-icons')
+		}).addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 	}
 
@@ -1989,7 +2010,7 @@ function addRadiolist (kwargs) {
 				})
 				list.call(addItem)
 			})
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle')
 	}
 
@@ -2024,7 +2045,7 @@ function addRadiolist (kwargs) {
 		opts.addElems('div', 'radio')
 			.addElems('label')
 			.attr('for', d => `radio-item-${radiolist_id}-${d.id}`)
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
 		opts.addElems('div', 'grow')
 			.addElems('label', 'list-item')
@@ -2057,7 +2078,7 @@ function addRadiolist (kwargs) {
 
 		if (editing && !templated && level !== 'meta') {
 			opts.addElems('div', 'rm')
-				.addElems('i', 'material-icons')
+				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
 			.on('click', function (d) {
 				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
@@ -2086,7 +2107,7 @@ function addLocations (kwargs) {
 	let dragging = false
 	required = required ?? false
 
-	if (!editing && centerpoints?.length === 0) return null
+	if (!editing && activity !== 'preview' && centerpoints?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2115,7 +2136,7 @@ function addLocations (kwargs) {
 		iconAnchor: [0, 24],
 		labelAnchor: [-6, 0],
 		popupAnchor: [0, -36],
-		html: '<i class="material-icons">place</i>'
+		html: '<i class="material-icons google-translate-attr">place</i>'
 	})
 
 	function rmPin (marker, container) {
@@ -2197,7 +2218,7 @@ function addLocations (kwargs) {
 
 		filter.addElems('button',  'search')
 			.on('click', searchLocation)
-		.addElems('i', 'material-icons')
+		.addElems('i', 'material-icons google-translate-attr')
 			.html('search')
 
 		async function searchLocation () {
@@ -2321,7 +2342,7 @@ function addIndexes (kwargs) {
 		tags.sort((a, b) => a.key - b.key)
 		required = required ?? false
 
-		if (!editing && tags?.length === 0) return null
+		if (!editing && activity !== 'preview' && tags?.length === 0) return null
 
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 		if (input) input.disabled = true
@@ -2349,7 +2370,7 @@ function addIndexes (kwargs) {
 				const opt = list.opts.addElem('div', 'opt-group')
 					.datum({ key: 'constraint', label: 'block', value: constraint })
 					.addElems('button', 'opt active')
-				opt.addElems('i', 'material-icons')
+				opt.addElems('i', 'material-icons google-translate-attr')
 					.html(d => d.label)
 				opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 					.html(d => d.value - tags.length)
@@ -2367,7 +2388,7 @@ async function addTags (kwargs) {
 	if (!tags) tags = []
 	required = required ?? false
 
-	if (!editing && tags?.length === 0) return null
+	if (!editing && activity !== 'preview' && tags?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2393,7 +2414,7 @@ async function addTags (kwargs) {
 			const opt = list.opts.addElem('div', 'opt-group')
 				.datum({ key: 'constraint', label: 'block', value: constraint })
 				.addElems('button', 'opt active')
-			opt.addElems('i', 'material-icons')
+			opt.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 				.html(d => d.value - tags.length)
@@ -2409,7 +2430,7 @@ async function addAttachment (kwargs) {
 	if (!srcs) srcs = []
 	required = required ?? false
 
-	if (!editing && srcs?.length === 0) return null
+	if (!editing && activity !== 'preview' && srcs?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2433,7 +2454,7 @@ async function addAttachment (kwargs) {
 			const opt = meta.opts.addElem('div', 'opt-group')
 				.datum({ key: 'constraint', label: 'block', value: constraint })
 				.addElems('button', 'opt active')
-			opt.addElems('i', 'material-icons')
+			opt.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
 				.html(d => d.value - srcs.length)
@@ -2515,7 +2536,7 @@ async function addAttachment (kwargs) {
 				kwargs.focus = true
 				kwargs.container = meta.container
 				addAttachment(kwargs)
-			}).addElems('i', 'material-icons')
+			}).addElems('i', 'material-icons google-translate-attr')
 			.html('badge')
 		}
 	}
@@ -2532,7 +2553,7 @@ function addGroup (kwargs) {
 	if (!items) items = []
 	if (!values) values = []
 
-	if (!editing && items?.length === 0) return null
+	if (!editing && activity !== 'preview' && items?.length === 0) return null
 
 	if (editing && !items.length && templated) items.push(JSON.parse(JSON.stringify(structure)))
 
@@ -2555,7 +2576,7 @@ function addGroup (kwargs) {
 					}).call(addItems)
 					if (media.container.selectAll('.media-group-items').size() >= repeat) media.media.classed('hide', true)
 				})
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 				.html('add_circle')
 		}
 	}
@@ -2584,7 +2605,7 @@ function addGroup (kwargs) {
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons')
+			.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 
 		function rmGroup (sel) { // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS

@@ -1,5 +1,5 @@
 const { app_title, DB } = include('config/')
-const { checklanguage, email: sendemail } = include('routes/helpers/')
+const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -14,29 +14,29 @@ module.exports = (req, res) => {
 		return obj
 	})
 
-	DB.conn.tx(t => {
+	DB.general.tx(t => {
 		const batch = []
-		const sql = `${DB.pgp.helpers.insert(data, [ 'pinboard', 'participant' ], 'pinboard_contributors')} ON CONFLICT ON CONSTRAINT unique_pinboard_contributor DO NOTHING;`
+		const sql = `${DB.pgp.helpers.insert(data, [ 'pinboard', 'participant' ], 'pinboard_contributors')} ON CONFLICT ON CONSTRAINT pinboard_contributors_pkey DO NOTHING;`
 		batch.push(t.none(sql))
 		batch.push(t.none(`
 			DELETE FROM pinboard_contributors
 			WHERE pinboard = $1::INT
 				AND participant NOT IN ($2:csv)
 				AND participant NOT IN (SELECT owner FROM pinboards WHERE id = $1::INT)
-		;`, [ pinboard, contributor ]))
+		;`, [ pinboard, safeArr(contributor, DEFAULT_UUID) ]))
 		return t.batch(batch)
 		.then(_ => {
 			return t.one(`SELECT title FROM pinboards WHERE id = $1::INT;`, [ pinboard ])
 			.then(result => {
 				const { title } = result
-				return DB.general.any(`
+				return t.any(`
 					SELECT email FROM users
 					WHERE uuid IN ($1:csv)
 						AND uuid <> $2
 						AND notifications = TRUE
-				;`, [ contributor, uuid ])
+				;`, [ safeArr(contributor, DEFAULT_UUID), uuid ])
 				.then(results => {
-					// SEND EMAIL NOTIFICATION	
+					// SEND EMAIL NOTIFICATION
 					// NEED TO CHECK IF EMAIL NOTIFICATIONS IS ACTIVATED
 					return Promise.all(results.map(d => {
 						sendemail({

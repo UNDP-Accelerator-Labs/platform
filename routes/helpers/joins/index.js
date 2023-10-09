@@ -15,13 +15,14 @@ exports.users = (data, args = []) => {
 	if (!key) key = 'owner'
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
+		const uuids = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
 		return DB.general.any(`
-			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, cn.name AS country FROM users u 
+			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, cn.name AS country FROM users u
 			INNER JOIN country_names cn
 				ON u.iso3 = cn.iso3
 			WHERE u.uuid IN ($2:csv)
 				AND cn.language = $3
-		;`, [ key, Array.isArray(data) ? data.map(d => d[key]) : data[key], lang ])
+		;`, [ key, uuids, lang ])
 		.then(users => {
 			if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
 			else return this.joinObj.call(data, users[0])
@@ -58,11 +59,11 @@ exports.tags = (data, args = []) => {
 						// data = this.multijoin.call(data, [ results, key ])
 						return this.multijoin.call(tags_with_equivalences, [ tags, 'key' ])
 						// return { key: 'key', tags }
-					}).catch(err => console.log(err)))	
+					}).catch(err => console.log(err)))
 				}
 				if (tags_without_equivalences.length) {
 					batch.push(t.any(`
-						SELECT id AS $1:name, key, name FROM tags 
+						SELECT id AS $1:name, key, name FROM tags
 						WHERE type = $2
 							AND id IN ($3:csv)
 							AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
@@ -86,7 +87,7 @@ exports.tags = (data, args = []) => {
 		// let sql = ''
 		// if (tagtype === 'index') {
 		// 	sql = DB.pgp.as.format(`
-		// 		SELECT id AS $1:name, key, name FROM tags 
+		// 		SELECT id AS $1:name, key, name FROM tags
 		// 		WHERE type = $2
 		// 			AND id IN ($3:csv)
 		// 			AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
@@ -101,7 +102,7 @@ exports.tags = (data, args = []) => {
 		// }
 
 		// return DB.general.any(`
-		// 	SELECT id AS $1:name, key, name FROM tags 
+		// 	SELECT id AS $1:name, key, name FROM tags
 		// 	WHERE type = $2
 		// 		AND id IN ($3:csv)
 		// 		AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))

@@ -1,17 +1,21 @@
-@import '_vars';
+@import '_vars.xs';
 
 html, body {
 	font-size: $t-main;
 	line-height: 1.3em;
 }
 
-.lg {
+.sm:not(.xs),
+.m:not(.xs),
+.lg:not(.xs),
+.xl:not(.xs),
+.xxl:not(.xs) {
 	display: none !important;
 }
 
 .modal {
 	width: 300px;
-	margin-bottom: 75px;
+	flex-shrink: 1;
 
 	.close {
 		padding: 5px 10px;
@@ -21,6 +25,12 @@ html, body {
 		clear: both;
 		padding: 15px 15px 5px 15px;
 		background-color: #FFF;
+		overflow-y: auto;
+		max-height: 85vh;
+
+		* {
+			padding: 5px;
+		}
 
 		.headline {
 			margin-bottom: 15px;
@@ -159,4 +169,50 @@ html, body {
 	line-height: 19px;
 	text-align: center;
 	vertical-align: text-top;
+}
+
+input.toggle + label {
+	display: block;
+	position: relative;
+	width: 60px;
+	height: 30px;
+	border-radius: 30px;
+	border: 1px solid $c-light-grey;
+	margin: 15px auto 0px auto;
+	background-color: $c-light-grey;
+	cursor: pointer;
+	transition: background-color .25s, border-color .25s;
+}
+input.toggle + label::after {
+	content: attr(data-content);
+	position: absolute;
+	display: block;
+	width: 30px;
+	height: 30px;
+	margin: -1px 0 0 -1px;
+	background-color: #FFF;
+	border: 1px solid $c-light-grey;
+	border-radius: 30px;
+	font-size: 8px;
+	line-height: 1.5em;
+	font-weight: bold;
+	text-align: center;
+	line-height: 30px;
+	color: $c-light-grey;
+	transition: transform .25s;
+}
+input.toggle:checked + label::after {
+	transform: translate(30px, 0);
+	background-color: $c-dark-blue;
+	border-color: $c-dark-blue;
+	color: #FFF;
+}
+input.toggle:disabled + label {
+	background-color: $c-light-2;
+	border-color: $c-light-2;
+}
+input.toggle:disabled + label::after {
+	color: $c-light-2;
+	background-color: #FFF;
+	border-color: $c-light-2;
 }

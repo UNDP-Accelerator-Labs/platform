@@ -2,9 +2,9 @@ const {
 	app_id,
 	app_title: title,
 	app_description: description,
-	app_title_short: app_db,
 	app_languages,
 	app_storage,
+	app_suite_url,
 	modules,
 	metafields,
 	media_value_keys,
@@ -14,16 +14,21 @@ const {
 	welcome_module,
 	page_content_limit,
 	DB,
+	ownDB,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
-const array = require('../array')
-const { app_title_short } = require('../../../config')
+const array = require('../array');
+const { checkDevice } = require('../../login/device-info');
+
+function stripExplorationId(url) {
+	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
+}
 
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
-	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
@@ -41,15 +46,46 @@ exports.sessiondata = _data => {
 		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
+	obj.app = title
+	obj.device = device || {}
 
 	return obj
 }
+exports.sessionsummary = async _kwargs => {
+	const conn = _kwargs.connection || DB.general
+	const { uuid } = _kwargs
+
+	return new Promise(resolve => {
+		if (uuid) {
+			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
+			.then(sessions => {
+				if (sessions) {
+					// EXTRACT SESSION DATA
+					const sessionsArr = sessions.map(d => d.sess)
+					sessionsArr.forEach(d => {
+						d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
+					})
+
+					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
+					.map(d => {
+						const { values, ...data } = d
+						return data
+					})
+					const total = array.sum.call(sessions, 'count')
+					sessions.push({ key: 'All', count: total, app: 'All' })
+					resolve(sessions)
+				}
+			}).catch(err => console.log(err))
+		} else resolve(null)
+	})
+}
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
-	const { page, pagecount, map, display, mscale, req, res } = _kwargs || {}
+	const { page, pagecount, map, display, mscale, excerpt, req, res } = _kwargs || {}
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 	let activity = path[1]
+	const currentpage_url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
 
 	let { object, space, instance } = params || {}
 	if (instance) {
@@ -59,11 +95,12 @@ exports.pagemetadata = (_kwargs) => {
 	}
 
 	if (session.uuid) { // USER IS LOGGED IN
-		var { uuid, username: name, country, rights, collaborators, public } = session || {}
+		var { uuid, username: name, country, rights, collaborators, public, errormessage, sessions } = session || {}
 	} else { // PUBLIC/ NO SESSION
 		var { uuid, username: name, country, rights, collaborators, public } = this.sessiondata({ public: true }) || {}
 	}
 	const language = checklanguage(params?.language || session.language || this.sessiondata())
+	const page_language = params?.language || 'en';
 
 	const parsedQuery = {}
 	for (let key in query) {
@@ -150,26 +187,72 @@ exports.pagemetadata = (_kwargs) => {
 		} else batch.push(null)
 		// PINBOARD LIST
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
-			batch.push(t.any(`
-				SELECT pb.id, pb.title, pb.status,
-					COUNT (pc.pad) AS size,
-					COUNT (DISTINCT (p.owner)) AS contributors
+			batch.push(ownDB().then(async (ownId) => {
+				const pinboard_stats = await DB.general.any(`
+					SELECT pb.id, pb.title, pb.status, COUNT (pc.pad) AS size,
+						CASE WHEN EXISTS (
+							SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
+						) THEN TRUE ELSE FALSE END AS is_exploration
 
-				FROM pinboards pb
-				INNER JOIN pinboard_contributions pc
-					ON pc.pinboard = pb.id
-				INNER JOIN pads p
-					ON pc.pad = p.id
+					FROM pinboards pb
+					INNER JOIN pinboard_contributions pc
+						ON pc.pinboard = pb.id
 
-				WHERE pb.owner = $1
-				GROUP BY pb.id
-			;`, [ uuid ]))
+					WHERE pb.owner = $1 AND pc.db = $2 AND pc.is_included = true
+					GROUP BY pb.id
+				;`, [ uuid, ownId ]);
+				const pinboard_pads = await DB.general.any(`
+					SELECT pb.id, pc.pad
+
+					FROM pinboards pb
+					INNER JOIN pinboard_contributions pc
+						ON pc.pinboard = pb.id
+
+					WHERE pb.owner = $1 AND pc.db = $2 AND pc.is_included = true
+				;`, [ uuid, ownId ]);
+				const pads = new Set();
+				const pinpads = new Map();
+				pinboard_pads.forEach((row) => {
+					pads.add(row.pad);
+					const padlist = pinpads.get(row.id) ?? [];
+					padlist.push(row.pad);
+					pinpads.set(row.id, padlist);
+				});
+				const padIds = pads.size ? [...pads] : [-1];
+				const owners = new Map((await t.any(`
+					SELECT p.id, p.owner
+					FROM pads p
+					WHERE p.id IN ($1:csv)
+				;`, [ padIds ])).map((row) => [row.id, row.owner]));
+				return pinboard_stats.map((stats) => {
+					return {
+						...stats,
+						contributors: new Set(pinpads.get(stats.id).map((pad_id) => owners.get(pad_id))).size,
+					}
+				});
+			}).catch(err => console.log(err)));
 		} else batch.push(null)
+
+		let hasJustLoggedIn = false;
+		try {
+			const referer = headers.referrer || headers.referer
+			hasJustLoggedIn = (
+				object === 'contributor'
+				|| (referer && new URL(referer).pathname === '/login'));
+		} catch (e) {
+			console.log('hasJustLoggedInCheck', headers.referrer, headers.referer, object, e);
+		}
+		if (hasJustLoggedIn) {
+			// GET MULTI-SESSION INFO
+			batch.push(this.sessionsummary({ uuid }));
+		} else {
+			batch.push(null);
+		}
 
 		return t.batch(batch)
 		.catch(err => console.log(err))
-	}).then(results => {
-		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards ] = results
+	}).then(async results => {
+		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards, sessions ] = results
 		let [ languages, speakers ] = languagedata
 
 		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
@@ -201,25 +284,36 @@ exports.pagemetadata = (_kwargs) => {
 				engagementtypes,
 				welcome_module,
 				app_storage,
-				app_db, // NOT SURE THIS SHOULD BE EXPOSED TO THE FRONT END, ESPECIALLY SEEING IT IS NOT USED IN THE views/.ejs FILES
-				app_id
+				own_db: await ownDB(),
+				app_id,
+				app_suite_url,
 			},
 			user: {
 				uuid,
 				name,
 				country,
-				rights
+				rights,
+				sessions,
+				pagestats: {
+					id: session?.read_doc_id,
+					docType: session?.read_doc_type,
+				},
 			},
 			page: {
 				title,
 				instance_title: res?.locals.instance_vars?.title || null,
+				instanceReadCount: res?.locals.instance_vars?.readCount || null,
 				id: page ?? undefined,
 				count: pagecount ?? null,
 				language,
+				page_language,
 				public,
+				excerpt: excerpt || { title: res?.locals.instance_vars?.title || title, txt: res?.locals.instance_vars?.description || description, p: false },
 
 				path,
-				referer: headers.referer,
+				referer: stripExplorationId(headers.referer),
+				currentpage_url,
+				originalUrl: req.originalUrl,
 				activity,
 				object,
 				space,
@@ -229,7 +323,9 @@ exports.pagemetadata = (_kwargs) => {
 				map: map || false,
 				mscale: mscale || 'contain',
 				display: display || browse_display,
-				page_content_limit
+				page_content_limit,
+
+				errormessage
 			},
 			menu: {
 				templates,
@@ -294,13 +390,14 @@ exports.pagedata = (_req, _data) => {
 			modules,
 			metafields,
 			engagementtypes,
-			public
+			public,
+			app_suite_url
 		},
 		user: {
 			// TO DO: GET THIS FROM SESSION DATA OR FROM this.sessiondata
 			name: username,
 			country,
-			rights
+			rights,
 		},
 		page: {
 			title: pagetitle, // NEED TO FETCH SOMEWHERE

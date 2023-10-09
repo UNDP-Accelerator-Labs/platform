@@ -1,5 +1,5 @@
 const { DB } = include('config/')
-const helpers = include('routes/helpers/')
+const {flatObj, safeArr, DEFAULT_UUID} = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -32,7 +32,7 @@ module.exports = async kwargs => {
 				ON f.source = p.id
 			LEFT JOIN mobilization_contributions mob
 				ON p.id = mob.pad
-			WHERE TRUE 
+			WHERE TRUE
 				$1:raw $2:raw
 			GROUP BY f.status
 			ORDER BY f.status
@@ -42,7 +42,7 @@ module.exports = async kwargs => {
 			SELECT COUNT (DISTINCT (f.id))::INT FROM files f
 			WHERE f.owner IN ($1:csv)
 				OR $2 > 2
-		;`, [ collaborators.map(d => d.uuid), rights ], d => d.count).then(d => { return { private: d } }))
+		;`, [ safeArr(collaborators.map(d => d.uuid), DEFAULT_UUID), rights ], d => d.count).then(d => { return { private: d } }))
 		// GET SHARED FILES COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (f.id))::INT FROM files f
@@ -60,6 +60,6 @@ module.exports = async kwargs => {
 				$1:raw
 		;`, [ full_filters ]))
 		return t.batch(batch)
-	}).then(d => helpers.flatObj.call(d))
+	}).then(d => flatObj.call(d))
 	.catch(err => console.log(err))
 }

@@ -9,6 +9,7 @@
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
 	const uuid = locals.metadata.user.uuid
+	const pagedisplay = locals.metadata.page.display
 
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -30,7 +31,12 @@
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
-		<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png'>
+		<a href='/'>
+			<div class='logo-container'>
+				<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
+				<div class='filler'></div>
+			</div>
+		</a>
 
 		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
@@ -41,7 +47,7 @@
 
 							<% if (rights >= Math.min(minwritepads ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
 								<li>
-									<button>
+									<button class="google-translate-attr">
 										<img src='/imgs/icons/i-pad.svg'>
 										<label><%- vocabulary['pad'][language](false).capitalize() %></label>
 										<span class='expandable'>></span>
@@ -50,7 +56,7 @@
 										<ul>
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
 											<!-- THE ISSUE HERE IS WE WANT TO PREVENT USERS OF THE experiments AND action plans PLATFORMS FROM CREATING BLANK PADS -->
-												<li>
+												<li class="google-translate-attr">
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
 															<label><%- vocabulary['blank pad'][language] %></label>
@@ -60,7 +66,7 @@
 											<% } // rights %>
 											<% if (rights >= (writepads.templated ?? writepads) ?? Infinity) { %>
 												<% if (locals.metadata.menu.templates?.length > 0) { %>
-													<li>
+													<li class="google-translate-attr">
 														<button>
 															<label><%- vocabulary['templated pad'][language] %></label>
 															<span class='expandable'>></span>
@@ -68,7 +74,7 @@
 														<div class='dropdown leaf'>
 															<ul>
 																<% if (locals.metadata.menu.templates.length > 2) { %>
-																	<li class='filter lg'>
+																	<li class='filter xs sm m lg xl xxl'>
 																		<input type='text' id='filter-pad-templates' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																		<label for='filter-pad-templates'><%- vocabulary['filter'][language](true) %></label>
 																	</li>
@@ -105,7 +111,7 @@
 												<% } // locals.metadata.menu.templates 0 %>
 											<% } // rights %>
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
-												<li>
+												<li class="google-translate-attr">
 													<button>
 														<label><%- vocabulary['campaign pad'][language] %></label>
 														<span class='expandable'>></span>
@@ -114,7 +120,7 @@
 														<ul>
 															<% if (locals.metadata.menu.participations
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1).length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-pad-mobilizations' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-pad-mobilizations'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -146,7 +152,7 @@
 											<!-- <%# if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)	|| locals.metadata.menu.participations.filter(p => !p.source).length > 0) { %> -->
 
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
-												<li class='lg'>
+												<li class='lg xl xxl google-translate-attr'>
 													<a href='/<%- language %>/import/pads'>
 														<button><%- vocabulary['import pads'][language] %></button>
 													</a>
@@ -159,7 +165,7 @@
 						<% } %>
 						<% if (modules?.some(d => d.type === 'templates')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'templates')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-template.svg'>
 										<label><%- vocabulary['template'][language](false, false).capitalize() %></label>
@@ -183,7 +189,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.templates.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-templates-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-templates-copy'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -230,7 +236,7 @@
 														<ul>
 															<!-- TO DO: FINISH THIS WITH A FILTER MENU -->
 															<!-- <% if (locals.metadata.menu.templates.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-templates-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-templates-copy'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -275,7 +281,7 @@
 						<% } %>
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'contributors')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'contributors')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<a href='/<%- language %>/contribute/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
@@ -288,7 +294,7 @@
 
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'mobilizations')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'mobilizations')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-mobilization.svg'>
 										<label><%- vocabulary['mobilization'][language](false).capitalize() %></label>
@@ -316,7 +322,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.pinboards.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-deep-dive-pinbords' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-deep-dive-pinbords'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -350,7 +356,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.filter(d => !d.target_id).length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-mobilization-followup' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-mobilization-followup'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -384,7 +390,7 @@
 													<div class='dropdown leaf'>
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-mobilization-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-mobilization-copy'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -419,7 +425,7 @@
 														<ul>
 															<% if (locals.metadata.menu.participations
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child).length > 2) { %>
-																<li class='filter lg'>
+																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-mobilization-child' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
 																	<label for='filter-mobilization-child'><%- vocabulary['filter'][language](true) %></label>
 																</li>
@@ -455,7 +461,7 @@
 						<% } %>
 						<% if (locals.metadata?.site?.modules?.includes('analyses')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'analyses')?.rights.write ?? Infinity)) { %>
-								<li>
+								<li class="google-translate-attr">
 									<button>
 										<label><%- vocabulary['analyse']?.[language](false, false)?.capitalize() || 'Analysis' %></label>
 										<span class='expandable'>></span>
@@ -468,7 +474,7 @@
 				</div>
 			</div>
 		<% } %>
-		<h1><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+		<h1 ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
 		<% if (!publicpage) { %>
 			<h2>
 				<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
@@ -477,14 +483,14 @@
 		<% } %>
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
-			<div class='save lg hide'>
+			<div class='save lg xl xxl hide google-translate-attr'>
 				<button><%- vocabulary['save'][language] %></button>
 			</div>
 		<% } %>
 	</div>
 </nav>
 <nav id='modules'>
-	<menu>
+	<menu class="google-translate-attr">
 	<% modules.filter(d => {
 		let { write } = d.rights
 		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
@@ -504,7 +510,7 @@
 			<% } else if (d.type === 'contributors') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } else if (d.type === 'reviews') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary[d.type.slice(0, -1)]?.[language](false, true)?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary["my reviews"][language]?.capitalize() %></a>
 			<% } else { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } %>
@@ -512,7 +518,7 @@
 	<% }) %>
 	</menu>
 </nav>
-<nav class='pagination lg'>
+<nav class='pagination <% if (pagedisplay === "slideshow") { %>xs sm m <% } %>lg xl xxl'>
 	<% if ((activity === 'browse' || locals.instance_vars?.activity === 'browse') && mapscale !== 'full-screen') { %>
 		<%- include('../browse/modules/pagination') %>
 	<% } %>
@@ -521,54 +527,84 @@
 <script type='text/javascript'>
 	if (!mediaSize) var mediaSize = getMediaSize()
 	// THIS IS FOR MOBILE DISPLAY
-	if (mediaSize === 'xs') {
+	if (['xs', 'sm', 'm'].includes(mediaSize)) {
 		d3.select('.create').selectAll('button')
-		.on('touchend', function () {
-			// d3.event.preventDefault()
-			this.focus()
-		}).on('focus', function () {
+		.on('click', function () {
 			const dropdown = d3.select(this.nextElementSibling)
 			if (dropdown.node() && dropdown.classed('dropdown')) {
+				let { top, height } = this.getBoundingClientRect()
+				top = top + height
+				const viewheight = window.innerHeight
+				if (!mediaSize) var mediaSize = getMediaSize()
+				if (mediaSize === 'xs' && top + 300 >= viewheight) dropdown.classed('dropup', true)
+
 				if (dropdown.node().style.maxHeight) {
 					dropdown.node().style.maxHeight = null
 					dropdown.node().style.overflow = null
+					d3.select('#site-title .inner .create').classed('open', false)
+					dropdown.findAncestor('li').classed('open', false)
 				} else {
+					// COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
+					if (d3.select(this).hasAncestor('dropdown')) {
+						const parent_dropdown = d3.select(this).findAncestor('dropdown')
+						parent_dropdown.selectAll('.dropdown')
+						.each(function () {
+							this.style.maxHeight = null
+							this.style.overflow = null
+							d3.select(this).findAncestor('li').classed('open', false)
+						})
+					}
+
 					dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
 					setTimeout(_ => {
 						if (dropdown.select('.dropdown').size() > 0) dropdown.node().style.overflow = 'visible'
 						else dropdown.node().style.overflow = 'scroll'
 					}, 250)
+					d3.select('#site-title .inner .create').classed('open', true)
+					dropdown.findAncestor('li')?.classed('open', true)
 				}
-				// dropdown.selectAll('button').on('mousedown', _ => d3.event.preventDefault())
 			}
-		}).on('blur', function () {
-			const target = d3.event.relatedTarget
-			if (!target) {
-				d3.select('.create').selectAll('.dropdown')
+		})
+		// .on('blur', function () {
+		// 	const target = d3.event.relatedTarget
+		// 	if (!target) {
+		// 		d3.select('.create').selectAll('.dropdown')
+		// 		.each(function () {
+		// 			this.style.maxHeight = null
+		// 			this.style.overflow = null
+		// 		})
+		// 	} else if (!d3.select(target).hasAncestor(this.nextElementSibling)) {
+		// 		if (d3.select(target).findAncestor('dropdown')?.node() === d3.select(this).findAncestor('dropdown')?.node()) { // IF THE target IS PART OF THE SAME PARENT DROPDOWN
+		// 			const dropdown = d3.select(this.nextElementSibling)
+		// 			dropdown.node().style.maxHeight = null
+		// 			dropdown.node().style.overflow = null
+		// 		} else { // COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
+		// 			let dropdown = d3.select(this.nextElementSibling)
+		// 			let i = 0
+		// 			while (dropdown.node() && !dropdown.classed('main')) {
+		// 				if (i === 5) break // THIS IS TO PREVENT A WILD while STATEMENT
+		// 				// THERE SHOULD NOT BE MORE THAN 5 DROPDOWN LEVELS
+		// 				dropdown.node().style.maxHeight = null
+		// 				dropdown.node().style.overflow = null
+		// 				dropdown = d3.select(dropdown.node().parentNode).findAncestor('dropdown')
+		// 				i++
+		// 			}
+		// 		}
+		// 	}
+		// })
+
+		window.addEventListener('mouseup', function (e) {
+			if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('create')) {
+				d3.selectAll('#site-title .inner .open').classed('open', false)
+				.selectAll('.dropdown')
 				.each(function () {
 					this.style.maxHeight = null
 					this.style.overflow = null
 				})
-			} else if (!d3.select(target).hasAncestor(this.nextElementSibling)) {
-				if (d3.select(target).findAncestor('dropdown')?.node() === d3.select(this).findAncestor('dropdown')?.node()) { // IF THE target IS PART OF THE SAME PARENT DROPDOWN
-					const dropdown = d3.select(this.nextElementSibling)
-					dropdown.node().style.maxHeight = null
-					dropdown.node().style.overflow = null
-				} else { // COLLAPSE ALL DROPDOWNS BETWEEN .main AND target
-					let dropdown = d3.select(this.nextElementSibling)
-					let i = 0
-					while (dropdown.node() && !dropdown.classed('main')) {
-						if (i === 5) break // THIS IS TO PREVENT A WILD while STATEMENT
-						// THERE SHOULD NOT BE MORE THAN 5 DROPDOWN LEVELS
-						dropdown.node().style.maxHeight = null
-						dropdown.node().style.overflow = null
-						dropdown = d3.select(dropdown.node().parentNode).findAncestor('dropdown')
-						i++
-					}
-				}
 			}
 		})
-	} else if (mediaSize === 'lg') {
+
+	} else if (['lg', 'xl', 'xxl'].includes(mediaSize)) {
 		d3.selectAll('#site-title .inner .create button')
 		.on('click', function () {
 			if (this.nextElementSibling?.classList.contains('dropdown')) {
@@ -586,13 +622,12 @@
 		window.addEventListener('mouseup', function (e) {
 			if (e.target.nodeName !== 'HTML' && !d3.select(e.target).hasAncestor('create')) d3.selectAll('#site-title .inner .open').classed('open', false)
 		})
-
-		function filterDropdown (node) {
-			const dropdown = d3.select(node).findAncestor('dropdown')
-			dropdown.selectAll('ul li:not(.filter):not(.padding)')
-				.classed('hide', function () {
-					return !this.textContent.trim().toLowerCase().includes(node.value.trim().toLowerCase())
-				})
-		}
+	}
+	function filterDropdown (node) {
+		const dropdown = d3.select(node).findAncestor('dropdown')
+		dropdown.selectAll('ul li:not(.filter):not(.padding)')
+			.classed('hide', function () {
+				return !this.textContent.trim().toLowerCase().includes(node.value.trim().toLowerCase())
+			})
 	}
 </script>

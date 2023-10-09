@@ -8,7 +8,7 @@ const XLSX = require('xlsx') // SEE HERE: https://www.npmjs.com/package/xlsx
 const { BlobServiceClient } = require('@azure/storage-blob')
 
 const { app_title_short, app_storage, metafields, media_value_keys, DB } = include('config/')
-const { checklanguage, array, join, parsers, flatObj } = include('routes/helpers/')
+const { checklanguage, array, join, parsers, flatObj, safeArr } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter')
 
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
 			const batch = pads.map(pad_group => {
 				return t.task(t1 => {
 					const batch1 = []
-					const ids = pad_group.values.map(d => d.pad_id)
+					const ids = safeArr(pad_group.values.map(d => d.pad_id), -1)
 					if (include_tags) {
 						batch1.push(t1.any(`
 							SELECT pad AS pad_id, tag_id, type FROM tagging
@@ -368,6 +368,12 @@ module.exports = async (req, res) => {
 								// NOTE THIS id IS COMMON TO ALL WORKBOOKS (IF SEVERAL ARE GENERATED)
 								d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
 
+								d.snippet = parsers.getTxt(d)?.[0]
+								if (app_storage) {
+									const vignette_path = parsers.getImg(d, true)?.[0]
+									if (vignette_path) d.vignette = new URL(path.join(new URL(app_storage).pathname, vignette_path), app_storage).href
+									else d.vignette = null
+								}
 								// FIGURE OUT WHICH CONTENT STRUCTURE TO KEEP
 								if (!use_templates) {
 									d.content = d.full_text?.replace(/<[^>]*>/g, '')
@@ -393,6 +399,7 @@ module.exports = async (req, res) => {
 									}
 								}
 								delete d.img
+								
 								if (single_sheet && include_locations) {
 									const pad_locations = locations.filter(c => c.pad_id === d.pad_id)
 									for (let i = 0; i < max_locations; i ++) {

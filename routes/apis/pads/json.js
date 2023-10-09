@@ -87,6 +87,14 @@ module.exports = async (req, res) => {
 		GROUP BY (p.id)
 		ORDER BY p.id DESC
 	;`, [ full_filters, cors_filter ]).then(async pads => {	
+		pads = await join.users(pads, [ language, 'contributor_id' ])
+		// AND DELETE ALL THE PERSONAL INFORMATION
+		pads.forEach(d => {
+			delete d.position
+			delete d.ownername
+			delete d.rights
+		})
+		
 		let contributor_list = array.unique.call(pads, { key: 'contributor_id', onkey: true })
 		contributor_list = array.shuffle.call(contributor_list)
 
@@ -122,7 +130,12 @@ module.exports = async (req, res) => {
 						d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
 
 						// GET SNIPPET
-						d.snippet = parsers.getTxt(d, false)
+						d.snippet = parsers.getTxt(d)?.[0]
+						if (app_storage) {
+							const vignette_path = parsers.getImg(d, true)?.[0]
+							if (vignette_path) d.vignette = new URL(path.join(new URL(app_storage).pathname, vignette_path), app_storage).href
+							else d.vignette = null
+						}
 						// SET TAGS WITH NAMES
 						if (include_tags) {
 							const nest = array.nest.call(d.tags, { key: 'type' })
@@ -152,8 +165,9 @@ module.exports = async (req, res) => {
 										return `images/pad-${d.pad_id}/image-${idx + 1}${path.extname(c)}`
 									} else {
 										if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
-											return path.join(app_storage, c)
-										} else return path.join(host, c)
+											return new URL(path.join(new URL(app_storage).pathname, c), app_storage).href
+										} else return new URL(c, host)?.href
+										// } else return path.join(host, c)
 									}
 								}
 							})

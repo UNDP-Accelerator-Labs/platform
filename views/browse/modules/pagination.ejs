@@ -55,7 +55,7 @@
 			<!-- INSPIRED BY https://stackoverflow.com/questions/44573859/a-loop-to-create-the-alphabet-using-javascript -->
 			<% for (let i = 0; i < 26; i++) { 
 				const char = (i + 10).toString(36).toUpperCase()
-				const count = locals.stats.toc.find(d => d.initial === char)?.count || 0
+				const count = locals.stats.toc?.find(d => d.initial === char)?.count || 0
 				const disabled = count > 0 ? false : true
 			%>
 				<% if (!disabled) { %>

@@ -3,19 +3,19 @@ const { checklanguage, datastructures } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
-
+	
 	if (public) res.redirect('/login')
 	else {
-
-		const { object } = req.params || {}
-		const { id } = req.query || {}
+		const { referer } = req.headers || {}
+		const { id, errormessage, u_errormessage } = req.query || {}
+		
 		const language = checklanguage(req.params?.language || req.session.language)
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
 
 		DB.general.tx(async t => {
 			return check_authorization({ connection: t, id, uuid, rights, public })
-			.then(result => {
+			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
 					if (referer) return res.redirect(referer)
@@ -100,13 +100,28 @@ module.exports = async (req, res) => {
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
+					if(uuid === id){
+						batch.push(t.any(`
+						SELECT *
+						FROM trusted_devices
+						WHERE user_uuid = $1
+						  AND is_trusted = true
+						  AND created_at >= NOW() - INTERVAL '1 year';
+						;`, [ uuid ]))
+					} else batch.push(null)
 
 					return t.batch(batch)
 					.then(async results => {
-						const [ countries, languages, teams, data ] = results
+						let [ countries, languages, teams, data, devices ] = results
 
+						const trusted_devices = devices?.map(p=> ({
+							...p,
+							last_login: new Date(p.last_login)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
+							created_at: new Date(p.created_at)?.toLocaleDateString() + ' ' + new Date(p.last_login).toLocaleTimeString(),
+						}))
 						const metadata = await datastructures.pagemetadata({ req })
-						return Object.assign(metadata, { data, countries, languages, teams })
+
+						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices, u_errormessage })
 					}).then(data => res.render('profile', data))
 					.catch(err => console.log(err))
 				}
@@ -118,7 +133,6 @@ module.exports = async (req, res) => {
 function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.general
 	const { id, uuid, rights, public } = _kwargs
-
 	const { read, write } = modules.find(d => d.type === 'contributors')?.rights || {}
 
 	if (public) return new Promise(resolve => resolve({ authorized: false }))
@@ -130,7 +144,7 @@ function check_authorization (_kwargs) {
 				AND host = $2
 		;`, [ id, uuid ])
 		.then(result => {
-			if (result) return { authorized: true, redirect: 'view' }
+			if (result) return { authorized: true, redirect: 'view' } // THIS SHOULD ACTUALLY PREVENT EVEN PEOPLE WHO CREATED A THIRD PARTY ACCOUNT FROM CHANGING THE SETTINGS OF THAT ACCOUNT
 			else return { authorized: false }
 		}).catch(err => console.log(err))
 	} else return new Promise(resolve => resolve({ authorized: rights >= write }))

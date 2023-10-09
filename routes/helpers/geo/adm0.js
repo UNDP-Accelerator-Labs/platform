@@ -23,3 +23,16 @@ exports.table = _kwargs => {
 		}).catch(err => console.log(err))
 	}).catch(err => console.log(err))
 }
+exports.name_column = kwargs => {
+	const conn = kwargs.connection || DB.general
+	const { language } = kwargs || {}
+	return conn.many(`
+		SELECT DISTINCT column_name FROM information_schema.columns 
+		WHERE table_name IN ('adm0', 'adm0_subunits')
+			AND column_name LIKE 'name_%'
+	;`).then(results => {
+		let column = results.find(d => d.column_name.indexOf(language) === 5)?.column_name
+		if (column) return column
+		else return 'name' // THIS IS THE DEFAULT NAME IN ENGLISH, AS PER NATURAL EARTH DATA
+	}).catch(err => console.log(err))
+}

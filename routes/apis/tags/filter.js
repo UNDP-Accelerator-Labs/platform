@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
 			platform_filters.push(await DB.general.any(`
 				SELECT u.uuid FROM users u
 				INNER JOIN countries c
-				ON c.iso3 = u.iso3
+					ON c.iso3 = u.iso3
 				WHERE c.bureau IN ($1:csv)
 			;`, [ regions ])
 			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))

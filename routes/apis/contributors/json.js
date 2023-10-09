@@ -7,14 +7,15 @@ const fs = require('fs')
 const turf = require('@turf/turf')
 
 const { app_title_short, DB } = include('config/')
-const { checklanguage, array, safeArr, geo, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, array, safeArr, join, DEFAULT_UUID } = include('routes/helpers/')
 
 const filter = include('routes/browse/contributors/filter')
 
 module.exports = async (req, res) => {
-	let { output, render, include_data, include_teams, include_contributions } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {} // req.body || {}
+	let { output, render, include_data, include_teams, include_contributions } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const pw = req.session.email || null
-	const language = checklanguage(req.params?.language || req.body.language || req.session.language)
+	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
+	console.log('language', language)
 
 	const [ f_space, page, full_filters ] = await filter(req, res)
 	let cors_filter = ''
@@ -32,15 +33,10 @@ module.exports = async (req, res) => {
 	}
 
 	DB.general.tx(async t => {
-		// const adm0table = await geo.adm0.table({ connection: t, iso3 })
-
 		return t.any(`
-			SELECT u.uuid, u.name, u.email, u.position,
-				u.iso3, cn.name AS country,
+			SELECT u.uuid, u.name, u.email, u.position, u.iso3, 
 				u.language AS primary_language, u.secondary_languages,
 				u.invited_at, u.confirmed_at, u.left_at,
-
-				jsonb_build_object('lat', c.lat, 'lng', c.lng) AS location,
 
 				COALESCE(
 				(SELECT json_agg(t.name) FROM teams t
@@ -52,17 +48,15 @@ module.exports = async (req, res) => {
 				AS teams
 
 			FROM users u
-			INNER JOIN countries c
-				ON c.iso3 = u.iso3
-			INNER JOIN country_names cn
-				ON cn.iso3 = u.iso3
-
-			WHERE cn.language = $1
+			WHERE TRUE
+				$1:raw
 				$2:raw
-				$3:raw
 			ORDER BY u.iso3, u.name ASC
-		;`, [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, ''), cors_filter ]) // NEED TO REMOVE page INFO
+		;`, [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, ''), cors_filter ]) // NEED TO REMOVE page INFO
 		.then(async users => {
+			// JOIN LOCATION INFO
+			users = await join.locations(users, { connection: t, language, key: 'iso3', concat_location_key: 'location' })
+
 			const ids = safeArr(users.map(d => d.uuid), DEFAULT_UUID)
 
 			return DB.conn.tx(t => {
@@ -121,7 +115,6 @@ module.exports = async (req, res) => {
 					// SET contributor_id
 					d.contributor_id = `c-${ids.indexOf(d.uuid) + 1}`
 
-					console.log(include_data)
 					if (!include_data) {
 						delete d.name
 						delete d.email

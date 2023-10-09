@@ -1,4 +1,5 @@
 const { DB } = include('config/')
+const { adm0 } = require('../geo/')
 
 exports.joinObj = function (obj = {}) {
 	return {...this, ...obj}
@@ -114,33 +115,68 @@ exports.tags = (data, args = []) => {
 		// ;`, [ key, tagname, data.map(d => d[key]), lang ])
 	} else return new Promise(resolve => resolve(data))
 }
-exports.locations = (data, kwargs) => {
+exports.concatunique = function (args = []) {
+	let [ arr, key, keep ] = args
+	const arrcopy = [...arr]
+	if (!keep) keep = 'prior'
+	const output = []
+
+	this.forEach(d => {
+		if (key) {
+			if (arrcopy.some(c => c[key] === d[key]) && keep === 'latter') {
+				const duplicate = arrcopy.splice(arrcopy.findIndex(c => c[key] === d[key]), 1)[0]
+				output.push(duplicate)
+			} else output.push(d)
+		} else {
+			if (arrcopy.some(c => c === d) && keep === 'latter') {
+				const duplicate = arrcopy.splice(arrcopy.findIndex(c => c === d))[0]
+				output.push(duplicate)
+			} else output.push(d)
+		}
+	})
+
+	return output.concat(arrcopy)
+}
+exports.locations = (data, kwargs = {}) => {
 	const conn = kwargs.connection || DB.general
-	const { lang, key } = kwargs
+	const { language, key, concat_location_key } = kwargs
 	if (!key) key = 'iso3'
 	
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const iso3s = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
 		
 		return conn.task(async t => {
-			const adm0_column = await geo.adm0_name({ connection: t, language: lang })
+			const name_column = await adm0.name_column({ connection: t, language })
+
+			let location_structure = DB.pgp.as.format(`
+				ST_Y(ST_Centroid(wkb_geometry)) AS lat,
+				ST_X(ST_Centroid(wkb_geometry)) AS lng 
+			`)
+			if (concat_location_key) {
+				location_structure = DB.pgp.as.format(`
+					jsonb_build_object('lat', ST_Y(ST_Centroid(wkb_geometry)), 'lng', ST_X(ST_Centroid(wkb_geometry))) AS $1:name
+				`, [ concat_location_key ])
+			}
 
 			const batch = []
-
-			// TO DO: INCLUDE lat AND lng CENTROIDS TOO
-
 			// GET ONLY THE RELEVANT SUBUNITS
 			// THE su_a3 <> adm0_a3 IS IMPORTANT TO AVOID DUPLICATES IN THE END
 			batch.push(t.any(`
-				SELECT su_a3 AS $1:name, $2:name AS country FROM adm0_subunits
-				WHERE su_a3 IN ($3:csv)
+				SELECT su_a3 AS $1:name, $2:name AS country,
+					$3:raw					
+
+				FROM adm0_subunits
+				WHERE su_a3 IN ($4:csv)
 					AND su_a3 <> adm0_a3
-			;`, [ key, adm0_column, iso3s ]).catch(err => console.log(err)))
+			;`, [ key, name_column, location_structure, iso3s ]).catch(err => console.log(err)))
 
 			batch.push(t.any(`
-				SELECT adm0_a3 AS $1:name, $2:name AS country FROM adm0_subunits
-				WHERE adm0_a3 IN ($3:csv)
-			;`, [ key, adm0_column, iso3s ]).catch(err => console.log(err)))
+				SELECT adm0_a3 AS $1:name, $2:name AS country,
+					$3:raw
+
+				FROM adm0
+				WHERE adm0_a3 IN ($4:csv)
+			;`, [ key, name_column, location_structure, iso3s ]).catch(err => console.log(err)))
 
 			return t.batch(batch)
 			.then(results => {
@@ -151,19 +187,6 @@ exports.locations = (data, kwargs) => {
 				else return this.joinObj.call(data, locations[0])
 
 			}).catch(err => console.log(err))
-		})
-
-
-
-		return DB.general.tx(async t => {
-			const adm0_column = await geo.adm0_name({ connection: t, language: lang })
-			return t.any(`
-				SELECT adm0_a3 AS $1:name, $2:name AS country FROM adm0
-				WHERE adm0_a3 IN ($3:csv)
-			;`, [ key, adm0_column, iso3s ])
-		}).then(locationnames => {
-			if (Array.isArray(data)) return this.multijoin.call(data, [ locationnames, key ])
-			else return this.joinObj.call(data, locationnames[0])
 		}).catch(err => console.log(err))
 	
 	} else return new Promise(resolve => resolve(data))

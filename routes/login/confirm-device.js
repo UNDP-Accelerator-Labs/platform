@@ -1,4 +1,5 @@
 const { DB } = include("config/");
+const { sessionupdate } = include('routes/helpers')
 const { deviceInfo, sendDeviceCode } = require("./device-info");
 const { v4: uuidv4 } = require("uuid");
 
@@ -138,7 +139,11 @@ exports.removeDevice = async (req, res) => {
           "DELETE FROM trusted_devices WHERE id = $1 AND user_uuid = $2",
           [id, uuid]
         );
-        await t.none("UPDATE session SET sess = NULL WHERE sid = $1", [sid]);
+        await sessionupdate({
+          conn: t,
+          queryValues: [sid],
+          whereClause: `sid = $1"`,
+        });
       }
     });
     res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);

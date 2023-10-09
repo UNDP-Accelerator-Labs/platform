@@ -1,5 +1,5 @@
 const { app_title, app_languages, DB } = include('config/')
-const { email: sendemail, datastructures } = include('routes/helpers/')
+const { email: sendemail, datastructures, sessionupdate } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
@@ -107,7 +107,7 @@ module.exports =async (req, res) => {
 							logoutAll = true;
 							//IF EMAIL CHANGES, SEND CONFIRM EMAIL BEFORE UPDATING EMAIL
 							if(u_user?.email != email){
-								confirmEmail({email, name: u_user.name, uuid: id, old_email: email, req })
+								confirmEmail({email, name: u_user.name, uuid: id, old_email: u_user?.email, req })
 								if(!update_pw && u_user.name == name) logoutAll = false
 								message = 'An email has been sent to your email address. Please confirm the email to proceed with the email update.'
 								req.session.errormessage = message
@@ -190,7 +190,11 @@ module.exports =async (req, res) => {
 			.then(async _ => {
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
-					await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1;`, [uuid])
+					sessionupdate({
+						conn: t,
+						whereClause: `sess ->> 'uuid' = $1`,
+						queryValue: [uuid]
+					})
 
 				} else {
 					// UPDATE THE SESSION DATA

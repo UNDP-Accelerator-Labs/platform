@@ -1,15 +1,15 @@
 const jwt = require("jsonwebtoken");
-const { email: sendEmail, datastructures } = include("routes/helpers/");
+const { email: sendEmail, sessionupdate } = include("routes/helpers/");
 const { DB } = include("config/");
 
 exports.confirmEmail = async (_kwarg) => {
-  const { uuid, email, name, req } = _kwarg;
+  const { uuid, email, name, old_email, req } = _kwarg;
 
   const { host } = req.headers || {};
   const protocol = req.protocol;
 
   const token = await jwt.sign(
-    { email, uuid, name, action: "confirm-email" },
+    { email, uuid, name, old_email, action: "confirm-email" },
     process.env.APP_SECRET,
     { expiresIn: "1h", issuer: host }
   );
@@ -87,9 +87,11 @@ exports.updateNewEmail = async (req, res, next) => {
         `,
             [email, uuid]
           );
-          await t.none(`UPDATE session SET sess = NULL WHERE sess ->> 'uuid' = $1;`, [
-            uuid,
-          ]);
+          await sessionupdate({
+            conn: t,
+            queryValues: [uuid],
+            whereClause: `sess ->> 'uuid' = $1`,
+          });
         })
         .then(() => {
           sendEmail({

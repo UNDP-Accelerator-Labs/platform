@@ -175,7 +175,7 @@ module.exports = (req, res, next) => {
 								req.session.cookie.expires = sessionExpiration; 
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 
-								const sess = { ...result, device: {...device, is_trusted: true}}
+								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}}
 								Object.assign(req.session, datastructures.sessiondata(sess));
 								res.redirect(redirecturl);
 
@@ -199,7 +199,7 @@ module.exports = (req, res, next) => {
 								}).catch(err => res.redirect('/module-error'))
 							}
 							else {
-								const sess = { ...result, device: {...device, is_trusted: false}}
+								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}}
 								Object.assign(req.session, datastructures.sessiondata(sess))
 								res.redirect(redirecturl)
 							}

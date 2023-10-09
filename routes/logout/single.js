@@ -1,15 +1,19 @@
-const { DB } = include('config/')
+const { DB } = include("config/");
 
 module.exports = async (req, res) => {
-	const { uuid } = req.session || {}
-	await DB.general.none(`
-		DELETE FROM trusted_devices
-		WHERE session_sid IN (
-		SELECT sid
-		FROM session
-		WHERE sess ->> 'uuid' = $1
-		);
-	`, [uuid]);
-	req.session.destroy()
-	res.redirect('/')
-}
+  const { sessionID: sid } = req || {};
+  await DB.general.tx(async (t) => {
+    await t.none(
+      `
+		UPDATE trusted_devices
+		SET session_sid = NULL
+		  WHERE session_sid = $1;
+		`,
+      [sid]
+    );
+
+    await t.none(`DELETE FROM session WHERE sid = $1;`, [sid]);
+  });
+  req.session.destroy();
+  res.redirect("/");
+};

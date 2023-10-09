@@ -1,12 +1,11 @@
-const { app_title, app_suite, app_languages, DB } = include('config/')
+const { app_title, app_languages, DB } = include('config/')
 const { email: sendemail, datastructures } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
-const { deviceInfo, sendDeviceCode, checkDevice } = require('../../login/device-info')
-const { updateRecord } = require('./confirm-device')
+const { updateRecord, confirmEmail } = require('./services')
 
 module.exports =async (req, res) => {
 	const { referer } = req.headers || {}
-	const { uuid, rights: session_rights, username } = req.session || {}
+	const { uuid, rights: session_rights, username, is_trusted } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
@@ -17,7 +16,6 @@ module.exports =async (req, res) => {
 	const referer_url = new URL(referer)
 	const referer_params = new URLSearchParams(referer_url.search)
 
-	const is_trusted = await checkDevice({ req, conn: DB.general })
 	if(password.length) {
 		let message = isPasswordSecure(password);
 		if (message.length) {
@@ -102,71 +100,42 @@ module.exports =async (req, res) => {
 					let update_rights = ''
 					if ((results.some(d => d.host === uuid) || session_rights > 2) && ![undefined, null].includes(rights)) update_rights = DB.pgp.as.format('rights = $1,', [ rights ]) // ONLY HOSTS AND SUPER USERS CAN CHANGE THE USER RIGHTS
 
-					const { __ucd_app, __puid, __cduid } = req.cookies
 					const u_user = await t.oneOrNone(`SELECT email, name FROM users WHERE uuid = $1`, [id])
-					//check if email or password is to be edited
-					// TO DO: FIXME send an email to the new address to confirm that the new address actually exists
-					if(u_user?.email != email || update_pw?.length > 0){
-						// CHECK IF DEVICE IS TRUSTED
-						const device = deviceInfo(req)
-						return t.oneOrNone(`
-							SELECT * FROM trusted_devices
-							WHERE user_uuid = $1
-							AND device_os = $2
-							AND device_browser = $3
-							AND device_name = $4
-							AND duuid1 = $5
-							AND duuid2 = $6
-							AND duuid3 = $7
-							AND is_trusted IS TRUE`,
-							[uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid  ]
-						).then(deviceResult => {
-							if (deviceResult) {
-								logoutAll = true;
-								updateRecord({
-									conn: t,
-									data: [
-										/* $1 */ name,
-										/* $2 */ email,
-										/* $3 */ position,
-										/* $4 */ update_pw,
-										/* $5 */ iso3,
-										/* $6 */ language,
-										/* $7 */ JSON.stringify(secondary_languages || []),
-										/* $8 */ update_rights,
-										/* $9 */ notifications || false,
-										/* $10 */ reviewer || false,
-										/* $11 */ id
-									]
-								})
-								.catch(err => res.redirect('/module-error'))
-							} else {
-								req.session.confirm_dev_origins = {
-									redirecturl : referer || '/login',
-									u_profile : [
-										/* $1 */ name,
-										/* $2 */ email,
-										/* $3 */ position,
-										/* $4 */ update_pw,
-										/* $5 */ iso3,
-										/* $6 */ language,
-										/* $7 */ JSON.stringify(secondary_languages || []),
-										/* $8 */ update_rights,
-										/* $9 */ notifications || false,
-										/* $10 */ reviewer || false,
-										/* $11 */ id
-									],
-									uuid: id,
-								}
-								// Device is not part of the trusted devices
-								sendDeviceCode({
-									name: u_user?.name, email: u_user?.email, uuid: id, conn: t
-								}).then(()=>{
-									req.session.page_message = "This action can be performed exclusively on trusted devices. All active sessions will be terminated, and the user will need to log in again and confirm their trusted devices."
-									redirect_url = '/confirm-device'
-								}).catch(err => console.log(err))
+
+					if(u_user?.email != email || update_pw?.length > 0 || u_user.name != name){
+						if (is_trusted) {
+							logoutAll = true;
+							//IF EMAIL CHANGES, SEND CONFIRM EMAIL BEFORE UPDATING EMAIL
+							if(u_user?.email != email){
+								confirmEmail({email, name: u_user.name, uuid: id, req })
+								if(!update_pw && u_user.name == name) logoutAll = false
+								message = 'An email has been sent to your email address. Please confirm the email to proceed with the email update.'
+								req.session.errormessage = message
+								referer_params.set('u_errormessage', message);
+								redirect_url = `${referer_url.pathname}?${referer_params.toString()}`
 							}
-						})
+
+							updateRecord({
+								conn: t,
+								data: [
+									/* $1 */ name,
+									/* $2 */ email,
+									/* $3 */ position,
+									/* $4 */ update_pw,
+									/* $5 */ iso3,
+									/* $6 */ language,
+									/* $7 */ JSON.stringify(secondary_languages || []),
+									/* $8 */ update_rights,
+									/* $9 */ notifications || false,
+									/* $10 */ reviewer || false,
+									/* $11 */ id
+								]
+							})
+							.catch(err => res.redirect('/module-error'))
+						} else {
+							referer_params.set('u_errormessage', 'This action can only be authorized on trusted devices. Please log in from a trusted device');
+							redirect_url = `${referer_url.pathname}?${referer_params.toString()}`
+						}
 					} else {
 						return t.none(`
 							UPDATE users
@@ -222,7 +191,8 @@ module.exports =async (req, res) => {
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
 					await t.none(`
-						DELETE FROM trusted_devices
+					UPDATE trusted_devices
+					SET session_sid = NULL
 						WHERE session_sid IN (
 							SELECT sid
 							FROM session
@@ -267,7 +237,9 @@ module.exports =async (req, res) => {
 						WHERE uuid = $2
 					;`, [ app_languages, id ])
 					.then(result => {
-						Object.assign(req.session, datastructures.sessiondata(result))
+						const { device } = req.session
+						const sess = { ...result, is_trusted, device: {...device, is_trusted}}
+						Object.assign(req.session, datastructures.sessiondata(sess))
 						return null
 					}).catch(err => console.log(err))
 				}

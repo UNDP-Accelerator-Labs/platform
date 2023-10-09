@@ -3,7 +3,7 @@ const getResetToken = require('./forget-password').getResetToken
 
 module.exports = async (req, res, next) => {
 	const { originalUrl, path } = req || {}
-	const { errormessage, successmessage, page_message } = req.session || {}
+	const { errormessage, successmessage, page_message, confirm_dev_origins } = req.session || {}
 
 	const { token } = req.params;
 
@@ -16,7 +16,7 @@ module.exports = async (req, res, next) => {
 	else if(path === '/reset-password'){
 		return res.render('reset-password', data)
 	}
-	else if(path === '/confirm-device'){
+	else if(path === '/confirm-device' && confirm_dev_origins){
 		return res.render('confirm-device', data)
 	}
 	else if(token) getResetToken(req, res, next)

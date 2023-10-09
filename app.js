@@ -153,6 +153,9 @@ app.route('/reset-password')
 	.get(routes.redirect.browse, routes.render.login)
 	.post(routes.process.updatePassword)
 
+app.route('/confirm-email/:token')
+	.get(routes.update.email)
+
 app.route('/confirm-device')
 	.get(routes.render.login)
 	.post(routes.process.confirmDevice)

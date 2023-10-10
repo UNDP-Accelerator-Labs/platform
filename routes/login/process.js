@@ -86,7 +86,8 @@ module.exports = (req, res, next) => {
 		} else res.redirect('/login')
 	} else {
 		const { username, password, originalUrl, is_trusted } = req.body || {}
-
+		const { sessionID: sid } = req || {}
+		
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
 			res.redirect('/login')
@@ -157,10 +158,10 @@ module.exports = (req, res, next) => {
 						AND duuid1 = $5
 						AND duuid2 = $6
 						AND duuid3 = $7
+						AND session_sid = $8
 						AND is_trusted IS TRUE`,
-						[result.uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid ]
+						[result.uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid, sid ]
 					).then(deviceResult => {
-						const { sessionID: sid } = req || {}
 						if (deviceResult) {
 							// Device is trusted, update last login info
 							return t.none(`
@@ -175,7 +176,7 @@ module.exports = (req, res, next) => {
 								req.session.cookie.expires = sessionExpiration; 
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 
-								const sess = { ...result, device: {...device, is_trusted: true}}
+								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}}
 								Object.assign(req.session, datastructures.sessiondata(sess));
 								res.redirect(redirecturl);
 
@@ -199,7 +200,7 @@ module.exports = (req, res, next) => {
 								}).catch(err => res.redirect('/module-error'))
 							}
 							else {
-								const sess = { ...result, device: {...device, is_trusted: false}}
+								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}}
 								Object.assign(req.session, datastructures.sessiondata(sess))
 								res.redirect(redirecturl)
 							}

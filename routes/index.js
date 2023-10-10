@@ -21,6 +21,7 @@ if (!exports.process) { exports.process = {} }
 if (!exports.public) { exports.public = {} }
 if (!exports.private) { exports.private = {} }
 if (!exports.dispatch) { exports.dispatch = {} }
+if (!exports.update) { exports.update = {} }
 
 exports.forwardGeocoding = require('./helpers/geo/').forwardcode.render
 // (req, res) => {
@@ -463,7 +464,7 @@ exports.process.screenshot = (req, res) => {
 }
 
 
-
+exports.update.email = require('./save/contributor/services').updateNewEmail
 exports.process.check = require('./check/')
 exports.process.save = require('./save/')
 exports.process.delete = require('./delete/')

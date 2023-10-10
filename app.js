@@ -74,7 +74,7 @@ const sessionMiddleware = session({
 });
 
 app.use(sessionMiddleware);
-app.use(cookieParser(`${app_suite}-${app_suite_secret}-pass`))
+app.use(cookieParser(`${app_suite}-${app_suite_secret}-pass`));
 
 function setAccessControlAllowOrigin(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -155,14 +155,12 @@ app
   .get(routes.redirect.browse, routes.render.login)
   .post(routes.process.updatePassword);
 
-app
-  .route('/confirm-email/:token')
-	.get(routes.update.email);
+app.route('/confirm-email/:token').get(routes.update.email);
 
 app
   .route('/confirm-device')
-	.get(routes.render.login)
-	.post(routes.process.confirmDevice);
+  .get(routes.render.login)
+  .post(routes.process.confirmDevice);
 
 app.route('/resend-otp-code').get(routes.process.resendCode);
 

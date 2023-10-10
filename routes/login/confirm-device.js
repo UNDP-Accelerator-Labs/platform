@@ -142,7 +142,7 @@ exports.removeDevice = async (req, res) => {
         await sessionupdate({
           conn: t,
           queryValues: [sid],
-          whereClause: `sid = $1"`,
+          whereClause: `sid = $1`,
         });
       }
     });

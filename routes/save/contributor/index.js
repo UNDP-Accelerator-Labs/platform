@@ -193,7 +193,7 @@ module.exports =async (req, res) => {
 					sessionupdate({
 						conn: t,
 						whereClause: `sess ->> 'uuid' = $1`,
-						queryValue: [uuid]
+						queryValues: [uuid]
 					})
 
 				} else {

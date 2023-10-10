@@ -29,11 +29,13 @@ module.exports = async (req, res) => {
 			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))
 		} else if (regions) {
+			// TO DO: FINISH HERE
 			platform_filters.push(await DB.general.any(`
-				SELECT u.uuid FROM users u
-				INNER JOIN countries c
-					ON c.iso3 = u.iso3
-				WHERE c.bureau IN ($1:csv)
+				SELECT DISTINCT (u.uuid) FROM users u
+				INNER JOIN adm0_subunits c
+					ON c.su_a3 = u.iso3
+					OR c.adm0_a3 = u.iso3
+				WHERE c.undp_bureau IN ($1:csv)
 			;`, [ regions ])
 			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))

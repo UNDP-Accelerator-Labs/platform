@@ -139,8 +139,9 @@ exports.concatunique = function (args = []) {
 }
 exports.locations = (data, kwargs = {}) => {
 	const conn = kwargs.connection || DB.general
-	const { language, key, concat_location_key } = kwargs
+	let { language, key, name_key, concat_location_key } = kwargs
 	if (!key) key = 'iso3'
+	if (!name_key) name_key = 'country'
 	
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const iso3s = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
@@ -153,30 +154,36 @@ exports.locations = (data, kwargs = {}) => {
 				ST_X(ST_Centroid(wkb_geometry)) AS lng 
 			`)
 			if (concat_location_key) {
-				location_structure = DB.pgp.as.format(`
-					jsonb_build_object('lat', ST_Y(ST_Centroid(wkb_geometry)), 'lng', ST_X(ST_Centroid(wkb_geometry))) AS $1:name
-				`, [ concat_location_key ])
+				if (concat_location_key === 'geometry') {
+					location_structure = DB.pgp.as.format(`
+						ST_AsGeoJson(ST_Point(ST_X(ST_Centroid(wkb_geometry)), ST_Y(ST_Centroid(wkb_geometry))))::jsonb AS $1:name
+					`, [ concat_location_key ])
+				} else {
+					location_structure = DB.pgp.as.format(`
+						jsonb_build_object('lat', ST_Y(ST_Centroid(wkb_geometry)), 'lng', ST_X(ST_Centroid(wkb_geometry))) AS $1:name
+					`, [ concat_location_key ])
+				}
 			}
 
 			const batch = []
 			// GET ONLY THE RELEVANT SUBUNITS
 			// THE su_a3 <> adm0_a3 IS IMPORTANT TO AVOID DUPLICATES IN THE END
 			batch.push(t.any(`
-				SELECT su_a3 AS $1:name, $2:name AS country,
-					$3:raw					
+				SELECT su_a3 AS $1:name, $2:name AS $3:name,
+					$4:raw				
 
 				FROM adm0_subunits
-				WHERE su_a3 IN ($4:csv)
+				WHERE su_a3 IN ($5:csv)
 					AND su_a3 <> adm0_a3
-			;`, [ key, name_column, location_structure, iso3s ]).catch(err => console.log(err)))
+			;`, [ key, name_column, name_key, location_structure, iso3s ]).catch(err => console.log(err)))
 
 			batch.push(t.any(`
-				SELECT adm0_a3 AS $1:name, $2:name AS country,
-					$3:raw
+				SELECT adm0_a3 AS $1:name, $2:name AS $3:name,
+					$4:raw
 
 				FROM adm0
-				WHERE adm0_a3 IN ($4:csv)
-			;`, [ key, name_column, location_structure, iso3s ]).catch(err => console.log(err)))
+				WHERE adm0_a3 IN ($5:csv)
+			;`, [ key, name_column, name_key, location_structure, iso3s ]).catch(err => console.log(err)))
 
 			return t.batch(batch)
 			.then(results => {

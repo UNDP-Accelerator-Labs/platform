@@ -22,12 +22,12 @@ module.exports = async (req, res) => {
 		if (!instance_vars) {
 			const vars = await DB.general.tx(t => {
 				return t.oneOrNone(`
-					SELECT iso3, name FROM country_names
-					WHERE (iso3 ILIKE $1
+					SELECT COALESCE(su_a3, adm0_a3) AS iso3, name FROM adm0_subunits
+					WHERE (su_a3 ILIKE $1
+						OR adm0_a3 ILIKE $1
 						OR LOWER(name) = LOWER($1))
-						AND language = $2
 					LIMIT 1
-				;`, [ decodeURI(instance), language ]) // CHECK WHETHER THE instance IS A COUNTRY
+				;`, [ decodeURI(instance) ]) // CHECK WHETHER THE instance IS A COUNTRY
 				.then(result => {
 					if (!result) {
 						return t.oneOrNone(`
@@ -169,11 +169,18 @@ module.exports = async (req, res) => {
 		if (pads) platform_filters.push(DB.pgp.as.format(`p.id IN ($1:csv)`, [ pads ]))
 		if (contributors) platform_filters.push(DB.pgp.as.format(`p.owner IN ($1:csv)`, [ contributors ]))
 		if (countries) {
-			platform_filters.push(await DB.general.any(`
-				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
-			;`, [ countries ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
-			.catch(err => console.log(err)))
+			if (metafields.some((d) => d.type === "location")) {
+				platform_filters.push(await DB.general.any(`
+					SELECT 
+				;`).then()
+				.catch(err => console.log(err)))
+			} else {
+				platform_filters.push(await DB.general.any(`
+					SELECT uuid FROM users WHERE iso3 IN ($1:csv)
+				;`, [ countries ])
+				.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			}
 		} else if (regions) {
 			platform_filters.push(await DB.general.any(`
 				SELECT u.uuid FROM users u

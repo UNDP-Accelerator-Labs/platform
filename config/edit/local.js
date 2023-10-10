@@ -71,19 +71,19 @@ exports.metafields = [
 
   // { type: 'radiolist', name: 'experiment status', instruction: 'Current status of experimental activity',
   // options: [
-  // 	{ name: 'Idea stage' },
-  // 	{ name: 'Design stage' },
-  // 	{ name: 'Under review' },
-  // 	{ name: 'Implementation stage' },
-  // 	{ name: 'Completed' }
+  //   { name: 'Idea stage' },
+  //   { name: 'Design stage' },
+  //   { name: 'Under review' },
+  //   { name: 'Implementation stage' },
+  //   { name: 'Completed' }
   // ] }
 
   // { type: 'radiolist', name: 'gender', required: false, instruction: 'Innovator gender',
   // options: [
-  // 	{ name: 'Female' },
-  // 	{ name: 'Male' },
-  // 	{ name: 'Other' },
-  // 	{ name: 'Undisclosed' }
+  //   { name: 'Female' },
+  //   { name: 'Male' },
+  //   { name: 'Other' },
+  //   { name: 'Undisclosed' }
   // ] }
 ];
 // DESIRED ENGAGEMENT TYPES

@@ -56,7 +56,7 @@ if (
   m.rights.write = { blank: write, templated: write };
 }
 // if (modules.includes('mobilizations')) {
-// 	if (!modules.includes('templates')) modules.push('templates')
+//   if (!modules.includes('templates')) modules.push('templates')
 // }
 if (modules.some((d) => d.type === 'mobilizations')) {
   const { rights } = modules.find((d) => d.type === 'mobilizations');
@@ -70,21 +70,21 @@ if (modules.some((d) => d.type === 'mobilizations')) {
 }
 // IF THERE ARE TEMPLATES, AND THE contribute RIGHTS FOR PADS HAVE NOT BEEN SET, SET THEM
 // if (modules.some(d => d.type === 'templates')
-// 	&& !modules.some(d => d.type === 'pads'
-// 		&& !isNaN(d.rights?.write.templated)
-// 	)
+//   && !modules.some(d => d.type === 'pads'
+//     && !isNaN(d.rights?.write.templated)
+//   )
 // ) {
-// 	let { rights } = modules.find(d => d.type === 'pads')
-// 	const { write } = rights
-// 	if (typeof write === 'object') rights.templated = rights.blank
-// 	else rights = { blank: rights, templated: rights }
-// 	modules.find(d => d.type === 'pads').rights = rights
+//   let { rights } = modules.find(d => d.type === 'pads')
+//   const { write } = rights
+//   if (typeof write === 'object') rights.templated = rights.blank
+//   else rights = { blank: rights, templated: rights }
+//   modules.find(d => d.type === 'pads').rights = rights
 // }
 // if (modules.some(d => d.type === 'contributors')) {
-// 	if (!modules.some(d => d.type === 'mobilizations')) {
-// 		const rights = modules.find(d => d.type === 'contributors').rights
-// 		modules.push({ type: 'mobilizations', rights })
-// 	}
+//   if (!modules.some(d => d.type === 'mobilizations')) {
+//     const rights = modules.find(d => d.type === 'contributors').rights
+//     modules.push({ type: 'mobilizations', rights })
+//   }
 // }
 // TO DO: MAKE SURE THAT mobilizations DOES NOT HAVE LOWER RIGHTS THAN templates
 // TO DO: MAKE SURE THAT mobilizations AND contributors HAVE THE SAME rights
@@ -126,12 +126,7 @@ exports.ownDB = async function () {
       aid = 'sm';
     }
     ownDBid = (
-      await DB.general.one(
-        `
-			SELECT id FROM extern_db WHERE db = $1;
-		`,
-        [aid],
-      )
+      await DB.general.one(`SELECT id FROM extern_db WHERE db = $1;`, [aid])
     ).id;
   }
   return ownDBid;
@@ -143,12 +138,9 @@ let globalDBid = null;
 exports.globalDB = async function () {
   if (globalDBid === null) {
     globalDBid = (
-      await DB.general.one(
-        `
-			SELECT id FROM extern_db WHERE db = $1;
-		`,
-        ['global'],
-      )
+      await DB.general.one(`SELECT id FROM extern_db WHERE db = $1;`, [
+        'global',
+      ])
     ).id;
   }
   return globalDBid;

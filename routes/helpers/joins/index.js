@@ -12,26 +12,29 @@ exports.multijoin = function (args = []) {
 	})
 }
 exports.users = (data, args = []) => {
-	// TO DO: THIS WILL NEED TO BE INTEGRATED WITH THE locations FUNCTION TO GET APPROPRIATE LOCATION NAME
-
-	const [ lang, key ] = args
+	const [ language, key ] = args
 	if (!key) key = 'owner'
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const uuids = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
-		return DB.general.any(`
-			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, 
-				cn.name AS country 
+		
+		return DB.general.tx(async t => {
+			const name_column = await adm0.name_column({ connection: t, language })
 
-			FROM users u
-			INNER JOIN country_names cn
-				ON u.iso3 = cn.iso3
-			WHERE u.uuid IN ($2:csv)
-				AND cn.language = $3
-		;`, [ key, uuids, lang ])
-		.then(users => {
-			if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
-			else return this.joinObj.call(data, users[0])
+			return t.any(`
+				SELECT DISTINCT(u.uuid) AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, 
+					COALESCE(su.$2:name, adm0.$2:name) AS country 
+				FROM users u
+				LEFT JOIN adm0_subunits su
+					ON su.su_a3 = u.iso3
+				LEFT JOIN adm0
+					ON adm0.adm0_a3 = u.iso3
+				WHERE u.uuid IN ($3:csv)
+			;`, [ key, name_column, uuids ])
+			.then(users => {
+				if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
+				else return this.joinObj.call(data, users[0])
+			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 	} else return new Promise(resolve => resolve(data))
 }
@@ -187,8 +190,8 @@ exports.locations = (data, kwargs = {}) => {
 
 			return t.batch(batch)
 			.then(results => {
-				const [ su_a3, adm0_a3 ] = results
-				const locations = su_a3.concat(adm0_a3)
+				const [ su_a3, adm_a3 ] = results
+				const locations = su_a3.concat(adm_a3)
 
 				if (Array.isArray(data)) return this.multijoin.call(data, [ locations, key ])
 				else return this.joinObj.call(data, locations[0])

@@ -20,29 +20,22 @@ module.exports = async kwargs => {
 		
 		batch.push(t.task(t1 => {
 			const batch1 = []
-			if (['private', 'curated'].includes(space)) {
+			if (metafields.some((d) => d.type === 'location')) {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (id))::INT, owner
-					FROM pads p
+					SELECT COUNT(p.id)::INT, l.iso3 AS id FROM pads p
+					INNER JOIN locations l
+						ON l.pad = p.id
 					WHERE TRUE
 						$1:raw
-					GROUP BY owner
-				;`, [ f_space ]) // [ full_filters ])
+					GROUP BY l.iso3
+				;`, [ f_space ])
 				.then(async results => {
-					let contributors = await join.users(results, [ language, 'owner' ])
-					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
-					contributors = contributors.map(d => {
-						const obj = {}
-						obj.id = d.owner
-						obj.name = d.ownername
-						obj.count = d.count
-						return obj
-					})
-					contributors.sort((a, b) => a.name?.localeCompare(b.name))
-
-					return contributors.length ? { contributors } : null
+					// JOIN LOCATION INFO
+					const countries = await join.locations(results, { language, key: 'id', name_key: 'name' })
+					countries.sort((a, b) => a.name.localeCompare(b.name))
+					return countries.length ? { countries } : null
 				}).catch(err => console.log(err)))
-			} else if (['pinned', 'shared', 'public'].includes(space)) {
+			} else {
 				batch1.push(t1.any(`
 					SELECT p.owner
 					FROM pads p
@@ -63,8 +56,7 @@ module.exports = async kwargs => {
 					countries.sort((a, b) => a.name?.localeCompare(b.name))
 					return countries.length ? { countries } : null
 				}).catch(err => console.log(err)))
-
-			} else batch1.push(null)
+			}
 			
 			// GET TEMPLATE BREAKDOWN
 			if (modules.some(d => d.type === 'templates')) {

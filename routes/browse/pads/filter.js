@@ -1,5 +1,5 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum, geo } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, country, collaborators, public } = req.session || {}
@@ -20,14 +20,24 @@ module.exports = async (req, res) => {
 	if (instance) {
 		const { instance_vars } = res.locals
 		if (!instance_vars) {
-			const vars = await DB.general.tx(t => {
+			const vars = await DB.general.tx(async t => {
+				const name_column = await geo.adm0.name_column({ connection: t, language })
+
 				return t.oneOrNone(`
-					SELECT COALESCE(su_a3, adm0_a3) AS iso3, name FROM adm0_subunits
-					WHERE (su_a3 ILIKE $1
-						OR adm0_a3 ILIKE $1
-						OR LOWER(name) = LOWER($1))
+					WITH l AS (
+						SELECT COALESCE(
+							(SELECT su_a3 FROM adm0_subunits WHERE su_a3 ILIKE $1), 
+							(SELECT su_a3 FROM adm0 WHERE adm0_a3 ILIKE $1)
+						) AS iso3
+					)
+					SELECT l.iso3, COALESCE(su.$2:name, adm0.$2:name) AS name
+					FROM l
+					LEFT JOIN adm0_subunits su
+						ON su.su_a3 = l.iso3
+					LEFT JOIN adm0
+						ON adm0.adm0_a3 = l.iso3
 					LIMIT 1
-				;`, [ decodeURI(instance) ]) // CHECK WHETHER THE instance IS A COUNTRY
+				;`, [ decodeURI(instance), name_column ]) // CHECK WHETHER THE instance IS A COUNTRY
 				.then(result => {
 					if (!result) {
 						return t.oneOrNone(`
@@ -169,11 +179,8 @@ module.exports = async (req, res) => {
 		if (pads) platform_filters.push(DB.pgp.as.format(`p.id IN ($1:csv)`, [ pads ]))
 		if (contributors) platform_filters.push(DB.pgp.as.format(`p.owner IN ($1:csv)`, [ contributors ]))
 		if (countries) {
-			if (metafields.some((d) => d.type === "location")) {
-				platform_filters.push(await DB.general.any(`
-					SELECT 
-				;`).then()
-				.catch(err => console.log(err)))
+			if (metafields.some((d) => d.type === 'location')) {
+				platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ countries ]))
 			} else {
 				platform_filters.push(await DB.general.any(`
 					SELECT uuid FROM users WHERE iso3 IN ($1:csv)
@@ -182,14 +189,36 @@ module.exports = async (req, res) => {
 				.catch(err => console.log(err)))
 			}
 		} else if (regions) {
-			platform_filters.push(await DB.general.any(`
-				SELECT u.uuid FROM users u
-				INNER JOIN countries c
-				ON c.iso3 = u.iso3
-				WHERE c.bureau IN ($1:csv)
-			;`, [ regions ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
-			.catch(err => console.log(err)))
+			if (metafields.some((d) => d.type === 'location')) {
+				platform_filters.push(await DB.general.tx(gt => {
+					const gbatch = []
+					gbatch.push(gt.any(`
+						SELECT su_a3 AS iso3 FROM adm0_subunits
+						WHERE undp_bureau IN ($1:csv)
+							AND su_a3 <> adm0_a3
+					;`, [ regions ]))
+					gbatch.push(gt.any(`
+						SELECT adm0_a3 AS iso3 FROM adm0
+						WHERE undp_bureau IN ($1:csv)
+					;`, [ regions ]))
+					return gt.batch(gbatch)
+					.then(results => {
+						const [ su_a3, adm_a3 ] = results
+						const locations = su_a3.concat(adm_a3)
+						return DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ locations.map(d => d.iso3) ])
+					}).catch(err => console.log(err))
+				}).catch(err => console.log(err)))
+			} else {
+				platform_filters.push(await DB.general.any(`
+					SELECT u.uuid FROM users u
+					INNER JOIN adm0_subunits c
+						ON c.su_a3 = u.iso3
+						OR c.adm0_a3 = u.iso3
+					WHERE c.undp_bureau IN ($1:csv)
+				;`, [ regions ])
+				.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			}
 		}
 		if (teams) {
 			platform_filters.push(await DB.general.any(`

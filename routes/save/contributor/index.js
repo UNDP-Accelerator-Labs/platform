@@ -1,5 +1,5 @@
 const { app_title, app_suite, app_languages, DB } = include('config/')
-const { email: sendemail, datastructures } = include('routes/helpers/')
+const { email: sendemail, datastructures, join } = include('routes/helpers/')
 const { isPasswordSecure } = require('../../login')
 const { deviceInfo, sendDeviceCode, checkDevice } = require('../../login/device-info')
 const { updateRecord } = require('./confirm-device')
@@ -234,17 +234,13 @@ module.exports =async (req, res) => {
 				} else {
 					// UPDATE THE SESSION DATA
 					await t.one(`
-						SELECT u.uuid, u.rights, u.name, u.email, u.iso3, c.lng, c.lat, c.bureau,
+						SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+						COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
 						CASE WHEN u.language IN ($1:csv)
 							THEN u.language
 							ELSE 'en'
 						END AS language,
-
-						CASE WHEN u.language IN ($1:csv)
-							THEN (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = u.language)
-							ELSE (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = 'en')
-						END AS countryname,
 
 						COALESCE(
 							(SELECT json_agg(DISTINCT(jsonb_build_object(
@@ -261,12 +257,18 @@ module.exports =async (req, res) => {
 						AS collaborators
 
 						FROM users u
-						INNER JOIN countries c
-							ON u.iso3 = c.iso3
+						
+						LEFT JOIN adm0_subunits su
+							ON su.su_a3 = u.iso3
+						LEFT JOIN adm0
+							ON adm0.adm0_a3 = u.iso3
 
 						WHERE uuid = $2
 					;`, [ app_languages, id ])
-					.then(result => {
+					.then(async result => {
+						const { language } = result
+						// JOIN LOCATION INFO
+						result = await join.locations(result, { connection: t, language, key: 'iso3', name_key: 'countryname' })
 						Object.assign(req.session, datastructures.sessiondata(result))
 						return null
 					}).catch(err => console.log(err))

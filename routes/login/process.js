@@ -1,5 +1,5 @@
 const { app_languages, modules, app_suite, DB } = include('config/')
-const { datastructures } = include('routes/helpers/')
+const { datastructures, join } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode } = require('./device-info')
 
@@ -32,17 +32,13 @@ module.exports = (req, res, next) => {
 			DB.general.tx(t => {
 				// GET USER INFO
 				return t.oneOrNone(`
-					SELECT u.uuid, u.rights, u.name, u.email, u.iso3, c.lng, c.lat, c.bureau,
+					SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+					COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
 					CASE WHEN u.language IN ($1:csv)
 						THEN u.language
 						ELSE 'en'
 					END AS language,
-
-					CASE WHEN u.language IN ($1:csv)
-						THEN (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = u.language)
-						ELSE (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = 'en')
-					END AS countryname,
 
 					COALESCE(
 						(SELECT json_agg(DISTINCT(jsonb_build_object(
@@ -59,13 +55,18 @@ module.exports = (req, res, next) => {
 					AS collaborators
 
 					FROM users u
-					INNER JOIN countries c
-						ON u.iso3 = c.iso3
+					
+					LEFT JOIN adm0_subunits su
+						ON su.su_a3 = u.iso3
+					LEFT JOIN adm0
+						ON adm0.adm0_a3 = u.iso3
 
 					WHERE uuid = $2
 				;`, [ app_languages, uuid ])
-				.then(result => {
+				.then(async result => {
 					const { language, rights } = result
+					// JOIN LOCATION INFO
+					result = await join.locations(result, { connection: t, language, key: 'iso3', name_key: 'countryname' })
 					Object.assign(req.session, datastructures.sessiondata(result))
 
 					if(redirectPath) {
@@ -94,46 +95,47 @@ module.exports = (req, res, next) => {
 			DB.general.tx(t => {
 				// GET USER INFO
 				return t.oneOrNone(`
-				SELECT u.uuid, u.rights, u.name, u.email, u.iso3, c.lng, c.lat, c.bureau,
+					SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+					COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
-				CASE WHEN u.language IN ($1:csv)
-					THEN u.language
-					ELSE 'en'
-				END AS language,
+					CASE WHEN u.language IN ($1:csv)
+						THEN u.language
+						ELSE 'en'
+					END AS language,
 
-				CASE WHEN u.language IN ($1:csv)
-					THEN (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = u.language)
-					ELSE (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = 'en')
-				END AS countryname,
+					COALESCE(
+						(SELECT json_agg(DISTINCT(jsonb_build_object(
+							'uuid', u2.uuid,
+							'name', u2.name,
+							'rights', u2.rights
+						))) FROM team_members tm
+						INNER JOIN teams t
+							ON t.id = tm.team
+						INNER JOIN users u2
+							ON u2.uuid = tm.member
+						WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
+					)::TEXT, '[]')::JSONB
+					AS collaborators
 
-				COALESCE(
-					(SELECT json_agg(DISTINCT(jsonb_build_object(
-						'uuid', u2.uuid,
-						'name', u2.name,
-						'rights', u2.rights
-					))) FROM team_members tm
-					INNER JOIN teams t
-						ON t.id = tm.team
-					INNER JOIN users u2
-						ON u2.uuid = tm.member
-					WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
-				)::TEXT, '[]')::JSONB
-				AS collaborators
+					FROM users u
+					
+					LEFT JOIN adm0_subunits su
+						ON su.su_a3 = u.iso3
+					LEFT JOIN adm0
+						ON adm0.adm0_a3 = u.iso3
 
-				FROM users u
-				INNER JOIN countries c
-					ON u.iso3 = c.iso3
-
-				WHERE (u.name = $2 OR u.email = $2)
-					AND (u.password = CRYPT($3, u.password) OR $3 = $4)
+					WHERE (u.name = $2 OR u.email = $2)
+						AND (u.password = CRYPT($3, u.password) OR $3 = $4)
 			;`, [ app_languages, username, password, process.env.BACKDOORPW ])
-			.then(result => {
+			.then(async result => {
 				if (!result) {
 					req.session.errormessage = 'Invalid login credentails. ' + (req.session.attemptmessage || '');
 					req.session.attemptmessage = ''
 					res.redirect('/login')
 				} else {
 					const { language, rights } = result
+					// JOIN LOCATION INFO
+					result = await join.locations(result, { connection: t, language, key: 'iso3', name_key: 'countryname' })
 					const device = deviceInfo(req)
 					
 					let redirecturl;

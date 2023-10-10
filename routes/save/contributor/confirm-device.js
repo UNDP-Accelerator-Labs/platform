@@ -1,5 +1,5 @@
-exports.updateRecord = (_kwarq) => {
-  const { data, conn } = _kwarq;
+exports.updateRecord = _kwargs => {
+  const { data, conn } = _kwargs;
   return conn.none(`
     UPDATE users
     SET name = $1,

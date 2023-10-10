@@ -40,7 +40,7 @@ module.exports = async kwargs => {
 			.then(async results => { 
 				// JOIN LOCATION INFO
 				results = await join.locations(results, { connection: t1, language, key: 'id', name_key: 'name' })
-				return results.length ? { countries: results.sort((a, b) => a.name.localeCompare(b.name)) } : null
+				return results.length ? { countries: results.sort((a, b) => a.name?.localeCompare(b.name)) } : null
 			}))
 
 			// GET RIGHTS BREAKDOWN

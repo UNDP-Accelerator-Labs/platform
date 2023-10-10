@@ -9,11 +9,6 @@ module.exports = async kwargs => {
 	const { req, res } = kwargs || {}
 	
 	const { uuid, rights, collaborators } = req.session || {}
-	// if (req.session.uuid) { // USER IS LOGGED IN
-	// 	var { uuid, rights, collaborators } = req.session || {}
-	// } else { // PUBLIC/ NO SESSION
-	// 	var { uuid, rights, collaborators } = datastructures.sessiondata({ public: true }) || {}
-	// }
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
 	// GET FILTERS
@@ -50,26 +45,43 @@ module.exports = async kwargs => {
 					return contributors.length ? { contributors } : null
 				}).catch(err => console.log(err)))
 			} else if (['pinned', 'shared', 'public'].includes(space)) {
-				batch1.push(t1.any(`
-					SELECT p.owner
-					FROM pads p
-					WHERE p.id NOT IN (SELECT review FROM reviews)
-						$1:raw
-				;`, [ f_space ]) // [ full_filters ])
-				.then(async results => {
-					let countries = await join.users(results, [ language, 'owner' ])
-					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
-					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
-					countries = countries.map(d => {
-						const obj = {}
-						obj.id = d.iso3
-						obj.name = d.name
-						obj.count = d.count
-						return obj
-					})
-					countries.sort((a, b) => a.name?.localeCompare(b.name))
-					return countries.length ? { countries } : null
-				}).catch(err => console.log(err)))
+				if (metafields.some((d) => d.type === 'location')) {
+					batch1.push(t1.any(`
+						SELECT COUNT(p.id)::INT, l.iso3 AS id FROM pads p
+						INNER JOIN locations l
+							ON l.pad = p.id
+						WHERE p.id NOT IN (SELECT review FROM reviews)
+							$1:raw
+						GROUP BY l.iso3
+					;`, [ f_space ])
+					.then(async results => {
+						// JOIN LOCATION INFO
+						const countries = await join.locations(results, { language, key: 'id', name_key: 'name' })
+						countries.sort((a, b) => a.name.localeCompare(b.name))
+						return countries.length ? { countries } : null
+					}).catch(err => console.log(err)))
+				} else {
+					batch1.push(t1.any(`
+						SELECT p.owner
+						FROM pads p
+						WHERE p.id NOT IN (SELECT review FROM reviews)
+							$1:raw
+					;`, [ f_space ]) // [ full_filters ])
+					.then(async results => {
+						let countries = await join.users(results, [ language, 'owner' ])
+						countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
+						// THIS NEEDS SOME CLEANING FOR THE FRONTEND
+						countries = countries.map(d => {
+							const obj = {}
+							obj.id = d.iso3
+							obj.name = d.name
+							obj.count = d.count
+							return obj
+						})
+						countries.sort((a, b) => a.name?.localeCompare(b.name))
+						return countries.length ? { countries } : null
+					}).catch(err => console.log(err)))
+				}
 			} else batch1.push(null)
 			
 			// GET TEMPLATE BREAKDOWN

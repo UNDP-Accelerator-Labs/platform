@@ -138,33 +138,48 @@ module.exports = async (req, res) => {
 			return data.filter(d => d.img?.length).slice(0, max)
 		}))
 		// LIST OF COUNTRIES
-		batch.push(t.any(`
-			SELECT COUNT(p.id)::INT, p.owner FROM pads p
-			WHERE p.id NOT IN (SELECT review FROM reviews)
-				$1:raw
-			GROUP BY p.owner
-		;`, [ full_filters ]).then(results => {
-			if (results.length) {
-				return DB.general.tx(gt => {
-					const columns = Object.keys(results[0])
-					const values = DB.pgp.helpers.values(results, columns)
-					const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
+		if (metafields.some((d) => d.type === 'location')) {
+			batch.push(t.any(`
+				SELECT COUNT(p.id)::INT, l.iso3 FROM pads p
+				INNER JOIN locations l
+					ON l.pad = p.id
+				WHERE p.id NOT IN (SELECT review FROM reviews)
+					$1:raw
+				GROUP BY l.iso3
+			;`, [ full_filters ]).then(async results => {
+				// JOIN LOCATION INFO
+				results = await join.locations(results, { language, key: 'iso3' })
+				return results.sort((a, b) => a.country.localeCompare(b.country))
+			}).catch(err => console.log(err)))
+		} else {
+			batch.push(t.any(`
+				SELECT COUNT(p.id)::INT, p.owner FROM pads p
+				WHERE p.id NOT IN (SELECT review FROM reviews)
+					$1:raw
+				GROUP BY p.owner
+			;`, [ full_filters ]).then(results => {
+				if (results.length) {
+					return DB.general.tx(gt => {
+						const columns = Object.keys(results[0])
+						const values = DB.pgp.helpers.values(results, columns)
+						const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
 
-					return gt.any(`
-						SELECT t.count, u.iso3 
-						FROM users u
-						INNER JOIN ($1:raw) t
-							ON t.owner::uuid = u.uuid::uuid
-						ORDER BY u.iso3
-					;`, [ set_table ])
-					.then(async users => {
-						// JOIN LOCATION INFO
-						users = await join.locations(users, { connection: gt, language, key: 'iso3' })
-						return users
+						return gt.any(`
+							SELECT t.count, u.iso3 
+							FROM users u
+							INNER JOIN ($1:raw) t
+								ON t.owner::uuid = u.uuid::uuid
+							ORDER BY u.iso3
+						;`, [ set_table ])
+						.then(async users => {
+							// JOIN LOCATION INFO
+							users = await join.locations(users, { connection: gt, language, key: 'iso3' })
+							return users
+						}).catch(err => console.log(err))
 					}).catch(err => console.log(err))
-				}).catch(err => console.log(err))
-			} else return []
-		}).catch(err => console.log(err)))
+				} else return []
+			}).catch(err => console.log(err)))
+		}
 		// LIST OF PINBOARDS/ COLLECTIONS
 		batch.push(ownDB().then(async ownId => {
 			const pads = new Map();

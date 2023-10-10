@@ -115,8 +115,11 @@ exports.removeDevice = async (req, res) => {
   const { referer } = req.headers || {};
   const { uuid, language, is_trusted } = req.session;
 
+  const { host } = req.headers || {}
+  const protocol = req.protocol
+
   const referer_url = new URL(
-    referer || `/${language}/edit/contributor?id=${uuid}`
+    referer || `${protocol}://${host}/${language}/edit/contributor?id=${uuid}`
   );
   const referer_params = new URLSearchParams(referer_url.search);
 

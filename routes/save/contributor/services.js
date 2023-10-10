@@ -101,7 +101,7 @@ exports.updateNewEmail = async (req, res, next) => {
                     <div>
                       <p>Dear ${name},</p>
                       <br/>
-                      <p>We are writing to inform you that your email address has been successfully updated.</p>
+                      <p>We are writing to inform you that your email address has been updated.</p>
                       <p>If you made this change, please disregard this notification.</p>
                       <p>However, if you did not authorize this change, please contact our support team immediately.</p>
                       <br/>

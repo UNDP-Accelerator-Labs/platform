@@ -2,11 +2,11 @@ const app_id = process.env.APP_ID;
 
 let app_obj = require('./local.js');
 if (app_id === 'ap') {
-  app_obj = {...app_obj, ...require('./ap.js')};
+  app_obj = { ...app_obj, ...require('./ap.js') };
 } else if (app_id === 'exp') {
-  app_obj = {...app_obj, ...require('./exp.js')};
+  app_obj = { ...app_obj, ...require('./exp.js') };
 } else if (app_id === 'sm') {
-  app_obj = {...app_obj, ...require('./sm.js')};
+  app_obj = { ...app_obj, ...require('./sm.js') };
 } else if (app_id === 'global') {
   app_obj = {
     ...app_obj,

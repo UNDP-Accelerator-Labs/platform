@@ -10,7 +10,8 @@
     "sass-deploy": "sass public/scss:public/css",
     "dev": "nodemon app.js",
     "lint": "./node_modules/.bin/eslint .",
-    "lint-fix": "./node_modules/.bin/eslint . --fix"
+    "lint-fix": "./node_modules/.bin/eslint . --fix",
+    "pretty": "prettier . --write"
   },
   "author": "",
   "license": "ISC",
@@ -65,6 +66,7 @@
     "pagedjs": "^0.4.0",
     "pagedjs-cli": "^0.3.3",
     "pdfkit": "^0.13.0",
+    "prettier": "^3.0.3",
     "sass": "^1.62.1",
     "socket.io": "^4.5.4"
   }

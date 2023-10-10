@@ -1,10 +1,10 @@
 {
-    "name": "Acclabs platform",
-    "short_name": "acclabs",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#0e9c95",
-    "theme_color": "#16a0d6e7",
-    "orientation": "portrait",
-    "icons": []
+  "name": "Acclabs platform",
+  "short_name": "acclabs",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e9c95",
+  "theme_color": "#16a0d6e7",
+  "orientation": "portrait",
+  "icons": []
 }

@@ -53,7 +53,7 @@ DB.conn.tx(t => {
 				return gt.batch(locations.map(d => {
 					return gt.oneOrNone(`
 						SELECT $1 AS id, su_a3 AS iso3
-						FROM adm0
+						FROM adm0_subunits
 						WHERE ST_CONTAINS(wkb_geometry, ST_SetSRID(ST_Point($2, $3), 4326))
 					;`, [ d.id, d.lng, d.lat ])
 					.then(result => {

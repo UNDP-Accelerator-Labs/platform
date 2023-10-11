@@ -45,6 +45,7 @@ const Media = function (kwargs) {
 	parent = d3.select(parent).classed('focus', focus)
 
 	this.type = type
+	this.name = name
 	this.lang = lang
 	this.constraint = datum.constraint
 
@@ -420,6 +421,8 @@ const Taglist = function (kwargs) {
 		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle_outline')
 	}
+
+	console.log(meta)
 	return meta
 }
 Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia

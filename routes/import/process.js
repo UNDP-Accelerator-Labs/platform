@@ -1,7 +1,7 @@
 const { modules, DB } = include('config/')
 const helpers = include('routes/helpers/')
 
-module.exports = (req, res) => { // TO DO
+module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCATION TO locations TABLE
 	// 1 CREATE AND STORE THE TEMPLATE
 	// 2 CREATE AND STORE THE PADS
 	const { pads, template, tags, mobilization } = req.body || {}

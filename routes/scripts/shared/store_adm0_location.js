@@ -70,8 +70,10 @@ DB.conn.tx(t => {
 
 			const update = `${DB.pgp.helpers.update(iso3, [ '?id', 'iso3' ], 'locations')} WHERE v.id = t.id`
 			return t.none(update)
-			.then(_ => console.log('updated everything'))
-			.catch(err => console.log(err))
+			.then(_ => {
+				console.log('updated everything')
+				process.exit()
+			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 	}).catch(err => console.log(err))
 })

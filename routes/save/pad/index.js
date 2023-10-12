@@ -5,6 +5,8 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 
 module.exports = (req, res) => {
 	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
+	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
+
 	const { uuid } = req.session || {}
 
 	if (!id) { // INSERT OBJECT

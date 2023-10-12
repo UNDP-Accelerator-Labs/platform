@@ -722,7 +722,7 @@
 		if (!attr || attr === 'description') content.description = description
 		if (!attr || ['lead', 'media', 'meta'].includes(attr)
 		|| sections.map(d => d.structure).flat().unique('type', true).includes(attr)) {
-			content.sections = JSON.stringify(sections)
+			content.sections = sections
 		}
 		// ALWAYS SEND fullTxt
 		content.full_text = fullTxt

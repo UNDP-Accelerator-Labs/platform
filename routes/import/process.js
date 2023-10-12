@@ -10,6 +10,7 @@ module.exports = (req, res) => { // TO DO
 
 	DB.conn.tx(t => {
 		// INSERT THE TEMPLATE TO GET THE id
+		template.sections = JSON.stringify(template.sections)
 		const sql = DB.pgp.helpers.insert(template, null, 'templates')
 		return t.one(`
 			$1:raw
@@ -21,6 +22,7 @@ module.exports = (req, res) => { // TO DO
 			return t.batch(pads.map(d => {
 				d.owner = uuid
 				d.template = template_id
+				d.sections = JSON.stringify(d.sections)
 
 				return t.task(t1 => {
 					// STORE PAD INFO
@@ -69,7 +71,7 @@ module.exports = (req, res) => { // TO DO
 							}).catch(err => console.log(err)))
 						}
 
-						if (d.locations?.length) {
+						if (d.locations?.filter(d => d).length) {
 							// SAVE LOCATIONS INFO
 							d.locations.forEach(c => c.pad = pad_id)
 							const locations_sql = DB.pgp.helpers.insert(d.locations, ['pad', 'lng', 'lat'], 'locations')

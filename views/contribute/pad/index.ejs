@@ -1040,7 +1040,7 @@
 		content.title = title
 		if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr)
 		|| sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
-			content.sections = JSON.stringify(sections)
+			content.sections = sections
 		}
 		// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
 		// if (!attr || attr === 'location') content.location = JSON.stringify(location)

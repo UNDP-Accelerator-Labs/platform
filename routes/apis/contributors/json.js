@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
 	let { output, render, include_data, include_teams, include_contributions } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
-	console.log('language', language)
 
 	const [ f_space, page, full_filters ] = await filter(req, res)
 	let cors_filter = ''

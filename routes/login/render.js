@@ -3,7 +3,7 @@ const getResetToken = require('./forget-password').getResetToken
 
 module.exports = async (req, res, next) => {
 	const { originalUrl, path } = req || {}
-	const { errormessage, successmessage, page_message } = req.session || {}
+	const { errormessage, successmessage, page_message, confirm_dev_origins } = req.session || {}
 
 	const { token } = req.params;
 

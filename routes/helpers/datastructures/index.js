@@ -28,7 +28,7 @@ function stripExplorationId(url) {
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
-	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device, is_trusted } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
@@ -48,6 +48,7 @@ exports.sessiondata = _data => {
 	}
 	obj.app = title
 	obj.device = device || {}
+	obj.is_trusted= is_trusted || false
 
 	return obj
 }

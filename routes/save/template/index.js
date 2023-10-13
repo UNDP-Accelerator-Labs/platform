@@ -1,9 +1,9 @@
 const { DB } = include('config/')
 
 module.exports = (req, res) => {
-	let { id, sections, review_template, review_language, source } = req.body || {}
+	const { id, review_template, review_language, source } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
-		
+
 	const { uuid } = req.session || {}
 
 	if (!id) { // INSERT OBJECT

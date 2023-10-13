@@ -1,4 +1,3 @@
-
 exports.deviceInfo = (req) => {
   const userAgent = req.headers["user-agent"];
   const useragent = require("useragent");
@@ -40,7 +39,7 @@ exports.sendDeviceCode = (_kwarg) => {
           <br/>
           <p>We have noticed that you recently attempted to log in or update your account from a new device.
           To ensure the security of your account, we require your confirmation before adding this device to your list of trusted devices or update your record.</p>
-          <p>Please confirm this device using the OTP below:</p>
+          <p>Please confirm this device using the OTP (One Time Password) below:</p>
           <h3>${code}</h3>
           <p>This OTP will expire in 10 minutes.</p>
           <p>If you are receiving this email and did not initiate this request, your account might be compromised. Please reset your password or contact system administrators.</p>
@@ -57,6 +56,7 @@ exports.checkDevice = async (_kwarg) => {
   const { uuid } = req.session;
   const { __ucd_app, __puid, __cduid } = req.cookies;
   const device = this.deviceInfo(req);
+  const { sessionID: sid } = req || {}
 
   return conn.oneOrNone(
     `
@@ -68,6 +68,7 @@ exports.checkDevice = async (_kwarg) => {
           AND duuid1 = $5
           AND duuid2 = $6
           AND duuid3 = $7
+          AND session_sid = $8
           AND is_trusted IS TRUE`,
     [
       uuid,
@@ -77,6 +78,7 @@ exports.checkDevice = async (_kwarg) => {
       __ucd_app,
       __puid,
       __cduid,
+      sid
     ],
     (d) => (d?.id ? true : false)
   );

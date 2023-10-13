@@ -34,19 +34,25 @@ module.exports = async (req, res) => {
 					batch.push(t.task(async t1 => {
 						const batch1 = []
 						batch1.push(t1.any(`
-							SELECT DISTINCT (su_a3) AS iso3, $1:name AS name
+							SELECT DISTINCT (su_a3) AS iso3, $1:name AS name, 'subunit' AS type
 							FROM adm0_subunits
 							WHERE su_a3 <> adm0_a3
 						;`, [ country_name_column ]))
 						batch1.push(t1.any(`
-							SELECT DISTINCT (adm0_a3) AS iso3, $1:name AS name
+							SELECT DISTINCT (adm0_a3) AS iso3, $1:name AS name, 'unit' AS type
 							FROM adm0
 						;`, [ country_name_column ]))
 
 						return t1.batch(batch1)
 						.then(results => {
 							const [ su_a3, adm_a3 ] = results
-							const locations = su_a3.concat(adm_a3)
+							let locations = su_a3.concat(adm_a3)
+							locations = locations.filter(d => {
+								if (locations.filter(c => c.name === d.name).length > 1) {
+									if (d.type === 'subunit') return true
+									else return false
+								} else return true
+							})
 							return locations.sort((a, b) => a.name.localeCompare(b.name))
 						}).catch(err => console.log(err))
 					}).catch(err => console.log(err)))

@@ -1,15 +1,14 @@
-const { DB } = include('config/')
+const { DB } = include("config/");
+const { sessionupdate } = include('routes/helpers')
 
 module.exports = async (req, res) => {
-	const { uuid } = req.session || {}
-	await DB.general.none(`
-		DELETE FROM trusted_devices
-		WHERE session_sid IN (
-		SELECT sid
-		FROM session
-		WHERE sess ->> 'uuid' = $1
-		);
-	`, [uuid]);
-	req.session.destroy()
-	res.redirect('/')
-}
+  const { sessionID: sid } = req || {};
+  await DB.general.tx(async (t) => {
+	await sessionupdate({
+        conn: t,
+        queryValues: [sid],
+        whereClause: `sid = $1`,
+      });
+  });
+  res.redirect("/");
+};

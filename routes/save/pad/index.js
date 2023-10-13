@@ -4,7 +4,7 @@ const path = require('path')
 const { BlobServiceClient } = require('@azure/storage-blob')
 
 module.exports = (req, res) => {
-	let { id, sections, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
+	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
 
 	const { uuid } = req.session || {}
@@ -25,8 +25,6 @@ module.exports = (req, res) => {
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
-		// req.body.sections = JSON.stringify(req.body.sections)
-		console.log(req.body.sections)
 		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
 	}	
 

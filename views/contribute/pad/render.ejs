@@ -1503,8 +1503,8 @@ function addTxt (kwargs) {
 				{ key: 'h-align', label: 'format_align_left', value: 'left' },
 				{ key: 'h-align', label: 'format_align_center', value: 'center' },
 				{ key: 'h-align', label: 'format_align_right', value: 'right' },
-				{ key: 'excerpt', label: 'bookmark', value: is_excerpt },
 			]
+			if (!locked_excerpt || is_excerpt) para_styles.push({ key: 'excerpt', label: 'bookmark', value: is_excerpt })
 			if (constraint) para_styles.push({ key: 'constraint', label: 'block', value: constraint })
 			return [font_styles, para_styles]
 		}).addElems('button', 'opt', d => d)
@@ -1520,8 +1520,7 @@ function addTxt (kwargs) {
 		.each(function (d) {
 			d3.select(this).classed(d.key, true)
 			d3.select(this).classed(d.value, true)
-		})
-		.on('click', function (d) {
+		}).on('click', function (d) {
 			const sel = d3.select(this)
 			if (d.key === 'font-properties') {
 				sel.classed('active', d.value.includes('scale') || !sel.classed('active'))
@@ -1543,7 +1542,8 @@ function addTxt (kwargs) {
 				sel.findAncestor('opt-group').selectAll('.opt')
 					.classed('active', function () { return this == sel.node() })
 				media.media.style('text-align', c => c.textalign = d.value).node().focus()
-			} else if (d.key === 'excerpt' && !templated) {
+			} else if (d.key === 'excerpt' && !locked_excerpt) {
+				// NEED TO DETERMINE WHETHER THE template HAS A SET EXCERPT 
 				const datum = media.container.datum()
 				if (!sel.classed('active')) {
 					d3.selectAll('.txt-container').each(c => { if (c) c.is_excerpt = false })

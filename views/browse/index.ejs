@@ -24,6 +24,7 @@
 	const logged = locals.metadata.user.uuid !== null
 
 	const slides = locals.sample_images
+	
 	// const is_intropage = (publicpage
 	// 	&& object === 'pads'
 	// 	&& space !== 'pinned'
@@ -331,6 +332,10 @@
 							<% if (activity !== 'preview' && locals.pinboard.editable) { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave()' contenteditable><%- locals.pinboard.title %></div>
 								<div class='description' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave()' contenteditable><%- (locals.pinboard.description) %></div>
+
+								<% if (locals.pinboard.sections?.length) { %>
+									<%- include('./modules/sections.ejs') %>
+								<% } %>
 							<% } else { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'><%- locals.pinboard.title %></div>
 								<div class='contributor'><%- vocabulary['curation credit'][language](locals.pinboard.owner, locals.pinboard.ownername, 'contributors') %></div>

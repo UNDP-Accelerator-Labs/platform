@@ -1,5 +1,5 @@
 const tag = require('./tag/')
-const pinboard = require('./pinboard/')
+const { pinboard, sections } = require('./pinboard/')
 const contributor = require('./contributor/')
 const pad = require('./pad/')
 const template = require('./template/')

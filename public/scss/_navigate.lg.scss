@@ -140,6 +140,10 @@ nav.tabs {
 	background-color: #FFF;
 	z-index: 10000;
 
+	&.pinboard-sections {
+		position: static;
+	}
+
 	.inner {
 		width: 100%;
 

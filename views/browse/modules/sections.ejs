@@ -1,0 +1,29 @@
+<%
+	// CREATE ALIASES
+	const modules = locals.metadata.site.modules
+	const space = locals.metadata.page.space
+	const object = locals.metadata.page.object
+	const query = locals.metadata.page.query
+	const language = locals.metadata.page.language
+	const rights = locals.metadata.user.rights
+    const explorationVocab = vocabulary['exploration'][language];
+
+    const sections = locals.pinboard.sections
+    const section = query.section[0]
+%>
+
+<nav class='tabs pinboard-sections'>
+	<div class='inner'>
+		<div class='m lg xl xxl'>
+			<menu class="google-translate-attr">
+				<% sections.forEach(d => { %>
+					<li class='<% if (d.id === +section) { %>active<% } %>'>
+						<a href='?pinboard=<%- pinboard.id %>&section=<%- section %>'>
+							<button><%- d.title %><div class='count'><%- d.count ?? 0 %></div></button>
+						</a>
+					</li>
+				<% }) %>
+			</menu>
+		</div>
+	</div>
+</nav>

@@ -1,4 +1,5 @@
 const { DB } = include('config/')
+const { adm0 } = require('../geo/')
 
 exports.joinObj = function (obj = {}) {
 	return {...this, ...obj}
@@ -11,27 +12,35 @@ exports.multijoin = function (args = []) {
 	})
 }
 exports.users = (data, args = []) => {
-	const [ lang, key ] = args
+	const [ language, key ] = args
 	if (!key) key = 'owner'
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const uuids = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
-		return DB.general.any(`
-			SELECT u.uuid AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, cn.name AS country FROM users u
-			INNER JOIN country_names cn
-				ON u.iso3 = cn.iso3
-			WHERE u.uuid IN ($2:csv)
-				AND cn.language = $3
-		;`, [ key, uuids, lang ])
-		.then(users => {
-			if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
-			else return this.joinObj.call(data, users[0])
+		
+		return DB.general.tx(async t => {
+			const name_column = await adm0.name_column({ connection: t, language })
+
+			return t.any(`
+				SELECT DISTINCT(u.uuid) AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, 
+					COALESCE(su.$2:name, adm0.$2:name) AS country 
+				FROM users u
+				LEFT JOIN adm0_subunits su
+					ON su.su_a3 = u.iso3
+				LEFT JOIN adm0
+					ON adm0.adm0_a3 = u.iso3
+				WHERE u.uuid IN ($3:csv)
+			;`, [ key, name_column, uuids ])
+			.then(users => {
+				if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
+				else return this.joinObj.call(data, users[0])
+			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 	} else return new Promise(resolve => resolve(data))
 }
 exports.tags = (data, args = []) => {
 	const [ lang, key, tagname, tagtype ] = args
-	if (!key) return false
+	if (!key) return new Promise(resolve => resolve(data))
 
 	if (data?.length) {
 		return DB.general.tx(t => {
@@ -108,4 +117,88 @@ exports.tags = (data, args = []) => {
 		// 		AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
 		// ;`, [ key, tagname, data.map(d => d[key]), lang ])
 	} else return new Promise(resolve => resolve(data))
+}
+exports.concatunique = function (args = []) {
+	let [ arr, key, keep ] = args
+	const arrcopy = [...arr]
+	if (!keep) keep = 'prior'
+	const output = []
+
+	this.forEach(d => {
+		if (key) {
+			if (arrcopy.some(c => c[key] === d[key]) && keep === 'latter') {
+				const duplicate = arrcopy.splice(arrcopy.findIndex(c => c[key] === d[key]), 1)[0]
+				output.push(duplicate)
+			} else output.push(d)
+		} else {
+			if (arrcopy.some(c => c === d) && keep === 'latter') {
+				const duplicate = arrcopy.splice(arrcopy.findIndex(c => c === d))[0]
+				output.push(duplicate)
+			} else output.push(d)
+		}
+	})
+
+	return output.concat(arrcopy)
+}
+exports.locations = (data, kwargs = {}) => {
+	const conn = kwargs.connection || DB.general
+	let { language, key, name_key, concat_location_key } = kwargs
+	if (!key) key = 'iso3'
+	if (!name_key) name_key = 'country'
+	
+	if ((Array.isArray(data) && data.length) || data?.[key]) {
+		const iso3s = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
+		
+		return conn.task(async t => {
+			const name_column = await adm0.name_column({ connection: t, language })
+
+			let location_structure = DB.pgp.as.format(`
+				ST_Y(ST_Centroid(wkb_geometry)) AS lat,
+				ST_X(ST_Centroid(wkb_geometry)) AS lng 
+			`)
+			if (concat_location_key) {
+				if (concat_location_key === 'geometry') {
+					location_structure = DB.pgp.as.format(`
+						ST_AsGeoJson(ST_Point(ST_X(ST_Centroid(wkb_geometry)), ST_Y(ST_Centroid(wkb_geometry))))::jsonb AS $1:name
+					`, [ concat_location_key ])
+				} else {
+					location_structure = DB.pgp.as.format(`
+						jsonb_build_object('lat', ST_Y(ST_Centroid(wkb_geometry)), 'lng', ST_X(ST_Centroid(wkb_geometry))) AS $1:name
+					`, [ concat_location_key ])
+				}
+			}
+
+			const batch = []
+			// GET ONLY THE RELEVANT SUBUNITS
+			// THE su_a3 <> adm0_a3 IS IMPORTANT TO AVOID DUPLICATES IN THE END
+			batch.push(t.any(`
+				SELECT su_a3 AS $1:name, $2:name AS $3:name,
+					$4:raw				
+
+				FROM adm0_subunits
+				WHERE su_a3 IN ($5:csv)
+					AND su_a3 <> adm0_a3
+			;`, [ key, name_column, name_key, location_structure, iso3s ]).catch(err => console.log(err)))
+
+			batch.push(t.any(`
+				SELECT adm0_a3 AS $1:name, $2:name AS $3:name,
+					$4:raw
+
+				FROM adm0
+				WHERE adm0_a3 IN ($5:csv)
+			;`, [ key, name_column, name_key, location_structure, iso3s ]).catch(err => console.log(err)))
+
+			return t.batch(batch)
+			.then(results => {
+				const [ su_a3, adm_a3 ] = results
+				const locations = su_a3.concat(adm_a3)
+
+				if (Array.isArray(data)) return this.multijoin.call(data, [ locations, key ])
+				else return this.joinObj.call(data, locations[0])
+
+			}).catch(err => console.log(err))
+		}).catch(err => console.log(err))
+	
+	} else return new Promise(resolve => resolve(data))
+
 }

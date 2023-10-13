@@ -147,10 +147,17 @@ process.on('message', message => {
 										const gbatch = []
 										gbatch.push(gt.one(`
 											SELECT ST_Distance (
-												(SELECT ST_Transform(ST_SetSRID(ST_Point(lng, lat), 4326), 3857) FROM countries WHERE iso3 = (SELECT iso3 FROM users WHERE uuid = $1)),
-												(SELECT ST_Transform(ST_SetSRID(ST_Point(lng, lat), 4326), 3857) FROM countries WHERE iso3 = (SELECT iso3 FROM users WHERE uuid = $2))
+												(COALESCE(
+													(SELECT ST_Centroid(wkb_geometry) FROM adm0_subunits WHERE su_a3 = (SELECT iso3 FROM users WHERE uuid = $1)),
+													(SELECT ST_Centroid(wkb_geometry) FROM adm0 WHERE adm0_a3 = (SELECT iso3 FROM users WHERE uuid = $1))
+												)),
+												(COALESCE(
+													(SELECT ST_Centroid(wkb_geometry) FROM adm0_subunits WHERE su_a3 = (SELECT iso3 FROM users WHERE uuid = $2)),
+													(SELECT ST_Centroid(wkb_geometry) FROM adm0 WHERE adm0_a3 = (SELECT iso3 FROM users WHERE uuid = $2))
+												))
 											) AS distance
 										;`, [ d.owner, owner ], d => d.distance))
+
 										gbatch.push(gt.one(`SELECT language FROM users WHERE uuid = $1;`, [ d.owner ], d => d.language))
 										return gt.batch(gbatch)
 										.then(results => {

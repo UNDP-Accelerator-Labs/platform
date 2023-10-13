@@ -247,8 +247,7 @@
 				obj.types = ref.map(c => typeof c).unique() // THIS SHOULD BE ['string']
 			} else if (obj.types.length === 0) {
 				// IF THERE ARE NO TYPES
-				// if (obj.entries.filter(c => ![null, undefined].includes(c)).unique()[0] === 0) {
-				if (ref.unique().every(c => c === 0)) {
+				if (ref.length && ref.unique().every(c => c === 0)) {
 					obj.entries = obj.entries.map(c => 0)
 					ref = obj.entries.filter(c => c === 0)
 					obj.values = ref.unique()

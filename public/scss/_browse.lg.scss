@@ -1063,7 +1063,7 @@ div.browse {
 		}
 	}
 
-	nav:not(.tabs) {
+	nav:not(.tabs):not(.pinboard-sections) {
 		width: 100%;
 		margin: 0 0 30px -15px;
 
@@ -1270,10 +1270,14 @@ div.browse {
 					color: $c-mid-blue;
 				}
 				.description {
+
+					&.lead {
+						font-size: $t-mid;
+						line-height: 1.3em;
+					}
+
 					margin-bottom: 25px;
 					padding-bottom: 5px;
-					font-size: $t-mid;
-					line-height: 1.5em;
 					border-top: none;
 					outline: none;
 					color: $c-dark-blue;

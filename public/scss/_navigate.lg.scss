@@ -129,9 +129,8 @@ button#expand-nav.close {
 		transform-origin: center;
 	}
 }
-nav.tabs {
-	position: fixed;
-	top: 30px;
+nav.tabs,
+nav.pinboard-sections {
 	width: calc(300px * 3 + 15px * 2);
 	height: 75px;
 	margin-left: -15px;
@@ -140,15 +139,10 @@ nav.tabs {
 	background-color: #FFF;
 	z-index: 10000;
 
-	&.pinboard-sections {
-		position: static;
-	}
-
 	.inner {
 		width: 100%;
 
 		div.lg {
-
 			menu,
 			ul {
 				display: flex;
@@ -181,6 +175,22 @@ nav.tabs {
 						overflow: hidden;
 						white-space: nowrap;
 
+						&.add {
+							display: none;
+							width: 30px;
+							height: 30px;
+							margin: 10px 5px 0 -5px;
+							background: url('../imgs/icons/i-add.svg');
+							border: none;
+							outline: none;
+							float: right;
+							cursor: pointer;
+						}
+
+						div {
+							display: inline-block;
+							outline: none;
+						}
 						.count {
 							position: relative;
 							display: inline-block;
@@ -355,8 +365,39 @@ nav.tabs {
 						border-color: $c-dark-blue;
 					}
 				}
+				li.editing {
+					background-color: $c-light-2;
+
+					a {
+						cursor: default;
+					}
+					button {
+						color: $c-dark-blue !important;
+
+						&.add {
+							display: inline-block;
+						}
+					}
+				}
 			}
 		}
+	}
+}
+nav.tabs {
+	position: fixed;
+	top: 30px;
+}
+nav.pinboard-sections {
+	margin-bottom: 30px;
+
+	div, a {
+		display: inline-block !important;
+	}
+	i.material-icons {
+		font-size: $t-main;
+		vertical-align: middle;
+		margin-left: 5px;
+		cursor: pointer;
 	}
 }
 /* THE FOLLOWING IS THE SAME AS THE nav.tabs IN _navigate.m */

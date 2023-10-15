@@ -1,5 +1,5 @@
 const tag = require('./tag/')
-const { pinboard, sections } = require('./pinboard/')
+const { pinboard, section: pinboard_section } = require('./pinboard/')
 const contributor = require('./contributor/')
 const pad = require('./pad/')
 const template = require('./template/')
@@ -11,6 +11,7 @@ module.exports = (req, res) => {
 
 	if (object === 'tag') tag(req, res)
 	else if (object === 'pinboard') pinboard(req, res)
+	else if (object === 'pinboard-section') pinboard_section(req, res)
 	else if (object === 'contributor') contributor(req, res)
 	else if (object === 'pad') pad(req, res)
 	else if (object === 'template') template(req, res)

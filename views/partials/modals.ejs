@@ -68,8 +68,11 @@
 
 			inner.addElems('ul', 'opts', opts ? [opts] : [])
 				.addElems('li', 'opt link', d => d)
+				.classed('default', d => d.default || false)
 			.each(function (d) {
-				d3.select(this).call(addInputNode, { d, resolve })
+				const sel = d3.select(this)
+				if (d.classname) d3.select(this).classed(d.classname, true)
+				sel.call(addInputNode, { d, resolve })
 			})
 		})
 	}
@@ -325,7 +328,7 @@
 					'checked': d.checked || null,
 					'disabled': d.disabled || null
 				}).html(d.label)
-			.on('click', async function (d) { // PROBABLY d DOES NOT NEED TO BE PASSED HERE (LIKE IN THE keyup BELOW)
+			.on('click', async function () { 
 				if (['button', 'submit'].includes(d.type)) {
 					if (resolve) {
 						if (typeof d.resolve === 'function') {
@@ -351,7 +354,10 @@
 					}
 				}
 			}).on('change', function () {
-				if (d.node === 'input') fixLabel(this)
+				if (d.node === 'input') {
+					fixLabel(this)
+					if (d.fn && typeof d.fn === 'function') d.fn.call(this, d)
+				}
 			})
 		}
 

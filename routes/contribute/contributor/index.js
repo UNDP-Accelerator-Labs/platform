@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
-const { checklanguage, datastructures } = include('routes/helpers/')
+const { checklanguage, datastructures, geo } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
@@ -28,13 +28,34 @@ module.exports = async (req, res) => {
 					return res.redirect(`/${language}/${redirect}/contributor${query.length > 0 ? `?${query.join('&')}` : ''}`)
 					// return res.redirect(`/${language}/${redirect}/contributor?id=${id}`)
 				} else {
+					const country_name_column = await geo.adm0.name_column({ connection: t, language })
 					const batch = []
 					// GET LIST OF COUNTRIES
-					batch.push(t.any(`
-						SELECT DISTINCT (iso3), name FROM country_names
-						WHERE language = (COALESCE((SELECT DISTINCT (language) FROM country_names WHERE language = $1 LIMIT 1), 'en'))
-						ORDER BY name
-					;`, [ language ]))
+					batch.push(t.task(async t1 => {
+						const batch1 = []
+						batch1.push(t1.any(`
+							SELECT DISTINCT (su_a3) AS iso3, $1:name AS name, 'subunit' AS type
+							FROM adm0_subunits
+							WHERE su_a3 <> adm0_a3
+						;`, [ country_name_column ]))
+						batch1.push(t1.any(`
+							SELECT DISTINCT (adm0_a3) AS iso3, $1:name AS name, 'unit' AS type
+							FROM adm0
+						;`, [ country_name_column ]))
+
+						return t1.batch(batch1)
+						.then(results => {
+							const [ su_a3, adm_a3 ] = results
+							let locations = su_a3.concat(adm_a3)
+							locations = locations.filter(d => {
+								if (locations.filter(c => c.name === d.name).length > 1) {
+									if (d.type === 'subunit') return true
+									else return false
+								} else return true
+							})
+							return locations.sort((a, b) => a.name.localeCompare(b.name))
+						}).catch(err => console.log(err))
+					}).catch(err => console.log(err)))
 					// GET LIST OF LANGUAGES
 					batch.push(t.any(`
 						SELECT DISTINCT (language), name FROM languages
@@ -56,7 +77,9 @@ module.exports = async (req, res) => {
 					if (id) {
 						batch.push(t.one(`
 							SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language, u.secondary_languages, u.rights, u.notifications, u.reviewer,
-							cn.name AS country, l.name AS languagename,
+							l.name AS languagename,
+
+							COALESCE(su.$1:name, adm0.$1:name) AS country, 
 
 							COALESCE(
 							(SELECT json_agg(json_build_object(
@@ -70,26 +93,28 @@ module.exports = async (req, res) => {
 							)::TEXT, '[]')::JSONB
 							AS teams,
 
-							CASE WHEN uuid = $1
-								OR $2 > 2
+							CASE WHEN uuid = $2
+								OR $3 > 2
 									THEN TRUE
 									ELSE FALSE
 							END AS editable,
 
-							CASE WHEN $1 IN (SELECT host FROM cohorts WHERE contributor = u.uuid)
-								OR $2 > 2
+							CASE WHEN $2 IN (SELECT host FROM cohorts WHERE contributor = u.uuid)
+								OR $3 > 2
 									THEN TRUE
 									ELSE FALSE
 							END AS host_editor
 
 							FROM users u
-							INNER JOIN country_names cn
-								ON cn.iso3 = u.iso3
-								AND cn.language = u.language
+							LEFT JOIN adm0_subunits su
+								ON su.su_a3 = u.iso3
+							LEFT JOIN adm0 
+								ON adm0.adm0_a3 = u.iso3
+
 							INNER JOIN languages l
 								ON l.language = u.language
-							WHERE uuid = $3
-						;`, [ uuid, rights, id ])
+							WHERE uuid = $4
+						;`, [ country_name_column, uuid, rights, id ])
 						.then(result => {
 							return DB.conn.one(`
 								SELECT COUNT (id)::INT FROM pads

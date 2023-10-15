@@ -21,8 +21,7 @@ module.exports = kwargs => {
 			u.confirmed_at, u.left_at,
 			u.language, u.secondary_languages,
 			to_char(u.confirmed_at, 'DD Mon YYYY') AS start_date, to_char(u.left_at, 'DD Mon YYYY') AS end_date,
-			cn.name AS country,
-
+			
 			CASE WHEN $1 > 2
 				THEN TRUE
 				ELSE FALSE
@@ -48,20 +47,21 @@ module.exports = kwargs => {
 			-- FROM cohorts c
 			-- INNER JOIN users u
 			-- 	ON u.uuid = c.contributor
-
-			INNER JOIN country_names cn
-				ON cn.iso3 = u.iso3
-			INNER JOIN languages l
+			
+			LEFT JOIN languages l
 				ON l.iso3 = u.iso3
-			WHERE cn.language = $3
-				$4:raw
+			WHERE TRUE
+				$3:raw
 			ORDER BY u.name
-		;`, [ rights, collaborators_ids, language, full_filters ])
-		.then(users => {
+		;`, [ rights, collaborators_ids, full_filters ])
+		.then(async users => {
 			// CONVERT THE pinboards TO json
 			// users.forEach(d => {
 			// 	d.pinboards = JSON.parse(d.pinboards)
 			// })
+
+			// JOIN LOCATION INFO
+			users = await join.locations(users, { connection: gt, language, key: 'iso3' })
 
 			if (users.length) {
 				return DB.conn.task(t => {
@@ -117,14 +117,6 @@ module.exports = kwargs => {
 			} else return users
 		}).catch(err => console.log(err))
 	}).then(data => {
-
-		// const sections = array.nest.call(data, { key: d => d.name.charAt(0).toUpperCase() })
-		// sections.forEach(d => {
-		// 	d.data = d.values
-		// 	delete d.values
-		// })
-		// sections.sort((a, b) => a.key?.localeCompare(b.key))
-
 		return {
 			data,
 			// count: (page - 1) * page_content_limit,

@@ -17,8 +17,8 @@ module.exports = async (req, res) => {
 		LEFT JOIN countries c
 			ON c.bureau = b.abbv
 		WHERE TRUE
-			AND $2:raw
-	;`, [ language, filters ])
+			AND $1:raw
+	;`, [ filters ])
 	.then(results => {
 		if (results.length) res.json(results)
 		else res.status(400).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })

@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken')
 module.exports = (req, res) => {
 	const { action, object } = req.params || {}
 	const { output, render } = Object.keys(req.body)?.length ? req.body : Object.keys(req.query)?.length ? req.query : {}
-
+	
 	// TO DO: ADD Readme.md TO DOWNLOADS
 	if (action === 'download') {
 		if (render) {

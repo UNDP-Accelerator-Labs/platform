@@ -31,6 +31,7 @@ app.use(
         'style-src': csp_links,
         'connect-src': csp_links,
         "frame-src": ["'self'","https://www.youtube.com/","https://youtube.com/","https://web.microsoftstream.com"]
+
       },
     },
     referrerPolicy: {

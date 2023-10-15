@@ -1693,22 +1693,21 @@ function addEmbed (kwargs) {
 		const url = this.innerText.trim() || d.src
 		const isYoutube = url.match(/^(((http|https):\/\/)|(www\.))(?=.*youtube)/gi)
 		const isMSStream = url.match(/^(((http|https):\/\/))(?=.*microsoftstream)/gi)
-		
+
 		if (isYoutube) {
 			d.src = url.replace('watch?v=', 'embed/')
 			this.innerText = null
 			sel.addElems('iframe')
-			.attrs({
-				'width': 560, 'height': 315, 'src': d.src, 'frameborder': 0,
-				'allow': 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
-			})
-			.each(function () { this.allowfullscreen })
+				.attrs({
+					'width': 560, 'height': 315, 'src': d.src, 'frameborder': 0,
+					'allow': 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
+				}).each(function () { this.allowfullscreen })
 		} else if (isMSStream) {
 			d.src = url.replace(/\?(.*)/gi, '?autoplay=false&amp;showinfo=true')
 			this.innerText = null
 			sel.addElems('iframe')
-					.attrs({ 'width': 560, 'height': 315, 'src': d.src })
-					.style('border', 'none')
+				.attrs({ 'width': 560, 'height': 315, 'src': d.src })
+				.style('border', 'none')
 			.each(function () { this.allowfullscreen })
 		} else {
 			if (false) { // TO DO: FINSIH THIS

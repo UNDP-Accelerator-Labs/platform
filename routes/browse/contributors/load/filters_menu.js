@@ -1,5 +1,5 @@
 const { modules, metafields, DB } = include('config/')
-const { datastructures, checklanguage, count, flatObj } = include('routes/helpers/')
+const { datastructures, checklanguage, count, flatObj, join } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -31,16 +31,16 @@ module.exports = async kwargs => {
 			
 			// GET COUNTRY BREAKDOWN
 			batch1.push(t1.any(`
-				SELECT COUNT (DISTINCT (u.id))::INT, u.iso3 AS id, cn.name AS name FROM users u
-				INNER JOIN country_names cn
-					ON cn.iso3 = u.iso3
-				WHERE cn.language = $1
+				SELECT COUNT (DISTINCT (u.id))::INT, u.iso3 AS id
+				FROM users u
+				WHERE TRUE
 					$2:raw
-				GROUP BY (u.iso3, cn.name)
-				ORDER BY cn.name
+				GROUP BY (u.iso3)
 			;`, [ language, f_space ]) // [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
-			.then(results => { 
-				return results.length ? { countries: results } : null
+			.then(async results => { 
+				// JOIN LOCATION INFO
+				results = await join.locations(results, { connection: t1, language, key: 'id', name_key: 'name' })
+				return results.length ? { countries: results.sort((a, b) => a.name?.localeCompare(b.name)) } : null
 			}))
 
 			// GET RIGHTS BREAKDOWN

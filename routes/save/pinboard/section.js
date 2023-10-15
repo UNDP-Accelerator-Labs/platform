@@ -1,4 +1,5 @@
-const { modules, DB } = include('config/')
+const { modules, map, DB } = include('config/')
+const { checklanguage, array, geo } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { id, ...data } = req.body || {}
@@ -53,13 +54,15 @@ module.exports = (req, res) => {
 						SELECT pad FROM pinboard_contributions
 						WHERE pinboard = $1
 					;`, [ pinboard ])
-					.then(pads => {
-						pads = pads.map(d => d.id)
+					.then(async pads => {
+						pads = pads.map(d => d.pad)
 						const batch = []
 
-						let sql = ''
-						if (modules.some(d => d.type === 'countries') && countries) {
+						if (map && countries) {
 							if (!Array.isArray(countries)) countries = [countries]
+							const name_column = await geo.adm0.name_column({ connection: gt, language })
+
+							batch.push('countries')
 
 							batch.push(t.any(`
 								SELECT p.id, l.iso3 FROM pads p
@@ -71,24 +74,26 @@ module.exports = (req, res) => {
 
 							// GET COLUMN NAME FOR COUNTRY NAME IN CURRENT LANGUAGE
 							batch.push(gt.any(`
-								SELECT $1:name AS title, su_a3 AS iso3
+								SELECT $1:name AS title, su_a3 AS iso3, ''::TEXT AS description, $2::INT AS pinboard
 								FROM adm0_subunits
-								WHERE su_a3 IN ($2:csv)
+								WHERE su_a3 IN ($3:csv)
 									AND su_a3 <> adm0_a3
-							;`, [ column_name, countries ]) // TO DO: GET COLUMN NAME WHEN MERGED WITH LOCATIONS BRANCH
+							;`, [ name_column, pinboard, countries ]) // TO DO: GET COLUMN NAME WHEN MERGED WITH LOCATIONS BRANCH
 							.then(su => {
 								return gt.any(`
-									SELECT $1:name AS title, adm0 AS iso3
+									SELECT $1:name AS title, adm0 AS iso3, ''::TEXT AS description, $2::INT AS pinboard
 									FROM adm0
-									WHERE adm0_a3 IN ($2:csv)
-								;`, [ column_name, countries ])
+									WHERE adm0_a3 IN ($3:csv)
+								;`, [ name_column, pinboard, countries ])
 								.then(adm => {
-									return array.nest.call(su.concat(adm), { key: 'title' })
+									return array.nest.call(su.concat(adm), { key: 'title', keyname: 'title', keep: [ 'description', 'pinboard' ] })
 								}).catch(err => console.log(err))
 							}).catch(err => console.log(err)))
 
 						} else if (modules.some(d => d.type === 'templates') && templates) {
 							if (!Array.isArray(templates)) templates = [templates]
+
+							batch.push('templates')
 
 							batch.push(t.any(`
 								SELECT p.id FROM pads p
@@ -98,12 +103,14 @@ module.exports = (req, res) => {
 							;`, [ pads, templates ])) // TO DO: MAKE SURE TO ACCOUNT FOR PADS THAT HAVE NO TEMPLATE
 
 							batch.push(t.any(`
-								SELECT title, description FROM templates
-								WHERE id IN ($1:csv)
-							;`, [ templates ]))
+								SELECT title, description, $1::INT AS pinboard FROM templates
+								WHERE id IN ($2:csv)
+							;`, [ pinboard, templates ]))
 
 						} else if (modules.some(d => d.type === 'mobilizations') && mobilizations) {
 							if (!Array.isArray(mobilizations)) mobilizations = [mobilizations]
+
+							batch.push('mobilizations')
 
 							batch.push(t.any(`
 								SELECT p.id FROM pads p
@@ -114,17 +121,33 @@ module.exports = (req, res) => {
 							;`, [ pads, mobilizations ]))
 
 							batch.push(t.any(`
-								SELECT title, description FROM mobilizations
-								WHERE id IN ($1:csv)
-							;`, [ mobilizations ]))
-						}
+								SELECT title, description, $1::INT AS pinboard FROM mobilizations
+								WHERE id IN ($2:csv)
+							;`, [ pinboard, mobilizations ]))
+						} else res.redirect('/module-error')
 
 						return t.batch(batch)
 						.then(results => {
-							const [ section_pads, sections ] = results
+							const [ type, section_pads, sections ] = results
 							
+							if (type === 'countries') insert_sections = `${DB.pgp.helpers.insert(sections, [ 'title', 'description', 'pinboard' ], 'pinboard_sections')} RETURNING id, title`
+							else insert_sections = `${DB.pgp.helpers.insert(sections, [ 'title', 'description', 'pinboard' ], 'pinboard_sections')} RETURNING id`
 
+							return gt.any(insert_sections)
+							.then(ids => {
+								console.log(ids)
+								// RETURN THE INSERT FIRST TO GET THE id, AND INSERT IT INTO pinboard_contribution.section FOR EACH pad.id
+								let update_pinboard_contributions = ''
 
+								if (map && countries) {
+									
+									// UPDATE section IN pinboard_contribution
+
+								} else {
+
+								}
+							})
+							
 						}).catch(err => console.log(err))
 
 					}).catch(err => console.log(err))

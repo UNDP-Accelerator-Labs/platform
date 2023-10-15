@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 					WITH l AS (
 						SELECT COALESCE(
 							(SELECT su_a3 FROM adm0_subunits WHERE su_a3 ILIKE $1), 
-							(SELECT su_a3 FROM adm0 WHERE adm0_a3 ILIKE $1)
+							(SELECT adm0_a3 FROM adm0 WHERE adm0_a3 ILIKE $1)
 						) AS iso3
 					)
 					SELECT l.iso3, COALESCE(su.$2:name, adm0.$2:name) AS name
@@ -38,6 +38,7 @@ module.exports = async (req, res) => {
 						ON adm0.adm0_a3 = l.iso3
 					LIMIT 1
 				;`, [ decodeURI(instance), name_column ]) // CHECK WHETHER THE instance IS A COUNTRY
+				// TO DO: NEST BY name TO CATCH e.g. "FXX" AND "FRA" AS THE SAME ENTITY "FRANCE"
 				.then(result => {
 					if (!result) {
 						return t.oneOrNone(`

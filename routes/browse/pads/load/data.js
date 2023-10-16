@@ -71,6 +71,23 @@ module.exports = async kwargs => {
 					})
 					return results
 				}).catch(err => console.log(err)))
+				// LOCATION INFORMATION
+				if (metafields.some(d => d.type === 'location')) {
+					batch.push(t.any(`
+						SELECT DISTINCT pad AS id, iso3 FROM locations
+						WHERE pad IN $1:raw
+					;`, [ padlist ])
+					.then(async results => {
+						let location_names = await join.locations(results, { language, key: 'iso3' })
+						location_names = array.nest.call(location_names, { key: 'id', keyname: 'id' })
+						location_names.forEach(d => {
+							d.locations = d.values
+							delete d.values
+							delete d.count
+						})
+						return location_names
+					}).catch(err => console.log(err)))
+				}
 				// SOURCE INFORMATION
 				batch.push(t.any(`
 					SELECT p.id, pp.title AS source_title
@@ -338,7 +355,6 @@ module.exports = async kwargs => {
 		}).catch(err => console.log(err))
 	}).then(async results => {
 		const data = await join.users(results, [ language, 'owner' ])
-
 		return {
 			data,
 			// count: (page - 1) * page_content_limit,

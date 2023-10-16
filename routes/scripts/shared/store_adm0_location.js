@@ -68,11 +68,12 @@ DB.general.tx(async gt => {
 					})).catch(err => console.log(err))
 				}).catch(err => console.log(err))
 
-				const update = `${DB.pgp.helpers.update(iso3, [ '?id', 'iso3' ], 'locations')} WHERE v.id = t.id`
-				return t.none(update)
-				.then(_ => {
-					console.log('updated everything')
-				}).catch(err => console.log(err))
+				if (iso3.length) {
+					const update = `${DB.pgp.helpers.update(iso3, [ '?id', 'iso3' ], 'locations')} WHERE v.id = t.id`
+					return t.none(update).then(_ => {
+						console.log('updated everything')
+					}).catch(err => console.log(err))
+				}
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 	}).catch(err => console.log(err))

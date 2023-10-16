@@ -11,6 +11,8 @@ module.exports = req => {
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
 	else page = +page
+
+	// TO DO: INTEGRATE FILTER FOR COUNTRIES
 	
 	// BASE FILTERS
 	const base_filters = []

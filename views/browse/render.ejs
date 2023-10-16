@@ -70,30 +70,39 @@ const Entry = function (_kwargs) {
 	this.render = {
 		owner: function (_sel) {
 			const metainfo = _sel.addElems('div', 'meta meta-data')
-			metainfo.addElems('div', 'meta meta-contributor')
-				.addElems('a', 'contributor-name')
-				.attr('href', d => {
-					<% if ((['pads', 'templates', 'files'].includes(object) && ['private', 'curated'].includes(space))
-						|| object === 'mobilizations')
-					{ %>
-						return `?contributors=${d.owner}`
-					<% } else if (object === 'reviews') { %>
-						return d.is_review ? `?contributors=${d.owner}` : '#'
-					<% } else { %>
-						return `?countries=${d.iso3}`
-					<% } %>
-				}).html(d => {
-					<% if ((['pads', 'templates', 'files'].includes(object) && ['private', 'curated'].includes(space))
-						|| object === 'mobilizations')
-					{ %>
-						return d.ownername || '<%- vocabulary["anonymous contributor"][language] %>'
-					<% } else if (object === 'reviews' && space === 'private') { %>
-						return d.is_review ? d.ownername : '<%- vocabulary["blinded for review"][language] %>'
-					<% } else { %>
-						if (d.iso3 === 'NUL') return '<%- vocabulary["global"][language] %>'
-						return d.country || '<%- vocabulary["anonymous contributor"][language] %>'
-					<% } %>
-				})
+			
+			metainfo.addElems('div', 'meta meta-contributor', d => {
+				let data = []
+				<% if (
+					(['pads', 'files'].includes(object) 
+						&& ['private', 'curated'].includes(space)
+					) || ['templates' ,'mobilizations'].includes(object)
+				) { %> 
+					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' }]
+					
+					if (d.locations?.length) {
+						d.locations.forEach(c => {
+							data.push({ href: `?countries=${c.iso3}`, name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') })
+						})
+					} else {
+						data.push({ href: `?countries=${d.iso3}`, name: (d.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (d.country || '<%- vocabulary["anonymous contributor"][language] %>') })
+					}
+				<% } else if (object === 'reviews') { %>
+					data = [{ href: d.is_review ? `?contributors=${d.owner}` : null, name: <% if (space === 'private') { %>d.is_review ? d.ownername : '<%- vocabulary["blinded for review"][language] %>'<% } else { %>null<% } %> }]
+				<% } else { %>
+					if (d.locations?.length) {
+						data = d.locations.map(c => {
+							return { href: `?countries=${c.iso3}`, name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') }
+						})
+					} else {
+						data = [{ href: `?countries=${d.iso3}`, name: (d.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (d.country || '<%- vocabulary["anonymous contributor"][language] %>') }]
+					}
+				<% } %>
+				return data
+			}).addElems('a', 'contributor-name')
+				.attr('href', d => d.href)
+				.html(d => d.name)
+
 			metainfo.addElems('div', 'meta meta-date')
 				.html(d => {
 					if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)

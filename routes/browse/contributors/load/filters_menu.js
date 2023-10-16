@@ -1,5 +1,5 @@
 const { modules, metafields, DB } = include('config/')
-const { datastructures, checklanguage, count, flatObj, join } = include('routes/helpers/')
+const { array, datastructures, checklanguage, count, flatObj, join } = include('routes/helpers/')
 
 const filter = require('../filter')
 
@@ -39,8 +39,28 @@ module.exports = async kwargs => {
 			;`, [ language, f_space ]) // [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
 			.then(async results => { 
 				// JOIN LOCATION INFO
-				results = await join.locations(results, { connection: t1, language, key: 'id', name_key: 'name' })
-				return results.length ? { countries: results.sort((a, b) => a.name?.localeCompare(b.name)) } : null
+				let countries = await join.locations(results, { connection: t1, language, key: 'id', name_key: 'name' })
+				if (countries.length !== array.unique.call(countries, { key: 'name' }).length) {
+					console.log('equivalents: need to do something about countries that have equivalents')
+					countries = array.nest.call(countries, { key: 'name', keyname: 'name' })
+					.map(d => {
+						const obj = {}
+						obj.name = d.name
+
+						if (d.count > 1) {
+							obj.count = array.unique.call(d.values.map(c => c.contributors).flat()).length
+							obj.id = d.values.splice(0, 1)[0].id
+							obj.equivalents = d.values.map(c => c.id)
+						} else {
+							obj.count = d.values[0].count
+							obj.id = d.values[0].id
+						}
+
+						return obj
+					})
+				} else console.log('no equivalents: do nothing')
+				countries.sort((a, b) => a.name?.localeCompare(b.name))
+				return countries.length ? { countries } : null
 			}))
 
 			// GET RIGHTS BREAKDOWN

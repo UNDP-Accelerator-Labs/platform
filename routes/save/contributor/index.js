@@ -193,7 +193,7 @@ module.exports =async (req, res) => {
 					sessionupdate({
 						conn: t,
 						whereClause: `sess ->> 'uuid' = $1`,
-						queryValues: [uuid]
+						queryValues: [id]
 					})
 
 				} else {
@@ -230,14 +230,12 @@ module.exports =async (req, res) => {
 
 						WHERE uuid = $2
 					;`, [ app_languages, id ])
-					.then(async result => {
-						const { language } = result
-						const { device } = req.session
-						// JOIN LOCATION INFO
-						result = await join.locations(result, { connection: t, language, key: 'iso3', name_key: 'countryname' })
-						const sess = { ...result, is_trusted, device: {...device, is_trusted}}
-						Object.assign(req.session, datastructures.sessiondata(sess))
-						return null
+					.then(result => {
+						sessionupdate({
+							conn: t,
+							whereClause: `sess ->> 'uuid' = $1`,
+							queryValues: [id]
+						})
 					}).catch(err => console.log(err))
 				}
 

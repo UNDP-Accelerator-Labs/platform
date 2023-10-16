@@ -48,7 +48,7 @@ Run the following command for the two `.shp` (shape)file in the unzipped folders
 - in `ne_10m_admin_0_map_subunits/`:
 `ogr2ogr -f "PostgreSQL" PG:"dbname='{your_db_name}' host='{your_host}' port='{your_port}' user='{your_psql_username}' password='{your_psql_password}'" ne_10m_admin_0_map_subunits.shp -nln adm0_subunits -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326`
 
-Assuming you extracted both zips into the same base folder and you have a `.env` run:
+Assuming you extracted both zips into the same base folder and you have a `.env` at `path/to/.env` run:
 
 ```sh
 pushd ne_10m_admin_0_countries/

@@ -61,17 +61,17 @@ module.exports = (req, res) => {
 				}).catch(err => console.log(err)))
 			} else {
 				if (rights < 3) { // IF THE USER/ HOST IS NOT A sudo ADMIN
-					// TO DO: CAN THIS BE SIMPLIFIED?
 					batch.push(DB.general.any(`
-						SELECT u.uuid AS id, u.name AS ownername, u.iso3, u.position, cn.name AS country FROM cohorts c
-						INNER JOIN users u
-							ON u.uuid = c.contributor
-						INNER JOIN country_names cn
-							ON cn.iso3 = u.iso3
+						SELECT u.uuid AS id FROM users u
+						INNER JOIN cohorts c
+							ON c.contributor = u.uuid
 						WHERE c.host = $1
-							AND cn.language = (COALESCE((SELECT DISTINCT (language) FROM country_names WHERE language = $2 LIMIT 1), 'en'))
-						ORDER BY cn.name, u.name
-					;`, [ uuid, language ]))
+					;`, [ uuid ])
+					.then(async results => {
+						const data = await join.users(results, [ language, 'id' ])
+						data.sort((a, b) => a.country?.localeCompare(b.country))
+						return data
+					}).catch(err => console.log(err)))
 				} else { // THE USER IS A sudo ADMIN
 					batch.push(DB.general.any(`
 						SELECT uuid AS id FROM users

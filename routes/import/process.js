@@ -1,7 +1,7 @@
 const { modules, DB } = include('config/')
 const helpers = include('routes/helpers/')
 
-module.exports = (req, res) => { // TO DO
+module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCATION TO locations TABLE
 	// 1 CREATE AND STORE THE TEMPLATE
 	// 2 CREATE AND STORE THE PADS
 	const { pads, template, tags, mobilization } = req.body || {}
@@ -73,13 +73,48 @@ module.exports = (req, res) => { // TO DO
 
 						if (d.locations?.filter(d => d).length) {
 							// SAVE LOCATIONS INFO
-							d.locations.forEach(c => c.pad = pad_id)
+							d.locations.forEach(c => {
+								if (c) c.pad = pad_id
+							})
 							const locations_sql = DB.pgp.helpers.insert(d.locations, ['pad', 'lng', 'lat'], 'locations')
 							batch1.push(t1.none(`
 								$1:raw
 								ON CONFLICT ON CONSTRAINT unique_pad_lnglat
 									DO NOTHING
-							;`, [ locations_sql ]))
+							;`, [ locations_sql ])
+							.then(_ => {
+								// SAVE THE ISO3 HERE
+								return t1.any(`
+									SELECT l.id, l.lat, l.lng, p.owner FROM locations l
+									INNER JOIN pads p
+										ON p.id = l.pad
+									WHERE l.pad = $1
+								;`, [ pad_id ])
+								.then(async locations => {
+									const iso3 = await DB.general.task(gt => {
+										return gt.batch(locations.map(d => {
+											return gt.oneOrNone(`
+												SELECT $1 AS id, su_a3 AS iso3 
+												FROM adm0_subunits
+												WHERE ST_CONTAINS(wkb_geometry, ST_SetSRID(ST_Point($2, $3), 4326))
+											;`, [ d.id, d.lng, d.lat ])
+											.then(result => {
+												if (!result) { // DEFAULT TO USER LOCATION
+													return gt.one(`
+														SELECT $1 AS id, iso3 FROM users
+														WHERE uuid = $2
+													;`, [ d.id, d.owner ])
+													.catch(err => console.log(err))
+												} else return result
+											}).catch(err => console.log(err))
+										})).catch(err => console.log(err))
+									}).catch(err => console.log(err))
+
+									const update = `${DB.pgp.helpers.update(iso3, [ '?id', 'iso3' ], 'locations')} WHERE v.id = t.id`
+									return t1.none(update)
+									.catch(err => console.log(err))
+								})
+							}).catch(err => console.log(err)))
 						}
 
 						if (d.metadata?.length) {

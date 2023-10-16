@@ -61,7 +61,15 @@ popd
 ```
 
 Finally, run:
-`node routes/scripts/shared/store_adm0_location.js`
+`node routes/scripts/shared/store_adm0_location.js` or better
+
+```
+make script ENV=.ap.env CMD=store_adm0_location.js
+make script ENV=.exp.env CMD=store_adm0_location.js
+make script ENV=.sm.env CMD=store_adm0_location.js
+make script ENV=.global.env CMD=store_adm0_location.js
+```
+
 This will add a couple of columns to the two tables with information on UNDP regional bureaux.
 
 For more information on using `ogr2ogr` to convert shapefiles to postgis, please refer to [this resource](https://mapscaping.com/loading-spatial-data-into-postgis/#:~:text=One%20common%20way%20to%20load,table%20in%20a%20PostgreSQL%20database.)

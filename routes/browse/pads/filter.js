@@ -26,8 +26,8 @@ module.exports = async (req, res) => {
 				return t.oneOrNone(`
 					WITH l AS (
 						SELECT COALESCE(
-							(SELECT su_a3 FROM adm0_subunits WHERE su_a3 ILIKE $1), 
-							(SELECT su_a3 FROM adm0 WHERE adm0_a3 ILIKE $1)
+							(SELECT su_a3 FROM adm0_subunits WHERE su_a3 ILIKE $1),
+							(SELECT adm0_a3 FROM adm0 WHERE adm0_a3 ILIKE $1)
 						) AS iso3
 					)
 					SELECT l.iso3, COALESCE(su.$2:name, adm0.$2:name) AS name

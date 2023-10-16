@@ -84,6 +84,8 @@ const Entry = function (_kwargs) {
 						d.locations.forEach(c => {
 							data.push({ href: `?countries=${c.iso3}`, name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') })
 						})
+					} else {
+						data.push({ href: `?countries=${d.iso3}`, name: (d.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (d.country || '<%- vocabulary["anonymous contributor"][language] %>') })
 					}
 				<% } else if (object === 'reviews') { %>
 					data = [{ href: d.is_review ? `?contributors=${d.owner}` : null, name: <% if (space === 'private') { %>d.is_review ? d.ownername : '<%- vocabulary["blinded for review"][language] %>'<% } else { %>null<% } %> }]

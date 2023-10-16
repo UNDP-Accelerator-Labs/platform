@@ -48,6 +48,18 @@ Run the following command for the two `.shp` (shape)file in the unzipped folders
 - in `ne_10m_admin_0_map_subunits/`:
 `ogr2ogr -f "PostgreSQL" PG:"dbname='{your_db_name}' host='{your_host}' port='{your_port}' user='{your_psql_username}' password='{your_psql_password}'" ne_10m_admin_0_map_subunits.shp -nln adm0_subunits -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326`
 
+Assuming you extracted both zips into the same base folder and you have a `.env` run:
+
+```sh
+source path/to/.env
+pushd ne_10m_admin_0_countries/
+ogr2ogr -f "PostgreSQL" PG:"dbname='${LOGIN_DB_NAME}' host='${LOGIN_DB_HOST}' port='${LOGIN_DB_PORT}' user='${LOGIN_DB_USERNAME}' password='${LOGIN_DB_PASSWORD}'" ne_10m_admin_0_countries.shp -nln adm0 -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326
+popd
+pushd ne_10m_admin_0_map_subunits/
+ogr2ogr -f "PostgreSQL" PG:"dbname='${LOGIN_DB_NAME}' host='${LOGIN_DB_HOST}' port='${LOGIN_DB_PORT}' user='${LOGIN_DB_USERNAME}' password='${LOGIN_DB_PASSWORD}'" ne_10m_admin_0_map_subunits.shp -nln adm0_subunits -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326
+popd
+```
+
 Finally, run:
 `node routes/scripts/shared/store_adm0_location.js`
 This will add a couple of columns to the two tables with information on UNDP regional bureaux.

@@ -47,6 +47,7 @@ module.exports = async (req, res) => {
 						.then(results => {
 							const [ su_a3, adm_a3 ] = results
 							let locations = su_a3.concat(adm_a3)
+							// TO DO: COULD IMPROVE THIS WITH THE equivalents METHOD
 							locations = locations.filter(d => {
 								if (locations.filter(c => c.name === d.name).length > 1) {
 									if (d.type === 'subunit') return true

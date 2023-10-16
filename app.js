@@ -332,9 +332,11 @@ app
 app.get('/module-error', routes.error);
 app.get('*', routes.notfound);
 
-app.use((err, req, res, next) => {
-  res.status(500).redirect('/module-error');
-});
+if (process.env.NODE_ENV === 'production') {
+  app.use((err, req, res, next) => {
+    res.status(500).redirect('/module-error');
+  });
+}
 
 // RUN THE SERVER
 app.listen(process.env.PORT || 2000, (_) => {

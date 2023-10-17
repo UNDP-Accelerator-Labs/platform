@@ -159,7 +159,7 @@
 			<% locals.countries.forEach(d => { %>
 				<li>
 					<% if (d.count > 0) { %>
-						<a href='/<%- language %>/<%- d.iso3 %>' target='_blank'><%- d.country %></a>
+						<a href='/<%- language %>/<%- d.iso3 %><% if (d.equivalents?.length) {%>?<% d.equivalents.forEach(c => { %>equivalents=<%- c %><% }) %><% } %>' target='_blank'><%- d.country %></a>
 					<% } else { %>
 						<%- d.country %>
 					<% } %>

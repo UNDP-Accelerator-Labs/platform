@@ -209,7 +209,7 @@ module.exports = async (req, res) => {
 								'title', ps.title, 
 								'description', ps.description, 
 								'count', (SELECT COUNT(1)::INT FROM pinboard_contributions WHERE section = ps.id)
-							)) FILTER (WHERE ps.id IS NOT NULL), 
+							) ORDER BY ps.id) FILTER (WHERE ps.id IS NOT NULL), 
 							'[]'::jsonb
 						) AS sections,
 

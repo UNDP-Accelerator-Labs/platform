@@ -390,14 +390,37 @@ nav.tabs {
 nav.pinboard-sections {
 	margin-bottom: 30px;
 
-	div, a {
-		display: inline-block !important;
+	.inner {
+		div.lg {
+			menu {
+			
+				li {
+					display: flex;
+					align-items: center;
+
+					&.editing {
+						button {
+							.section-title {
+								cursor: text;
+							}
+						}
+					}
+
+					div, a {
+						display: inline-block;
+					}
+					i.material-icons {
+						font-size: $t-main;
+						margin-left: 5px;
+						cursor: pointer;
+					}
+				}
+			}
+		}
 	}
-	i.material-icons {
-		font-size: $t-main;
-		vertical-align: middle;
-		margin-left: 5px;
-		cursor: pointer;
+
+	& + .description {
+		margin: 45px 0 55px 0 !important;
 	}
 }
 /* THE FOLLOWING IS THE SAME AS THE nav.tabs IN _navigate.m */

@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 	let { space, object, instance } = req.params || {}
 	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
-	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, section, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -23,24 +23,55 @@ module.exports = async (req, res) => {
 			const vars = await DB.general.tx(async t => {
 				const name_column = await geo.adm0.name_column({ connection: t, language })
 
+				// FIRST CHECK IF THE instance NAME IS AN ISO3 CODE
 				return t.oneOrNone(`
-					WITH l AS (
-						SELECT COALESCE(
-							(SELECT su_a3 FROM adm0_subunits WHERE su_a3 ILIKE $1), 
-							(SELECT adm0_a3 FROM adm0 WHERE adm0_a3 ILIKE $1)
-						) AS iso3
-					)
-					SELECT l.iso3, COALESCE(su.$2:name, adm0.$2:name) AS name
-					FROM l
-					LEFT JOIN adm0_subunits su
-						ON su.su_a3 = l.iso3
-					LEFT JOIN adm0
-						ON adm0.adm0_a3 = l.iso3
-					LIMIT 1
-				;`, [ decodeURI(instance), name_column ]) // CHECK WHETHER THE instance IS A COUNTRY
-				// TO DO: NEST BY name TO CATCH e.g. "FXX" AND "FRA" AS THE SAME ENTITY "FRANCE"
-				.then(result => {
-					if (!result) {
+					SELECT COUNT(1)::INT FROM adm0_subunits
+					WHERE su_a3 ILIKE $1 OR adm0_a3 ILIKE $1
+				;`, [ decodeURI(instance) ]).then(result => {
+					if (result.count > 0) {
+						let { equivalents } = req.query || {}
+						if (equivalents) {
+							if (Array.isArray(equivalents)) equivalents.unshift(decodeURI(instance))
+							else equivalents = [decodeURI(instance), equivalents]
+						} else equivalents = [decodeURI(instance)]
+
+						return t.oneOrNone(`
+							WITH su AS (
+								SELECT COALESCE(jsonb_agg(su_a3), '[]')::jsonb AS iso3, 
+									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name 
+								FROM adm0_subunits 
+								WHERE (LOWER(su_a3) IN ($1:csv) OR LOWER(adm0_a3) IN ($1:csv))
+									AND su_a3 <> adm0_a3
+							),
+							adm AS (
+								SELECT COALESCE(jsonb_agg(adm0_a3), '[]')::jsonb AS iso3,
+									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name 
+								FROM adm0 
+								WHERE LOWER(adm0_a3) IN ($1:csv)
+							)
+							SELECT su.iso3 || adm.iso3 AS iso3, 
+								CASE WHEN adm.name->>0 IS NOT NULL THEN adm.name->>0
+								ELSE su.name->>0
+								END AS name
+							FROM su CROSS JOIN adm
+							WHERE jsonb_array_length(su.iso3 || adm.iso3) > 0;
+						;`, [ equivalents.map(d => d.toLowerCase()), name_column ]) // CHECK WHETHER THE instance IS A COUNTRY
+						.then(result => {
+							if (!result) {
+								return null;
+							} else {
+								return {
+									object: 'pads',
+									space: rights >= read ? 'all' : 'public',
+									countries: Array.isArray(result?.iso3) ? result.iso3 : [result?.iso3],
+									title: result?.name,
+									// instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
+									instanceId: shortStringAsNum(`${decodeURI(instance)}`.toLowerCase()),  // create a numeric id based on the iso3 characters
+									docType: 'country',
+								};
+							}
+						}).catch(err => console.log(err))
+					} else {
 						return t.oneOrNone(`
 							SELECT id, name FROM teams
 							WHERE LOWER(name) = LOWER($1)
@@ -68,25 +99,18 @@ module.exports = async (req, res) => {
 										docType: 'pinboard',
 									}
 								}).catch(err => console.log(err))
+							} else {
+								return {
+									object: 'pads',
+									space: 'public',
+									teams: [result?.id],
+									title: result?.name,
+									instanceId: result?.id,
+									docType: 'team',
+								};
 							}
-							return {
-								object: 'pads',
-								space: 'public',
-								teams: [result?.id],
-								title: result?.name,
-								instanceId: result?.id,
-								docType: 'team',
-							};
 						}).catch(err => console.log(err))
 					}
-					return {
-						object: 'pads',
-						space: rights >= read ? 'all' : 'public',
-						countries: [result?.iso3],
-						title: result?.name,
-						instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
-						docType: 'country',
-					};
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err));
 			if (!vars) {
@@ -132,9 +156,21 @@ module.exports = async (req, res) => {
 			if (public) {
 				if (pinboard) {
 					const ownId = await ownDB();
-					const pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					`, [ pinboard, ownId ])).map(row => row.pad);
+					let pbpads = ''
+
+					if (section) {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions 
+							WHERE pinboard = $1::INT 
+								AND db = $2 
+								AND is_included = true 
+								AND section = $3::INT
+						`, [ pinboard, ownId, section ])).map(row => row.pad);
+					} else {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
+						`, [ pinboard, ownId ])).map(row => row.pad);
+					}
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);
@@ -148,9 +184,21 @@ module.exports = async (req, res) => {
 			} else { // THE USER IS LOGGED IN
 				if (pinboard) {
 					const ownId = await ownDB();
-					const pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					`, [ pinboard, ownId ])).map(row => row.pad);
+					let pbpads = ''
+
+					if (section) {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions 
+							WHERE pinboard = $1::INT 
+								AND db = $2 
+								AND is_included = true
+								AND section = $3::INT
+						`, [ pinboard, ownId, section ])).map(row => row.pad);
+					} else {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
+						`, [ pinboard, ownId ])).map(row => row.pad);
+					}
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);
@@ -179,7 +227,7 @@ module.exports = async (req, res) => {
 		const platform_filters = []
 		if (pads) platform_filters.push(DB.pgp.as.format(`p.id IN ($1:csv)`, [ pads ]))
 		if (contributors) platform_filters.push(DB.pgp.as.format(`p.owner IN ($1:csv)`, [ contributors ]))
-		if (countries) {
+		if (countries?.length) {
 			if (metafields.some((d) => d.type === 'location')) {
 				platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ countries ]))
 			} else {

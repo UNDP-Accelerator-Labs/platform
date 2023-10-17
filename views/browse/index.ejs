@@ -321,7 +321,7 @@
 												subnode.disabled = !node.checked
 												d3.select(subnode).findAncestor('li').select('p').classed('disabled', !node.checked)
 											}
-											partialSave('pinboard')
+											partialSave('pinboard', <%- locals.pinboard.id %>)
 										}
 									</script>
 								</form>
@@ -330,7 +330,7 @@
 
 						<div class='head google-translate-attr'>
 							<% if (activity !== 'preview' && locals.pinboard.editable) { %>
-								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave("pinboard")' contenteditable><%- locals.pinboard.title %></div>
+								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave("pinboard", <%- locals.pinboard.id %>)' contenteditable><%- locals.pinboard.title %></div>
 								
 								<% if (!locals.metadata.page.instanceReadCount) { %>
 									<div class='engagement-group page-stats'>
@@ -341,7 +341,7 @@
 									</div>
 								<% } %>
 
-								<div class='description lead' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave("pinboard")' contenteditable><%- (locals.pinboard.description) %></div><!-- TO DO: TRANSLATE -->
+								<div class='description lead' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave("pinboard", <%- locals.pinboard.id %>)' contenteditable><%- (locals.pinboard.description) %></div><!-- TO DO: TRANSLATE -->
 							<% } else { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'><%- locals.pinboard.title %></div>
 								<div class='contributor'><%- vocabulary['curation credit'][language](locals.pinboard.owner, locals.pinboard.ownername, 'contributors') %></div>
@@ -372,7 +372,7 @@
 								}
 							}
 
-							async function partialSave (object) {
+							async function partialSave (object, id) {
 								if (!object) object = 'pinboard'
 
 								if (object === 'pinboard') {
@@ -386,7 +386,7 @@
 										displayopts[this.name] = this.checked
 									})
 
-									const res = await POST('/save/pinboard', Object.assign(displayopts, { id: <%- locals.pinboard.id %>, title, description }))
+									const res = await POST('/save/pinboard', Object.assign(displayopts, { id, title, description }))
 									if (res.status === 200) {
 										console.log('saved')
 										const { datum } = res
@@ -396,27 +396,40 @@
 										// d3.selectAll('.pin, .pinboard').html(d => d.title = datum.title)
 										d3.selectAll('.pin label.name').html(d => d.title = datum.title)
 									}
-								} else if (object === 'section') {
+								} else if (object.includes('section')) {
 									console.log('save section')
 
-									// const res = await POST('/save/pinboard-sections', Object.assign(displayopts, { id: <%- locals.pinboard.id %>, title, description }))
-									// if (res.status === 200) {
+									const li = d3.select('.pinboard-sections li.editing')
+
+									const obj = {}
+									obj.id = id
+
+									if (object === 'section-title') {
+										obj.title = li.select('button div.section-title').node()?.innerText.trim() || ''
+									} else if (object === 'section-description') {
+										obj.description = d3.select('div.pinboard-sections-container div.description').node()?.innerText.trim() || ''
+									}
+
+									const res = await POST('/save/pinboard-section', obj)
+									if (res.status === 200) {
 										console.log('saved')
 
-										const li = d3.select('.pinboard-sections li.editing')
 										if (li.node()) {
 											li.classed('editing', false)
-											li.select('div').classed('active', false)
+											li.select('div').classed('focus', false)
 											const a = li.select('a')
 											
-											const href = a.attr('data-href')
-											a.attrs({
-												'href': href,
-												'data-href': null
-											})
-											a.select('button div.section-title').node().blur()
+											if (a.node()) {
+												const href = a.attr('data-href')
+												a.attrs({
+													'href': href,
+													'data-href': null
+												})
+												li.select('button div.section-title').node().contentEditable = false
+											}
+
 										}
-									// }
+									}
 								}
 							}
 						</script>

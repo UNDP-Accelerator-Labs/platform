@@ -1,5 +1,5 @@
 const { app_title, DB, ownDB, modules, engagementtypes, metafields } = include('config/')
-const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID, pagestats, shortStringAsNum, geo } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, country, collaborators, public } = req.session || {}
@@ -20,16 +20,58 @@ module.exports = async (req, res) => {
 	if (instance) {
 		const { instance_vars } = res.locals
 		if (!instance_vars) {
-			const vars = await DB.general.tx(t => {
+			const vars = await DB.general.tx(async t => {
+				const name_column = await geo.adm0.name_column({ connection: t, language })
+
+				// FIRST CHECK IF THE instance NAME IS AN ISO3 CODE
 				return t.oneOrNone(`
-					SELECT iso3, name FROM country_names
-					WHERE (iso3 ILIKE $1
-						OR LOWER(name) = LOWER($1))
-						AND language = $2
-					LIMIT 1
-				;`, [ decodeURI(instance), language ]) // CHECK WHETHER THE instance IS A COUNTRY
-				.then(result => {
-					if (!result) {
+					SELECT COUNT(1)::INT FROM adm0_subunits
+					WHERE su_a3 ILIKE $1 OR adm0_a3 ILIKE $1
+				;`, [ decodeURI(instance) ]).then(result => {
+					if (result.count > 0) {
+						let { equivalents } = req.query || {}
+						if (equivalents) {
+							if (Array.isArray(equivalents)) equivalents.unshift(decodeURI(instance))
+							else equivalents = [decodeURI(instance), equivalents]
+						} else equivalents = [decodeURI(instance)]
+
+						return t.oneOrNone(`
+							WITH su AS (
+								SELECT COALESCE(jsonb_agg(su_a3), '[]')::jsonb AS iso3, 
+									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name 
+								FROM adm0_subunits 
+								WHERE (LOWER(su_a3) IN ($1:csv) OR LOWER(adm0_a3) IN ($1:csv))
+									AND su_a3 <> adm0_a3
+							),
+							adm AS (
+								SELECT COALESCE(jsonb_agg(adm0_a3), '[]')::jsonb AS iso3,
+									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name 
+								FROM adm0 
+								WHERE LOWER(adm0_a3) IN ($1:csv)
+							)
+							SELECT su.iso3 || adm.iso3 AS iso3, 
+								CASE WHEN adm.name->>0 IS NOT NULL THEN adm.name->>0
+								ELSE su.name->>0
+								END AS name
+							FROM su CROSS JOIN adm
+							WHERE jsonb_array_length(su.iso3 || adm.iso3) > 0;
+						;`, [ equivalents.map(d => d.toLowerCase()), name_column ]) // CHECK WHETHER THE instance IS A COUNTRY
+						.then(result => {
+							if (!result) {
+								return null;
+							} else {
+								return {
+									object: 'pads',
+									space: rights >= read ? 'all' : 'public',
+									countries: Array.isArray(result?.iso3) ? result.iso3 : [result?.iso3],
+									title: result?.name,
+									// instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
+									instanceId: shortStringAsNum(`${decodeURI(instance)}`.toLowerCase()),  // create a numeric id based on the iso3 characters
+									docType: 'country',
+								};
+							}
+						}).catch(err => console.log(err))
+					} else {
 						return t.oneOrNone(`
 							SELECT id, name FROM teams
 							WHERE LOWER(name) = LOWER($1)
@@ -57,25 +99,18 @@ module.exports = async (req, res) => {
 										docType: 'pinboard',
 									}
 								}).catch(err => console.log(err))
+							} else {
+								return {
+									object: 'pads',
+									space: 'public',
+									teams: [result?.id],
+									title: result?.name,
+									instanceId: result?.id,
+									docType: 'team',
+								};
 							}
-							return {
-								object: 'pads',
-								space: 'public',
-								teams: [result?.id],
-								title: result?.name,
-								instanceId: result?.id,
-								docType: 'team',
-							};
 						}).catch(err => console.log(err))
 					}
-					return {
-						object: 'pads',
-						space: rights >= read ? 'all' : 'public',
-						countries: [result?.iso3],
-						title: result?.name,
-						instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
-						docType: 'country',
-					};
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err));
 			if (!vars) {
@@ -168,21 +203,47 @@ module.exports = async (req, res) => {
 		const platform_filters = []
 		if (pads) platform_filters.push(DB.pgp.as.format(`p.id IN ($1:csv)`, [ pads ]))
 		if (contributors) platform_filters.push(DB.pgp.as.format(`p.owner IN ($1:csv)`, [ contributors ]))
-		if (countries) {
-			platform_filters.push(await DB.general.any(`
-				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
-			;`, [ countries ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
-			.catch(err => console.log(err)))
+		if (countries?.length) {
+			if (metafields.some((d) => d.type === 'location')) {
+				platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ countries ]))
+			} else {
+				platform_filters.push(await DB.general.any(`
+					SELECT uuid FROM users WHERE iso3 IN ($1:csv)
+				;`, [ countries ])
+				.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			}
 		} else if (regions) {
-			platform_filters.push(await DB.general.any(`
-				SELECT u.uuid FROM users u
-				INNER JOIN countries c
-				ON c.iso3 = u.iso3
-				WHERE c.bureau IN ($1:csv)
-			;`, [ regions ])
-			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
-			.catch(err => console.log(err)))
+			if (metafields.some((d) => d.type === 'location')) {
+				platform_filters.push(await DB.general.tx(gt => {
+					const gbatch = []
+					gbatch.push(gt.any(`
+						SELECT su_a3 AS iso3 FROM adm0_subunits
+						WHERE undp_bureau IN ($1:csv)
+							AND su_a3 <> adm0_a3
+					;`, [ regions ]))
+					gbatch.push(gt.any(`
+						SELECT adm0_a3 AS iso3 FROM adm0
+						WHERE undp_bureau IN ($1:csv)
+					;`, [ regions ]))
+					return gt.batch(gbatch)
+					.then(results => {
+						const [ su_a3, adm_a3 ] = results
+						const locations = su_a3.concat(adm_a3)
+						return DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ locations.map(d => d.iso3) ])
+					}).catch(err => console.log(err))
+				}).catch(err => console.log(err)))
+			} else {
+				platform_filters.push(await DB.general.any(`
+					SELECT u.uuid FROM users u
+					INNER JOIN adm0_subunits c
+						ON c.su_a3 = u.iso3
+						OR c.adm0_a3 = u.iso3
+					WHERE c.undp_bureau IN ($1:csv)
+				;`, [ regions ])
+				.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			}
 		}
 		if (teams) {
 			platform_filters.push(await DB.general.any(`

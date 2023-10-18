@@ -523,7 +523,8 @@
 			// render.tags(entry.body)
 			render.title(entry.body)
 			render.owner(entry.body)
-			if (data.img?.length === 0) render.txt(entry.body)
+			// if (data.img?.length === 0) render.txt(entry.body)
+			render.txt(entry.body)
 			<% if (!publicpage) { %>
 				render.metainfo(entry.body)
 				render.followup(entry.body)

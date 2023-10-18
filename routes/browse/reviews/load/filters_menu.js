@@ -20,29 +20,42 @@ module.exports = async kwargs => {
 		
 		batch.push(t.task(t1 => {
 			const batch1 = []
-			if (['private', 'curated'].includes(space)) {
+			if (metafields.some((d) => d.type === 'location')) {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (id))::INT, owner
-					FROM pads p
+					SELECT COUNT(DISTINCT(p.id))::INT, jsonb_agg(DISTINCT(p.id)) AS pads, l.iso3 AS id FROM pads p
+					INNER JOIN locations l
+						ON l.pad = p.id
 					WHERE TRUE
 						$1:raw
-					GROUP BY owner
-				;`, [ f_space ]) // [ full_filters ])
+					GROUP BY l.iso3
+				;`, [ f_space ])
 				.then(async results => {
-					let contributors = await join.users(results, [ language, 'owner' ])
-					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
-					contributors = contributors.map(d => {
-						const obj = {}
-						obj.id = d.owner
-						obj.name = d.ownername
-						obj.count = d.count
-						return obj
-					})
-					contributors.sort((a, b) => a.name?.localeCompare(b.name))
+					// JOIN LOCATION INFO
+					const countries = await join.locations(results, { language, key: 'id', name_key: 'name' })
 
-					return contributors.length ? { contributors } : null
+					if (countries.length !== array.unique.call(countries, { key: 'name' }).length) {
+						console.log('equivalents: need to do something about countries that have equivalents')
+						countries = array.nest.call(countries, { key: 'name', keyname: 'name' })
+						.map(d => {
+							const obj = {}
+							obj.name = d.name
+
+							if (d.count > 1) {
+								obj.count = array.unique.call(d.values.map(c => c.pads).flat()).length
+								obj.id = d.values.splice(0, 1)[0].id
+								obj.equivalents = d.values.map(c => c.id)
+							} else {
+								obj.count = d.values[0].count
+								obj.id = d.values[0].id
+							}
+
+							return obj
+						})
+					} else console.log('no equivalents: do nothing')
+					countries.sort((a, b) => a.name.localeCompare(b.name))
+					return countries.length ? { countries } : null
 				}).catch(err => console.log(err)))
-			} else if (['pinned', 'shared', 'public'].includes(space)) {
+			} else {
 				batch1.push(t1.any(`
 					SELECT p.owner
 					FROM pads p
@@ -51,20 +64,42 @@ module.exports = async kwargs => {
 				;`, [ f_space ]) // [ full_filters ])
 				.then(async results => {
 					let countries = await join.users(results, [ language, 'owner' ])
-					countries = array.count.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
+					const iso3s = array.unique.call(countries, { key: 'iso3', onkey: true })
+
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
-					countries = countries.map(d => {
-						const obj = {}
-						obj.id = d.iso3
-						obj.name = d.name
-						obj.count = d.count
-						return obj
-					})
+					if (iso3s.length !== array.unique.call(countries, { key: 'country' }).length) {
+						console.log('equivalents: need to do something about countries that have equivalents')
+						countries = array.nest.call(countries, { key: 'country', keyname: 'name' })
+						.map(d => {
+							const obj = {}
+							obj.name = d.name
+
+							if (d.count > 1) {
+								obj.count = array.unique.call(d.values.map(c => c.pads).flat()).length
+								obj.id = d.values.splice(0, 1)[0].iso3
+								obj.equivalents = d.values.map(c => c.iso3)
+							} else {
+								obj.count = d.values[0].count
+								obj.id = d.values[0].iso3
+							}
+
+							return obj
+						})
+					} else {
+						console.log('no equivalents: do simple cleanup for frontend')
+						countries = array.nest.call(countries, { key: 'country', keyname: 'name', keep: 'iso3' })
+						.map(d => {
+							const obj = {}
+							obj.id = d.iso3
+							obj.name = d.name
+							obj.count = d.count
+							return obj
+						})
+					}
 					countries.sort((a, b) => a.name?.localeCompare(b.name))
 					return countries.length ? { countries } : null
 				}).catch(err => console.log(err)))
-
-			} else batch1.push(null)
+			}
 			
 			// GET TEMPLATE BREAKDOWN
 			if (modules.some(d => d.type === 'templates')) {

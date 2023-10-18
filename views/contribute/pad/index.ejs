@@ -1299,6 +1299,7 @@
 	// POPULATE THE PAGE
 	if (activity === 'contribute' && templated) {
 		const template = <%- JSON.stringify(locals.display_template || {}) %>;
+		var locked_excerpt = templated && template.sections?.some(d => d.structure.some(c => c.is_excerpt))
 
 		if (template.sections) {
 			const title_instruction = template.sections.map(d => d.items || d.structure).flat()
@@ -1320,6 +1321,7 @@
 		window.sessionStorage.removeItem('changed-content')
 	} else if (['edit', 'view'].includes(activity)) {
 		const data = <%- JSON.stringify(locals.data || {}) %>;
+		var locked_excerpt = templated && data.sections?.some(d => d.structure.some(c => c.is_excerpt))
 
 		// THIS WAS AN ATTEMPT TO FLATTEN THE DATA STRCUTURE FOR SLIDES,
 		// BUT DOING THIS WOULD MAKE THE CURRENT SAVING MECHANISM FAIL
@@ -1354,6 +1356,7 @@
 		} else { // THIS IS AN AUTO GENERATED PAD
 			if (templated) { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
 				const template = <%- JSON.stringify(locals.display_template || {}) %>;
+				var locked_excerpt = templated && template.sections?.some(d => d.structure.some(c => c.is_excerpt))
 
 				if (template.sections) {
 					const title_instruction = template.sections.map(d => d.items || d.structure).flat()

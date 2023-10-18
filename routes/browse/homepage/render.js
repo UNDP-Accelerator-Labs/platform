@@ -88,29 +88,30 @@ module.exports = async (req, res) => {
 						const values = DB.pgp.helpers.values(results, columns)
 						const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
 
-						return DB.general.any(`
-							SELECT
-							jsonb_build_object(
-								'type', 'Feature',
-								'geometry', ST_AsGeoJson(ST_Centroid(ST_Collect(clusters.geo)))::jsonb,
-								'properties', json_build_object('pads', json_agg(clusters.pad), 'count', COUNT(clusters.pad), 'cid', clusters.cid)::jsonb
-							) AS json
-							FROM (
-								SELECT c.iso3 AS cid, ST_Point(c.lng, c.lat) AS geo, t.pad FROM countries c
-								INNER JOIN users u
-									ON u.iso3 = c.iso3
+						return DB.general.tx(gt => {
+							return gt.any(`
+								SELECT COUNT(t.pad)::INT, array_agg(t.pad) AS pads, u.iso3 
+								FROM users u
 								INNER JOIN ($1:raw) t
 									ON t.owner::uuid = u.uuid::uuid
-							) AS clusters
-							GROUP BY (clusters.cid)
-							ORDER BY clusters.cid
-						;`, [ set_table ])
-						.then(results => results.map(d => d.json))
-						.catch(err => console.log(err))
-					} else return null
+								GROUP BY u.iso3
+								ORDER BY u.iso3
+							;`, [ set_table ])
+							.then(async users => {
+								// JOIN LOCATION INFO
+								users = await join.locations(users, { connection: gt, language, key: 'iso3', concat_location_key: 'geometry' })
+								return users.map(d => {
+									const obj = {}
+									obj.type = 'Feature'
+									obj.geometry = d.geometry
+									obj.properties = { pads: d.pads, count: d.count, cid: d.iso3 }
+									return obj
+								}).filter(d => d.geometry)
+							}).catch(err => console.log(err))
+						}).catch(err => console.log(err))
+					} else return []
 				}).catch(err => console.log(err)))
 			}
-			// batch1.push(t1.any())
 			return t1.batch(batch1)
 			.catch(err => console.log(err))
 		}))
@@ -118,7 +119,7 @@ module.exports = async (req, res) => {
 		// THIS IS FOR THE BANNER AT THE TOP OF PUBLIC PAGES
 		batch.push(t.any(`
 			SELECT p.id, p.title, p.owner, p.sections FROM pads p
-			WHERE TRUE
+			WHERE p.id NOT IN (SELECT review FROM reviews)
 				$1:raw
 			ORDER BY random()
 			LIMIT 72
@@ -137,39 +138,122 @@ module.exports = async (req, res) => {
 			return data.filter(d => d.img?.length).slice(0, max)
 		}))
 		// LIST OF COUNTRIES
-		batch.push(t.any(`
-			SELECT COUNT(p.id)::INT, p.owner FROM pads p
-			WHERE TRUE
-				$1:raw
-			GROUP BY p.owner
-		;`, [ full_filters ]).then(results => {
-			if (!results.length) {
-				return [];
-			}
-			return DB.general.task(gt => {
-				return gt.any(`
-					SELECT iso3, uuid AS owner FROM users
-					WHERE uuid IN ($1:csv)
-				;`, [ results.map(d => d.owner) ])
-				.then(users => {
-					const data = array.nest.call(join.multijoin.call(results, [ users, 'owner' ]), { key: 'iso3' })
-					.map(d => { return { iso3: d.key, count: array.sum.call(d.values, 'count') } })
+		if (metafields.some((d) => d.type === 'location')) {
+			batch.push(t.any(`
+				SELECT COUNT(DISTINCT(p.id))::INT, jsonb_agg(DISTINCT(p.id)) AS pads, l.iso3 FROM pads p
+				INNER JOIN locations l
+					ON l.pad = p.id
+				WHERE p.id NOT IN (SELECT review FROM reviews)
+					$1:raw
+				GROUP BY l.iso3
+			;`, [ full_filters ])
+			.then(async results => {
+				// JOIN LOCATION INFO
+				let countries = await join.locations(results, { language, key: 'iso3' })
+				
+				if (countries.length !== array.unique.call(countries, { key: 'country' }).length) {
+					console.log('equivalents: need to do something about countries that have equivalents')
+					countries = array.nest.call(countries, { key: 'country', keyname: 'country' })
+					.map(d => {
+						const obj = {}
+						obj.country = d.country
 
-					return gt.any(`
-						SELECT DISTINCT (cn.name), cn.iso3, cn.language
-						FROM users u
-						INNER JOIN country_names cn
-							ON cn.iso3 = u.iso3
-						WHERE u.position = 'Head of Solutions Mapping'
-							AND cn.language = $1
-						ORDER BY cn.name
-					;`, [ language ])
-					.then(countries => {
-						return join.multijoin.call(countries, [ data, 'iso3' ])
-					}).catch(err => console.log(err))
-				}).catch(err => console.log(err))
-			}).catch(err => console.log(err))
-		}).catch(err => console.log(err)))
+						if (d.count > 1) {
+							obj.count = array.unique.call(d.values.map(c => c.pads).flat()).length
+							obj.iso3 = d.values.splice(0, 1)[0].iso3
+							obj.equivalents = d.values.map(c => c.iso3)
+						} else {
+							obj.count = d.values[0].count
+							obj.iso3 = d.values[0].iso3
+						}
+						return obj
+					})
+				} else console.log('no equivalents: do nothing')
+				countries.sort((a, b) => a.country.localeCompare(b.country))
+				return countries
+			}).catch(err => console.log(err)))
+			
+		} else {
+			// TO DO: THIS IS DIFFERENT/ CHECK EQUIVALENTS
+			// batch.push(t.any(`
+			// 	SELECT COUNT(p.id)::INT, p.owner FROM pads p
+			// 	WHERE p.id NOT IN (SELECT review FROM reviews)
+			// 		$1:raw
+			// 	GROUP BY p.owner
+			// ;`, [ full_filters ]).then(results => {
+			// 	if (results.length) {
+			// 		return DB.general.tx(gt => {
+			// 			const columns = Object.keys(results[0])
+			// 			const values = DB.pgp.helpers.values(results, columns)
+			// 			const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
+
+			// 			return gt.any(`
+			// 				SELECT t.count, u.iso3 
+			// 				FROM users u
+			// 				INNER JOIN ($1:raw) t
+			// 					ON t.owner::uuid = u.uuid::uuid
+			// 				ORDER BY u.iso3
+			// 			;`, [ set_table ])
+			// 			.then(async users => {
+			// 				console.log('pre')
+			// 				console.log(users)
+			// 				// JOIN LOCATION INFO
+			// 				users = await join.locations(users, { connection: gt, language, key: 'iso3' })
+			// 				console.log('post')
+			// 				console.log(users)
+			// 				return users
+			// 			}).catch(err => console.log(err))
+			// 		}).catch(err => console.log(err))
+			// 	} else return []
+			// }).catch(err => console.log(err)))
+
+
+			batch.push(t.any(`
+				SELECT p.owner
+				FROM pads p
+				WHERE p.id NOT IN (SELECT review FROM reviews)
+					$1:raw
+			;`, [ full_filters ])
+			.then(async results => {
+				if (results.length) {
+					let countries = await join.users(results, [ language, 'owner' ])
+					const iso3s = array.unique.call(countries, { key: 'iso3', onkey: true })
+
+					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
+					if (iso3s.length !== array.unique.call(countries, { key: 'country' }).length) {
+						console.log('equivalents: need to do something about countries that have equivalents')
+						countries = array.nest.call(countries, { key: 'country', keyname: 'country' })
+						.map(d => {
+							const obj = {}
+							obj.country = d.country
+
+							if (d.count > 1) {
+								obj.count = array.unique.call(d.values.map(c => c.pads).flat()).length
+								obj.iso3 = d.values.splice(0, 1)[0].iso3
+								obj.equivalents = d.values.map(c => c.iso3)
+							} else {
+								obj.count = d.values[0].count
+								obj.iso3 = d.values[0].iso3
+							}
+
+							return obj
+						})
+					} else {
+						console.log('no equivalents: do simple cleanup for frontend')
+						countries = array.nest.call(countries, { key: 'country', keyname: 'country', keep: 'iso3' })
+						.map(d => {
+							const obj = {}
+							obj.iso3 = d.iso3
+							obj.country = d.country
+							obj.count = d.count
+							return obj
+						})
+					}
+					countries.sort((a, b) => a.country?.localeCompare(b.country))
+					return countries
+				} else return []
+			}).catch(err => console.log(err)))
+		}
 		// LIST OF PINBOARDS/ COLLECTIONS
 		batch.push(ownDB().then(async ownId => {
 			const pads = new Map();

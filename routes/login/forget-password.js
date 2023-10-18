@@ -1,6 +1,6 @@
 const sendEmail = require('../helpers').email
 const { DB } = include('config/')
-const { datastructures } = include('routes/helpers/')
+const { datastructures, sessionupdate } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
 const { isPasswordSecure } = require('./password-requirement')
 
@@ -130,22 +130,12 @@ exports.updatePassword = async (req, res, next) => {
           UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
         `, [password, decoded.email]);
 
-        //DELETE ALL ACTIVE SESSION
-        await DB.general.tx(t =>{
-            t.none(`
-            DELETE FROM trusted_devices
-            WHERE session_sid IN (
-            SELECT sid
-            FROM session
-            WHERE sess ->> 'email' = $1
-            );
-          `, [decoded.email])
-
-            t.none(`
-            DELETE FROM session WHERE sess ->> 'email' = $1
-          `, [decoded.email])
-
-          }).catch(err => console.log(err))
+        //UPDATE ALL ACTIVE SESSION
+        sessionupdate({
+          conn: DB.general,
+          whereClause: `sess ->> 'email' = $1`,
+          queryValues: [decoded.email]
+        })
 
         // Redirect the user to the login page
         res.redirect('/login');

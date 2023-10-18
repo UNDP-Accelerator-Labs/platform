@@ -130,9 +130,8 @@ button#expand-nav.close {
 		transform-origin: center;
 	}
 }
-nav.tabs {
-	position: fixed;
-	top: 30px;
+nav.tabs,
+nav.pinboard-sections {
 	width: 100%;
 	height: 60px;
 	left: 0;
@@ -179,6 +178,22 @@ nav.tabs {
 						overflow: hidden;
 						white-space: nowrap;
 
+						&.add {
+							display: none;
+							width: 30px;
+							height: 30px;
+							margin: 7px 5px 0 -5px;
+							background: url('../imgs/icons/i-add.svg');
+							border: none;
+							outline: none;
+							float: right;
+							cursor: pointer;
+						}
+
+						div {
+							display: inline-block;
+							outline: none;
+						}
 						.count {
 							position: relative;
 							display: inline-block;
@@ -353,6 +368,20 @@ nav.tabs {
 						border-color: $c-dark-blue;
 					}
 				}
+				li.editing {
+					background-color: $c-light-2;
+
+					a {
+						cursor: default;
+					}
+					button {
+						color: $c-dark-blue !important;
+
+						&.add {
+							display: inline-block;
+						}
+					}
+				}
 			}
 		}
 
@@ -385,7 +414,57 @@ nav.tabs {
 		}
 	}
 }
+nav.tabs {
+	position: fixed;
+	top: 30px;
+}
+nav.pinboard-sections {
+	/* width: 100vw;
+	margin-left: calc(-1 * (100vw - (300px * 3 + 15px * 2)) / 2); */
+	width: calc(100% + 30px);
+	margin: 0 0 30px -15px;
 
+	.inner {
+		div.m {
+			menu {
+				justify-content: flex-start;
+			
+				li {
+					display: flex;
+					align-items: center;
+
+					/* &:first-child {
+						margin-left: auto;
+					}
+					&:last-child {
+						margin-right: auto;
+					} */
+
+					&.editing {
+						button {
+							.section-title {
+								cursor: text;
+							}
+						}
+					}
+
+					div, a {
+						display: inline-block;
+					}
+					i.material-icons {
+						font-size: $t-main;
+						margin-left: 5px;
+						cursor: pointer;
+					}
+				}
+			}
+		}
+	}
+
+	& + .description {
+		margin: 45px 0 55px 0 !important;
+	}
+}
 
 header { /* LEFT COlUMN */
 	position: fixed;

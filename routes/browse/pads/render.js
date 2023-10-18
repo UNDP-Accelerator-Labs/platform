@@ -219,9 +219,11 @@ module.exports = async (req, res) => {
 							THEN TRUE
 							ELSE FALSE
 						END AS editable,
+						
 						CASE WHEN EXISTS (
 							SELECT 1 FROM exploration WHERE linked_pinboard = p.id
 						) THEN TRUE ELSE FALSE END AS is_exploration
+					
 					FROM pinboards p
 
 					INNER JOIN pinboard_contributors pc

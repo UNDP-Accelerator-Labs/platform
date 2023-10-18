@@ -18,74 +18,59 @@
     const enableSingleSection = false
 %>
 
-<% if (editable || sections.length) { %>
-<div class='pinboard-sections-container'>
-	<nav class='pinboard-sections'>
-		<div class='inner'>
-			<div class='m lg xl xxl'>
-				<menu class="google-translate-attr">
-					<% sections?.forEach(d => { %>
-						<li class='<% if (d.id === +section) { %>active<% } %>'>
-							<% if (editable && (d.id === +section || editAll)) { %>
-								<% if (editAll) { %>
-									<div onclick='makeEditable(this, this.nextElementSibling)'><i class="material-icons google-translate-attr">edit</i></div>
-								<% } else { %>
-									<div><i class="material-icons google-translate-attr">edit</i></div>
-								<% } %>
-							<% } %>
-							<% if (d.id !== +section) { %>
-								<% if (editable && editAll) { %>
-									<a href='?pinboard=<%- pinboard.id %>&section=<%- d.id %>'>
-										<button>
-											<div class='section-title' data-placeholder='Section' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave("section-title", <%- d.id %>)'><%- d.title %></div><!-- TO DO: TRANSLATE -->
-											<div class='count'><%- d.count ?? 0 %></div>
-										</button>
-									
-									</a>
-								<% } else { %>
-									<a href='?pinboard=<%- pinboard.id %>&section=<%- d.id %>'>
-										<button>
-											<div class='section-title' data-placeholder='Section'><%- d.title %></div><!-- TO DO: TRANSLATE -->
-											<div class='count'><%- d.count ?? 0 %></div>
-										</button>
-									</a>
-								<% } %>
-							<% } else { %>
-								<% if (editable) { %>
-									<button>
-										<div class='section-title' data-placeholder='Section' onfocus='this.classList.add("focus"); this.parentNode.parentNode.classList.add("editing")' onkeydown='checkForEnter(event, this)' onblur='partialSave("section-title", <%- d.id %>)' contenteditable><%- d.title %></div><!-- TO DO: TRANSLATE -->
-										<div class='count'><%- d.count ?? 0 %></div>
-									</button>
-								<% } else { %>
-									<button>
-										<div class='section-title' data-placeholder='Section'><%- d.title %></div><!-- TO DO: TRANSLATE -->
-										<div class='count'><%- d.count ?? 0 %></div>
-									</button>
-								<% } %>
-							<% } %>
-						</li>
-					<% }) %>
-					<% if (editable && !sections.length) { %>
-						<li>
-							<button class='new-section'>
-								<div class='section-title' onfocus='makeEditable(this)' onkeydown='checkForEnter(event, this);' onblur='addSection(this)' data-placeholder='Section' contenteditable>Add (a) section(s)</div>
-							</button>
-							<button class='add' onclick='addSection(this.previousElementSibling)'></button>
-							<!-- TO DO: TRANSLATE -->
-							<!-- <button class='new-section' onclick='addSection(this)' contenteditable>Add a section</button> -->
-						</li>
-					<% } %>
-					<!-- TO DO: PROBABLY AN OPTION TO REMOVE ALL sections -->
-				</menu>
-			</div>
-		</div>
-	</nav>
-	<% if (editable) {%>
-		<div class='description<% if (!sections?.length) { %> hide<% } %>' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave("section-description", <%- section %>)' contenteditable><%- sections.find(d => d.id === +section)?.description %></div><!-- TO DO: TRANSLATE -->
-	<% } else if (sections?.some(d => d.id === +section)) { %>
-		<div class='description<% if (!sections?.length) { %> hide<% } %>' data-placeholder='Provide a short description for this pinboard.'><%- sections.find(d => d.id === +section)?.description %></div><!-- TO DO: TRANSLATE -->
+
+<menu class="google-translate-attr">
+	<% sections?.forEach(d => { %>
+		<li class='<% if (d.id === +section) { %>active<% } %>'>
+			<% if (editable && (d.id === +section || editAll)) { %>
+				<div onclick='makeEditable(this, this.nextElementSibling)'><i class="material-icons google-translate-attr">edit</i></div>
+			<% } %>
+			<% if (d.id !== +section) { %>
+				<% if (editable && editAll) { %>
+					<a href='?pinboard=<%- pinboard.id %>&section=<%- d.id %>'>
+						<button>
+							<div class='section-title' data-placeholder='Section' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave("section-title", <%- d.id %>)'><%- d.title %></div><!-- TO DO: TRANSLATE -->
+							<div class='count'><%- d.count ?? 0 %></div>
+						</button>
+					
+					</a>
+				<% } else { %>
+					<a href='?pinboard=<%- pinboard.id %>&section=<%- d.id %>'>
+						<button>
+							<div class='section-title' data-placeholder='Section'><%- d.title %></div><!-- TO DO: TRANSLATE -->
+							<div class='count'><%- d.count ?? 0 %></div>
+						</button>
+					</a>
+				<% } %>
+			<% } else { %>
+				<% if (editable) { %>
+					<button>
+						<div class='section-title' data-placeholder='Section' onfocus='this.classList.add("focus"); this.parentNode.parentNode.classList.add("editing")' onkeydown='checkForEnter(event, this)' onblur='partialSave("section-title", <%- d.id %>)' contenteditable><%- d.title %></div><!-- TO DO: TRANSLATE -->
+						<div class='count'><%- d.count ?? 0 %></div>
+					</button>
+				<% } else { %>
+					<button>
+						<div class='section-title' data-placeholder='Section'><%- d.title %></div><!-- TO DO: TRANSLATE -->
+						<div class='count'><%- d.count ?? 0 %></div>
+					</button>
+				<% } %>
+			<% } %>
+		</li>
+	<% }) %>
+	<% if (editable && !sections.length) { %>
+		<li>
+			<button class='new-section'>
+				<div class='section-title' onfocus='makeEditable(this)' onkeydown='checkForEnter(event, this);' onblur='addSection(this)' data-placeholder='Section' contenteditable>Add (a) section(s)</div>
+			</button>
+			<button class='add' onclick='addSection(this.previousElementSibling)'></button>
+			<!-- TO DO: TRANSLATE -->
+			<!-- <button class='new-section' onclick='addSection(this)' contenteditable>Add a section</button> -->
+		</li>
 	<% } %>
-</div>
+	<!-- TO DO: PROBABLY AN OPTION TO REMOVE ALL sections -->
+</menu>
+
+
 
 <script type='text/javascript'>
 	function makeEditable (node, a_node) {
@@ -183,8 +168,20 @@
 			}
 
 			form.select('button[type=submit]').node().disabled = (form.select('input[value=multiple]:checked').node() && !form.selectAll('input.multiple-section-id').size())
-		}
-		
+		}	
 	}
+	(function scrollToActiveSection (node) {
+		if (!mediaSize) var mediaSize = getMediaSize()
+		if (!['xs', 'sm'].includes(mediaSize)) {
+			const menu = d3.select('.pinboard-sections menu')
+			const section = menu.select('li.active').node()
+			if (section?.node()) {
+				menu.node().scrollTo({
+					top: 0,
+					left: section.offsetLeft,
+					behavior: 'smooth'
+				})
+			}
+		}
+	})()
 </script>
-<% } %>

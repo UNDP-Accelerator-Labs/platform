@@ -191,7 +191,7 @@ module.exports = (req, res, next) => {
 
 								// Device is not part of the trusted devices
 								sendDeviceCode({
-									name: result.name, email: result.email, uuid: result.uuid, conn: t
+									name: result.name, email: result.email, uuid: result.uuid, conn: t, req
 								})
 								.then(()=>{
 									req.session.confirm_dev_origins = {	

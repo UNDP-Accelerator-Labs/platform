@@ -102,6 +102,7 @@ exports.resendCode = async (req, res, next) => {
     email,
     uuid,
     conn: DB.general,
+    req,
   })
     .then(() => {
       req.session.errormessage = "OTP code sent successfully!";

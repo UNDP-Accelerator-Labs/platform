@@ -169,6 +169,7 @@
 						color: $c-light-2;
 						cursor: default;
 						border-color: $c-light-2;
+						background-color: transparent;
 					}
 				}
 				button.padded {
@@ -268,9 +269,11 @@
 						overflow: auto;
 						z-index: 10;
 						transition: max-height 0.25s ease-out;
+						padding: 0;
 
 						menu {
 							width: 100%;
+							padding: 0;
 
 							li {
 								display: inline-block;
@@ -396,12 +399,6 @@
 					font-size: $t-mid-small;
 				}
 			}
-			// li:hover {
-			// 	/*button {
-			// 		background-color: $c-dark-blue;
-			// 		color: #FFF;
-			// 	}*/
-			// }
 		}
 		.foot {
 			margin: 10px 0;

@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 	let { space, object, instance } = req.params || {}
 	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
-	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, section, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -156,9 +156,21 @@ module.exports = async (req, res) => {
 			if (public) {
 				if (pinboard) {
 					const ownId = await ownDB();
-					const pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					`, [ pinboard, ownId ])).map(row => row.pad);
+					let pbpads = ''
+
+					if (section) {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions 
+							WHERE pinboard = $1::INT 
+								AND db = $2 
+								AND is_included = true 
+								AND section = $3::INT
+						`, [ pinboard, ownId, section ])).map(row => row.pad);
+					} else {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
+						`, [ pinboard, ownId ])).map(row => row.pad);
+					}
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);
@@ -172,9 +184,21 @@ module.exports = async (req, res) => {
 			} else { // THE USER IS LOGGED IN
 				if (pinboard) {
 					const ownId = await ownDB();
-					const pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					`, [ pinboard, ownId ])).map(row => row.pad);
+					let pbpads = ''
+
+					if (section) {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions 
+							WHERE pinboard = $1::INT 
+								AND db = $2 
+								AND is_included = true
+								AND section = $3::INT
+						`, [ pinboard, ownId, section ])).map(row => row.pad);
+					} else {
+						pbpads = (await DB.general.any(`
+							SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
+						`, [ pinboard, ownId ])).map(row => row.pad);
+					}
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);

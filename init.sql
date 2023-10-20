@@ -203,12 +203,21 @@ CREATE TABLE pinboard_contributors (
     PRIMARY KEY (participant, pinboard)
 );
 
+CREATE TABLE pinboard_sections (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    title VARCHAR(99),
+    description TEXT
+);
+
 CREATE TABLE pinboard_contributions (
     pad INT NOT NULL,
     db INT REFERENCES extern_db(id) ON UPDATE CASCADE ON DELETE CASCADE,
     pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (pad, db, pinboard)
 );
+-- for adding sections
+ALTER TABLE pinboard_contributions ADD COLUMN section INT REFERENCES pinboard_sections(id) ON UPDATE CASCADE;
 
 CREATE TABLE tagging (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,

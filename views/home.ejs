@@ -159,9 +159,9 @@
 			<% locals.countries.forEach(d => { %>
 				<li>
 					<% if (d.count > 0) { %>
-						<a href='/<%- language %>/<%- d.iso3 %>' target='_blank'><%- d.name %></a>
+						<a href='/<%- language %>/<%- d.iso3 %><% if (d.equivalents?.length) {%>?<% d.equivalents.forEach(c => { %>equivalents=<%- c %><% }) %><% } %>' target='_blank'><%- d.country %></a>
 					<% } else { %>
-						<%- d.name %>
+						<%- d.country %>
 					<% } %>
 					<small class="google-translate-attr"><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language]((d.count ?? 0) !== 1).toLowerCase() %></small>
 				</li>

@@ -247,8 +247,7 @@
 				obj.types = ref.map(c => typeof c).unique() // THIS SHOULD BE ['string']
 			} else if (obj.types.length === 0) {
 				// IF THERE ARE NO TYPES
-				// if (obj.entries.filter(c => ![null, undefined].includes(c)).unique()[0] === 0) {
-				if (ref.unique().every(c => c === 0)) {
+				if (ref.length && ref.unique().every(c => c === 0)) {
 					obj.entries = obj.entries.map(c => 0)
 					ref = obj.entries.filter(c => c === 0)
 					obj.values = ref.unique()
@@ -1166,7 +1165,7 @@
 		
 		template.title = title.slice(0, 99)
 		template.description = description
-		template.sections = JSON.stringify(sections)
+		template.sections = sections //JSON.stringify(sections)
 		template.full_text = full_text
 		template.medium = 'xlsx'
 		template.imported = true
@@ -1313,7 +1312,7 @@
 		} else console.log('no images to upload')
 
 		// 3) SAVE PADS
-		pads.forEach(d => d.sections = JSON.stringify(d.sections))
+		// pads.forEach(d => d.sections = JSON.stringify(d.sections))
 		// const results = await POST('/storeImport', { pads, template, mobilization })
 		addGlobalLoader()
 		const results = await POST('/upload/xlsx', { pads, template, mobilization })

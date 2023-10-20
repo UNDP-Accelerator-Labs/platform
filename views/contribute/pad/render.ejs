@@ -1506,8 +1506,8 @@ function addTxt (kwargs) {
 				{ key: 'h-align', label: 'format_align_left', value: 'left' },
 				{ key: 'h-align', label: 'format_align_center', value: 'center' },
 				{ key: 'h-align', label: 'format_align_right', value: 'right' },
-				{ key: 'excerpt', label: 'bookmark', value: is_excerpt },
 			]
+			if (!locked_excerpt || is_excerpt) para_styles.push({ key: 'excerpt', label: 'bookmark', value: is_excerpt })
 			if (constraint) para_styles.push({ key: 'constraint', label: 'block', value: constraint })
 			return [font_styles, para_styles]
 		}).addElems('button', 'opt', d => d)
@@ -1523,8 +1523,7 @@ function addTxt (kwargs) {
 		.each(function (d) {
 			d3.select(this).classed(d.key, true)
 			d3.select(this).classed(d.value, true)
-		})
-		.on('click', function (d) {
+		}).on('click', function (d) {
 			const sel = d3.select(this)
 			if (d.key === 'font-properties') {
 				sel.classed('active', d.value.includes('scale') || !sel.classed('active'))
@@ -1546,7 +1545,8 @@ function addTxt (kwargs) {
 				sel.findAncestor('opt-group').selectAll('.opt')
 					.classed('active', function () { return this == sel.node() })
 				media.media.style('text-align', c => c.textalign = d.value).node().focus()
-			} else if (d.key === 'excerpt' && !templated) {
+			} else if (d.key === 'excerpt' && !locked_excerpt) {
+				// NEED TO DETERMINE WHETHER THE template HAS A SET EXCERPT 
 				const datum = media.container.datum()
 				if (!sel.classed('active')) {
 					d3.selectAll('.txt-container').each(c => { if (c) c.is_excerpt = false })
@@ -1653,37 +1653,67 @@ function addEmbed (kwargs) {
 		'contenteditable': editing
 	}).classed('padded', true)
 	.style('text-align', d => d.textalign)
-		.html(d => {
-			if (!editing && d.html.trim().isURL()) return `<a href=${d.html.trim()} target='_blank'>${d.html}</a>`
-			else return d.html
+		.each(function (d) {
+			const sel = d3.select(this)
+			if (this.innerText.trim().isURL() || d.src) {
+				renderIframe.call(this, d)
+			} else {
+				sel.style('text-align', d.textalign)
+					.html(this.innerText)
+			}
+			sel.classed('padded', !this.children.length)
 		})
-	.on('focus', function () {
-		setTimeout(_ => d3.select(this).classed('padded', true).style('text-align', 'left').html(this.innerHTML), 250)
+		// .html(d => {
+		// 	if (!editing && d.html.trim().isURL()) return `<a href=${d.html.trim()} target='_blank'>${d.html}</a>`
+		// 	else return d.html
+		// })
+	.on('focus', function (d) {
+		setTimeout(_ => {
+			d3.select(this).classed('padded', true).style('text-align', 'left')
+				.html(d.html.innerText || d.src || this.innerHTML)
+		}, 250)
 	}).on('blur', async function (d) {
 		const sel = d3.select(this)
 
-		if (this.innerText.trim().isURL()) {
-			const url = this.innerText.trim()
-			const isYoutube = url.match(/^(((http|https):\/\/)|(www\.))(?=.*youtube)/gi)
-			const isMSStream = url.match(/^(((http|https):\/\/))(?=.*microsoftstream)/gi)
+		if (this.innerText.trim().isURL() || d.src) {
+			renderIframe.call(this, d)
+		} else {
+			sel.style('text-align', d.textalign)
+				.html(this.innerText)
+		}
+		sel.classed('padded', !this.children.length)
 
-			if (isYoutube) {
-				d.src = url.replace('watch?v=', 'embed/')
-				this.innerText = null
-				sel.addElems('iframe')
-					.attrs({
-						'width': 560, 'height': 315, 'src': d.src, 'frameborder': 0,
-						'allow': 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
-					})
-				.each(function () { this.allowfullscreen })
-			} else if (isMSStream) {
-				d.src = url.replace(/\?(.*)/gi, '?autoplay=false&amp;showinfo=true')
-				this.innerText = null
-				sel.addElems('iframe')
-					.attrs({ 'width': 560, 'height': 315, 'src': d.src })
-					.style('border', 'none')
-				.each(function () { this.allowfullscreen })
-			} else { // TO DO: FINSIH THIS
+		if (editing) {
+			if (!publicpage) switchButtons(lang)
+			else window.sessionStorage.setItem('changed-content', true)
+		}
+	})
+	// media.addElems('img', 'cover', d => d.src ? [d] : [])
+	//	.attr('src', d => d.src)
+
+	async function renderIframe (d) {
+		const sel = d3.select(this)
+		const url = this.innerText.trim() || d.src
+		const isYoutube = url.match(/^(((http|https):\/\/)|(www\.))(?=.*youtube)/gi)
+		const isMSStream = url.match(/^(((http|https):\/\/))(?=.*microsoftstream)/gi)
+
+		if (isYoutube) {
+			d.src = url.replace('watch?v=', 'embed/')
+			this.innerText = null
+			sel.addElems('iframe')
+				.attrs({
+					'width': 560, 'height': 315, 'src': d.src, 'frameborder': 0,
+					'allow': 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
+				}).each(function () { this.allowfullscreen })
+		} else if (isMSStream) {
+			d.src = url.replace(/\?(.*)/gi, '?autoplay=false&amp;showinfo=true')
+			this.innerText = null
+			sel.addElems('iframe')
+				.attrs({ 'width': 560, 'height': 315, 'src': d.src })
+				.style('border', 'none')
+			.each(function () { this.allowfullscreen })
+		} else {
+			if (false) { // TO DO: FINSIH THIS
 				const screenshot = await POST('/screenshot', { src: this.innerText.trim() })
 				if (screenshot.src) {
 					d.src = screenshot.src
@@ -1707,20 +1737,12 @@ function addEmbed (kwargs) {
 						<% } %>
 					}
 				}
+			} else {
+				d.src = url
+				sel.html(`<a href='${d.src}' target='_blank'>${d.src}</a>`)
 			}
-		} else {
-			sel.style('text-align', d.textalign)
-				.html(this.innerText)
 		}
-		sel.classed('padded', !this.children.length)
-
-		if (editing) {
-			if (!publicpage) switchButtons(lang)
-			else window.sessionStorage.setItem('changed-content', true)
-		}
-	})
-	// media.addElems('img', 'cover', d => d.src ? [d] : [])
-	//	.attr('src', d => d.src)
+	}
 
 	if (focus) media.media.node().focus()
 }

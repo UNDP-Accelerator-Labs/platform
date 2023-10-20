@@ -5,6 +5,8 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 
 module.exports = (req, res) => {
 	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
+	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
+
 	const { uuid } = req.session || {}
 
 	if (!id) { // INSERT OBJECT
@@ -68,7 +70,40 @@ module.exports = (req, res) => {
 					$1:raw
 					ON CONFLICT ON CONSTRAINT unique_pad_lnglat
 						DO NOTHING
-				;`, [ sql ]))
+				;`, [ sql ])
+				.then(_ => {
+					// SAVE THE ISO3 HERE
+					return t.any(`
+						SELECT l.id, l.lat, l.lng, p.owner FROM locations l
+						INNER JOIN pads p
+							ON p.id = l.pad
+						WHERE l.pad = $1
+					;`, [ newID || id ])
+					.then(async locations => {
+						const iso3 = await DB.general.task(gt => {
+							return gt.batch(locations.map(d => {
+								return gt.oneOrNone(`
+									SELECT $1 AS id, su_a3 AS iso3 
+									FROM adm0_subunits
+									WHERE ST_CONTAINS(wkb_geometry, ST_SetSRID(ST_Point($2, $3), 4326))
+								;`, [ d.id, d.lng, d.lat ])
+								.then(result => {
+									if (!result) { // DEFAULT TO USER LOCATION
+										return gt.one(`
+											SELECT $1 AS id, iso3 FROM users
+											WHERE uuid = $2
+										;`, [ d.id, d.owner ])
+										.catch(err => console.log(err))
+									} else return result
+								}).catch(err => console.log(err))
+							})).catch(err => console.log(err))
+						}).catch(err => console.log(err))
+
+						const update = `${DB.pgp.helpers.update(iso3, [ '?id', 'iso3' ], 'locations')} WHERE v.id = t.id`
+						return t.none(update)
+						.catch(err => console.log(err))
+					})
+				}).catch(err => console.log(err)))
 				// REMOVE ALL OLD LOCATIONS
 				const values = DB.pgp.helpers.values(locations, ['pad', 'lng', 'lat'])
 				batch.push(t.none(`

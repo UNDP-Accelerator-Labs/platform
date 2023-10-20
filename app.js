@@ -30,6 +30,8 @@ app.use(
         'script-src-attr': ["'unsafe-inline'"],
         'style-src': csp_links,
         'connect-src': csp_links,
+        "frame-src": ["'self'","https://www.youtube.com/","https://youtube.com/","https://web.microsoftstream.com"]
+
       },
     },
     referrerPolicy: {
@@ -330,9 +332,11 @@ app
 app.get('/module-error', routes.error);
 app.get('*', routes.notfound);
 
-app.use((err, req, res, next) => {
-  res.status(500).redirect('/module-error');
-});
+if (process.env.NODE_ENV === 'production') {
+  app.use((err, req, res, next) => {
+    res.status(500).redirect('/module-error');
+  });
+}
 
 // RUN THE SERVER
 app.listen(process.env.PORT || 2000, (_) => {

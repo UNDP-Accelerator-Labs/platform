@@ -222,3 +222,12 @@ function checkPassword (password) {
 	};
 	return Object.keys(checkPass).filter((key) => !checkPass[key]).map((key) => msgs[key]);
 }
+
+function selectElementContents (node) {
+	// CREDIT TO https://stackoverflow.com/questions/6139107/programmatically-select-text-in-a-contenteditable-html-element
+	const range = document.createRange();
+	range.selectNodeContents(node);
+	const sel = window.getSelection();
+	sel.removeAllRanges();
+	sel.addRange(range);
+}

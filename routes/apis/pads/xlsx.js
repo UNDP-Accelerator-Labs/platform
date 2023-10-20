@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 	if (action === 'fetch') include_data = true
 
 	const pw = req.session.email || null
-	const language = checklanguage(req.params?.language || req.body.language || req.session.language)
+	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 
 	const [ f_space, order, page, full_filters ] = await filter(req, res)
 	let cors_filter = ''

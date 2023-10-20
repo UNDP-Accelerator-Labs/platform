@@ -22,18 +22,23 @@ module.exports = async (req, res) => {
 		if (pads) platform_filters.push(DB.pgp.as.format(`t.pad IN ($1:csv)`, [ pads ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
 		if (countries) {
-			platform_filters.push(await DB.general.any(`
-				SELECT uuid FROM users
-				WHERE iso3 IN ($1:csv)
-			;`, [ countries ])
-			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
-			.catch(err => console.log(err)))
+			if (metafields.some((d) => d.type === 'location')) {
+				platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ countries ]))
+			} else {
+				platform_filters.push(await DB.general.any(`
+					SELECT uuid FROM users WHERE iso3 IN ($1:csv)
+				;`, [ countries ])
+				.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			}
 		} else if (regions) {
+			// TO DO: FINISH HERE
 			platform_filters.push(await DB.general.any(`
-				SELECT u.uuid FROM users u
-				INNER JOIN countries c
-				ON c.iso3 = u.iso3
-				WHERE c.bureau IN ($1:csv)
+				SELECT DISTINCT (u.uuid) FROM users u
+				INNER JOIN adm0_subunits c
+					ON c.su_a3 = u.iso3
+					OR c.adm0_a3 = u.iso3
+				WHERE c.undp_bureau IN ($1:csv)
 			;`, [ regions ])
 			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
 			.catch(err => console.log(err)))

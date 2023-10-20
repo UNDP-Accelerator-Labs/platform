@@ -1057,7 +1057,7 @@ div.browse {
 		}
 	}
 
-	nav:not(.tabs) {
+	nav:not(.tabs):not(.pinboard-sections) {
 		width: 100%;
 		margin: 0 0 30px -15px;
 
@@ -1259,15 +1259,25 @@ div.browse {
 					border-bottom-color: $c-light-yellow;
 				}
 				.contributor {
-					font-size: $t-small;
+					margin-top: 12.5px;
+					color: $c-light-grey;
+				}
+				.meta-country {
+					display: inline-block;
+					margin: 0;
+					font-size: $t-mid-small;
 					line-height: 1.5em;
-					color: $c-mid-blue;
+					color: $c-light-grey;
 				}
 				.description {
+
+					&.lead {
+						font-size: $t-mid;
+						line-height: 1.3em;
+					}
+
 					margin-bottom: 25px;
 					padding-bottom: 5px;
-					font-size: $t-mid;
-					line-height: 1.5em;
 					border-top: none;
 					outline: none;
 					color: $c-dark-blue;

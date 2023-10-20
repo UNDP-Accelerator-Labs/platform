@@ -2010,7 +2010,7 @@ function addRadiolist (kwargs) {
 	}
 
 	// DETERMINE ID FOR THE INPUT NAME
-	let radiolist_id = media.id//uuidv4()
+	let radiolist_id = media.id // uuidv4
 
 	const list = media.media.addElem('ol')
 		.styles({
@@ -2594,7 +2594,11 @@ function addGroup (kwargs) {
 				.on('click', function (d) {
 					const sel = d3.select(this)
 					media.container.each(d => {
-						d.items.push(JSON.parse(JSON.stringify(structure)))
+						const new_structure = structure.map(c => {
+							const { id, ...data } = c
+							return data
+						})
+						d.items.push(JSON.parse(JSON.stringify(new_structure)))
 					}).call(addItems)
 					if (media.container.selectAll('.media-group-items').size() >= repeat) media.media.classed('hide', true)
 				})

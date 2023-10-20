@@ -6,6 +6,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 module.exports = (req, res) => {
 	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
+	if (req.body?.title.length > 99) req.body.title = `${req.body.title.slice(0, 98)}…`
 
 	const { uuid } = req.session || {}
 

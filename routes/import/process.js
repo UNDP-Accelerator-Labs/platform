@@ -23,6 +23,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 				d.owner = uuid
 				d.template = template_id
 				d.sections = JSON.stringify(d.sections)
+				if (d.title.length > 99) d.title = `${d.title.slice(0, 98)}…`
 
 				return t.task(t1 => {
 					// STORE PAD INFO

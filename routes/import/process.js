@@ -10,6 +10,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 
 	DB.conn.tx(t => {
 		// INSERT THE TEMPLATE TO GET THE id
+		if (template.title?.length > 99) template.title = `${template.title.slice(0, 98)}…`
 		template.sections = JSON.stringify(template.sections)
 		const sql = DB.pgp.helpers.insert(template, null, 'templates')
 		return t.one(`

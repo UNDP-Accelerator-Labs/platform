@@ -3,6 +3,7 @@ const { DB } = include('config/')
 module.exports = (req, res) => {
 	const { id, review_template, review_language, source } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
+	if (req.body?.title.length > 99) req.body.title = `${req.body.title.slice(0, 98)}…`
 
 	const { uuid } = req.session || {}
 

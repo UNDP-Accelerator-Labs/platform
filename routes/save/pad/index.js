@@ -1,4 +1,5 @@
 const { app_title_short, app_storage, DB } = include('config/')
+const { limitLength } = include('routes/helpers/')
 const fs = require('fs')
 const path = require('path')
 const { BlobServiceClient } = require('@azure/storage-blob')
@@ -6,7 +7,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 module.exports = (req, res) => {
 	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
-	if (req.body?.title.length > 99) req.body.title = `${req.body.title.slice(0, 98)}…`
+	if (req.body?.title) req.body.title = limitLength(req.body.title, 99)
 
 	const { uuid } = req.session || {}
 
@@ -18,25 +19,25 @@ module.exports = (req, res) => {
 				obj[key] = req.body[key]
 				return obj
 			}, {})
-		
+
 		var saveSQL = DB.pgp.as.format(`
-			INSERT INTO pads ($1:name, owner) 
+			INSERT INTO pads ($1:name, owner)
 			VALUES ($1:csv, $2)
 			RETURNING id
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
 		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
-	}	
+	}
 
-	DB.conn.tx(t => { 
+	DB.conn.tx(t => {
 		const batch = []
 
 		return t.oneOrNone(saveSQL)
 		.then(result => {
 			const newID = result ? result.id : undefined
-			const batch = []	
-			
+			const batch = []
+
 			// SAVE TAGS INFO
 			if (tagging?.length) {
 				// SAVE TAGS INFO
@@ -61,7 +62,7 @@ module.exports = (req, res) => {
 				DELETE FROM tagging
 				WHERE pad = $1
 			;`, [ newID || id ]))
-			
+
 			// SAVE LOCATIONS INFO
 			if (locations?.length) {
 				// SAVE THE LOCATION INFO
@@ -84,7 +85,7 @@ module.exports = (req, res) => {
 						const iso3 = await DB.general.task(gt => {
 							return gt.batch(locations.map(d => {
 								return gt.oneOrNone(`
-									SELECT $1 AS id, su_a3 AS iso3 
+									SELECT $1 AS id, su_a3 AS iso3
 									FROM adm0_subunits
 									WHERE ST_CONTAINS(wkb_geometry, ST_SetSRID(ST_Point($2, $3), 4326))
 								;`, [ d.id, d.lng, d.lat ])
@@ -141,32 +142,32 @@ module.exports = (req, res) => {
 				DELETE FROM metafields
 				WHERE pad = $1
 			;`, [ newID || id ]))
-			
+
 			// SAVE MOBILIZATION INFO
 			if (mobilization && newID) {
 				batch.push(t.none(`
 					INSERT INTO mobilization_contributions (pad, mobilization)
 					-- VALUES ($1, $2)
-					SELECT $1::INT, m.id FROM mobilizations m 
+					SELECT $1::INT, m.id FROM mobilizations m
 						WHERE m.id IN ($2::INT, (SELECT source FROM mobilizations WHERE id = $2::INT AND child = TRUE))
 				;`, [ newID, mobilization ]))
 			}
 			// SAVE VERSION TREE
 			if (source && newID) {
 				batch.push(t.none(`
-					UPDATE pads 
-					SET version = source.version || $1::TEXT 
+					UPDATE pads
+					SET version = source.version || $1::TEXT
 					FROM (SELECT id, version FROM pads) AS source
 					WHERE pads.id = $1
 						AND source.id = pads.source
 				;`, [ newID ]))
 			}
-			
+
 			// UPDATE THE TIMESTAMP
 			batch.push(t.none(`
 				UPDATE pads SET update_at = NOW() WHERE id = $1::INT
 			;`, [ newID || id]))
-			
+
 			return t.batch(batch)
 				.then(_ => newID)
 				.catch(err => console.log(err))

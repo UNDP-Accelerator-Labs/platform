@@ -10,7 +10,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 
 	DB.conn.tx(t => {
 		// INSERT THE TEMPLATE TO GET THE id
-		if (template.title?.length > 99) template.title = `${template.title.slice(0, 98)}…`
+		if (template.title) template.title = helpers.limitLength(template.title, 99);
 		template.sections = JSON.stringify(template.sections)
 		const sql = DB.pgp.helpers.insert(template, null, 'templates')
 		return t.one(`
@@ -24,7 +24,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 				d.owner = uuid
 				d.template = template_id
 				d.sections = JSON.stringify(d.sections)
-				if (d.title.length > 99) d.title = `${d.title.slice(0, 98)}…`
+				if (d.title) d.title = helpers.limitLength(d.title, 99);
 
 				return t.task(t1 => {
 					// STORE PAD INFO
@@ -38,7 +38,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 						const batch1 = []
 
 						if (d.tags?.length) {
-							// STORE NEW TAGS 
+							// STORE NEW TAGS
 							d.tags.forEach(c => {
 								c.contributor = uuid
 								c.name = c.name?.trim()
@@ -96,7 +96,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 									const iso3 = await DB.general.task(gt => {
 										return gt.batch(locations.map(d => {
 											return gt.oneOrNone(`
-												SELECT $1 AS id, su_a3 AS iso3 
+												SELECT $1 AS id, su_a3 AS iso3
 												FROM adm0_subunits
 												WHERE ST_CONTAINS(wkb_geometry, ST_SetSRID(ST_Point($2, $3), 4326))
 											;`, [ d.id, d.lng, d.lat ])
@@ -140,7 +140,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 							// ;`, [ pad_id, mobilization ]))
 							batch1.push(t.none(`
 								INSERT INTO mobilization_contributions (pad, mobilization)
-								SELECT $1::INT, m.id FROM mobilizations m 
+								SELECT $1::INT, m.id FROM mobilizations m
 									WHERE m.id IN ($2::INT, (SELECT source FROM mobilizations WHERE id = $2::INT AND child = TRUE))
 							;`, [ pad_id, mobilization ]))
 						}

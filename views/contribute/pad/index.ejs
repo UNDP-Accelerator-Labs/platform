@@ -906,7 +906,7 @@
 		// COLLECT TITLE
 		// let title = head.select('.title').node().innerText
 		let title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || '<%- vocabulary["missing title"][language] %>'
-		if (title.length > 99) title = `${title.slice(0, 98)}…`
+		if (title) title = limitLength(title, 99);
 		// MAYBE INCLUDE ALERT IF title IS EMPTY
 		// COLLECT ALL MEDIA
 		const sections = []

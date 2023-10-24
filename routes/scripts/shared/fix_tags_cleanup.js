@@ -6,16 +6,16 @@ const updatesql = false
 
 if (updatesql) {
 	DB.general.none(`
-		DELETE FROM tags 
+		DELETE FROM tags
 			WHERE type IS NULL
 				AND name IN (SELECT name FROM tags WHERE type IS NOT NULL)
 				AND name <> ''
-	;`).then(_ => process.exit())
+	;`).then(_ => console.log('done'))
 	.catch(err => console.log(err))
 } else {
 	DB.general.tx(t => {
 		return t.any(`
-			SELECT * FROM tags 
+			SELECT * FROM tags
 			WHERE type IS NULL
 				AND name NOT IN (SELECT name FROM tags WHERE type IS NOT NULL)
 				AND name <> ''
@@ -35,10 +35,11 @@ if (updatesql) {
 						})
 					})
 				})
-			}).then(_ => process.exit())
+			}).then(_ => {return;})
 			.catch(err => console.log(err))
 		})
-	})
+	}).then(_ => console.log('done'))
+	.catch(err => console.log(err))
 }
 
 Array.prototype.nest = function (key, keep) { // THIS IS NOT QUITE THE SAME FUNCTION AS IN distances.js, THIS MORE CLOSELY RESEMBLES d3.nest

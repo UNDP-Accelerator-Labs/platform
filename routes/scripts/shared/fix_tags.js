@@ -1,18 +1,18 @@
 const { DB } = require('../../../config')
 const updatesql = true
 
-DB.general.tx(gt => {
-	const gbatch = []
-	
-	gbatch.push(gt.any(`SELECT id FROM tags WHERE type IS NULL;`))
-	gbatch.push(gt.any(`SELECT id, name, type FROM tags WHERE type IS NOT NULL;`))
+DB.conn.tx(t => {
+	DB.general.tx(gt => {
+		const gbatch = []
 
-	return gt.batch(gbatch)
-	.then(results => {
-		let [ notype_tags, type_tags ] = results
-		notype_tags = notype_tags.map(d => d.id)
+		gbatch.push(gt.any(`SELECT id FROM tags WHERE type IS NULL;`))
+		gbatch.push(gt.any(`SELECT id, name, type FROM tags WHERE type IS NOT NULL;`))
 
-		return DB.conn.tx(t => {
+		return gt.batch(gbatch)
+		.then(results => {
+			let [ notype_tags, type_tags ] = results
+			notype_tags = notype_tags.map(d => d.id)
+
 			return t.any(`
 				SELECT id, status, sections FROM pads
 			;`).then(results => {
@@ -55,7 +55,7 @@ DB.general.tx(gt => {
 									if (unregistered_tags.length > 0) {
 										unregistered_tags.forEach(async a => {
 											a.type = b.name // SET THE type IN THE pad > sections > tags
-											
+
 											// CHECK IF THE COMPLETE TAG (WITH type) ALREADY EXISTS IN THE DB
 											const exists_in_db = type_tags.some(x => x.name === a.name && x.type === a.type)
 											console.log(exists_in_db)
@@ -93,7 +93,7 @@ DB.general.tx(gt => {
 							})
 							if (updatesql) {
 								batch.push(t.none(`
-									UPDATE pads 
+									UPDATE pads
 									SET sections = $1::jsonb
 									WHERE id = $2
 								;`, [ JSON.stringify(d.sections), d.id ]))
@@ -113,30 +113,31 @@ DB.general.tx(gt => {
 					}
 				}
 			}).catch(err => console.log(err))
+		}).then(ids => {
+			// UPDATE THE notype_tags IN THE tags TABLE
+			if (ids.length) {
+				if (updatesql) {
+					const sql = `${DB.pgp.helpers.update(ids, ['?id', 'type'], 'tags')} WHERE v.id = t.id`;
+					return gt.none(sql)
+					.catch(err => console.log(err))
+				} else {
+					return gt.any(`
+						SELECT COUNT(id)::INT, array_agg(id) AS ids, array_agg(DISTINCT(contributor)) AS contributors, name
+						FROM tags WHERE name IN ($1:csv)
+						GROUP BY name
+					;`, [ ids.map(d => d.name) ])
+					.then(tags => {
+						tags = tags.filter(d => d.count > 1)
+						console.log(ids.length)
+						console.log(tags.length)
+						console.log(tags)
+					}).catch(err => console.log(err))
+				}
+			} else return null
 		}).catch(err => console.log(err))
-	}).then(ids => {
-		// UPDATE THE notype_tags IN THE tags TABLE
-		if (ids.length) {
-			if (updatesql) {
-				const sql = `${DB.pgp.helpers.update(ids, ['?id', 'type'], 'tags')} WHERE v.id = t.id`;
-				return gt.none(sql)
-				.catch(err => console.log(err))
-			} else {
-				return gt.any(`
-					SELECT COUNT(id)::INT, array_agg(id) AS ids, array_agg(DISTINCT(contributor)) AS contributors, name 
-					FROM tags WHERE name IN ($1:csv)
-					GROUP BY name
-				;`, [ ids.map(d => d.name) ])
-				.then(tags => {
-					tags = tags.filter(d => d.count > 1)
-					console.log(ids.length)
-					console.log(tags.length)
-					console.log(tags)
-				}).catch(err => console.log(err))
-			}
-		} else return null
-	}).catch(err => console.log(err))
-}).then(_ => process.exit())
+	}).then(_ => console.log('done global'))
+	.catch(err => console.log(err))
+}).then(_ => console.log('done'))
 .catch(err => console.log(err))
 
 

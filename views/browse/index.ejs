@@ -28,7 +28,7 @@
 	const logged = locals.metadata.user.uuid !== null
 
 	const slides = locals.sample_images
-	
+
 	// const is_intropage = (publicpage
 	// 	&& object === 'pads'
 	// 	&& space !== 'pinned'
@@ -253,7 +253,7 @@
 						<div class='head google-translate-attr'>
 							<% if (editable_pinboard) { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onfocus='this.classList.add("focus")' onkeydown='checkForEnter(event, this)' onblur='partialSave("pinboard", <%- locals.pinboard.id %>)' contenteditable><%- locals.pinboard.title %></div>
-								
+
 								<% if (!locals.metadata.page.instanceReadCount) { %>
 									<div class='engagement-group page-stats'>
 										<button class='engagement engagement-reads'>
@@ -266,7 +266,7 @@
 								<div class='description lead' data-placeholder='Provide a short description for this pinboard.' onblur='partialSave("pinboard", <%- locals.pinboard.id %>)' contenteditable><%- (locals.pinboard.description) %></div><!-- TO DO: TRANSLATE -->
 							<% } else { %>
 								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'><%- locals.pinboard.title %></div>
-								
+
 								<div class='contributor'><%- vocabulary['curation credit'][language](locals.pinboard.owner, locals.pinboard.ownername, 'contributors') %></div>
 								<% if (locals.pinboard?.country) { %><div class='meta meta-country'><%- locals.pinboard?.country %></div><% } %>
 
@@ -311,7 +311,7 @@
 								<div class='description<% if (!sections?.length) { %> hide<% } %>' data-placeholder='Provide a short description for this pinboard.'><%- sections.find(d => d.id === +section)?.description %></div><!-- TO DO: TRANSLATE -->
 							<% } %>
 						</div>
-						
+
 						<script type='text/javascript'>
 							function checkForEnter (evt, node) {
 								if (evt.code === 'Enter' || evt.keyCode === 13) {
@@ -325,7 +325,7 @@
 
 								if (object === 'pinboard') {
 									let title = d3.select('main .inner .head .title').node().innerText.trim()
-									if (title.length > 99) title = `${title.slice(0, 98)}…`
+									if (title) title = limitLength(title, 99);
 									const description = d3.select('main .inner .head .description.lead').node().innerHTML.trim()
 									const displayopts = {}
 
@@ -366,7 +366,7 @@
 											li.classed('editing', false)
 											li.select('div').classed('focus', false)
 											const a = li.select('a')
-											
+
 											if (a.node()) {
 												const href = a.attr('data-href')
 												a.attrs({

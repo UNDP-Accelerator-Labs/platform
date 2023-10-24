@@ -1,11 +1,11 @@
 const { app_title, DB, ownDB } = include('config/')
-const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID, limitLength } = include('routes/helpers/')
 
 const cron = require('node-cron')
 
 module.exports = (req, res) => {
 	let { title, description, source, cohort, template, public, start_date, end_date } = req.body || {}
-	if (title.length > 99) title = `${title.slice(0, 96)}…`
+	if (title) title = limitLength(title, 99);
 	if (!Array.isArray(cohort)) cohort = [cohort]
 	if (start_date) start_date = new Date(start_date)
 	if (end_date) end_date = new Date(end_date)

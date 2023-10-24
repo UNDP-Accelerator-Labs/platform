@@ -645,8 +645,8 @@
 	function compileContent (attr) {
 		const content = {}
 		// COLLECT TITLE
-		const title = head.select('.title').node().innerText
-		if (title.length > 99) title = `${title.slice(0, 98)}…`
+		let title = head.select('.title').node().innerText
+		if (title) title = limitLength(title, 99);
 
 		const description = descriptionLayout.select('.media-container .media-txt').node()['outerText' || 'textContent' || 'innerText']
 		const slideshow = descriptionLayout.select('.input-slideshow #slideshow-status').node()?.checked || false

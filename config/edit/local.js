@@ -45,10 +45,10 @@ exports.metafields = [
     opencode: true,
     limit: 5,
   },
-  // { type: 'tag', name: 'methods', required: true, opencode: false },
-  // { type: 'tag', name: 'datasources', required: true, opencode: true },
+  { type: 'tag', name: 'methods', required: true, opencode: false },
+  { type: 'tag', name: 'datasources', required: true, opencode: true },
 
-  { type: 'location', name: 'locations', required: true },
+  // { type: 'location', name: 'locations', required: true },
 
   // { type: 'tag', name: 'primary signature solution', required: false, opencode: true, limit: 1 },
   // { type: 'tag', name: 'additional signature solution', required: false, opencode: true },

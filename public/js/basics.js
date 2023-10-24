@@ -231,3 +231,12 @@ function selectElementContents (node) {
 	sel.removeAllRanges();
 	sel.addRange(range);
 }
+
+function limitLength(text, limit) {
+	text = `${text}`;  // converting to string just to be sure
+	const arr = [...text].reduce((p, c) => c.match(/\p{Emoji_Modifier}/u) ? [...p.slice(0, -1), p[p.length - 1] + c] : [...p, c], []);
+	if (arr.length < limit) {
+		return text;
+	}
+	return `${arr.slice(0, limit - 1).join('')}…`;
+}

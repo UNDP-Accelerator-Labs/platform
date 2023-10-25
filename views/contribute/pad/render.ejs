@@ -45,6 +45,7 @@ const Media = function (kwargs) {
 	parent = d3.select(parent).classed('focus', focus)
 
 	this.type = type
+	this.name = name
 	this.lang = lang
 	this.constraint = datum.constraint
 
@@ -420,6 +421,7 @@ const Taglist = function (kwargs) {
 		.addElems('i', 'material-icons google-translate-attr')
 			.html('add_circle_outline')
 	}
+
 	return meta
 }
 Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
@@ -1543,7 +1545,7 @@ function addTxt (kwargs) {
 					.classed('active', function () { return this == sel.node() })
 				media.media.style('text-align', c => c.textalign = d.value).node().focus()
 			} else if (d.key === 'excerpt' && !locked_excerpt) {
-				// NEED TO DETERMINE WHETHER THE template HAS A SET EXCERPT 
+				// NEED TO DETERMINE WHETHER THE template HAS A SET EXCERPT
 				const datum = media.container.datum()
 				if (!sel.classed('active')) {
 					d3.selectAll('.txt-container').each(c => { if (c) c.is_excerpt = false })

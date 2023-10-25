@@ -36,7 +36,7 @@ if (updatesql) {
 					})
 				})
 			}).then(_ => {return;})
-			.catch(err => console.log(err))
+			.catch(err => {throw err})
 		})
 	}).then(_ => console.log('done'))
 	.catch(err => console.log(err))

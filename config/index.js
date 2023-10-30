@@ -68,6 +68,13 @@ if (modules.some((d) => d.type === 'mobilizations')) {
     modules.push({ type: 'contributors', rights });
   }
 }
+if (modules.some((d) => d.type === 'pinboards')) {
+  const { rights } = modules.find((d) => d.type === 'pinboards');
+
+  if (!modules.some((d) => d.type === 'urls')) {
+    modules.push({ type: 'urls', rights });
+  }
+}
 // IF THERE ARE TEMPLATES, AND THE contribute RIGHTS FOR PADS HAVE NOT BEEN SET, SET THEM
 // if (modules.some(d => d.type === 'templates')
 //   && !modules.some(d => d.type === 'pads'

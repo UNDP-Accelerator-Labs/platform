@@ -361,3 +361,10 @@ CREATE TABLE public.device_confirmation_code (
   code INTEGER NOT NULL,
   expiration_time TIMESTAMP with time zone NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS specific_urls (
+    id INT PRIMARY KEY,
+    pathname VARCHAR(99) NOT NULL,
+    url VARCHAR(99) NOT NULL
+);

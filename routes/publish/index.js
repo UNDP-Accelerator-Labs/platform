@@ -6,17 +6,20 @@ const templates = require('./templates/')
 const files = require('./files/')
 const reviews = require('./reviews/')
 const mobilizations = require('./mobilizations/')
+const urls = require('./urls/')
 
 exports.publish = (req, res) => {
 	const { referer } = req.headers || {}
 	const { rights } = req.session || {}
 	const { object } = req.params || {}
 
+
 	if (modules.some(d => d.type === object)) {
 		let { write } = modules.find(d => d.type === object).rights
+
 		// MAKE SURE write IS THE NUMERICAL VALUE
 		if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-		console.log('check write', write)
+
 
 		if (object === 'pads' && rights >= write) pads.publish(req, res)
 		else if (object === 'pinboards' && rights >= write) pinboards.publish(req, res)
@@ -24,6 +27,7 @@ exports.publish = (req, res) => {
 		else if (object === 'files' && rights >= write) files.publish(req, res)
 		else if (object === 'reviews' && rights >= write) reviews.publish(req, res)
 		else if (object === 'mobilizations' && rights >= write) mobilizations.publish(req, res)
+		else if (object === 'urls' && rights >= write) urls.publish(req, res)
 
 		else {
 			if (referer) res.redirect(referer)

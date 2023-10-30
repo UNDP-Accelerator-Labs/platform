@@ -1,0 +1,137 @@
+<%
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+%>
+
+<div class='meta-status status-<%- locals.pinboard.status || 0 %>'>
+	<form id='pinboard-display-opts' method='GET' action='/publish/pinboards'>
+		<input type='hidden' name='id' value='<%- locals.pinboard.id %>'>
+		<menu class='opts google-translate-attr'>
+			<li>
+				<p class='<% if (locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['slideshow'][language] %>: </p>
+				<input type='checkbox' class='toggle' id='display-slideshow' value='true' name='slideshow' onchange='toggleOptions(this)' <% if (locals.pinboard.slideshow) { %>checked<% } %> <% if (locals.pinboard.display_map) { %>disabled<% } %>>
+				<label for='display-slideshow' data-content='<% if (locals.pinboard.slideshow) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+			</li>
+			<li>
+				<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display filters'][language] %>: </p>
+				<input type='checkbox' class='toggle' id='display-filters' value='true' name='display_filters' onchange='toggleOptions(this)' <% if (locals.pinboard.display_filters) { %>checked<% } %> <% if (locals.pinboard.slideshow) { %>disabled<% } %>>
+				<label for='display-filters' data-content='<% if (locals.pinboard.display_filters) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+			</li>
+			<li>
+				<ul>
+					<li>
+						<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display map'][language] %>: </p>
+						<input type='checkbox' class='toggle' id='display-map' value='true' name='display_map' onchange='toggleOptions(this)' <% if (locals.pinboard.display_map) { %>checked<% } %> <% if (locals.pinboard.slideshow) { %>disabled<% } %>>
+						<label for='display-map' data-content='<% if (locals.pinboard.display_map) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+					</li>
+					<li>
+						<p class='<% if (locals.pinboard.slideshow || !locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['full screen'][language] %>: </p>
+						<input type='checkbox' class='toggle' id='display-fullscreen' value='true' name='display_fullscreen' onchange='toggleOptions(this)' <% if (locals.pinboard.display_fullscreen) { %>checked<% } %> <% if ((locals.pinboard.slideshow) || !locals.pinboard.display_map) { %>disabled<% } %>>
+						<label for='display-fullscreen' data-content='<% if (locals.pinboard.display_fullscreen) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+					</li>
+				</ul>
+			</li>
+		</menu>
+		<div class='btn-group google-translate-attr'>
+			<button type='button' onclick='openPreview()'><%- vocabulary['preview'][language] %></button>
+
+			<button type='button' onclick='setShareOptions()'>Share</button>
+			<!-- TO DO: TRANSLATE -->
+
+			<% if (locals.pinboard.status === 3) { %>
+				<button type='submit' class='publish' name='status' value='3'><%- vocabulary['publish'][language] %></button>
+			<% } else { %>
+				<button type='submit' class='publish' disabled><%- vocabulary['publish'][language] %></button>
+			<% } %>
+		</div>
+
+		<script type='text/javascript'>
+			function openPreview () {
+				const url = new URL(window.location)
+				const href = url.href.replace('/browse/', '/preview/')
+				window.open(href, '_blank')
+			}
+
+			async function setShareOptions () {
+				const contributors = await POST('/<%- language %>/browse/contributors/invited', { limit: null })
+
+				const formdata = { action: '/share/pinboard',  method: 'POST' }
+				const message = 'Share with contributors'
+				const opts = []
+
+				contributors.data.forEach(d => {
+					opts.push({ node: 'input', type: 'checkbox', name: 'contributor', value: d.id, placeholder: d.name, checked: (<%- JSON.stringify(locals.pinboard.contributors) %>).includes(d.id), default: true })
+				})
+
+				const foot = { node: 'button', type: 'submit', name: 'pinboard', value: <%- locals.pinboard.id %>, label: '<%- vocabulary["share"][language] %>' }
+
+				const new_constraint = await renderLonglistFormModal({ message, formdata, opts, foot })
+			}
+
+			async function catchSubmit (evt) {
+				if (evt.preventDefault) evt.preventDefault()
+
+				console.log(this)
+
+				const message = 'Create a distinct URL for this collection.' // TO DO: TRANSLATE
+				const opts = [
+					{ node: 'input', type: 'text', name: 'pathname', label: 'pathname', value: '/path' },
+					{ node: 'button', type: 'button', label: '<%- vocabulary["import"][language] %>', resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value }
+				]
+				const mobilization = await renderPromiseModal({ message, opts })
+
+				return false
+			}
+
+			function toggleOptions (node) {
+				for (const label of node.labels) {
+					d3.select(label).attr('data-content', node.checked ? '<%- vocabulary["yes"][language] %>' : '<%- vocabulary["no"][language] %>')
+				}
+				// IF slideshow THEN PREVENT OTHERS
+				const sel = d3.select(node)
+				const menu = sel.findAncestor('menu')
+				const parent = sel.findAncestor('li')
+				if (node.name === 'slideshow') {
+					menu.selectAll('li')
+					.each(function () {
+						const sel = d3.select(this)
+						sel.select('p').classed('disabled', function () {
+							return this.parentNode !== parent.node() && node.checked
+						})
+						sel.selectAll('input[type=checkbox]').each(function () {
+							this.disabled = this.parentNode !== parent.node() && node.checked
+						})
+					})
+				}
+				// IF map THEN ENABLE fullscreen OPTION
+				if (node.name === 'display_map') {
+					menu.selectAll('li')
+					.each(function () {
+						const sel = d3.select(this)
+						sel.select('p').classed('disabled', function () {
+							return this.parentNode !== parent.node() && this.nextElementSibling.name !== 'display_filters' && node.checked
+						})
+						sel.selectAll('input[type=checkbox]').each(function () {
+							this.disabled = this.parentNode !== parent.node() && this.name !== 'display_filters' && node.checked
+						})
+					})
+					const subnode = d3.select('input#display-fullscreen').node()
+					subnode.disabled = !node.checked
+					d3.select(subnode).findAncestor('li').select('p').classed('disabled', !node.checked)
+				}
+				partialSave('pinboard', <%- locals.pinboard.id %>)
+			}
+
+			const optsForm = d3.select('form#pinboard-display-opts')
+			if (optsForm.node().attachEvent) optsForm.node().attachEvent('submit', catchSubmit)
+			else optsForm.node().addEventListener('submit', catchSubmit)
+		</script>
+	</form>
+
+	<div class='btn-group url-input google-translate-attr'>
+		<label>solutions.sdg-innovation-commons.org/</label>
+		<input type='text' value='pathname'>
+		<button>Create link</button>
+		<button>Copy link</button>
+	</div>
+</div>

@@ -363,7 +363,7 @@ CREATE TABLE public.device_confirmation_code (
 );
 
 
-CREATE TABLE IF NOT EXISTS specific_urls (
+CREATE TABLE IF NOT EXISTS instance_urls (
     id INT PRIMARY KEY,
     pathname VARCHAR(99) NOT NULL,
     url VARCHAR(99) NOT NULL

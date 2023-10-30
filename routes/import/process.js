@@ -1,5 +1,5 @@
-const { modules, DB } = include('config/')
-const helpers = include('routes/helpers/')
+const { modules, metafields, DB } = include('config/')
+const { limitLength, array } = include('routes/helpers/')
 
 module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCATION TO locations TABLE
 	// 1 CREATE AND STORE THE TEMPLATE
@@ -10,7 +10,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 
 	DB.conn.tx(t => {
 		// INSERT THE TEMPLATE TO GET THE id
-		if (template.title) template.title = helpers.limitLength(template.title, 99);
+		if (template.title) template.title = limitLength(template.title, 99);
 		template.sections = JSON.stringify(template.sections)
 		const sql = DB.pgp.helpers.insert(template, null, 'templates')
 		return t.one(`
@@ -24,7 +24,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 				d.owner = uuid
 				d.template = template_id
 				d.sections = JSON.stringify(d.sections)
-				if (d.title) d.title = helpers.limitLength(d.title, 99);
+				if (d.title) d.title = limitLength(d.title, 99);
 
 				return t.task(t1 => {
 					// STORE PAD INFO
@@ -37,12 +37,22 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 						const { pad_id } = result
 						const batch1 = []
 
+						// CHECK WHETHER THE TAGS ARE null AND IF THEY ARE OPEN FOR CODING
+						d.tags = d.tags.filter(c => {
+							const { opencode, type: metatype } = metafields.find(b => b.label?.toLowerCase() === c.type?.toLowerCase()) || {}
+							const isnull = !c.name || (!c.key && metatype === 'index') || false
+							return (opencode && !isnull) || false
+						})
+
 						if (d.tags?.length) {
 							// STORE NEW TAGS
+							const tag_types = array.unique.call(d.tags, { key: 'type' })
+
 							d.tags.forEach(c => {
 								c.contributor = uuid
 								c.name = c.name?.trim()
 							})
+							
 							const sql = DB.pgp.helpers.insert(d.tags, ['name', 'type', 'contributor'], 'tags')
 							batch1.push(DB.general.task(gt => {
 								return gt.any(`

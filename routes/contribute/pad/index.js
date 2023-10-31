@@ -125,7 +125,7 @@ module.exports = async (req, res) => {
 						) e ON e.docid = p.id
 
 						WHERE p.id = $3::INT
-					;`, [ engagement.cases, uuid, id ])
+					;`, [ engagement.cases || false, uuid, id ])
 					.then(async result => {
 						if (result.reviews?.length > 0) {
 							// TO DO: INVESTIGATE THIS

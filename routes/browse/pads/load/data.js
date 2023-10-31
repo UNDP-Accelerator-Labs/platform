@@ -323,18 +323,22 @@ module.exports = async kwargs => {
 					GROUP BY (p.id, m.pad_limit)
 				;`, [ padlist, collaborators_ids ]).catch(err => console.log(err)))
 				// CURRENT USER ENGAGMENT WITH PADS
-				batch.push(t.any(`
-					SELECT p.id, $2:raw
-					FROM pads p
-					WHERE p.id IN $1:raw
-				;`, [ padlist, engagement.cases ]).catch(err => console.log(err)))
+				if (engagementtypes?.length > 0) {
+					batch.push(t.any(`
+						SELECT p.id, $2:raw
+						FROM pads p
+						WHERE p.id IN $1:raw
+					;`, [ padlist, engagement.cases ]).catch(err => console.log(err)))
+				} else batch.push([])
 				// ENGAGEMENT STATS
-				batch.push(t.any(`
-					SELECT p.id, $2:raw
-					FROM pads p
-					LEFT JOIN ($3:raw) ce ON ce.docid = p.id
-					WHERE p.id IN $1:raw
-				;`, [ padlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
+				if (engagementtypes?.length > 0) {
+					batch.push(t.any(`
+						SELECT p.id, $2:raw
+						FROM pads p
+						LEFT JOIN ($3:raw) ce ON ce.docid = p.id
+						WHERE p.id IN $1:raw
+					;`, [ padlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
+				} else batch.push([])
 
 				return t.batch(batch)
 				.then(results => {

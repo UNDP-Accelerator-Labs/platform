@@ -6,6 +6,7 @@ exports.joinObj = function (obj = {}) {
 }
 exports.multijoin = function (args = []) {
 	const [ arr, key ] = args
+		
 	return this.map(d => {
 		const obj = arr.find(c => c[key] === d[key]) || {}
 		return {...d, ...obj}

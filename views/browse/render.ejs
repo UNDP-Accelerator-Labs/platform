@@ -19,7 +19,6 @@ const Entry = function (_kwargs) {
 
 	this.language = language
 	this.data = data
-
 	this.container = parent.addElem('article', '<%- object.slice(0, -1) %><% if (pagedisplay === "slideshow") { %> slide<% } %>')
 		.datum(data)
 	.each(function (d) {
@@ -74,7 +73,7 @@ const Entry = function (_kwargs) {
 			metainfo.addElems('div', 'meta meta-contributor', d => {
 				let data = []
 				<% if (
-					(['pads', 'files'].includes(object) 
+					(['pads'].includes(object) 
 						&& ['private', 'curated'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
 				) { %> 
@@ -89,6 +88,16 @@ const Entry = function (_kwargs) {
 					}
 				<% } else if (object === 'reviews') { %>
 					data = [{ href: d.is_review ? `?contributors=${d.owner}` : null, name: <% if (space === 'private') { %>d.is_review ? d.ownername : '<%- vocabulary["blinded for review"][language] %>'<% } else { %>null<% } %> }]
+				<% } else if (object === 'files') { %>
+					if (d.locations?.length) {
+						data = d.locations.map(c => {
+							return { href: `${c.url}`, target: '_blank', name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') }
+						})
+					} else {
+						data = [{ href: `${d.url}`, target: '_blank', name: (d.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (d.country || '<%- vocabulary["anonymous contributor"][language] %>') }]
+					}
+
+					data.push({ href: `${d.url}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' })
 				<% } else { %>
 					if (d.locations?.length) {
 						data = d.locations.map(c => {
@@ -123,6 +132,7 @@ const Entry = function (_kwargs) {
 							} else return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date)
 						<% } %>
 					}
+					else if (d.created_at) { return d.created_at }
 					else return d.email
 				})
 		}.bind(this),
@@ -218,6 +228,16 @@ const Entry = function (_kwargs) {
 						<% if (space === 'invited') { %>
 							opts.push({ node: 'button', type: 'button', classname: 'revoke', label: '<%- vocabulary["revoke"][language] %>', name: 'contributor', value: d.id, disabled: ![null, undefined].includes(d.end_date), fn: revoke })
 						<% } %>
+					<% } else if (object === 'files') { %>
+						opts.push({ 
+							node: 'button', 
+							type: 'button', 
+							classname: 'publish', 
+							label: 'View', 
+							value: d.id, 
+							inputs: [{ name: 'status', value: 2 }],
+							fn: revoke 
+						})
 					<% } %>
 
 					return opts
@@ -508,9 +528,19 @@ const Entry = function (_kwargs) {
 								return `/<%- language %>/view/pad?${queryparams.toString()}`
 							}
 						<% } %>
+						<% if (object === 'files') { %>
+							if (d.url){
+								return d.url
+							}
+						<% } %>
 						if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 						else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-					}//, 'target': '_blank'
+					}, 
+					'target': d => {
+						<% if (object === 'files') { %>
+							return '_blank'
+						<% } else { %> return '_self' <% } %>
+					}
 				}).addElems('h1')
 			title.addElems('img')
 				.attr('src', d => {
@@ -518,7 +548,7 @@ const Entry = function (_kwargs) {
 					else if (d.is_forward) return '/imgs/icons/i-forward-<%- object.slice(0, -1) %>.svg'
 					else if (d.is_copy) return '/imgs/icons/i-copy-<%- object.slice(0, -1) %>.svg'
 					else {
-						<% if (object === 'reviews') { %>return '/imgs/icons/i-pad.svg'
+						<% if (object === 'reviews' || object === 'files') { %>return '/imgs/icons/i-pad.svg'
 						<% } else { %>return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'<% } %>
 					}
 				})

@@ -77,6 +77,31 @@
 				</button>
 			</a>
 		</li>
+	<% } else if (object === 'files') { %>
+		<li class='<% if (space === "private") { %>active<% } %>'>
+			<a href='./private'>
+				<!-- TO DO: TRANSLATE -->
+				<button>My Files
+					<div class='count'><%- locals.stats?.invited %></div>
+				</button>
+			</a>
+		</li>
+		<li class='<% if (space === "team") { %>active<% } %>'>
+			<a href='./team'>
+				<button> My team
+					<div class='count'><%- locals.stats?.all %></div>
+				</button>
+			</a>
+		</li>
+		<% if ( rights >= 3 ){ %>
+			<li class='<% if (space === "all") { %>active<% } %>'>
+				<a href='./all'>
+					<button> All
+						<div class='count'><%- locals.stats?.all %></div>
+					</button>
+				</a>
+			</li>
+		<% } %>
 	<% } else { %>
 		<% if (modules.some(d => {
 			let { write } = d.rights

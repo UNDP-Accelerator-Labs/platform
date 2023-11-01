@@ -2,7 +2,7 @@ const { page_content_limit, modules, engagementtypes, DB } = include('config/')
 const { checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
-
+const dat = require('../../files/load').data
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req } = kwargs || {}
@@ -98,7 +98,7 @@ module.exports = async kwargs => {
 		})
 		await pagestats.putReadCount('template', results, d => d.id);
 		const data = await join.users(results, [ language, 'owner' ])
-
+await dat({ req })
 		return {
 			data,
 			count: page * page_content_limit,

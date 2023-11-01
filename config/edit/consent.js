@@ -13,7 +13,7 @@ exports.app_suite_url = 'https://acclabs.azurewebsites.net/';
 
 // DESIRED MODULES
 exports.modules = [
-  { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } } }, // respond IS FOR TEMPLATED PADS
+  { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } }, publish: 'def' }, // respond IS FOR TEMPLATED PADS
   // { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 3 } },
   { type: 'files', rights: { read: 0, write: 1 } },
@@ -22,7 +22,7 @@ exports.modules = [
   //   rights: { read: 1, write: 1, coordinate: 3 },
   //   reviewers: 1,
   // },
-  { type: 'mobilizations', rights: { read: 2, write: 2 } },
+  // { type: 'mobilizations', rights: { read: 2, write: 2 } },
   // { type: 'contributors', rights: { read: 2, write: 2 } },
   // { type: 'teams', rights: { read: 2, write: 2 } },
 
@@ -69,6 +69,9 @@ exports.colors = {
   'dark-grey': '#000000',
   'mid-grey': '#646464',
   'light-grey': '#969696',
+
+  'light-2': '#E5E5E5',
+  'light-3': 'rgb(239,239,239)',
 };
 
 // DISPLAY VARIABLES

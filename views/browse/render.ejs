@@ -217,7 +217,7 @@ const Entry = function (_kwargs) {
 						
 						if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
 						
-						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
+						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
 						
 						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
 					<% } else if (object === 'contributors') { %>

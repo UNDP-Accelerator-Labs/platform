@@ -105,30 +105,32 @@ module.exports = async kwargs => {
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err)))
 			// ASSOCIATED MOBILIZATION INFORMATION
-			batch.push(t.task(t1 => {
-				const batch1 = new Array(2).fill(0).map((d, i) => {
-					return t1.any(`
-						SELECT t.id, jsonb_build_object('count', COUNT(m.id)::INT, 'status', $2::INT) AS associated_mobilizations
-						FROM templates t
-						INNER JOIN mobilizations m
-							ON m.template = t.id
-						WHERE t.id IN $1:raw
-							AND m.status = $2::INT
-						GROUP BY t.id
-					;`, [ templatelist, i ])
-					.catch(err => console.log(err))
-				})
-
-				return t1.batch(batch1)
-				.then(results => {
-					const data =  array.nest.call(results.flat(), { key: 'id', keyname: 'id' })
-					data.forEach(d => {
-						d.associated_mobilizations = d.values.map(c => c.associated_mobilizations) 
-						delete d.values
+			if (modules.some((d) => d.type === 'mobilizations' && d.rights.read <= rights)) {
+				batch.push(t.task(t1 => {
+					const batch1 = new Array(2).fill(0).map((d, i) => {
+						return t1.any(`
+							SELECT t.id, jsonb_build_object('count', COUNT(m.id)::INT, 'status', $2::INT) AS associated_mobilizations
+							FROM templates t
+							INNER JOIN mobilizations m
+								ON m.template = t.id
+							WHERE t.id IN $1:raw
+								AND m.status = $2::INT
+							GROUP BY t.id
+						;`, [ templatelist, i ])
+						.catch(err => console.log(err))
 					})
-					return data
-				}).catch(err => console.log(err))
-			}))
+
+					return t1.batch(batch1)
+					.then(results => {
+						const data =  array.nest.call(results.flat(), { key: 'id', keyname: 'id' })
+						data.forEach(d => {
+							d.associated_mobilizations = d.values.map(c => c.associated_mobilizations) 
+							delete d.values
+						})
+						return data
+					}).catch(err => console.log(err))
+				}))
+			}
 
 			// CURRENT USER ENGAGMENT WITH TEMPLATES
 			if (engagementtypes?.length > 0) {
@@ -136,8 +138,8 @@ module.exports = async kwargs => {
 					SELECT t.id, $2:raw
 					FROM templates t
 					WHERE t.id IN $1:raw
-				;`, [ padlist, engagement.cases ]).catch(err => console.log(err)))
-			} else batch.push([])
+				;`, [ templatelist, engagement.cases ]).catch(err => console.log(err)))
+			}
 			// ENGAGEMENT STATS
 			if (engagementtypes?.length > 0) {
 				batch.push(t.any(`
@@ -145,8 +147,8 @@ module.exports = async kwargs => {
 					FROM templates t
 					LEFT JOIN ($3:raw) ce ON ce.docid = t.id
 					WHERE t.id IN $1:raw
-				;`, [ padlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
-			} else batch.push([])
+				;`, [ templatelist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
+			}
 
 			return t.batch(batch)
 			.then(results => {

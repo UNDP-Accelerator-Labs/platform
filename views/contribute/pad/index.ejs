@@ -192,6 +192,7 @@
 									<input type='hidden' name='source' value='<%- locals.source %>'>
 									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
+								<!-- TO DO: CHECK IF THIS IS NOT AN ERROR, ALTHOUGH IT IS DISABLED -->
 									<button type='button' class='publish' name='status' value='1' onclick='saveAndSubmit(this)' disabled><%- vocabulary['submit'][language] %></button>
 									<script type='text/javascript'>
 										function saveAndSubmit (node) {

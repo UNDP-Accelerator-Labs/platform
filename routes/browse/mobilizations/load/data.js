@@ -93,15 +93,22 @@ module.exports = kwargs => {
 			;`, [ mobilizationlist ]).catch(err => console.log(err)))
 
 			// TARGET INFORMATION (NEEDED IN FRONT END TO LIMIT THE NUMBER OF MOBILZIATIONS THAT CAN BE FOLLOWED UP)
-			// batch.push(t.oneOrNone(`
-			// 	SELECT m.id, mm.id AS target_id
-			// 	FROM mobilizations m
-			// 	INNER JOIN mobilizations mm
-			// 		ON mm.source = m.id
-			// 	WHERE m.id IN $1:raw
-			// 	ORDER BY mm.id DESC
-			// 	LIMIT 1
-			// ;`, [ mobilizationlist ]).catch(err => console.log(err)))
+			batch.push(t.any(`
+				SELECT m.id, mm.id AS follow
+				FROM mobilizations m
+				INNER JOIN mobilizations mm
+					ON mm.source = m.id
+				WHERE m.id IN $1:raw
+					AND mm.status < 2
+			;`, [ mobilizationlist ])
+			.then(results => {
+				const data = array.nest.call(results, { key: 'id', keyname: 'id' })
+				data.forEach(d => {
+					d.following_up = d.count > 0
+					delete d.values
+				})
+				return data
+			}).catch(err => console.log(err)))
 
 			// ASSOCIATED TEMPLATE INFORMATION
 			batch.push(t.any(`
@@ -187,6 +194,24 @@ module.exports = kwargs => {
 
 			}).catch(err => console.log(err)))
 
+			// CURRENT USER ENGAGMENT WITH MOBILIZATIONS
+			if (engagementtypes?.length > 0) {
+				batch.push(t.any(`
+					SELECT m.id, $2:raw
+					FROM mobilizations m
+					WHERE m.id IN $1:raw
+				;`, [ mobilizationlist, engagement.cases ]).catch(err => console.log(err)))
+			}
+			// ENGAGEMENT STATS
+			if (engagementtypes?.length > 0) {
+				batch.push(t.any(`
+					SELECT m.id, $2:raw
+					FROM mobilizations m
+					LEFT JOIN ($3:raw) ce ON ce.docid = m.id
+					WHERE m.id IN $1:raw
+				;`, [ mobilizationlist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
+			}
+
 			return t.batch(batch)
 			.then(results => {
 				let data = mobilizations.map(d => { return { id: d } })
@@ -238,10 +263,10 @@ module.exports = kwargs => {
 			-- 	ELSE jsonb_build_object('type', 'end','interval', 'negative', 'date', to_char(m.end_date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), m.end_date)), 'hours', EXTRACT(hour FROM AGE(now(), m.end_date)), 'days', EXTRACT(day FROM AGE(now(), m.end_date)), 'months', EXTRACT(month FROM AGE(now(), m.end_date)))
 			-- END AS end_date,
 
-			CASE WHEN m.source IS NOT NULL
-				THEN (SELECT m2.title FROM mobilizations m2 WHERE m2.id = m.source)
-				ELSE NULL
-			END AS source_title,
+			-- CASE WHEN m.source IS NOT NULL
+			-- 	THEN (SELECT m2.title FROM mobilizations m2 WHERE m2.id = m.source)
+			-- 	ELSE NULL
+			-- END AS source_title,
 
 			-- CASE WHEN m.source IS NOT NULL
 			-- 	AND m.copy = FALSE
@@ -268,7 +293,7 @@ module.exports = kwargs => {
 			COALESCE((SELECT sm.id FROM mobilizations sm WHERE sm.id = m.source LIMIT 1), NULL) AS source_id, -- THIS IS NOT USED IN THE FRONT END: IT IS THE SETUP FOR LIMITING THE NUMBER OF COPIED MOBILIZATIONS
 
 			COALESCE((SELECT tm.title FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target, -- NOT SURE THIS IS NEEDED
-			COALESCE((SELECT tm.id FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target_id,
+			-- COALESCE((SELECT tm.id FROM mobilizations tm WHERE tm.source = m.id LIMIT 1), NULL) AS target_id,
 
 			-- COALESCE((SELECT COUNT (DISTINCT(p.id)) FROM mobilization_contributions mc INNER JOIN pads p ON mc.pad = p.id WHERE p.status >= 2 AND mc.mobilization = m.id), 0)::INT AS associated_pads,
 			-- COALESCE((SELECT COUNT (DISTINCT(p.id)) FROM mobilization_contributions mc INNER JOIN pads p ON mc.pad = p.id WHERE p.status < 2 AND mc.mobilization = m.id AND (p.owner = $1 OR $4 > 2)), 0)::INT AS private_associated_pads,

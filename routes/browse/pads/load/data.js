@@ -117,14 +117,16 @@ module.exports = async kwargs => {
 					WHERE p.id IN $1:raw
 				;`, [ padlist ]).catch(err => console.log(err)))
 				// MOBILIZATION INFORMATION
-				batch.push(t.any(`
-					SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit
-					FROM mobilizations m
-					INNER JOIN mobilization_contributions mc
-						ON mc.mobilization = m.id
-					WHERE mc.pad IN $1:raw
-					GROUP BY (mc.pad, m.title, m.pad_limit)
-				;`, [ padlist ]).catch(err => console.log(err)))
+				if (modules.some((d) => d.type === 'mobilizations' && d.rights.read <= rights)) {
+					batch.push(t.any(`
+						SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit
+						FROM mobilizations m
+						INNER JOIN mobilization_contributions mc
+							ON mc.mobilization = m.id
+						WHERE mc.pad IN $1:raw
+						GROUP BY (mc.pad, m.title, m.pad_limit)
+					;`, [ padlist ]).catch(err => console.log(err)))
+				}
 				// PINBOARD INFORMATION
 				const padToPinboards = new Map();
 				(await DB.general.any(`

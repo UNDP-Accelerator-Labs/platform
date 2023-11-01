@@ -250,7 +250,9 @@ async function check_authorization (_kwargs) {
 	const conn = _kwargs.connection || DB.conn
 	const { id, template, mobilization, source, uuid, rights, collaborators, public } = _kwargs
 
-	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
+	const { rights: modulerights, publish } = modules.find(d => d.type === 'pads') || {}
+	let { read, write } = modulerights || {}
+	
 	if (typeof write === 'object') {
 		if (!id && template) write = write.templated
 		else if (id) {
@@ -281,7 +283,7 @@ async function check_authorization (_kwargs) {
 		}
 	} else {
 		if (id) return conn.oneOrNone(`
-				SELECT TRUE AS bool FROM pads
+				SELECT TRUE AS bool, status FROM pads
 				WHERE id = $1::INT
 					AND (
 						owner IN ($2:csv)
@@ -299,8 +301,10 @@ async function check_authorization (_kwargs) {
 					)
 			;`, [ id, collaborators_ids, rights ])
 			.then(result => {
-				if (result) return { authorized: true, redirect: 'edit' }
-				else return { authorized: rights >= read, redirect: 'view' }
+				if (result.bool) {
+					if (!(publish === 'def' && result.status >= 2)) return { authorized: true, redirect: 'edit' }
+					else return { authorized: true, redirect: 'view' }
+				} else return { authorized: rights >= read, redirect: 'view' }
 			}).catch(err => console.log(err))
 		else return conn.task(t => {
 			const batch = []

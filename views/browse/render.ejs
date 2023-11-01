@@ -31,9 +31,10 @@ const Entry = function (_kwargs) {
 			return (display === 'slideshow'
 			&& d.img?.length === 0
 			&& d.items === undefined
-			&& d.contributors === undefined
-			&& d.private_associated_pads === undefined
-			&& d.associated_pads === undefined
+			&& d.participants.contributors === undefined
+			&& !d.associated_pads?.length
+			&& !d.associated_mobilizations?.length
+			&& d.private_associated_pads === undefined // THIS IS DEPRECATED
 			&& d.ongoing_associated_mobilizations === undefined
 			&& d.past_associated_mobilizations === undefined)
 		})
@@ -46,9 +47,10 @@ const Entry = function (_kwargs) {
 			return (display !== 'columns'
 			&& d.img?.length === 0
 			&& d.items === undefined
-			&& d.contributors === undefined
-			&& d.private_associated_pads === undefined
-			&& d.associated_pads === undefined
+			&& d.participatns.contributors === undefined
+			&& !d.associated_pads?.length
+			&& !d.associated_mobilizations?.length
+			&& d.private_associated_pads === undefined // THIS IS DEPRECATED
 			&& d.ongoing_associated_mobilizations === undefined
 			&& d.past_associated_mobilizations === undefined)
 		})
@@ -56,9 +58,10 @@ const Entry = function (_kwargs) {
 		if (display === 'columns'
 			|| d.img?.length > 0
 			|| d.items !== undefined
-			|| d.contributors !== undefined
-			|| d.private_associated_pads !== undefined
-			|| d.associated_pads !== undefined
+			|| d.participants.contributors !== undefined
+			|| d.associated_pads?.length
+			|| d.associated_mobilizations?.length
+			|| d.private_associated_pads !== undefined // THIS IS DEPRECATED
 			|| d.ongoing_associated_mobilizations !== undefined
 			|| d.past_associated_mobilizations !== undefined)
 		{ return [d]
@@ -211,8 +214,11 @@ const Entry = function (_kwargs) {
 							opts.push({ node: 'button', type: 'button', classname: 'copy', label: '<%- vocabulary["copy link"][language] %>', value: d.id, inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }], fn: copyLink })
 						}
 						opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', name: 'mobilizations', value: d.id, fn: setDownloadOptions }) // TO DO: CHECK IF THIS WORKS
+						
 						if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
-						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.target_id), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
+						
+						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
+						
 						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
 					<% } else if (object === 'contributors') { %>
 						<% if (space === 'invited') { %>
@@ -437,6 +443,8 @@ const Entry = function (_kwargs) {
 					obj.count = d.items
 					data.push(obj)
 				}
+
+				/*
 				if (![undefined, null].includes(d.contributors) && ![undefined, null].includes(d.participants)) {
 					const obj = {}
 					obj.type = 'contributor'
@@ -446,24 +454,50 @@ const Entry = function (_kwargs) {
 					obj.text = `${d.contributors} <small class='total'>/ ${d.participants}</small>`
 					data.push(obj)
 				}
-				if (d.private_associated_pads !== undefined) {
+				if (d.private_associated_pads !== undefined) { // THIS IS DEPRECATED
 					const obj = {}
 					obj.type = 'pad'
-					// obj.label = `${vocabulary['status']['<%- language %>'](0, d.count !== 1)} ${vocabulary['pad']['<%- language %>'](d.count !== 1).toLowerCase()}`
 					obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 0, d.private_associated_pads !== 1)} ${Function(`"use strict";return (<%- vocabulary["pad"][language] %>)`)()(d.private_associated_pads !== 1).toLowerCase()}`
 					obj.count = d.private_associated_pads
 					obj.href = `/<%- language %>/browse/pads/curated?<%- object %>=${d.id}&status=0&status=1`
 					data.push(obj)
 				}
-				if (d.associated_pads !== undefined) {
+				*/
+				if (d.participants) {
+					const { contributors, total } = d.participants
 					const obj = {}
-					obj.type = 'pad'
-					// obj.label = `${vocabulary['status']['<%- language %>'](2, d.count !== 1)} ${vocabulary['pad']['<%- language %>'](d.count !== 1).toLowerCase()}`
-					obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 2, d.associated_pads !== 1)} ${Function(`"use strict";return (<%- vocabulary["pad"][language] %>)`)()(d.associated_pads !== 1).toLowerCase()}`
-					obj.count = d.associated_pads
-					obj.href = `/<%- language %>/browse/pads/shared?<%- object %>=${d.id}`
+					obj.type = 'contributor'
+					obj.label = Function(`"use strict";return (<%- vocabulary["contributor"][language] %>)`)()(total !== 1)
+					obj.count = contributors
+					obj.text = `${contributors} <small class='total'>/ ${total}</small>`
 					data.push(obj)
 				}
+				if (d.associated_pads?.length) {
+					d.associated_pads.forEach(c => {
+						const obj = {}
+						obj.type = 'pad'
+						obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', c.status, c.count !== 1)}`
+						obj.count = c.count
+						let space = 'private'
+						if (c.status === 2) space = 'shared'
+						else if (c.status > 2) space = 'public'
+						obj.href = `/<%- language %>/browse/pads/${space}?<%- object %>=${d.id}`
+						data.push(obj)
+					})
+				}
+				if (d.associated_mobilizations?.length) {
+					d.associated_mobilizations.forEach(c => {
+						const obj = {}
+						obj.type = 'mobilization'
+						obj.label = Function(`"use strict";return (<%- vocabulary["mobilization"][language] %>)`)()(c.count !== 1).toLowerCase()
+						obj.count = c.count
+						let space = 'ongoing'
+						if (c.status === 2) space = 'past'
+						obj.href = `/<%- language %>/browse/mobilizations/${space}?<%- object %>=${d.id}`
+						data.push(obj)
+					})
+				}
+				
 				if (d.ongoing_associated_mobilizations !== undefined) {
 					const obj = {}
 					obj.type = 'mobilization'

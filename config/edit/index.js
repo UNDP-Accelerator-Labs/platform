@@ -7,6 +7,8 @@ if (app_id === 'ap') {
   app_obj = { ...app_obj, ...require('./exp.js') };
 } else if (app_id === 'sm') {
   app_obj = { ...app_obj, ...require('./sm.js') };
+} else if (app_id === 'consent') {
+  app_obj = { ...app_obj, ...require('./consent.js') };
 } else if (app_id === 'global') {
   app_obj = {
     ...app_obj,

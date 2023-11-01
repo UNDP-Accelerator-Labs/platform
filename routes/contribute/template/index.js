@@ -50,7 +50,8 @@ module.exports = async (req, res) => {
 							})
 							return t1.batch(batch1)
 							.then(results => {
-								return flatObj.call(results)
+								if (results.length) return flatObj.call(results)
+								else return []
 							}).catch(err => console.log(err))
 						})
 					)
@@ -91,7 +92,7 @@ module.exports = async (req, res) => {
 							) e ON e.docid = t.id
 
 							WHERE t.id = $3
-						;`, [ engagement.cases, uuid, +id ]).then(async results => {
+						;`, [ engagement.cases || false, uuid, +id ]).then(async results => {
 							results.readCount = await pagestats.getReadCount(id, 'template');
 							const data = await join.users(results, [ language, 'owner' ])
 							return data
@@ -99,7 +100,7 @@ module.exports = async (req, res) => {
 					}
 
 					if (id) {
-						// NOTE: for now we record views/reads even for unpublished templates
+						// TO NOTE: for now we record views/reads even for unpublished templates
 						// can be changed by moving this block up where readCount is set
 						// and checking the status instead of id
 						await pagestats.recordRender(req, id, 'template');

@@ -1757,7 +1757,7 @@ function addChecklist (kwargs) {
 	if (!options) options = []
 	else {
 		// if (!populate) options.forEach(d => d.checked = false)
-		// THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
+		// THIS IS SO THAT ANY NULL OPTION (THAT MIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
 		options.sort((a, b) => {
 			if (a.name === b.name) return 0
 			else if (!a.name || !a.name.trim().length) return 1

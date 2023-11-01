@@ -192,6 +192,7 @@
 									<input type='hidden' name='source' value='<%- locals.source %>'>
 									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
+								<!-- TO DO: CHECK IF THIS IS NOT AN ERROR, ALTHOUGH IT IS DISABLED -->
 									<button type='button' class='publish' name='status' value='1' onclick='saveAndSubmit(this)' disabled><%- vocabulary['submit'][language] %></button>
 									<script type='text/javascript'>
 										function saveAndSubmit (node) {
@@ -743,6 +744,7 @@
 			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required, instruction: d.instruction, options: d.options || null }
 			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'drawing') addDrawing({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'radiolist') addRadiolist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			// THE FOLLOWING ARE ALWAYS META

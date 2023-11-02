@@ -31,7 +31,7 @@ const Entry = function (_kwargs) {
 			return (display === 'slideshow'
 			&& d.img?.length === 0
 			&& d.items === undefined
-			&& d.participants.contributors === undefined
+			&& d.participants?.contributors === undefined
 			&& !d.associated_pads?.length
 			&& !d.associated_mobilizations?.length
 			&& d.private_associated_pads === undefined // THIS IS DEPRECATED
@@ -47,7 +47,7 @@ const Entry = function (_kwargs) {
 			return (display !== 'columns'
 			&& d.img?.length === 0
 			&& d.items === undefined
-			&& d.participatns.contributors === undefined
+			&& d.participants?.contributors === undefined
 			&& !d.associated_pads?.length
 			&& !d.associated_mobilizations?.length
 			&& d.private_associated_pads === undefined // THIS IS DEPRECATED
@@ -58,7 +58,7 @@ const Entry = function (_kwargs) {
 		if (display === 'columns'
 			|| d.img?.length > 0
 			|| d.items !== undefined
-			|| d.participants.contributors !== undefined
+			|| d.participants?.contributors !== undefined
 			|| d.associated_pads?.length
 			|| d.associated_mobilizations?.length
 			|| d.private_associated_pads !== undefined // THIS IS DEPRECATED
@@ -73,16 +73,16 @@ const Entry = function (_kwargs) {
 	this.render = {
 		owner: function (_sel) {
 			const metainfo = _sel.addElems('div', 'meta meta-data')
-			
+
 			metainfo.addElems('div', 'meta meta-contributor', d => {
 				let data = []
 				<% if (
-					(['pads', 'files'].includes(object) 
+					(['pads', 'files'].includes(object)
 						&& ['private', 'curated'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
-				) { %> 
+				) { %>
 					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' }]
-					
+
 					if (d.locations?.length) {
 						d.locations.forEach(c => {
 							data.push({ href: `?countries=${c.iso3}`, name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') })
@@ -214,11 +214,11 @@ const Entry = function (_kwargs) {
 							opts.push({ node: 'button', type: 'button', classname: 'copy', label: '<%- vocabulary["copy link"][language] %>', value: d.id, inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }], fn: copyLink })
 						}
 						opts.push({ node: 'button', type: 'button', disabled: d.pads === 0, classname: 'download', label: '<%- vocabulary["download"][language] %>', name: 'mobilizations', value: d.id, fn: setDownloadOptions }) // TO DO: CHECK IF THIS WORKS
-						
+
 						if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
-						
+
 						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
-						
+
 						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
 					<% } else if (object === 'contributors') { %>
 						<% if (space === 'invited') { %>
@@ -497,7 +497,7 @@ const Entry = function (_kwargs) {
 						data.push(obj)
 					})
 				}
-				
+
 				if (d.ongoing_associated_mobilizations !== undefined) {
 					const obj = {}
 					obj.type = 'mobilization'

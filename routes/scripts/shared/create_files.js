@@ -2,14 +2,20 @@ const { DB } = require('../../../config')
 const validate = require('uuid').validate;
 const { BlobServiceClient } = require("@azure/storage-blob");
 
-async function extractFileInfoFromAzureStorage (){
-    const containerName = 'experiments'
-    const results = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
-    if(results) {
-        await insertIntoDB(results).catch(err => console.log(`Error inserting data into DB: ${err}`));
-    }
-    console.log('Operation completed.')
-}
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  
+// async function extractFileInfoFromAzureStorage (){
+//     const containerName = 'experiments'
+//     const [know_users, unknown_users] = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
+
+//     if(know_users) {
+//         await insertIntoDB(know_users).catch(err => console.log(`Error inserting data into DB: ${err}`));
+//     }
+//     console.log('Operation completed.')
+// }
 
 async function getBlobList(containername) {
     const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);	
@@ -18,6 +24,7 @@ async function getBlobList(containername) {
     const blobs = containerClient.listBlobsFlat()
 	
 	let list = []
+    let unknown = []
 	const blob_url = 'https://acclabplatforms.blob.core.windows.net/'
 
     console.log('Please wait, processing blob list...')
@@ -25,19 +32,30 @@ async function getBlobList(containername) {
         try {
             const u_uuid = blob?.name.split('/')[1] //EXTRACT USER UUID FROM FILE NAME
             if(blob && validate(u_uuid)){ 
-                list.push({
-                    name: blob?.name,
-                    date: blob?.properties?.createdOn,
-                    owner: u_uuid,
-                    path: `${blob_url}${containername}/${blob?.name}`,
-                })
+                if(await checkUUID(u_uuid)){ //CHECK IF THERE IS A VALID USER WITH THE UUID
+                    list.push({
+                        name: blob?.name,
+                        date: blob?.properties?.createdOn,
+                        owner: u_uuid,
+                        path: `${blob_url}${containername}/${blob?.name}`,
+                    })
+                } else {
+                    unknown.push({
+                        name: blob?.name,
+                        date: blob?.properties?.createdOn,
+                        owner: u_uuid,
+                        path: `${blob_url}${containername}/${blob?.name}`,
+                    })
+                }
             }
         } catch(err) {
             console.log(`Error processing blob ${blob?.name}: ${err}`);
         }
     }
     console.log('Blob list processed...')
-	return list
+    console.log('There are ' + list.length + ' records with known users.')
+    console.log('There are ' + unknown.length + ' records with unknown users.')
+	return [list, unknown]
 }
 
 async function insertIntoDB(results) {
@@ -54,5 +72,56 @@ async function insertIntoDB(results) {
     console.log('Data inserted successfully')
 }
 
+async function checkUUID(uuid) {
+   const value = await DB.general.oneOrNone(`
+    SELECT TRUE as bool FROM users
+    WHERE uuid = $1
+    `, [uuid],  d => d?.bool)
+    .catch(err => false)
+
+    return value
+}
+
+async function extractFileInfoFromAzureStorage (){
+      const containerName = 'experiments'
+      const [know_users, unknown_users] = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
+  
+      readline.question('Please choose an option: \n1. Abort the inserting into the database because there are some records with unknown data. \n2. Insert only the records with known users. \n3. Insert records with unknown users. \n4. Insert all records. \n', async (answer) => {
+          switch(answer) {
+              case '1':
+                  console.log('Operation aborted.')
+                  readline.close();
+                  break;
+              case '2':
+                  if(know_users) {
+                      await insertIntoDB(know_users).catch(err => console.log(`Error inserting data into DB: ${err}`));
+                  }
+                  console.log('Operation completed.')
+                  readline.close();
+                  break;
+              case '3':
+                  if(unknown_users) {
+                      await insertIntoDB(unknown_users).catch(err => console.log(`Error inserting data into DB: ${err}`));
+                  }
+                  console.log('Operation completed.')
+                  readline.close();
+                  break;
+              case '4':
+                  if(know_users) {
+                      await insertIntoDB(know_users).catch(err => console.log(`Error inserting data into DB: ${err}`));
+                  }
+                  if(unknown_users) {
+                      await insertIntoDB(unknown_users).catch(err => console.log(`Error inserting data into DB: ${err}`));
+                  }
+                  console.log('Operation completed.')
+                  readline.close();
+                  break;
+              default:
+                  console.log('Invalid option. Operation aborted.')
+                  readline.close();
+          }
+      });
+}
+  
 
 extractFileInfoFromAzureStorage()

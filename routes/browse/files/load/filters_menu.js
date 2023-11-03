@@ -1,33 +1,65 @@
-const { modules, metafields, DB } = include('config/')
-const { flatObj } = include('routes/helpers/')
+const { DB } = include('config/')
+const { flatObj, checklanguage, join } = include('routes/helpers/')
+
+const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	const { req } = kwargs || {}
-	const { uuid, rights, collaborators } = req.session || {}
+	const { req, res } = kwargs || {}
+	
+	const { rights} = req.session || {}
+	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
+	// GET FILTERS
+	const [ f_space, order, page, full_filters ] = await filter(req, res)
 
 	return conn.task(t => {
 		const batch = []
 		batch.push(t.task(async t1 => {
 			const batch1 = []
-			if (space === 'private' || space === 'team') {
-					contributors = collaborators.map(d => {
+			if (space === 'private') {
+				batch1.push(t1.any(`
+					SELECT COUNT (DISTINCT (id))::INT, owner
+					FROM files f
+					WHERE TRUE
+						$1:raw
+					GROUP BY owner
+				;`, [ f_space ]) 
+				.then(async results => {
+					let contributors = await join.users(results, [ language, 'owner' ])
+					
+					contributors = contributors.map(d => {
 						const obj = {}
-						obj.id = d.uuid
-						obj.name = d.name
+						obj.id = d.owner
+						obj.name = d.ownername
+						obj.count = d.count
 						return obj
 					})
 					contributors.sort((a, b) => a.name?.localeCompare(b.name))
 
-					batch1.push(contributors.length ? { contributors } : null)
+					return contributors.length ? { contributors } : null
+				}).catch(err => console.log(err)))
 			} else if (space === 'all' && rights >= 3) {
-				const contributors = await DB.general.any(`
-					SELECT u.uuid AS id, u.name, u.iso3, u.position, u.rights
-					FROM users u
-				;`,)
-				.then(async results => results).catch(err => console.log(err))
-				batch1.push(contributors.length ? { contributors } : null)
+				batch1.push(
+					t1.any(`
+					SELECT COUNT (DISTINCT (id))::INT, owner
+						FROM files f
+						GROUP BY owner
+					;`)
+					.then(async results => {
+						let contributors = await join.users(results, [ language, 'owner' ])
+						
+						contributors = contributors.map(d => {
+							const obj = {}
+							obj.id = d.owner
+							obj.name = d.ownername
+							obj.count = d.count
+							return obj
+						})
+						contributors.sort((a, b) => a.name?.localeCompare(b.name))
+						return contributors.length ? { contributors } : null
+					})
+					.catch(err => console.log(err)))
 			} else batch1.push(null)
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
@@ -39,5 +71,4 @@ module.exports = async kwargs => {
 	}).then(results => {
 		return results.map(d => flatObj.call(d))
 	})
-	.catch(err=> console.log('err ', err))
 }

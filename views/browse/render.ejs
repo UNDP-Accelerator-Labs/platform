@@ -30,7 +30,7 @@ const Entry = function (_kwargs) {
 			return (display === 'slideshow'
 			&& d.img?.length === 0
 			&& d.items === undefined
-			&& d.participants.contributors === undefined
+			&& d.participants?.contributors === undefined
 			&& !d.associated_pads?.length
 			&& !d.associated_mobilizations?.length
 			&& d.private_associated_pads === undefined // THIS IS DEPRECATED
@@ -57,7 +57,7 @@ const Entry = function (_kwargs) {
 		if (display === 'columns'
 			|| d.img?.length > 0
 			|| d.items !== undefined
-			|| d.participants.contributors !== undefined
+			|| d.participants?.contributors !== undefined
 			|| d.associated_pads?.length
 			|| d.associated_mobilizations?.length
 			|| d.private_associated_pads !== undefined // THIS IS DEPRECATED

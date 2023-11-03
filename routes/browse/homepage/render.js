@@ -169,7 +169,7 @@ module.exports = async (req, res) => {
 						return obj
 					})
 				} else console.log('no equivalents: do nothing')
-				countries.sort((a, b) => a.country.localeCompare(b.country))
+				countries.sort((a, b) => a?.country?.localeCompare(b.country))
 				return countries
 			}).catch(err => console.log(err)))
 			

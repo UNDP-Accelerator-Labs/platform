@@ -8,45 +8,38 @@ const filter = require('./filter.js')
 
 module.exports = async (req, res) => {
 	const { public, rights } = req.session || {}
+	// GET FILTERS
+	const [ f_space, order, page, full_filters ] = await filter(req)
 
 	if (public || rights < modules.find(d => d.type === 'files')?.rights.read) res.redirect('/login')
 	else {
-		const { object, space } = req.params || {}
 		const { display } = req.query || {}
-		const language = checklanguage(req.params?.language || req.session.language)
-
-		// GET FILTERS
-		const [ f_space, order, page, full_filters ] = await filter(req)
 
 		DB.conn.tx(async t => {		
 			const batch = []
 			
-			// PADS DATA
+			// FILE DATA
 			batch.push(load.data({ connection: t, req }))
 			// FILTERS_MENU
 			batch.push(load.filters_menu({ connection: t, req }))
 			// SUMMARY STATISTICS
-			batch.push(load.statistics({ connection: t, req }))
-			
+			batch.push(load.statistics({ connection: t, req, res }))
+
 			return t.batch(batch)
 			.then(async results => {
 				let [ data, 
 					filters_menu,
 					statistics
 				] = results
-// console.log('data ', data)
+
 				const stats = { 
-					total: data?.sections?.length || 0, 
+					total: array.sum.call(statistics.total, 'count'), 
 					filtered: array.sum.call(statistics.filtered, 'count'),
 					
 					private: statistics.private,
-					curated: statistics.curated,
-					shared: statistics.shared,
-					public: statistics.public, 
+					all: statistics.all.count,
 					
-					displayed: 0,
-					breakdown: statistics.filtered,
-					persistent_breakdown: statistics.persistent,
+					displayed: data.count,
 					contributors: statistics.contributors
 				}
 

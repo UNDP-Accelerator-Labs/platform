@@ -267,8 +267,10 @@ exports.process.upload = (req, res) => {
 
 	const fls = req.files
 	const maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
+	// ESTABLISH THE CONNECTION TO AZURE
+	const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 
-	const promises = fls.map(f => {
+	const promises = fls.map(async f => {
 		// TO DO: MOVE THIS DOWN TO THE if NO app_storage
 		const basedir = path.join(__dirname, `../public/uploads/`)
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
@@ -290,10 +292,9 @@ exports.process.upload = (req, res) => {
 					const targetdir = path.join('uploads/', uuid)
 					const targetsmdir = path.join('uploads/sm/', uuid)
 
-					// ESTABLISH THE CONNECTION TO AZURE
-					const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 					// FIND OR CREATE THE CONTAINER
 					const containerClient = await createContainer(blobServiceClient)
+
 					// SET UP BLOB OPTIONS
 					Jimp.read(source, async (err, image) => {
 						if (err) console.log(err)
@@ -399,19 +400,43 @@ exports.process.upload = (req, res) => {
 					resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
 				})
 			} else if (f.mimetype.includes('application/pdf')) {
-				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+				const targetdir = path.join('uploads/', uuid)
+				const filename = `${f.filename}.pdf`
+				let fileerror = false
 
-				DB.conn.one(`
-					INSERT INTO files (name, path, contributor)
-					SELECT $1, $2, id FROM contributors WHERE uuid = $3
-					RETURNING id
-				;`, [f.originalname, `/${target.split('public/')[1]}`, uuid])
-				.then(result => {
-					if (result) {
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
-					} else resolve({ status: 403, message: 'file was not properly stored' })
-				}).catch(err => console.log(err))
+				// FIND OR CREATE THE CONTAINER
+				const conatinerName = 'solutions-mapping'
+				const containerClient = blobServiceClient.getContainerClient(conatinerName)
+					
+				const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, filename))
+				const buffer = await fs.readFileSync(source)
+				await blobClient.uploadData(buffer)
+				.catch(err=> {
+					if(err){
+						fileerror = true;
+						console.log(err)
+					}
+				})
+
+				if(!fileerror){
+					const path_base = `https://acclabplatforms.blob.core.windows.net`
+					const pathurl = `${path_base}/${conatinerName}/${targetdir}/${filename}`
+					DB.conn.one(`
+						INSERT INTO files (name, path, owner)
+						VALUES ($1, $2, $3)
+						RETURNING id
+					;`, [f.originalname, pathurl, uuid])
+					.then(result => {
+						if (result) {
+							fs.unlinkSync(source)
+							resolve({ status: 200, src: targetdir, originalname: f.originalname, message: 'success' })
+						} else resolve({ status: 403, message: 'file was not properly stored' })
+					}).catch(err => console.log(err))
+				} else {
+					fs.unlinkSync(source)
+					resolve({ status: 403, ftype: f.mimetype, message: 'file upload failed.' })
+				}
+
 			} else {
 				fs.unlinkSync(source)
 				resolve({ status: 403, ftype: f.mimetype, message: 'wrong file format' })

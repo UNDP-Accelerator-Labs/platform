@@ -6,6 +6,7 @@ module.exports = req => {
 	const { space } = req.params || {}
 	let { pads, search, contributors, countries, templates, mobilizations, methods, datasources, sdgs, tags, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const sudo = rights > 2
+	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
@@ -29,30 +30,18 @@ module.exports = req => {
 			.catch(err => console.log(err))
 		}
 
-		const f_templates = templates ? DB.pgp.as.format(`f.source IN (SELECT id FROM pads WHERE template IN ($1:csv))`, [ templates ]) : null
-		// THE MOBILIZATION FILTER BELOW WILL ONLY PICK UP ON FILES GENERATED IN THE PLATFORM, NOT ON FILES UPLOADED
-		const f_mobilizations = mobilizations ? DB.pgp.as.format(`f.source IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]) : null
-
 		// PUBLIC/ PRIVATE FILTERS
 		let f_space = ''
-		if (space === 'private' && !sudo) f_space = DB.pgp.as.format(`AND f.owner IN ($1:csv)`, [ safeArr(collaborators.map(d => d.uuid), DEFAULT_UUID) ])
-
-		engagementtypes.forEach(e => {
-			if (space === `${e}s`) f_space = DB.pgp.as.format(`AND f.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'file' AND type = $2)`, [ uuid, e ])
-		})
-
-		if (space === 'shared')	f_space = DB.pgp.as.format(`AND f.status = 2`)
-		if (space === 'public')	f_space = DB.pgp.as.format(`AND f.status = 3`)
+		if (space === 'private') f_space = DB.pgp.as.format(`AND f.owner IN ($1:csv)`, [ collaborators_ids ])
+		
+		if (space === 'all')	f_space = DB.pgp.as.format(`AND f.status > 0`)
 		// ORDER
-		// let 	order = DB.pgp.as.format(`ORDER BY p.status ASC, p.date DESC`)
 		let order = DB.pgp.as.format(`ORDER BY f.date DESC`)
 
 		// ADDITIONAL FILTER FOR SETTING UP THE "LINKED PADS" DISPLAY
-		// const f_sources = DB.pgp.as.format(`AND f.source IS NULL`)
+		const platform_filters = [f_contributors, f_countries].filter(d => d).join(' OR ')
+		const content_filters = [].filter(d => d).join(' OR ') 
 
-		const platform_filters = [f_contributors, f_countries, f_templates, f_mobilizations].filter(d => d).join(' OR ')
-		const content_filters = [].filter(d => d).join(' OR ') //[f_methods, f_datasources, f_tags, f_sdgs].filter(d => d).join(' OR ')
-		const display_filters = []
 
 		let filters = ''
 		if (f_pads) {
@@ -69,7 +58,7 @@ module.exports = req => {
 		}
 		if (content_filters !== '') filters += `(${content_filters})`
 		if (filters.length) filters = `AND ${filters}`
-
+		
 		resolve([ f_space, order, page, filters ])
 	})
 }

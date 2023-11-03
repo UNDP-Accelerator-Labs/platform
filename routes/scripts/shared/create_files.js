@@ -1,4 +1,4 @@
-const { DB } = require('../../../config')
+const { DB, app_storage } = require('../../../config')
 const validate = require('uuid').validate;
 const { BlobServiceClient } = require("@azure/storage-blob");
 
@@ -15,7 +15,6 @@ async function getBlobList(containername) {
 	
 	let list = []
     let unknown = []
-	const blob_url = 'https://acclabplatforms.blob.core.windows.net/'
 
     console.log('Please wait, processing blob list...')
 	for await (const blob of blobs) {
@@ -27,14 +26,14 @@ async function getBlobList(containername) {
                         name: blob?.name,
                         date: blob?.properties?.createdOn,
                         owner: u_uuid,
-                        path: `${blob_url}${containername}/${blob?.name}`,
+                        path: `${app_storage}${containername}/${blob?.name}`,
                     })
                 } else {
                     unknown.push({
                         name: blob?.name,
                         date: blob?.properties?.createdOn,
                         owner: u_uuid,
-                        path: `${blob_url}${containername}/${blob?.name}`,
+                        path: `${app_storage}${containername}/${blob?.name}`,
                     })
                 }
             }

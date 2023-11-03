@@ -419,8 +419,7 @@ exports.process.upload = (req, res) => {
 				})
 
 				if(!fileerror){
-					const path_base = `https://acclabplatforms.blob.core.windows.net`
-					const pathurl = `${path_base}/${conatinerName}/${targetdir}/${filename}`
+					const pathurl = `${app_storage}${conatinerName}/${targetdir}/${filename}`
 					DB.conn.one(`
 						INSERT INTO files (name, path, owner)
 						VALUES ($1, $2, $3)

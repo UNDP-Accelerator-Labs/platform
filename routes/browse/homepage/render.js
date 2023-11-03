@@ -90,7 +90,7 @@ module.exports = async (req, res) => {
 
 						return DB.general.tx(gt => {
 							return gt.any(`
-								SELECT COUNT(t.pad)::INT, array_agg(t.pad) AS pads, u.iso3 
+								SELECT COUNT(t.pad)::INT, array_agg(t.pad) AS pads, u.iso3
 								FROM users u
 								INNER JOIN ($1:raw) t
 									ON t.owner::uuid = u.uuid::uuid
@@ -150,7 +150,7 @@ module.exports = async (req, res) => {
 			.then(async results => {
 				// JOIN LOCATION INFO
 				let countries = await join.locations(results, { language, key: 'iso3' })
-				
+
 				if (countries.length !== array.unique.call(countries, { key: 'country' }).length) {
 					console.log('equivalents: need to do something about countries that have equivalents')
 					countries = array.nest.call(countries, { key: 'country', keyname: 'country' })
@@ -168,11 +168,12 @@ module.exports = async (req, res) => {
 						}
 						return obj
 					})
+					.filter(d => d.country)  // FIXME: investigate why country might be undefined here
 				} else console.log('no equivalents: do nothing')
 				countries.sort((a, b) => a?.country?.localeCompare(b.country))
 				return countries
 			}).catch(err => console.log(err)))
-			
+
 		} else {
 			// TO DO: THIS IS DIFFERENT/ CHECK EQUIVALENTS
 			// batch.push(t.any(`
@@ -188,7 +189,7 @@ module.exports = async (req, res) => {
 			// 			const set_table = DB.pgp.as.format(`SELECT $1:name FROM (VALUES $2:raw) AS t($1:name)`, [ columns, values ])
 
 			// 			return gt.any(`
-			// 				SELECT t.count, u.iso3 
+			// 				SELECT t.count, u.iso3
 			// 				FROM users u
 			// 				INNER JOIN ($1:raw) t
 			// 					ON t.owner::uuid = u.uuid::uuid

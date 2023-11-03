@@ -6,16 +6,6 @@ const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  
-// async function extractFileInfoFromAzureStorage (){
-//     const containerName = 'experiments'
-//     const [know_users, unknown_users] = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
-
-//     if(know_users) {
-//         await insertIntoDB(know_users).catch(err => console.log(`Error inserting data into DB: ${err}`));
-//     }
-//     console.log('Operation completed.')
-// }
 
 async function getBlobList(containername) {
     const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);	

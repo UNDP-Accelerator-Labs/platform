@@ -73,7 +73,7 @@ async function checkUUID(uuid) {
 }
 
 async function extractFileInfoFromAzureStorage (){
-      const containerName = 'solutions-mapping'
+      const containerName = 'solutions-mapping' //TODO: CHANGE TO CONSENT ARCHIVE CONSTAINER NAME
       const [know_users, unknown_users] = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
   
       readline.question('Please choose an option: \n1. Abort the inserting into the database because there are some records with unknown data. \n2. Insert only the records with known users. \n3. Insert records with unknown users. \n4. Insert all records. \n >>> ', async (answer) => {

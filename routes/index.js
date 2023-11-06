@@ -405,7 +405,7 @@ exports.process.upload = (req, res) => {
 				let fileerror = false
 
 				// FIND OR CREATE THE CONTAINER
-				const conatinerName = 'solutions-mapping'
+				const conatinerName = 'solutions-mapping' //TODO: CHANGE TO CONSENT ARCHIVE CONSTAINER NAME
 				const containerClient = blobServiceClient.getContainerClient(conatinerName)
 					
 				const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, filename))

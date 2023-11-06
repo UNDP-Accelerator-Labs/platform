@@ -165,7 +165,7 @@ module.exports = async kwargs => {
 
 		return {
 			data,
-			count: page * page_content_limit,
+			count: page_content_limit,
 			sections: [{ data }]
 		}
 	}).catch(err => console.log(err))

@@ -1,4 +1,5 @@
-const { DB, app_storage } = require('../../../config')
+const { DB } = require('../../../config')
+const { app_storage } = require('../../../config/edit/index')
 const validate = require('uuid').validate;
 const { BlobServiceClient } = require("@azure/storage-blob");
 
@@ -72,10 +73,10 @@ async function checkUUID(uuid) {
 }
 
 async function extractFileInfoFromAzureStorage (){
-      const containerName = 'experiments'
+      const containerName = 'solutions-mapping'
       const [know_users, unknown_users] = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
   
-      readline.question('Please choose an option: \n1. Abort the inserting into the database because there are some records with unknown data. \n2. Insert only the records with known users. \n3. Insert records with unknown users. \n4. Insert all records. \n', async (answer) => {
+      readline.question('Please choose an option: \n1. Abort the inserting into the database because there are some records with unknown data. \n2. Insert only the records with known users. \n3. Insert records with unknown users. \n4. Insert all records. \n >>> ', async (answer) => {
           switch(answer) {
               case '1':
                   console.log('Operation aborted.')

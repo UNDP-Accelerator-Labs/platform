@@ -38,10 +38,8 @@ module.exports = async kwargs => {
 		// GET PRIVATE FILES COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (f.id))::INT FROM files f
-			WHERE TRUE
-			$1:raw
-			$2:raw
-		;`, [ full_filters, f_space ], d => d.count).then(d => { return { private: d } })
+			WHERE f.owner IN ($1:csv)
+		;`, [ collaborators_ids ], d => d.count).then(d => { return { private: d } })
 		.catch(err => console.log(err)))
 		// GET ALL FILES COUNT
 		batch.push(t.one(`

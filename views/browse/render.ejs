@@ -76,13 +76,13 @@ const Entry = function (_kwargs) {
 			metainfo.addElems('div', 'meta meta-contributor', d => {
 				let data = []
 				<% if (
-					(['pads'].includes(object) 
+					(['pads', 'files'].includes(object) 
 						&& ['private', 'curated'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
 				) { %>
 					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' }]
 
-					if (d.locations?.length) {
+					if (d.locations?.length && object != 'files') {
 						d.locations.forEach(c => {
 							data.push({ href: `?countries=${c.iso3}`, name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') })
 						})

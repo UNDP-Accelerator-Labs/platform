@@ -40,6 +40,7 @@ module.exports = async (req, res) => {
 					all: statistics.all.count,
 					
 					displayed: data.count,
+					breakdown: statistics.filtered,
 					contributors: statistics.contributors
 				}
 

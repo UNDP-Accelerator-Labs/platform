@@ -8,6 +8,8 @@ const readline = require('readline').createInterface({
     output: process.stdout
   });
 
+const containerName = 'consent'
+
 async function getBlobList(containername) {
     const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);	
     const containerClient = blobServiceClient.getContainerClient(containername);
@@ -21,10 +23,11 @@ async function getBlobList(containername) {
 	for await (const blob of blobs) {
         try {
             const u_uuid = blob?.name.split('/')[1] //EXTRACT USER UUID FROM FILE NAME
+            const f_name = blob?.name.split('/')[2]
             if(blob && validate(u_uuid)){ 
                 if(await checkUUID(u_uuid)){ //CHECK IF THERE IS A VALID USER WITH THE UUID
                     list.push({
-                        name: blob?.name,
+                        name: f_name,
                         date: blob?.properties?.createdOn,
                         owner: u_uuid,
                         path: `${app_storage}${containername}/${blob?.name}`,
@@ -73,7 +76,6 @@ async function checkUUID(uuid) {
 }
 
 async function extractFileInfoFromAzureStorage (){
-      const containerName = 'solutions-mapping' //TODO: CHANGE TO CONSENT ARCHIVE CONSTAINER NAME
       const [know_users, unknown_users] = await getBlobList(containerName).catch(err => console.log(`Error getting blob list: ${err}`));
   
       readline.question('Please choose an option: \n1. Abort the inserting into the database because there are some records with unknown data. \n2. Insert only the records with known users. \n3. Insert records with unknown users. \n4. Insert all records. \n >>> ', async (answer) => {

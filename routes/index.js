@@ -1,4 +1,5 @@
 const { app_title, app_title_short, app_storage, DB } = include('config/')
+const { app_storage: app_storage_url } = include('config/edit/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 // const format = require('./formatting.js')
@@ -405,7 +406,7 @@ exports.process.upload = (req, res) => {
 				let fileerror = false
 
 				// FIND OR CREATE THE CONTAINER
-				const conatinerName = 'solutions-mapping' //TODO: CHANGE TO CONSENT ARCHIVE CONSTAINER NAME
+				const conatinerName = 'consent'
 				const containerClient = blobServiceClient.getContainerClient(conatinerName)
 					
 				const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, filename))
@@ -419,7 +420,7 @@ exports.process.upload = (req, res) => {
 				})
 
 				if(!fileerror){
-					const pathurl = `${app_storage}${conatinerName}/${targetdir}/${filename}`
+					const pathurl = `${app_storage_url}${conatinerName}/${targetdir}/${filename}`
 					DB.conn.one(`
 						INSERT INTO files (name, path, owner)
 						VALUES ($1, $2, $3)

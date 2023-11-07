@@ -34,7 +34,7 @@ module.exports = req => {
 		let f_space = ''
 		if (space === 'private') f_space = DB.pgp.as.format(`AND f.owner IN ($1:csv)`, [ collaborators_ids ])
 		
-		if (space === 'all')	f_space = DB.pgp.as.format(`AND f.status > 0`)
+		if (space === 'all')	f_space = DB.pgp.as.format(`AND f.status > 0 AND $1 > 2`, [ rights])
 		// ORDER
 		let order = DB.pgp.as.format(`ORDER BY f.date DESC`)
 

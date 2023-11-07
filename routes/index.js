@@ -1,5 +1,4 @@
 const { app_title, app_title_short, app_storage, DB } = include('config/')
-const { app_storage: app_storage_url } = include('config/edit/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 // const format = require('./formatting.js')
@@ -263,13 +262,16 @@ exports.process.import = require('./import/').process
 /* =============================================================== */
 /* ====================== SAVING MECHANISMS ====================== */
 /* =============================================================== */
-exports.process.upload = (req, res) => {
+exports.process.upload = async (req, res) => {
 	const { uuid } = req.session || {}
 
 	const fls = req.files
 	const maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
 	// ESTABLISH THE CONNECTION TO AZURE
 	const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+	// FIND OR CREATE THE CONTAINER
+	const containerClient = await createContainer(blobServiceClient)
+
 
 	const promises = fls.map(async f => {
 		// TO DO: MOVE THIS DOWN TO THE if NO app_storage
@@ -292,9 +294,6 @@ exports.process.upload = (req, res) => {
 					// USEFUL GUIDE: https://spin.atomicobject.com/2022/03/25/azure-storage-node-js/
 					const targetdir = path.join('uploads/', uuid)
 					const targetsmdir = path.join('uploads/sm/', uuid)
-
-					// FIND OR CREATE THE CONTAINER
-					const containerClient = await createContainer(blobServiceClient)
 
 					// SET UP BLOB OPTIONS
 					Jimp.read(source, async (err, image) => {
@@ -405,10 +404,6 @@ exports.process.upload = (req, res) => {
 				const filename = `${f.filename}.pdf`
 				let fileerror = false
 
-				// FIND OR CREATE THE CONTAINER
-				const conatinerName = 'consent'
-				const containerClient = blobServiceClient.getContainerClient(conatinerName)
-					
 				const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, filename))
 				const buffer = await fs.readFileSync(source)
 				await blobClient.uploadData(buffer)
@@ -419,8 +414,8 @@ exports.process.upload = (req, res) => {
 					}
 				})
 
-				if(!fileerror){
-					const pathurl = `${app_storage_url}${conatinerName}/${targetdir}/${filename}`
+				if(!fileerror && app_storage){
+					const pathurl = `${app_storage}/${targetdir}/${filename}`
 					DB.conn.one(`
 						INSERT INTO files (name, path, owner)
 						VALUES ($1, $2, $3)

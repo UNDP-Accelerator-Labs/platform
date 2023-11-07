@@ -1,5 +1,5 @@
 const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
-const { DB } = include('config/')
+const { metafields, DB } = include('config/')
 
 module.exports = async (req, res) => {
 	let { tags, type, pads, mobilizations, countries, regions, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
@@ -32,16 +32,37 @@ module.exports = async (req, res) => {
 				.catch(err => console.log(err)))
 			}
 		} else if (regions) {
-			// TO DO: FINISH HERE
-			platform_filters.push(await DB.general.any(`
-				SELECT DISTINCT (u.uuid) FROM users u
-				INNER JOIN adm0_subunits c
-					ON c.su_a3 = u.iso3
-					OR c.adm0_a3 = u.iso3
-				WHERE c.undp_bureau IN ($1:csv)
-			;`, [ regions ])
-			.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
-			.catch(err => console.log(err)))
+			if (metafields.some((d) => d.type === 'location')) {
+				platform_filters.push(await DB.general.task(t => {
+					const batch = []
+
+					batch.push(t.any(`
+						SELECT DISTINCT (su_a3) AS iso3 FROM adm0_subunits 
+						WHERE undp_bureau IN ($1:csv)
+					;`, [ regions ]))
+					batch.push(t.any(`
+						SELECT DISTINCT (adm0_a3) AS iso3 FROM adm0_subunits 
+						WHERE undp_bureau IN ($1:csv)
+					;`, [ regions ]))
+					return t.batch(batch)
+					.then(results => {
+						const [ su_a3, adm_a3 ] = results
+						let locations = su_a3.concat(adm_a3)
+						return locations
+					}).catch(err => console.log(err))
+				}).then(results => DB.pgp.as.format(`t.pad IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ safeArr(results.map(d => d.iso3), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			} else {
+				platform_filters.push(await DB.general.any(`
+					SELECT DISTINCT (u.uuid) FROM users u
+					INNER JOIN adm0_subunits c
+						ON c.su_a3 = u.iso3
+						OR c.adm0_a3 = u.iso3
+					WHERE c.undp_bureau IN ($1:csv)
+				;`, [ regions ])
+				.then(results => DB.pgp.as.format(`t.pad IN (SELECT id FROM pads WHERE owner IN ($1:csv))`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+				.catch(err => console.log(err)))
+			}
 		}
 		const f_type = DB.pgp.as.format(`AND t.type = $1`, [ type ])
 

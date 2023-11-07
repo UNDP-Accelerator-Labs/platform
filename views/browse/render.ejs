@@ -135,7 +135,6 @@ const Entry = function (_kwargs) {
 							} else return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date)
 						<% } %>
 					}
-					else if (d.created_at) { return d.created_at }
 					else return d.email
 				})
 		}.bind(this),
@@ -234,16 +233,6 @@ const Entry = function (_kwargs) {
 						<% if (space === 'invited') { %>
 							opts.push({ node: 'button', type: 'button', classname: 'revoke', label: '<%- vocabulary["revoke"][language] %>', name: 'contributor', value: d.id, disabled: ![null, undefined].includes(d.end_date), fn: revoke })
 						<% } %>
-					<% } else if (object === 'files') { %>
-						opts.push({ 
-							node: 'button', 
-							type: 'button', 
-							classname: 'publish', 
-							label: 'View', 
-							value: d.id, 
-							inputs: [{ name: 'status', value: 2 }],
-							fn: revoke 
-						})
 					<% } %>
 
 					return opts

@@ -108,7 +108,10 @@ function redirectOldUrl(req, res, next) {
       issuer: app_base_host,
       expiresIn: '1h',
     });
-    console.log(`WRAPPING USER uuid:${uuid} rights:${rights} ip:${ip}`);
+    console.log(
+      `WRAPPING USER uuid:${uuid} rights:${rights} ` +
+        `ip:${ip} url:${req.originalUrl}`,
+    );
     return res.redirect(
       307,
       `${own_app_url}/transfer?path=${origUrl}&token=${token}`,

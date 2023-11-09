@@ -348,7 +348,7 @@ CREATE TABLE public.trusted_devices (
   device_browser VARCHAR(255) NOT NULL,
   last_login TIMESTAMP with time zone NOT NULL,
   is_trusted BOOLEAN NOT NULL DEFAULT true,
-  session_sid VARCHAR(255) REFERENCES session(sid),
+  session_sid VARCHAR(255) REFERENCES session(sid) ON UPDATE CASCADE ON DELETE CASCADE,
   duuid1 UUID NOT NULL,
   duuid2 UUID NOT NULL,
   duuid3 UUID NOT NULL,

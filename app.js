@@ -30,8 +30,12 @@ app.use(
         'script-src-attr': ["'unsafe-inline'"],
         'style-src': csp_links,
         'connect-src': csp_links,
-        "frame-src": ["'self'","https://www.youtube.com/","https://youtube.com/","https://web.microsoftstream.com"]
-
+        'frame-src': [
+          "'self'",
+          'https://www.youtube.com/',
+          'https://youtube.com/',
+          'https://web.microsoftstream.com',
+        ],
       },
     },
     referrerPolicy: {
@@ -59,6 +63,7 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 app.use(xss());
 
 const cookie = {
+  domain: ``,
   httpOnly: true, // THIS IS ACTUALLY DEFAULT
   secure: process.env.NODE_ENV === 'production',
   maxAge: 1 * 1000 * 60 * 60 * 24 * 1, // DEFAULT TO 1 DAY. UPDATE TO 1 YEAR FOR TRUSTED DEVICES

@@ -1,10 +1,11 @@
 const { DB, app_id } = require('../../../config');
 const link_map = {
-    'ap': 'https://acclabs-actionlearningplans.azurewebsites.net/',
-    'exp': 'https://acclabs-experiments.azurewebsites.net/',
-    'global': 'https://acclabs.azurewebsites.net/',
-    'sm': 'https://acclabs-solutionsmapping.azurewebsites.net/',
-    'blogs': 'https://acclabs.azurewebsites.net/',
+    'ap': 'https://actionplans.sdg-innovation-commons.org/',
+    'exp': 'https://experiments.sdg-innovation-commons.org/',
+    'global': 'https://www.sdg-innovation-commons.org/',
+    'sm': 'https://solutions.sdg-innovation-commons.org/',
+    'blogs': 'https://blogs.sdg-innovation-commons.org/',
+    'consent': 'https://consent.sdg-innovation-commons.org/',
 };
 if (!link_map[app_id]) {
     throw new Error(`app_id '${app_id}' must be one of 'ap', 'exp', 'sm', 'global', or 'blogs'!`);

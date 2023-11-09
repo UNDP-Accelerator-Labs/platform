@@ -93,7 +93,10 @@ app.use(cookieParser(`${app_suite}-${app_suite_secret}-pass`));
 
 function redirectOldUrl(req, res, next) {
   const hostname = req.get('host');
-  if (!hostname.endsWith('azurewebsites.net')) {
+  if (
+    hostname === 'staging.azurewebsites.net' ||
+    !hostname.endsWith('azurewebsites.net')
+  ) {
     return next();
   }
   const { session, ip } = req;

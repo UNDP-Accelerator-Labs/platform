@@ -29,38 +29,6 @@ const cookieParser = require('cookie-parser');
 const app = express();
 app.disable('x-powered-by');
 
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        'img-src': csp_links,
-        'script-src': csp_links,
-        'script-src-attr': ["'unsafe-inline'"],
-        'style-src': csp_links,
-        'connect-src': csp_links,
-        'frame-src': [
-          "'self'",
-          'https://www.youtube.com/',
-          'https://youtube.com/',
-          'https://web.microsoftstream.com',
-        ],
-      },
-    },
-    referrerPolicy: {
-      policy: ['strict-origin-when-cross-origin', 'same-origin'],
-    },
-    xPoweredBy: false,
-    strictTransportSecurity: {
-      maxAge: 123456,
-    },
-  }),
-);
-
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'same-origin');
-  next();
-});
-
 app.set('view engine', 'ejs');
 app.set('trust proxy', true); // trust leftmost proxy
 app.use(express.static(path.join(__dirname, './public')));
@@ -130,6 +98,38 @@ function setAccessControlAllowOrigin(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   next();
 }
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        'img-src': csp_links,
+        'script-src': csp_links,
+        'script-src-attr': ["'unsafe-inline'"],
+        'style-src': csp_links,
+        'connect-src': csp_links,
+        'frame-src': [
+          "'self'",
+          'https://www.youtube.com/',
+          'https://youtube.com/',
+          'https://web.microsoftstream.com',
+        ],
+      },
+    },
+    referrerPolicy: {
+      policy: ['strict-origin-when-cross-origin', 'same-origin'],
+    },
+    xPoweredBy: false,
+    strictTransportSecurity: {
+      maxAge: 123456,
+    },
+  }),
+);
+
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', 'same-origin');
+  next();
+});
 
 const routes = require('./routes/');
 

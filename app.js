@@ -99,7 +99,8 @@ function redirectOldUrl(req, res, next) {
   ) {
     return next();
   }
-  if (req.originalUrl.startsWith('/apis')) {
+  if (req.originalUrl.startsWith('/apis/')) {
+    console.log('add cors');
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
   const newbase = own_app_url.replace(/\/+$/g, '');

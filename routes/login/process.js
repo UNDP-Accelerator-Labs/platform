@@ -19,17 +19,14 @@ module.exports = (req, res, next) => {
 		} catch(_) {
 			tobj = {};
 			if (redirectPath) {
-				console.log(`PLAIN redirect ${redirectPath}`);
 				res.redirect(redirectPath)
 				return;
 			}
 		}
 		const { uuid, rights, ip, acceptedorigins } = tobj;
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
-			console.log(`IP ${ip} redirect ${redirectPath}`);
 			res.redirect(redirectPath)
 		} else if (acceptedorigins && !acceptedorigins.includes(referer)) {
-			console.log(`ORIGIN ${referer} redirect ${redirectPath}`);
 			res.redirect(redirectPath)
 		} else if (uuid) {
 			DB.general.tx(t => {

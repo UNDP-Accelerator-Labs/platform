@@ -99,6 +99,7 @@ function redirectOldUrl(req, res, next) {
   ) {
     return next();
   }
+  const newbase = own_app_url.replace(/\/+$/g, '');
   const { session, ip } = req;
   const { uuid, rights } = session;
   const origUrl = encodeURIComponent(req.originalUrl);
@@ -114,11 +115,10 @@ function redirectOldUrl(req, res, next) {
     );
     return res.redirect(
       307,
-      `${own_app_url}/transfer?path=${origUrl}&token=${token}`,
+      `${newbase}/transfer?path=${origUrl}&token=${token}`,
     );
   }
-  console.log(`REDIRECT NORMAL ${own_app_url} ${req.originalUrl}`);
-  return res.redirect(301, `${own_app_url}/${req.originalUrl}`);
+  return res.redirect(301, `${newbase}${req.originalUrl}`);
 }
 
 app.use(redirectOldUrl);

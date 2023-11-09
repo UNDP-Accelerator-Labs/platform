@@ -1,6 +1,6 @@
 const { DB, app_id } = require('../../../config');
 const link_map = {
-    'ap': 'https://actionplans.sdg-innovation-commons.org/',
+    'ap': 'https://learningplans.sdg-innovation-commons.org/',
     'exp': 'https://experiments.sdg-innovation-commons.org/',
     'global': 'https://www.sdg-innovation-commons.org/',
     'sm': 'https://solutions.sdg-innovation-commons.org/',

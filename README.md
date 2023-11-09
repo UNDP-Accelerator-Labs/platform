@@ -8,7 +8,7 @@ https://experiments.sdg-innovation-commons.org/
 
 https://solutions.sdg-innovation-commons.org/
 
-https://actionplans.sdg-innovation-commons.org/
+https://learningplans.sdg-innovation-commons.org/
 
 https://consent.sdg-innovation-commons.org/
 

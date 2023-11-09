@@ -168,7 +168,7 @@ CREATE TABLE extern_db (
     db VARCHAR(20) UNIQUE NOT NULL,
     url_prefix TEXT NOT NULL
 );
-INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://actionplans.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://learningplans.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('exp', 'https://experiments.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://www.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://solutions.sdg-innovation-commons.org/');

@@ -9,11 +9,15 @@ exports.app_description =
   require('./translations.js').translations['app description'];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.app_suite_url = 'https://acclabs.azurewebsites.net/';
+exports.own_app_url = 'https://consent.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
-  { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } }, publish: 'def' }, // respond IS FOR TEMPLATED PADS
+  {
+    type: 'pads',
+    rights: { read: 0, write: { blank: 4, templated: 1 } },
+    publish: 'def',
+  }, // respond IS FOR TEMPLATED PADS
   // { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 3 } },
   { type: 'files', rights: { read: 0, write: 1 } },

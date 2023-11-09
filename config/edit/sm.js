@@ -9,7 +9,7 @@ exports.app_description =
   require('./translations.js').translations['app description'];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.app_suite_url = 'https://acclabs.azurewebsites.net/';
+exports.own_app_url = 'https://solutions.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
@@ -52,7 +52,7 @@ exports.metafields = [
     required: true,
     uris: [
       {
-        uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file',
+        uri: 'https://consent.sdg-innovation-commons.org/api/join/file',
       },
       { uri: undefined },
     ],

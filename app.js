@@ -117,6 +117,7 @@ function redirectOldUrl(req, res, next) {
       `${own_app_url}/transfer?path=${origUrl}&token=${token}`,
     );
   }
+  console.log(`REDIRECT NORMAL ${own_app_url} ${req.originalUrl}`);
   return res.redirect(301, `${own_app_url}/${req.originalUrl}`);
 }
 

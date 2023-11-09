@@ -99,6 +99,9 @@ function redirectOldUrl(req, res, next) {
   ) {
     return next();
   }
+  if (req.originalUrl.startsWith('/apis')) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   const newbase = own_app_url.replace(/\/+$/g, '');
   const { session, ip } = req;
   const { uuid, rights } = session;

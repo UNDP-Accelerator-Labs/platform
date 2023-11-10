@@ -27,12 +27,13 @@ exports.forgetPassword = async (req, res, next) => {
     return;
   }
   const { host } = req.headers || {}
+  const mainHost = host.split(".").slice(-2).join(".");
   const protocol = req.protocol
   // Generate JWT token
   const token = await jwt.sign(
     { email, action: 'password-reset' },
     process.env.APP_SECRET,
-    { expiresIn: '24h', issuer: host })
+    { expiresIn: '24h', issuer: mainHost })
 
   const resetLink = `${protocol}://${host}/reset/${token}`;
   const html = `

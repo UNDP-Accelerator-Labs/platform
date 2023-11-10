@@ -7,6 +7,8 @@ module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
+	const mainHost = host.split('.').slice(-2).join('.');
+	console.log('TOKEN VERIFY', host, mainHost);
 	const { path, ip: ownIp } = req || {}
 
 	const { __ucd_app, __puid, __cduid } = req.cookies
@@ -15,7 +17,7 @@ module.exports = (req, res, next) => {
 		// VERIFY TOKEN
 		let tobj;
 		try {
-			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: mainHost })
 		} catch(_) {
 			tobj = {};
 			if (redirectPath) {

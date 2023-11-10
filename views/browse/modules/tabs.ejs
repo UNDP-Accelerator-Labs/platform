@@ -77,25 +77,7 @@
 				</button>
 			</a>
 		</li>
-	<% } else if (object === 'files') { %>
-		<li class='<% if (space === "private") { %>active<% } %>'>
-			<a href='./private'>
-				<!-- TO DO: TRANSLATE -->
-				<button>My Files
-					<div class='count'><%- locals.stats?.private %></div>
-				</button>
-			</a>
-		</li>
-		<% if ( rights >= 3 ){ %>
-			<li class='<% if (space === "all") { %>active<% } %>'>
-				<a href='./all'>
-					<!-- TO DO: TRANSLATE -->
-					<button> All
-						<div class='count'><%- locals.stats?.all %></div>
-					</button>
-				</a>
-			</li>
-		<% } %>
+
 	<% } else { %>
 		<% if (modules.some(d => {
 			let { write } = d.rights
@@ -169,6 +151,15 @@
 				</a>
 			</li>
 		<% } %>
+
+		<li class='<% if (space === "all") { %>active<% } %>'>
+			<a onclick='redirect("./all")'>
+				<button><%- vocabulary['space'][language](object, 'all') %>
+					<div class='count'><%- locals.stats?.all %></div>
+				</button>
+			</a>
+		</li>
+
 		<% if (object === 'templates' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read)
 			&& locals.metadata.menu.review_templates?.length > 0)
 		{ %>

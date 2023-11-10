@@ -82,7 +82,7 @@ const Entry = function (_kwargs) {
 				) { %>
 					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' }]
 
-					if (d.locations?.length && object != 'files') {
+					if (d.locations?.length) {
 						d.locations.forEach(c => {
 							data.push({ href: `?countries=${c.iso3}`, name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') })
 						})
@@ -91,16 +91,6 @@ const Entry = function (_kwargs) {
 					}
 				<% } else if (object === 'reviews') { %>
 					data = [{ href: d.is_review ? `?contributors=${d.owner}` : null, name: <% if (space === 'private') { %>d.is_review ? d.ownername : '<%- vocabulary["blinded for review"][language] %>'<% } else { %>null<% } %> }]
-				<% } else if (object === 'files') { %>
-					if (d.locations?.length) {
-						data = d.locations.map(c => {
-							return { href: `${c.url}`, target: '_blank', name: (c.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (c.country || '<%- vocabulary["anonymous contributor"][language] %>') }
-						})
-					} else {
-						data = [{ href: `${d.url}`, target: '_blank', name: (d.iso3 === 'NUL') ? '<%- vocabulary["global"][language] %>' : (d.country || '<%- vocabulary["anonymous contributor"][language] %>') }]
-					}
-
-					data.push({ href: `${d.url}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' })
 				<% } else { %>
 					if (d.locations?.length) {
 						data = d.locations.map(c => {
@@ -425,6 +415,8 @@ const Entry = function (_kwargs) {
 				const img = new Image()
 				img.onload = function () { node.src = this.src }
 
+				if (!Array.isArray(d.img)) d.img = [d.img]
+
 				<% if (locals.metadata.site.app_storage) { %>
 					const source = new URL(`<%- locals.metadata.site.app_storage %>${d.img[0]}`).href
 				<% } else { %>
@@ -552,9 +544,9 @@ const Entry = function (_kwargs) {
 							}
 						<% } %>
 						<% if (object === 'files') { %>
-							if (d.url){
+							if (d.url) {
 								return d.url
-							}
+							} else return null
 						<% } %>
 						if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 						else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
@@ -571,7 +563,7 @@ const Entry = function (_kwargs) {
 					else if (d.is_forward) return '/imgs/icons/i-forward-<%- object.slice(0, -1) %>.svg'
 					else if (d.is_copy) return '/imgs/icons/i-copy-<%- object.slice(0, -1) %>.svg'
 					else {
-						<% if (object === 'reviews' || object === 'files') { %>return '/imgs/icons/i-pad.svg'
+						<% if (object === 'reviews') { %>return '/imgs/icons/i-pad.svg'
 						<% } else { %>return '/imgs/icons/i-<%- object.slice(0, -1) %>.svg'<% } %>
 					}
 				})

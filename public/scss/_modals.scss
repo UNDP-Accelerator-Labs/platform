@@ -149,7 +149,36 @@
 				text-align: center;
 				font-size: $t-main;
 
-				button {
+				div.divider {
+					position: relative;
+					width: calc(100% + 30px);
+					height: 30px;
+					margin: 15px 0;
+					margin-left: -15px;
+					line-height: 30px;
+
+					&:before {
+						content: '';
+						position: absolute;
+						border: 1px dotted $c-light-grey;
+						top: 50%;
+						left: 0;
+						width: 100%;
+					}
+
+					span {
+						position: relative;
+						padding: 0 5px;
+						background-color: #FFF;
+						z-index: 1;
+					}
+				}
+
+				input[type=file] {
+					display: none;
+				}
+				button,
+				input[type=file] + label {
 					width: 100%;
 					min-height: 30px;
 					border: 1px solid $c-dark-blue;
@@ -171,9 +200,26 @@
 						border-color: $c-light-2;
 						background-color: transparent;
 					}
+					&.padded {
+						padding: 10px 30px;
+					}
 				}
-				button.padded {
-					padding: 10px 30px;
+				button.input-submit,
+				button[type=submit] {
+					border-color: $c-light-blue;
+					background-color: $c-light-blue;
+					color: #FFF;
+				}
+				input[type=file] + label {
+					position: relative;
+					display: block;
+					top: 0;
+					left: 0;
+					transform: none;
+					box-sizing: border-box;
+					font-size: $t-mid-small;
+					color: $c-dark-blue;
+					line-height: 30px;
 				}
 				textarea {
 					width: 100%;
@@ -189,10 +235,10 @@
 				label {
 					position: absolute;
 					top: -15px;
-					left: 0;
-					font-size: $t-main;
+					left: 15px;
+					font-size: $t-mid-small;
 					color: $c-light-grey;
-					transform: translateY(calc(#{$t-main}));
+					transform: translateY(17px);
 					transition: transform .25s, font-size .25s;
 					cursor: pointer;
 				}
@@ -204,19 +250,30 @@
 					transform: translateY(-5px);
 				}
 				input.full-width {
+					/*
 					width: 100%;
 					margin: 5px 0 15px 0;
 					padding: 15px 0 15px 0;
 					border: none;
-					border-bottom: 1px solid $c-dark-blue;
+					border-bottom: 1px solid $c-light-grey;
 					outline: none;
 					font-size: $t-main;
+					*/
+					width: calc(100% - 30px);
+					height: 45px;
+					margin: 5px 0 15px 0;
+					padding: 0 15px;
+					border: none;
+					outline: none;
+					border-bottom: 1px solid $c-light-grey;
+					font-size: $t-main;
+					line-height: 1.3em;
 				}
 				input + label {
 					top: 1px;
 				}
 				input:focus {
-					border-color: $c-light-yellow;
+					/* border-color: $c-light-yellow; */
 				}
 				input[type=date] {
 					padding-bottom: 5px;
@@ -301,6 +358,11 @@
 									.count {
 										float: right;
 										color: $c-light-grey;
+									}
+
+									.sub {
+										color: $c-light-grey;
+										font-size: $t-small;
 									}
 								}
 								label.secondary {

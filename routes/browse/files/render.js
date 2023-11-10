@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
 			// FILTERS_MENU
 			batch.push(load.filters_menu({ connection: t, req }))
 			// SUMMARY STATISTICS
-			batch.push(load.statistics({ connection: t, req, res }))
+			batch.push(load.statistics({ connection: t, req }))
 
 			return t.batch(batch)
 			.then(async results => {
@@ -37,14 +37,16 @@ module.exports = async (req, res) => {
 					filtered: array.sum.call(statistics.filtered, 'count'),
 					
 					private: statistics.private,
-					all: statistics.all.count,
+					shared: statistics.shared,
+					public: statistics.public,
+					all: statistics.all,
 					
 					displayed: data.count,
 					breakdown: statistics.filtered,
 					contributors: statistics.contributors
 				}
 
-				const metadata = await datastructures.pagemetadata({ req, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), display: display || 'rows' })
+				const metadata = await datastructures.pagemetadata({ req, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), display })
 				return Object.assign(metadata, { sections: data.sections, stats, filters_menu })
 			})
 		}).then(data => res.render('browse/', data))

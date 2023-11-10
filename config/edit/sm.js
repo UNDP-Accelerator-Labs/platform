@@ -52,7 +52,7 @@ exports.metafields = [
     required: true,
     uris: [
       {
-        uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file',
+        uri: 'https://consent.sdg-innovation-commons.org/en/contribute/resource',
       },
       { uri: undefined },
     ],

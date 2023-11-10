@@ -2456,6 +2456,7 @@ async function addAttachment (kwargs) {
 
 	if (!editing && activity !== 'preview' && srcs?.length === 0) return null
 
+	console.log(name)
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
 
@@ -2494,7 +2495,7 @@ async function addAttachment (kwargs) {
 		item.opts = []
 
 		// TO DO: RESOLVE THIS FOR PUBLIC CONTRIBUTIONS: HOW DO PEOPLE SUBMIT CONSENT OR REFRENCE AN EXTERNAL FILE?
-		uris.forEach(d => {
+		uris.forEach((d, i) => {
 			if (d.uri !== undefined) {
 				item.opts.push({
 					node: 'button',
@@ -2502,8 +2503,8 @@ async function addAttachment (kwargs) {
 					label: '<%- vocabulary["link file"][language] %>',
 					resolve: _ => {
 						return new Promise(async resolve => {
-							const id = await partialSave('meta')
-							resolve(window.location = `/request/attachment?uri=${encodeURI(d.uri)}&join_id=${id}&name=${name}`)
+							const pad_id = await partialSave('meta')
+							resolve(window.location.replace(`/request/resource?uri=${encodeURI(d.uri)}&pad_id=${pad_id}&element_id=${meta.id}&name=${name}&type=${type}`))
 						})
 					}
 				})
@@ -2511,25 +2512,37 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'input',
 					type: 'url',
-					placeholder: '<%- vocabulary["or paste link"][language] %>',
+					placeholder: '<%- vocabulary["paste link"][language] %>',
 					class: 'full-width',
 					resolve: async _ => {
 						const input = d3.select('.modal input[type="url"]').node().value
 						if (input.isURL()) {
 							return new Promise(async resolve => {
-								const id = await partialSave('meta')
-								POST('/request/attachment', { name, join_id: id, src: input })
-								.then(res => {
-									if (res.status === 200) resolve(window.location.reload())
-									else resolve(console.log(res))
-								})
+								const pad_id = await partialSave('meta')
+								// const save = await POST('/save/resource', { name, type, pad_id, element_id: meta.id, src: input })
+								// if (save.status === 200) resolve(window.location.reload())
+								// else resolve(console.log(save))
+
+								resolve(window.location.replace(`/save/resource?pad_id=${pad_id}&element_id=${meta.id}&name=${name}&type=${type}&src=${input}`))
 							})
 						} else alert ('This is not a URL.')
 					}
 				})
 			}
+			if (i < uris.length - 1) {
+				item.opts.push({
+					node: 'div',
+					class: 'divider',
+					label: 'OR' // TO DO: TRANSLATE
+				})
+			}
 		})
 		var result = await renderPromiseModal(item)
+		// THIS IS IN CASE THE USER IS LOOKING TO LOAD AN EXTERNAL FILE
+		d3.selectAll('div.screen').classed('hide', true)
+		const screen = d3.select('div.screen')
+			.classed('hide', false)
+			.classed('dark', true)
 		if (!srcs.length && result === null) meta.rmMedia()
 	}
 

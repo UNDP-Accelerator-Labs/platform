@@ -273,7 +273,7 @@
 								<li>
 									<form action='/upload/pdf' method='POST' enctype='multipart/form-data'>
 										<img src='/imgs/icons/i-pad.svg'>
-										<input type='file' id='input-file-pdf' name='pdf' accept='application/pdf' onchange='uploadPDF(this.form, "<%- language %>")' multiple>
+										<input type='file' id='input-file-pdf' name='pdf' accept='application/pdf, image/*,' onchange='uploadFile(this.form, "<%- language %>")' multiple>
 										<label for='input-file-pdf' title='Upload a pdf.'><%- vocabulary['file'][language](false) %></label>
 									</form>
 								</li>
@@ -511,8 +511,6 @@
 				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
 			<% } else if (d.type === 'reviews') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary["my reviews"][language]?.capitalize() %></a>
-			<% } else if (d.type === 'files') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary['file'][language](false)?.capitalize() %></a>
 			<% } 
 			else { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>

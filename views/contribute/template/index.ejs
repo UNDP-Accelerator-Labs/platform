@@ -422,6 +422,7 @@
 			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required, options: d.options || null }
 			if (d.type === 'txt') addTxt({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'embed') addEmbed({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
+			if (d.type === 'drawing') addDrawing({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'checklist') addChecklist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			if (d.type === 'radiolist') addRadiolist({ data, lang: '<%- language %>', sibling: this['__active_node__'], focus: true })
 			// THE FOLLOWING ARE ALWAYS META

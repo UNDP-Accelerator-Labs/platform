@@ -147,7 +147,7 @@
 						type: 'file',
 						name: 'pdf',
 						accept: 'application/pdf, image/*,', // EXTEND THIS TO ANY FILE
-						placeholder: 'Upload a new .pdf <%- key.slice(0, -1) %>', // TO DO: TRANSLATE
+						placeholder: 'Upload a new <%- key.slice(0, -1) %>', // TO DO: TRANSLATE
 						resolve: function (node) {
 							const formData = new FormData()
 							formData.append(this.name, node.files[0], node.files[0].name)

@@ -131,7 +131,7 @@ exports.updatePassword = async (req, res, next) => {
         `, [password, decoded.email]);
 
         //UPDATE ALL ACTIVE SESSION
-        sessionupdate({
+        await sessionupdate({
           conn: DB.general,
           whereClause: `sess ->> 'email' = $1`,
           queryValues: [decoded.email]

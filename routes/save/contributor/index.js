@@ -190,7 +190,7 @@ module.exports =async (req, res) => {
 			.then(async _ => {
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
-					sessionupdate({
+					await sessionupdate({
 						conn: t,
 						whereClause: `sess ->> 'uuid' = $1`,
 						queryValues: [id]
@@ -199,7 +199,7 @@ module.exports =async (req, res) => {
 				} else {
 					// UPDATE THE SESSION DATA
 					await t.one(`
-						SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+						SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
 						COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
 						CASE WHEN u.language IN ($1:csv)
@@ -222,7 +222,7 @@ module.exports =async (req, res) => {
 						AS collaborators
 
 						FROM users u
-						
+
 						LEFT JOIN adm0_subunits su
 							ON su.su_a3 = u.iso3
 						LEFT JOIN adm0
@@ -230,8 +230,8 @@ module.exports =async (req, res) => {
 
 						WHERE uuid = $2
 					;`, [ app_languages, id ])
-					.then(result => {
-						sessionupdate({
+					.then(async result => {
+						await sessionupdate({
 							conn: t,
 							whereClause: `sess ->> 'uuid' = $1`,
 							queryValues: [id]

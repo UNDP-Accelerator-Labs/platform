@@ -190,7 +190,7 @@ module.exports =async (req, res) => {
 			.then(async _ => {
 				if (logoutAll) {
 					// PASSWORD HAS BEEN RESET SO LOG OUT EVERYWHERE
-					sessionupdate({
+					await sessionupdate({
 						conn: t,
 						whereClause: `sess ->> 'uuid' = $1`,
 						queryValues: [id]
@@ -231,7 +231,7 @@ module.exports =async (req, res) => {
 						WHERE uuid = $2
 					;`, [ app_languages, id ])
 					.then(result => {
-						sessionupdate({
+						await sessionupdate({
 							conn: t,
 							whereClause: `sess ->> 'uuid' = $1`,
 							queryValues: [id]

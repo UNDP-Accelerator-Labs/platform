@@ -230,7 +230,7 @@ module.exports =async (req, res) => {
 
 						WHERE uuid = $2
 					;`, [ app_languages, id ])
-					.then(result => {
+					.then(async result => {
 						await sessionupdate({
 							conn: t,
 							whereClause: `sess ->> 'uuid' = $1`,

@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
-const { email: sendEmail, sessionupdate } = include("routes/helpers/");
+const { email: sendEmail, sessionupdate, removeSubdomain } = include("routes/helpers/");
 const { DB } = include("config/");
 
 exports.confirmEmail = async (_kwarg) => {
   const { uuid, email, name, old_email, req } = _kwarg;
 
   const { host } = req.headers || {};
-  const mainHost = host.split(".").slice(-2).join(".");
+  const mainHost = removeSubdomain(host);
   const protocol = req.protocol;
 
   const token = await jwt.sign(

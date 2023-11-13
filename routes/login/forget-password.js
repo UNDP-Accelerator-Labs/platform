@@ -1,4 +1,4 @@
-const sendEmail = require('../helpers').email
+const { email: sendEmail, removeSubdomain } = require('../helpers')
 const { DB } = include('config/')
 const { datastructures, sessionupdate } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
@@ -27,7 +27,7 @@ exports.forgetPassword = async (req, res, next) => {
     return;
   }
   const { host } = req.headers || {}
-  const mainHost = host.split(".").slice(-2).join(".");
+  const mainHost = removeSubdomain(host);
   const protocol = req.protocol
   // Generate JWT token
   const token = await jwt.sign(

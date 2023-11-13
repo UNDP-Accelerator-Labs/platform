@@ -1,5 +1,5 @@
 const { app_languages, modules, app_base_host, DB } = include('config/')
-const { datastructures, join } = include('routes/helpers/')
+const { datastructures, join, removeSubdomain } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode } = require('./device-info')
 
@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
-	const mainHost = host.split('.').slice(-2).join('.');
+	const mainHost = removeSubdomain(host);
 	console.log('TOKEN VERIFY', host, mainHost);
 	const { path, ip: ownIp } = req || {}
 

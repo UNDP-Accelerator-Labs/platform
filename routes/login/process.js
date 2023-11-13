@@ -1,4 +1,4 @@
-const { app_languages, modules, app_suite, DB } = include('config/')
+const { app_languages, modules, app_base_host, DB } = include('config/')
 const { datastructures, join } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode } = require('./device-info')
@@ -177,6 +177,7 @@ module.exports = (req, res, next) => {
 							)
 							.then(() => {
 								const sessionExpiration = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year from now
+								req.session.domain = app_base_host;
 								req.session.cookie.expires = sessionExpiration;
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 

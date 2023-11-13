@@ -92,8 +92,13 @@ exports.unpin = (req, res) => {
 					DELETE FROM pinboards
 					WHERE id = $1::INT
 						AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
-						AND owner = $2
+						AND (owner = $2 OR EXISTS (
+							SELECT 1 FROM pinboard_contributors pc
+							WHERE pc.pinboard = $1::INT 
+								AND pc.participant = $2
+						))
 				;`, [ board_id, uuid ])
+
 				const batch = []
 				batch.push(gt.any(retrievepins(object_id, uuid, ownId)));
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))

@@ -3,7 +3,7 @@ let {
   app_title,
   app_title_short,
   app_suite,
-  app_suite_url,
+  own_app_url,
   app_suite_secret,
   app_languages,
   app_description,
@@ -29,7 +29,12 @@ exports.app_id = app_id;
 exports.app_title = app_title;
 exports.app_title_short = app_title_short;
 exports.app_suite = app_suite;
-exports.app_suite_url = app_suite_url;
+exports.own_app_url = own_app_url;
+
+const base_host = 'sdg-innovation-commons.org';
+exports.app_base_host = base_host;
+exports.app_suite_url = `https://www.${base_host}/`;
+
 exports.app_suite_secret = app_suite_secret;
 exports.app_description = app_description;
 exports.app_storage = process.env.AZURE_STORAGE_CONNECTION_STRING

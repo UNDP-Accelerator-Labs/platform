@@ -9,7 +9,7 @@ exports.app_description =
   require('./translations.js').translations['app description'];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.app_suite_url = 'https://acclabs.azurewebsites.net/';
+exports.own_app_url = 'https://solutions.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
@@ -60,13 +60,11 @@ exports.metafields = [
   //   required: true,
   //   uris: [
   //     {
-  //       uri: 'https://acclabs-consent-archive.azurewebsites.net/api/join/file',
+  //       uri: 'https://consent.sdg-innovation-commons.org/api/join/file',
   //     },
   //     { uri: undefined },
   //   ],
   // }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
- 
-
 
   // { type: 'attachment', name: 'consent', required: true, uris: [ { uri: 'http://localhost:3000/api/join/file' }, { uri: undefined } ], limit: 1 } // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 
@@ -95,6 +93,18 @@ exports.metafields = [
     required: true,
     instruction: 'Signature',
   },
+  // {
+  //   type: 'attachment',
+  //   name: 'consent',
+  //   required: true,
+  //   uris: [
+  //     {
+  //       uri: 'http://localhost:2000/en/contribute/resource',
+  //     },
+  //     { uri: undefined },
+  //   ],
+  //   limit: 1,
+  // },
 ];
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']

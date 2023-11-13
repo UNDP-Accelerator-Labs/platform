@@ -7,7 +7,7 @@ module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
 	const { req, res } = kwargs || {}
-	
+
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
@@ -18,7 +18,7 @@ module.exports = async kwargs => {
 		const batch = []
 		// GET CONTRBIUTOR BREAKDOWN
 		// DEPENDING ON space, GET names OR COUNTRIES
-		
+
 		batch.push(t.task(t1 => {
 			const batch1 = []
 			// GET CONTRIBUTOR BREAKDOWN
@@ -44,7 +44,7 @@ module.exports = async kwargs => {
 
 					return contributors.length ? { contributors } : null
 				}).catch(err => console.log(err)))
-			} else if (['pinned', 'shared', 'public'].includes(space)) {
+			} else if (['pinned', 'shared', 'public', 'all'].includes(space)) {
 				if (metafields.some((d) => d.type === 'location')) {
 					batch1.push(t1.any(`
 						SELECT COUNT(DISTINCT(p.id))::INT, jsonb_agg(DISTINCT(p.id)) AS pads, l.iso3 AS id FROM pads p
@@ -57,7 +57,7 @@ module.exports = async kwargs => {
 					.then(async results => {
 						// JOIN LOCATION INFO
 						let countries = await join.locations(results, { language, key: 'id', name_key: 'name' })
-						
+
 						if (countries.length !== array.unique.call(countries, { key: 'name' }).length) {
 							console.log('equivalents: need to do something about countries that have equivalents')
 							countries = array.nest.call(countries, { key: 'name', keyname: 'name' })
@@ -77,7 +77,7 @@ module.exports = async kwargs => {
 								return obj
 							})
 						} else console.log('no equivalents: do nothing')
-						countries.sort((a, b) => a.name.localeCompare(b.name))
+						countries.sort((a, b) => a.name?.localeCompare(b.name))
 						return countries.length ? { countries } : null
 					}).catch(err => console.log(err)))
 				} else {
@@ -126,18 +126,18 @@ module.exports = async kwargs => {
 					}).catch(err => console.log(err)))
 				}
 			} else batch1.push(null)
-			
+
 			// GET TEMPLATE BREAKDOWN
 			if (modules.some(d => d.type === 'templates')) {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p 
-					INNER JOIN templates t 
+					SELECT COUNT (DISTINCT (p.id))::INT, t.id, t.title FROM pads p
+					INNER JOIN templates t
 						ON p.template = t.id
 					WHERE p.id NOT IN (SELECT review FROM reviews)
 						$1:raw
 					GROUP BY t.id
 				;`, [ f_space ]) // [ full_filters ])
-				.then(results => { 
+				.then(results => {
 					// THIS NEEDS SOME CLEANING FOR THE FRONTEND
 					const templates = results.map(d => {
 						const obj = {}
@@ -151,21 +151,21 @@ module.exports = async kwargs => {
 					return templates.length ? { templates } : null
 				}))
 			} else batch1.push(null)
-			
+
 			// GET MOBILIZATIONS BREAKDOWN
 			// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
 			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
 			// if (modules.some(d => d.type === 'mobilizations') && participations.length) {
 			if (modules.some(d => d.type === 'mobilizations')) {
 				batch1.push(t1.any(`
-					SELECT COUNT (DISTINCT (p.id))::INT, m.id, m.title AS name, start_date FROM pads p 
-					INNER JOIN mobilization_contributions mc 
+					SELECT COUNT (DISTINCT (p.id))::INT, m.id, m.title AS name, start_date FROM pads p
+					INNER JOIN mobilization_contributions mc
 						ON mc.pad = p.id
 					INNER JOIN mobilizations m
 						ON m.id = mc.mobilization
 					WHERE (m.id IN (
 						SELECT mobilization
-						FROM mobilization_contributors 
+						FROM mobilization_contributors
 							WHERE participant = $1
 					) OR m.owner = $1)
 						AND p.id NOT IN (SELECT review FROM reviews)
@@ -173,20 +173,20 @@ module.exports = async kwargs => {
 					GROUP BY m.id
 					ORDER BY m.start_date DESC
 				;`, [ uuid, f_space ]) // [ uuid, full_filters ])
-				.then(results => { 
+				.then(results => {
 					return results.length ? { mobilizations: results } : null
 				}))
 			} else batch1.push(null)
-			
+
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
 			.catch(err => console.log(err))
 		}).catch(err => console.log(err)))
-		
+
 		// GET TAGS, INDEXES, AND OTHER METAFILEDS BREAKDOWN
 		batch.push(t.task(t1 => {
 			const batch1 = []
-			
+
 			metafields.filter(d => ['tag', 'index'].includes(d.type))
 			.forEach(d => {
 				batch1.push(t1.any(`
@@ -198,7 +198,7 @@ module.exports = async kwargs => {
 						$2:raw
 					GROUP BY (tag_id, t.type)
 				;`, [ d.label, f_space ]) // [ d.label, full_filters ])
-				.then(async results => { 
+				.then(async results => {
 					const tags = await join.tags(results, [ language, 'id', d.label, d.type ])
 
 					if (d.type === 'index') {
@@ -209,7 +209,7 @@ module.exports = async kwargs => {
 						})
 						tags.sort((a, b) => a.key - b.key)
 					} else tags.sort((a, b) => a.name?.localeCompare(b.name))
-					
+
 					let obj = null
 					if (tags.length) {
 						obj = {}
@@ -235,7 +235,7 @@ module.exports = async kwargs => {
 						if (Number.isInteger(a?.id) && Number.isInteger(b?.id)) return a?.id - b?.id
 						else return a?.name?.localeCompare(b?.name)
 					})
-					
+
 					let obj = null
 					if (results.length) {
 						obj = {}

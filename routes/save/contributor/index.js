@@ -199,7 +199,7 @@ module.exports =async (req, res) => {
 				} else {
 					// UPDATE THE SESSION DATA
 					await t.one(`
-						SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+						SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
 						COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
 						CASE WHEN u.language IN ($1:csv)
@@ -222,7 +222,7 @@ module.exports =async (req, res) => {
 						AS collaborators
 
 						FROM users u
-						
+
 						LEFT JOIN adm0_subunits su
 							ON su.su_a3 = u.iso3
 						LEFT JOIN adm0

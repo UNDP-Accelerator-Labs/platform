@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<%
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+	const modules = locals.metadata.site.modules
+	const rights = locals.metadata.user.rights
+%>
+
+<head>
+
+<%- include ('../../partials/head.ejs') %>
+
+</head>
+
+<body>
+
+<%- include ('../../partials/translations.ejs') %>
+<%- include ('../../partials/menu-languages.ejs') %>
+<%- include ('../../partials/modals.ejs') %>
+
+<div class='main-content'>
+<header>
+	<div class='inner'>
+		<nav id='site-title'>
+			<div class='inner'>
+				<a href='/'>
+					<div class='logo-container'>
+						<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
+						<div class='filler'></div>
+					</div>
+				</a>
+
+				<h1 ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
+				<h2>
+					<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
+					<% } else { %><%- locals.metadata.user.country.name %><% } %>
+				</h2>
+			</div>
+		</nav>
+	</div>
+</header>
+<div class='browse'></div>
+<div class='sidebar lg xl xxl'></div>
+</div>
+
+<footer></footer>
+<%- include ('../../partials/footer.ejs') %>
+
+
+<script type='text/javascript'>
+	document.addEventListener('DOMContentLoaded', async evt => {
+		// CREATE MODAL
+		const headline = 'Select a resource.' // TO DO: TRANSLATE
+		const opts = []
+
+		const url = new URL(window.location)
+		const queryparams = new URLSearchParams(url.search)
+		const token = queryparams.get('token')
+
+		<% for (key in locals.data) { %>
+			<% if (locals.data[key].length) { %>
+
+				const <%- key %>_opts = <%- JSON.stringify(locals.data[key]) %>.map(d => {
+					return { 
+						label: `${d.title || d.name}${d.ownername ? `<div class="sub">${d.ownername}</div>` : ''}`, 
+						value: d.path || d.id, 
+						type: 'radio' 
+					}
+				})
+				opts.push({
+					node: 'select', 
+					name: '<%- key %>',
+					label: 'Select a <%- key.slice(0, -1) %>', // TO DO: TRANSLATE
+					options: <%- key %>_opts,
+					resolve: function (node) {
+						<% if (key === 'files') { %>
+							const src = node.value
+						<% } else { %>
+							const path = `/<%- language %>/view/<%- key.slice(0, -1) %>?id=${node.value}`
+							const src = new URL(path, url.origin).href
+						<% } %>
+
+						return new Promise(async resolve => {
+							resolve(window.location.replace(`/share/resource?token=${encodeURIComponent(token)}&src=${src}`))
+						})
+					}
+				})
+				<% if (['templates', 'pads'].includes(key)) { %>
+ 					opts.push({
+ 						node: 'div',
+ 						class: 'divider',
+ 						label: 'OR' // TO DO: TRANSLATE
+ 					})
+ 					<% if (locals.templates[key]?.length) { %>
+ 						const <%- key %>_template_opts = <%- JSON.stringify(locals.templates[key]) %>.map(d => {
+ 							return { 
+ 								label: `${d.title || d.name}${d.ownername ? `<div class="sub">${d.ownername}</div>` : ''}`, 
+ 								value: d.id, 
+ 								type: 'radio' 
+ 							}
+ 						})
+ 						<% 
+ 							let { write } = modules.find(d => d.type === key)?.rights
+ 							if (write) {
+	 							if (typeof write === 'object') write = write.blank
+	 							if (write <= rights) { 
+	 					%>
+	 								<%- key %>_template_opts.unshift({
+	 									label: '<%- vocabulary['blank pad'][language] %>', // TO DO: TRANSLATE
+	 									value: 'blank',
+	 									type: 'radio'
+	 								})
+ 						<% 
+ 								}
+ 							} 
+ 						%>
+
+ 						opts.push({
+ 							node: 'select', 
+ 							name: 'template-<%- key %>',
+ 							label: 'Create a new <%- key.slice(0, -1) %> (based on a template)', // TO DO: TRANSLATE
+ 							options: <%- key %>_template_opts,
+ 							resolve: function (node) {
+								if (node.value !== 'blank') window.location.replace(`/<%- language %>/contribute/<%- key.slice(0, -1) %>?template=${node.value}&token=${encodeURIComponent(token)}&action=publish_and_share`)
+								else window.location.replace(`/<%- language %>/contribute/<%- key.slice(0, -1) %>?token=${encodeURIComponent(token)}&action=publish_and_share`)
+ 							}
+ 						})
+ 					<% } else { %>
+	 					opts.push({
+							node: 'button',
+							type: 'button',
+							label: 'Create a new <%- key.slice(0, -1) %>', // TO DO: TRANSLATE
+							resolve: _ => {
+								window.location.replace(`/<%- language %>/contribute/<%- key.slice(0, -1) %>?token=${encodeURIComponent(token)}`)
+							}
+						})
+					<% } %>
+				<% } else if (key === 'files') { %>
+					opts.push({
+						node: 'div',
+						class: 'divider',
+						label: 'OR' // TO DO: TRANSLATE
+					})
+					opts.push({
+						node: 'input',
+						type: 'file',
+						name: 'pdf',
+						accept: 'application/pdf, image/*,', // EXTEND THIS TO ANY FILE
+						placeholder: 'Upload a new <%- key.slice(0, -1) %>', // TO DO: TRANSLATE
+						resolve: function (node) {
+							const formData = new FormData()
+							formData.append(this.name, node.files[0], node.files[0].name)
+
+							const form = {
+								action: '/upload/pdf',
+								method: 'POST',
+								data: formData
+							}
+
+							const storage_url = new URL(`<%- locals.metadata.site.app_storage %>`)
+							storage_url.pathname = `${storage_url.pathname}/${'/uploads/save'}`.replace(/\/\//g, '/')
+							 
+							return new Promise(async resolve => {
+								const res = await uploadFile(form, '<%- language %>')
+								if (res.every(d => d.status === 200)) {
+									const filepath = res[0].src
+									const storage_url = new URL(`<%- locals.metadata.site.app_storage %>`)
+									storage_url.pathname = `${storage_url.pathname}/${filepath}`.replace(/\/\//g, '/')
+									const src = new URL(storage_url.pathname, storage_url.origin).href
+
+									resolve(window.location.replace(`/share/resource?token=${encodeURIComponent(token)}&src=${src}`))
+								}
+							})
+							
+						}
+					})
+				<% } %>
+				<% if (key !== Object.keys(locals.data)[Object.keys(locals.data).length - 1]) { %>
+					opts.push({
+						node: 'div',
+						class: 'divider',
+						label: 'OR' // TO DO: TRANSLATE
+					})
+				<% } %>
+			<% } %>
+		<% } %>
+
+		const close = function () {
+			window.location.replace(`/share/resource?token=${encodeURIComponent(token)}`) // DO NOT PASS A RESOURCE, SO ESSENTIALLY CANCEL THE REQUEST
+		}
+
+		const mobilization = await renderPromiseModal({ headline, opts }, close)
+	})
+</script>
+</main>
+
+</body>
+</html>

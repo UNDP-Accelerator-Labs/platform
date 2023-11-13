@@ -1,14 +1,44 @@
 const { modules, DB } = include('config/')
-const { safeArr, DEFAULT_UUID } = include("routes/helpers")
+const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers')
+const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
+	const req_token = req.body.token || req.query.token || req.headers['x-access-token']
 	const { referer } = req.headers || {}
 	let { id, limit, status } = req.query || {}
 	if (!Array.isArray(id)) id = [id]
-
 	const { uuid, rights, collaborators } = req.session || {}
 
+	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
+
+	
+	let redirect = undefined
+	
+	if (req_token) {
+		const auth = jwt.verify(req_token, process.env.APP_SUITE_SECRET)
+		if (!auth) return res.json({ status: 403, message: 'The token is no longer valid.' })
+		else {
+			const { callback } = auth
+			if (callback?.referer && callback?.endpoint) {
+				const { referer: cb_referer, endpoint } = callback
+
+				const referer_url = new URL(referer)
+				const path = `/${language}/view/pad?id=${id}`
+				const src = new URL(path, referer_url.origin).href
+				
+				const res_token = jwt.sign({ uuid, callback, resource_path: src }, process.env.APP_SUITE_SECRET, { expiresIn: 15 * 60 }) // EXPIRES IN 15 MINUTES
+				
+				const { origin } = new URL(cb_referer)
+				const callbackurl = new URL(endpoint, origin)
+				const queryparams = new URLSearchParams(callbackurl.search)
+				queryparams.set('token', res_token)
+
+				redirect = `${callbackurl.href}?${queryparams.toString()}`
+
+			} else return res.json({ status: 403, message: 'There is no callback to the request.' })
+		}
+	}
 
 	// EXECUTE SQL
 	DB.conn.tx(t => {
@@ -53,7 +83,8 @@ module.exports = (req, res) => {
 
 		return t.batch(batch)
 		.then(_ => {
-			if (referer) res.redirect(referer)
+			if (redirect) res.redirect(redirect)
+			else if (referer) res.redirect(referer)
 			else res.redirect('/login')
 		}).catch(err => console.log(err))
 	})

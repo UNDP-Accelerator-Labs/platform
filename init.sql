@@ -168,11 +168,12 @@ CREATE TABLE extern_db (
     db VARCHAR(20) UNIQUE NOT NULL,
     url_prefix TEXT NOT NULL
 );
-INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://acclabs-actionlearningplans.azurewebsites.net/');
-INSERT INTO extern_db (db, url_prefix) VALUES ('exp', 'https://acclabs-experiments.azurewebsites.net/');
-INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://acclabs.azurewebsites.net/');
-INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://acclabs-solutionsmapping.azurewebsites.net/');
-INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://acclabs.azurewebsites.net/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('ap', 'https://learningplans.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('exp', 'https://experiments.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://www.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://solutions.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://blogs.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('consent', 'https://consent.sdg-innovation-commons.org/');
 
 CREATE TABLE pinboards (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,
@@ -347,7 +348,7 @@ CREATE TABLE public.trusted_devices (
   device_browser VARCHAR(255) NOT NULL,
   last_login TIMESTAMP with time zone NOT NULL,
   is_trusted BOOLEAN NOT NULL DEFAULT true,
-  session_sid VARCHAR(255) REFERENCES session(sid),
+  session_sid VARCHAR(255) REFERENCES session(sid) ON UPDATE CASCADE ON DELETE CASCADE,
   duuid1 UUID NOT NULL,
   duuid2 UUID NOT NULL,
   duuid3 UUID NOT NULL,

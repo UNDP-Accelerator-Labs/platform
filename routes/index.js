@@ -1,4 +1,4 @@
-const { app_title, app_title_short, app_storage, DB } = include('config/')
+const { app_title, app_title_short, app_storage, modules, DB } = include('config/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 // const format = require('./formatting.js')
@@ -262,13 +262,17 @@ exports.process.import = require('./import/').process
 /* =============================================================== */
 /* ====================== SAVING MECHANISMS ====================== */
 /* =============================================================== */
-exports.process.upload = (req, res) => {
+exports.process.upload = async (req, res) => {
 	const { uuid } = req.session || {}
 
 	const fls = req.files
 	const maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
+	// ESTABLISH THE CONNECTION TO AZURE
+	const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
+	// FIND OR CREATE THE CONTAINER
+	const containerClient = await createContainer(blobServiceClient)
 
-	const promises = fls.map(f => {
+	const promises = fls.map(async f => {
 		// TO DO: MOVE THIS DOWN TO THE if NO app_storage
 		const basedir = path.join(__dirname, `../public/uploads/`)
 		if (!fs.existsSync(basedir)) fs.mkdirSync(basedir)
@@ -290,10 +294,6 @@ exports.process.upload = (req, res) => {
 					const targetdir = path.join('uploads/', uuid)
 					const targetsmdir = path.join('uploads/sm/', uuid)
 
-					// ESTABLISH THE CONNECTION TO AZURE
-					const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
-					// FIND OR CREATE THE CONTAINER
-					const containerClient = await createContainer(blobServiceClient)
 					// SET UP BLOB OPTIONS
 					Jimp.read(source, async (err, image) => {
 						if (err) console.log(err)
@@ -307,11 +307,29 @@ exports.process.upload = (req, res) => {
 						await image.getBufferAsync(Jimp.MIME_PNG)
 						.then(async buffer => {
 							if (err) console.log(err)
+							let fileerror = false
+							
 							const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, `${f.filename}.png`))
 							const options = { blobHTTPHeaders: { blobContentType: Jimp.MIME_PNG } }
-
 							// const buffer = await fs.readFileSync(source)
 							await blobClient.uploadData(buffer, options)
+							.catch(err=> {
+								if(err){
+									fileerror = true;
+									console.log(err)
+								}
+							})
+
+							if(!fileerror && modules.some(d => d.type === 'files')){
+								const pathurl = `${app_storage}/${targetdir}/${f.filename}.png`
+								await DB.conn.one(`
+									INSERT INTO files (name, path, owner)
+									VALUES ($1, $2, $3)
+									RETURNING id
+								;`, [f.originalname, pathurl, uuid])
+								.catch(err => console.log(err))
+							}
+
 							console.log('should have written main file')
 						}).catch(err => console.log(err))
 
@@ -337,7 +355,6 @@ exports.process.upload = (req, res) => {
 							console.log('should have written small file')
 						}).catch(err => console.log(err))
 
-						console.log('should resolve now')
 						resolve({ status: 200, src: path.join(targetdir, `${f.filename}.png`), originalname: f.originalname, message: 'success' })
 						console.log('failed resolve')
 					})
@@ -399,19 +416,42 @@ exports.process.upload = (req, res) => {
 					resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
 				})
 			} else if (f.mimetype.includes('application/pdf')) {
-				const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+				const targetdir = path.join('uploads/', uuid)
+				const filename = `${f.filename}.pdf`
+				let fileerror = false
 
-				DB.conn.one(`
-					INSERT INTO files (name, path, contributor)
-					SELECT $1, $2, id FROM contributors WHERE uuid = $3
-					RETURNING id
-				;`, [f.originalname, `/${target.split('public/')[1]}`, uuid])
-				.then(result => {
-					if (result) {
-						fs.renameSync(source, target)
-						resolve({ status: 200, src: target.split('public/')[1], originalname: f.originalname, message: 'success' })
-					} else resolve({ status: 403, message: 'file was not properly stored' })
-				}).catch(err => console.log(err))
+				if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
+					const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, filename))
+					const buffer = await fs.readFileSync(source)
+					await blobClient.uploadData(buffer)
+					.catch(err=> {
+						if(err){
+							fileerror = true;
+							console.log(err)
+						}
+					})
+
+					if(!fileerror && modules.some(d => d.type === 'files')){
+						const pathurl = `${app_storage}/${targetdir}/${filename}`
+						DB.conn.one(`
+							INSERT INTO files (name, path, owner)
+							VALUES ($1, $2, $3)
+							RETURNING id
+						;`, [f.originalname, pathurl, uuid])
+						.then(result => {
+							if (result) {
+								fs.unlinkSync(source)
+								resolve({ status: 200, src: path.join(targetdir, filename), originalname: f.originalname, message: 'success' })
+							} else resolve({ status: 403, message: 'file was not properly stored' })
+						}).catch(err => console.log(err))
+					} else {
+						fs.unlinkSync(source)
+						resolve({ status: 403, ftype: f.mimetype, message: 'file upload failed.' })
+					}
+				} else {
+					// TO DO: HANDLE CASE WHEN THERE IS NO BLOB STORAGE WITH if (app_storage)
+					resolve({ status: 403, message: 'Sorry, storage on the server is not currently handled.' })
+				}
 			} else {
 				fs.unlinkSync(source)
 				resolve({ status: 403, ftype: f.mimetype, message: 'wrong file format' })
@@ -431,8 +471,6 @@ async function createContainer (blobServiceClient, uuid) {
 	const createContainerResponse = await containerClient.createIfNotExists({ access: 'blob' })
 	return containerClient
 }
-
-
 
 // THIS IS NOT BEING USED NOW
 exports.process.screenshot = (req, res) => {

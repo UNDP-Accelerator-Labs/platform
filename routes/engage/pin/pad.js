@@ -59,8 +59,10 @@ exports.pin = (req, res) => {
 		if (object_id) {
 			return DB.general.tx(gt => {
 				return ownDB().then(async ownId => {
-					await gt.none(insertpads(board_id, object_id, mobilization, ownId));
-					await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
+					if(await can_inserts(gt, board_id, uuid)){
+						await gt.none(insertpads(board_id, object_id, mobilization, ownId));
+						await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
+					}
 					const batch = [];
 					batch.push(gt.any(retrievepins(object_id, uuid, ownId)))
 					// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -222,3 +224,12 @@ function retrievepinboards (_owners, ownId) {
 		GROUP BY p.id
 	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])
 }
+
+async function can_inserts (t, id, uuid) {
+	return t.oneOrNone(`
+			SELECT TRUE AS bool FROM pinboard_contributors pc
+			WHERE pc.pinboard = $1::INT
+			AND pc.participant = $2`,
+		[id, uuid], d => d?.bool)
+}
+

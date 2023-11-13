@@ -9,6 +9,8 @@
 	const currentpage_query = new URLSearchParams(currentpage_url.search)
 	if (excerpt?.p) currentpage_query.append('ogp', true)
 	const querylength = [...new Set(currentpage_query.keys())].length
+	const fullHost = `${currentpage_url.origin}`;
+	const mainHost = fullHost.endsWith('azurewebsites.net') ? fullHost : fullHost.split('.').slice(-2).join('.');
 	const url = `${currentpage_url.origin}${currentpage_url.pathname}${querylength ? `?${currentpage_query.toString()}` : ''}`
 
 	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || ''; //COUNTRY INSTANCE TITLE OR COLLECTION TITLE
@@ -93,9 +95,10 @@
 	var languages= ('<%= languages.map(p=> p.language) %>').split(',');
 
 	function setCookie(key, value, expiry) {
-	  var expires = new Date();
+	  const expires = new Date();
 	  expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
-	  document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+	  const domain = '<%= mainHost %>';
+	  document.cookie = `${key}=${value};expires=${expires.toUTCString()};domain=${domain}`;
 	}
 	function googleTranslateElementInit() {
 		setCookie('GoogleAccountsLocale_session', `${languageAlias}`);

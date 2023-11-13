@@ -9,7 +9,7 @@ exports.app_description =
   require('./translations.js').translations['app description'];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.app_suite_url = 'https://acclabs.azurewebsites.net/';
+exports.own_app_url = 'https://experiments.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [

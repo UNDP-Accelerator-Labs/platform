@@ -2,11 +2,19 @@
 global.include = (path) => require(`${__dirname}/${path}`);
 global.rootpath = __dirname;
 
-const { app_id, app_suite, app_suite_secret, DB, csp_links } =
-  include('config/');
+const {
+  app_id,
+  app_suite,
+  own_app_url,
+  app_suite_secret,
+  DB,
+  csp_links,
+  app_base_host,
+} = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const bodyparser = require('body-parser');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
@@ -30,8 +38,12 @@ app.use(
         'script-src-attr': ["'unsafe-inline'"],
         'style-src': csp_links,
         'connect-src': csp_links,
-        "frame-src": ["'self'","https://www.youtube.com/","https://youtube.com/","https://web.microsoftstream.com"]
-
+        'frame-src': [
+          "'self'",
+          'https://www.youtube.com/',
+          'https://youtube.com/',
+          'https://web.microsoftstream.com',
+        ],
       },
     },
     referrerPolicy: {
@@ -59,6 +71,7 @@ app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 app.use(xss());
 
 const cookie = {
+  domain: process.env.NODE_ENV === 'production' ? app_base_host : undefined,
   httpOnly: true, // THIS IS ACTUALLY DEFAULT
   secure: process.env.NODE_ENV === 'production',
   maxAge: 1 * 1000 * 60 * 60 * 24 * 1, // DEFAULT TO 1 DAY. UPDATE TO 1 YEAR FOR TRUSTED DEVICES
@@ -77,6 +90,41 @@ const sessionMiddleware = session({
 
 app.use(sessionMiddleware);
 app.use(cookieParser(`${app_suite}-${app_suite_secret}-pass`));
+
+function redirectOldUrl(req, res, next) {
+  const hostname = req.get('host');
+  if (
+    hostname === 'acclabs-staging.azurewebsites.net' ||
+    !hostname.endsWith('azurewebsites.net')
+  ) {
+    return next();
+  }
+  if (req.originalUrl.startsWith('/apis/')) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  const newbase = own_app_url.replace(/\/+$/g, '');
+  const { session, ip } = req;
+  const { uuid, rights } = session;
+  const origUrl = encodeURIComponent(req.originalUrl);
+  if (uuid) {
+    const token = jwt.sign({ uuid, rights, ip }, process.env.APP_SECRET, {
+      audience: 'user:known',
+      issuer: app_base_host,
+      expiresIn: '1h',
+    });
+    console.log(
+      `WRAPPING USER uuid:${uuid} rights:${rights} ` +
+        `ip:${ip} url:${req.originalUrl}`,
+    );
+    return res.redirect(
+      307,
+      `${newbase}/transfer?path=${origUrl}&token=${token}`,
+    );
+  }
+  return res.redirect(301, `${newbase}${req.originalUrl}`);
+}
+
+app.use(redirectOldUrl);
 
 function setAccessControlAllowOrigin(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');

@@ -151,4 +151,12 @@ exports.limitLength = (text, limit) => {
 		return text;
 	}
 	return `${arr.slice(0, limit - 1).join('')}…`;
-}
+};
+
+exports.removeSubdomain = (hostname) => {
+	const host = `${hostname}`;
+	if (host.endsWith('azurewebsites.net')) {
+		return host;
+	}
+	return host.split(".").slice(-2).join(".");
+};

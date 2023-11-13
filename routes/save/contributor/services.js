@@ -1,17 +1,18 @@
 const jwt = require("jsonwebtoken");
-const { email: sendEmail, sessionupdate } = include("routes/helpers/");
+const { email: sendEmail, sessionupdate, removeSubdomain } = include("routes/helpers/");
 const { DB } = include("config/");
 
 exports.confirmEmail = async (_kwarg) => {
   const { uuid, email, name, old_email, req } = _kwarg;
 
   const { host } = req.headers || {};
+  const mainHost = removeSubdomain(host);
   const protocol = req.protocol;
 
   const token = await jwt.sign(
     { email, uuid, name, old_email, action: "confirm-email" },
     process.env.APP_SECRET,
-    { expiresIn: "1h", issuer: host }
+    { expiresIn: "1h", issuer: mainHost }
   );
 
   const confirmationLink = `${protocol}://${host}/confirm-email/${token}`;
@@ -81,7 +82,7 @@ exports.updateNewEmail = async (req, res, next) => {
         .tx(async (t) => {
           await t.none(
             `
-            UPDATE users 
+            UPDATE users
             SET email = $1
             WHERE uuid = $2
         `,

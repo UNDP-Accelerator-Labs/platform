@@ -39,20 +39,6 @@ module.exports = async (req, res) => {
 					// locations
 				] = results
 
-				// IF SDG TAGS ARE USED, GO FETCH THE NAME AND DETAILS FROM THE SOlUTIONS MAPPING PLATFORM
-				// await new Promise(resolve => {
-				// 	if (filters_menu.sdgs.length) {
-				// 		fetch(`https://undphqexoacclabsapp01.azurewebsites.net/api/sdgs?lang=${language}`)
-				// 			.then(response => response.json())
-				// 			.then(sdgs => {
-				// 				filters_menu.sdgs.forEach(d => {
-				// 					d.tag_name = sdgs.find(s => +s.key === +d.tag_id)?.name
-				// 				})
-				// 				resolve()
-				// 			}).catch(err => console.log(err))
-				// 	} else resolve()
-				// })
-
 				return {
 					metadata : {
 						site: {

@@ -183,7 +183,7 @@
 						<% } %>
 						<form method='GET' action='/publish/<%- `${object}s` %>'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
-							<% 
+							<%
 								const currentpage_url = new URL(locals.metadata.page.currentpage_url)
 								const queryparams = new URLSearchParams(currentpage_url.search)
 								const token = queryparams.get('token')

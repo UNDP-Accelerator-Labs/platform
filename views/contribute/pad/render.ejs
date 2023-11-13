@@ -577,7 +577,7 @@ function populateSection (data, lang = 'en', section) {
 		if (data.type === 'radiolist') addRadiolist({ data, lang, section })
 		// META
 		if (data.type === 'location') addLocations({ data, lang, section })
-		if (data.type === 'index') await addIndexes({ data, lang, section })
+		if (data.type === 'index') addIndexes({ data, lang, section })
 		if (data.type === 'tag') addTags({ data, lang, section })
 		if (data.type === 'attachment') addAttachment({ data, lang, section })
 		// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM

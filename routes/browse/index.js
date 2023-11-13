@@ -14,14 +14,14 @@ module.exports = async (req, res) => {
 
 	if (modules.some(d => d.type === object)) {
 		if (!xhr) {
-			if (object === 'pads') pads.render(req, res)
-			else if (object === 'templates') templates.render(req, res)
-			else if (object === 'files') files.render(req, res)
-			else if (object === 'reviews') reviews.render(req, res)
+			if (object === 'pads') await pads.render(req, res)
+			else if (object === 'templates') await templates.render(req, res)
+			else if (object === 'files') await files.render(req, res)
+			else if (object === 'reviews') await reviews.render(req, res)
 			else if (object === 'mobilizations') mobilizations.render(req, res)
 			else if (object === 'contributors') contributors.render(req, res)
 		} else { // AJAX CALL
-			let data 
+			let data
 			if (object === 'pads') data = await pads.load({ req })
 			else if (object === 'templates') data = await templates.load({ req })
 			else if (object === 'files') data = await files.load({ req })
@@ -31,6 +31,6 @@ module.exports = async (req, res) => {
 			res.status(200).json(data)
 		}
 	} else if (instance) {
-		pads.render(req, res)
+		await pads.render(req, res)
 	} else res.redirect('/module-error')
 }

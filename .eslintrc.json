@@ -16,5 +16,27 @@
     "require-jsdoc": "off"
   },
   "plugins": ["ejs-js"],
-  "ignorePatterns": ["/public/*", "/routes/*", "/views/*"]
+  "ignorePatterns": [
+    "/public/*",
+    "/routes/accept/*",
+    "/routes/browse/*",
+    "/routes/check/*",
+    "/routes/contribute/*",
+    "/routes/delete/*",
+    "/routes/engage/*",
+    "/routes/forward/*",
+    "/routes/helpers/*",
+    "/routes/import/*",
+    "/routes/login/*",
+    "/routes/logout/*",
+    "/routes/mobilize/*",
+    "/routes/print/*",
+    "/routes/publish/*",
+    "/routes/redirect/*",
+    "/routes/request/*",
+    "/routes/save/*",
+    "/routes/scripts/*",
+    "/routes/share/*",
+    "/views/*"
+  ]
 }

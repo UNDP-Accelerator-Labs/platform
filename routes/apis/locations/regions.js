@@ -2,7 +2,7 @@ const { DB } = include('config/')
 const { checklanguage } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	let { countries, regions } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	const { countries, regions } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	let filters = []

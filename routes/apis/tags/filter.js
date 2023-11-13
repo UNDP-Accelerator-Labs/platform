@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
 					return t.batch(batch)
 					.then(results => {
 						const [ su_a3, adm_a3 ] = results
-						let locations = su_a3.concat(adm_a3)
+						const locations = su_a3.concat(adm_a3)
 						return locations
 					}).catch(err => console.log(err))
 				}).then(results => DB.pgp.as.format(`t.pad IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ safeArr(results.map(d => d.iso3), DEFAULT_UUID) ]))

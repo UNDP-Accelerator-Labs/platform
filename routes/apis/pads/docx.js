@@ -90,7 +90,7 @@ module.exports = async (req, res) => {
 		}
 
 		// TO DO: PROBABLY ONLY USE ONE SECTION BECUSE IN WORD, NEW SECTIONS FORCE PAGE BREAKS THAT CANNOT BE REMOVED EASILY
-		let sections = await Promise.all(data.map(async d => {
+		const sections = await Promise.all(data.map(async d => {
 			return new Promise(async resolve => {
 				const arr = []
 				if (d.key) {
@@ -620,7 +620,7 @@ module.exports = async (req, res) => {
 					})
 				} else {
 					// var zip = spawn('zip',[ '-P', pw, 'archive.zip', path.relative(basedir, `${app_title_short}.docx`) ], { cwd: basedir })
-					var zip = spawn('zip',[ '-P', pw, 'archive.zip', `${app_title_short}.docx` ], { cwd: basedir })
+					const zip = spawn('zip',[ '-P', pw, 'archive.zip', `${app_title_short}.docx` ], { cwd: basedir })
 					// zip.stdin.on('data', (data) => { console.log(`stdin: ${data}`) })
 					zip.stdout.on('data', data => console.log(`stdout: ${data}`))
 					zip.stderr.on('data', data => console.log(`stderr: ${data}`))

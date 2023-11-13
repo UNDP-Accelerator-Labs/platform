@@ -1,4 +1,4 @@
-const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
+const { followup_count, modules, engagementtypes, metafields, DB } = include('config/')
 const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
@@ -252,7 +252,7 @@ async function check_authorization (_kwargs) {
 
 	const { rights: modulerights, publish } = modules.find(d => d.type === 'pads') || {}
 	let { read, write } = modulerights || {}
-	
+
 	if (typeof write === 'object') {
 		if (!id && template) write = write.templated
 		else if (id) {

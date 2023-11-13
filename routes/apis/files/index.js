@@ -1,4 +1,4 @@
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
 	const { filepath } = req.query || {}
 	if (filepath) res.sendFile(filepath)
 	else res.status(400).json({ message: 'Missing file path.' })
@@ -13,7 +13,7 @@ module.exports = (req, res) => {
 	// 		results = results.map(d => d.uuid)
 	// 		// ADD PLATFORM REQUEST KEYS
 	// 		results.push(process.env.ACCLAB_PLATFORM_KEY)
-			
+
 	// 		const auth = results.map(d => {
 	// 			try {
 	// 				return jwt.verify(token, d)
@@ -21,7 +21,7 @@ module.exports = (req, res) => {
 	// 				return null
 	// 			}
 	// 		}).filter(d => d)?.[0]
-			
+
 	// 		if (auth?.authorization?.includes('api')) {
 	// 			const { filepath } = req.query || {}
 

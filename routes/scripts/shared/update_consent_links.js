@@ -42,6 +42,7 @@ DB.conn.tx(t => {
 		// IF THERE ARE MORE OR LESS PADS THAN CONSENT STORED
 		// FIX THE ISSUE
 		if (pads_with_consent.unique('id', true).length !== consent.filter(d => d.value.includes('https://acclabs-consent-archive.azurewebsites.net')).unique('pad', true).length) {
+			console.log('different number of pads with consent and values stored in the metafields table')
 			console.log(pads.length)
 			console.log(consent.filter(d => d.value.includes('https://acclabs-consent-archive.azurewebsites.net')).length)
 			console.log(pads_with_consent.map(d => d.id).length)
@@ -61,12 +62,13 @@ DB.conn.tx(t => {
 					c.items.forEach(b => {
 						if (b.name === 'consent') {
 							console.log(d.id, b)
+							console.log('consent equivalent')
 							console.log(consent.find(a => a.pad === d.id))
 						}
 					})
 				})
 			})
-			return false
+			return 'different number of pads with consent and values stored in the metafields table'
 		} else {
 			return t.any(`
 				SELECT * FROM
@@ -100,6 +102,7 @@ DB.conn.tx(t => {
 							obj.pad = d.pad
 
 							if (!archive_datum) {
+								console.log('no corresponding archive')
 								console.log('missing:')
 								console.log(d.value)
 								console.log('\n')
@@ -108,6 +111,7 @@ DB.conn.tx(t => {
 								const corresponding_user = users.find(c => c.email === archive_datum.email || c.name === archive_datum.username)
 							
 								if (!corresponding_user) {
+									console.log('no corresponding user')
 									console.log(d.value)
 									console.log(archive_datum)
 									console.log(corresponding_user)
@@ -135,7 +139,9 @@ DB.conn.tx(t => {
 					const update_paths = new_consent_paths.filter(d => d.value)
 
 					// DOUBLE CHECK THAT WE HAVE THE SAME NUMBER OF PADS AND NEW CONSENT PATHS
-					if (update_paths.unique('pad', true).length === pads_with_consent.unique('id', true).length) {
+					console.log('outer')
+					if (update_paths.length && update_paths.unique('pad', true).length === pads_with_consent.unique('id', true).length) {
+						console.log('inner')
 						// UPDATE THE metafields TABLE
 						const update = `${DB.pgp.helpers.update(update_paths, ['?id', '?pad', 'value'], 'metafields')} WHERE v.id = t.id AND v.pad = t.pad`
 						return t.none(update)
@@ -149,21 +155,30 @@ DB.conn.tx(t => {
 											b.srcs = b.srcs.map(a => {
 												if (updates.some(z => z.or_value === a)) {
 													return updates.find(z => z.or_value === a).value
-												} else return a
+												} else {
+													console.log('not changing here')
+													console.log(a)
+													console.log(updates)
+													console.log('\n')
+
+													return a
+												}
 											})
 										}
 									})
 								})
 								return t.none(`UPDATE pads SET sections = $1::jsonb WHERE id = $2;`, [ JSON.stringify(d.sections), d.id ])
+								// return 'all ok'
 							})).catch(err => console.log(err))
 						}).catch(err => console.log(err))
-					} else return false
+					} else return 'diffrent number of pads and new consent urls'
 
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err))
 		}
 	}).catch(err => console.log(err))
 }).then(results => {
+	// console.log(results)
 	console.log('done')
 }).catch(err => console.log(err))
 

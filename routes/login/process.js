@@ -1,5 +1,5 @@
-const { app_languages, modules, app_suite, DB } = include('config/')
-const { datastructures, join } = include('routes/helpers/')
+const { app_languages, modules, app_base_host, DB } = include('config/')
+const { datastructures, join, removeSubdomain } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode } = require('./device-info')
 
@@ -7,6 +7,8 @@ module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
+	const mainHost = removeSubdomain(host);
+	console.log('TOKEN VERIFY', host, mainHost);
 	const { path, ip: ownIp } = req || {}
 
 	const { __ucd_app, __puid, __cduid } = req.cookies
@@ -15,7 +17,7 @@ module.exports = (req, res, next) => {
 		// VERIFY TOKEN
 		let tobj;
 		try {
-			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: host })
+			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: mainHost })
 		} catch(_) {
 			tobj = {};
 			if (redirectPath) {
@@ -23,6 +25,7 @@ module.exports = (req, res, next) => {
 				return;
 			}
 		}
+		console.log('TOKEN VERIFY TOBJ', tobj);
 		const { uuid, rights, ip, acceptedorigins } = tobj;
 
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
@@ -33,7 +36,7 @@ module.exports = (req, res, next) => {
 			DB.general.tx(t => {
 				// GET USER INFO
 				return t.oneOrNone(`
-					SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+					SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
 					COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
 					CASE WHEN u.language IN ($1:csv)
@@ -56,7 +59,7 @@ module.exports = (req, res, next) => {
 					AS collaborators
 
 					FROM users u
-					
+
 					LEFT JOIN adm0_subunits su
 						ON su.su_a3 = u.iso3
 					LEFT JOIN adm0
@@ -89,7 +92,7 @@ module.exports = (req, res, next) => {
 	} else {
 		const { username, password, originalUrl, is_trusted } = req.body || {}
 		const { sessionID: sid } = req || {}
-		
+
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
 			res.redirect('/login')
@@ -97,7 +100,7 @@ module.exports = (req, res, next) => {
 			DB.general.tx(t => {
 				// GET USER INFO
 				return t.oneOrNone(`
-					SELECT u.uuid, u.rights, u.name, u.email, u.iso3, 
+					SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
 					COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
 
 					CASE WHEN u.language IN ($1:csv)
@@ -120,7 +123,7 @@ module.exports = (req, res, next) => {
 					AS collaborators
 
 					FROM users u
-					
+
 					LEFT JOIN adm0_subunits su
 						ON su.su_a3 = u.iso3
 					LEFT JOIN adm0
@@ -139,7 +142,7 @@ module.exports = (req, res, next) => {
 					// JOIN LOCATION INFO
 					result = await join.locations(result, { connection: t, language, key: 'iso3', name_key: 'countryname' })
 					const device = deviceInfo(req)
-					
+
 					let redirecturl;
 					if (redirectPath) {
 						redirecturl = redirectPath
@@ -153,11 +156,11 @@ module.exports = (req, res, next) => {
 					}
 					// CHECK IF DEVICE IS TRUSTED
 					return t.oneOrNone(`
-						SELECT * FROM trusted_devices 
-						WHERE user_uuid = $1 
-						AND device_os = $2 
-						AND device_browser = $3 
-						AND device_name = $4 
+						SELECT * FROM trusted_devices
+						WHERE user_uuid = $1
+						AND device_os = $2
+						AND device_browser = $3
+						AND device_name = $4
 						AND duuid1 = $5
 						AND duuid2 = $6
 						AND duuid3 = $7
@@ -169,14 +172,15 @@ module.exports = (req, res, next) => {
 							// Device is trusted, update last login info
 							return t.none(`
 								UPDATE trusted_devices SET last_login = $1, session_sid = $5
-								WHERE user_uuid = $2 
-								AND device_os = $3 
+								WHERE user_uuid = $2
+								AND device_os = $3
 								AND device_browser = $4`,
 								[new Date(), result.uuid, device.os, device.browser, sid]
 							)
 							.then(() => {
 								const sessionExpiration = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year from now
-								req.session.cookie.expires = sessionExpiration; 
+								req.session.domain = app_base_host;
+								req.session.cookie.expires = sessionExpiration;
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 
 								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}}
@@ -195,7 +199,7 @@ module.exports = (req, res, next) => {
 									name: result.name, email: result.email, uuid: result.uuid, conn: t, req
 								})
 								.then(()=>{
-									req.session.confirm_dev_origins = {	
+									req.session.confirm_dev_origins = {
 										redirecturl,
 										...result,
 									}
@@ -209,8 +213,8 @@ module.exports = (req, res, next) => {
 							}
 						}
 					})
-					
-					
+
+
 				}
 			}).catch(err => console.log(err))
 		}).catch(err => res.redirect('/module-error'))

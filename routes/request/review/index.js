@@ -1,7 +1,7 @@
 const { fork } = require('child_process')
 const path = require('path')
 
-const { app_title, modules, DB } = include('config/')
+const { app_title, modules, DB, own_app_url } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -25,7 +25,7 @@ module.exports = (req, res) => {
 					to: d.email,
 					bcc: 'myjyby@gmail.com',
 					subject: `[${app_title}] Request for review`,
-					html: `You are invited to review the submission entitled ${title} on the ${app_title} platform. Please navigate <a href="https://acclabs-experimenters.azurewebsites.net/en/browse/reviews/pending">here</a> to accept of decline the review.`
+					html: `You are invited to review the submission entitled ${title} on the ${app_title} platform. Please navigate <a href="${own_app_url}/en/browse/reviews/pending">here</a> to accept of decline the review.`
 				})
 			}
 		})

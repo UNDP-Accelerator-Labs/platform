@@ -70,23 +70,21 @@ DB.conn.tx(t => {
 			})
 			return 'different number of pads with consent and values stored in the metafields table'
 		} else {
-			return t.any(`
-				SELECT * FROM
-				dblink(
-					'host=$1:raw port=$2:raw dbname=$3:raw user=$4:raw password=$5:raw sslmode=require', 
-					'SELECT f.path, u.uuid, u.name AS username, u.email 
-						FROM files f 
-						INNER JOIN contributors u 
-							ON u.id = f.contributor
-				') AS t(path text, uuid uuid, username text, email text)
-			;`, [ 
-				process.env.CONSENT_DB_HOST, 
-				process.env.CONSENT_DB_PORT,
-				process.env.CONSENT_DB_NAME,
-				process.env.CONSENT_DB_USERNAME,
-				process.env.CONSENT_DB_PASSWORD
-			])
-			.then(archive_data => {
+			const archive_conn = {
+			  database: process.env.CONSENT_DB_NAME,
+			  port: process.env.CONSENT_DB_PORT,
+			  host: process.env.CONSENT_DB_HOST,
+			  user: process.env.CONSENT_DB_USERNAME,
+			  password: process.env.CONSENT_DB_PASSWORD,
+			  ssl: true,
+			};
+
+			return DB.pgp(archive_conn).any(`
+				SELECT f.path, u.uuid, u.name AS username, u.email 
+				FROM files f 
+				INNER JOIN contributors u 
+					ON u.id = f.contributor
+			;`).then(archive_data => {
 				return DB.general.any(`
 					SELECT uuid, name, email FROM users
 					WHERE name IN ($1:csv)

@@ -139,8 +139,9 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 			WHERE pinboard = $1::INT
 				AND pad IN ($2:csv)
 				AND pinboard IN (
-					SELECT id FROM pinboards
-					WHERE owner = $3
+					SELECT p.id FROM pinboards p
+					LEFT JOIN pinboard_contributors pc ON p.id = pc.pinboard
+					WHERE p.owner = $3 OR pc.participant = $3
 				)
 				AND db = $4
 				AND is_included = true

@@ -89,14 +89,14 @@ exports.unpin = (req, res) => {
 				// we ignore the db and is_included fields here so we don't delete pinboards if the only
 				// pads of the board are on a different database or ignored
 				await gt.none(`
-					DELETE FROM pinboards
-					WHERE id = $1::INT
-						AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
-						AND (owner = $2 OR EXISTS (
-							SELECT 1 FROM pinboard_contributors pc
-							WHERE pc.pinboard = $1::INT 
-								AND pc.participant = $2
-						))
+				DELETE FROM pinboards 
+				WHERE id IN (
+					SELECT p.id FROM pinboards p
+					LEFT JOIN pinboard_contributors pc ON p.id = pc.pinboard
+					WHERE p.id = $1::INT
+					AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
+					AND pc.participant = $2
+				)				
 				;`, [ board_id, uuid ])
 
 				const batch = []
@@ -146,7 +146,7 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 				AND pinboard IN (
 					SELECT p.id FROM pinboards p
 					LEFT JOIN pinboard_contributors pc ON p.id = pc.pinboard
-					WHERE p.owner = $3 OR pc.participant = $3
+					WHERE pc.participant = $3
 				)
 				AND db = $4
 				AND is_included = true

@@ -69,6 +69,11 @@ module.exports = async kwargs => {
 			SELECT COUNT (DISTINCT (t.id))::INT FROM templates t
 			WHERE t.status = 3
 		;`, [], d => d.count).then(d => { return { public: d } }))
+		// GET ALL PUBLISHED TEMPLATES COUNT
+		batch.push(t.one(`
+			SELECT COUNT (DISTINCT (t.id))::INT FROM templates t
+			WHERE t.status >= 2
+		;`, [], d => d.count).then(d => { return { all: d } }))
 		// GET A COUNT OF CONTRBIUTORS: NOTE THIS IS NOT USED FOR NOW
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (t.owner))::INT FROM templates t

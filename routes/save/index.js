@@ -5,6 +5,7 @@ const pad = require('./pad/')
 const template = require('./template/')
 const review = require('./review/')
 const file = require('./file/')
+const resource = require('./resource/')
 
 module.exports = (req, res) => {
 	const { object } = req.params || {}
@@ -17,5 +18,6 @@ module.exports = (req, res) => {
 	else if (object === 'template') template(req, res)
 	else if (object === 'review') review(req, res)
 	else if (object === 'file') file(req, res)
+	else if (object === 'resource') resource(req, res)
 	else res.redirect('/module-error')
 }

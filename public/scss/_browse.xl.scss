@@ -1474,6 +1474,10 @@ div.browse {
 										font-weight: bold;
 										cursor: pointer;
 
+										span {
+											word-wrap: break-word;
+										}
+
 										img {
 											vertical-align: text-bottom;
 											width: 30px;

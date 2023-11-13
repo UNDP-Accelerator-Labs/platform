@@ -259,7 +259,10 @@ app.get(
 
 app.post('/check/:object', routes.check.login, routes.process.check);
 
-app.post('/save/:object', routes.check.login, routes.process.save);
+app
+  .route('/save/:object')
+  .get(routes.check.login, routes.process.save)
+  .post(routes.check.login, routes.process.save);
 app.post('/pin', routes.check.login, routes.process.pin);
 app.post('/engage', routes.check.login, routes.process.engage);
 app.post('/comment', routes.check.login, routes.process.comment);
@@ -312,7 +315,9 @@ app
   .get(routes.check.login, routes.process.publish)
   .post(routes.check.login, routes.process.publish);
 app.get('/unpublish/:object', routes.check.login, routes.process.unpublish);
-app.post('/share/:object', routes.check.login, routes.process.share);
+app.route('/share/:object')
+  .get(routes.check.login, routes.process.share)
+  .post(routes.check.login, routes.process.share);
 app.get('/forward/:object', routes.check.login, routes.process.forward);
 app.get('/delete/:object', routes.check.login, routes.process.delete);
 

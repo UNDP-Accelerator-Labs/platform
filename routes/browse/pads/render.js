@@ -1,4 +1,4 @@
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, welcome_module, ownDB, DB } = include('config/')
 const { array, datastructures, checklanguage, join, parsers, pagestats } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
@@ -291,6 +291,7 @@ module.exports = async (req, res) => {
 				shared: statistics.shared,
 				reviewing: statistics.reviewing,
 				public: statistics.public,
+				all: statistics.all, // all IS ALL PUBLISHED
 
 				displayed: data.count,
 				breakdown: statistics.filtered,

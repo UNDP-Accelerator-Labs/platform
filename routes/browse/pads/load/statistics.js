@@ -108,6 +108,13 @@ module.exports = async kwargs => {
 				AND p.id NOT IN (SELECT review FROM reviews)
 		;`, [], d => d.count).then(d => { return { public: d } })
 		.catch(err => console.log(err)))
+		// GET ALL PUBLISHED PADS COUNT
+		batch.push(t.one(`
+			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
+			WHERE p.status >= 2
+				AND p.id NOT IN (SELECT review FROM reviews)
+		;`, [], d => d.count).then(d => { return { all: d } })
+		.catch(err => console.log(err)))
 		// GET A COUNT OF CONTRBIUTORS
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (p.owner))::INT FROM pads p

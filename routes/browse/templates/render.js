@@ -42,7 +42,8 @@ module.exports = async (req, res) => {
 					private: statistics.private,
 					curated: statistics.curated,
 					shared: statistics.shared,
-					public: statistics.public, 
+					public: statistics.public, // PUBLIC IS NOT SET UP FOR TEMPLATES
+					all: statistics.all, // all IS ALL PUBLISHED
 					
 					displayed: data.count,
 					breakdown: statistics.filtered,

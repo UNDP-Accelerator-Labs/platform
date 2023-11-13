@@ -27,6 +27,7 @@ module.exports = (req, res, next) => {
 		}
 		console.log('TOKEN VERIFY TOBJ', tobj);
 		const { uuid, rights, ip, acceptedorigins } = tobj;
+
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
 			res.redirect(redirectPath)
 		} else if (acceptedorigins && !acceptedorigins.includes(referer)) {

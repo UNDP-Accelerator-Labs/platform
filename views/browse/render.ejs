@@ -19,7 +19,6 @@ const Entry = function (_kwargs) {
 
 	this.language = language
 	this.data = data
-
 	this.container = parent.addElem('article', '<%- object.slice(0, -1) %><% if (pagedisplay === "slideshow") { %> slide<% } %>')
 		.datum(data)
 	.each(function (d) {
@@ -77,7 +76,7 @@ const Entry = function (_kwargs) {
 			metainfo.addElems('div', 'meta meta-contributor', d => {
 				let data = []
 				<% if (
-					(['pads', 'files'].includes(object)
+					(['pads', 'files'].includes(object) 
 						&& ['private', 'curated'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
 				) { %>
@@ -416,6 +415,8 @@ const Entry = function (_kwargs) {
 				const img = new Image()
 				img.onload = function () { node.src = this.src }
 
+				if (!Array.isArray(d.img)) d.img = [d.img]
+
 				<% if (locals.metadata.site.app_storage) { %>
 					const source = new URL(`<%- locals.metadata.site.app_storage %>${d.img[0]}`).href
 				<% } else { %>
@@ -542,9 +543,19 @@ const Entry = function (_kwargs) {
 								return `/<%- language %>/view/pad?${queryparams.toString()}`
 							}
 						<% } %>
+						<% if (object === 'files') { %>
+							if (d.url) {
+								return d.url
+							} else return null
+						<% } %>
 						if (d.editable) return `/<%- language %>/edit/<%- object.slice(0, -1) %>?${queryparams.toString()}`
 						else return `/<%- language %>/view/<%- object.slice(0, -1) %>?${queryparams.toString()}`
-					}//, 'target': '_blank'
+					}, 
+					'target': d => {
+						<% if (object === 'files') { %>
+							return '_blank'
+						<% } else { %> return '_self' <% } %>
+					}
 				}).addElems('h1')
 			title.addElems('img')
 				.attr('src', d => {

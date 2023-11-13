@@ -183,6 +183,13 @@
 						<% } %>
 						<form method='GET' action='/publish/<%- `${object}s` %>'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
+							<% 
+								const currentpage_url = new URL(locals.metadata.page.currentpage_url)
+								const queryparams = new URLSearchParams(currentpage_url.search)
+								const token = queryparams.get('token')
+								const action = queryparams.get('action')
+							%>
+
 							<% if ((locals.data?.status || 0) < 1
 								|| ((locals.data?.status || 0) === 2 && !locals.data?.publishable)
 								|| (locals.data?.status || 0) === 3
@@ -204,6 +211,14 @@
 											// SO THAT AUTHORS CAN GO CHECK THEM OUT
 										}
 									</script>
+								<!-- IF THERE IS A TOKEN WITH A CALLBACK URL, THEN THIS SHOULD AUTO SUBMIT AND SEND BACK THE PAD ID TO THE REQUESTING SOURCE -->
+								<% } else if (token && action === 'publish_and_share') { %>
+									<% console.log(token) %>
+									<% console.log(action) %>
+
+									<input type='hidden' name='token' value='<%- token %>'>
+									<button type='submit' class='publish' name='status' value='3' disabled><%- vocabulary['publish'][language] %></button>
+
 								<% } else { %>
 									<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
@@ -427,7 +442,7 @@
 					<div class='vertical-separator'></div>
 					<!-- TO DO: TRANSLATE title INFO -->
 					<form action='/upload/img' method='POST' enctype='multipart/form-data'>
-						<input type='file' id='input-media-img' name='img' accept='image/*, .pdf' multiple>
+						<input type='file' id='input-media-img' name='img' accept='image/*' multiple>
 						<label for='input-media-img' title='Upload an image. You can also use the “i” key as a keyboard shortcut.'><i class='material-icons google-translate-attr'>add_photo_alternate</i></label>
 					</form>
 					<form action='/upload/video' method='POST' enctype='multipart/form-data'>

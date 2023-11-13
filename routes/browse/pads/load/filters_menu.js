@@ -44,7 +44,7 @@ module.exports = async kwargs => {
 
 					return contributors.length ? { contributors } : null
 				}).catch(err => console.log(err)))
-			} else if (['pinned', 'shared', 'public'].includes(space)) {
+			} else if (['pinned', 'shared', 'public', 'all'].includes(space)) {
 				if (metafields.some((d) => d.type === 'location')) {
 					batch1.push(t1.any(`
 						SELECT COUNT(DISTINCT(p.id))::INT, jsonb_agg(DISTINCT(p.id)) AS pads, l.iso3 AS id FROM pads p

@@ -38,6 +38,7 @@ module.exports = req => {
 				OR t.version <@ (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2))))
 			`, [ safeArr(nodes, -1), collaborators_ids, rights ])
 		}
+		else if (space === 'all') f_space = DB.pgp.as.format(`(t.status >= 2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
 
 		engagementtypes.forEach(e => {
 			if (space === `${e}s`) f_space = DB.pgp.as.format(`t.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'template' AND type = $2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ uuid, e ])

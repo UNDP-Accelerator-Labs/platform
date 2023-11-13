@@ -93,6 +93,18 @@ exports.metafields = [
     required: true,
     instruction: 'Signature',
   },
+  // {
+  //   type: 'attachment',
+  //   name: 'consent',
+  //   required: true,
+  //   uris: [
+  //     {
+  //       uri: 'http://localhost:2000/en/contribute/resource',
+  //     },
+  //     { uri: undefined },
+  //   ],
+  //   limit: 1,
+  // },
 ];
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']

@@ -14,7 +14,7 @@
     "camelcase": "off",
     "max-len": "off",
     "require-jsdoc": "off",
-    "ignoreRestSiblings": true
+    "no-unused-vars": [2, { "argsIgnorePattern": "^_" }]
   },
   "plugins": ["ejs-js"],
   "ignorePatterns": [

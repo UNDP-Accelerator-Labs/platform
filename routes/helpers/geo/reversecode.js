@@ -55,7 +55,7 @@ exports.code = (locations, list = false) => {
 };
 exports.render = (req, res) => {
   const { locations, list } = req.body || {};
-  const { country } = req.session || {};
+  // const { country } = req.session || {};
 
   const promises = this.code(locations, list);
   Promise.all(promises)

@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
       req.session.language,
   );
 
-  const [, page, full_filters] = await filter(req, res);
+  const [_f_space, page, full_filters] = await filter(req, res);
 
   let single_sheet = false;
   if (output === 'csv') {

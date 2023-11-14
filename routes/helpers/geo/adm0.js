@@ -49,7 +49,7 @@ exports.name_column = (kwargs) => {
     ;`,
     )
     .then((results) => {
-      let column = results.find(
+      const column = results.find(
         (d) => d.column_name.indexOf(language) === 5,
       )?.column_name;
       if (column) return column;

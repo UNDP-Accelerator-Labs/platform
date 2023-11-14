@@ -53,7 +53,12 @@ exports.users = (data, args = []) => {
   } else return new Promise((resolve) => resolve(data));
 };
 exports.tags = (data, args = []) => {
-  const [lang, key, tagname, tagtype] = args;
+  const [
+    lang,
+    key,
+    tagname,
+    // tagtype
+  ] = args;
   if (!key) return new Promise((resolve) => resolve(data));
 
   if (data?.length) {

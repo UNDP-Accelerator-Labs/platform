@@ -1,13 +1,13 @@
-let findAND = /\sAND\s/dgi;
-let findOR = /\sOR\s|\s?\,\s?/dgi;
-let findPhrase = /(?<=(^|\s))\"[\w\d\*\s\']+\"(?=(\s|$))/dgi;
+// const findAND = /\sAND\s/dgi;
+const findOR = /\sOR\s|\s?\,\s?/dgi;
+const findPhrase = /(?<=(^|\s))\"[\w\d\*\s\']+\"(?=(\s|$))/dgi;
 const fNest = /[\(\)\"\w\d\*\']+(\sor)?\s\(+[\"\w\d\*\s\'\(]+\)+/dgi;
 
 function prepStr(_str) {
   const max = ([..._str.matchAll(findPhrase)]?.length ?? 0) - 1;
 
   function findPhrases(_i = 0) {
-    let [start, end] = [..._str.matchAll(findPhrase)][_i].indices[0];
+    const [start, end] = [..._str.matchAll(findPhrase)][_i].indices[0];
     _str = `${_str.slice(0, start)}${_str
       .slice(start, end)
       .replace(/\s/g, '__')}${_str.slice(end)}`;
@@ -75,7 +75,7 @@ function completeStr(_str) {
           prev = /\bor\b/i.test(forward[idx]);
           next =
             /\bor\b/i.test(forward[idx + 1]) ||
-            forward[idx + 1].charAt(forward[idx + 1].length - 1) === ')'; //&& /\bor\b/i.test(forward[idx + 2])
+            forward[idx + 1].charAt(forward[idx + 1].length - 1) === ')'; // && /\bor\b/i.test(forward[idx + 2])
           if (!prev && !next) break;
           else idx++;
         }
@@ -127,7 +127,7 @@ function findNests(_str) {
   function helper(_substr) {
     const nests = _substr.match(fNest);
     return nests.reverse().map((d) => {
-      let outer = d.slice(0, d.indexOf('(')).trim();
+      const outer = d.slice(0, d.indexOf('(')).trim();
       let inner = d.slice(d.indexOf('(') + 1, d.length - 1).trim();
 
       if (fNest.test(inner)) {
@@ -240,7 +240,7 @@ function resetQuotes(_arr) {
     return d.split(/\s/g).map((c) => {
       if (/\_\_/g.test(c)) return `"${c.replace(/\_\_/g, ' ')}"`;
       else return c;
-    }); //.join(' ')
+    }); // .join(' ')
   });
 }
 

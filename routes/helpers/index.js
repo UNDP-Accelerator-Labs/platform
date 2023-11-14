@@ -14,7 +14,7 @@ exports.sessionupdate = require('./session-update');
 
 exports.flatObj = function () {
   // FLATTEN OBJECT: https://stackoverflow.com/questions/31136422/flatten-array-with-objects-into-1-object
-  return Object.assign.apply(Object, this);
+  return Object.assign({}, ...this);
 };
 exports.engagementsummary = function (kwargs = {}) {
   const { doctype, docid, engagementtypes, uuid } = kwargs;

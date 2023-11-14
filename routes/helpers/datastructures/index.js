@@ -95,7 +95,7 @@ exports.sessionsummary = async (_kwargs) => {
                 { key: 'primarykey', keep: ['app'] },
               )
               .map((d) => {
-                const { values, ...data } = d;
+                const { values: _, ...data } = d;
                 return data;
               });
             const total = array.sum.call(sessions, 'count');
@@ -154,7 +154,7 @@ exports.pagemetadata = (_kwargs) => {
   const page_language = params?.language || 'en';
 
   const parsedQuery = {};
-  for (let key in query) {
+  for (const key in query) {
     if (key === 'search') {
       if (query[key].trim().length) parsedQuery[key] = query[key];
     } else {
@@ -282,7 +282,7 @@ exports.pagemetadata = (_kwargs) => {
           t.any(`
                 SELECT template, language FROM review_templates
             ;`),
-        ); //.then())
+        ); // .then())
       } else batch.push(null);
       // PINBOARD LIST
       if (

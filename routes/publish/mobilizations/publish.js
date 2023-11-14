@@ -136,7 +136,6 @@ module.exports = (req, res) => {
 								Here is some information about the campaign:
 								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE
 						})
-						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))
 				}
 

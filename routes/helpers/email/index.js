@@ -1,5 +1,4 @@
 const { app_title } = include('config/');
-const nodeMailer = require('nodemailer');
 const sgMail = require('@sendgrid/mail');
 
 module.exports = (kwargs) => {
@@ -8,7 +7,7 @@ module.exports = (kwargs) => {
       process.env;
     sgMail.setApiKey(SENDGRID_API_KEY);
 
-    let { to, subject, html } = kwargs;
+    const { to, subject, html } = kwargs;
 
     if (!to) return { status: 500, message: 'The message has no recipient.' };
     if (!subject)

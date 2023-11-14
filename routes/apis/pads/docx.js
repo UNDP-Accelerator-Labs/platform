@@ -4,8 +4,6 @@ const fs = require('fs')
 const request = require('request').defaults({ encoding: null })
 const imgsize = require('image-size')
 
-const { BlobServiceClient } = require('@azure/storage-blob')
-
 const { Document, SectionType, AlignmentType, UnderlineType, HeadingLevel, StyleLevel, Packer, Paragraph, TextRun, ImageRun, TableOfContents } = require('docx')
 
 const { app_title_short, app_storage, colors, metafields, DB } = include('config/')
@@ -35,9 +33,9 @@ module.exports = async (req, res) => {
 	}
 
 	return DB.conn.any(`
-		SELECT p.id, p.owner, p.title, p.sections, p.status, 
+		SELECT p.id, p.owner, p.title, p.sections, p.status,
 			FALSE AS editable,
-			m.id AS mobilization, m.title AS mobilization_title, 
+			m.id AS mobilization, m.title AS mobilization_title,
 			t.title AS template_title,
 
 			-- CASE
@@ -45,39 +43,39 @@ module.exports = async (req, res) => {
 			-- 		THEN jsonb_build_object('interval', 'positive', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(p.date, now())), 'hours', EXTRACT(hour FROM AGE(p.date, now())), 'days', EXTRACT(day FROM AGE(p.date, now())), 'months', EXTRACT(month FROM AGE(p.date, now())))
 			-- 	ELSE jsonb_build_object('interval', 'negative', 'date', to_char(p.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), p.date)), 'hours', EXTRACT(hour FROM AGE(now(), p.date)), 'days', EXTRACT(day FROM AGE(now(), p.date)), 'months', EXTRACT(month FROM AGE(now(), p.date)))
 			-- END AS date
-			
-			---- THIS DOES NOT NEED TO BE SO COMPLEX 
+
+			---- THIS DOES NOT NEED TO BE SO COMPLEX
 			jsonb_build_object('date', to_char(p.date, 'DD Mon YYYY')) AS date,
 			to_char(p.date, 'YYYY') AS year
-			
+
 		FROM pads p
-		
+
 		LEFT JOIN templates t
 			ON t.id = p.template
-		
+
 		LEFT JOIN mobilization_contributions mc
 			ON mc.pad = p.id
-		
+
 		LEFT JOIN mobilizations m
 			ON m.id = mc.mobilization
-		
-		WHERE TRUE 
-			$2:raw 
+
+		WHERE TRUE
+			$2:raw
 			AND (m.id = (SELECT MAX(mc2.mobilization) FROM mobilization_contributions mc2 WHERE mc2.pad = p.id)
 				OR m.id IS NULL) -- THIS IS IN CASE A PAD IS CONTRIBUTED TO TWO MOBILIZATIONS
 			AND p.id NOT IN (SELECT review FROM reviews)
-		
+
 		GROUP BY (
-			p.id, 
-			m.id, 
-			m.title, 
+			p.id,
+			m.id,
+			m.title,
 			m.pad_limit,
 			t.title
 		)
 		$3:raw
-	;`, [ 
+	;`, [
 		/* $1 */ DB.pgp.as.format(uuid === null ? 'NULL' : '$1', [ uuid ]),
-		/* $2 */ full_filters, 
+		/* $2 */ full_filters,
 		/* $3 */ order
 	]).then(async results => {
 		const open = results.every(d => d.status > 2)
@@ -96,27 +94,27 @@ module.exports = async (req, res) => {
 				if (d.key) {
 					const title_obj = {}
 					title_obj.properties = { type: SectionType.ODD_PAGE }
-					title_obj.children = [new Paragraph({ 
-						text: d.key.toUpperCase(), 
+					title_obj.children = [new Paragraph({
+						text: d.key.toUpperCase(),
 						heading: HeadingLevel.HEADING_1,
 						alignment: AlignmentType.CENTER
 					})]
 					arr.push(title_obj)
 				}
-				
+
 				const pads = await Promise.all(d.values.map((c, j) => {
 					return new Promise(async resolve1 => {
 						const obj = {}
 						// if (j > 0) obj.properties = { type: SectionType.NEXT_PAGE }
 						obj.children = []
 						// ADD THE TITLE
-						const title = new Paragraph({ 
+						const title = new Paragraph({
 							text: c.title,
 							heading: HeadingLevel.HEADING_2
 						})
 						// TO DO: ADD THE AUTHOR INFO
 						obj.children.push(title)
-						
+
 						if (include_data) {
 							let repetition = 0 // THIS IS FOR REPEATED SECTIONS
 							const items = await Promise.all(c.sections.map(async b => {
@@ -132,7 +130,7 @@ module.exports = async (req, res) => {
 									// if (b.lead) children.push(new Paragraph({ text: b.lead }))
 									if (b.lead) paragraphs.push(new Paragraph({ text: b.lead }))
 								}
-								if (b.items?.length) {					
+								if (b.items?.length) {
 									const items = await Promise.all(b.items.map(a => populateSection(a)))
 
 									// paragraphs.push(...b.items.map(a => populateSection(a)).filter(a => a.length).flat())
@@ -146,7 +144,7 @@ module.exports = async (req, res) => {
 						resolve1(obj)
 					})
 				}))
-			
+
 				arr.push(...pads)
 				resolve(arr)
 			})
@@ -159,13 +157,13 @@ module.exports = async (req, res) => {
 				const arr = []
 				// ADD THE INSTRUCTION IF THERE IS ONE
 				if (instruction) {
-					arr.push(new Paragraph({ 
+					arr.push(new Paragraph({
 						text: repetition > 0 ? `${instruction} – ${repetition}` : instruction,
 						heading: HeadingLevel.HEADING_4
 					}))
 				} else {
 					if (level === 'meta') {
-						arr.push(new Paragraph({ 
+						arr.push(new Paragraph({
 							text: capitalize(metafields.find(c => c.label === name)?.name || name),
 							heading: HeadingLevel.HEADING_4
 						}))
@@ -174,10 +172,10 @@ module.exports = async (req, res) => {
 
 				if (type === 'img') {
 					const { src } = data
-					
+
 					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 						if (src) {
-							// TO DO: FILTER IF URL							
+							// TO DO: FILTER IF URL
 							await new Promise(resolve1 => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
 									if (err) console.log(err)
@@ -224,7 +222,7 @@ module.exports = async (req, res) => {
 					const { srcs } = data
 					const children = []
 					const maxwidth = srcs.length === 2 ? 600 / 2 : 600 / 3
-					
+
 					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 						// TO DO: FILTER IF URL
 						// src.isURL()
@@ -264,7 +262,7 @@ module.exports = async (req, res) => {
 					arr.push(new Paragraph({ children, alignment: AlignmentType.CENTER, style: 'images' }))
 				}
 				// if (type === 'video') addVideo({ data, lang, section }) // CANNOT DISPLAY VIDEOS IN PRINT
-				
+
 				// if (type === 'drawing') addDrawing({ data, lang, section }) // TO DO
 
 				if (type === 'txt') {
@@ -328,7 +326,7 @@ module.exports = async (req, res) => {
 						}
 					}
 				}
-				
+
 				if (type === 'index') {
 					const { tags } = data
 					tags.sort((a, b) => a.key - b.key)
@@ -374,7 +372,7 @@ module.exports = async (req, res) => {
 						}))
 					})
 				}
-				
+
 				if (type === 'attachment') {
 					const { srcs } = data
 
@@ -384,10 +382,10 @@ module.exports = async (req, res) => {
 							children.push(new TextRun({ text: d }))
 							children.push(new TextRun({ break: 1 }))
 						})
-						arr.push(new Paragraph({ children, style: 'hyperlink' })) 
+						arr.push(new Paragraph({ children, style: 'hyperlink' }))
 					}
 				}
-				
+
 				// GROUP
 				if (type === 'group') {
 					const { items } = data
@@ -421,14 +419,14 @@ module.exports = async (req, res) => {
 			} else return false
 		}
 		function capitalize (str) {
-			return str.charAt(0).toUpperCase() + str.slice(1)	
+			return str.charAt(0).toUpperCase() + str.slice(1)
 		}
 		function splitLinks (str) {
 		}
 
 		if (include_toc) {
 			// ADD TABLE OF CONTENTS
-			const toc = { children: 
+			const toc = { children:
 				[ new TableOfContents('Summary', {
 					hyperlink: true,
 					headingStyleRange: '1-5',

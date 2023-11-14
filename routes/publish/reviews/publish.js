@@ -106,7 +106,6 @@ module.exports = (req, res) => {
 											return Promise.all(user_info.map(d => {
 												return sendemail({
 													to: d.email,
-													bcc: 'myjyby@gmail.com', // TO DO: THIS IS TEMP
 													subject: `[${app_title}] Reviews for "${title}" are in`,
 													html
 												})
@@ -134,7 +133,6 @@ module.exports = (req, res) => {
 											return Promise.all(user_info.map(d => {
 												return sendemail({
 													to: d.email,
-													bcc: 'myjyby@gmail.com', // TO DO: THIS IS TEMP
 													subject: `[${app_title}] Your submission "${title}" has been reviewed`,
 													html
 												})

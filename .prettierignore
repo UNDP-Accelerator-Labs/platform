@@ -6,7 +6,6 @@
 /routes/delete/*
 /routes/engage/*
 /routes/forward/*
-/routes/helpers/*
 /routes/import/*
 /routes/login/*
 /routes/logout/*

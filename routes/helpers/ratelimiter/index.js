@@ -7,16 +7,21 @@ const rateLimiter = new RateLimiterMemory({
 });
 
 const rateLimiterMiddleware = (req, res, next) => {
-  rateLimiter.consume(req.ip)
+  rateLimiter
+    .consume(req.ip)
     .then((rateLimiterRes) => {
-        if(rateLimiterRes?.remainingPoints <= 3){
-            req.session.attemptmessage = 'You have ' + rateLimiterRes?.remainingPoints + ' attempts remaining.' // TO DO: TRANSLATE
-        }
+      if (rateLimiterRes?.remainingPoints <= 3) {
+        req.session.attemptmessage =
+          'You have ' +
+          rateLimiterRes?.remainingPoints +
+          ' attempts remaining.'; // TO DO: TRANSLATE
+      }
       next();
     })
     .catch((rateLimiterRes) => {
-        req.session.errormessage = 'Too many failed login requests. Please try again after 3 hours or contact system admin.'
-        res.redirect('/login');
+      req.session.errormessage =
+        'Too many failed login requests. Please try again after 3 hours or contact system admin.';
+      res.redirect('/login');
     });
 };
 

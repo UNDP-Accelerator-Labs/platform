@@ -13,7 +13,8 @@
   "rules": {
     "camelcase": "off",
     "max-len": "off",
-    "require-jsdoc": "off"
+    "require-jsdoc": "off",
+    "ignoreRestSiblings": true
   },
   "plugins": ["ejs-js"],
   "ignorePatterns": [
@@ -25,7 +26,6 @@
     "/routes/delete/*",
     "/routes/engage/*",
     "/routes/forward/*",
-    "/routes/helpers/*",
     "/routes/import/*",
     "/routes/login/*",
     "/routes/logout/*",

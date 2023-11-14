@@ -34,17 +34,20 @@ module.exports = async (req, res) => {
 
   const [, page, full_filters] = await filter(req, res);
 
+  let single_sheet = false;
   if (output === 'csv') {
-    var single_sheet = true;
+    single_sheet = true;
   }
 
   // CREATE A tmp FOLDER TO STORE EVERYTHING
+  let basedir = undefined;
+  let dir = undefined;
   if (render) {
     // const basedir = path.join(__dirname, `../public/uploads/`)
-    var basedir = path.join(rootpath, '/tmp');
+    basedir = path.join(rootpath, '/tmp');
     if (!fs.existsSync(basedir)) fs.mkdirSync(basedir);
     const now = new Date();
-    var dir = path.join(basedir, `download-${+now}`);
+    dir = path.join(basedir, `download-${+now}`);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   }
 
@@ -177,29 +180,33 @@ module.exports = async (req, res) => {
                   ...users.map((d) => d.secondary_languages?.length).flat(),
                 );
                 // MAX TEAMS
+                let max_teams = undefined;
                 if (teams?.length)
-                  var max_teams = Math.max(
+                  max_teams = Math.max(
                     ...array.nest
                       .call(teams, { key: 'uuid' })
                       .map((d) => d.count),
                   );
                 // MAX PADS
+                let max_pads = undefined;
                 if (pads?.length)
-                  var max_pads = Math.max(
+                  max_pads = Math.max(
                     ...array.nest
                       .call(pads, { key: 'owner' })
                       .map((d) => d.count),
                   );
                 // MAX TEMPLATES
+                let max_templates = undefined;
                 if (templates?.length)
-                  var max_templates = Math.max(
+                  max_templates = Math.max(
                     ...array.nest
                       .call(templates, { key: 'owner' })
                       .map((d) => d.count),
                   );
                 // MAX MOBILIZATIONS
+                let max_mobilizations = undefined;
                 if (mobilizations?.length)
-                  var max_mobilizations = Math.max(
+                  max_mobilizations = Math.max(
                     ...array.nest
                       .call(mobilizations, { key: 'owner' })
                       .map((d) => d.count),

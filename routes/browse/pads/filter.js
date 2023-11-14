@@ -142,14 +142,48 @@ module.exports = async (req, res) => {
 		if (status) base_filters.push(DB.pgp.as.format(`p.status IN ($1:csv)`, [ status ]))
 
 		let f_space = null
-		if (space === 'private') f_space = DB.pgp.as.format(`p.owner IN ($1:csv)`, [ collaborators_ids ])
-		else if (space === 'curated') f_space = DB.pgp.as.format(`(p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2) AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL) AND p.status < 2`, [ collaborators_ids, rights ])
+		if (space === 'private') f_space = DB.pgp.as.format(`p.owner = $1`, [ uuid ])
+		else if (space === 'curated') f_space = DB.pgp.as.format(`
+		(
+			(
+				p.id IN (
+					SELECT mc.pad 
+					FROM mobilization_contributions mc 
+					INNER JOIN mobilizations m 
+						ON m.id = mc.mobilization 
+					WHERE m.owner = $1
+				) 
+				OR $2 > 2
+			) AND (
+				p.owner <> $1 
+				OR p.owner IS NULL
+			) AND p.status < 2
+		)
+		`, [ uuid, rights ])
+		// else if (space === 'team') f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) AND p.owner <> $2)`, [ collaborators_ids, uuid ])
 		else if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
 		else if (space === 'reviewing') f_space = DB.pgp.as.format(`
-			((p.id IN (SELECT mc.pad FROM mobilization_contributions mc INNER JOIN mobilizations m ON m.id = mc.mobilization WHERE m.owner IN ($1:csv)) OR $2 > 2)
-				OR (p.owner IN ($1:csv)))
-			AND p.id IN (SELECT pad FROM review_requests)
-		`, [ collaborators_ids, rights ])
+		(	
+			(
+				( -- THE CURATOR OF A MOBILIZATION HAS OVERSIGHT OVER THE REVIEWING OF COLLECTED PADS
+					p.id IN (
+						SELECT mc.pad 
+						FROM mobilization_contributions mc 
+						INNER JOIN mobilizations m 
+							ON m.id = mc.mobilization 
+						WHERE m.owner = $1
+					)
+					OR $2 > 2
+				) OR (
+					p.owner = $1
+				)
+			)
+			AND p.id IN (
+				SELECT pad 
+				FROM review_requests
+			)
+		)
+		`, [ uuid, rights ])
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'pinned') {
@@ -180,7 +214,7 @@ module.exports = async (req, res) => {
 						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($2:csv))))
 					`, [ safeArr(pbpads, -1), safeArr(mobs, -1) ])
 				}
-				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`)
+				else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`) // TO DO: CHECK THIS LOGIC
 			} else { // THE USER IS LOGGED IN
 				if (pinboard) {
 					const ownId = await ownDB();
@@ -203,9 +237,20 @@ module.exports = async (req, res) => {
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);
 					f_space = DB.pgp.as.format(`
-						((p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)
-						AND (p.id IN ($3:csv)
-						OR p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($4:csv))))
+					(
+						(
+							p.owner IN ($1:csv) 
+							OR $2 > 2 
+							OR p.status > 1
+						) AND (
+							p.id IN ($3:csv) 
+							OR p.id IN (
+								SELECT pad 
+								FROM mobilization_contributions 
+								WHERE mobilization IN ($4:csv)
+							)
+						)
+					)
 					`, [ collaborators_ids, rights, safeArr(pbpads, -1), safeArr(mobs, -1) ])
 				}
 				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
@@ -213,8 +258,35 @@ module.exports = async (req, res) => {
 		}
 		else if (space === 'versiontree') {
 			f_space = DB.pgp.as.format(`
-				(p.version @> (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2)))
-				OR p.version <@ (SELECT version FROM pads WHERE id IN ($1:csv) AND (status >= p.status OR (owner IN ($2:csv) OR $3 > 2))))
+			(	
+				(
+					p.version @> (
+						SELECT version 
+						FROM pads 
+						WHERE id IN ($1:csv) 
+							AND (
+								-- status >= p.status 
+								status >= 2
+								OR (
+									owner IN ($2:csv) 
+									OR $3 > 2
+								)
+							)
+					) OR p.version <@ (
+						SELECT version 
+						FROM pads 
+						WHERE id IN ($1:csv) 
+							AND (
+								-- status >= p.status 
+								status >= 2
+								OR (
+									owner IN ($2:csv) 
+									OR $3 > 2
+								)
+							)
+					)
+				)
+			)
 			`, [ safeArr(nodes, -1), collaborators_ids, rights ])
 		}
 		else if (engagementtypes.some(d => space === `${d}s`)) {

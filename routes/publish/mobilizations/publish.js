@@ -116,7 +116,6 @@ module.exports = (req, res) => {
 			.then(_ => {
 				const batch = []
 
-
 				if (!public) {
 					// SEND EMAILS TO THOSE WHO ACCEPT NOTIFICATIONS (IN bcc FOR ONLY ONE EMAIL)
 					batch.push(DB.general.any(`
@@ -124,7 +123,8 @@ module.exports = (req, res) => {
 						WHERE uuid IN ($1:csv)
 							AND uuid <> $2
 							AND notifications = TRUE
-					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ]).then(async results => {
+					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
+					.then(async results => {
 						const bcc = results.map(d => d.email)
 						bcc.push('myjyby@gmail.com') // TO DO: THIS IS TEMP
 
@@ -136,10 +136,10 @@ module.exports = (req, res) => {
 								Here is some information about the campaign:
 								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE
 						})
+						return false
 						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))
 				}
-
 
 				// PUBLISH THE TEMPLATE USED
 				batch.push(t.none(`
@@ -150,7 +150,7 @@ module.exports = (req, res) => {
 				return t.batch(batch)
 				.catch(err => console.log(err))
 			}).catch(err => console.log(err))
-		})
+		}).catch(err => console.log(err))
 	}).then(_ => res.redirect(`/${language}/browse/mobilizations/ongoing`))
 	.catch(err => console.log(err))
 }

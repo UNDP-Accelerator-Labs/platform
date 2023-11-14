@@ -2520,10 +2520,6 @@ async function addAttachment (kwargs) {
 						if (input.isURL()) {
 							return new Promise(async resolve => {
 								const pad_id = await partialSave('meta')
-								// const save = await POST('/save/resource', { name, type, pad_id, element_id: meta.id, src: input })
-								// if (save.status === 200) resolve(window.location.reload())
-								// else resolve(console.log(save))
-
 								resolve(window.location.replace(`/save/resource?pad_id=${pad_id}&element_id=${meta.id}&name=${name}&type=${type}&src=${input}`))
 							})
 						} else alert ('This is not a URL.')
@@ -2534,7 +2530,7 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'div',
 					class: 'divider',
-					label: 'OR' // TO DO: TRANSLATE
+					label: '<%- vocabulary["or"][language].toUpperCase() %>'
 				})
 			}
 		})

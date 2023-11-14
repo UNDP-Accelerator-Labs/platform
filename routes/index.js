@@ -266,7 +266,6 @@ exports.process.upload = async (req, res) => {
 	const { uuid } = req.session || {}
 
 	const fls = req.files
-	const maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
 	// ESTABLISH THE CONNECTION TO AZURE
 	const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 	// FIND OR CREATE THE CONTAINER
@@ -280,6 +279,8 @@ exports.process.upload = async (req, res) => {
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 		const source = path.join(__dirname, `../${f.path}`)
 
+		let maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
+		if (f.mimetype.includes('video/') || f.mimetype.includes('audio/')) maxFileSizeBytes = 100 * 1024 * 1024; // 100MB 
 		// Check if the file size exceeds the maximum allowed size
 		if (f.size > maxFileSizeBytes) {
 			fs.unlinkSync(source); // Delete the uploaded file

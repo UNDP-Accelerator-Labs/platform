@@ -280,7 +280,7 @@ exports.process.upload = async (req, res) => {
 		const source = path.join(__dirname, `../${f.path}`)
 
 		let maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
-		if (f.mimetype.includes('video/') || f.mimetype.includes('audio/')) maxFileSizeBytes = 100 * 1024 * 1024; // 100MB 
+		if (f.mimetype.includes('video/') || f.mimetype.includes('audio/')) maxFileSizeBytes = 500 * 1024 * 1024; // 100MB 
 		// Check if the file size exceeds the maximum allowed size
 		if (f.size > maxFileSizeBytes) {
 			fs.unlinkSync(source); // Delete the uploaded file

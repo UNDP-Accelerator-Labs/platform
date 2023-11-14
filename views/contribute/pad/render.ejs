@@ -2513,6 +2513,7 @@ async function addAttachment (kwargs) {
 					node: 'input',
 					type: 'url',
 					placeholder: '<%- vocabulary["paste link"][language] %>',
+					// value: srcs.length ? srcs[0] : null,
 					class: 'full-width',
 					resolve: async _ => {
 						const input = d3.select('.modal input[type="url"]').node().value
@@ -2538,12 +2539,14 @@ async function addAttachment (kwargs) {
 			}
 		})
 		var result = await renderPromiseModal(item)
-		// THIS IS IN CASE THE USER IS LOOKING TO LOAD AN EXTERNAL FILE
-		d3.selectAll('div.screen').classed('hide', true)
-		const screen = d3.select('div.screen')
-			.classed('hide', false)
-			.classed('dark', true)
-		if (!srcs.length && result === null) meta.rmMedia()
+		if (result === null) {
+			if (!srcs.length) meta.rmMedia()
+		} else {
+			d3.selectAll('div.screen').classed('hide', true)
+			const screen = d3.select('div.screen')
+				.classed('hide', false)
+				.classed('dark', true)
+		}
 	}
 
 	meta.media.addElems('a', 'attachment', d => { return d.srcs.map(c => { return { src: c, name: d.name } }) })

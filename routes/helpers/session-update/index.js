@@ -1,7 +1,9 @@
-const updateSession = async _kwarq =>{
-    const { whereClause, queryValues, conn } = _kwarq
-      await conn.none(`
-        UPDATE session 
+const updateSession = async (_kwarq) => {
+  const { whereClause, queryValues, conn } = _kwarq;
+  await conn
+    .none(
+      `
+        UPDATE session
         SET sess = jsonb_build_object(
           'cookie', sess -> 'cookie',
           'sessions', sess -> 'sessions',
@@ -20,8 +22,10 @@ const updateSession = async _kwarq =>{
           'confirm_dev_origins', sess -> 'confirm_dev_origins'
         )
         WHERE ${whereClause};
-      `, queryValues)
-      .catch(err => console.log(err));
-  }
+      `,
+      queryValues,
+    )
+    .catch((err) => console.log(err));
+};
 
-  module.exports = updateSession;
+module.exports = updateSession;

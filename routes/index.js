@@ -165,7 +165,7 @@ exports.process.login = require('./login/').process
 exports.redirect.home = require('./redirect/').home
 exports.redirect.browse = require('./redirect/').browse
 
-exports.dispatch.public = require('./browse/homepage').render //require('./login/').public
+exports.dispatch.public = require('./browse/homepage').render // require('./login/').public
 
 exports.process.forgetPassword = require('./login/').forgetPassword
 exports.process.getResetToken = require('./login/').getResetToken

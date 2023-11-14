@@ -1,13 +1,13 @@
 const { modules, DB } = include('config/')
 const { parsers } = include('routes/helpers/')
 
-module.exports = req => { 
+module.exports = req => {
 	const { uuid, rights } = req.session || {}
-	
+
 	let { space } = req.params || {}
 	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM DOWNLOAD)
 	const { limit } = req.body || {} // THIS IS IN THE CASE OF AJAX REQUESTS, TO LIMIT TO A CERTAIN LETTER OR NOT
-	
+
 	// TO DO: UPDATE BELOW BASED ON FILTERS PASSED
 	let { search, status, countries, positions, rights: userrights, pinboard, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
@@ -16,7 +16,7 @@ module.exports = req => {
 	// const f_search = search ? DB.pgp.as.format(`AND (u.name::TEXT || u.position::TEXT || cn.name::TEXT ~* $1)`, [ parsers.regexQuery(search) ]) : null
 	if (status) base_filters.push(DB.pgp.as.format(`AND u.confirmed::INT IN ($1:csv)`, [ status ]))
 
-	let f_space = null	
+	let f_space = null
 	// THE all SPACE SHOWS ALL CONTRIBUTORS, i.e. USERS WHO ARE ALLOWED TO WRTIE PADS
 	let { write } = modules.find(d => d.type === 'pads')?.rights
 	if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)

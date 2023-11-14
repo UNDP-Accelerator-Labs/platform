@@ -5,7 +5,7 @@ module.exports = async (kwargs) => {
 		console.log('working locally so no need to send email', kwargs);
 		return new Promise(resolve => resolve(null));
 	}
-	let { to, subject, html } = kwargs;
+	const { to, subject, html } = kwargs;
 	const from = `"No Reply" <no-reply@sdg-innovation-commons.org>`
 	if (!to) return { status: 500, message: 'The message has no recipient.' }
 	if (!subject) return { status: 500, message: 'The message has no subject.' }
@@ -30,7 +30,11 @@ module.exports = async (kwargs) => {
 	console.log('SENDING EMAIL', from, to, subject);
 	return new Promise(resolve => {
 		transporter.sendMail(mailOptions, (err, info) => {
-			if (err) resolve({ status: 500, message: err })
+			if (err) {
+				console.log('SENDING EMAIL FAILED', from, to, subject, err);
+				resolve({ status: 500, message: err });
+				return;
+			}
 			resolve({ status: 200, message: `Message ${info?.messageId} sent: ${info?.response}` })
 		})
 	})

@@ -27,6 +27,7 @@ module.exports = async (kwargs) => {
 		html,
 	};
 
+	console.log('SENDING EMAIL', from, to, subject);
 	return new Promise(resolve => {
 		transporter.sendMail(mailOptions, (err, info) => {
 			if (err) resolve({ status: 500, message: err })

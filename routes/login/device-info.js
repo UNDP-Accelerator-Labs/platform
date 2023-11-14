@@ -20,7 +20,7 @@ exports.sendDeviceCode = (_kwarg) => {
     code %= 1000000;
   }
 
-  const { protocol, host } = req || {}
+  const { protocol, hostname: host } = req || {}
   const resetLink = `${protocol}://${host}/forget-password`;
 
   // Save the code to the database

@@ -30,6 +30,7 @@ module.exports = req => {
 		const platform_filters = []
 		if (files) platform_filters.push(DB.pgp.as.format(`f.id IN ($1:csv)`, [ files ]))
 		if (contributors) platform_filters.push(DB.pgp.as.format(`f.owner IN ($1:csv)`, [ contributors ]))		
+
 		if (countries?.length) {
 			platform_filters.push(await DB.general.any(`
 				SELECT uuid FROM users WHERE iso3 IN ($1:csv)

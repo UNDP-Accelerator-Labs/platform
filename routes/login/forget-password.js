@@ -1,4 +1,4 @@
-const sendEmail = require('../helpers').email
+const { email: sendEmail, removeSubdomain } = require('../helpers')
 const { DB } = include('config/')
 const { datastructures, sessionupdate } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
@@ -27,12 +27,13 @@ exports.forgetPassword = async (req, res, next) => {
     return;
   }
   const { host } = req.headers || {}
+  const mainHost = removeSubdomain(host);
   const protocol = req.protocol
   // Generate JWT token
   const token = await jwt.sign(
     { email, action: 'password-reset' },
     process.env.APP_SECRET,
-    { expiresIn: '24h', issuer: host })
+    { expiresIn: '24h', issuer: mainHost })
 
   const resetLink = `${protocol}://${host}/reset/${token}`;
   const html = `
@@ -131,7 +132,7 @@ exports.updatePassword = async (req, res, next) => {
         `, [password, decoded.email]);
 
         //UPDATE ALL ACTIVE SESSION
-        sessionupdate({
+        await sessionupdate({
           conn: DB.general,
           whereClause: `sess ->> 'email' = $1`,
           queryValues: [decoded.email]

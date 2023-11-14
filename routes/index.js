@@ -9,7 +9,6 @@ const Jimp = require('jimp')
 const { execFile } = require('child_process')
 const fetch = require('node-fetch')
 const Pageres = require('pageres') // THIS IS FOR SCREENSHOTS
-const turf = require('@turf/turf')
 const archiver = require('archiver')
 const { BlobServiceClient } = require('@azure/storage-blob')
 
@@ -308,7 +307,7 @@ exports.process.upload = async (req, res) => {
 						.then(async buffer => {
 							if (err) console.log(err)
 							let fileerror = false
-							
+
 							const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, `${f.filename}.png`))
 							const options = { blobHTTPHeaders: { blobContentType: Jimp.MIME_PNG } }
 							// const buffer = await fs.readFileSync(source)

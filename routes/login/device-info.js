@@ -11,7 +11,7 @@ exports.deviceInfo = (req) => {
 
 
 exports.sendDeviceCode = (_kwarg) => {
-  const { email : sendEmail } = include('routes/helpers/')
+  const { email: sendEmail } = include('routes/helpers/')
 
   const { conn, uuid, email, name, req } = _kwarg;
   let code = 0;
@@ -30,10 +30,10 @@ exports.sendDeviceCode = (_kwarg) => {
       VALUES ($1, $2, NOW() + INTERVAL '10 MINUTES')`,
       [uuid, code]
     )
-    .then(() => {
+    .then(async () => {
       // Send the email to the user
       // TO DO: translate
-      sendEmail({
+      await sendEmail({
         to: email,
         subject: `Device Confirmation`,
         html: `

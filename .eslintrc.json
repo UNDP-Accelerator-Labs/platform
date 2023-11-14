@@ -16,5 +16,5 @@
     "require-jsdoc": "off"
   },
   "plugins": ["ejs-js"],
-  "ignorePatterns": ["/public/*", "/routes/*", "/views/*"]
+  "ignorePatterns": []
 }

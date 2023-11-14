@@ -160,8 +160,10 @@ module.exports = async (req, res) => {
 			) AND p.status < 2
 		)
 		`, [ uuid, rights ])
-		// else if (space === 'team') f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) AND p.owner <> $2)`, [ collaborators_ids, uuid ])
-		else if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
+		
+		else if (space === 'shared') f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) AND p.owner <> $2)`, [ collaborators_ids, uuid ])
+		
+		// else if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
 		else if (space === 'reviewing') f_space = DB.pgp.as.format(`
 		(	
 			(
@@ -184,8 +186,11 @@ module.exports = async (req, res) => {
 			)
 		)
 		`, [ uuid, rights ])
-		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
-		else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		// else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		// else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		
+		else if (space === 'published') f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])
+		
 		else if (space === 'pinned') {
 			if (public) {
 				if (pinboard) {
@@ -239,9 +244,9 @@ module.exports = async (req, res) => {
 					f_space = DB.pgp.as.format(`
 					(
 						(
-							p.owner IN ($1:csv) 
+							(p.status = 2 AND p.owner IN ($1:csv))
+							OR p.status = 3
 							OR $2 > 2 
-							OR p.status > 1
 						) AND (
 							p.id IN ($3:csv) 
 							OR p.id IN (
@@ -253,10 +258,16 @@ module.exports = async (req, res) => {
 					)
 					`, [ collaborators_ids, rights, safeArr(pbpads, -1), safeArr(mobs, -1) ])
 				}
-				else f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) OR $2 > 2 OR p.status > 1)`, [ collaborators_ids, rights ])
+				else f_space = DB.pgp.as.format(`
+					(
+						(p.status = 2 AND p.owner IN ($1:csv))
+						OR p.status = 3
+						OR $2 > 2 
+					)`, [ collaborators_ids, rights ])
 			}
 		}
 		else if (space === 'versiontree') {
+			// TO DO: THIS NEEDS SOME THINKING
 			f_space = DB.pgp.as.format(`
 			(	
 				(
@@ -265,8 +276,7 @@ module.exports = async (req, res) => {
 						FROM pads 
 						WHERE id IN ($1:csv) 
 							AND (
-								-- status >= p.status 
-								status >= 2
+								status >= p.status 
 								OR (
 									owner IN ($2:csv) 
 									OR $3 > 2
@@ -277,8 +287,7 @@ module.exports = async (req, res) => {
 						FROM pads 
 						WHERE id IN ($1:csv) 
 							AND (
-								-- status >= p.status 
-								status >= 2
+								status >= p.status 
 								OR (
 									owner IN ($2:csv) 
 									OR $3 > 2

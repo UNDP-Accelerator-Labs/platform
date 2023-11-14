@@ -92,6 +92,14 @@
 				</a>
 			</li>
 		<% } %>
+		<li class='<% if (space === "shared") { %>active<% } %>'>
+			<a onclick='redirect("./shared")'>
+				<button><%- vocabulary['space'][language](object, 'shared') %>
+					<div class='count'><%- locals.stats?.shared %></div>
+					<!-- TO DO: CHANGE TRANSLATION TERM preprint TO SHARED -->
+				</button>
+			</a>
+		</li>
 		<% if (['pads', 'templates'].includes(object)
 			&& (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) || rights > 2)
 			&& locals.stats?.curated > 0
@@ -124,13 +132,6 @@
 				</div>
 			</li>
 		<% } %>
-		<li class='<% if (space === "shared") { %>active<% } %>'>
-			<a onclick='redirect("./shared")'>
-				<button><%- vocabulary['space'][language](object, 'shared') %>
-					<div class='count'><%- locals.stats?.shared %></div>
-				</button>
-			</a>
-		</li>
 		<% if (object === 'pads' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read)
 			&& locals.stats?.reviewing > 0)
 		{ %>
@@ -142,7 +143,8 @@
 				</a>
 			</li>
 		<% } %>
-		<% if (!['reviews', 'templates'].includes(object)) { %>
+		
+		<!-- <% if (!['pads', 'reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
 				<a onclick='redirect("./public")'>
 					<button><%- vocabulary['space'][language](object, 'public') %>
@@ -150,10 +152,10 @@
 					</button>
 				</a>
 			</li>
-		<% } %>
+		<% } %> -->
 
-		<li class='<% if (space === "all") { %>active<% } %>'>
-			<a onclick='redirect("./all")'>
+		<li class='<% if (space === "published") { %>active<% } %>'>
+			<a onclick='redirect("./published")'>
 				<button><%- vocabulary['space'][language](object, 'all') %>
 					<div class='count'><%- locals.stats?.all %></div>
 				</button>

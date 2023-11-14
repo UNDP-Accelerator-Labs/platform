@@ -77,7 +77,7 @@ const Entry = function (_kwargs) {
 				let data = []
 				<% if (
 					(['pads', 'files'].includes(object) 
-						&& ['private', 'curated'].includes(space)
+						&& ['private', 'curated', 'shared'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
 				) { %>
 					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || '<%- vocabulary["anonymous contributor"][language] %>' }]

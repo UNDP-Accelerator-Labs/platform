@@ -400,6 +400,7 @@ exports.process.upload = async (req, res) => {
 				// TO DO: CHECK SIZE HERE AND IF TOO BIG DO NOTHING (IN FRONT END TELL USER TO GO THROUGH YOUTUBE OF MSSTREAM)
 				// const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
 				const fftarget = path.join(dir, `./ff-${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+				let fileerror = false
 
 				execFile('ffmpeg', [
 					'-i', source,
@@ -409,11 +410,44 @@ exports.process.upload = async (req, res) => {
 					'-c:a', 'copy',
 					'-vf', 'scale=854:ih*854/iw', // 854 = 480p
 					fftarget
-				], function(err, stdout, stderr) {
+				], async function(err, stdout, stderr) {
 					if (err) console.log(err)
+					const targetdir = path.join('uploads/', uuid)
 
-					fs.unlinkSync(source)
-					resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
+					if (app_storage) {
+						const buffer = await fs.readFileSync(fftarget)
+
+						const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`))
+						const options = { blobHTTPHeaders: { blobContentType: f.mimetype } }
+						await blobClient.uploadData(buffer, options)
+						.then(_ => {
+							// DELETE FILE STORED ON SERVER
+							fs.unlinkSync(fftarget)
+						}).catch(err=> {
+							if (err){
+								fileerror = true;
+								console.log(err)
+							}
+						})
+					} 
+
+					if(!fileerror && modules.some(d => d.type === 'files')){
+						const pathurl = `${app_storage}/${targetdir}/${f.filename}${path.extname(f.originalname).toLowerCase()}`
+						DB.conn.one(`
+							INSERT INTO files (name, path, owner)
+							VALUES ($1, $2, $3)
+							RETURNING id
+						;`, [f.originalname, pathurl, uuid])
+						.then(result => {
+							if (result) {
+								fs.unlinkSync(source)
+								resolve({ status: 200, src: path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`), originalname: f.originalname, message: 'success' })
+							} else resolve({ status: 403, message: 'file was not properly stored' })
+						}).catch(err => console.log(err))
+					} else {
+						fs.unlinkSync(source)
+						resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
+					}
 				})
 			} else if (f.mimetype.includes('application/pdf')) {
 				const targetdir = path.join('uploads/', uuid)

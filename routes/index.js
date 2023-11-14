@@ -265,7 +265,6 @@ exports.process.upload = async (req, res) => {
 	const { uuid } = req.session || {}
 
 	const fls = req.files
-	const maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
 	// ESTABLISH THE CONNECTION TO AZURE
 	const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 	// FIND OR CREATE THE CONTAINER
@@ -279,6 +278,8 @@ exports.process.upload = async (req, res) => {
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 		const source = path.join(__dirname, `../${f.path}`)
 
+		let maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
+		if (f.mimetype.includes('video/') || f.mimetype.includes('audio/')) maxFileSizeBytes = 500 * 1024 * 1024; // 100MB 
 		// Check if the file size exceeds the maximum allowed size
 		if (f.size > maxFileSizeBytes) {
 			fs.unlinkSync(source); // Delete the uploaded file
@@ -399,6 +400,7 @@ exports.process.upload = async (req, res) => {
 				// TO DO: CHECK SIZE HERE AND IF TOO BIG DO NOTHING (IN FRONT END TELL USER TO GO THROUGH YOUTUBE OF MSSTREAM)
 				// const target = path.join(dir, `./${f.filename}${path.extname(f.originalname).toLowerCase()}`)
 				const fftarget = path.join(dir, `./ff-${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+				let fileerror = false
 
 				execFile('ffmpeg', [
 					'-i', source,
@@ -408,12 +410,99 @@ exports.process.upload = async (req, res) => {
 					'-c:a', 'copy',
 					'-vf', 'scale=854:ih*854/iw', // 854 = 480p
 					fftarget
-				], function(err, stdout, stderr) {
+				], async function(err, stdout, stderr) {
 					if (err) console.log(err)
+					const targetdir = path.join('uploads/', uuid)
 
-					fs.unlinkSync(source)
-					resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
+					if (app_storage) {
+						const buffer = await fs.readFileSync(fftarget)
+
+						const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`))
+						const options = { blobHTTPHeaders: { blobContentType: f.mimetype } }
+						await blobClient.uploadData(buffer, options)
+						.then(_ => {
+							// DELETE FILE STORED ON SERVER
+							fs.unlinkSync(fftarget)
+						}).catch(err=> {
+							if (err){
+								fileerror = true;
+								console.log(err)
+							}
+						})
+					} 
+
+					if(!fileerror && modules.some(d => d.type === 'files')){
+						const pathurl = `${app_storage}/${targetdir}/${f.filename}${path.extname(f.originalname).toLowerCase()}`
+						DB.conn.one(`
+							INSERT INTO files (name, path, owner)
+							VALUES ($1, $2, $3)
+							RETURNING id
+						;`, [f.originalname, pathurl, uuid])
+						.then(result => {
+							fs.unlinkSync(source)
+							if (result) {
+								resolve({ status: 200, src: path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`), originalname: f.originalname, message: 'success' })
+							} else resolve({ status: 403, message: 'file was not properly stored' })
+						}).catch(err => console.log(err))
+					} else {
+						fs.unlinkSync(source)
+						resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
+					}
 				})
+			} else if (f.mimetype.includes('audio/')) {
+				// CREDIT: https://superuser.com/questions/552817/fastest-way-to-convert-any-audio-file-to-low-bitrate
+				// ffmpeg -i input.file -map 0:a:0 -b:a 96k output.mp3
+
+				// TO DO: TEST THIS
+
+				const fftarget = path.join(dir, `./ff-${f.filename}${path.extname(f.originalname).toLowerCase()}`)
+				let fileerror = false
+
+				execFile('ffmpeg', [
+					'-i', source,
+					'-map', '0:a:0',
+					'-b:a', '48K',
+					fftarget
+				], async function(err, stdout, stderr) {
+					if (err) console.log(err)
+					const targetdir = path.join('uploads/', uuid)
+
+					if (app_storage) {
+						const buffer = await fs.readFileSync(fftarget)
+
+						const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`))
+						const options = { blobHTTPHeaders: { blobContentType: f.mimetype } }
+						await blobClient.uploadData(buffer, options)
+						.then(_ => {
+							// DELETE FILE STORED ON SERVER
+							fs.unlinkSync(fftarget)
+						}).catch(err=> {
+							if (err){
+								fileerror = true;
+								console.log(err)
+							}
+						})
+					} 
+
+					if(!fileerror && modules.some(d => d.type === 'files')){
+						const pathurl = `${app_storage}/${targetdir}/${f.filename}${path.extname(f.originalname).toLowerCase()}`
+						DB.conn.one(`
+							INSERT INTO files (name, path, owner)
+							VALUES ($1, $2, $3)
+							RETURNING id
+						;`, [f.originalname, pathurl, uuid])
+						.then(result => {
+							fs.unlinkSync(source)
+							if (result) {
+								resolve({ status: 200, src: path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`), originalname: f.originalname, message: 'success' })
+							} else resolve({ status: 403, message: 'file was not properly stored' })
+						}).catch(err => console.log(err))
+					} else {
+						fs.unlinkSync(source)
+						resolve({ status: 200, src: fftarget.split('public/')[1], originalname: f.originalname, message: 'success' })
+					}
+				})
+
 			} else if (f.mimetype.includes('application/pdf')) {
 				const targetdir = path.join('uploads/', uuid)
 				const filename = `${f.filename}.pdf`
@@ -438,8 +527,8 @@ exports.process.upload = async (req, res) => {
 							RETURNING id
 						;`, [f.originalname, pathurl, uuid])
 						.then(result => {
+							fs.unlinkSync(source)
 							if (result) {
-								fs.unlinkSync(source)
 								resolve({ status: 200, src: path.join(targetdir, filename), originalname: f.originalname, message: 'success' })
 							} else resolve({ status: 403, message: 'file was not properly stored' })
 						}).catch(err => console.log(err))

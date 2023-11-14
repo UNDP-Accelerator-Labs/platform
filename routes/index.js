@@ -440,8 +440,8 @@ exports.process.upload = async (req, res) => {
 							RETURNING id
 						;`, [f.originalname, pathurl, uuid])
 						.then(result => {
+							fs.unlinkSync(source)
 							if (result) {
-								fs.unlinkSync(source)
 								resolve({ status: 200, src: path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`), originalname: f.originalname, message: 'success' })
 							} else resolve({ status: 403, message: 'file was not properly stored' })
 						}).catch(err => console.log(err))
@@ -493,8 +493,8 @@ exports.process.upload = async (req, res) => {
 							RETURNING id
 						;`, [f.originalname, pathurl, uuid])
 						.then(result => {
+							fs.unlinkSync(source)
 							if (result) {
-								fs.unlinkSync(source)
 								resolve({ status: 200, src: path.join(targetdir, `${f.filename}${path.extname(f.originalname).toLowerCase()}`), originalname: f.originalname, message: 'success' })
 							} else resolve({ status: 403, message: 'file was not properly stored' })
 						}).catch(err => console.log(err))
@@ -528,8 +528,8 @@ exports.process.upload = async (req, res) => {
 							RETURNING id
 						;`, [f.originalname, pathurl, uuid])
 						.then(result => {
+							fs.unlinkSync(source)
 							if (result) {
-								fs.unlinkSync(source)
 								resolve({ status: 200, src: path.join(targetdir, filename), originalname: f.originalname, message: 'success' })
 							} else resolve({ status: 403, message: 'file was not properly stored' })
 						}).catch(err => console.log(err))

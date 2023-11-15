@@ -53,7 +53,7 @@ exports.updateRecord = (_kwarq) => {
           notifications = $9,
           reviewer = $10,
           confirmed_at = COALESCE(confirmed_at, NOW()),
-          confirmed = True
+          confirmed = TRUE
       WHERE uuid = $11
       ;`,
     data

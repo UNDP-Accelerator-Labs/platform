@@ -24,7 +24,7 @@ module.exports =async (req, res) => {
 		}
 	}
 	if (!id) {
-		password = Math.random().toString(36).slice(-8);  // we always create a random password
+		password = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);  // we always create a random password
 		DB.general.tx(t => {
 			return t.one(`
 				INSERT INTO users (name, email, position, password, iso3, language, secondary_languages, rights, notifications, reviewer)

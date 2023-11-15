@@ -35,18 +35,26 @@ app.use(
       directives: {
         'img-src': csp_links,
         'script-src': csp_links,
-        'script-src-attr': ["'unsafe-inline'"],
+        'script-src-attr': [
+          "'self'",
+          "'unsafe-inline'",
+          '*.sdg-innovation-commons.org',
+          'sdg-innovation-commons.org',
+        ],
         'style-src': csp_links,
         'connect-src': csp_links,
         'frame-src': [
           "'self'",
+          '*.sdg-innovation-commons.org',
+          'sdg-innovation-commons.org',
           'https://www.youtube.com/',
           'https://youtube.com/',
           'https://web.microsoftstream.com',
         ],
         'form-action': [
-          "'self'", 
-          '*.sdg-innovation-commons.org'
+          "'self'",
+          '*.sdg-innovation-commons.org',
+          'sdg-innovation-commons.org',
         ],
       },
     },
@@ -319,7 +327,8 @@ app
   .get(routes.check.login, routes.process.publish)
   .post(routes.check.login, routes.process.publish);
 app.get('/unpublish/:object', routes.check.login, routes.process.unpublish);
-app.route('/share/:object')
+app
+  .route('/share/:object')
   .get(routes.check.login, routes.process.share)
   .post(routes.check.login, routes.process.share);
 app.get('/forward/:object', routes.check.login, routes.process.forward);

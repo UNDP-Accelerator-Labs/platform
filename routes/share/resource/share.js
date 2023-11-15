@@ -1,5 +1,3 @@
-const { app_title, DB } = include('config/')
-const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
@@ -19,14 +17,14 @@ module.exports = (req, res) => {
 					if (callback?.referer && callback?.endpoint) {
 						const { referer, endpoint } = callback
 						const res_token = jwt.sign({ uuid, callback, resource_path: src }, process.env.APP_SUITE_SECRET, { expiresIn: 15 * 60 }) // EXPIRES IN 15 MINUTES
-						
+
 						const { origin } = new URL(referer)
 						const callbackurl = new URL(endpoint, origin)
 						const queryparams = new URLSearchParams(callbackurl.search)
 						queryparams.set('token', res_token)
 
 						res.redirect(`${callbackurl.href}?${queryparams.toString()}`)
-					
+
 					} else res.json({ status: 403, message: 'There is no callback to the request.' })
 
 				} else { // CANCEL THE REQUEST AS NO src IS PASSED: JUST REDIRECT TO THE CALLING PAGE

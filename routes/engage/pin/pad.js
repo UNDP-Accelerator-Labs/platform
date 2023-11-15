@@ -59,8 +59,10 @@ exports.pin = (req, res) => {
 		if (object_id) {
 			return DB.general.tx(gt => {
 				return ownDB().then(async ownId => {
-					await gt.none(insertpads(board_id, object_id, mobilization, ownId));
-					await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
+					if(await can_inserts(gt, board_id, uuid)){
+						await gt.none(insertpads(board_id, object_id, mobilization, ownId));
+						await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
+					}
 					const batch = [];
 					batch.push(gt.any(retrievepins(object_id, uuid, ownId)))
 					// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -89,11 +91,16 @@ exports.unpin = (req, res) => {
 				// we ignore the db and is_included fields here so we don't delete pinboards if the only
 				// pads of the board are on a different database or ignored
 				await gt.none(`
-					DELETE FROM pinboards
-					WHERE id = $1::INT
-						AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
-						AND owner = $2
+				DELETE FROM pinboards 
+				WHERE id IN (
+					SELECT p.id FROM pinboards p
+					LEFT JOIN pinboard_contributors pc ON p.id = pc.pinboard
+					WHERE p.id = $1::INT
+					AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
+					AND pc.participant = $2
+				)				
 				;`, [ board_id, uuid ])
+
 				const batch = []
 				batch.push(gt.any(retrievepins(object_id, uuid, ownId)));
 				// batch.push(gt.any(retrievepinboards(collaborators_ids, ownId)))
@@ -139,8 +146,9 @@ function removepads (_id, _object_id, _mobilization, _uuid, ownId) {
 			WHERE pinboard = $1::INT
 				AND pad IN ($2:csv)
 				AND pinboard IN (
-					SELECT id FROM pinboards
-					WHERE owner = $3
+					SELECT p.id FROM pinboards p
+					LEFT JOIN pinboard_contributors pc ON p.id = pc.pinboard
+					WHERE pc.participant = $3
 				)
 				AND db = $4
 				AND is_included = true
@@ -216,3 +224,12 @@ function retrievepinboards (_owners, ownId) {
 		GROUP BY p.id
 	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])
 }
+
+async function can_inserts (t, id, uuid) {
+	return t.oneOrNone(`
+			SELECT TRUE AS bool FROM pinboard_contributors pc
+			WHERE pc.pinboard = $1::INT
+			AND pc.participant = $2`,
+		[id, uuid], d => d?.bool)
+}
+

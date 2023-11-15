@@ -1,10 +1,10 @@
 const { app_title, DB } = include('config/')
-const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	let { contributor, pinboard } = req.body || {}
-	const { uuid, email: from, username } = req.session || {}
+	const { uuid, username } = req.session || {}
 
 	if (!Array.isArray(contributor)) contributor = [contributor]
 	const data = contributor.map(d => {
@@ -41,8 +41,6 @@ module.exports = (req, res) => {
 					return Promise.all(results.map(d => {
 						sendemail({
 							to: d.email,
-							cc: from,
-							bcc: 'myjyby@gmail.com',
 							subject: `[${app_title}] Collections`,
 							html: `Dear contributor, ${username} has shared with you the follow collection on the ${app_title} platform:
 								<br><br><strong>${title}</strong>

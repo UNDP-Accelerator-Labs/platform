@@ -6,8 +6,7 @@ const { isPasswordSecure } = require('./password-requirement')
 
 // Function to send password reset email
 async function sendResetEmail(email, html) {
-  sendEmail({
-    from: 'no-reply@acclab-platform.org',
+  await sendEmail({
     to: email,
     subject: 'Password reset',
     html

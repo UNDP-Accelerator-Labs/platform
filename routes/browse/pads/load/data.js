@@ -172,20 +172,23 @@ module.exports = async kwargs => {
 				;`, [ padlist ]).catch(err => console.log(err)))
 				// FOLLOW UP OPTIONS: THIS IS NOW DONE WITH THE ltree STRUCTURE
 				// THE SOURCE OF THE FOLLOW UP MOBILIZATION IS THE MOBILIZATION THAT THE PAD WAS CONTRIBUTED TO
-				const validMobs = (await t.any(`
-					SELECT DISTINCT mc.mobilization as id
-					FROM pads p
-					INNER JOIN mobilization_contributions mc
-						ON mc.pad = p.id
-					WHERE p.status >= 2
-						AND p.id IN $1:raw
-				`, [ padlist ])).map(row => row.id);
-				const pbMobs = (await DB.general.any(`
-					SELECT pb.mobilization as mob
-					FROM pinboards pb
-					WHERE pb.mobilization_db = $2
-						AND pb.mobilization IN ($1:csv)
-				`, [ safeArr(validMobs, -1), ownId ])).map(row => row.mob);
+				
+				// TO DO: THERE IS AN ISSUE HERE: VALID MOBS PREVENTS PBMOBS FROM WORKING, SINCE PBMOBS IS NOT BASED ON A PREVIOUS MOBILIZATION
+				// const validMobs = (await t.any(`
+				// 	SELECT DISTINCT mc.mobilization AS id
+				// 	FROM pads p
+				// 	INNER JOIN mobilization_contributions mc
+				// 		ON mc.pad = p.id
+				// 	WHERE p.status >= 2
+				// 		AND p.id IN $1:raw
+				// ;`, [ padlist ])).map(row => row.id);
+				// const pbMobs = (await DB.general.any(`
+				// 	SELECT pb.mobilization as mob
+				// 	FROM pinboards pb
+				// 	WHERE pb.mobilization_db = $2
+				// 		AND pb.mobilization IN ($1:csv)
+				// ;`, [ safeArr(validMobs, -1), ownId ])).map(row => row.mob);
+
 				batch.push(t.task(t1 => {
 					const batch1 = []
 
@@ -216,33 +219,67 @@ module.exports = async kwargs => {
 							AND p.id IN $1:raw
 						GROUP BY p.id
 					;`, [ padlist, followup_count ]))
+					
+					// THIS CODE WAS NOT WORKING
+					// batch1.push(t1.any(`
+					// 	SELECT p.id AS id,
+					// 		json_agg(json_build_object(
+					// 			'id', m.id,
+					// 			'title', m.title,
+					// 			'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
+					// 			'template', m.template,
+					// 			'count', (
+					// 				SELECT COUNT (pp.id) FROM pads pp
+					// 				INNER JOIN mobilization_contributions mm_cc
+					// 					ON mm_cc.pad = pp.id
+					// 				WHERE p.version @> pp.version
+					// 				AND mm_cc.mobilization = m.id
+					// 			),
+					// 			'max', $2::INT
+					// 		)) AS followups
+					// 	FROM pads p
+					// 	INNER JOIN mobilization_contributions mc
+					// 		ON mc.pad = p.id
+					// 	INNER JOIN mobilizations m
+					// 		ON m.id = mc.mobilization
+					// 	WHERE m.status = 1
+					// 		AND m.version IS NULL
+					// 		AND p.status >= 2
+					// 		AND m.id IN ($1:csv)
+					// 	GROUP BY p.id
+					// ;`, [ safeArr(pbMobs, -1), followup_count ]))
+					
+					// FIRST WE CONSTRUCT THE followups OBJECT
+					// THEN WE ATTACH TO RELEVANT PADS
 					batch1.push(t1.any(`
-						SELECT p.id AS id,
-							json_agg(json_build_object(
-								'id', m.id,
-								'title', m.title,
-								'source', p.id, -- THE SOURCE AND THE TEMPLATE ARE FOR PASSING TO ANY NEW FOLLOWUP PAD SUBMISSION
-								'template', m.template,
-								'count', (
-									SELECT COUNT (pp.id) FROM pads pp
-									INNER JOIN mobilization_contributions mm_cc
-										ON mm_cc.pad = pp.id
-									WHERE p.version @> pp.version
-									AND mm_cc.mobilization = m.id
-								),
-								'max', $2::INT
-							)) AS followups
-						FROM pads p
-						INNER JOIN mobilization_contributions mc
-							ON mc.pad = p.id
-						INNER JOIN mobilizations m
-							ON m.id = mc.mobilization
+						SELECT m.collection, json_build_object(
+							'id', m.id,
+							'title', m.title,
+							'template', m.template,
+							'count', 0,
+							'max', $1::INT
+						) AS followups
+
+						FROM mobilizations m
 						WHERE m.status = 1
 							AND m.version IS NULL
-							AND p.status >= 2
-							AND m.id IN ($1:csv)
-						GROUP BY p.id
-					;`, [ safeArr(pbMobs, -1), followup_count ]))
+							AND m.collection IS NOT NULL
+					;`, [ followup_count ])
+					.then(results => {
+						return DB.general.any(`
+							SELECT pad AS id, pinboard AS collection FROM pinboard_contributions
+							WHERE pinboard IN ($1:csv)
+							AND db = $2
+						;`, [ results.map(d => d.collection), ownId ])
+						.then(pinnedpads => {
+							pinnedpads.forEach(d => {
+								d.followups = results.find(c => c.collection === d.collection)?.followups
+								d.followups.source = d.id
+								delete d.collection
+							})
+							return pinnedpads
+						}).catch(err => console.log(err))
+					}).catch(err => console.log(err)))
 					return t1.batch(batch1)
 					.then(results => {
 						const [ followups, depths ] = results

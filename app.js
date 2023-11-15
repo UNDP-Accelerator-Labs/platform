@@ -355,6 +355,12 @@ app.post(
   routes.check.login,
   routes.process.upload,
 );
+app.post(
+  '/upload/file',
+  upload.array('file'),
+  routes.check.login,
+  routes.process.upload,
+);
 app.post('/upload/xlsx', routes.check.login, routes.process.import); // TO DO: CHANGE path SCHEMA
 
 app.post('/screenshot', routes.process.screenshot);

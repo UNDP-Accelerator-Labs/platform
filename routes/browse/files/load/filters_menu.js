@@ -6,7 +6,7 @@ const filter = require('../filter')
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	const { req, res } = kwargs || {}
-	
+
 	const { rights} = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	const { space } = req.params || {}
@@ -24,10 +24,10 @@ module.exports = async kwargs => {
 					WHERE TRUE
 						$1:raw
 					GROUP BY owner
-				;`, [ f_space ]) 
+				;`, [ f_space ])
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
-					
+
 					contributors = contributors.map(d => {
 						const obj = {}
 						obj.id = d.owner
@@ -50,7 +50,7 @@ module.exports = async kwargs => {
 				.then(async results => {
 					let contributors = await join.users(results, [ language, 'owner' ])
 					// TO DO: MAYBE SWITCH THIS TO COUNTRIES, LIKE FOR PADS
-					
+
 					contributors = contributors.map(d => {
 						const obj = {}
 						obj.id = d.owner
@@ -63,15 +63,15 @@ module.exports = async kwargs => {
 					return contributors.length ? { contributors } : null
 				}).catch(err => console.log(err)))
 			} else batch1.push(null)
-		
+
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
 		}).catch(err => console.log(err)))
 
 
 		return t.batch(batch)
-		.then(results => results.filter(d => d.length))
+		.then(results => results.filter(d => d?.length ?? 0))
 	}).then(results => {
-		return results.map(d => flatObj.call(d))
+		return results?.map(d => flatObj.call(d)) ?? []
 	})
 }

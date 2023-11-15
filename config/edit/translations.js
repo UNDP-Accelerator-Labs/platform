@@ -6,5 +6,30 @@ exports.translations = {
     es: 'En esta plataforma, puede encontrar muchas soluciones de base en etapa inicial, locales y, a menudo, de código abierto, desarrolladas por personas que están innovando en los márgenes para resolver los complejos desafíos de desarrollo que enfrentan sus comunidades.',
     pt: 'Nesta plataforma, você pode encontrar muitas soluções de base em estágio inicial, desenvolvidas em casa e muitas vezes de código aberto, desenvolvidas por pessoas que estão inovando nas margens para resolver complexos desafios de desenvolvimento enfrentados por suas comunidades.',
   },
-  'email notifications': {},
+  'email notifications': {
+    'new user subject': {
+      en: (appTitle) => `[${appTitle}] An account has been created for you`,
+      es: (appTitle) => `[${appTitle}] Se ha creado una cuenta para ti`,
+    },
+    'new user body': {
+      en: (creator, appTitle, resetLink, baseURL) => `
+        ${creator} has created an account for you to access the
+        <a href="${baseURL}">${appTitle}</a> application.
+
+        For logging in for the first time please use the following link: <a href="${resetLink}">${resetLink}</a>.
+
+        After 24 hours the above link will expire. In this case, pleas use
+        <a href="${baseURL}forget-password">${baseURL}forget-password</a> instead.
+      `,
+      es: (creator, appTitle, resetLink, baseURL) => `
+        ${creator} ha creado una cuenta para que puedas acceder a la aplicación
+        <a href="${baseURL}">${appTitle}</a>.
+
+        Para iniciar sesión por primera vez, utiliza el siguiente enlace: <a href="${resetLink}">${resetLink}</a>.
+
+        Después de 24 horas, el enlace anterior caducará. En ese caso, utiliza
+        <a href="${baseURL}forget-password">${baseURL}forget-password</a> en su lugar.
+      `,
+    },
+  },
 };

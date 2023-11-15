@@ -17,18 +17,18 @@ module.exports = async kwargs => {
 		const batch = []
 
 		batch.push(t.task(t1 => {
-			const batch1 = []			
+			const batch1 = []
 			// GET POSITION BREAKDOWN
 			batch1.push(t1.any(`
 				SELECT COUNT (DISTINCT (u.id))::INT, u.position AS id, u.position AS name FROM users u
-				WHERE TRUE 
+				WHERE TRUE
 					$1:raw
 				GROUP BY u.position
 			;`, [ f_space ]) // [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
 			.then(results => {
 				return { positions: results }
 			}))
-			
+
 			// GET COUNTRY BREAKDOWN
 			batch1.push(t1.any(`
 				SELECT COUNT (DISTINCT (u.id))::INT, u.iso3 AS id
@@ -37,7 +37,7 @@ module.exports = async kwargs => {
 					$2:raw
 				GROUP BY (u.iso3)
 			;`, [ language, f_space ]) // [ language, full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
-			.then(async results => { 
+			.then(async results => {
 				// JOIN LOCATION INFO
 				let countries = await join.locations(results, { connection: t1, language, key: 'id', name_key: 'name' })
 				if (countries.length !== array.unique.call(countries, { key: 'name' }).length) {
@@ -66,22 +66,22 @@ module.exports = async kwargs => {
 			// GET RIGHTS BREAKDOWN
 			batch1.push(t1.any(`
 				SELECT COUNT (DISTINCT (u.id))::INT, u.rights AS id, u.rights AS name FROM users u
-				WHERE TRUE 
+				WHERE TRUE
 					$1:raw
 				GROUP BY u.rights
 			;`, [ f_space ]) // [ full_filters.replace(`AND LEFT(u.name, 1) = '${page}'`, '') ])
-			.then(results => { 
+			.then(results => {
 				return results.length ? { rights: results } : null
 			}))
-			
+
 			return t1.batch(batch1)
 			.then(results => results.filter(d => d))
 		}).catch(err => console.log(err)))
-	
+
 		return t.batch(batch)
-		.then(results => results.filter(d => d.length))
+		.then(results => results.filter(d => d?.length ?? 0))
 		.catch(err => console.log(err))
 	}).then(results => {
-		return results.map(d => flatObj.call(d))
+		return results?.map(d => flatObj.call(d)) ?? []
 	}).catch(err => console.log(err))
 }

@@ -13,9 +13,12 @@ exports.translations = {
     'new user body': {
       en: (creator, appTitle, resetLink, baseURL) => `
         ${creator} has created an account for you to access the
-        <a href="${resetLink}">${appTitle}</a> application.
+        <a href="${baseURL}">${appTitle}</a> application.
 
-        If the above link has expired you can <a href="${baseURL}forget-password">reset password</a>
+        For logging in for the first time please use <a href="${resetLink}">this link</a>.
+
+        After 24 hours the above link will expire. In this case, pleas use
+        <a href="${baseURL}forget-password">this link</a> instead.
       `,
     },
   },

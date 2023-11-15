@@ -5,7 +5,7 @@ module.exports = async (kwargs) => {
 		console.log('working locally so no need to send email', kwargs);
 		return new Promise(resolve => resolve(null));
 	}
-	const { to, subject, html } = kwargs;
+	const { to, subject, cc, bcc, html } = kwargs;
 	const from = `"No Reply" <no-reply@sdg-innovation-commons.org>`
 	if (!to) return { status: 500, message: 'The message has no recipient.' }
 	if (!subject) return { status: 500, message: 'The message has no subject.' }
@@ -23,6 +23,8 @@ module.exports = async (kwargs) => {
 	const mailOptions = {
 		from,
 		to,
+		cc,
+		bcc,
 		subject,
 		html,
 	};

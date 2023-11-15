@@ -1,4 +1,5 @@
 const app_id = process.env.APP_ID;
+const is_staging = `${process.env.LOGIN_DB_HOST}`.includes('staging');
 
 let app_obj = require('./local.js');
 if (app_id === 'ap') {
@@ -42,11 +43,14 @@ const {
   fixed_uuid,
 } = app_obj;
 
+exports.is_staging = is_staging;
 exports.app_id = app_id;
-exports.app_title = app_title;
+exports.app_title = is_staging ? `${app_title} (staging)` : app_title;
 exports.app_title_short = app_title_short;
 exports.app_suite = app_suite;
-exports.own_app_url = own_app_url;
+exports.own_app_url = is_staging
+  ? 'https://acclabs-staging.azurewebsites.net/'
+  : own_app_url;
 exports.app_suite_secret = app_suite_secret;
 exports.app_languages = app_languages;
 exports.app_description = app_description;

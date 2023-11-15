@@ -145,15 +145,15 @@
 					opts.push({
 						node: 'input',
 						type: 'file',
-						name: 'pdf',
-						accept: 'application/pdf, image/*,', // EXTEND THIS TO ANY FILE
+						name: 'file',
+						accept: 'application/pdf,image/*,video/*,audio/*',
 						placeholder: 'Upload a new <%- key.slice(0, -1) %>', // TO DO: TRANSLATE
 						resolve: function (node) {
 							const formData = new FormData()
 							formData.append(this.name, node.files[0], node.files[0].name)
 
 							const form = {
-								action: '/upload/pdf',
+								action: '/upload/file',
 								method: 'POST',
 								data: formData
 							}

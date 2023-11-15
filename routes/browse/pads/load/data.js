@@ -270,7 +270,7 @@ module.exports = async kwargs => {
 							SELECT pad AS id, pinboard AS collection FROM pinboard_contributions
 							WHERE pinboard IN ($1:csv)
 							AND db = $2
-						;`, [ results.map(d => d.collection), ownId ])
+						;`, [ safeArr(results.map(d => d.collection), -1), ownId ])
 						.then(pinnedpads => {
 							pinnedpads.forEach(d => {
 								d.followups = results.find(c => c.collection === d.collection)?.followups

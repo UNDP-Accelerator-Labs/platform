@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
 							} else {
 								return {
 									object: 'pads',
-									space: rights >= read ? 'all' : 'public',
+									space: rights >= read ? 'published' : 'public',
 									countries: Array.isArray(result?.iso3) ? result.iso3 : [result?.iso3],
 									title: result?.name,
 									// instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
@@ -186,7 +186,7 @@ module.exports = async (req, res) => {
 			)
 		)
 		`, [ uuid, rights ])
-		// else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
+		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		// else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		
 		else if (space === 'published') f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])

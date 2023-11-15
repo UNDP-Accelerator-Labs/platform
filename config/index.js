@@ -168,6 +168,8 @@ exports.fixed_uuid = fixed_uuid;
 // ADD LIST OF DOMAIN NAMES OF ALL IMAGES, JS SCRIPT AND STYLESHEETS REQUIRED BY THE BROWSER TO RENDER CORRECTLY
 exports.csp_links = [
   "'self'",
+  '*.sdg-innovation-commons.org',
+  'sdg-innovation-commons.org',
   "'unsafe-inline'",
   "'unsafe-eval'",
   'https://translate.google.com',

@@ -126,7 +126,7 @@ exports.updatePassword = async (req, res, next) => {
         }
 
         // Update the password and clear the reset token
-          await DB.general.none(`
+        await DB.general.none(`
           UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
         `, [password, decoded.email]);
 

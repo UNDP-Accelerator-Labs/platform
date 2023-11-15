@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
 		// CHECK IF THE USER IS ALLOWED TO CONTRIBUTE A PAD (IN THE EVENT OF A MOBILIZATION)
 		return check_authorization({ connection: t, id, template, mobilization, source, uuid, rights, collaborators, public })
 		.then(async result => {
-			const { authorized, redirect } = result
+			const { authorized, redirect } = result || {}
 
 			if (!authorized) {
 				if (referer) return res.redirect(referer)

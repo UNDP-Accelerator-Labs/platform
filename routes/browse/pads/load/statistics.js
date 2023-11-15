@@ -84,9 +84,10 @@ module.exports = async kwargs => {
 		// GET SHARED PADS COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE p.status = 2
+			-- WHERE p.status = 2
+			WHERE (p.owner IN ($1:csv) AND p.owner <> $2)
 				AND p.id NOT IN (SELECT review FROM reviews)
-		;`, [], d => d.count).then(d => { return { shared: d } })
+		;`, [ collaborators_ids, uuid ], d => d.count).then(d => { return { shared: d } })
 		.catch(err => console.log(err)))
 		// GET UNDER REVIEW PADS COUNT
 		batch.push(t.one(`

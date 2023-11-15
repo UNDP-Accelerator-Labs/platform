@@ -44,7 +44,10 @@ app.use(
           'https://youtube.com/',
           'https://web.microsoftstream.com',
         ],
-        'form-action': ["'self'", '*.sdg-innovation-commons.org']
+        'form-action': [
+          "'self'", 
+          '*.sdg-innovation-commons.org'
+        ],
       },
     },
     referrerPolicy: {

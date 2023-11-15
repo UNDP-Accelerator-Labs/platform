@@ -153,6 +153,18 @@ exports.metafields = [
       { name: 'This activity has a low risk' },
     ],
   },
+  {
+    type: 'attachment',
+    name: 'learning plan',
+    required: true,
+    uris: [
+      {
+        uri: 'https://learningplans.sdg-innovation-commons.org/en/contribute/resource',
+      },
+      { uri: undefined },
+    ],
+    limit: 1,
+  }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
 ];
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']

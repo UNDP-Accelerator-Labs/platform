@@ -63,3 +63,5 @@ exports.browse_display = browse_display;
 exports.view_display = view_display;
 exports.welcome_module = welcome_module;
 exports.fixed_uuid = fixed_uuid;
+
+exports.translations = require('./translations.js').translations;

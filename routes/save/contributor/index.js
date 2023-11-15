@@ -1,6 +1,6 @@
-const { app_title, app_languages, DB } = include('config/')
-const { email: sendemail, datastructures, join, sessionupdate } = include('routes/helpers/')
-const { isPasswordSecure } = require('../../login')
+const { own_app_url, app_title, app_languages, DB, translations } = include('config/')
+const { email: sendemail, sessionupdate } = include('routes/helpers/')
+const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
 module.exports =async (req, res) => {
@@ -58,12 +58,18 @@ module.exports =async (req, res) => {
 				}
 				return t.batch(batch)
 				.then(async _ => {
+					// cc creator
+					// remove password field
+					const own_app = new URL(own_app_url)
+					const resetLink = await createResetLink(own_app.protocol, own_app.hostname, email);
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+						const temail = translations['email notifications'];
 						await sendemail({
 							to: email,
-							subject: `[${app_title}] An account has been created for you`,
-							html: `${username} has created an account for you to access the ${app_title} application.`
+							// cc:
+							subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(app_title),
+							html: (temail['new user body'][language] ?? temail['new user body']['en'])(username, app_title, resetLink, own_app_url),
 						})
 						return result
 					} else return result

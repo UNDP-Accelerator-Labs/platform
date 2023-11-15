@@ -6,5 +6,17 @@ exports.translations = {
     es: 'En esta plataforma, puede encontrar muchas soluciones de base en etapa inicial, locales y, a menudo, de código abierto, desarrolladas por personas que están innovando en los márgenes para resolver los complejos desafíos de desarrollo que enfrentan sus comunidades.',
     pt: 'Nesta plataforma, você pode encontrar muitas soluções de base em estágio inicial, desenvolvidas em casa e muitas vezes de código aberto, desenvolvidas por pessoas que estão inovando nas margens para resolver complexos desafios de desenvolvimento enfrentados por suas comunidades.',
   },
-  'email notifications': {},
+  'email notifications': {
+    'new user subject': {
+      en: (appTitle) => `[${appTitle}] An account has been created for you`,
+    },
+    'new user body': {
+      en: (creator, appTitle, resetLink, baseURL) => `
+        ${creator} has created an account for you to access the
+        <a href="${resetLink}">${appTitle}</a> application.
+
+        If the above link has expired you can <a href="${baseURL}forget-password">reset password</a>
+      `,
+    },
+  },
 };

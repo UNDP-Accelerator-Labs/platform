@@ -20,9 +20,9 @@ let {
   view_display,
   welcome_module,
   fixed_uuid,
+  translations,
 } = require('./edit/');
 
-const { translations } = require('./edit/translations.js');
 exports.translations = translations;
 
 exports.app_id = app_id;

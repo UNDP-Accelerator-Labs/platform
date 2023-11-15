@@ -147,6 +147,7 @@ CREATE TABLE mobilizations (
     description TEXT,
     language VARCHAR(9),
     old_collection INT,
+    collection INT,
     version ltree
 );
 CREATE INDEX version_idx ON mobilizations USING GIST (version);

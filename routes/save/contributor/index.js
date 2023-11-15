@@ -62,7 +62,6 @@ module.exports =async (req, res) => {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						await sendemail({
 							to: email,
-							bcc: 'myjyby@gmail.com',
 							subject: `[${app_title}] An account has been created for you`,
 							html: `${username} has created an account for you to access the ${app_title} application.`
 						})
@@ -243,9 +242,7 @@ module.exports =async (req, res) => {
 				if (id !== uuid) {
 					// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 					await sendemail({
-						// from,
 						to: email,
-						bcc: 'myjyby@gmail.com',
 						subject: `[${app_title}] Your account information has been modified`,
 						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE
 					})

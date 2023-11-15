@@ -126,7 +126,6 @@ module.exports = (req, res) => {
 					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
 					.then(async results => {
 						const bcc = results.map(d => d.email)
-						bcc.push('myjyby@gmail.com') // TO DO: THIS IS TEMP
 
 						await sendemail({
 							to: email,

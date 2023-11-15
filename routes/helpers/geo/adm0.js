@@ -27,7 +27,7 @@ exports.name_column = kwargs => {
 	const conn = kwargs.connection || DB.general
 	const { language } = kwargs || {}
 	return conn.many(`
-		SELECT DISTINCT column_name FROM information_schema.columns 
+		SELECT DISTINCT column_name FROM information_schema.columns
 		WHERE table_name IN ('adm0', 'adm0_subunits')
 			AND column_name LIKE 'name_%'
 	;`).then(results => {

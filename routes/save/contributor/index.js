@@ -150,13 +150,13 @@ module.exports =async (req, res) => {
 								secondary_languages = $7,
 								$8:raw
 								notifications = $9,
-								reviewer = $10
+								reviewer = $10,
 							WHERE uuid = $11
 						;`, [
 							/* $1 */ name,
 							/* $2 */ email,
 							/* $3 */ position,
-							/* $4 */ update_pw,
+							/* $4 */ 'NOT USED',
 							/* $5 */ iso3,
 							/* $6 */ language,
 							/* $7 */ JSON.stringify(secondary_languages || []),

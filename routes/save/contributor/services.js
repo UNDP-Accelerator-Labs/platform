@@ -51,7 +51,9 @@ exports.updateRecord = (_kwarq) => {
           secondary_languages = $7,
           $8:raw
           notifications = $9,
-          reviewer = $10
+          reviewer = $10,
+          confirmed_at = COALESCE(confirmed_at, NOW()),
+          confirmed = True
       WHERE uuid = $11
       ;`,
     data

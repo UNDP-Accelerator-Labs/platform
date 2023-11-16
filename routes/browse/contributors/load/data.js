@@ -36,8 +36,7 @@ module.exports = kwargs => {
 				)) FROM teams t
 				INNER JOIN team_members tm
 					ON tm.team = t.id
-				WHERE t.host IN ($2:csv)
-					AND tm.member = u.uuid
+				WHERE tm.member = u.uuid
 				GROUP BY tm.member
 			)::TEXT, '[]')::JSONB
 			AS pinboards

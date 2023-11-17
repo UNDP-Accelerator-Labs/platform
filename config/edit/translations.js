@@ -14,6 +14,39 @@ exports.translations = {
   },
   'app desc': {
     'solutions-mapping': {
+      en: `
+      <p>
+      The platform has been designed to systematize the solutions identified
+      and share them effectively. Each solution is documented in pads, which are
+      organized in tabs according to their publication status.
+      </p>
+      <p>
+      Key Features:<br/>
+      <ul>
+      <li>
+      Tab Organization: Solutions are classified by their publication status,
+      providing a clear view of the progress and availability of each initiative.
+      </li>
+      <li>
+      Real-Time Collaboration: The platform facilitates collaborative editing in real
+      time through pads, fostering active participation and continuous contribution from team members.
+      </li>
+      <li>
+      Comment System: A comment system is integrated to facilitate the
+      feedback and discussion on each solution, promoting collaboration and quality of information.
+      </li>
+      </ul>
+      </p>
+      <p>
+      Potential Benefits for you:<br/>
+      <ul>
+      <li>Greater efficiency in the management and documentation of solutions.</li>
+      <li>Quick and easy access to relevant information.</li>
+      <li>Facilitates collaboration and active participation of team members.</li>
+      <li>Improved visibility of solutions in different stages of development.</li>
+      </ul>
+      </p>
+      `,
       es: `
       <p>
       La plataforma ha sido diseñada para sistematizar las soluciones identificadas
@@ -64,13 +97,25 @@ exports.translations = {
         resetLink,
         baseURL,
       ) => `
-        ${creator} has created an account for you to access the
-        <a href="${baseURL}">${appTitle}</a> application.
-
-        For logging in for the first time please use the following link: <a href="${resetLink}">${resetLink}</a>.
-
-        After 24 hours the above link will expire. In this case, pleas use
-        <a href="${baseURL}forget-password">${baseURL}forget-password</a> instead.
+        <p>
+        Hello ${newName}!
+        </p><p>
+        Welcome to the <a href="${baseURL}">${appTitle}</a>.<br/>
+        We are excited to share with you the ${appTitle} of the UNDP Accelerator Labs.
+        </p>
+        ${appDesc}
+        <p>
+        Next Steps:<br/>
+        To log in for the first time, use the following link: <a href="${resetLink}">${resetLink}</a><br/>
+        After 24 hours, the above link will expire.
+        In that case, use <a href="${baseURL}forget-password">${baseURL}forget-password</a> to reset your password.
+        </p>
+        <p>
+        You can contact <a href="mailto:${creatorEmail}">${creator}</a> to follow up on how to add more initiatives.
+        </p>
+        <p>
+        We appreciate your interest in advance and look forward to the possibility of collaborating closely on this initiative.
+        </p>
       `,
       es: (
         newName,

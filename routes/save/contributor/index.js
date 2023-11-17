@@ -1,4 +1,4 @@
-const { own_app_url, app_title, app_languages, DB, translations } = include('config/')
+const { own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
 const { email: sendemail, sessionupdate } = include('routes/helpers/')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
@@ -64,11 +64,13 @@ module.exports =async (req, res) => {
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						const temail = translations['email notifications'];
+						const platformName = translations['app title']?.['app_title_short']?.[language] ?? app_title;
+						const platformDesc = translations['app desc']?.['app_title_short']?.[language] ?? '';
 						await sendemail({
 							to: email,
 							cc: initiatorEmail,
-							subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(app_title),
-							html: (temail['new user body'][language] ?? temail['new user body']['en'])(username, app_title, resetLink, own_app_url),
+							subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(platformName),
+							html: (temail['new user body'][language] ?? temail['new user body']['en'])(name, username, initiatorEmail, platformName, platformDesc, resetLink, own_app_url),
 						})
 						return result
 					} else return result

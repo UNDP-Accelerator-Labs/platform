@@ -64,8 +64,8 @@ module.exports =async (req, res) => {
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 						const temail = translations['email notifications'];
-						const platformName = translations['app title']?.['app_title_short']?.[language] ?? app_title;
-						const platformDesc = translations['app desc']?.['app_title_short']?.[language] ?? '';
+						const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+						const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
 						await sendemail({
 							to: email,
 							cc: initiatorEmail,

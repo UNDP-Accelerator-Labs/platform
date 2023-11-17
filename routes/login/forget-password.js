@@ -1,15 +1,15 @@
 const { email: sendEmail, removeSubdomain } = require('../helpers')
-const { DB } = include('config/')
+const { DB, own_app_url, app_title_short, app_title, translations } = include('config/');
 const { datastructures, sessionupdate } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
 const { isPasswordSecure } = require('./password-requirement')
 
 // Function to send password reset email
-async function sendResetEmail(email, html) {
+async function sendResetEmail(email, html, platformName) {
   await sendEmail({
     to: email,
-    subject: 'Password reset',
-    html
+    subject: `[${platformName}] Password reset`,
+    html,
   });
 }
 
@@ -39,14 +39,15 @@ exports.forgetPassword = async (req, res, next) => {
   const { host } = req.headers || {}
   const protocol = req.protocol
   const resetLink = await createResetLink(protocol, host, email);
+  const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
   const html = `
   <div>
       <p>Dear User,</p>
       <br/>
-      <p>We have received a request to reset your password. Please click the link below to proceed:</p>
+      <p>We have received a request to reset your password for the <a href="${own_app_url}">${platformName}</a>.
+      Please click the link below to proceed:</p>
       <p><a href="${resetLink}">Reset Password</a></p>
       <p>This link will expire in 24 hours.</p>
-
       <p>If you did not request a password reset, please ignore this email.</p>
       <br/>
       <p>Best regards,</p>
@@ -54,7 +55,7 @@ exports.forgetPassword = async (req, res, next) => {
   </div`
 
   // Send the password reset email
-  await sendResetEmail(email, html);
+  await sendResetEmail(email, html, platformName);
 
   req.session.errormessage = 'Password reset link has been successfully sent to your email. Please check your email inbox/spam to use the reset link.'
 

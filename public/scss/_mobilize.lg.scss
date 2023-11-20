@@ -406,11 +406,14 @@ main#mobilize-new {
 						margin: 15px 0;
 						cursor: pointer;
 					}
-					input[type=checkbox]:checked + label {
+					input[type=checkbox]:checked:not(:disabled) + label {
 						border-color: $c-dark-blue;
 					}
 					input[type=checkbox]:checked + label + p {
 						color: $c-dark-blue;
+					}
+					input[type=checkbox]:disabled + label + p {
+						color: $c-light-2 !important;
 					}
 					.contributor-count {
 						margin: 15px 0;

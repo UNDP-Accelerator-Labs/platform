@@ -27,7 +27,13 @@
 
 <main id='mobilize-new'>
 	<!-- FIRST MODAL: TITLE -->
-	<form action='/publish/mobilizations' method='POST'>
+	<!-- <form action='/publish/mobilizations' method='POST'> -->
+	<form action='<% if (!locals.data?.id) { %>/publish/mobilizations<% } else { %>/save/mobilization<% } %>' method='POST'>
+
+		<% if (locals.data?.id) { %>
+			<input type='hidden' name='id' value='<%- locals.data.id %>'>
+		<% } %>
+
 		<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
 		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
 		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
@@ -66,7 +72,7 @@
 				</div>
 				<div class='foot'>
 					<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
-						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %>>
+						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %> <% if (locals.data?.id) { %>disabled<% } %>>
 						<label for='public-status'></label>
 						<p class="google-translate-attr"><%- vocabulary['public mobilization'][language] %></p>
 					<% } %>
@@ -112,9 +118,6 @@
 			</div>
 		</div>
 		<!-- SET DATE RANGES -->
-		<% console.log(locals.data) %>
-		<% console.log(locals.data?.id) %>
-		<% console.log(!locals.data?.id) %>
 		<% if (!locals.data?.id) { %>
 			<div class='modal m-3 hide'>
 				<div class='inner'>
@@ -161,7 +164,7 @@
 							<div>
 								<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' onchange='offsetMinEndDate(this)' disabled>
 							</div>
-						</div>	
+						</div>
 
 						<!-- OPTION FOR NO END DATE -->
 						<div class='cron-option end'>
@@ -268,56 +271,59 @@
 			</div>
 		<% } %>
 		<!-- COHORT -->
-		<div class='modal m-6 hide'>
-			<div class='inner'>
-				<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true"))) { %>status-0<% } else { %>status-1<% } %>'>
-					<div class='btn-group'>
-						<button type='button' class='back' onclick='prev(this)'>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
-						</button>
-						<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
-							<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true'))) { %>disabled<% } %>>
-								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+		<% if (!locals.data?.public) { %>
+			<div class='modal m-6 hide'>
+				<div class='inner'>
+					<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) && !locals.data?.cohort?.length) { %>status-0<% } else { %>status-1<% } %>'>
+						<div class='btn-group'>
+							<button type='button' class='back' onclick='prev(this)'>
+								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 							</button>
-						<% } else { %> 
-							<button type='submit' class='next'>
-								<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
-							</button>
-						<% } %>
+							<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
+								<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
+									<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+								</button>
+							<% } else { %> 
+								<button type='submit' class='next'>
+									<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+								</button>
+							<% } %>
+						</div>
 					</div>
-				</div>
 
-				<div class='body'>
-					<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
-					<div class='filter'>
-						<input type='text' id='contributors' onblur='fixLabel(this)'>
-						<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language](true) %></label>
+					<div class='body'>
+						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
+						<div class='filter'>
+							<input type='text' id='contributors' onblur='fixLabel(this)'>
+							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language](true) %></label>
 
-						<menu>
-							<% locals.cohort.forEach(c => { %>
-								<li class='<% if (locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true")) { %>checked<% } %>'>
-									<div class='hide'>
-										<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true') || locals.data?.active_participants.includes(c.id)) { %>checked<% } %>>
-									</div>
-									<div class='main'>
-										<label for='c-<%- c.id %>'><%- c.ownername %></label>
-									</div>
-									<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
-									<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
-								</li>
-							<% }) %>
-						</menu>
+							<menu>
+								<% locals.cohort.forEach(c => { %>
+									<li class='<% if ((locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) || locals.data?.cohort.includes(c.id)) { %>checked<% } %>'>
+										<div class='hide'>
+											<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if ((locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) || locals.data?.cohort.includes(c.id)) { %>checked<% } %>>
+										</div>
+										<div class='main'>
+											<label for='c-<%- c.id %>'><%- c.ownername %></label>
+										</div>
+										<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
+										<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
+									</li>
+								<% }) %>
+							</menu>
+						</div>
 					</div>
-				</div>
-				<div class='foot stretch'>
-					<div class='global-opt'>
-						<button type='button' onclick='selectAllOpts(this); enableNext(this)'><%- vocabulary['select all'][language] %></button>
+					<div class='foot stretch'>
+						<div class='global-opt'>
+							<button type='button' onclick='selectAllOpts(this); enableNext(this)'><%- vocabulary['select all'][language] %></button>
+						</div>
+						<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](locals.data?.cohort?.length ?? 0) %></div>
 					</div>
-					<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](0) %></div>
 				</div>
 			</div>
-		</div>
+		<% } %>
 		<!-- LAST MODAL: LIMIT CONTRIBUTIONS -->
+		<!-- TO DO: ADD TOGGLE FOR THIS -->
 		<div class='modal m-7 hide'>
 			<div class='inner'>
 				<div class='head meta-status status-1'>
@@ -326,16 +332,43 @@
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
 						<button type='submit' class='next'>
-							<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+							<label class="google-translate-attr">
+								<% if (!locals.data?.id) { %>
+									<%- vocabulary['launch'][language] %>
+								<% } else { %>
+									Update mobilization
+									<!-- TO DO: TRANSLATE -->
+								<% } %>
+							</label>
 						</button>
 					</div>
 				</div>
 
-				<div class='body center'>
-					<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
-					<input id='pad-limit' type='number' name='pad_limit' value=1 min=1 placeholder='Number of pads.'>
+				<div class='body'>
+
+					<h1 class="google-translate-attr">Limit the number of pads each contributor can submit</h1>
 					<!-- TO DO: TRANSLATE -->
-					<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
+					<p class="google-translate-attr">By default, a contributor can submit as many pads as they like.</p>
+					<!-- TO DO: TRANSLATE -->
+
+					<div class='pad-limit-option'>
+						<div class='toggle-option'>
+							<input id='limit-pads' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.data?.pad_limit) { %>checked<% } %>>
+							<label for='limit-pads'></label>
+							<p class="google-translate-attr">Limit the number of pads each contributor can submit</p>
+							<!-- TO DO: TRANSLATE -->
+						</div>
+
+						<div>
+							<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
+							<input id='pad-limit' type='number' name='pad_limit' value=<%- (locals.data?.pad_limit ?? 1) %> min=1 placeholder='Number of pads.'>
+							<!-- TO DO: TRANSLATE -->
+							<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
+						</div>
+					</div>	
+
+
+					
 				</div>
 				<div class='foot'>
 				</div>
@@ -359,7 +392,7 @@
 
 	// CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
 	const queryparams = new URLSearchParams(url.search)
-	const source = queryparams.get('id')
+	const source = queryparams.get('source')
 
 	if (source) {
 		d3.select('main#mobilize-new form')

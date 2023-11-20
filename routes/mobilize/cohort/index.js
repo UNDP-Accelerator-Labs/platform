@@ -127,10 +127,10 @@ module.exports = (req, res) => {
 			batch.push(null) // THIS IS A NEW MOBILIZATION
 		} else {
 			batch.push(t.one(`
-				SELECT m.id, m.title, m.language, m.description, m.public,
-					jsonb_agg(mc.participant) AS active_participants
+				SELECT m.id, m.title, m.language, m.description, m.public, m.pad_limit, m.collection,
+					COALESCE(jsonb_agg(mc.participant) FILTER (WHERE mc.participant IS NOT NULL), '[]') AS cohort
 				FROM mobilizations m
-				INNER JOIN mobilization_contributors mc
+				LEFT JOIN mobilization_contributors mc
 					ON mc.mobilization = m.id
 				WHERE m.id = $1::INT
 				GROUP BY m.id

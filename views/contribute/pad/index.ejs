@@ -213,9 +213,6 @@
 									</script>
 								<!-- IF THERE IS A TOKEN WITH A CALLBACK URL, THEN THIS SHOULD AUTO SUBMIT AND SEND BACK THE PAD ID TO THE REQUESTING SOURCE -->
 								<% } else if (token && action === 'publish_and_share') { %>
-									<% console.log(token) %>
-									<% console.log(action) %>
-
 									<input type='hidden' name='token' value='<%- token %>'>
 									<button type='submit' class='publish' name='status' value='3' disabled><%- vocabulary['publish'][language] %></button>
 
@@ -237,14 +234,16 @@
 								<div class='dropdown'>
 									<menu class='opts'>
 										<% if (modules.some(d => d.type === 'reviews')) { %>
-											<% if (locals.data?.status === 1) { %>
+											<% if ((locals.data?.status || 0) < 2) { %>
 												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='2'>
 														<%- vocabulary['object status'][language](object, 2, false) %>
 													</button>
 												</li>
 											<% } %>
-											<% if (locals.data?.status <= 2 && locals.data?.review_status === 0) { %>
+											<% if ((locals.data?.status || 0) <= 2 
+												&& (locals.data?.review_status === 0 || true))
+											{ %>
 												<li class='opt google-translate-attr'>
 													<button type='button' name='review_status' value='1' onclick='selectReviewLanguage.call(this)'>
 														<%- vocabulary['submit for review'][language] %>
@@ -252,14 +251,17 @@
 												</li>
 											<% } %>
 										<% } else { %>
-											<% if (locals.data?.status === 1) { %>
+											<% if ((locals.data?.status || 0) < 2) { %>
 												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='2'>
 														<%- vocabulary['internally'][language] %>
 													</button>
 												</li>
 											<% } %>
-											<% if (locals.data?.status <= 2 && locals.data?.publishable) { %>
+											<% if (
+												(locals.data?.status || 0) <= 2 
+												&& (locals.data?.publishable !== undefined ? locals.data?.publishable: true)
+											) { %>
 												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='3'>
 														<%- vocabulary['externally'][language] %>

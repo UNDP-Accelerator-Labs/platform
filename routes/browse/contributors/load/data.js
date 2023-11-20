@@ -3,7 +3,7 @@ const { array, join, checklanguage, safeArr, DEFAULT_UUID } = include('routes/he
 
 const filter = require('../filter')
 
-module.exports = kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
 	const { req } = kwargs || {}
 	const { object } = req.params || {}
@@ -11,7 +11,7 @@ module.exports = kwargs => {
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
-	const [ f_space, page, full_filters ] = filter(kwargs.req)
+	const [ f_space, page, full_filters ] = await filter(kwargs.req)
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 

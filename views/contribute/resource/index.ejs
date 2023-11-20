@@ -90,7 +90,7 @@
  					opts.push({
  						node: 'div',
  						class: 'divider',
- 						label: 'OR' // TO DO: TRANSLATE
+ 						label: '<%- vocabulary["or"][language] %>'
  					})
  					<% if (locals.templates[key]?.length) { %>
  						const <%- key %>_template_opts = <%- JSON.stringify(locals.templates[key]) %>.map(d => {
@@ -107,7 +107,7 @@
 	 							if (write <= rights) { 
 	 					%>
 	 								<%- key %>_template_opts.unshift({
-	 									label: '<%- vocabulary['blank pad'][language] %>', // TO DO: TRANSLATE
+	 									label: '<%- vocabulary["blank pad"][language] %>', 
 	 									value: 'blank',
 	 									type: 'radio'
 	 								})
@@ -180,7 +180,7 @@
 					opts.push({
 						node: 'div',
 						class: 'divider',
-						label: 'OR' // TO DO: TRANSLATE
+						label: '<%- vocabulary["or"][language] %>' // TO DO: TRANSLATE
 					})
 				<% } %>
 			<% } %>

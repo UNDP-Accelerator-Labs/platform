@@ -63,23 +63,41 @@ module.exports = async kwargs => {
 		// GET PRIVATE PADS COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE p.owner IN ($1:csv)
+			WHERE p.owner = $1
 				AND p.id NOT IN (SELECT review FROM reviews)
-		;`, [ collaborators_ids, rights ], d => d.count).then(d => { return { private: d } })
+		;`, [ uuid, rights ], d => d.count).then(d => { return { private: d } })
 		.catch(err => console.log(err)))
 		// GET CURATED PADS COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE (p.id IN (
-				SELECT mc.pad FROM mobilization_contributions mc
-				INNER JOIN mobilizations m
-					ON m.id = mc.mobilization
-				WHERE m.owner IN ($1:csv)
-			) OR $2 > 2)
-				AND p.id NOT IN (SELECT review FROM reviews)
-				AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL)
-				AND p.status < 2
-		;`, [ collaborators_ids, rights ], d => d.count).then(d => { return { curated: d } })
+
+			WHERE (
+				(
+					p.id IN (
+						SELECT mc.pad 
+						FROM mobilization_contributions mc 
+						INNER JOIN mobilizations m 
+							ON m.id = mc.mobilization 
+						WHERE m.owner = $1
+					) 
+					OR $2 > 2
+				) AND (
+					p.owner <> $1 
+					OR p.owner IS NULL
+				) AND p.status < 2
+			) 
+			AND p.id NOT IN (SELECT review FROM reviews)
+
+			-- WHERE (p.id IN (
+			-- 	SELECT mc.pad FROM mobilization_contributions mc
+			-- 	INNER JOIN mobilizations m
+			-- 		ON m.id = mc.mobilization
+			-- 	WHERE m.owner IN ($1:csv)
+			-- ) OR $2 > 2)
+			-- 	AND p.id NOT IN (SELECT review FROM reviews)
+			-- 	AND (p.owner NOT IN ($1:csv) OR p.owner IS NULL)
+			-- 	AND p.status < 2
+		;`, [ uuid, rights ], d => d.count).then(d => { return { curated: d } })
 		.catch(err => console.log(err)))
 		// GET SHARED PADS COUNT
 		batch.push(t.one(`
@@ -92,15 +110,23 @@ module.exports = async kwargs => {
 		// GET UNDER REVIEW PADS COUNT
 		batch.push(t.one(`
 			SELECT COUNT (DISTINCT (p.id))::INT FROM pads p
-			WHERE ((p.id IN (
-					SELECT mc.pad FROM mobilization_contributions mc
-					INNER JOIN mobilizations m
-						ON m.id = mc.mobilization
-					WHERE m.owner IN ($1:csv)
-				) OR $2 > 2) OR (p.owner IN ($1:csv)))
-				AND p.id IN (SELECT pad FROM review_requests)
-				AND p.id NOT IN (SELECT review FROM reviews)
-		;`, [ collaborators_ids, rights ], d => d.count).then(d => { return { reviewing: d } })
+			WHERE (
+				(
+					p.id IN (
+						SELECT mc.pad 
+						FROM mobilization_contributions mc
+						INNER JOIN mobilizations m
+							ON m.id = mc.mobilization
+						WHERE m.owner = $1
+					) 
+					OR $2 > 2
+				) OR (
+					p.owner = $1
+				)
+			)
+			AND p.id IN (SELECT pad FROM review_requests)
+			AND p.id NOT IN (SELECT review FROM reviews)
+		;`, [ uuid, rights ], d => d.count).then(d => { return { reviewing: d } }) // TO DO: REMOVE collaborators_ids
 		.catch(err => console.log(err)))
 		// GET PUBLIC PADS COUNT
 		batch.push(t.one(`

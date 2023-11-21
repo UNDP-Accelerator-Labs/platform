@@ -118,14 +118,65 @@ module.exports = async kwargs => {
 				;`, [ padlist ]).catch(err => console.log(err)))
 				// MOBILIZATION INFORMATION
 				if (modules.some((d) => d.type === 'mobilizations' && d.rights.read <= rights)) {
-					batch.push(t.any(`
-						SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit
-						FROM mobilizations m
-						INNER JOIN mobilization_contributions mc
-							ON mc.mobilization = m.id
-						WHERE mc.pad IN $1:raw
-						GROUP BY (mc.pad, m.title, m.pad_limit)
-					;`, [ padlist ]).catch(err => console.log(err)))
+					batch.push(t.task(t1 => {
+						return t1.any(`
+							SELECT mc.pad AS id, MAX(m.id) AS mobilization, m.title AS mobilization_title, m.pad_limit
+							FROM mobilizations m
+							INNER JOIN mobilization_contributions mc
+								ON mc.mobilization = m.id
+							WHERE mc.pad IN $1:raw
+							GROUP BY (mc.pad, m.title, m.pad_limit)
+						;`, [ padlist ])
+						.then(results => {
+							// DETECT PUBLICATION LIMIT TO DETERMINE WHETHER OR NOT THE PAD CAN BE PUBLISHED
+							return t1.batch(results.map(d => {
+								if (!d.mobilization) return d
+								else return t1.oneOrNone(`
+										SELECT COUNT(1)::INT AS count --, p.status 
+										FROM pads p
+										INNER JOIN mobilization_contributions mc
+											ON mc.pad = p.id
+										WHERE mc.mobilization = $2::INT
+											AND p.owner IN (SELECT owner FROM pads WHERE id = $1::INT)
+											AND p.status >= 2
+										-- GROUP BY p.status
+								;`, [ d.id, d.mobilization ]) // FOR NOW WE DO NOT GROUP BY status
+								.then(limit => {
+									if (d.pad_limit === 0) d.available_publications = undefined
+									else d.available_publications = Math.max(d.pad_limit - limit.count, 0)
+									return d
+								}).catch(err => console.log(err))
+							})).catch(err => console.log(err))
+							// BELOW IS OLD LOGIC
+							// batch.push(t.any(`
+							// 	SELECT p.id,
+
+							// 		CASE WHEN m.pad_limit = 0
+							// 			THEN 'infinity'::FLOAT4
+							// 			ELSE GREATEST(COALESCE(m.pad_limit - COUNT(contributed.id), 0)::INT, 0)
+							// 		END AS available_publications
+								
+							// 	FROM pads p
+							// 	INNER JOIN mobilization_contributions mc
+							// 		ON mc.pad = p.id
+							// 	INNER JOIN mobilizations m
+							// 		ON m.id = mc.mobilization
+							// 	LEFT JOIN (
+							// 		SELECT pp.id, pp.owner, mm_cc.mobilization 
+							// 		FROM pads pp
+							// 		INNER JOIN mobilization_contributions mm_cc
+							// 			ON mm_cc.pad = pp.id
+							// 		WHERE pp.status >= 2
+							// 			AND pp.owner IN ($2:csv)
+							// 	) AS contributed
+							// 		ON contributed.mobilization = m.id
+							// 		AND contributed.owner = p.owner
+							// 	WHERE p.id IN $1:raw
+							// 	GROUP BY (p.id, m.pad_limit)
+							// ;`, [ padlist, collaborators_ids ]) // THIS USED TO BE SPECIFICALLY FOR ACTION PLANS, WHERE TEAM CONTRIBUTIONS WERE LIMITED. BUT FOR THE SAKE OF GENERALIZATION, WE ARE CHANGING THIS TO THE UNIQUE USER.
+							
+						}).catch(err => console.log(err))
+					}))
 				}
 				// PINBOARD INFORMATION
 				const padToPinboards = new Map();
@@ -342,25 +393,6 @@ module.exports = async kwargs => {
 					})
 					return results
 				}).catch(err => console.log(err)))
-				// DETECT PUBLICATION LIMIT TO DETERMINE WHETHER OR NOT THE PAD CAN BE PUBLISHED
-				batch.push(t.any(`
-					SELECT p.id, COALESCE(m.pad_limit - COUNT(contributed.id), 1)::INT AS available_publications
-					FROM pads p
-					INNER JOIN mobilization_contributions mc
-						ON mc.pad = p.id
-					INNER JOIN mobilizations m
-						ON m.id = mc.mobilization
-					LEFT JOIN (
-						SELECT pp.id, mm_cc.mobilization FROM pads pp
-						INNER JOIN mobilization_contributions mm_cc
-							ON mm_cc.pad = pp.id
-						WHERE pp.status >= 2
-							AND pp.owner IN ($2:csv)
-					) AS contributed
-						ON contributed.mobilization = m.id
-					WHERE p.id IN $1:raw
-					GROUP BY (p.id, m.pad_limit)
-				;`, [ padlist, collaborators_ids ]).catch(err => console.log(err)))
 				// CURRENT USER ENGAGMENT WITH PADS
 				if (engagementtypes?.length > 0) {
 					batch.push(t.any(`

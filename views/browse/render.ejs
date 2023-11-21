@@ -151,16 +151,72 @@ const Entry = function (_kwargs) {
 					<% if (['files', 'pads'].includes(object)) { %>
 						if (d.editable) {
 							const publish_dropdown = []
+							const exceeds_publication_limit = d.available_publications === 0 
+							console.log(d)
+							console.log(d.available_publications)
+							console.log(exceeds_publication_limit)
+								
 							<% if (modules.some(d => d.type === 'reviews')) { %>
-								if (d.status === 1) publish_dropdown.push({ name: 'status', value: 2, classname: 'preprint', label: '<%- vocabulary["object status"][language](object, 2) %>' })
-								if (d.status <= 2 && d.review_status === 0) publish_dropdown.push({ name: 'review_status', value: 1, classname: 'review',label: '<%- vocabulary["submit for review"][language] %>', fn: selectReviewLanguage })
+								if (d.status === 1 && !exceeds_publication_limit) {
+									publish_dropdown.push({ 
+										name: 'status', 
+										value: 2, 
+										classname: 'preprint', 
+										label: '<%- vocabulary["object status"][language](object, 2) %>' 
+									})
+								}
+								if (d.status <= 2 && d.review_status === 0) {
+									if (!(d.status === 1 && exceeds_publication_limit)) {
+										publish_dropdown.push({ 
+											name: 'review_status', 
+											value: 1, 
+											classname: 'review',
+											label: '<%- vocabulary["submit for review"][language] %>', 
+											fn: selectReviewLanguage 
+										})
+									}
+								}
 							<% } else { %>
-								if (d.status === 1) publish_dropdown.push({ name: 'status', value: 2, classname: 'internally', label: '<%- vocabulary["internally"][language] %>' })
-								// TO DO: MAKE SURE THIS IS ONLY POSSIBLE WHEN ALL META FIELDS ARE FILLED OUT
-								if (d.status <= 2 && d.publishable) publish_dropdown.push({ name: 'status', value: 3, classname: 'externally', label: '<%- vocabulary["externally"][language] %>' })
+								if (d.status === 1 && !exceeds_publication_limit) {
+									publish_dropdown.push({ 
+										name: 'status', 
+										value: 2, 
+										classname: 'internally', 
+										label: '<%- vocabulary["internally"][language] %>' 
+									})
+								}
+								if (d.status <= 2 && d.publishable) {
+									if (!(d.status === 1 && exceeds_publication_limit)) {
+										publish_dropdown.push({ 
+											name: 'status', 
+											value: 3, 
+											classname: 'externally', 
+											label: '<%- vocabulary["externally"][language] %>' 
+										})
+									}
+								}
 							<% } %>
 
-							if (publish_dropdown.length > 0) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'button', value: d.id, disabled: !(d.editable && [1, 2].includes(d.status) && (d.available_publications === undefined || d.available_publications > 0)), classname: 'publish', label: '<%- vocabulary["publish"][language] %>', dropdown: publish_dropdown, inputs: [{ name: 'id', value: d.id }, { name: 'title', value: d.title }] })
+							opts.push({ 
+								action: '/publish/<%- object %>', 
+								method: 'GET', 
+								node: 'button', 
+								type: 'button', 
+								value: d.id, 
+								disabled: 
+									!(
+										d.editable 
+										&& [1, 2].includes(d.status) 
+										&& publish_dropdown.length
+									), 
+								classname: 'publish', 
+								label: '<%- vocabulary["publish"][language] %>', 
+								dropdown: publish_dropdown, 
+								inputs: [
+									{ name: 'id', value: d.id }, 
+									{ name: 'title', value: d.title }
+								]
+							})
 
 							// if (d.status > 1) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
 

@@ -353,21 +353,17 @@
 
 					<div class='pad-limit-option'>
 						<div class='toggle-option'>
-							<input id='limit-pads' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.data?.pad_limit) { %>checked<% } %>>
+							<input id='limit-pads' type='checkbox' class='toggle' onchange='togglePadLimit(this)' <% if (locals.data?.pad_limit) { %>checked<% } %>>
 							<label for='limit-pads'></label>
-							<p class="google-translate-attr">Limit the number of pads each contributor can submit</p>
-							<!-- TO DO: TRANSLATE -->
 						</div>
 
 						<div>
 							<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
-							<input id='pad-limit' type='number' name='pad_limit' value=<%- (locals.data?.pad_limit ?? 1) %> min=1 placeholder='Number of pads.'>
+							<input id='pad-limit' type='number' name='pad_limit' value=<%- (locals.data?.pad_limit ?? 0) %> min=0 placeholder='Number of pads.' <% if (!locals.data?.pad_limit) { %>disabled<% } %>>
 							<!-- TO DO: TRANSLATE -->
 							<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
 						</div>
 					</div>	
-
-
 					
 				</div>
 				<div class='foot'>
@@ -462,6 +458,11 @@
 		const sel = d3.select(node)
 		const parent = sel.findAncestor('cron-option')
 		parent.select('input[type=date]').attr('disabled', node.checked ? null : true)
+	}
+	function togglePadLimit (node) {
+		const sel = d3.select(node)
+		const parent = sel.findAncestor('pad-limit-option')
+		parent.select('input[type=number]').attr('disabled', node.checked ? null : true)
 	}
 	function offsetMinEndDate (node) {
 		const sel = d3.select(node)

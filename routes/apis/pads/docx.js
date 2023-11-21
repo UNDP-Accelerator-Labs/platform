@@ -69,7 +69,7 @@ module.exports = async (req, res) => {
 			p.id,
 			m.id,
 			m.title,
-			m.pad_limit,
+			m.pad_limit, -- THIS IS PROBABLY NOT NEEDED, BUT NEED TO TEST
 			t.title
 		)
 		$3:raw

@@ -150,6 +150,7 @@ CREATE TABLE mobilizations (
     collection INT,
     version ltree
 );
+ALTER TABLE mobilizations ALTER pad_limit SET DEFAULT 0; 
 CREATE INDEX version_idx ON mobilizations USING GIST (version);
 
 CREATE TABLE mobilization_contributors (

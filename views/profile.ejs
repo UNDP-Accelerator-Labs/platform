@@ -333,6 +333,7 @@
 									</div>
 								</li>
 							<% } %>
+							<% if (false) { // notification block toggle %>
 							<li class='google-translate-attr'>
 								<label class='instruction'><%- vocabulary['email notifications'][language] %></label>
 								<div class='input-group'>
@@ -340,6 +341,9 @@
 									<label for='email-notifications' data-content='<% if (locals.data?.notifications) { %><%- vocabulary["yes"][language].toUpperCase() %><% } else { %><%- vocabulary["no"][language].toUpperCase() %><% } %>'></label>
 								</div>
 							</li>
+							<% } else { // notification block hidden %>
+								<input type='hidden' id='email-notifications' name='email_notifications' value='true' %>>
+							<% } // notification block end %>
 						</ul>
 					</div>
 				</form>

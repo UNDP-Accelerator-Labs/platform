@@ -39,7 +39,7 @@ module.exports =async (req, res) => {
 				/* $6 */ language,
 				/* $7 */ JSON.stringify(secondary_languages || []),
 				/* $8 */ rights,
-				/* $9 */ notifications || false,
+				/* $9 */ true,  // notifications
 				/* $10 */ reviewer || false
 			], d => d.uuid)
 			.then(result => {
@@ -132,7 +132,7 @@ module.exports =async (req, res) => {
 									/* $6 */ language,
 									/* $7 */ JSON.stringify(secondary_languages || []),
 									/* $8 */ update_rights,
-									/* $9 */ notifications || false,
+									/* $9 */ true,  // notifications
 									/* $10 */ reviewer || false,
 									/* $11 */ id
 								]
@@ -163,7 +163,7 @@ module.exports =async (req, res) => {
 							/* $6 */ language,
 							/* $7 */ JSON.stringify(secondary_languages || []),
 							/* $8 */ update_rights,
-							/* $9 */ notifications || false,
+							/* $9 */ true,  // notifications
 							/* $10 */ reviewer || false,
 							/* $11 */ id
 						])

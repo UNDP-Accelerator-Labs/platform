@@ -273,7 +273,9 @@
 									</div>
 								</li>
 							<% } %>
-							<% if (!locals.data || locals.data?.host_editor) { %>
+							<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.write)
+								&& (!locals.data || locals.data?.host_editor)
+							) { %>
 								<li>
 									<label class='instruction google-translate-attr'><%- vocabulary['teams'][language] %></label>
 									<div class='add select'>
@@ -306,7 +308,9 @@
 										</div>
 									</div>
 								</li>
-							<% } else if (locals.data?.teams?.length) { %>
+							<% } else if (modules.some(d => d.type === 'teams' && rights >= d.rights.read)
+								&& locals.data?.teams?.length
+							) { %>
 								<li class='google-translate-attr'>
 									<label class='instruction'><%- vocabulary['teams'][language] %></label>
 									<div class='pinboard-group'>
@@ -594,93 +598,92 @@
 				.node().value = values.join(', ')
 		})
 
-		selects.select('input#new-team')
-		.on('keydown', function () {
-			const evt = d3.event
-			if (evt.code === 'Enter' || evt.keyCode === 13) {
-				evt.preventDefault()
-			}	
-		}).on('keyup.checkEnter', function (d) {
-			const evt = d3.event
-			const node = this
-			const newpin = d3.select(this).findAncestor('add')
+		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.write)) { %>
+			selects.select('input#new-team')
+			.on('keydown', function () {
+				const evt = d3.event
+				if (evt.code === 'Enter' || evt.keyCode === 13) {
+					evt.preventDefault()
+				}	
+			}).on('keyup.checkEnter', function (d) {
+				const evt = d3.event
+				const node = this
+				const newpin = d3.select(this).findAncestor('add')
 
-			if (evt.code === 'Enter' || evt.keyCode === 13) {
-				evt.preventDefault()
-				newpin.select('button').node().click()
-			}
-		})
-
-		function addPinOption (value) {
-			const dropdown = d3.select(this)
-			const li = dropdown.select('menu')
-			.addElem('li')
-			const pinItem = li.addElems('input')
-				.attrs({
-					'type': 'checkbox',
-					'id': value.simplify(),
-					'name': 'new_teams',
-					'value': value,
-					'data-label': value
-				}).each(function () { 
-					this.checked = true 
-				})
-			li.addElems('label', 'title')
-				.attr('for', value.simplify())
-				.html(value)
-			renderPin.call(pinItem.node())
-		}
-		function renderPin () {
-			const sel = d3.select(this)
-			const pinboard = d3.select('.pinboard-group').classed('hide', false)
-			
-			if (this.checked) {
-				const pin = pinboard.select('.pinboard .pins')
-					.addElem('div', 'pin tag')
-				pin.addElem('label', 'name')
-					.classed('notranslate', true)
-					.html(this.dataset.label)
-				pin.addElem('div', 'close')
-					.attrs({ 'data-name': this.name, 'data-id': this.value })
-				.on('click', function () { rmPin(this) })
-					.html('x')
-			} else {
-				console.log(this.name)
-				console.log(this.value)
-				console.log(d3.select(`label.close[data-name='${this.name}'][data-id='${this.value}']`).node())
-				d3.select(`label.close[data-name='${this.name}'][data-id='${this.value}']`).node().click()
-			}
-		}
-
-		selects.selectAll('input[name=teams]')
-		.on('change', function () {
-			renderPin.call(this)
-		})
-		selects.select('button#add-new-team')
-		.on('click', async function (d) {
-			const newpin = d3.select(this).findAncestor('add')
-			const node = newpin.select('input[type=text]').node()
-
-			if (node.value.trim().length) {
-				const dropdown = newpin.select('.dropdown')
-
-				const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
-					return this.textContent.trim().toLowerCase() === node.value.trim().toLowerCase()
-				})
-				// IF EXIST, JUST CHECK IT
-				if (existingBoard.node()) {
-					const pinItem = existingBoard.node().previousElementSibling
-					pinItem.checked = true
-					renderPin.call(pinItem)
-				} else {
-					addPinOption.call(dropdown.node(), node.value.trim())
+				if (evt.code === 'Enter' || evt.keyCode === 13) {
+					evt.preventDefault()
+					newpin.select('button').node().click()
 				}
-				
-				// RESET DROPDOWN
-				this.value = ''
-				dropdown.selectAll('menu li').classed('hide', false)
+			})
+
+			function addPinOption (value) {
+				const dropdown = d3.select(this)
+				const li = dropdown.select('menu')
+				.addElem('li')
+				const pinItem = li.addElems('input')
+					.attrs({
+						'type': 'checkbox',
+						'id': value.simplify(),
+						'name': 'new_teams',
+						'value': value,
+						'data-label': value
+					}).each(function () { 
+						this.checked = true 
+					})
+				li.addElems('label', 'title')
+					.attr('for', value.simplify())
+					.html(value)
+				renderPin.call(pinItem.node())
 			}
-		})
+			function renderPin () {
+				const sel = d3.select(this)
+				const pinboard = d3.select('.pinboard-group').classed('hide', false)
+				
+				if (this.checked) {
+					const pin = pinboard.select('.pinboard .pins')
+						.addElem('div', 'pin tag')
+					pin.addElem('label', 'name')
+						.classed('notranslate', true)
+						.html(this.dataset.label)
+					pin.addElem('div', 'close')
+						.attrs({ 'data-name': this.name, 'data-id': this.value })
+					.on('click', function () { rmPin(this) })
+						.html('x')
+				} else {
+					d3.select(`label.close[data-name='${this.name}'][data-id='${this.value}']`).node().click()
+				}
+			}
+
+			selects.selectAll('input[name=teams]')
+			.on('change', function () {
+				renderPin.call(this)
+			})
+			selects.select('button#add-new-team')
+			.on('click', async function (d) {
+				const newpin = d3.select(this).findAncestor('add')
+				const node = newpin.select('input[type=text]').node()
+
+				if (node.value.trim().length) {
+					const dropdown = newpin.select('.dropdown')
+
+					const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
+						return this.textContent.trim().toLowerCase() === node.value.trim().toLowerCase()
+					})
+					// IF EXIST, JUST CHECK IT
+					if (existingBoard.node()) {
+						const pinItem = existingBoard.node().previousElementSibling
+						pinItem.checked = true
+						renderPin.call(pinItem)
+					} else {
+						addPinOption.call(dropdown.node(), node.value.trim())
+					}
+					
+					// RESET DROPDOWN
+					this.value = ''
+					dropdown.selectAll('menu li').classed('hide', false)
+				}
+			})
+		<% } %>
 	}
 
 	function rmPin (node) {

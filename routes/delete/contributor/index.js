@@ -1,4 +1,4 @@
-const { DB } = include('config/')
+const { modules, DB } = include('config/')
 const cron = require('node-cron')
 
 module.exports = (req, res) => {	
@@ -15,7 +15,7 @@ module.exports = (req, res) => {
 		const usersql = DB.pgp.as.format(`
 			UPDATE users
 			SET rights = 0,
-				left_at = $1,
+				left_at = $1
 			WHERE uuid IN ($2:csv)
 				AND (uuid IN (
 					SELECT contributor FROM cohorts
@@ -23,10 +23,13 @@ module.exports = (req, res) => {
 				) OR $4 > 2)
 		;`, [ date, id, uuid, rights ])
 
-		teamsql = DB.pgp.as.format(`
-			DELETE FROM team_members
-			WHERE member IN ($1:csv)
-		;`, [ id ])
+		let teamsql = undefined
+		if (modules.some(d => d.type === 'teams' && d.rights.write <= rights)) {
+			teamsql = DB.pgp.as.format(`
+				DELETE FROM team_members
+				WHERE member IN ($1:csv)
+			;`, [ id ])
+		}
 
 		if (end_date >= now) {
 			const min = end_date.getMinutes()
@@ -39,8 +42,22 @@ module.exports = (req, res) => {
 				DB.conn.tx(t => {
 					return t.none(usersql)
 					.then(_ => {
-						return t.none(teamsql)
-						.catch(err => console.log(err))
+						if (teamsql) {
+							return t.none(teamsql)
+							.then(_ => {
+								return t.none(`
+									DELETE FROM teams t
+									WHERE t.host = $1
+										AND t.id IN (
+											SELECT team 
+											FROM team_members 
+											GROUP BY team
+											HAVING COUNT (member) = 1
+											AND $1 = ANY (array_agg(member))
+										)
+								;`, [ uuid ]).catch(err => console.log(err))
+							}).catch(err => console.log(err))
+						}
 					}).catch(err => console.log(err))
 				}).then(_ => {
 					if (referer) res.redirect(referer)
@@ -51,8 +68,22 @@ module.exports = (req, res) => {
 			DB.general.tx(t => {
 				return t.none(usersql)
 				.then(_ => {
-					return t.none(teamsql)
-					.catch(err => console.log(err))
+					if (teamsql) {
+						return t.none(teamsql)
+						.then(_ => {
+							return t.none(`
+								DELETE FROM teams t
+								WHERE t.host = $1
+									AND t.id IN (
+										SELECT team 
+										FROM team_members 
+										GROUP BY team
+										HAVING COUNT (member) = 1
+										AND $1 = ANY (array_agg(member))
+									)
+							;`, [ uuid ]).catch(err => console.log(err))
+						}).catch(err => console.log(err))
+					}
 				}).catch(err => console.log(err))
 			}).then(_ => {
 				if (referer) res.redirect(referer)

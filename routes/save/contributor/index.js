@@ -1,4 +1,4 @@
-const { own_app_url, app_title, app_languages, DB, translations } = include('config/')
+const { modules, own_app_url, app_title, app_languages, DB, translations } = include('config/')
 const { email: sendemail, sessionupdate } = include('routes/helpers/')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
@@ -52,38 +52,41 @@ module.exports =async (req, res) => {
 						VALUES ($1, $2)
 					;`, [ result, uuid ]))
 
-					if (new_teams?.length > 0) {
-						const insert_teams = new_teams.map(d => {
-							const obj = {}
-							obj.host = uuid
-							obj.name = d
-							return obj
-						})
 
-						const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`						
-						batch.push(t.any(sql)
-						.then(results => {
-							const team_members = results.map(d => {
-								return [ result, uuid ].map(c => {
-									const obj = {}
-									obj.team = d.id
-									obj.member = c
-									return obj
-								})
-							}).flat()
-							
-							const sql = DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')
-							return t.none(sql)
-							.catch(err => console.log(err))
-						}).catch(err => console.log(err)))
-					}
-					if (teams?.length > 0) {
-						teams.forEach(d => {
-							batch.push(t.none(`
-								INSERT INTO team_members (team, member)
-								VALUES ($1, $2)
-							;`, [ d, result ]))
-						})
+					if (modules.some(d => d.type === 'teams' && d.rights.write <= session_rights)) {
+						if (new_teams?.length > 0) {
+							const insert_teams = new_teams.map(d => {
+								const obj = {}
+								obj.host = uuid
+								obj.name = d
+								return obj
+							})
+
+							const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`						
+							batch.push(t.any(sql)
+							.then(results => {
+								const team_members = results.map(d => {
+									return [ result, uuid ].map(c => {
+										const obj = {}
+										obj.team = d.id
+										obj.member = c
+										return obj
+									})
+								}).flat()
+								
+								const sql = DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')
+								return t.none(sql)
+								.catch(err => console.log(err))
+							}).catch(err => console.log(err)))
+						}
+						if (teams?.length > 0) {
+							teams.forEach(d => {
+								batch.push(t.none(`
+									INSERT INTO team_members (team, member)
+									VALUES ($1, $2)
+								;`, [ d, result ]))
+							})
+						}
 					}
 					return t.batch(batch)
 					.then(async _ => {
@@ -200,76 +203,80 @@ module.exports =async (req, res) => {
 				}).catch(err => console.log(err)))
 			}
 
-			if (teams?.length > 0) {
-				const team_members = teams.map(d => {
-					const obj = {}
-					obj.team = d
-					obj.member = id
-					return obj
-				})
-				const sql = `${DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')} ON CONFLICT ON CONSTRAINT unique_team_member DO NOTHING;`
-				batch.push(t.none(sql))
-
-				// teams.forEach(d => {
-				// 	batch.push(t.none(`
-				// 		INSERT INTO team_members (team, member)
-				// 		VALUES ($1, $2)
-				// 		ON CONFLICT ON CONSTRAINT unique_team_member
-				// 			DO NOTHING
-				// 	;`, [ d, id ]))
-				// })
-				
-			}
-			if (new_teams?.length > 0) {
-				const insert_teams = new_teams.map(d => {
-					const obj = {}
-					obj.host = uuid
-					obj.name = d
-					return obj
-				})
-
-				const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`						
-				batch.push(t.any(sql)
-				.then(results => {
-					const team_members = results.map(d => {
-						return [ id, uuid ].map(c => {
-							const obj = {}
-							obj.team = d.id
-							obj.member = c
-							return obj
-						})
-					}).flat()
-					
+			if (modules.some(d => d.type === 'teams' && d.rights.write <= session_rights)) {
+				if (teams?.length > 0) {
+					const team_members = teams.map(d => {
+						const obj = {}
+						obj.team = d
+						obj.member = id
+						return obj
+					})
 					const sql = `${DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')} ON CONFLICT ON CONSTRAINT unique_team_member DO NOTHING;`
-					return t.none(sql)
-					.then(_ => results)
-					.catch(err => console.log(err))
-				}).catch(err => console.log(err)))
+					batch.push(t.none(sql))
+
+					// teams.forEach(d => {
+					// 	batch.push(t.none(`
+					// 		INSERT INTO team_members (team, member)
+					// 		VALUES ($1, $2)
+					// 		ON CONFLICT ON CONSTRAINT unique_team_member
+					// 			DO NOTHING
+					// 	;`, [ d, id ]))
+					// })
+					
+				}
+				if (new_teams?.length > 0) {
+					const insert_teams = new_teams.map(d => {
+						const obj = {}
+						obj.host = uuid
+						obj.name = d
+						return obj
+					})
+
+					const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`						
+					batch.push(t.any(sql)
+					.then(results => {
+						const team_members = results.map(d => {
+							return [ id, uuid ].map(c => {
+								const obj = {}
+								obj.team = d.id
+								obj.member = c
+								return obj
+							})
+						}).flat()
+						
+						const sql = `${DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')} ON CONFLICT ON CONSTRAINT unique_team_member DO NOTHING;`
+						return t.none(sql)
+						.then(_ => results)
+						.catch(err => console.log(err))
+					}).catch(err => console.log(err)))
+				}
 			}
 
 			return t.batch(batch)
 			.then(results => {
-				const new_teams_ids = results[results.length - 1]?.map(d => d.id)
-				// DO ALL THE DELETES
 				const batch = []
-				let sql = DB.pgp.as.format(`DELETE FROM team_members WHERE member = $1;`, [ id ])
-				const allteams = (teams || []).concat(new_teams_ids || []).map(d => +d)
-				if (allteams?.length > 0) sql = DB.pgp.as.format(`DELETE FROM team_members WHERE member = $1 AND team NOT IN ($2:csv);`, [ id, allteams ])
+				if (modules.some(d => d.type === 'teams' && d.rights.write <= session_rights)) {
+					// DO ALL THE DELETES
+					const new_teams_ids = results[results.length - 1]?.map(d => d.id)
+					let sql = DB.pgp.as.format(`DELETE FROM team_members WHERE member = $1;`, [ id ])
+					const allteams = (teams || []).concat(new_teams_ids || []).map(d => +d)
+					if (allteams?.length > 0) sql = DB.pgp.as.format(`DELETE FROM team_members WHERE member = $1 AND team NOT IN ($2:csv);`, [ id, allteams ])
 
-				batch.push(t.none(sql)
-				.then(_ => {
-					return t.none(`
-						DELETE FROM teams t
-						WHERE t.host = $1
-							AND t.id IN (
-								SELECT team 
-								FROM team_members 
-								GROUP BY team
-								HAVING COUNT (member) = 1
-								AND $1 = ANY (array_agg(member))
-							)
-					;`, [ uuid ]).catch(err => console.log(err))
-				}).catch(err => console.log(err)))
+					batch.push(t.none(sql)
+					.then(_ => {
+						return t.none(`
+							DELETE FROM teams t
+							WHERE t.host = $1
+								AND t.id IN (
+									SELECT team 
+									FROM team_members 
+									GROUP BY team
+									HAVING COUNT (member) = 1
+									AND $1 = ANY (array_agg(member))
+								)
+						;`, [ uuid ]).catch(err => console.log(err))
+					}).catch(err => console.log(err)))
+				} else batch.push(null)
 
 				return t.batch(batch)
 				.then(async _ => {

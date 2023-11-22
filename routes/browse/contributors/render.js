@@ -30,7 +30,10 @@ module.exports = async (req, res) => {
 				// PINBOARDS LIST
 				if (modules.some(d => d.type === 'teams' && d.rights.read <= rights)) {
 					batch.push(t.any(`
-						SELECT t.id, t.name AS title, COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, FALSE AS is_exploration FROM teams t
+						SELECT t.id, t.name AS title, 
+							COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, 
+							FALSE AS is_exploration 
+						FROM teams t
 						INNER JOIN team_members tm
 							ON tm.team = t.id
 						WHERE t.host = $1

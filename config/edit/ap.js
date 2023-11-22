@@ -24,7 +24,7 @@ exports.modules = [
   }, // TO DO: UPDATE THIS TO 2
   { type: 'mobilizations', rights: { read: 2, write: 3 } },
   { type: 'contributors', rights: { read: 2, write: 2 } },
-  { type: 'teams', rights: { read: 2, write: 2 } },
+  { type: 'teams', rights: { read: 1, write: 2 } },
   // { type: 'analyses', rights: { read: 1, write: 2 } }
 ];
 

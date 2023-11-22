@@ -943,7 +943,7 @@ const Entry = function (_kwargs) {
 							if (d.title.length > 25) return `${d.title.slice(0, 25)}…`
 							else return d.title
 						})
-					pin.addElems('label', 'close')
+					pin.addElems('label', 'close', d => d.editable ? [d] : [])
 					.on('click', async function (d) {
 						const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 						if (res.status === 200) {
@@ -1031,7 +1031,10 @@ const Entry = function (_kwargs) {
 					d3.select(this).call(renderPins, d.pinboards);
 				})
 
-				const newpin = pingroup.addElems('div', 'add filter')
+				const newpin = pingroup.addElems('div', 'add filter', d => {
+					if ('<%- object %>' === 'contributors' && !d.editable) return []
+					else return [d]
+				})
 
 				const renderDropdown = (pid) => {
 					const d = pinPbMap[pid];
@@ -1094,7 +1097,13 @@ const Entry = function (_kwargs) {
 
 				newpin.addElems('label')
 					.attr('for', 'new-pinboard')
-					.html('<%- vocabulary["add to collection"][language] %>')
+					.html(_ => {
+						<% if (object === 'contributors') { %>
+							return '<%- vocabulary["assign to teams"][language] %>'
+						<% } else { %>
+							return '<%- vocabulary["add to collection"][language] %>'
+						<% } %>
+					})
 				newpin.addElems('button')
 					.attr('type', 'button')
 					.on('click', async function (d) {
@@ -1118,18 +1127,6 @@ const Entry = function (_kwargs) {
 							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
-									// d.pinboards = res.pins
-									// // ADD THE NEW PIN TO THE OBJECT
-									// pins.call(renderPins, res.pins)
-									// // ADD THE NEW PINBOARD TO ALL LISTS
-									// d3.selectAll('.pinboard-group').selectAll('.add.filter')
-									// .each(function (c) {
-									// 	const data = res.pinboards_list.map(b => Object.assign(Object.assign({}, b), { object_id: c.id, checked: c.pinboards.map(a => a.id).includes(b.id) ? true : null }))
-									// 	d3.select(this).call(renderPinOptions, data)
-									// })
-									// // ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-									// renderPinNavigation(res.pinboards_list)
-
 									// RELOAD THE PAGE
 									location.reload()
 								}

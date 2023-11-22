@@ -1,5 +1,5 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
-const { checklanguage, datastructures, geo } = include('routes/helpers/')
+const { checklanguage, datastructures, geo, join } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
@@ -64,65 +64,140 @@ module.exports = async (req, res) => {
 						ORDER BY name
 					;`, [ app_languages ]))
 					// GET LIST OF TEAMS
-					batch.push(t.any(`
-						SELECT id, name FROM teams
-						WHERE host = $1
-							OR id IN (
-								SELECT team FROM team_members
-								WHERE member = $1
-							)
-							OR $2 > 2
-						ORDER BY name
-					;`, [ uuid, rights ]))
+					if (modules.some(d => d.type === 'teams' && d.rights.write <= rights)) {
+						batch.push(t.any(`
+							SELECT id, name FROM teams
+							WHERE host = $1
+								OR id IN (
+									SELECT team FROM team_members
+									WHERE member = $1
+								)
+								OR $2 > 2
+							ORDER BY name
+						;`, [ uuid, rights ]))
+					} else batch.push(null)
 					// GET DATA
 					if (id) {
-						batch.push(t.one(`
-							SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language, u.secondary_languages, u.rights, u.notifications, u.reviewer,
-							l.name AS languagename,
+						// TO DO: EXTRACT TEAMS AND SET IF VIEWING RIGHTS
+						batch.push(t.task(t1 => {
+							const batch1 = []
 
-							COALESCE(su.$1:name, adm0.$1:name) AS country, 
+							// GET BASIC INFO
+							batch1.push(t1.one(`
+								SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language, 
+									u.secondary_languages, u.rights, u.notifications, u.reviewer,
 
-							COALESCE(
-							(SELECT json_agg(json_build_object(
-									'id', t.id, 
-									'name', t.name
-								)) FROM teams t
-								INNER JOIN team_members tm
-									ON tm.team = t.id
-								WHERE tm.member = u.uuid
-								GROUP BY tm.member
-							)::TEXT, '[]')::JSONB
-							AS teams,
+									CASE WHEN u.uuid = $1
+										OR $2 > 2
+											THEN TRUE
+											ELSE FALSE
+									END AS editable
 
-							CASE WHEN uuid = $2
-								OR $3 > 2
-									THEN TRUE
-									ELSE FALSE
-							END AS editable,
+								FROM users u
+								WHERE u.uuid = $3
+							;`, [ uuid, rights, id ])
+							.then(async result => {
+								const located_user = await join.locations(result, { connection: t1, language, key: 'iso3' })
+								return located_user
+							}).catch(err => console.log(err)))
+							// GET LANGUAGE
+							batch1.push(t1.one(`
+								SELECT DISTINCT (u.uuid), l.name AS languagename
+								FROM languages l
+								INNER JOIN users u
+									ON u.language = l.language
+								WHERE u.uuid = $1
+							;`, [ id ]))
+							// DETERMINE IF CURRENT USER IS HOST
+							batch1.push(t1.one(`
+								SELECT DISTINCT (u.uuid), 
+									(
+										u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2) 
+										OR $3 > 2
+									) AS host_editor
+								FROM users u
+								WHERE u.uuid = $1
+							;`, [ id, uuid, rights ]))
+							if (modules.some(d => d.type === 'teams' && d.rights.read <= rights)) {
+								batch1.push(t1.one(`
+									SELECT DISTINCT (u.uuid),
 
-							CASE WHEN $2 IN (SELECT host FROM cohorts WHERE contributor = u.uuid)
-								OR $3 > 2
-									THEN TRUE
-									ELSE FALSE
-							END AS host_editor
+										COALESCE(
+										(SELECT json_agg(json_build_object(
+												'id', t.id, 
+												'name', t.name,
+												'editable', ((u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2) OR $3 > 2) AND $4)
+											)) FROM teams t
+											INNER JOIN team_members tm
+												ON tm.team = t.id
+											WHERE tm.member = u.uuid
+											GROUP BY tm.member
+										)::TEXT, '[]')::JSONB
+										AS teams
 
-							FROM users u
-							LEFT JOIN adm0_subunits su
-								ON su.su_a3 = u.iso3
-							LEFT JOIN adm0 
-								ON adm0.adm0_a3 = u.iso3
+									FROM users u
+									WHERE u.uuid = $1
+								;`, [ id, uuid, rights, modules.find(d => d.type === 'teams').rights.write <= rights ]))
+							}
 
-							INNER JOIN languages l
-								ON l.language = u.language
-							WHERE uuid = $4
-						;`, [ country_name_column, uuid, rights, id ])
-						.then(result => {
-							return DB.conn.one(`
-								SELECT COUNT (id)::INT FROM pads
-								WHERE owner = $1
-							;`, result.uuid, d => d.count)
-							.then(pads => Object.assign(result, { pads }))
-							.catch(err => console.log(err))
+							/*
+							t.one(`
+								-- SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language, u.secondary_languages, u.rights, u.notifications, u.reviewer,
+								
+								-- l.name AS languagename,
+
+								-- COALESCE(su.$1:name, adm0.$1:name) AS country, 
+
+								COALESCE(
+								(SELECT json_agg(json_build_object(
+										'id', t.id, 
+										'name', t.name
+									)) FROM teams t
+									INNER JOIN team_members tm
+										ON tm.team = t.id
+									WHERE tm.member = u.uuid
+									GROUP BY tm.member
+								)::TEXT, '[]')::JSONB
+								AS teams,
+
+								-- CASE WHEN uuid = $2
+								-- 	OR $3 > 2
+								-- 		THEN TRUE
+								-- 		ELSE FALSE
+								-- END AS editable,
+
+								-- CASE WHEN u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2)
+								-- 	OR $3 > 2
+								-- 		THEN TRUE
+								-- 		ELSE FALSE
+								-- END AS host_editor
+
+								-- FROM users u
+								-- LEFT JOIN adm0_subunits su
+								-- 	ON su.su_a3 = u.iso3
+								-- LEFT JOIN adm0 
+								-- 	ON adm0.adm0_a3 = u.iso3
+
+								-- INNER JOIN languages l
+								--	ON l.language = u.language
+								-- WHERE uuid = $4
+							;`, [ country_name_column, uuid, rights, id ])
+							*/
+							return t1.batch(batch1)
+							.then(results => {
+								let [ userinfo, ...uservariables ] = results
+								uservariables.forEach(d => {
+									userinfo = join.joinObj.call(userinfo, d)
+								})
+
+								return DB.conn.one(`
+									SELECT COUNT (id)::INT FROM pads
+									WHERE owner = $1
+								;`, userinfo.uuid, d => d.count)
+								.then(pads => Object.assign(userinfo, { pads }))
+								.catch(err => console.log(err))
+
+							}).catch(err => console.log(err))
 						}).catch(err => console.log(err)))
 					} else batch.push(null)
 
@@ -148,7 +223,7 @@ module.exports = async (req, res) => {
 						const metadata = await datastructures.pagemetadata({ req })
 
 						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices, u_errormessage })
-					}).then(data => res.render('profile', data))
+					}).then(data => res.render('contribute/contributor/', data))
 					.catch(err => console.log(err))
 				}
 			}).catch(err => console.log(err))

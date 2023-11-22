@@ -185,9 +185,12 @@ module.exports = async kwargs => {
 						pc.pad, pb.id, pb.title,
 						CASE WHEN EXISTS (
 							SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
-						) THEN TRUE ELSE FALSE END AS is_exploration
+						) THEN TRUE 
+							ELSE FALSE 
+						END AS is_exploration
 					FROM pinboard_contributions pc
-					INNER JOIN pinboards pb ON pb.id = pc.pinboard
+					INNER JOIN pinboards pb 
+						ON pb.id = pc.pinboard
 					WHERE
 						pc.pad IN $1:raw
 						AND $2:raw IN (SELECT participant FROM pinboard_contributors WHERE pinboard = pb.id)
@@ -199,6 +202,7 @@ module.exports = async kwargs => {
 						id: row.id,
 						title: row.title,
 						is_exploration: row.is_exploration,
+						editable: true // THIS SHOULD BE HANDLED BY THE sql QUERY: ONLY AUTHORIZED USERS SHOULD SEE THE PINS
 					});
 					padToPinboards.set(row.pad, pinboards);
 				});

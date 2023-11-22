@@ -345,8 +345,11 @@ main#mobilize-new {
 						font-size: $t-small;
 						line-height: 1.5em;
 					}
+					label[for="pad-limit"] {
+						text-align: center;
+					}
 					input[type=number] {
-						width: calc(#{$t-xlarge} * 3);
+/*						width: calc(#{$t-xlarge} * 3);*/
 						border: none;
 						outline: none;
 						margin: 15px 0 0 10px;
@@ -356,7 +359,12 @@ main#mobilize-new {
 						color: $c-dark-blue;
 						text-align: center;
 					}
-					.cron-option {
+					input[type=number]:disabled {
+						color: $c-light-grey;
+						background-color: transparent;
+					}
+					.cron-option,
+					.pad-limit-option {
 						display: flex;
 						align-items: center;
 						margin: 15px 0;
@@ -406,11 +414,14 @@ main#mobilize-new {
 						margin: 15px 0;
 						cursor: pointer;
 					}
-					input[type=checkbox]:checked + label {
+					input[type=checkbox]:checked:not(:disabled) + label {
 						border-color: $c-dark-blue;
 					}
 					input[type=checkbox]:checked + label + p {
 						color: $c-dark-blue;
+					}
+					input[type=checkbox]:disabled + label + p {
+						color: $c-light-2 !important;
 					}
 					.contributor-count {
 						margin: 15px 0;

@@ -27,7 +27,13 @@
 
 <main id='mobilize-new'>
 	<!-- FIRST MODAL: TITLE -->
-	<form action='/publish/mobilizations' method='POST'>
+	<!-- <form action='/publish/mobilizations' method='POST'> -->
+	<form action='<% if (!locals.data?.id) { %>/publish/mobilizations<% } else { %>/save/mobilization<% } %>' method='POST'>
+
+		<% if (locals.data?.id) { %>
+			<input type='hidden' name='id' value='<%- locals.data.id %>'>
+		<% } %>
+
 		<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
 		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
 		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
@@ -47,12 +53,12 @@
 
 		<div class='modal m-1'>
 			<div class='inner'>
-				<div class='head meta-status <% if (!locals.sourceinfo?.title) { %>status-0<% } else { %>status-1<% } %>'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back' disabled>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.title) { %>disabled<% } %>>
+						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>disabled<% } %>>
 							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 						</button>
 					</div>
@@ -60,13 +66,13 @@
 				<div class='body'>
 					<h1 class="google-translate-attr"><%- vocabulary['name mobilization'][language] %></h1>
 					<div class='input'>
-						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language](false, true) %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } %>>
+						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language](false, true) %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
 						<label aria-colspan="google-translate-attr" class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
 					</div>
 				</div>
 				<div class='foot'>
 					<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
-						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %> <% if (locals.data?.id) { %>disabled<% } %>>
 						<label for='public-status'></label>
 						<p class="google-translate-attr"><%- vocabulary['public mobilization'][language] %></p>
 					<% } %>
@@ -76,12 +82,12 @@
 		<!-- SECOND MODAL: LANGUAGE -->
 		<div class='modal m-2 hide'>
 			<div class='inner'>
-				<div class='head meta-status <% if (!locals.sourceinfo?.language) { %>status-0<% } else { %>status-1<% } %>'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back' onclick='prev(this)'>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.language) { %>disabled<% } %>>
+						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>disabled<% } %>>
 							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 						</button>
 					</div>
@@ -94,7 +100,7 @@
 
 						<menu>
 							<% languages.forEach(c => { %>
-								<li <% if (locals.sourceinfo?.language === c.language) { %>class='checked'<% } %>>
+								<li <% if ((locals.sourceinfo?.language || locals.data?.language) === c.language) { %>class='checked'<% } %>>
 									<div class='hide'>
 										<input type='radio' id='c-<%- c.language %>' name='language' value='<%- c.language %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo?.language === c.language) { %>checked<% } %>>
 									</div>
@@ -112,87 +118,89 @@
 			</div>
 		</div>
 		<!-- SET DATE RANGES -->
-		<div class='modal m-3 hide'>
-			<div class='inner'>
-				<div class='head meta-status status-1'>
-					<div class='btn-group'>
-						<button type='button' class='back' onclick='prev(this)'>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
-						</button>
-						<button type='button' class='next' onclick='next(this)'>
-							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
-						</button>
-					</div>
-				</div>
-
-				<div class='body'>
-					<h1 class="google-translate-attr"><%- vocabulary['set mobilization dates'][language] %></h1>
-					<p class="google-translate-attr"><%- vocabulary['mobilization dates default'][language] %></p>
-
-					<% 
-						const today = new Date()
-						const tomorrow = new Date(today)
-						tomorrow.setDate(tomorrow.getDate() + 1)
-						
-						const dd = String(today.getDate()).padStart(2, '0')
-						const mm = String(today.getMonth() + 1).padStart(2, '0')
-						const yyyy = today.getFullYear()
-
-						const dd1 = String(tomorrow.getDate()).padStart(2, '0')
-						const mm1 = String(tomorrow.getMonth() + 1).padStart(2, '0')
-						const yyyy1 = tomorrow.getFullYear()
-					%>
-
-					<!-- SET THE DEFAULT STATUS OF THE PAD -->
-					<input type='hidden' name='status' value=1>
-
-					<!-- OPTION FOR START TODAY -->
-					<div class='cron-option start'>
-						<div class='toggle-option'>
-							<input id='cron-start' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
-							<label for='cron-start'></label>
-							<p class="google-translate-attr"><%- vocabulary['set start date'][language] %></p>
-						</div>
-
-						<div>
-							<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' onchange='offsetMinEndDate(this)' disabled>
-						</div>
-					</div>	
-
-					<!-- OPTION FOR NO END DATE -->
-					<div class='cron-option end'>
-						<div class='toggle-option'>
-							<input id='cron-end' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
-							<label for='cron-end'></label>
-							<p class="google-translate-attr"><%- vocabulary['set end date'][language] %></p>
-						</div>
-
-						<div>
-							<input id='end-date' type='date' name='end_date' min='<%- `${yyyy1}-${mm1}-${dd1}` %>' disabled>
+		<% if (!locals.data?.id) { %>
+			<div class='modal m-3 hide'>
+				<div class='inner'>
+					<div class='head meta-status status-1'>
+						<div class='btn-group'>
+							<button type='button' class='back' onclick='prev(this)'>
+								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							</button>
+							<button type='button' class='next' onclick='next(this)'>
+								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+							</button>
 						</div>
 					</div>
-				</div>
-				<div class='foot'>
+
+					<div class='body'>
+						<h1 class="google-translate-attr"><%- vocabulary['set mobilization dates'][language] %></h1>
+						<p class="google-translate-attr"><%- vocabulary['mobilization dates default'][language] %></p>
+
+						<% 
+							const today = new Date()
+							const tomorrow = new Date(today)
+							tomorrow.setDate(tomorrow.getDate() + 1)
+							
+							const dd = String(today.getDate()).padStart(2, '0')
+							const mm = String(today.getMonth() + 1).padStart(2, '0')
+							const yyyy = today.getFullYear()
+
+							const dd1 = String(tomorrow.getDate()).padStart(2, '0')
+							const mm1 = String(tomorrow.getMonth() + 1).padStart(2, '0')
+							const yyyy1 = tomorrow.getFullYear()
+						%>
+
+						<!-- SET THE DEFAULT STATUS OF THE PAD -->
+						<input type='hidden' name='status' value=1>
+
+						<!-- OPTION FOR START TODAY -->
+						<div class='cron-option start'>
+							<div class='toggle-option'>
+								<input id='cron-start' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+								<label for='cron-start'></label>
+								<p class="google-translate-attr"><%- vocabulary['set start date'][language] %></p>
+							</div>
+
+							<div>
+								<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' onchange='offsetMinEndDate(this)' disabled>
+							</div>
+						</div>
+
+						<!-- OPTION FOR NO END DATE -->
+						<div class='cron-option end'>
+							<div class='toggle-option'>
+								<input id='cron-end' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+								<label for='cron-end'></label>
+								<p class="google-translate-attr"><%- vocabulary['set end date'][language] %></p>
+							</div>
+
+							<div>
+								<input id='end-date' type='date' name='end_date' min='<%- `${yyyy1}-${mm1}-${dd1}` %>' disabled>
+							</div>
+						</div>
+					</div>
+					<div class='foot'>
+					</div>
 				</div>
 			</div>
-		</div>
+		<% } %>
 		<!-- DESCRIPTION -->
 		<div class='modal m-4 hide'>
 			<div class='inner'>
-				<div class='head meta-status <% if (!locals.sourceinfo?.description) { %>status-0<% } else { %>status-1<% } %>'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.description && !locals.data?.description) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back' onclick='prev(this)'>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.description) { %>disabled<% } %>>
+						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.description || !locals.data?.description) { %>disabled<% } %>>
 							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 						</button>
 					</div>
 				</div>
 				<div class='body'>
-					<h1 class="google-translate-attr"><%- vocabulary['state objectives'][language] %></h1>
+					<h1 class='google-translate-attr'><%- vocabulary['state objectives'][language] %></h1>
 					<div class='input'>
-						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%- locals.sourceinfo?.description %></textarea>
+						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%- locals.sourceinfo?.description || locals.data?.description %></textarea>
 						<label class='placeholder google-translate-attr' for='description'><%- vocabulary['describe intent'][language] %></label>
 					</div>
 					<script type='text/javascript'>
@@ -212,7 +220,7 @@
 			</div>
 		</div>
 		<!-- TEMPLATE -->
-		<% if (!locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
+		<% if (!locals.metadata.page.query?.copy?.some(d => d === "true") && !locals.data?.id) { %>
 			<div class='modal m-5 hide'>
 				<div class='inner'>
 					<div class='head meta-status status-0'>
@@ -263,55 +271,57 @@
 			</div>
 		<% } %>
 		<!-- COHORT -->
-		<div class='modal m-6 hide'>
-			<div class='inner'>
-				<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true"))) { %>status-0<% } else { %>status-1<% } %>'>
-					<div class='btn-group'>
-						<button type='button' class='back' onclick='prev(this)'>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
-						</button>
-						<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
-							<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true'))) { %>disabled<% } %>>
-								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+		<% if (!locals.data?.public) { %>
+			<div class='modal m-6 hide'>
+				<div class='inner'>
+					<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) && !locals.data?.cohort?.length) { %>status-0<% } else { %>status-1<% } %>'>
+						<div class='btn-group'>
+							<button type='button' class='back' onclick='prev(this)'>
+								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 							</button>
-						<% } else { %> 
-							<button type='submit' class='next'>
-								<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
-							</button>
-						<% } %>
+							<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
+								<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
+									<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+								</button>
+							<% } else { %> 
+								<button type='submit' class='next'>
+									<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+								</button>
+							<% } %>
+						</div>
 					</div>
-				</div>
 
-				<div class='body'>
-					<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
-					<div class='filter'>
-						<input type='text' id='contributors' onblur='fixLabel(this)'>
-						<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language](true) %></label>
+					<div class='body'>
+						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
+						<div class='filter'>
+							<input type='text' id='contributors' onblur='fixLabel(this)'>
+							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language](true) %></label>
 
-						<menu>
-							<% locals.cohort.forEach(c => { %>
-								<li class='<% if (locals.sourceinfo && locals.metadata.page?.query?.copy?.some(d => d !== "true")) { %>checked<% } %>'>
-									<div class='hide'>
-										<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) { %>checked<% } %>>
-									</div>
-									<div class='main'>
-										<label for='c-<%- c.id %>'><%- c.ownername %></label>
-									</div>
-									<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
-									<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
-								</li>
-							<% }) %>
-						</menu>
+							<menu>
+								<% locals.cohort.forEach(c => { %>
+									<li class='<% if ((locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) || locals.data?.cohort.includes(c.id)) { %>checked<% } %>'>
+										<div class='hide'>
+											<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if ((locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) || locals.data?.cohort.includes(c.id)) { %>checked<% } %>>
+										</div>
+										<div class='main'>
+											<label for='c-<%- c.id %>'><%- c.ownername %></label>
+										</div>
+										<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
+										<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
+									</li>
+								<% }) %>
+							</menu>
+						</div>
 					</div>
-				</div>
-				<div class='foot stretch'>
-					<div class='global-opt'>
-						<button type='button' onclick='selectAllOpts(this); enableNext(this)'><%- vocabulary['select all'][language] %></button>
+					<div class='foot stretch'>
+						<div class='global-opt'>
+							<button type='button' onclick='selectAllOpts(this); enableNext(this)'><%- vocabulary['select all'][language] %></button>
+						</div>
+						<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](locals.data?.cohort?.length ?? 0) %></div>
 					</div>
-					<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](0) %></div>
 				</div>
 			</div>
-		</div>
+		<% } %>
 		<!-- LAST MODAL: LIMIT CONTRIBUTIONS -->
 		<div class='modal m-7 hide'>
 			<div class='inner'>
@@ -321,16 +331,39 @@
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
 						<button type='submit' class='next'>
-							<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+							<label class="google-translate-attr">
+								<% if (!locals.data?.id) { %>
+									<%- vocabulary['launch'][language] %>
+								<% } else { %>
+									Update mobilization
+									<!-- TO DO: TRANSLATE -->
+								<% } %>
+							</label>
 						</button>
 					</div>
 				</div>
 
-				<div class='body center'>
-					<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
-					<input id='pad-limit' type='number' name='pad_limit' value=1 min=1 placeholder='Number of pads.'>
+				<div class='body'>
+
+					<h1 class="google-translate-attr">Limit the number of pads each contributor can submit</h1>
 					<!-- TO DO: TRANSLATE -->
-					<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
+					<p class="google-translate-attr">By default, a contributor can submit as many pads as they like.</p>
+					<!-- TO DO: TRANSLATE -->
+
+					<div class='pad-limit-option'>
+						<div class='toggle-option'>
+							<input id='limit-pads' type='checkbox' class='toggle' onchange='togglePadLimit(this)' <% if (locals.data?.pad_limit) { %>checked<% } %>>
+							<label for='limit-pads'></label>
+						</div>
+
+						<div>
+							<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
+							<input id='pad-limit' type='number' name='pad_limit' value=<%- (locals.data?.pad_limit ?? 1) %> min=1 placeholder='Number of pads.' <% if (!locals.data?.pad_limit) { %>disabled<% } %>>
+							<!-- TO DO: TRANSLATE -->
+							<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
+						</div>
+					</div>	
+					
 				</div>
 				<div class='foot'>
 				</div>
@@ -354,7 +387,7 @@
 
 	// CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
 	const queryparams = new URLSearchParams(url.search)
-	const source = queryparams.get('id')
+	const source = queryparams.get('source')
 
 	if (source) {
 		d3.select('main#mobilize-new form')
@@ -424,6 +457,24 @@
 		const sel = d3.select(node)
 		const parent = sel.findAncestor('cron-option')
 		parent.select('input[type=date]').attr('disabled', node.checked ? null : true)
+	}
+	function togglePadLimit (node) {
+		const sel = d3.select(node)
+		const parent = sel.findAncestor('pad-limit-option')
+		parent.select('input[type=number]').attr('disabled', node.checked ? null : true)
+		console.log(node.checked)
+		if (!node.checked) {
+			parent.addElem('input')
+			.attrs({
+				'id': 'hidden-pad-limit',
+				'type': 'hidden',
+				'name': 'pad_limit',
+				'value': 0
+			})
+		} else {
+			parent.select('input#hidden-pad-limit')
+			.remove()
+		}
 	}
 	function offsetMinEndDate (node) {
 		const sel = d3.select(node)

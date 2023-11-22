@@ -365,7 +365,7 @@
 															<% locals.metadata.menu.mobilizations.filter(d => !d.target_id)
 															.forEach(d => { %>
 																<li class='status-<%- d.status %>'>
-																	<a href='/<%- language %>/mobilize/cohort?id=<%- d.id %>'>
+																	<a href='/<%- language %>/mobilize/cohort?source=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -398,7 +398,7 @@
 															<% } %>
 															<% locals.metadata.menu.mobilizations.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/mobilize/cohort?copy=true&id=<%- d.id %>'>
+																	<a href='/<%- language %>/mobilize/cohort?copy=true&source=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -435,7 +435,7 @@
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child)
 															.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/mobilize/cohort?child=true&id=<%- d.id %>'>
+																	<a href='/<%- language %>/mobilize/cohort?child=true&source=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>

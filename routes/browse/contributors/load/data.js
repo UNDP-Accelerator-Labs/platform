@@ -22,9 +22,10 @@ module.exports = async kwargs => {
 			u.language, u.secondary_languages,
 			to_char(u.confirmed_at, 'DD Mon YYYY') AS start_date, to_char(u.left_at, 'DD Mon YYYY') AS end_date,
 			
-			CASE WHEN $1 > 2
-				THEN TRUE
-				ELSE FALSE
+			CASE WHEN u.uuid IN (SELECT contributor FROM cohorts WHERE host = $4) 
+				OR $1 > 2
+					THEN TRUE
+					ELSE FALSE
 			END AS editable,
 
 			-- THIS IS THE PINBOARD CASE STATEMENT
@@ -32,34 +33,28 @@ module.exports = async kwargs => {
 			(SELECT json_agg(json_build_object(
 					'id', t.id,
 					'title', t.name,
-					'is_exploration', FALSE
+					'is_exploration', FALSE,
+					'editable', (u.uuid IN (SELECT contributor FROM cohorts WHERE host = $4) OR $1 > 2)
 				)) FROM teams t
 				INNER JOIN team_members tm
 					ON tm.team = t.id
-				WHERE u.uuid IN ($2:csv)
-					AND tm.member = u.uuid
+				WHERE 
+					-- u.uuid IN ($2:csv)
+					-- AND 
+					tm.member = u.uuid
 				GROUP BY tm.member
 			)::TEXT, '[]')::JSONB
 			AS pinboards
 
 			FROM users u
-
-			-- FROM cohorts c
-			-- INNER JOIN users u
-			-- 	ON u.uuid = c.contributor
 			
 			LEFT JOIN languages l
 				ON l.iso3 = u.iso3
 			WHERE TRUE
 				$3:raw
 			ORDER BY u.name
-		;`, [ rights, collaborators_ids, full_filters ])
+		;`, [ rights, collaborators_ids, full_filters, uuid ])
 		.then(async users => {
-			// CONVERT THE pinboards TO json
-			// users.forEach(d => {
-			// 	d.pinboards = JSON.parse(d.pinboards)
-			// })
-
 			// JOIN LOCATION INFO
 			users = await join.locations(users, { connection: gt, language, key: 'iso3' })
 

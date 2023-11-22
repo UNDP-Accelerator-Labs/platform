@@ -100,7 +100,7 @@ module.exports = async (req, res) => {
 									ELSE FALSE
 							END AS editable,
 
-							CASE WHEN $2 IN (SELECT host FROM cohorts WHERE contributor = u.uuid)
+							CASE WHEN u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2)
 								OR $3 > 2
 									THEN TRUE
 									ELSE FALSE
@@ -148,7 +148,7 @@ module.exports = async (req, res) => {
 						const metadata = await datastructures.pagemetadata({ req })
 
 						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices, u_errormessage })
-					}).then(data => res.render('profile', data))
+					}).then(data => res.render('contribute/contributor/', data))
 					.catch(err => console.log(err))
 				}
 			}).catch(err => console.log(err))

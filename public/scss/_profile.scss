@@ -379,7 +379,27 @@
 												background-color: $c-light-3;
 											}
 										}
+									}
 
+									&.add {
+										button {
+											display: none;
+											position: absolute;
+											right: 5px;
+											top: 0;
+											width: 20px;
+											height: 30px;
+											margin-top: 15px;
+											background: url('../imgs/icons/i-add-sm.svg') center no-repeat;
+											border: none;
+											outline: none;
+											float: right;
+											cursor: pointer;
+										}
+										input[type=text]:focus ~ button,
+										input[type=text].has-value ~ button {
+											display: block;
+										}
 									}
 								}
 								button.add-info {

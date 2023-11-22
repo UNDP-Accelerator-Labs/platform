@@ -152,9 +152,6 @@ const Entry = function (_kwargs) {
 						if (d.editable) {
 							const publish_dropdown = []
 							const exceeds_publication_limit = d.available_publications === 0 
-							console.log(d)
-							console.log(d.available_publications)
-							console.log(exceeds_publication_limit)
 								
 							<% if (modules.some(d => d.type === 'reviews')) { %>
 								if (d.status === 1 && !exceeds_publication_limit) {

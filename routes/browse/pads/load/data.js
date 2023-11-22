@@ -143,7 +143,7 @@ module.exports = async kwargs => {
 								;`, [ d.id, d.mobilization ]) // FOR NOW WE DO NOT GROUP BY status
 								.then(limit => {
 									if (d.pad_limit === 0) d.available_publications = undefined
-									else d.available_publications = Math.max(d.pad_limit - limit.count, 0)
+									else d.available_publications = Math.max(d.pad_limit - (limit?.count ?? 0), 0)
 									return d
 								}).catch(err => console.log(err))
 							})).catch(err => console.log(err))

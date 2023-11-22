@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
 	const { sessionID: sid } = req || {}
 	const { uuid } = req.session || {}
 	req.session.sessions = null
-	
+
 	// const cookies = parseCookies(req)
 	// let sid = cookies[`${app_suite}-session`]
 	// if (sid) sid = sid.split(':')[1].split('.')[0]
@@ -22,10 +22,13 @@ module.exports = async (req, res, next) => {
 			;`, [ sid, uuid ], d => d.bool)
 			.then(result => {
 				if (result) {
-					return t.one(`SELECT COALESCE(rights, 0)::INT AS rights FROM users WHERE uuid = $1;`, [ uuid ], d => d.rights)
-					.then(result => {
-						req.session.rights = result
-						return true
+					return t.any(`SELECT COALESCE(rights, 0)::INT AS rights FROM users WHERE uuid = $1;`, [ uuid ], d => d.rights)
+					.then(results => {
+						if (!results) {
+							return false;
+						}
+						req.session.rights = results[0]
+						return true;
 					}).catch(err => console.log(err))
 				} else return false
 			}).catch(err => console.log(err))
@@ -37,7 +40,7 @@ module.exports = async (req, res, next) => {
 			res.redirect('/login')
 		}
 	} else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
-	else { 
+	else {
 		Object.assign(req.session, datastructures.sessiondata({ public: true }))
 		next()
 	}

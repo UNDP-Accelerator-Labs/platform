@@ -152,7 +152,7 @@ module.exports =async (req, res) => {
 								secondary_languages = $7,
 								$8:raw
 								notifications = $9,
-								reviewer = $10,
+								reviewer = $10
 							WHERE uuid = $11
 						;`, [
 							/* $1 */ name,
@@ -248,10 +248,11 @@ module.exports =async (req, res) => {
 				// SEND EMAIL IF THE CHANGES ARE NOT SELF-TRIGGERED
 				if (id !== uuid) {
 					// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+					const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 					await sendemail({
 						to: email,
-						subject: `[${app_title}] Your account information has been modified`,
-						html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE
+						subject: `[${platformName}] Your account information has been modified`,
+						html: `Your account information has been modified by ${username} via the <a href="${own_app_url}">${platformName}</a>.` // TO DO: TRANSLATE
 					})
 					return null
 				} else return null

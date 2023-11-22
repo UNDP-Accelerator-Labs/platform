@@ -11,6 +11,15 @@ exports.translations = {
       en: 'Solutions Mapping Platform',
       es: 'Plataforma de Mapeo de Soluciones',
     },
+    experiments: {
+      en: 'Experiments Platform',
+    },
+    consent: {
+      en: 'Consent Archive',
+    },
+    'action-plans': {
+      en: 'Action Plans Platform',
+    },
   },
   'app desc': {
     'solutions-mapping': {

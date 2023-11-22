@@ -1,7 +1,7 @@
 const { fork } = require('child_process')
 const path = require('path')
 
-const { app_title, modules, DB, own_app_url } = include('config/')
+const { app_title, app_title_short, translations, own_app_url } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -14,6 +14,7 @@ module.exports = (req, res) => {
 	// SEND THE REVIEW ASSIGNMENT TO A CHILD PROCESS
 	const c_process = fork(path.join(__dirname, 'assign-review.js'))
 	c_process.send({ rootpath, id, language, reviewers, tagfocus, uuid })
+	const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 
 	// THE FOLLOWING IS TECHNICALLY NOT NEEDED
 	c_process.on('message', message => {
@@ -23,8 +24,8 @@ module.exports = (req, res) => {
 			if (d.notifications) {
 				return await sendemail({
 					to: d.email,
-					subject: `[${app_title}] Request for review`,
-					html: `You are invited to review the submission entitled ${title} on the ${app_title} platform. Please navigate <a href="${own_app_url}/en/browse/reviews/pending">here</a> to accept of decline the review.`
+					subject: `[${platformName}] Request for review`,
+					html: `You are invited to review the submission entitled "${title}" on the <a href="${own_app_url}">${platformName}</a>. Please navigate <a href="${own_app_url}en/browse/reviews/pending">here</a> to accept or decline the review.`
 				})
 			}
 		})

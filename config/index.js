@@ -1,4 +1,5 @@
 let {
+  is_staging,
   app_id,
   app_title,
   app_title_short,
@@ -20,9 +21,9 @@ let {
   view_display,
   welcome_module,
   fixed_uuid,
+  translations,
 } = require('./edit/');
 
-const { translations } = require('./edit/translations.js');
 exports.translations = translations;
 
 exports.app_id = app_id;
@@ -31,9 +32,13 @@ exports.app_title_short = app_title_short;
 exports.app_suite = app_suite;
 exports.own_app_url = own_app_url;
 
-const base_host = 'sdg-innovation-commons.org';
+const base_host = is_staging
+  ? 'acclabs-staging.azurewebsites.net'
+  : 'sdg-innovation-commons.org';
 exports.app_base_host = base_host;
-exports.app_suite_url = `https://www.${base_host}/`;
+exports.app_suite_url = is_staging
+  ? `https://${base_host}/`
+  : `https://www.${base_host}/`;
 
 exports.app_suite_secret = app_suite_secret;
 exports.app_description = app_description;

@@ -13,6 +13,17 @@ async function sendResetEmail(email, html) {
   });
 }
 
+exports.createResetLink = async (protocol, host, email) => {
+  const mainHost = removeSubdomain(host);
+  // Generate JWT token
+  const token = await jwt.sign(
+    { email, action: 'password-reset' },
+    process.env.APP_SECRET,
+    { expiresIn: '24h', issuer: mainHost })
+
+  return `${protocol}://${host}/reset/${token}`;
+}
+
 // Generate and send password reset token
 exports.forgetPassword = async (req, res, next) => {
   const { email } = req.body;
@@ -26,15 +37,8 @@ exports.forgetPassword = async (req, res, next) => {
     return;
   }
   const { host } = req.headers || {}
-  const mainHost = removeSubdomain(host);
   const protocol = req.protocol
-  // Generate JWT token
-  const token = await jwt.sign(
-    { email, action: 'password-reset' },
-    process.env.APP_SECRET,
-    { expiresIn: '24h', issuer: mainHost })
-
-  const resetLink = `${protocol}://${host}/reset/${token}`;
+  const resetLink = await createResetLink(protocol, host, email);
   const html = `
   <div>
       <p>Dear User,</p>
@@ -127,7 +131,11 @@ exports.updatePassword = async (req, res, next) => {
 
         // Update the password and clear the reset token
         await DB.general.none(`
-          UPDATE users SET password = CRYPT($1, password) WHERE email = $2;
+          UPDATE users SET
+            password = CRYPT($1, password),
+            confirmed_at = COALESCE(confirmed_at, NOW()),
+            confirmed = TRUE
+          WHERE email = $2;
         `, [password, decoded.email]);
 
         //UPDATE ALL ACTIVE SESSION

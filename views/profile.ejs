@@ -123,6 +123,7 @@
 								</ul>
 							</div>
 						<% } %>
+						<% if (locals.data?.uuid) { %>
 						<div class='password-info info <% if (locals.data?.uuid) { %>collapsed<% } %>'>
 							<ul>
 								<li>
@@ -155,6 +156,7 @@
 								</li>
 							</ul>
 						</div>
+						<% }  // password fields %>
 					<% } %>
 					<div class='secondary-info info'>
 						<ul>
@@ -616,7 +618,7 @@
 
 		const pinboard = d3.select('.pinboard-group')
 		if (!pinboard.selectAll('.pin').size()) pinboard.classed('hide', true)
-		
+
 		partialSave()
 	}
 

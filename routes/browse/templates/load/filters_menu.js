@@ -101,8 +101,8 @@ module.exports = async kwargs => {
 
 
 		return t.batch(batch)
-		.then(results => results.filter(d => d.length))
+		.then(results => results.filter(d => d?.length ?? 0))
 	}).then(results => {
-		return results.map(d => flatObj.call(d))
+		return results?.map(d => flatObj.call(d)) ?? []
 	})
 }

@@ -1,11 +1,11 @@
-const { app_title, app_languages, DB } = include('config/')
-const { email: sendemail, datastructures, join, sessionupdate } = include('routes/helpers/')
-const { isPasswordSecure } = require('../../login')
+const { own_app_url, app_title, app_languages, DB, translations } = include('config/')
+const { email: sendemail, sessionupdate } = include('routes/helpers/')
+const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
 module.exports =async (req, res) => {
 	const { referer } = req.headers || {}
-	const { uuid, rights: session_rights, username, is_trusted } = req.session || {}
+	const { uuid, rights: session_rights, username, is_trusted, email: initiatorEmail } = req.session || {}
 	let { id, new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, teams, reviewer, email_notifications: notifications, secondary_languages } = req.body || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
@@ -16,7 +16,7 @@ module.exports =async (req, res) => {
 	const referer_url = new URL(referer)
 	const referer_params = new URLSearchParams(referer_url.search)
 
-	if(password.length) {
+	if(id && password.length) {
 		let message = isPasswordSecure(password);
 		if (message.length) {
 			referer_params.set('errormessage', message);
@@ -24,6 +24,7 @@ module.exports =async (req, res) => {
 		}
 	}
 	if (!id) {
+		password = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);  // we always create a random password
 		DB.general.tx(t => {
 			return t.one(`
 				INSERT INTO users (name, email, position, password, iso3, language, secondary_languages, rights, notifications, reviewer)
@@ -58,12 +59,16 @@ module.exports =async (req, res) => {
 				}
 				return t.batch(batch)
 				.then(async _ => {
+					const own_app = new URL(own_app_url)
+					const resetLink = await createResetLink(own_app.protocol, own_app.hostname, email);
 					if (result !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+						const temail = translations['email notifications'];
 						await sendemail({
 							to: email,
-							subject: `[${app_title}] An account has been created for you`,
-							html: `${username} has created an account for you to access the ${app_title} application.`
+							cc: initiatorEmail,
+							subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(app_title),
+							html: (temail['new user body'][language] ?? temail['new user body']['en'])(username, app_title, resetLink, own_app_url),
 						})
 						return result
 					} else return result
@@ -145,13 +150,13 @@ module.exports =async (req, res) => {
 								secondary_languages = $7,
 								$8:raw
 								notifications = $9,
-								reviewer = $10
+								reviewer = $10,
 							WHERE uuid = $11
 						;`, [
 							/* $1 */ name,
 							/* $2 */ email,
 							/* $3 */ position,
-							/* $4 */ update_pw,
+							/* $4 */ 'NOT USED',
 							/* $5 */ iso3,
 							/* $6 */ language,
 							/* $7 */ JSON.stringify(secondary_languages || []),

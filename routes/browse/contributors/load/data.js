@@ -137,10 +137,10 @@ module.exports = async kwargs => {
 							if (d.status === 1 && (d.associated_pads > 0 || d.private_associated_pads > 0)) d.status = 2
 						})
 
-						return users.sort((a, b) => a.name.localeCompare(b.name))
+						return users.sort((a, b) => a?.name?.localeCompare(b.name))
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
-			} else return users.sort((a, b) => a.name.localeCompare(b.name))
+			} else return users.sort((a, b) => a?.name?.localeCompare(b.name))
 		}).catch(err => console.log(err))
 		/*
 		return gt.any(`

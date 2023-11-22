@@ -4,7 +4,7 @@ const { array, checklanguage, datastructures } = include('routes/helpers/')
 
 const filter = require('./filter.js')
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
 
 	if (public || rights < modules.find(d => d.type === 'contributors')?.rights.read) res.redirect('/login')
@@ -13,7 +13,7 @@ module.exports = (req, res) => {
 		const { pinboard, display } = req.query || {}
 		const language = checklanguage(req.params?.language || req.session.language)
 		// GET FILTERS
-		const [ f_space, page, full_filters ] = filter(req)
+		const [ f_space, page, full_filters ] = await filter(req)
 
 		if (space === 'pinned' && page) res.redirect(`./invited?page=${page}`)
 		else {

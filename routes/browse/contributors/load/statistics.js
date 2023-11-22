@@ -3,12 +3,12 @@ const helpers = include('routes/helpers/')
 
 const filter = require('../filter')
 
-module.exports = kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
 	const { req } = kwargs || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	// GET FILTERS
-	const [ f_space, page, full_filters ] = filter(req) // THERE IS ONLY ONE f_space FOR NOW SO WE DO NOT NEED TO USE IT. IT IS ONLY HERE FOR CONSISTENCY
+	const [ f_space, page, full_filters ] = await filter(req) // THERE IS ONLY ONE f_space FOR NOW SO WE DO NOT NEED TO USE IT. IT IS ONLY HERE FOR CONSISTENCY
 	
 	return conn.task(t => {
 		const batch = []

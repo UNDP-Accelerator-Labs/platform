@@ -8,10 +8,10 @@ exports.isPasswordSecure = (password) => {
   // Check against common passwords (optional)
   const commonPasswords = ['password', '123456', 'qwerty', 'azerty'];
   const isUpper = uppercaseRegex.test(password);
-	const isLower = lowercaseRegex.test(password);
-	const isNumber = numberRegex.test(password);
-	const isSpecial = specialCharRegex.test(password);
-	const groups = [isUpper, isLower, isNumber, isSpecial].reduce((p, v) => p + (v ? 1 : 0), 0);
+  const isLower = lowercaseRegex.test(password);
+  const isNumber = numberRegex.test(password);
+  const isSpecial = specialCharRegex.test(password);
+  const groups = [isUpper, isLower, isNumber, isSpecial].reduce((p, v) => p + (v ? 1 : 0), 0);
   const checkPass = {
     'pw-length': !(password.length < minlength),
     'pw-groups': groups >= 3,

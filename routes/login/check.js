@@ -27,7 +27,7 @@ module.exports = async (req, res, next) => {
 						if (!results) {
 							return false;
 						}
-						req.session.rights = results[0]
+						req.session.rights = results[0].rights
 						return true;
 					}).catch(err => console.log(err))
 				} else return false

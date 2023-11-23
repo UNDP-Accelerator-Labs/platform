@@ -345,8 +345,11 @@ main#mobilize-new {
 						font-size: $t-small;
 						line-height: 1.5em;
 					}
+					label[for="pad-limit"] {
+						text-align: center;
+					}
 					input[type=number] {
-						width: calc(#{$t-xlarge} * 3);
+/*						width: calc(#{$t-xlarge} * 3);*/
 						border: none;
 						outline: none;
 						margin: 15px 0 0 10px;
@@ -356,7 +359,12 @@ main#mobilize-new {
 						color: $c-dark-blue;
 						text-align: center;
 					}
-					.cron-option {
+					input[type=number]:disabled {
+						color: $c-light-grey;
+						background-color: transparent;
+					}
+					.cron-option,
+					.pad-limit-option {
 						display: flex;
 						align-items: center;
 						margin: 15px 0;

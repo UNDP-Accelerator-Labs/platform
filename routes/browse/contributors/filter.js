@@ -51,7 +51,7 @@ module.exports = req => {
 				ORDER BY u.name
 				LIMIT 1
 			;`, [ uuid, rights ], d => d.letter)
-			.catch(err => console.log(err))
+			.catch(err => console.log(err)) || 'A'
 
 			filters.push(DB.pgp.as.format(`AND LEFT(u.name, 1) = $1`, [ page ]))
 		}

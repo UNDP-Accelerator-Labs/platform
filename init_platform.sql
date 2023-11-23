@@ -163,7 +163,7 @@ CREATE TABLE public.mobilizations (
     owner uuid,
     source integer,
     copy boolean DEFAULT false,
-    pad_limit integer DEFAULT 1,
+    pad_limit integer DEFAULT 0,
     public boolean DEFAULT false,
     child boolean DEFAULT false,
     description text,

@@ -204,11 +204,17 @@ function retrievepins (_object_id, uuid, ownId) {
 		SELECT pb.id, pb.title,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
-			) THEN TRUE ELSE FALSE END AS is_exploration
+			) THEN TRUE 
+				ELSE FALSE 
+			END AS is_exploration,
+			TRUE AS editable
 		FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
-		WHERE pbc.pad IN ($1:csv) AND pbc.db = $2 AND pb.owner = $3 AND pbc.is_included = true
+		WHERE pbc.pad IN ($1:csv) 
+			AND pbc.db = $2 
+			AND pb.owner = $3 
+			AND pbc.is_included = true
 	;`, [ safeArr(_object_id, -1), ownId, uuid ])
 }
 function retrievepinboards (_owners, ownId) {
@@ -216,11 +222,15 @@ function retrievepinboards (_owners, ownId) {
 		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM exploration WHERE linked_pinboard = p.id
-			) THEN TRUE ELSE FALSE END AS is_exploration
+			) THEN TRUE 
+				ELSE FALSE 
+			END AS is_exploration
 		FROM pinboards p
 		INNER JOIN pinboard_contributions pc
 			ON pc.pinboard = p.id
-		WHERE p.owner IN ($1:csv) AND pc.db = $2 AND pc.is_included = true
+		WHERE p.owner IN ($1:csv) 
+			AND pc.db = $2 
+			AND pc.is_included = true
 		GROUP BY p.id
 	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])
 }

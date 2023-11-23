@@ -116,6 +116,7 @@ exports.translations = {
         <p>
         Next Steps:<br/>
         To log in for the first time, use the following link: <a href="${resetLink}">${resetLink}</a><br/>
+        If clicking the link in the email doesn't work, try copying and pasting it directly into the browser's address bar.<br/>
         After 24 hours, the above link will expire.
         In that case, use <a href="${baseURL}forget-password">${baseURL}forget-password</a> to reset your password.
         </p>
@@ -145,6 +146,7 @@ exports.translations = {
         <p>
         Próximos Pasos:<br/>
         Para iniciar sesión por primera vez, utiliza el siguiente enlace: <a href="${resetLink}">${resetLink}</a><br/>
+        Si hacer clic en el enlace del correo electrónico no funciona, intenta copiarlo y pegarlo directamente en la barra de direcciones del navegador.<br/>
         Después de 24 horas, el enlace anterior caducará.
         En ese caso, utiliza <a href="${baseURL}forget-password">${baseURL}forget-password</a> para restaurar su contraseña.
         </p>

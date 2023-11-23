@@ -151,16 +151,69 @@ const Entry = function (_kwargs) {
 					<% if (['files', 'pads'].includes(object)) { %>
 						if (d.editable) {
 							const publish_dropdown = []
+							const exceeds_publication_limit = d.available_publications === 0 
+								
 							<% if (modules.some(d => d.type === 'reviews')) { %>
-								if (d.status === 1) publish_dropdown.push({ name: 'status', value: 2, classname: 'preprint', label: '<%- vocabulary["object status"][language](object, 2) %>' })
-								if (d.status <= 2 && d.review_status === 0) publish_dropdown.push({ name: 'review_status', value: 1, classname: 'review',label: '<%- vocabulary["submit for review"][language] %>', fn: selectReviewLanguage })
+								if (d.status === 1 && !exceeds_publication_limit) {
+									publish_dropdown.push({ 
+										name: 'status', 
+										value: 2, 
+										classname: 'preprint', 
+										label: '<%- vocabulary["object status"][language](object, 2) %>' 
+									})
+								}
+								if (d.status <= 2 && d.review_status === 0) {
+									if (!(d.status === 1 && exceeds_publication_limit)) {
+										publish_dropdown.push({ 
+											name: 'review_status', 
+											value: 1, 
+											classname: 'review',
+											label: '<%- vocabulary["submit for review"][language] %>', 
+											fn: selectReviewLanguage 
+										})
+									}
+								}
 							<% } else { %>
-								if (d.status === 1) publish_dropdown.push({ name: 'status', value: 2, classname: 'internally', label: '<%- vocabulary["internally"][language] %>' })
-								// TO DO: MAKE SURE THIS IS ONLY POSSIBLE WHEN ALL META FIELDS ARE FILLED OUT
-								if (d.status <= 2 && d.publishable) publish_dropdown.push({ name: 'status', value: 3, classname: 'externally', label: '<%- vocabulary["externally"][language] %>' })
+								if (d.status === 1 && !exceeds_publication_limit) {
+									publish_dropdown.push({ 
+										name: 'status', 
+										value: 2, 
+										classname: 'internally', 
+										label: '<%- vocabulary["internally"][language] %>' 
+									})
+								}
+								if (d.status <= 2 && d.publishable) {
+									if (!(d.status === 1 && exceeds_publication_limit)) {
+										publish_dropdown.push({ 
+											name: 'status', 
+											value: 3, 
+											classname: 'externally', 
+											label: '<%- vocabulary["externally"][language] %>' 
+										})
+									}
+								}
 							<% } %>
 
-							if (publish_dropdown.length > 0) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'button', value: d.id, disabled: !(d.editable && [1, 2].includes(d.status) && (d.available_publications === undefined || d.available_publications > 0)), classname: 'publish', label: '<%- vocabulary["publish"][language] %>', dropdown: publish_dropdown, inputs: [{ name: 'id', value: d.id }, { name: 'title', value: d.title }] })
+							opts.push({ 
+								action: '/publish/<%- object %>', 
+								method: 'GET', 
+								node: 'button', 
+								type: 'button', 
+								value: d.id, 
+								disabled: 
+									!(
+										d.editable 
+										&& [1, 2].includes(d.status) 
+										&& publish_dropdown.length
+									), 
+								classname: 'publish', 
+								label: '<%- vocabulary["publish"][language] %>', 
+								dropdown: publish_dropdown, 
+								inputs: [
+									{ name: 'id', value: d.id }, 
+									{ name: 'title', value: d.title }
+								]
+							})
 
 							// if (d.status > 1) opts.push({ action: '/publish/<%- object %>', method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: '<%- vocabulary["unpublish"][language] %>', inputs: [{ name: 'status', value: 1 }] })
 
@@ -216,9 +269,10 @@ const Entry = function (_kwargs) {
 
 						if (d.status === 1) opts.push({ action: '/unpublish/<%- object %>', method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 1), classname: 'demobilize', label: '<%- vocabulary["demobilize"][language] %>', value: d.id })
 
-						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', value: d.id })
+						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', name: 'source', value: d.id })
 
-						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', value: d.id, inputs: [{ name: 'copy', value: true }] })
+						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', name: 'source', value: d.id, inputs: [{ name: 'copy', value: true }] })
+					
 					<% } else if (object === 'contributors') { %>
 						<% if (space === 'invited') { %>
 							opts.push({ node: 'button', type: 'button', classname: 'revoke', label: '<%- vocabulary["revoke"][language] %>', name: 'contributor', value: d.id, disabled: ![null, undefined].includes(d.end_date), fn: revoke })
@@ -889,7 +943,7 @@ const Entry = function (_kwargs) {
 							if (d.title.length > 25) return `${d.title.slice(0, 25)}…`
 							else return d.title
 						})
-					pin.addElems('label', 'close')
+					pin.addElems('label', 'close', d => d.editable ? [d] : [])
 					.on('click', async function (d) {
 						const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: '<%- object.slice(0, -1) %>' })
 						if (res.status === 200) {
@@ -977,7 +1031,10 @@ const Entry = function (_kwargs) {
 					d3.select(this).call(renderPins, d.pinboards);
 				})
 
-				const newpin = pingroup.addElems('div', 'add filter')
+				const newpin = pingroup.addElems('div', 'add filter', d => {
+					if ('<%- object %>' === 'contributors' && !d.editable) return []
+					else return [d]
+				})
 
 				const renderDropdown = (pid) => {
 					const d = pinPbMap[pid];
@@ -1040,7 +1097,13 @@ const Entry = function (_kwargs) {
 
 				newpin.addElems('label')
 					.attr('for', 'new-pinboard')
-					.html('<%- vocabulary["add to collection"][language] %>')
+					.html(_ => {
+						<% if (object === 'contributors') { %>
+							return '<%- vocabulary["assign to teams"][language] %>'
+						<% } else { %>
+							return '<%- vocabulary["add to collection"][language] %>'
+						<% } %>
+					})
 				newpin.addElems('button')
 					.attr('type', 'button')
 					.on('click', async function (d) {
@@ -1064,18 +1127,6 @@ const Entry = function (_kwargs) {
 							} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
 								const res = await POST('/pin', { board_title: node.value.trim(), object_id: d.id, action: 'insert', object: '<%- object.slice(0, -1) %>' })
 								if (res.status === 200) {
-									// d.pinboards = res.pins
-									// // ADD THE NEW PIN TO THE OBJECT
-									// pins.call(renderPins, res.pins)
-									// // ADD THE NEW PINBOARD TO ALL LISTS
-									// d3.selectAll('.pinboard-group').selectAll('.add.filter')
-									// .each(function (c) {
-									// 	const data = res.pinboards_list.map(b => Object.assign(Object.assign({}, b), { object_id: c.id, checked: c.pinboards.map(a => a.id).includes(b.id) ? true : null }))
-									// 	d3.select(this).call(renderPinOptions, data)
-									// })
-									// // ADD THE NEW PINBOARD TO LIST IN MAIN NAV AT THE TOP
-									// renderPinNavigation(res.pinboards_list)
-
 									// RELOAD THE PAGE
 									location.reload()
 								}

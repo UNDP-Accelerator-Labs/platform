@@ -3,7 +3,7 @@ const { checklanguage, join, datastructures, safeArr, DEFAULT_UUID } = include('
 
 module.exports = (req, res) => {
 	const { object } = req.params || {}
-	const { public, id: source, copy, child, pinboard } = req.query || {}
+	const { id, public, source, copy, child, pinboard } = req.query || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
@@ -13,6 +13,7 @@ module.exports = (req, res) => {
 	DB.conn.tx(async t => {
 		const batch = []
 
+		// COHORT
 		if (public) { // NO NEED FOR A COHORT
 			batch.push(null)
 		} else { // DETERMINE WHAT TYPE OF COHORT IS NEEDED
@@ -84,6 +85,7 @@ module.exports = (req, res) => {
 			}
 		}
 
+		// TEMPLATE
 		// GET FROM THE query WHETHER THIS IS A COPY:
 		// IF IT IS A COPY, THEN GET ONLY THE TEMPLATE USED IN THE source
 		if (copy === 'true') {
@@ -111,6 +113,7 @@ module.exports = (req, res) => {
 			}))
 		}
 
+		// SOURCE INFO
 		if (source) { // THIS IS EITHER A FOLLOW UP OR A COPY
 			// SO WE COLLECT SOME BASIC INFO ABOUT THE SOURCE
 			batch.push(t.one(`
@@ -119,44 +122,27 @@ module.exports = (req, res) => {
 			;`, [ source ]))
 		} else batch.push(null)
 
+		// MOBILIZATION INFO
+		if (!id) {
+			batch.push(null) // THIS IS A NEW MOBILIZATION
+		} else {
+			batch.push(t.one(`
+				SELECT m.id, m.title, m.language, m.description, m.public, m.pad_limit, m.collection,
+					COALESCE(jsonb_agg(mc.participant) FILTER (WHERE mc.participant IS NOT NULL), '[]') AS cohort
+				FROM mobilizations m
+				LEFT JOIN mobilization_contributors mc
+					ON mc.mobilization = m.id
+				WHERE m.id = $1::INT
+				GROUP BY m.id
+			;`, [ id ]))
+		}
+
 		return t.batch(batch)
 		.then(async results => {
-			const [ cohort, templates, sourceinfo ] = results
+			const [ cohort, templates, sourceinfo, data ] = results
 
 			const metadata = await datastructures.pagemetadata({ connection: t, req })
-			return Object.assign(metadata, { cohort, templates, sourceinfo })
-
-			// return {
-			// 	metadata : {
-			// 		site: {
-			// 			modules
-			// 		},
-			// 		page: {
-			// 			title: pagetitle,
-			// 			path,
-			// 			referer: originalUrl,
-			// 			// id: page,
-			// 			language,
-			// 			activity: path[1],
-			// 			object,
-			// 			// space: space,
-			// 			query
-			// 		},
-			// 		menu: {
-			// 			templates,
-			// 			participations
-			// 		},
-			// 		user: {
-			// 			name: username,
-			// 			country,
-			// 			centerpoint: JSON.stringify(req.session.country?.lnglat || {}),
-			// 			rights
-			// 		}
-			// 	},
-			// 	source: sourceinfo,
-			// 	cohort,
-			// 	templates: active_templates
-			// }
+			return Object.assign(metadata, { cohort, templates, sourceinfo, data })
 		})
 	}).then(data => res.status(200).render('mobilization-new', data)) // CHANGE THE NAME TO MOBILIZATION
 	.catch(err => console.log(err))

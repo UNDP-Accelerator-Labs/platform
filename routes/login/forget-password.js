@@ -131,8 +131,8 @@ exports.updatePassword = async (req, res, next) => {
             password = CRYPT($1, password),
             confirmed_at = COALESCE(confirmed_at, NOW()),
             confirmed = TRUE
-          WHERE email = $2;
-        `, [password, decoded.email]);
+          WHERE email = $2
+        ;`, [password, decoded.email]);
 
         //UPDATE ALL ACTIVE SESSION
         await sessionupdate({

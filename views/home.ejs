@@ -124,13 +124,17 @@
 			</div>
 			<!-- <h3>ADD TAG CATEGORIES</h3> -->
 			<nav class='enter'>
-				<a href='/<%- language %>/browse/pads/published'>
-					<button type='button' class='highlight google-translate-attr'><%- vocabulary['browse publications'][language] %></button>
-				</a>
 				<% if (!logged) { %>
+					<a href='/<%- language %>/browse/pads/public'>
+						<button type='button' class='highlight google-translate-attr'><%- vocabulary['browse publications'][language] %></button>
+					</a>
 					<a href='/login'><button class="google-translate-attr" type='button'><%- vocabulary['log in'][language] %></button></a>
 					<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 					<!-- TO DO: TRANSLATE -->
+				<% } else { %>
+					<a href='/<%- language %>/browse/pads/published'>
+						<button type='button' class='highlight google-translate-attr'><%- vocabulary['browse publications'][language] %></button>
+					</a>
 				<% } %>
 			</nav>
 		</div>

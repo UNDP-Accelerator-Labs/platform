@@ -5,7 +5,7 @@
     const own_db = locals.metadata.site.own_db;
     const exploration_info_url = `/${page_language}/exploration-info/`;
 %>
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
     class Exploration {
         constructor() {
             this.past = [];

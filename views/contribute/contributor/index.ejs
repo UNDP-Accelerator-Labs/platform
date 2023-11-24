@@ -22,12 +22,14 @@
 	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
 	crossorigin=''></script>
 
+<script type='text/javascript' src='/js/contribute/contributor/main.js'></script>
+
 </head>
 
 <body>
 
 <%- include ('../../partials/translations.ejs') %>
-<%- include ('../../partials/menu-languages.ejs') %>
+<%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 <div class='main-content fit'>
 <header>
@@ -190,7 +192,7 @@
 								<label class='instruction google-translate-attr'><%- vocabulary['preferred language'][language] %></label>
 								<div class='select'>
 									<input type='text' id='new-language' autocomplete='new-language' value='<%- locals.data?.languagename %>' <% if (!editable) { %>disabled<% } %>>
-									<label for='new-language' class='google-translate-attr'><%- vocabulary['select language'][language]() %></label>
+									<label for='new-language' class='google-translate-attr'><%- vocabulary['select language'][language]['singular'] %></label>
 									<% if (editable) { %>
 										<div class='dropdown'>
 											<menu>
@@ -213,7 +215,7 @@
 									<label class='instruction google-translate-attr'><%- vocabulary['other languages'][language] %></label>
 									<div class='select'>
 										<input type='text' id='secondary-languages' autocomplete='secondary-languages' value='<%- locals.languages.filter(d => locals.data?.secondary_languages?.includes(d.language)).map(d => d.name).join(", ") %>' <% if (!editable) { %>disabled<% } %>>
-										<label for='secondary-languages' class='google-translate-attr'><%- vocabulary['select language'][language](true) %></label>
+										<label for='secondary-languages' class='google-translate-attr'><%- vocabulary['select language'][language]['plural'] %></label>
 										<% if (editable) { %>
 											<div class='dropdown'>
 												<menu>
@@ -334,7 +336,7 @@
 								<li class='google-translate-attr'>
 									<label class='instruction'><%- vocabulary['accept to review'][language] %></label>
 									<div class='input-group'>
-										<input type='checkbox' id='accept-reviews' name='reviewer' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.reviewer) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
+										<input type='checkbox' id='accept-reviews' name='reviewer' value='true' class='toggle' data-object='contributor' onchange='toggleOptions(this)' <% if (locals.data?.reviewer) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
 										<label for='accept-reviews' data-content='<% if (locals.data?.reviewer) { %><%- vocabulary["yes"][language].toUpperCase() %><% } else { %><%- vocabulary["no"][language].toUpperCase() %><% } %>'></label>
 									</div>
 								</li>
@@ -342,7 +344,7 @@
 							<li class='google-translate-attr'>
 								<label class='instruction'><%- vocabulary['email notifications'][language] %></label>
 								<div class='input-group'>
-									<input type='checkbox' id='email-notifications' name='email_notifications' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.notifications) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
+									<input type='checkbox' id='email-notifications' name='email_notifications' value='true' class='toggle' data-object='contributor' onchange='toggleOptions(this)' <% if (locals.data?.notifications) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
 									<label for='email-notifications' data-content='<% if (locals.data?.notifications) { %><%- vocabulary["yes"][language].toUpperCase() %><% } else { %><%- vocabulary["no"][language].toUpperCase() %><% } %>'></label>
 								</div>
 							</li>
@@ -358,28 +360,10 @@
 							<button class='request-token' type='button' onclick='requestToken(this.form)'>Request an API token</button>
 							<div class='input-group'>
 								<input type='text' name='api-token' class='hide' onclick='this.select()' readonly>
-								<button type='button' class='copy hide google-translate-attr' onclick='copyToken(this.form)'><%- vocabulary['copy'][language](true) %></button>
+								<button type='button' class='copy hide google-translate-attr' onclick='copyToken(this.form)'><%- vocabulary['copy'][language]['verb'] %></button>
 							</div>
 						</form>
 					</div>
-					<script type='text/javascript'>
-						async function requestToken (node) {
-							const token = await POST('/request/token')
-							if (token) {
-								const inputgroup = d3.select(node)
-								inputgroup.selectAll('.hide')
-									.classed('hide', false)
-								const input = inputgroup.select('input[type=text]')
-									.attr('value', token)
-								input.node().select()
-							}
-						}
-						function copyToken (node) {
-							const inputgroup = d3.select(node)
-							const token = inputgroup.select('input[type=text]').node().value
-							navigator.clipboard.writeText(token)
-						}
-					</script>
 				<% } %>
 				<% if (locals.data?.pads > 0) { %>
 					<div class='user-content py-5'>
@@ -405,15 +389,8 @@
 <footer></footer>
 <%- include ('../../partials/footer.ejs') %>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 	if (!mediaSize) var mediaSize = getMediaSize()
-
-	function toggleOptions (node, options) {
-		for (const label of node.labels) {
-			d3.select(label).attr('data-content', node.checked ? options[0] : options[1])
-		}
-		partialSave()
-	}
 
 	function addLanguage (node) {
 		// THEN SET UP MECHANISM IN BACKEND TO ALLOW MULTIPLE LANGUAGES
@@ -422,7 +399,7 @@
 		const parent = sel.findAncestor('ul')
 		const li = parent.insertElem(function () { return node }, 'li')
 		li.addElem('label', 'instruction')
-			.html('<%- vocabulary["other languages"][language] %>')
+			.html(vocabulary['other languages'][language])
 		const input = li.addElem('div', 'select')
 		input.addElem('input')
 			.attrs({
@@ -432,7 +409,7 @@
 			})
 		input.addElem('label')
 			.attr('for', 'secondary-languages')
-			.html('<%- vocabulary["select language"][language](true) %>')
+			.html(vocabulary['select language'][language]['plural'])
 		const dropdown = input.addElem('div', 'dropdown')
 			.addElem('menu')
 			.addElems('li', null, <%- JSON.stringify(locals.languages) %>)

@@ -18,12 +18,7 @@
 <div class='map-container<% if (mapscale !== "full-screen") { %> m lg xl xxl<% } %> <%- mapscale %>'>
 	<div id='map'>
 	</div>
-	<!-- <% if (locals.session_data?.logged) { %>
-		<div class='btn-group'>
-			<a class='mtype <% if (locals.mtype === "locations") { %>active<% } %>' data-type='locations'><%- capitalize(vocabulary['location'][language](true)) %></a>
-			<a class='mtype <% if (locals.mtype === "labs") { %>active<% } %>' data-type='labs'><%- capitalize(vocabulary['lab'][language](true)) %></a>
-		</div>
-	<% } %> -->
+
 	<% if (
 		!(space === 'pinned'
 		&& (!locals.pinboard?.editable || activity === 'preview'))
@@ -42,7 +37,7 @@
 	<% } %>
 </div>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 
 const centerpoint = <%- JSON.stringify(locals.metadata.user?.country?.lnglat || null) %>;
 const clusters = <%- JSON.stringify(locals.clusters || []) %>.filter((cur) => cur !== null);

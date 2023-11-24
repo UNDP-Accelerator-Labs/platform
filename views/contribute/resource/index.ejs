@@ -16,7 +16,7 @@
 <body>
 
 <%- include ('../../partials/translations.ejs') %>
-<%- include ('../../partials/menu-languages.ejs') %>
+<%- include ('../../partials/navigate/menu-languages.ejs') %>
 <%- include ('../../partials/modals.ejs') %>
 
 <div class='main-content'>
@@ -48,7 +48,7 @@
 <%- include ('../../partials/footer.ejs') %>
 
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 	document.addEventListener('DOMContentLoaded', async evt => {
 		// CREATE MODAL
 		const headline = 'Select a resource.' // TO DO: TRANSLATE

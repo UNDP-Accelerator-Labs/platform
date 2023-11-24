@@ -36,7 +36,7 @@
 							<% query[key].forEach(d => { %>
 								<% if (locals.filters_menu[key]?.some(c => c.id.toString() === d)) { %>
 									<div class='tag' data-type='<%- key %>' data-value='<%- d %>'>
-										<label class='type'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](false).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
+										<label class='type'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language]['singular'].capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 										<label class='name'>
 											<!-- TO DO: FIX PROBLEM HERE WITH SDGS -->
 											<% if (locals.filters_menu[key]?.find(c => c.id.toString() === d)?.name.length > 25) { %>
@@ -56,36 +56,3 @@
 		<% } %>
 	</div>
 </div>
-
-<script type='text/javascript'>
-	d3.selectAll('div#filters div.search-filters div.tag label.close')
-	.on('click', function () {
-		const sel = d3.select(this)
-		const tag = sel.findAncestor('tag')
-		const data_value = tag.attr('data-value')
-
-		const filter_form = d3.select('nav#search-and-filter')
-		filter_form.select('input#search-field').node().value = null
-
-		filter_form.select('form').node().submit()
-	})
-	d3.selectAll('div#filters div.filters-group:not(.search-filters) div.tag label.close')
-	.on('click', function () {
-		const sel = d3.select(this)
-		const tag = sel.findAncestor('tag')
-		const data_type = tag.attr('data-type')
-		const data_value = tag.attr('data-value')
-
-		const filter_form = d3.select('nav#search-and-filter')
-		const filter = filter_form.selectAll('input[type=checkbox]').filter(function () {
-			return d3.select(this).attr('name') === data_type && this.value === data_value
-		}).node()
-		filter.checked = false
-		if (d3.select(filter.parentNode).selectAll('input[type=hidden]:not(:disabled)').size()) {
-			d3.select(filter.parentNode).selectAll('input[type=hidden]:not(:disabled)').attr('disabled', true)
-		}
-
-		filter_form.select('form').node().submit()
-	})
-
-</script>

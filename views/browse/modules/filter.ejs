@@ -69,7 +69,7 @@
 				<% } else { %>
 					<input type='text' name='search' id='search-field' onblur='fixLabel(this)'>
 				<% } %>
-				<label for='search-field'><%- vocabulary['search'][language](object === 'contributors') %></label>
+				<label for='search-field'><%- vocabulary['search'][language][object === 'contributors' ? 'person' : 'object'] %></label>
 				<button id='search' type='submit'><img src='/imgs/icons/i-search.svg'></button>
 			</div>
 
@@ -80,7 +80,7 @@
 							<% for (let key in d) { %>
 								<div class='filter google-translate-attr'>
 									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
-									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
+									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language]['plural'].capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 									<div class='dropdown'>
 										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
@@ -142,14 +142,6 @@
 						<% }) %>
 					</menu>
 				</div>
-				<script type='text/javascript'>
-					if (!mediaSize) var mediaSize = getMediaSize()
-					const status_toggles = d3.select('#search-and-filter form .status').node()
-					if (mediaSize === 'xs') {
-						const parent = d3.select('#search-and-filter form .filters').node()
-						parent.appendChild(status_toggles)
-					}
-				</script>
 			<% } %>
 
 			<% if (logged) { %>
@@ -195,7 +187,7 @@
 	<nav><p class="google-translate-attr"><%- vocabulary['no entries'][language] %></p></nav>
 <% } %>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 	let curSelectSTM = 'stm-browse';
 	let hasUsedExploration = false;
 	if (!mediaSize) var mediaSize = getMediaSize()

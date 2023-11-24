@@ -1,9 +1,3 @@
-<%
-	// CREATE ALIASES
-	const language = locals.metadata.page.language
-	include ('../../partials/translations.ejs')
-%>
-<script type='text/javascript'>
 const obsvars = {
 	attributes: true,
 	attributeFilter: ['class'],
@@ -266,7 +260,7 @@ const Taglist = function (kwargs) {
 	Meta.call(this, kwargs)
 	const meta = this
 
-	const initialvalues = meta.media.attr('data-placeholder', '<%- vocabulary["missing tag"][language] %>')
+	const initialvalues = meta.media.attr('data-placeholder', vocabulary['missing tag'][language])
 	if (imglink) {
 		initialvalues
 		.addElems('img', 'tag', c => c.tags)
@@ -412,8 +406,8 @@ const Taglist = function (kwargs) {
 		meta.filter.addElem('label')
 			.attr('for', `filter-${meta.id}`)
 			.html(_ => {
-				if (opencode) return '<%- vocabulary["search or add"][language] %>'
-				else return '<%- vocabulary["search"][language]() %>'
+				if (opencode) return vocabulary['search or add'][language]
+				else return vocabulary['search'][language]['object']
 			})
 
 		meta.filter.addElems('button',  'add')
@@ -605,7 +599,7 @@ function uploadImg (kwargs) {
 		else {
 			notification = d3.select('body').addElem('div', 'notification')
 				.addElem('div')
-				.html('<%- vocabulary["image upload success"][language] %>')
+				.html(vocabulary['image upload success'][language])
 		}
 		setTimeout(_ => notification.remove(), 4000)
 
@@ -693,7 +687,7 @@ function uploadVideo (kwargs) {
 		else {
 			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			.html('<%- vocabulary["successful upload mediatype"][language]("video") %><i class="material-icons google-translate-attr">done</i>')
+			.html(`${vocabulary['successful upload mediatype'][language]["video"]}<i class="material-icons google-translate-attr">done</i>`)
 		}
 		setTimeout(_ => notification.remove(), 4000)
 		if (editing) {
@@ -815,7 +809,7 @@ function addSection (kwargs) {
 			else return [d]
 		}).addElems('h1')
 			.attrs({
-				'data-placeholder': d => '<%- vocabulary["section header"][language] %>',
+				'data-placeholder': d => vocabulary['section header'][language],
 				'contenteditable': editing && !templated ? true : null
 			}).html(d => d.title)
 		.on('keydown', function () {
@@ -842,7 +836,7 @@ function addSection (kwargs) {
 			if (medialead.opts) medialead.opts.remove()
 
 			medialead.media.attrs({
-				'data-placeholder': d => '<%- vocabulary["lead paragraph"][language] %>',
+				'data-placeholder': d => vocabulary['lead paragraph'][language],
 				'contenteditable': editing && !templated ? true : null
 			}).html(d => d.lead)
 		}
@@ -878,7 +872,7 @@ function addSection (kwargs) {
 				}
 
 			}).addElems('div').attrs({
-				'data-placeholder': d => '<%- vocabulary["repeat section"][language] %>'
+				'data-placeholder': d => vocabulary['repeat section'][language]
 			}).html(d => d.instruction)
 		}
 
@@ -919,7 +913,7 @@ function addTitle (kwargs) {
 	if (media.input) media.input.remove()
 
 	media.media.attrs({
-		'data-placeholder': '<%- vocabulary["untitled pad"][language] %>',
+		'data-placeholder': vocabulary['untitled pad'][language],
 		'contenteditable': editing ? true : null
 	}).html(d => d.txt)
 	.on('keydown', function (d) {
@@ -989,7 +983,7 @@ function addImg (kwargs) {
 			.html(d => d.label)
 	}
 
-	media.media.attr('data-placeholder', d => '<%- vocabulary["missing image"][language] %>')
+	media.media.attr('data-placeholder', d => vocabulary['missing image'][language])
 
 	if (src) {
 		const img = new Image()
@@ -1006,11 +1000,12 @@ function addImg (kwargs) {
 
 		if (src.isURL() || src.isBlob()) img.src = src
 		else {
-			<% if (locals.metadata.site.app_storage) { %>
-				img.src = new URL(`<%- locals.metadata.site.app_storage %>/${src}`).href
-			<% } else { %>
+			if (d3.select('data[name="app_storage"]').node()) {
+				const app_storage = d3.select('data[name="app_storage"]').node().value
+				img.src = new URL(`${app_storage}/${src}`).href
+			} else {
 				img.src = `/${src}`
-			<% } %>
+			}
 		}
 	}
 
@@ -1155,11 +1150,12 @@ function addMosaic (kwargs) {
 		if (d.isURL() || d.isBlob()) img.src = d
 		// else img.src = `/${d}`
 		else {
-			<% if (locals.metadata.site.app_storage) { %>
-				img.src = new URL(`<%- locals.metadata.site.app_storage %>/${d}`).href
-			<% } else { %>
+			if (d3.select('data[name="app_storage"]').node()) {
+				const app_storage = d3.select('data[name="app_storage"]').node().value
+				img.src = new URL(`${app_storage}/${d}`).href
+			} else {
 				img.src = `/${d}`
-			<% } %>
+			}
 		}
 	})
 
@@ -1569,7 +1565,7 @@ function addTxt (kwargs) {
 	}
 
 	media.media.attrs({
-		'data-placeholder': '<%- vocabulary["empty txt"][language] %>',
+		'data-placeholder': vocabulary['empty txt'][language],
 		'contenteditable': editing ? true : null
 	}).styles({
 		'min-height': d => `${d.fontsize}rem`,
@@ -1648,7 +1644,7 @@ function addEmbed (kwargs) {
 	}
 
 	media.media.attrs({
-		'data-placeholder': '<%- vocabulary["empty embed"][language] %>',
+		'data-placeholder': vocabulary['empty embed'][language],
 		'contenteditable': editing
 	}).classed('padded', true)
 	.style('text-align', d => d.textalign)
@@ -1729,11 +1725,12 @@ function addEmbed (kwargs) {
 					if (d.src.isURL() || d.src.isBlob()) img.src = d.src
 					// else img.src = `/${d.src}`
 					else {
-						<% if (locals.metadata.site.app_storage) { %>
-							img.src = new URL(`<%- locals.metadata.site.app_storage %>/${d.src}`).href
-						<% } else { %>
+						if (d3.select('data[name="app_storage"]').node()) {
+							const app_storage = d3.select('data[name="app_storage"]').node().value
+							img.src = new URL(`${app_storage}/${d.src}`).href
+						} else {
 							img.src = `/${d.src}`
-						<% } %>
+						}
 					}
 				}
 			} else {
@@ -1889,7 +1886,7 @@ function addChecklist (kwargs) {
 			.addElems('label',  'list-item')
 			.attrs({
 				'for': d => `check-item-${checklist_id}-${d.id}`,
-				'data-placeholder': '<%- vocabulary["new checklist item"][language] %>',
+				'data-placeholder': vocabulary['new checklist item'][language],
 				'contenteditable': activity !== 'view' && !templated ? true : null
 			})
 		.on('keydown', function () {
@@ -2075,7 +2072,7 @@ function addRadiolist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({
 				'for': d => `radio-item-${radiolist_id}-${d.id}`,
-				'data-placeholder': '<%- vocabulary["new checklist item"][language] %>',
+				'data-placeholder': vocabulary['new checklist item'][language],
 				'contenteditable': activity !== 'view' && !templated ? true : null // TO DO: FIGURE OUT WHY HERE WE USE activity !== 'view' RATHER THAN editing
 			})
 		.on('keydown', function () {
@@ -2147,7 +2144,7 @@ function addLocations (kwargs) {
 	})
 
 	if (meta.opts) {
-		meta.opts.addElems('div', 'opt-group', ['<%- vocabulary["click to search or add locations"][language] %>'])
+		meta.opts.addElems('div', 'opt-group', [vocabulary['click to search or add locations'][language]])
 			.addElems('label')
 			.html(d => d)
 	}
@@ -2165,7 +2162,7 @@ function addLocations (kwargs) {
 
 	function rmPin (marker, container) {
 		const btn = document.createElement('BUTTON')
-		btn.innerHTML = '<%- vocabulary["remove pin"][language] %>'
+		btn.innerHTML = vocabulary['remove pin'][language]
 		btn.addEventListener('click', _ => {
 			group.removeLayer(marker)
 			markers = markers.filter(m => m !== marker)
@@ -2238,7 +2235,7 @@ function addLocations (kwargs) {
 
 		filter.addElem('label')
 			.attr('for', 'search-field')
-			.html('<%- vocabulary["search place"][language] %>')
+			.html(vocabulary['search place'][language])
 
 		filter.addElems('button',  'search')
 			.on('click', searchLocation)
@@ -2386,7 +2383,7 @@ function addIndexes (kwargs) {
 
 		if (list.opts) {
 			list.opts.addElem('div', 'opt-group')
-				.datum('<%- vocabulary["click to see options"][language] %>')
+				.datum(vocabulary['click to see options'][language])
 			.addElems('label', 'instruction')
 				.html(d => d)
 
@@ -2430,7 +2427,7 @@ async function addTags (kwargs) {
 
 	if (list.opts) {
 		list.opts.addElem('div', 'opt-group')
-			.datum('<%- vocabulary["click to see options"][language] %>')
+			.datum(vocabulary['click to see options'][language])
 		.addElems('label', 'instruction')
 			.html(d => d)
 
@@ -2471,7 +2468,7 @@ async function addAttachment (kwargs) {
 	})
 
 	if (meta.opts) {
-		meta.opts.addElems('div', 'opt-group', ['<%- vocabulary["click to add attachment"][language] %>']) // TO DO: UPDATE TEXT
+		meta.opts.addElems('div', 'opt-group', [vocabulary['click to add attachment'][language]]) // TO DO: UPDATE TEXT
 			.addElems('label')
 			.html(d => d)
 
@@ -2491,7 +2488,7 @@ async function addAttachment (kwargs) {
 		const uris = metafields.find(d => d.label === name)?.uris || [ { uri: undefined } ]
 
 		const item = {}
-		item.headline = '<%- vocabulary["add external resource"][language] %>'
+		item.headline = vocabulary['add external resource'][language]
 		item.opts = []
 
 		// TO DO: RESOLVE THIS FOR PUBLIC CONTRIBUTIONS: HOW DO PEOPLE SUBMIT CONSENT OR REFRENCE AN EXTERNAL FILE?
@@ -2500,7 +2497,7 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'button',
 					type: 'button',
-					label: '<%- vocabulary["link file"][language] %>',
+					label: vocabulary['link file'][language],
 					resolve: _ => {
 						return new Promise(async resolve => {
 							const pad_id = await partialSave('meta')
@@ -2512,7 +2509,7 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'input',
 					type: 'url',
-					placeholder: '<%- vocabulary["paste link"][language] %>',
+					placeholder: vocabulary['paste link'][language],
 					// value: srcs.length ? srcs[0] : null,
 					class: 'full-width',
 					resolve: async _ => {
@@ -2530,7 +2527,7 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'div',
 					class: 'divider',
-					label: '<%- vocabulary["or"][language].toUpperCase() %>'
+					label: vocabulary['or'][language].toUpperCase()
 				})
 			}
 		})
@@ -2678,7 +2675,7 @@ function switchButtons (lang = 'en') {
 	if (mediaSize === 'xs') {
 		d3.select('.meta-status .btn-group .save button')
 		.each(function () { this.disabled = false })
-			.html('<%- vocabulary["save changes"][language] %>')
+			.html(vocabulary['save changes'][language])
 	} else {
 		const menu_logo = d3.select('nav#site-title .inner')
 		window.sessionStorage.setItem('changed-content', true)
@@ -2687,7 +2684,6 @@ function switchButtons (lang = 'en') {
 			.select('button')
 		.on('click', _ => {
 			if (editing) partialSave()
-		}).html('<%- vocabulary["save changes"][language] %>')
+		}).html(vocabulary['save changes'][language])
 	}
 }
-</script>

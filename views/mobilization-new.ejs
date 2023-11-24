@@ -15,7 +15,7 @@
 <body>
 
 <%- include ('partials/translations.ejs') %> 
-<%- include ('partials/menu-languages.ejs') %> 
+<%- include ('partials/navigate/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
 <div class='main-content'>
@@ -66,7 +66,7 @@
 				<div class='body'>
 					<h1 class="google-translate-attr"><%- vocabulary['name mobilization'][language] %></h1>
 					<div class='input'>
-						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language](false, true) %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
+						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
 						<label aria-colspan="google-translate-attr" class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
 					</div>
 				</div>
@@ -96,7 +96,7 @@
 					<h1 class="google-translate-attr"><%- vocabulary['select campaign language'][language] %></h1>
 					<div class='filter'>
 						<input type='text' id='language' onblur='fixLabel(this)'>
-						<label class="google-translate-attr" for='language'><%- vocabulary['search'][language]() %></label>
+						<label class="google-translate-attr" for='language'><%- vocabulary['search'][language]['object'] %></label>
 
 						<menu>
 							<% languages.forEach(c => { %>
@@ -240,7 +240,7 @@
 						<h1 class="google-translate-attr"><%- vocabulary['select template'][language] %></h1>
 						<div class='filter'>
 							<input type='text' id='templates' onblur='fixLabel(this)'>
-							<label class="google-translate-attr" for='templates'><%- vocabulary['search'][language]() %></label>
+							<label class="google-translate-attr" for='templates'><%- vocabulary['search'][language]['object'] %></label>
 
 							<menu>
 								<% locals.templates.forEach(t => { %>
@@ -295,7 +295,7 @@
 						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
 						<div class='filter'>
 							<input type='text' id='contributors' onblur='fixLabel(this)'>
-							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language](true) %></label>
+							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language]['person'] %></label>
 
 							<menu>
 								<% locals.cohort.forEach(c => { %>
@@ -503,7 +503,7 @@
 		const count = parent.selectAll('li.checked').size()
 		parent.select('.contributor-count')
 			.html(_ => {
-				return Function(`"use strict";return (<%- vocabulary["invited contributors"][language] %>)`)()(count)
+				return vocabulary['invited contributors'][language](count)
 			})
 		// IF THERE IS A FILTER MENU, CLEAR SEARCH TERM
 		if (parent.select('.filter input[type=text]').node()) {

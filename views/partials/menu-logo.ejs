@@ -49,7 +49,7 @@
 								<li>
 									<button class="google-translate-attr">
 										<img src='/imgs/icons/i-pad.svg'>
-										<label><%- vocabulary['pad'][language](false).capitalize() %></label>
+										<label><%- vocabulary['pad'][language]['singular'].capitalize() %></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='dropdown'>
@@ -128,16 +128,16 @@
 															<% } %>
 															<% locals.metadata.menu.participations
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1)
-															.forEach(p => { %>
+															.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/contribute/pad?mobilization=<%- p.id %>&template=<%- p.template %>'>
+																	<a href='/<%- language %>/contribute/pad?mobilization=<%- d.id %>&template=<%- d.template %>'>
 																		<button class='wrapable'>
-																			<label><%- p.title %></label>
+																			<label><%- d.title %></label>
 																			<div class='sub'>
-																				<% if (p.owner !== uuid) { %>
-																					<%- vocabulary['launched by'][language](p.ownername, vocabulary['date'][language]({ date: p.start_date })) %>
+																				<% if (d.owner !== uuid) { %>
+																					<%= vocabulary['launched by'][language] %> <%= d.ownername %> <%= vocabulary['on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } else { %>
-																					<%- vocabulary['launched by'][language](null, vocabulary['date'][language]({ date: p.start_date })) %>
+																					<%= vocabulary['launched on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -168,7 +168,7 @@
 								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-template.svg'>
-										<label><%- vocabulary['template'][language](false, false).capitalize() %></label>
+										<label><%- vocabulary['template'][language]['singular'].capitalize() %></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='dropdown'>
@@ -285,7 +285,7 @@
 									<a href='/<%- language %>/contribute/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
-											<label><%- vocabulary['contributor'][language](false).capitalize() %></label>
+											<label><%- vocabulary['contributor'][language]['singular'].capitalize() %></label>
 										</button>
 									</a>
 								</li>
@@ -297,7 +297,7 @@
 								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-mobilization.svg'>
-										<label><%- vocabulary['mobilization'][language](false).capitalize() %></label>
+										<label><%- vocabulary['mobilization'][language]['singular'].capitalize() %></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='dropdown'>
@@ -370,7 +370,7 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%- vocabulary['launched by'][language](d.ownername, null) %>
+																					<%= vocabulary['launched by'][language] %> <%= d.ownername %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -403,7 +403,7 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%- vocabulary['launched by'][language](d.ownername, null) %>
+																					<%= vocabulary['launched by'][language] %> <%= d.ownername %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -440,9 +440,9 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%- vocabulary['launched by'][language](d.ownername, vocabulary['date'][language]({ date: d.start_date })) %>
+																					<%= vocabulary['launched by'][language] %> <%= d.ownername %> <%= vocabulary['on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } else { %>
-																					<%- vocabulary['launched by'][language](null, vocabulary['date'][language]({ date: d.start_date })) %>
+																					<%= vocabulary['launched on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -506,14 +506,14 @@
 			<li>
 		<% } %>
 			<% if (d.type === 'mobilizations') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/ongoing'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/ongoing'><%- vocabulary[d.type.slice(0, -1)]?.[language]['plural']?.capitalize() || d.type.capitalize() %></a>
 			<% } else if (d.type === 'contributors') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language]['plural']?.capitalize() || d.type.capitalize() %></a>
 			<% } else if (d.type === 'reviews') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary["my reviews"][language]?.capitalize() %></a>
 			<% } 
 			else { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language](true)?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language]['plural']?.capitalize() || d.type.capitalize() %></a>
 			<% } %>
 		</li>
 	<% }) %>
@@ -525,7 +525,7 @@
 	<% } %>
 </nav>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 	if (!mediaSize) var mediaSize = getMediaSize()
 	// THIS IS FOR MOBILE DISPLAY
 	if (['xs', 'sm', 'm'].includes(mediaSize)) {

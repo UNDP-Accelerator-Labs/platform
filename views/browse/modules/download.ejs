@@ -8,7 +8,7 @@
 	const language = locals.metadata.page.language
 %>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 	async function setDownloadOptions () {
 		const target_opts = [
 			{
@@ -110,7 +110,7 @@
 			},
 			<% if (modules.some(d => d.type === 'templates')) { %>
 				{
-					label: '<%- vocabulary["template"][language]() %>',
+					label: '<%- vocabulary["template"][language]["singular"] %>',
 					value: 'template',
 					type: 'radio'
 				},

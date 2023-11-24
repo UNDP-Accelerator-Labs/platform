@@ -46,7 +46,7 @@
 
 <% include ('./partials/translations.ejs') %>
 
-<%- include ('./partials/menu-languages.ejs') %>
+<%- include ('./partials/navigate/menu-languages.ejs') %>
 <%- include ('./partials/modals.ejs') %>
 <%- include('./browse/render.ejs') %>
 
@@ -105,7 +105,7 @@
 					<% if (locals.stats?.contributors) { %>
 						<div class='statistic'>
 							<h2><%- simplifyNumber(locals.stats?.contributors) %></h2>
-							<p class="google-translate-attr"><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
+							<p class="google-translate-attr"><%- vocabulary['contributor']?.[language]['plural'].capitalize() %></p>
 						</div>
 					<% } %>
 					<% if (locals.metadata.page.map && locals.stats?.total > 0) { %>
@@ -167,7 +167,7 @@
 					<% } else { %>
 						<%- d.country %>
 					<% } %>
-					<small class="google-translate-attr"><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language]((d.count ?? 0) !== 1).toLowerCase() %></small>
+					<small class="google-translate-attr"><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language][(d.count ?? 0) !== 1 ? 'plural' : 'singular'].toLowerCase() %></small>
 				</li>
 			<% }) %>
 			</ul>
@@ -183,7 +183,7 @@
 				<li>
 					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
 					<!-- TO DO: FIX THIS -->
-					<small class="google-translate-attr"><strong><%- d.count %></strong> <%- vocabulary['pad'][language](d.count !== 1).toLowerCase() %></small>
+					<small class="google-translate-attr"><strong><%- d.count %></strong> <%- vocabulary['pad'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase() %></small>
 					<small class='contributor google-translate-attr'><%- vocabulary['curation credit'][language](d.owner, d.ownername, 'contributors') %></small>
 				</li>
 			<% }) %>

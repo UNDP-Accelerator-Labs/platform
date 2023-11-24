@@ -24,7 +24,7 @@
 <body>
 
 <%- include ('partials/translations.ejs') %> 
-<%- include ('partials/menu-languages.ejs') %> 
+<%- include ('partials/navigate/menu-languages.ejs') %> 
 
 
 <div class='main-content import'>
@@ -678,7 +678,7 @@
 			.html(_ => {
 				const rowcount = Math.max(...cols.map(c => c.entries.length))
 				const colcount = cols.length
-				return Function(`"use strict";return (<%- vocabulary["import table description"][language] %>)`)()(rowcount, colcount, Math.min(show, rowcount))
+				return vocabulary['import table description'][language](rowcount, colcount, Math.min(show, rowcount))
 
 			})
 
@@ -1114,7 +1114,7 @@
 
 		// THIS IS COPIED FROM template.ejs
 		const title = d3.select('input#upload').attr('data-fname').slice(0, 99) // THIS IS NECESSARY BECAUSE THE DB IS ONLY SET TO STORE 99 VARCHAR
-		const description = Function(`"use strict";return (<%- vocabulary["generated template"][language] %>)`)()(title.trim())
+		const description = vocabulary['generated template'][language](title.trim())
 
 		const data = await compilePads(0, true)
 		const sections = data[0].sections.map(d => {

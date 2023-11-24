@@ -12,7 +12,7 @@
     const explorationVocab = vocabulary['exploration'][language];
 %>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 
 const Entry = function (_kwargs) {
 	const { parent, data, display, language } = _kwargs
@@ -107,22 +107,23 @@ const Entry = function (_kwargs) {
 
 			metainfo.addElems('div', 'meta meta-date')
 				.html(d => {
-					if (d.date) return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.date)
-					else if (d.start_date) {
+					if (d.date) {
+						return new Date(d.date).toLocaleDateString(language, dateOptions)
+					} else if (d.start_date) {
 						<% if (object === 'contributors') { %>
-							const start = Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()({ date: d.start_date })
-							let str = Function(`"use strict";return (<%- vocabulary["joined on"][language] %>)`)()(start)
+							const start = new Date(d.start_date).toLocaleDateString(language, dateOptions)
+							let str = `${vocabulary['joined on'][language]} ${start}`
 
 							if (d.end_date) {
-								const end = Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()({ date: d.end_date })
-								str += ', ' + Function(`"use strict";return (<%- vocabulary["left on"][language] %>)`)()(end).toLowerCase()
+								const end = new Date(d.end_date).toLocaleDateString(language, dateOptions)
+								str += `, ${vocabulary['left on'][language].toLowerCase()} ${end}`
 							}
 							return str
 
 						<% } else { %>
 							if (d.end_date) {
-								return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date) + ' – ' + Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.end_date)
-							} else return Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(d.start_date)
+								return new Date(d.start_date).toLocaleDateString(language, dateOptions) + ' – ' + new Date(d.end_date).toLocaleDateString(language, dateOptions)
+							} else return new Date(d.start_date).toLocaleDateString(language, dateOptions)
 						<% } %>
 					}
 					else return d.email
@@ -159,7 +160,7 @@ const Entry = function (_kwargs) {
 										name: 'status', 
 										value: 2, 
 										classname: 'preprint', 
-										label: '<%- vocabulary["object status"][language](object, 2) %>' 
+										label: '<%- vocabulary["object status"][language][object.slice(0, -1)][2]["singular"] %>' 
 									})
 								}
 								if (d.status <= 2 && d.review_status === 0) {
@@ -271,7 +272,7 @@ const Entry = function (_kwargs) {
 
 						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), classname: 'followup', label: '<%- vocabulary["follow up"][language](true) %>', name: 'source', value: d.id })
 
-						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: '<%- vocabulary["copy"][language](true) %>', name: 'source', value: d.id, inputs: [{ name: 'copy', value: true }] })
+						if (d.status === 2) opts.push({ action: `/<%- language %>/mobilize/cohort`, method: 'GET', node: 'button', type: 'submit', disabled: !(d.editable && d.status === 2), classname: 'copy', label: vocabulary['copy'][language]['verb'], name: 'source', value: d.id, inputs: [{ name: 'copy', value: true }] })
 					
 					<% } else if (object === 'contributors') { %>
 						<% if (space === 'invited') { %>
@@ -348,7 +349,7 @@ const Entry = function (_kwargs) {
 					const message = '<%- vocabulary["select review language"][language] %>'
 
 					const opts = []
-					opts.push({ node: 'select', name: 'language', label: '<%- vocabulary["select language"][language](false) %>', options: target_opts, fn: updateReviewerList })
+					opts.push({ node: 'select', name: 'language', label: '<%- vocabulary["select language"][language]["singular"] %>', options: target_opts, fn: updateReviewerList })
 					opts.push({ node: 'select', name: 'reviewers', label: '<%- vocabulary["select reviewers"][language] %>', options: reviewer_opts, classname: 'reviewer-list hide', fn: countReviewers })
 
 					inputs.forEach(d => {
@@ -494,7 +495,7 @@ const Entry = function (_kwargs) {
 					const obj = {}
 					obj.type = 'item'
 					// obj.label = vocabulary['item']['<%- language %>'](d.items !== 1)
-					obj.label = Function(`"use strict";return (<%- vocabulary["item"][language] %>)`)()(d.items !== 1)
+					obj.label = vocabulary['item'][language][d.items !== 1 ? 'plural' : 'singular']
 					obj.count = d.items
 					data.push(obj)
 				}
@@ -504,7 +505,7 @@ const Entry = function (_kwargs) {
 					const obj = {}
 					obj.type = 'contributor'
 					// obj.label = vocabulary['contributor']['<%- language %>'](d.count !== 1)
-					obj.label = Function(`"use strict";return (<%- vocabulary["contributor"][language] %>)`)()(d.participants !== 1)
+					obj.label = vocabulary['contributor'][language](d.participants !== 1)
 					obj.count = d.contributors
 					obj.text = `${d.contributors} <small class='total'>/ ${d.participants}</small>`
 					data.push(obj)
@@ -512,7 +513,7 @@ const Entry = function (_kwargs) {
 				if (d.private_associated_pads !== undefined) { // THIS IS DEPRECATED
 					const obj = {}
 					obj.type = 'pad'
-					obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', 0, d.private_associated_pads !== 1)} ${Function(`"use strict";return (<%- vocabulary["pad"][language] %>)`)()(d.private_associated_pads !== 1).toLowerCase()}`
+					obj.label = `${vocabulary['object status'][language]['pad'][0][d.private_associated_pads !== 1 ? 'plural' : 'singular']} ${vocabulary['pad'][language][d.private_associated_pads !== 1 ? 'plural' : 'singular'].toLowerCase()}`
 					obj.count = d.private_associated_pads
 					obj.href = `/<%- language %>/browse/pads/curated?<%- object %>=${d.id}&status=0&status=1`
 					data.push(obj)
@@ -522,7 +523,7 @@ const Entry = function (_kwargs) {
 					const { contributors, total } = d.participants
 					const obj = {}
 					obj.type = 'contributor'
-					obj.label = Function(`"use strict";return (<%- vocabulary["contributor"][language] %>)`)()(total !== 1)
+					obj.label = vocabulary['contributor'][language][total !== 1 ? 'plural' : 'singular']
 					obj.count = contributors
 					obj.text = `${contributors} <small class='total'>/ ${total}</small>`
 					data.push(obj)
@@ -531,7 +532,7 @@ const Entry = function (_kwargs) {
 					d.associated_pads.forEach(c => {
 						const obj = {}
 						obj.type = 'pad'
-						obj.label = `${Function(`"use strict";return (<%- vocabulary["object status"][language] %>)`)()('pad', c.status, c.count !== 1)}`
+						obj.label = vocabulary['object status'][language]['pad'][c.status][c.count !== 1 ? 'plural' : 'singular']
 						obj.count = c.count
 						let space = 'private'
 						if (c.status === 2) space = 'shared'
@@ -544,7 +545,7 @@ const Entry = function (_kwargs) {
 					d.associated_mobilizations.forEach(c => {
 						const obj = {}
 						obj.type = 'mobilization'
-						obj.label = Function(`"use strict";return (<%- vocabulary["mobilization"][language] %>)`)()(c.count !== 1).toLowerCase()
+						obj.label = vocabulary['mobilization'][language][c.count !== 1 ? 'plural' : 'singular'].toLowerCase()
 						obj.count = c.count
 						let space = 'ongoing'
 						if (c.status === 2) space = 'past'
@@ -556,8 +557,8 @@ const Entry = function (_kwargs) {
 				if (d.ongoing_associated_mobilizations !== undefined) {
 					const obj = {}
 					obj.type = 'mobilization'
-					// obj.label = vocabulary['mobilization']['<%- language %>'](d.count !== 1).toLowerCase()
-					obj.label = Function(`"use strict";return (<%- vocabulary["mobilization"][language] %>)`)()(d.count !== 1).toLowerCase()
+					// obj.label = vocabulary['mobilization']['<%- language %>'][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+					obj.label = vocabulary['mobilization'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
 					obj.count = d.ongoing_associated_mobilizations
 					obj.href = `/<%- language %>/browse/mobilizations/ongoing?<%- object %>=${d.id}`
 					data.push(obj)
@@ -565,8 +566,8 @@ const Entry = function (_kwargs) {
 				if (d.past_associated_mobilizations !== undefined) {
 					const obj = {}
 					obj.type = 'mobilization'
-					// obj.label = vocabulary['mobilization']['<%- language %>'](d.count !== 1).toLowerCase()
-					obj.label = Function(`"use strict";return (<%- vocabulary["mobilization"][language] %>)`)()(d.count !== 1).toLowerCase()
+					// obj.label = vocabulary['mobilization']['<%- language %>'][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+					obj.label = vocabulary['mobilization'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
 					obj.count = d.past_associated_mobilizations
 					obj.href = `/<%- language %>/browse/mobilizations/ongoing?<%- object %>=${d.id}`
 					data.push(obj)
@@ -671,7 +672,7 @@ const Entry = function (_kwargs) {
 			const taggroup = _sel.addElems('div', 'meta tag-group')
 			const sdgs = taggroup.addElems('div', 'meta meta-sdgs', d => d.sdgs?.length ? [d.sdgs] : [])
 			sdgs.addElems('span')
-				.html(d => Function(`"use strict";return (<%- vocabulary["sdg"][language] %>)`)()((d?.length || 0) > 1))
+				.html(d => vocabulary['sdg'][language][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
 			sdgs.addElems('a', 'sdg-link', d => d)
 				.attr('href', d => `?sdgs=${d.key || d}`)
 				.html(d => d.key || d)
@@ -732,7 +733,7 @@ const Entry = function (_kwargs) {
 				const copy = treeinfo.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
 					.attr('title', d => d.source_title)
 				copy.addElems('i')
-					.html('<%- vocabulary["copy"][language](false, true) %>: ')
+					.html(`${vocabulary['copy'][language]['preposition']}: `)
 				copy.addElems('a')
 					.attrs({
 						'href': d => {
@@ -757,7 +758,7 @@ const Entry = function (_kwargs) {
 
 			_sel.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
 				.attr('title', d => d.mobilization_title)
-				.html('<i><%- vocabulary["mobilization"][language](false) %>:</i> ')
+				.html('<i><%- vocabulary["mobilization"][language]["singular"] %>:</i> ')
 			.addElems('a')
 				.attr('href', d => `?mobilizations=${d.mobilization}`)
 				.html(d => d.mobilization_title?.length > 25 ? `${d.mobilization_title.slice(0, 25)}…` : d.mobilization_title)
@@ -769,7 +770,7 @@ const Entry = function (_kwargs) {
 
 			_sel.addElems('div', 'meta meta-template', d => d.template ? [d] : [])
 				.attr('title', d => d.template_title)
-				.html('<i><%- vocabulary["template"][language](false, false) %>:</i> ')
+				.html('<i><%- vocabulary["template"][language]["singular"] %>:</i> ')
 			.addElems('a')
 				.attrs({
 					'href': d => `/<%- language %>/view/template?id=${d.template}`
@@ -780,7 +781,7 @@ const Entry = function (_kwargs) {
 				_sel.addElems('div', 'meta meta-reviewers', d => {
 					return !d.reviewer_pooled && ![null, undefined].includes(d.reviewers) ? [d] : []
 				}).html(d => {
-					return Function(`"use strict";return (<%- vocabulary["reviewers accepted"][language] %>)`)()(d.reviewers, <%- modules.find(d => d.type === 'reviews').reviewers %>)
+					return `<strong>${d.reviewers}</strong><small> / ${<%- modules.find(d => d.type === 'reviews').reviewers %>}</small> ${vocabulary['reviewers accepted'][language][d.reviewers !== 1 ? 'plural' : 'singular']}`
 				})
 			<% } %>
 		}.bind(this),
@@ -1248,7 +1249,7 @@ async function confirmRemoval (action) {
 			{
 				node: 'button',
 				type: 'button',
-				label: Function(`"use strict";return (<%- vocabulary["only pad"][language] %>)`)()(datum.title),
+				label: `${vocabulary['only'][language]} <strong>${datum.title}</strong>`,
 				resolve: [ datum.id ]
 			}
 		]

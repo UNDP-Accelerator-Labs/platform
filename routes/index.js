@@ -1000,6 +1000,7 @@ exports.sitemap = async (req, res) => {
 			],
 		},
 	};
+	res.setHeader('content-type', 'application/xml');
 	res.render('sitemap', obj);
 }
 

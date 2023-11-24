@@ -1,4 +1,4 @@
-const { app_title, app_title_short, app_storage, modules, DB } = include('config/')
+const { own_app_url, getVersionObject, app_title_short, app_storage, modules, DB } = include('config/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 // const format = require('./formatting.js')
@@ -279,7 +279,7 @@ exports.process.upload = async (req, res) => {
 		const source = path.join(__dirname, `../${f.path}`)
 
 		let maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
-		if (f.mimetype.includes('video/') || f.mimetype.includes('audio/')) maxFileSizeBytes = 500 * 1024 * 1024; // 100MB 
+		if (f.mimetype.includes('video/') || f.mimetype.includes('audio/')) maxFileSizeBytes = 500 * 1024 * 1024; // 100MB
 		// Check if the file size exceeds the maximum allowed size
 		if (f.size > maxFileSizeBytes) {
 			fs.unlinkSync(source); // Delete the uploaded file
@@ -429,7 +429,7 @@ exports.process.upload = async (req, res) => {
 								console.log(err)
 							}
 						})
-					} 
+					}
 
 					if(!fileerror && modules.some(d => d.type === 'files')){
 						const pathurl = `${app_storage}/${targetdir}/${f.filename}${path.extname(f.originalname).toLowerCase()}`
@@ -482,7 +482,7 @@ exports.process.upload = async (req, res) => {
 								console.log(err)
 							}
 						})
-					} 
+					}
 
 					if(!fileerror && modules.some(d => d.type === 'files')){
 						const pathurl = `${app_storage}/${targetdir}/${f.filename}${path.extname(f.originalname).toLowerCase()}`
@@ -974,6 +974,33 @@ exports.api.datasources = (req, res) => {
 		.then(result => res.status(200).json(result))
 		.catch(err => res.status(500).send(err))
 	}
+}
+
+exports.sitemap = async (req, res) => {
+	const vo = await getVersionObject();
+	const pads = await DB.conn.tx(async t => {
+		return (await t.any(`
+			SELECT p.id, p.update_at FROM pads p WHERE p.status > 2
+		;`)).map((row) => ({
+			// NOTE: uses en as canonical language
+			// TO DO: maybe we can adjust the canonical url
+			// based on the content language...
+			url: `${own_app_url}en/view/pad?id=${row.id}`,
+			date: row.update_at,
+		}))
+	});
+	const obj = {
+		metadata: {
+			all_urls: [
+				{
+					url: `${own_app_url}en/home/`, // NOTE: canonical home
+					date: vo.date,
+				},
+				...pads,
+			],
+		},
+	};
+	res.render('sitemap', obj);
 }
 
 exports.notfound = async(req, res) => {

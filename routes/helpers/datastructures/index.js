@@ -15,6 +15,7 @@ const {
 	page_content_limit,
 	DB,
 	ownDB,
+	lodashNonce,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -325,6 +326,8 @@ exports.pagemetadata = (_kwargs) => {
 				mscale: mscale || 'contain',
 				display: display || browse_display,
 				page_content_limit,
+
+				nonce: lodashNonce,
 
 				errormessage
 			},

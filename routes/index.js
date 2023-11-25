@@ -978,15 +978,21 @@ exports.api.datasources = (req, res) => {
 
 exports.sitemap = async (req, res) => {
 	const vo = await getVersionObject();
+	let maxDate = Number.isNaN(Date.parse(vo.date)) ? Date.now() : Date.parse(vo.date);
+
+	const toTimestamp = (date) => {
+		const res = Number.isNaN(Date.parse(date)) ? Date.now() : Date.parse(date);
+		maxDate = Math.max(maxDate, res);
+		return res;
+	}
+
 	const pads = await DB.conn.tx(async t => {
 		return (await t.any(`
 			SELECT p.id, p.update_at FROM pads p WHERE p.status > 2
 		;`)).map((row) => ({
-			// NOTE: uses en as canonical language
-			// TO DO: maybe we can adjust the canonical url
-			// based on the content language...
+			// NOTE: always use en as canonical language
 			url: `${own_app_url}en/view/pad?id=${row.id}`,
-			date: row.update_at,
+			date: new Date(toTimestamp(row.update_at)).toISOString(),
 		}))
 	});
 	const obj = {
@@ -994,7 +1000,7 @@ exports.sitemap = async (req, res) => {
 			all_urls: [
 				{
 					url: `${own_app_url}en/home/`, // NOTE: canonical home
-					date: vo.date,
+					date: new Date(maxDate).toISOString(),
 				},
 				...pads,
 			],

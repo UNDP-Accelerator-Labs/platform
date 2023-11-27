@@ -1,0 +1,56 @@
+const { engagementtypes, DB } = include('config/')
+const { checklanguage, engagementsummary, join, pagestats } = include('routes/helpers/')
+
+const check_authorization = require('../authorization.js')
+
+module.exports = async kwargs => {
+	const conn = kwargs.connection ? kwargs.connection : DB.conn
+	let { req, authorized } = kwargs || {}
+
+	const { id } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	const { uuid, rights, collaborators } = req.session || {}
+	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
+
+	if (authorized === undefined) {
+		const authorization = await check_authorization({ connection: conn, uuid, id, rights, collaborators })
+		authorized = authorization.authorized
+	}
+
+	if (authorized === false) return null
+	else {
+		const engagement = engagementsummary({ doctype: 'template', engagementtypes, docid: +id, uuid })
+		// GET THE TEMPLATE DATA
+		return conn.oneOrNone(`
+			SELECT t.id, t.title, t.owner, t.description, t.sections, t.status, t.slideshow,
+
+				CASE WHEN t.id IN (SELECT template FROM review_templates)
+					THEN TRUE
+					ELSE FALSE
+				END AS review_template,
+
+				CASE WHEN t.id IN (SELECT template FROM review_templates)
+					THEN (SELECT DISTINCT(language) FROM review_templates WHERE template = t.id)
+					ELSE NULL
+				END AS review_language,
+
+				-- THESE ARE THE ENGAGEMENT CASE STATEMENTS
+				$1:raw
+
+			FROM templates t
+
+			LEFT JOIN (
+				SELECT docid, user, array_agg(DISTINCT type) AS types FROM engagement
+				WHERE user = $2
+					AND doctype = 'template'
+				GROUP BY (docid, user)
+			) e ON e.docid = t.id
+
+			WHERE t.id = $3::INT
+		;`, [ engagement.cases || false, uuid, id ])
+		.then(async results => {
+			results.readCount = await pagestats.getReadCount(id, 'template');
+			const data = await join.users(results, [ language, 'owner' ])
+			return data;
+		})
+	}
+}

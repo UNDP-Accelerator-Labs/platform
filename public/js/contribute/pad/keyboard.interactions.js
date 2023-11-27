@@ -2,8 +2,15 @@ let keyTrack = []
 window.addEventListener('keydown', function (e) {
 	e = e || event
 	keyTrack.push(e.keyCode)
+	
+	const { display, activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	
+	const main = d3.select('#pad')
+	const head = main.select('.head')
+	const footer = d3.select('footer')
 
-	if (editing) {
+	if (activity === 'edit') {
 		// SHIFT + ENTER LEAVES THE FOCUSED CELL
 		if (keyTrack.includes(16) && e.keyCode === 13
 			&& (main.selectAll('.media-container.focus, .meta-container.focus').size())
@@ -22,7 +29,7 @@ window.addEventListener('keydown', function (e) {
 			&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() ||
 				main.selectAll('.media-container *:focus, .meta-container *:focus').size())
 			&& !d3.select('.modal').node()
-			&& !templated
+			&& pad.type === 'blank'
 		) {
 			if (e.key === 'i' || e.keyCode === 73) main.select('label[for=input-media-img]').classed('highlight', true)
 			if (e.key === 'd' || e.keyCode === 68) main.select('label[for=input-media-drawing]').classed('highlight', true)
@@ -34,7 +41,7 @@ window.addEventListener('keydown', function (e) {
 		}
 	}
 	// SET THE LEFT/RIGHT KEYBOARD NAVIGATION IF IN SLIDESHOW DISPLAY
-	if (d3.select('data[name="pagedisplay"]').node()?.value === 'slideshow') {
+	if (display === 'slideshow') {
 		if (document.activeElement === document.body) { // NOTHING IS IN FOCUS/ BEING EDITED
 			if (e.key === 'ArrrowRight' || e.keyCode === 39) {
 				d3.select('button.slide-nav.next:not(.hide)').node()?.click()
@@ -47,16 +54,23 @@ window.addEventListener('keydown', function (e) {
 })
 window.addEventListener('keyup', function (e) {
 	e = e || event
-	if (editing) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	
+	const main = d3.select('#pad')
+	const head = main.select('.head')
+	const footer = d3.select('footer')
+
+	if (page.activity === 'edit') {
 		if (
 			![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 			&& !(main.selectAll('.layout.focus *:focus').size())
 			&& !(main.selectAll('.media-container.focus, .meta-container.focus').size() ||
 				main.selectAll('.media-container *:focus, .meta-container *:focus').size())
 			&& !d3.select('.modal').node()
-			&& !templated
+			&& pad.type === 'blank'
 		) {
-			if (!templated) {
+			if (pad.type === 'blank') { // THIS IS REDUNDANT
 				if (e.key === 'i' || e.keyCode === 73) {
 					main.select('label[for=input-media-img]').classed('highlight', false)
 					d3.select('#input-media-img').node().click()
@@ -98,8 +112,8 @@ window.addEventListener('keyup', function (e) {
 					)
 				)
 			) {
-				if (editing) {
-					if (!publicpage) switchButtons(language)
+				if (page.activity === 'edit') {
+					if (page.type === 'private') switchButtons(language)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 				// THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS
@@ -111,7 +125,10 @@ window.addEventListener('keyup', function (e) {
 })
 window.addEventListener('mouseup', function (e) {
 	e = e || event
-	if (editing) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const main = d3.select('#pad')
+
+	if (page.activity === 'edit') {
 		const focused_node = d3.select('.focus')
 		const target = d3.select(e.target)
 		const media = target.findAncestor('media')

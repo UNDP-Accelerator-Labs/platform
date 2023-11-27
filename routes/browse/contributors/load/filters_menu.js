@@ -6,12 +6,14 @@ const filter = require('../filter')
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
 	// THIS NEEDS TO BE A TASK
-	const { req } = kwargs || {}
+	let { req, filters } = kwargs || {}
 	const { space } = req.params || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
+	
 	// GET FILTERS
-	const [ f_space, page, full_filters ] = await filter(req)
+	if (!filters?.length) filters = await filter(req)
+	const [ f_space, page, full_filters ] = filters
 
 	return conn.task(t => {
 		const batch = []

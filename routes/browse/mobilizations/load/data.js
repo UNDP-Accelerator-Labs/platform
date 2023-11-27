@@ -3,20 +3,20 @@ const { array, checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID } =
 
 const filter = require('../filter')
 
-module.exports = kwargs => {
+module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	const { req } = kwargs || {}
+	let { req, filters } = kwargs || {}
 	const { object } = req.params || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
-	const [ f_space, order, page, full_filters ] = filter(kwargs.req)
+	if (!filters?.length) filters = await filter(req)
+	const [ f_space, order, page, full_filters ] = await filters
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	const engagement = engagementsummary({ doctype: 'mobilization', engagementtypes, uuid })
-
 
 	// RESTRUCTURING HERE
 	return conn.task(t => {
@@ -365,7 +365,7 @@ module.exports = kwargs => {
 
 		return {
 			data,
-			count: page * page_content_limit,
+			count: page_content_limit,
 			sections: [{ data }]
 		}
 	}).catch(err => console.log(err))

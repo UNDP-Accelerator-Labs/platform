@@ -27,7 +27,7 @@
 
 	const logged = locals.metadata.user.uuid !== null
 
-	const slides = locals.sample_images
+	// const slides = locals.sample_images
 
 	// const is_intropage = (publicpage
 	// 	&& object === 'pads'
@@ -45,11 +45,17 @@
 <%- include ('../partials/head.ejs') %>
 <%- include('../partials/pagestats.ejs') %>
 
-<script type='text/javascript' src='/js/browse/index.js'></script>
+<script type='text/javascript' src='/js/browse/main.js'></script>
+<script type='text/javascript' src='/js/browse/render.js'></script>
+<script type='text/javascript' src='/js/browse/save.js'></script>
+<script type='text/javascript' src='/js/browse/keyboard.interactions.js'></script>
+<script type='text/javascript' src='/js/browse/download.js'></script>
 
 </head>
 
 <body>
+
+<%- include ('./modules/data.ejs') %>
 
 <%- include ('../partials/translations.ejs') %>
 
@@ -57,9 +63,7 @@
 <%- include ('../partials/modals.ejs') %>
 
 <%- include ('../partials/exploration.ejs') %>
-<%- include ('./modules/download.ejs') %>
-<%- include('./render.ejs') %>
-
+<%# include ('./modules/download.ejs') %>
 
 <% if (is_intropage) { %>
 <div class='public-page-header'>
@@ -82,7 +86,7 @@
 		<header<% if (mapscale === 'full-screen' || pagedisplay === 'slideshow') { %> class='folded'<% } %>>
 			<% if (!is_intropage) { %><div class='inner'>
 			<% } else { %><div class='inner fixed'><% } %>
-				<%- include ('../partials/menu-logo.ejs') %>
+				<%- include ('../partials/navigate/sidebar.ejs') %>
 			</div>
 		</header>
 
@@ -310,7 +314,7 @@
 		<div class='sidebar xl xxl'>
 			<div class='inner'>
 				<%# if (pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
-				<% if (mapscale !== 'full-screen' && pagedisplay !== "slideshow") { %>
+				<% if (mapscale !== 'full-screen' && pagedisplay !== 'slideshow') { %>
 					<%- include ('./modules/statistics.ejs') %>
 					<%- include ('../partials/filters.ejs') %>
 				<% } %>
@@ -336,257 +340,5 @@
 
 <%- include ('../partials/footer.ejs') %>
 
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-	if (!mediaSize) var mediaSize = getMediaSize()
-	const main = d3.select('div.browse main')
-	const layout = main.select('div.inner')
-	const overview = layout.select('section.overview')
-
-	let page = <% if (!isNaN(locals.metadata.page.id)) { %><%- locals.metadata.page.id %><% } else if (![null, undefined].includes(locals.metadata.page.id)) { %>'<%- locals.metadata.page.id %>'<% } else { %>undefined<% } %>;
-	var lazyloading = false
-
-	function renderSections (_data) {
-		const sections = layout.addElems('section', 'container <%- object %>', _data)
-
-		sections.addElems('div', 'layout')
-		.each(function (d) {
-			const section = d3.select(this)
-			// THIS IS WHERE THE GROUPING SHOULD HAPPEN FOR FOLLOW UPS AND FORWARDS
-			if (mediaSize === 'xs' && '<%- object %>' === 'pads') {
-				section.classed('<%- pagedisplay === "slideshow" ? pagedisplay : "columns" %>', true)
-				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay === "slideshow" ? pagedisplay : "columns" %>' }))
-			} else {
-				section.classed('<%- pagedisplay %>', true)
-				d.data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay %>' }))
-			}
-		})
-
-		<% if (pagedisplay === 'slideshow') { %>initSlideshow()<% } %>
-	}
-
-	function renderVignette (_section, _kwargs) {
-		const { data, display } = _kwargs
-
-		const entry = new Entry({
-			parent: _section,
-			data: data,
-			display: display,
-			language: '<%- language %>'
-		})
-		// CREATE ALIAS FOR render
-		const render = entry.render
-
-		if (display === 'columns') {
-			render.img(entry.head)
-			render.actions(entry.head)
-			// if (mediaSize !== 'xs') render.stats(entry.head)
-			// render.tags(entry.body)
-			render.title(entry.body)
-			render.owner(entry.body)
-			// if (data.img?.length === 0) render.txt(entry.body)
-			render.txt(entry.body)
-			<% if (!publicpage) { %>
-				render.metainfo(entry.body)
-				render.followup(entry.body)
-			<% } %>
-			render.tags(entry.body)
-			// if (mediaSize === 'xs') render.stats(entry.foot)
-			if (mediaSize !== 'xs') render.stats(entry.foot)
-			render.engagement(entry.foot)
-			render.pin(entry.foot)
-			render.delete(entry.outer)
-			render.unpublish(entry.outer)
-			render.exploration(entry.foot)
-		} else if (display === 'slideshow') {
-			render.img(entry.head)
-			render.owner(entry.metagroup)
-			render.title(entry.body)
-			render.txt(entry.body)
-			render.tags(entry.body)
-			render.stats(entry.foot)
-		} else {
-			render.owner(entry.metagroup)
-			render.actions(entry.metagroup)
-			render.title(entry.body)
-			render.txt(entry.body)
-			<% if (!publicpage) { %>
-				render.metainfo(entry.body)
-				render.followup(entry.body)
-			<% } %>
-			render.tags(entry.body)
-			render.engagement(entry.body)
-			render.img(entry.foot)
-			render.stats(entry.foot)
-			render.pin(entry.inner)
-			render.delete(entry.outer)
-			render.unpublish(entry.outer)
-			render.exploration(entry.foot)
-		}
-	}
-
-	function initSlideshow () {
-		const slideshow = d3.select('div.layout.slideshow')
-		const slides = slideshow.selectAll('.slide')
-
-		d3.select('div.browse')
-		.addElems('button', 'slide-nav', [{ label: '&lsaquo;', class: 'prev' }, { label: '&rsaquo;', class: 'next' }])
-		.each(function (d) { d3.select(this).classed(d.class, true) })
-			.classed('hide', d => {
-				const sel = d3.select(this)
-				let focus_id = 0
-				d3.selectAll('.slide').each(function (c, i) {
-					if (d3.select(this).classed('slide-in-view')) focus_id = i
-				})
-				if (d.class === 'prev' && focus_id === 0) {
-					<% if (pages && locals.metadata.page.id === 1) { %>
-						return true
-					<% } else { %>
-						return false
-					<% } %>
-				} else if (d.class === 'next' && focus_id === slides.size() - 1) {
-					<% if (pages && locals.metadata.page.id === pages) { %>
-						return true
-					<% } else { %>
-						return false
-					<% } %>
-				} else return false
-			}).html(d => d.label)
-		.on('click', d => {
-			if (d.class === 'prev') switchslide(idx - 1)
-			else if (d.class === 'next') switchslide(idx + 1)
-		}).on('mouseup', function () {
-			d3.event.stopPropagation()
-			// LOSE FOCUS OF THIS BUTTON TO RE-ENABLE KEYBOARD NAVIGATION
-			this.blur()
-		})
-		// ADD DOTS
-		d3.select('footer .dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
-		.classed('highlight', (d, i) => i === 0)
-		.on('click', (d, i) => { switchslide(i) })
-
-		let idx = 0
-		const slidewidth = slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth
-
-		function switchslide (i) {
-			slideshow.node().scrollTo({
-				top: 0,
-				left: i * slidewidth,
-				behavior: 'smooth'
-			})
-
-			if (i > slides.size() - 1) {
-				<% if (pages && locals.metadata.page.id < pages) { %>
-					const url = new URL(window.location)
-					const queryparams = new URLSearchParams(url.search)
-					queryparams.set('page', page + 1)
-					window.location = `${url.pathname}?${queryparams.toString()}`
-				<% } %>
-			} else if (i < 0) {
-				<% if (pages && locals.metadata.page.id > 1) { %>
-					// WE KEEP THE pages AT THE BEGINNING TO MAKE SURE THE PAGINATION SCHEMA IS NUMERIC (FOR EXAMPLE, IN THE CASE OF CONTRIBUTORS, IT IS ALPHABETIC)
-					const url = new URL(window.location)
-					const queryparams = new URLSearchParams(url.search)
-					queryparams.set('page', page - 1)
-					window.location = `${url.pathname}?${queryparams.toString()}`
-				<% } %>
-			}
-
-			return idx = i
-		}
-
-		slideshow.on('scroll', function () {
-			if (this.scrollLeft % slidewidth === 0) {
-				idx = Math.round(this.scrollLeft / slidewidth)
-				d3.selectAll('.dot').classed('highlight', (d, i) => i === idx)
-				d3.selectAll('button.slide-nav').classed('hide', d => {
-					if (d.class === 'prev' && idx === 0) {
-						<% if (pages && locals.metadata.page.id === 1) { %>
-							return true
-						<% } else { %>
-							return false
-						<% } %>
-					} else if (d.class === 'next' && idx === slides.size() - 1) {
-						<% if (pages && locals.metadata.page.id === pages) { %>
-							return true
-						<% } else { %>
-							return false
-						<% } %>
-					} else return false
-				})
-			}
-		})
-	}
-
-
-	// THIS IS THE LAZY LOADING MECHANISM
-	if (<%- JSON.parse(locals.metadata.page.lazyload) %>) {
-		window.onscroll = async function (ev) {
-			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && !lazyloading) {
-				console.log('hit the bottom')
-				main.select('.lds-ellipsis').classed('hide', false)
-
-				if (!isNaN(page)) page ++
-				lazyloading = true
-
-				const url = new URL(window.location)
-				const queryparams = new URLSearchParams(url.search)
-				queryparams.set('page', page)
-
-				const response = await GET(`?${queryparams.toString()}`) // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
-
-				d3.selectAll('section.container div.layout')
-				.each(function (d) {
-					const section = d3.select(this)
-					response.sections.find(s => s.status === d.status).data.forEach(c => section.call(renderVignette, { data: c, display: '<%- pagedisplay %>' }))
-				})
-
-				if (response.count < <%- locals.stats?.filtered || 0 %>) lazyloading = false
-				else main.select('.lds-ellipsis').classed('hide', true)
-			}
-		}
-	} else { // PAGINATION MECHANISM
-		d3.selectAll('.pagination a.page-link:not(.static)').each(function () {
-			const sel = d3.select(this)
-			const url = new URL(window.location)
-			const queryparams = new URLSearchParams(url.search)
-			queryparams.set('page', sel.attr('data-page'))
-			sel.attr('href', `?${queryparams.toString()}`)
-		})
-	}
-
-	<% if (pagedisplay === 'slideshow') { %>
-		window.addEventListener('keydown', function (e) {
-			// SET THE LEFT/RIGHT KEYBOARD NAVIGATION IF IN SLIDESHOW DISPLAY
-			if (document.activeElement === document.body) { // NOTHING IS IN FOCUS/ BEING EDITED
-				if (e.key === 'ArrrowRight' || e.keyCode === 39) {
-					d3.select('button.slide-nav.next:not(.hide)').node()?.click()
-				}
-				if (e.key === 'ArrowLeft' || e.keyCode === 37) {
-					d3.select('button.slide-nav.prev:not(.hide)').node()?.click()
-				}
-			}
-		})
-	<% } %>
-
-	window.addEventListener('keyup', function (e) {
-		e = e || event
-		if (e.key === 'Escape' || e.keyCode === 27) {
-			d3.selectAll('.modal').remove()
-
-			<% if (pagedisplay === 'slideshow') { %>
-				const url = new URL(window.location)
-				const queryparams = new URLSearchParams(url.search)
-				queryparams.delete('display')
-				window.location = `${url.pathname}?${queryparams.toString()}`
-			<% } %>
-		}
-	})
-
-	window.onload = function () {
-		<% if (!mapscale || mapscale === 'contain') { %>
-			renderSections(<%- JSON.stringify(locals.sections) %>)
-		<% } %>
-	}
-</script>
 </body>
 </html>

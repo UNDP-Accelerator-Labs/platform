@@ -6,7 +6,7 @@ const filter = require('../filter')
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	// THIS NEEDS TO BE A TASK
-	const { req, res } = kwargs || {}
+	let { req, res, filters } = kwargs || {}
 	const { object } = req.params || {}
 
 	const { uuid, rights, collaborators } = req.session || {}
@@ -18,7 +18,8 @@ module.exports = async kwargs => {
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
-	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	if (!filters?.length) filters = await filter(req, res)
+	const [ f_space, order, page, full_filters ] = filters
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 

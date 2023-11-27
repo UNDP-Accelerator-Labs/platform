@@ -85,7 +85,7 @@
 			return d.type === object && rights >= write
 		})) { %>
 			<li class='<% if (space === "private") { %>active<% } %>'>
-				<a data-redirect='./private'>
+				<a onclick='redirect({ location: "./private", params: [{ key: "page", value: 1 }] })'>
 					<button><%- vocabulary['space'][language](object, 'private') %>
 						<div class='count'><%- locals.stats?.private %></div>
 					</button>
@@ -93,7 +93,7 @@
 			</li>
 		<% } %>
 		<li class='<% if (space === "shared") { %>active<% } %>'>
-			<a data-redirect='./shared'>
+			<a onclick='redirect({ location: "./shared", params: [{ key: "page", value: 1 }] })'>
 				<button><%- vocabulary['space'][language](object, 'shared') %>
 					<div class='count'><%- locals.stats?.shared %></div>
 					<!-- TO DO: CHANGE TRANSLATION TERM preprint TO SHARED -->
@@ -105,7 +105,7 @@
 			&& locals.stats?.curated > 0
 		) { %>
 			<li class='<% if (space === "curated") { %>active<% } %>'>
-				<a data-redirect='./curated'>
+				<a onclick='redirect({ location: "./curated", params: [{ key: "page", value: 1 }] })'>
 					<button><%- vocabulary['space'][language](object, 'curated') %>
 						<div class='count'><%- locals.stats?.curated %></div>
 					</button>
@@ -147,7 +147,7 @@
 		
 		<!-- <% if (!['pads', 'reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
-				<a data-redirect='./public'>
+				<a onclick='redirect({ location: "./public", params: [{ key: "page", value: 1 }] })>
 					<button><%- vocabulary['space'][language](object, 'public') %>
 						<div class='count'><%- locals.stats?.public %></div>
 					</button>
@@ -156,7 +156,7 @@
 		<% } %> -->
 
 		<li class='<% if (space === "published") { %>active<% } %>'>
-			<a data-redirect='./published'>
+			<a onclick='redirect({ location: "./published", params: [{ key: "page", value: 1 }] })'>
 				<button><%- vocabulary['space'][language](object, 'all') %>
 					<div class='count'><%- locals.stats?.all %></div>
 				</button>

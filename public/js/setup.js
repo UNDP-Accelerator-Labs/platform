@@ -17,15 +17,15 @@ window.addEventListener('load', function () {
 	});
 
 	// SET NAVIGATION LINKS FOR TABS
-	d3.selectAll('nav.tabs menu li a')
-	.on('click', function () {
-		if (this.dataset.redirect) {
-			return redirect(this.dataset.redirect)
-		} else return false
-	})
+	// d3.selectAll('nav.tabs menu li a')
+	// .on('click', function () {
+	// 	if (this.dataset.redirect) {
+	// 		return redirect(this.dataset.redirect)
+	// 	} else return false
+	// })
 
 	// GENERIC BLUR FUNCTION
-	const inputs = d3.selectAll('input[type=text], input[type=password]')
+	const inputs = d3.selectAll('input[type=text]:not([name="api-token"]), input[type=password], input[type=email]')
 	inputs.on('blur.fixlabel', function () {
 		fixLabel(this)
 	}).each(function () { fixLabel(this) });
@@ -102,9 +102,12 @@ function scrollToPad (target) {
 	})
 };
 
-function redirect (location) {
+function redirect (_kwargs) {
+	let { location, params, keep_status } = _kwargs
+	
 	const url = new URL(window.location)
 	const queryparams = new URLSearchParams(url.search)
+	
 	// const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
 
 	// filter_keys.push('search')
@@ -113,9 +116,18 @@ function redirect (location) {
 	// }
 	// return window.location = `${location}?${queryparams.toString()}`
 
-	queryparams.delete('status')
+	if (!keep_status) { queryparams.delete('status'); }
 	
-	return window.location = `${location}?${queryparams.toString()}`
+	if (params && !Array.isArray(params)) params = [params]
+	if (params?.length) {
+		params.forEach(d => {
+			if (d.key && d.value) { queryparams.set(d.key, d.value); }
+		})
+	};
+
+	if (!location) { location = `${url.origin}${url.pathname}` }
+	
+	return window.location = `${location}?${queryparams.toString()}`;
 };
 
 function checkForEnter (evt, node) {
@@ -171,68 +183,6 @@ function toggleOptions (node) {
 	}
 }
 
-// THIS ONLY ACCOUNTS FOR USE IN browse/index.ejs FOR NOW
-async function partialSave (object, id) {
-	if (!object) object = 'pinboard'
-
-	if (object === 'pinboard') {
-		let title = d3.select('main .inner .head .title').node().innerText.trim()
-		if (title) title = limitLength(title, 99);
-		const description = d3.select('main .inner .head .description.lead').node().innerHTML.trim()
-		const displayopts = {}
-
-		d3.selectAll('#pinboard-display-opts input[type=checkbox]')
-		.each(function () {
-			displayopts[this.name] = this.checked
-		})
-
-		const res = await POST('/save/pinboard', Object.assign(displayopts, { id, title, description }))
-		if (res.status === 200) {
-			console.log('saved')
-			const { datum } = res
-			updateTab(datum.title)
-
-			// TO DO: UPDATE THIS TO USE THE RENDER FUNCTIONS BELOW
-			// d3.selectAll('.pin, .pinboard').html(d => d.title = datum.title)
-			d3.selectAll('.pin label.name').html(d => d.title = datum.title)
-		}
-	} else if (object.includes('section')) {
-		console.log('save section')
-
-		const li = d3.select('.pinboard-sections li.editing')
-
-		const obj = {}
-		obj.id = id
-
-		if (object === 'section-title') {
-			obj.title = li.select('button div.section-title').node()?.innerText.trim() || ''
-		} else if (object === 'section-description') {
-			obj.description = d3.select('div.pinboard-sections-container div.description').node()?.innerText.trim() || ''
-		}
-
-		const res = await POST('/save/pinboard-section', obj)
-		if (res.status === 200) {
-			console.log('saved')
-
-			if (li.node()) {
-				li.classed('editing', false)
-				li.select('div').classed('focus', false)
-				const a = li.select('a')
-
-				if (a.node()) {
-					const href = a.attr('data-href')
-					a.attrs({
-						'href': href,
-						'data-href': null
-					})
-					li.select('button div.section-title').node().contentEditable = false
-				}
-
-			}
-		}
-	}
-};
-
 function updateTab (value) {
 	const input = d3.select(`.${mediaSize} input[type=text]#pinboards`).node()
 	if (input) {
@@ -255,11 +205,121 @@ function expandstats (node) {
 		d3.select(this).remove()
 
 	}).html('<%- vocabulary["close"][language] %>')
-}
-
-const dateOptions = {
-	weekday: undefined,
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
 };
+
+async function renderCarousel () {
+	const page = JSON.parse(d3.select('data[name="page"]').node().value)
+
+	const container = d3.select('.slides')
+	const panel = container.findAncestor('panel')
+	const dots = panel.select('.dots')
+	
+	let slides = await getContent('samples')
+	if (!slides.length) return panel.remove()
+
+	const slide = container.addElems('div', 'slide', slides)
+	.addElems('a')
+		.attr('href', d => `/${language}/view/pad?id=${d.id}`)
+	const txt = slide.addElems('div', 'media media-txt')
+	txt.addElems('p', 'country')
+		.html(d => d.country)
+	txt.addElems('h1', 'title')
+		.html(d => d.title)
+	txt.addElems('p', 'snippet')
+		.html(d => {
+			if (d.txt?.[0]?.length > 500) { 
+				return `${d.txt?.[0].slice(0, 500)?.replace(/<\/?[^>]+(>|$)/ig, '').trim()}…`
+			} else { 
+				return d.txt?.[0]?.replace(/<\/?[^>]+(>|$)/ig, '').trim()
+			}
+		})
+	slide.addElems('img')
+		.attr('src', d => {
+			if (d3.select('data[name="app_storage"]').node()) {
+				const app_storage = d3.select('data[name="app_storage"]').node().value
+				return new URL(`${app_storage}${d.img[0]?.replace('uploads/sm/', 'uploads/')}`).href
+			} else {
+				return d.img[0]?.replace('uploads/sm/', 'uploads/')
+			}
+		})
+
+	dots.addElems('div', 'dot', slides)
+
+	animateCarousel(0);
+}
+function animateCarousel (idx) {
+	const carousel = d3.select('.carousel')
+	const deck = carousel.select('.slides')
+	const slides = carousel.selectAll('.slide')
+	const delay = 3000
+
+	if (idx === slides.size()) idx = 0
+	deck.node().scrollTo({
+		top: 0,
+		left: idx * (slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth),
+		behavior: 'smooth'
+	})
+	slides.selectAll('.media-txt')
+	.on('mouseover', _ => clearTimeout(animation))
+	.on('mouseout', _ => animation = setTimeout(_ => animateCarousel(idx + 1), delay))
+	carousel.selectAll('.dot')
+	.classed('highlight', (d, i) => i === idx)
+	.on('click', function (d, i) {
+		idx = i
+		clearTimeout(animation)
+		animateCarousel(idx)
+	})
+
+	let animation = setTimeout(_ => animateCarousel(idx + 1), delay)
+};
+async function renderMosaic () {
+	const page = JSON.parse(d3.select('data[name="page"]').node().value)
+
+	const container = d3.select('.slides')
+	const panel = container.findAncestor('panel')
+	
+	let slides = await getContent('samples')
+	if (!slides.length) return panel.remove()
+
+	// TO DO: LOAD MOSAIC DATA DYNAMICALLY HERE
+	if (!mediaSize) var mediaSize = getMediaSize()
+	if (mediaSize === 'xs') slides = slides.slice(0, 11)
+	else if (mediaSize === 'sm') slides = slides.slice(0, 21)
+	else if (mediaSize === 'm') slides = slides.slice(0, 26)
+	else if (mediaSize === 'lg') {
+		if (page.type === 'private') { 
+			slides = slides.slice(0, 30)
+		} else {
+			slides = slides.slice(0, 33)
+		}
+	} else {
+		if (page.type === 'private') { 
+			slides = slides.slice(0, 40)
+		}
+	}
+
+	const vignette = container.addElems('div', 'slide', slides)
+	.addElems('a')
+		.attr('href', d => `/${language}/view/pad?id=${d.id}`)
+	const txt = vignette.addElems('div', 'media media-txt')
+	txt.addElems('p', 'country')
+		.html(d => d.country)
+	txt.addElems('h1')
+		.html(d => {
+			if (d.title?.length > 50) return d.title?.slice(0, 50).trim()
+			else return d.title
+		})
+	vignette.addElems('img')
+		.attr('src', d => {
+			if (d3.select('data[name="app_storage"]').node()) {
+				const app_storage = d3.select('data[name="app_storage"]').node().value
+				return new URL(`${app_storage}${d.img[0]}`).href
+			} else {
+				return d.img[0]
+			}
+		})
+
+	window.onresize = (evt) => {
+		renderMosaic()
+	};
+}

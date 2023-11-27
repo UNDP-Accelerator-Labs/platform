@@ -31,21 +31,40 @@
 
 <script type='text/javascript' src='/js/contribute/pad/main.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/render.js'></script>
+<script type='text/javascript' src='/js/contribute/pad/save.js'></script>
+<script type='text/javascript' src='/js/contribute/pad/widget.interactions.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/keyboard.interactions.js'></script>
 <script type='text/javascript' src='/js/contribute/comment.js'></script>
-
-<%- include('../../partials/pagestats.ejs') %>
-<% if (locals.metadata?.user?.uuid) { %>
-	<%- include ('../../partials/exploration.ejs') %>
-<% } %>
 
 </head>
 
 <body>
 
 <!-- SET DATA ATTRIBUTES -->
-<data name='pagedisplay' value='<%= pagedisplay %>'></data>
+<data name='object' value='<%= object %>'></data>
 <data name='username' value='<%= locals.metadata.user.name %>'></data>
+<% 
+	const pagedata = {
+		type: publicpage ? 'public' : 'private',
+		display: pagedisplay,
+		activity: editing ? 'edit' : 'view'
+	}
+%>
+<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
+<%
+	const paddata = {
+		id: locals.data?.id ?? null,
+		type: templated ? 'templated' : 'blank',
+		template: templated ? locals.display_template : {},
+		source: locals.source ?? null,
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || [],
+		is_review: locals.data?.is_review || false,
+		title: locals.data?.title ?? null
+	}
+%>
+<data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
+<data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
 <% if (locals.metadata.site.app_storage) { %>
 	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
 <% } %>
@@ -53,11 +72,17 @@
 <%- include ('../../partials/translations.ejs') %>
 <%- include ('../../partials/navigate/menu-languages.ejs') %>
 
+<%- include('../../partials/pagestats.ejs') %>
+<% if (locals.metadata?.user?.uuid) { %>
+	<%- include ('../../partials/exploration.ejs') %>
+<% } %>
+
+
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
 <div class='main-content<% if (pagedisplay.includes("adjacent")) { %> adjacent<% } else { %> fit<% } %>'>
 <header<% if (pagedisplay === 'slideshow' || pagedisplay.includes('adjacent')) { %> class='folded'<% } %>>
 	<div class='inner'>
-		<%- include ('../../partials/menu-logo.ejs') %>
+		<%- include ('../../partials/navigate/sidebar.ejs') %>
 	</div>
 </header>
 
@@ -143,12 +168,11 @@
 									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
 								<!-- TO DO: CHECK IF THIS IS NOT AN ERROR, ALTHOUGH IT IS DISABLED -->
-									<button type='button' class='publish' name='status' value='1' disabled><%- vocabulary['submit'][language] %></button>
+									<button type='button' class='publish' name='status' value='1' onclick='saveAndSubmit(this);' disabled><%- vocabulary['submit'][language] %></button>
 								<!-- IF THERE IS A TOKEN WITH A CALLBACK URL, THEN THIS SHOULD AUTO SUBMIT AND SEND BACK THE PAD ID TO THE REQUESTING SOURCE -->
 								<% } else if (token && action === 'publish_and_share') { %>
 									<input type='hidden' name='token' value='<%- token %>'>
 									<button type='submit' class='publish' name='status' value='3' disabled><%- vocabulary['publish'][language] %></button>
-
 								<% } else { %>
 									<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
@@ -160,7 +184,13 @@
 									<!-- TO DO: INTERCEPT AND partialSave -->
 									<button type='submit' class='publish google-translate-attr' name='status' value='1'><%- vocabulary['submit'][language] %></button>
 								<% } else { %>
-									<button type='button' class='publish google-translate-attr'><%- vocabulary['publish'][language] %></button>
+
+									<% if (locals.data?.status === 2 && locals.data?.review_status === 1) { %>
+										<!-- THE PAD IS ALREADY A PREPRINT AND SUBMITTED FOR REVIEW -->
+										<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
+									<% } else { %>
+										<button type='button' class='publish google-translate-attr'><%- vocabulary['publish'][language] %></button>
+									<% } %>
 								<% } %>
 							<% } %>
 							<% if (object !== 'review' && !publicpage) { %>
@@ -178,7 +208,7 @@
 												&& (locals.data?.review_status === 0))
 											{ %>
 												<li class='opt google-translate-attr'>
-													<button id='submit-for-review' type='button' name='review_status' value='1'>
+													<button id='submit-for-review' type='button' name='review_status' value='1' onclick='selectReviewLanguage(this);'>
 														<%- vocabulary['submit for review'][language] %>
 													</button>
 												</li>
@@ -278,7 +308,7 @@
 							<a href='<%- `/${language}/browse/reviews/ongoing` %>' class='return'><%- vocabulary['back to reviews'][language] %></a>
 						<% } %>
 						<div class='title google-translate-attr'>
-							<%- vocabulary['review'][language](false, false) %> #<%- locals.data?.review_idx %>
+							<%- vocabulary['review'][language]['singular'] %> #<%- locals.data?.review_idx %>
 						</div>
 					<% } %>
 					<!-- TO DO: ADD OTHER STATS -->
@@ -316,8 +346,6 @@
 		</div>
 	</main>
 </div>
-<% console.log(pagedisplay) %>
-<% console.log(!pagedisplay.includes('adjacent')) %>
 <% if (!pagedisplay.includes('adjacent')) { %>
 <div class='sidebar xs sm m lg xl xxl'>
 	<% if (editing && !publicpage && (!templated || ![null, undefined].includes(locals.display_template.medium)))
@@ -361,60 +389,6 @@
 			</div>
 			<% if (!templated) { %><button class='scroll-down m lg xl xxl'><label>&rsaquo;</label></button><% } %>
 		</div>
-		
-		<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-			// TO DO: THE NONCE SHOULD BE TEMPORARY
-			if (!mediaSize) var mediaSize = getMediaSize()
-			if (['xs', 'sm'].includes(mediaSize)) {
-				d3.select('button.input-toolbox')
-				.on('touchend, click', function () {
-					d3.select(this).toggleClass('highlight')
-					d3.select('.media-input-group').node().focus()
-				})
-				d3.select('.media-input-group').on('touchend', function () { this.focus() })
-				.on('focus', function () {
-					if (this.style.maxHeight) this.style.maxHeight = null
-					else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
-				}).on('blur', function () {
-					 this.style.maxHeight = null
-					 d3.select('button.input-toolbox').classed('highlight', false)
-				})
-			}
-			<% if (!templated) { %>
-				d3.select('.media-input-group')
-				.each(function () {
-					const node = this
-					const sel = d3.select(this)
-					const inner = sel.select('.inner')
-					const height = inner.node().clientHeight || inner.node().offsetHeight
-					const scrollheight = inner.node().scrollHeight
-					const scrolltop = inner.node().scrollTop
-					const buttonheight = inner.select('button').node().clientHeight || inner.select('button').node().offsetHeight
-
-					sel.classed('overflowing', scrollheight > (height + buttonheight))
-
-					sel.select('button.scroll-up')
-						.classed('hide', scrollheight <= (height + buttonheight))
-					.on('click', function () {
-						inner.node().scrollTo({
-							top: scrolltop - (height - buttonheight),
-							left: 0,
-							behavior: 'smooth'
-						})
-					})
-
-					sel.select('button.scroll-down')
-						.classed('hide', scrollheight <= (height + buttonheight))
-					.on('click', function () {
-						inner.node().scrollTo({
-							top: scrolltop + height - buttonheight,
-							left: 0,
-							behavior: 'smooth'
-						})
-					})
-				})
-			<% } %>
-		</script>
 	<% } %>
 </div>
 <% } %>
@@ -505,803 +479,12 @@
 <%- include ('../../partials/footer.ejs') %>
 
 <script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-	async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /browse/index.js
-		const { name, value } = node
-
-		const target_opts = <%- JSON.stringify(locals.metadata.menu.review_templates.map(d => { return { label: d.name, value: d.language, count: d.count, disabled: { value: d.disabled, label: vocabulary['missing reviewers'][language] }, type: 'radio', required: true } })) %>
-
-		const formdata = { action: '/request/review',  method: 'POST' }
-		const message = vocabulary['select review language'][language]
-		const opts = []
-		opts.push({ node: 'select', name: 'language', label: vocabulary['select language'][language]['singular'], options: target_opts })
-		opts.push({ node: 'input', type: 'hidden', name: 'id', value: <%- locals.data?.id || JSON.stringify(null) %> })
-		opts.push({ node: 'button', type: 'submit', name: name, value: value, label: vocabulary['submit for review'][language] })
-		const new_constraint = await renderFormModal({ message, formdata, opts })
-	}
-
-	const metafields = <%- JSON.stringify(metafields || {}) %>
-
-	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
-	d3.select('.media-input-group #input-media-section')
-	.on('mousedown', function () {
-		this['__active_node__']	= d3.selectAll('.media-layout.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addSection({ lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-img + label')
-	.on('mousedown', function () {
-		this.control['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	})
-	d3.select('.media-input-group #input-media-img')
-	.on('change', function () {
-		uploadImg({ form: this.form, lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-video + label')
-	.on('mousedown', function () {
-		this.control['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	})
-	d3.select('.media-input-group #input-media-video')
-	.on('change', function () {
-		uploadVideo({ form: this.form, lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-drawing')
-	.on('mousedown', function () {
-		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addDrawing({ lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-txt')
-	.on('mousedown', function () {
-		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addTxt({ lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-embed')
-	.on('mousedown', function () {
-		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addEmbed({ lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-checklist')
-	.on('mousedown', function () {
-		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addChecklist({ lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	d3.select('.media-input-group #input-media-radiolist')
-	.on('mousedown', function () {
-		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addRadiolist({ lang: language, sibling: this['__active_node__'], focus: true })
-		this['__active_node__'] = null
-	})
-
-	metafields.forEach(d => {
-		d3.select(`.media-input-group #input-meta-${d.label}`)
-		.on('mouseover', function () {
-			d3.select(this).select('label').style('width', function () { return `${this.scrollWidth}px` })
-		}).on('mouseout', function () {
-			d3.select(this).select('label').style('width', 0)
-		}).on('mousedown', function () {
-			this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling || null
-		}).on('click', function () {
-			const data = { level: 'meta', name: d.label, constraint: d.limit || null, required: d.required, instruction: d.instruction, options: d.options || null }
-			if (d.type === 'txt') addTxt({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'embed') addEmbed({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'drawing') addDrawing({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'checklist') addChecklist({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'radiolist') addRadiolist({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			// THE FOLLOWING ARE ALWAYS META
-			if (d.type === 'tag') addTags({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'index') addIndexes({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'location') addLocations({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'attachment') addAttachment({ data, lang: language, sibling: this['__active_node__'], focus: true })
-
-			d3.select(this).select('label').style('width', 0)
-			this['__active_node__'] = null
-		})
-	})
-
-	const centerpoint = <%- JSON.stringify(locals.metadata.user.country.lnglat || {}) %>
-
-	const taglists = <%- JSON.stringify(locals.tags || {}) %>
-
-	const templated = <%- JSON.stringify(templated) %>;
-	const httpquery = <%- JSON.stringify(locals.metadata.page.query) %>;
-
-	const publicpage = <%- JSON.stringify(publicpage) %>;
-	let activity = '<%- activity %>';
-	const editing = <%- JSON.stringify(editing || false) %>;
-	const rights = <%- rights %>;
-
-	let status = <%- locals.data?.status || 0 %>;
-
-	const main = d3.select('#pad')
-	const head = main.select('.head')
-	const body = main.select('.body')
-	const foot = main.select('.foot')
-	const footer = d3.select('footer')
-
-	// ADD THE INTERACTION BEHAVIOR FOR THE TITLE INPUT
-	head.select('.title')
-	.on('keydown', function () {
-		const evt = d3.event
-		if (evt.code === 'Enter' || evt.keyCode === 13) {
-			evt.preventDefault()
-			this.blur()
-		}
-	})
-
-	// THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
-	function retrieveItems (sel, datum, items) {
-		// MEDIA
-		if (datum.type === 'title') {
-			datum.txt = (sel.select('.media-title').node() || sel.select('.meta-title').node()).innerText
-			datum.has_content = datum.txt?.trim()?.length > 0
-			items.push(datum)
-		}
-		if (['img', 'mosaic', 'video'].includes(datum.type)) {
-			if (datum.type === 'mosaic') datum.has_content = datum?.srcs?.filter(b => b)?.length > 0
-			else datum.has_content = datum.src !== null && datum.src !== undefined
-			items.push(datum)
-		}
-		else if (datum.type === 'drawing') {
-			datum.has_content = datum.shapes?.length > 0
-			items.push(datum)
-		}
-		else if (datum.type === 'txt') {
-			// datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
-			datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
-			datum.has_content = datum.txt?.trim()?.length > 0
-			items.push(datum)
-		}
-		else if (datum.type === 'embed') {
-			datum.html = (sel.select('.media-embed').node() || sel.select('.meta-embed').node()).innerHTML
-			datum.has_content = datum.html?.trim()?.length > 0
-			items.push(datum)
-		}
-		else if (['checklist', 'radiolist'].includes(datum.type)) {
-			datum.has_content = datum.options.filter(b => b.name?.length && b.checked).length > 0
-			const clone = JSON.parse(JSON.stringify(datum))
-			clone.options = clone.options.filter(b => b.name?.length)
-			items.push(clone)
-
-			// datum.options = datum.options.filter(b => b.name && b.name.length)
-			// items.push(datum)
-		}
-		// SPECIFIC META
-		else if (datum.type === 'location') {
-			datum.has_content = datum.centerpoints?.length > 0
-			items.push(datum)
-		}
-		else if (['tag', 'index'].includes(datum.type)) {
-			datum.has_content = (datum.sdgs?.length || datum.tags?.length) > 0 // THIS IS LEGACY FOR THE ACTION PLANNING PLATFORM: TO DO: DEPRECATE
-			items.push(datum)
-		}
-		else if (datum.type === 'attachment') {
-			datum.has_content = datum.srcs?.length > 0
-			items.push(datum)
-		}
-
-	}
-	function getStatus () {
-		const completion = []
-
-		const title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || '<%- vocabulary["missing title"][language] %>'
-		completion.push(title?.trim()?.length > 0)
-
-		let metacompletion = JSON.parse(JSON.stringify(metafields)).filter(d => d.required).map(d => d.label)
-
-		function checkCompletion (d) {
-			<% if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
-				if (d.required === null || d.required === undefined) throw 'there is no requirement: this should not happen'
-				if (d.required === false) return true
-				else return d.has_content === true
-			<% } else { %>
-				metacompletion = metacompletion.map(c => c === d.name ? d.has_content === true : c)
-			<% } %>
-		}
-
-		main.selectAll('.layout:not(.description-layout)')
-		.each(function (d) {
-			const items = []
-			const sel = d3.select(this)
-
-			sel.selectAll('.media-container, .meta-container')
-			.each(function (c) {
-				const sel = d3.select(this)
-				const ingroup = sel.findAncestor('group-container')
-				// GROUPS
-				if (c.type === 'group') {
-					// const groupitems = []
-					sel.selectAll('.media-group-items')
-						.each(function () {
-							const sel = d3.select(this)
-							const subitems = []
-							sel.selectAll('.media-container, .meta-container')
-								.each(function (b) {
-									retrieveItems(d3.select(this), b, subitems)
-								})
-							// completion.push(!subitems.map(checkCompletion).unique().includes(false))
-							completion.push(subitems.map(checkCompletion).every(d => d === true))
-						})
-				} else {
-					if (!ingroup) retrieveItems(sel, c, items)
-					// completion.push(!items.map(checkCompletion).unique().includes(false))
-				}
-			})
-			// if (items.length) completion.push(!items.map(checkCompletion).unique().includes(false))
-			if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
-		})
-
-		<% if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
-			console.log('override default requirements')
-			return completion.every(d => d === true)
-		<% } else { %>
-			console.log('default requirements')
-			return metacompletion.every(d => d === true)
-		<% } %>
-		// if (!templated) return metacompletion.every(d => d === true)
-		// else return !completion.unique().includes(false)
-		// else return completion.every(d => d === true)
-	}
-	function compileContent (attr) {
-		const content = {}
-		// COLLECT TITLE
-		// let title = head.select('.title').node().innerText
-		let title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || '<%- vocabulary["missing title"][language] %>'
-		if (title) title = limitLength(title, 99);
-		// MAYBE INCLUDE ALERT IF title IS EMPTY
-		// COLLECT ALL MEDIA
-		const sections = []
-		main.selectAll('.layout:not(.description-layout)')
-		.each(function (d) {
-			const items = []
-			const sel = d3.select(this)
-
-			sel.selectAll('.media-container, .meta-container')
-			.each(function (c) {
-				const sel = d3.select(this)
-				const ingroup = sel.findAncestor('group-container')
-				// GROUPS
-				if (c.type === 'group') {
-					const groupitems = []
-					sel.selectAll('.media-group-items')
-						.each(function () {
-							const sel = d3.select(this)
-							const subitems = []
-							sel.selectAll('.media-container, .meta-container')
-								.each(function (b) {
-									retrieveItems(d3.select(this), b, subitems)
-								})
-							groupitems.push(subitems)
-						})
-					c.items = groupitems
-					items.push(c)
-				} else {
-					if (!ingroup) retrieveItems(sel, c, items)
-				}
-			})
-
-			d.title = (sel.select('.section-header h1').node() || {}).innerText
-			d.lead = (sel.select('.media-lead').node() || {})['outerText' || 'textContent' || 'innerText']
-			d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
-			d.items = items
-			sections.push(d)
-		})
-
-		// const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
-		// let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
-
-		// THIS SHOULD REPLAE WHAT IS ABOVE
-
-		// if (main.select('.sdgs-container').node()) {
-		// 	main.selectAll('.sdgs-container').each(d => {
-		// 		d.tags.forEach(c => {
-		// 			// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY sdgs WERE ONLY THE keys, NOT THE { key: INT, name: STR } OBJECT
-		// 			if (Object.keys(c).includes('key') && Object.keys(c).includes('name')) {
-		// 				allTags.push({ id: c.key, name: c.name, type: d.type.slice(0, -1) })
-		// 			}
-		// 		})
-		// 	})
-		// }
-
-		const allTags = []
-		metafields.filter(d => ['tag', 'index'].includes(d.type)).forEach(d => {
-			main.selectAll(`.${d.label}-container .tag input:checked`)
-			.each(c => {
-				// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY tags WERE ONLY THE names, NOT THE { id: INT, name: STR } OBJECT
-				if (c.id && c.name && c.type) allTags.push({ id: c.id, type: c.type, name: c.name })
-			})
-		})
-		content.tagging = allTags
-
-		if (main.select('.location-container').node()) {
-			content.locations = main.select('.location-container')?.datum()?.centerpoints
-		} else content.locations = null
-
-		const otherMetadata = []
-		metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
-		.forEach(d => {
-			main.selectAll(`.${d.label}-container`)
-			.each(c => {
-				retrieveItems(d3.select(this), c, otherMetadata)
-			})
-		})
-		content.metadata = otherMetadata.map(d => {
-			const { id, level, has_content, instruction, required, ...metadata } = d
-			const { type, name } = metadata
-			const valuekey = Object.keys(metadata).find(c => <%- JSON.stringify(locals.metadata.site.media_value_keys) %>.includes(c))
-			const value = metadata[valuekey]
-
-			if (Array.isArray(value)) {
-				return value.filter(c => {
-					if (valuekey === 'options') return c.checked === true
-					else return c
-				}).map(c => {
-					if (valuekey === 'options') return { type, name, value: c.name, key: c.id }
-					else return { type, name, value: c }
-				})
-			} else return { type, name, value }
-		}).flat()
-
-		// COMPILE FULL TXT FOR SEARCH
-		const fullTxt = `${title}\n\n
-			${sections.map(d => d.title).join('\n\n').trim()}\n\n
-			${sections.map(d => d.lead).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'txt')
-				.map(d => d.txt).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'embed')
-				.map(d => d.html).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
-				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-			${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
-				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-				.filter(d => d.type === 'txt')
-				.map(d => d.txt).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-				.filter(d => d.type === 'embed')
-				.map(d => d.html).join('\n\n').trim()}\n\n
-			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-				.filter(d => d.type === 'checklist')
-				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-			${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-				.filter(d => d.type === 'radiolist')
-				.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
-
-		// ALWAYS SEND fullTxt
-		content.full_text = fullTxt
-
-		// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
-		const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
-
-		// IF THIS IS A NEW PAD, CHECK WHETHER IT HAS A SOURCE
-		// if (activity === 'contribute')
-		// ALWAYS SEND THE SOURCE (BECAUSE reviews DEPEND ON THE SOURCE)
-		content.source = <%- locals.source || JSON.stringify(locals.source) || JSON.stringify(null) %>;
-		// ALWAYS SAVE THE TITLE
-		content.title = title
-		if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr)
-		|| sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
-			content.sections = sections
-		}
-		// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
-		// if (!attr || attr === 'location') content.location = JSON.stringify(location)
-		// if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
-		// if (!attr || attr === 'tag') content.tags = JSON.stringify(tags)
-		// if (!attr || attr === 'skills') content.skills = JSON.stringify(skills)
-		// if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
-
-		// FULL TEXT
-		// if (!attr || ['title', 'lead', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr))
-
-
-		// ALWAYS SEND status
-		const completion = getStatus()
-
-		if (completion) status = Math.max(1, status)
-		else status = 0
-		content.status = status
-		// ALWAYS SEND deletion IF THERE IS SOMETHING TO DELET
-		if (deletion.length) content.deletion = deletion
-
-		return content
-	}
-	function partialSave (attr) {
-		return new Promise(resolve => {
-			console.log('saving')
-			// FIRST CHECK IF THIS IS A NEW PAD
-			const content = compileContent(attr)
-			// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
-			const url = new URL(window.location)
-			const queryparams = new URLSearchParams(url.search)
-			let id = queryparams.get('id')
-			if (id) content.id = +id
-			const template = queryparams.get('template')
-			if (template) content.template = +template
-			const mobilization = queryparams.get('mobilization')
-			if (mobilization) content.mobilization = +mobilization
-
-			POST('/save/<%- object %>', content)
-			.then(res => {
-				// ADD THE NOTIFICATION
-				window.sessionStorage.removeItem('changed-content')
-
-				if (!mediaSize) var mediaSize = getMediaSize()
-				if (['xs', 'sm'].includes(mediaSize)) {
-					const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
-					save_btn.select('button')
-						.html('<%- vocabulary["changes saved"][language] %>')
-					window.setTimeout(_ => {
-						save_btn.classed('saved', false)
-						.select('button').each(function () { this.disabled = true })
-							.html('<%- vocabulary["save"][language] %>')
-					}, 1000)
-				} else {
-					const menu_logo = d3.select('nav#site-title .inner')
-					menu_logo.select('.save').classed('saved', true)
-						.select('button')
-						.html('<%- vocabulary["changes saved"][language] %>')
-					window.setTimeout(_ => {
-						menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
-						menu_logo.selectAll('div.save').classed('hide', true)
-					}, 1000)
-				}
-
-				// REMOVE ITEMS TO DELETE
-				window.sessionStorage.removeItem('deleted')
-				// CHANGE THE URL TO INCLUDE THE PAD ID
-				if (!id) { // INSERT
-					id = res.object
-					queryparams.append('id', id)
-					url.search = queryparams.toString()
-					// BASED ON:
-					// https://usefulangle.com/post/81/javascript-change-url-parameters
-					// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
-					const nextURL = url.toString().replace('contribute', 'edit')
-					const nextTitle = 'Update pad' // TO DO: RESET FOR TEMPLATE
-					const nextState = { additionalInformation: 'Updated the URL with JS' }
-					window.history.pushState(nextState, nextTitle, nextURL)
-					// REMOVE THE templates MENU
-					// d3.select('nav#filter').remove()
-
-					// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
-					d3.selectAll('div.meta-status form input[name="id"]').attr('value', id)
-					// d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
-				}
-
-				updateStatus(content.status)
-				resolve(id)
-
-			}).catch(err => console.log(err))
-		})
-	}
-	function updateStatus (_status) {
-		if (!_status) {
-			const completion = getStatus()
-			if (completion) _status = Math.max(1, status)
-			else _status = 0
-		}
-
-		// ACTIVATE THE PUBLISHING OPTIONS AT THE END
-		const metastatus = d3.select('div.meta-status')
-			.classed('status-0 status-1', false)
-			.classed(`status-${_status}`, true)
-		metastatus.select('div.btn-group form button.publish')
-			.attr('disabled', _status >= 1 ? null : true)
-		metastatus.select('div.btn-group form button.generate-pdf')
-			.attr('disabled', _status > 0 ? null : true)
-	}
-
-	// POPULATE THE PAGE
-	if (activity === 'contribute' && templated) {
-		const template = <%- JSON.stringify(locals.display_template || {}) %>;
-		var locked_excerpt = templated && template.sections?.some(d => d.structure.some(c => c.is_excerpt))
-
-		if (template.sections) {
-			const title_instruction = template.sections.map(d => d.items || d.structure).flat()
-				.find(d => d.type === 'title')?.instruction
-			if (title_instruction) head.select('.title').attr('data-placeholder', title_instruction)
-
-			template.sections.forEach(async d => {
-				<% if (pagedisplay === 'slideshow') { %>
-					await addSlides({ data: d, lang: language })
-				<% } else { %>
-					addSection({ data: d, lang: language })
-				<% } %>
-			})
-		}
-		<% if (pagedisplay === 'slideshow') { %>
-			initSlideshow()
-		<% } %>
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	} else if (['edit', 'view'].includes(activity)) {
-		const data = <%- JSON.stringify(locals.data || {}) %>;
-		var locked_excerpt = templated && data.sections?.some(d => d.structure.some(c => c.is_excerpt))
-
-		// THIS WAS AN ATTEMPT TO FLATTEN THE DATA STRCUTURE FOR SLIDES,
-		// BUT DOING THIS WOULD MAKE THE CURRENT SAVING MECHANISM FAIL
-		// BECAUSE IT IS DEPENDENT ON THE DOM section STRUCTURE
-		// const { template, status, liked, disliked, sections, ...titleinfo } = data
-		// const slides = [ titleinfo ]
-		// data.sections.forEach(d => {
-		// 	const { items, structure, ...titleinfo } = d
-		// 	slides.push(titleinfo)
-
-		// 	d.items.forEach(c => {
-		// 		slides.push(c)
-		// 	})
-		// })
-
-		<% if (object !== 'review' && !locals.data?.is_review) { %>
-			if (data.title) head.select('.title').html(data.title)
-		<% } %>
-
-		if (data.sections) {
-			data.sections.forEach(async d => {
-				if (!editing) d.items = d.items.filter(c => {
-					if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
-					else return c.has_content
-				}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
-				<% if (pagedisplay === 'slideshow') { %>
-					await addSlides({ data: d, lang: language }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
-				<% } else { %>
-					await addSection({ data: d, lang: language })
-				<% } %>
-			})
-		} else { // THIS IS AN AUTO GENERATED PAD
-			if (templated) { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
-				const template = <%- JSON.stringify(locals.display_template || {}) %>;
-				var locked_excerpt = templated && template.sections?.some(d => d.structure.some(c => c.is_excerpt))
-
-				if (template.sections) {
-					const title_instruction = template.sections.map(d => d.items || d.structure).flat()
-						.find(d => d.type === 'title')?.instruction
-					if (title_instruction) head.select('.title').attr('data-placeholder', title_instruction)
-
-					template.sections.forEach(async d => {
-						<% if (pagedisplay === 'slideshow') { %>
-							await addSlides({ data: d, lang: language })
-						<% } else { %>
-							await addSection({ data: d, lang: language })
-						<% } %>
-					})
-				}
-			}
-		}
-		<% if (pagedisplay === 'slideshow') { %>
-			initSlideshow()
-		<% } %>
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	} else (async _ => await addSection({ lang: language }))()
-
-
-	let idx = 0
-
-	// FOR SLIDESHOW VIEW
-	function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
-		const { data, lang, sibling, focus } = kwargs || {}
-		let { title, lead, structure, items, repeat, group, instruction } = data || {}
-		if (!title) title = ''
-		if (!lead) lead = ''
-		if (!structure) structure = []
-		if (!items) items = []
-
-		if (editing && templated && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure))
-
-		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
-		// const section_id = uuidv4()
-
-		return new Promise(resolve => {
-			d3.selectAll('.media-layout').classed('focus', false)
-
-			const section = d3.select('main#pad div.inner div.body')
-				.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
-				.classed('repeat', repeat || false)
-				// .classed('focus', focus && !templated)
-				.datum({ type: 'section', title, lead, structure, items, repeat, group })
-			.on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
-
-			// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
-			if (title || lead) {
-				const titleslide = section.addElems('div', 'title-slide')
-
-				if (title) {
-					titleslide.addElems('div', 'section-header')
-						.addElems('h1')
-						.html(d => d.title)
-				}
-
-				if (lead) {
-					const medialead = new Media({
-						parent: titleslide.node(),
-						type: 'lead',
-						datum: { type: 'lead', lead: lead },
-						lang: lang
-					})
-					// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-					if (medialead.opts) medialead.opts.remove()
-
-					medialead.media.html(d => d.lead)
-				}
-			}
-			// END SLIDE
-
-			if (repeat) {
-				// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
-				d3.selectAll('.layout.repeat').filter(d => d.group === group)
-					.select('.repeat-container').classed('hide', true)
-
-				const mediarepeat = new Media({
-					parent: section.node(),
-					type: 'repeat',
-					datum: { type: 'repeat', instruction: instruction },
-					lang: lang
-				})
-				// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-				if (mediarepeat.opts) mediarepeat.opts.remove()
-				if (mediarepeat.instruction) mediarepeat.instruction.remove()
-
-				mediarepeat.media.addElems('button')
-				.on('click.repeat', function () {
-					const sel = d3.select(this)
-
-					const promises = []
-					section.findAncestor('pad').selectAll('.body>*')
-					.each(function (d, i) {
-						promises.push(new Promise(async resolve => {
-							if (this === section.node()) {
-								kwargs.sibling = `section:nth-child(${i + 2})`
-								kwargs.focus = true
-
-								const new_section = await addSlides(kwargs) // THIS TOO IS DIFFERENT TO addSection
-								initSlideshow()
-							}
-							resolve()
-						}))
-					})
-
-					Promise.all(promises)
-					.then(_ => switchslide(idx))
-				}).addElems('div').attrs({
-					'data-placeholder': d => '<%- vocabulary["repeat section"][language] %>'
-				}).html(d => d.instruction)
-			}
-
-			const displaypromises = []
-			if (items.length) {
-				section.each(function (d) {
-					d.items.forEach(c => displaypromises.push(new Promise(async resolvedisplay => {
-						await populateSection(c, lang, this)
-						resolvedisplay()
-					})))
-				})
-			}
-			Promise.all(displaypromises).then(_ => resolve(section))
-
-		}).then(section => {
-			return section.node()
-		})
-	}
-	function initSlideshow () {
-		// TRANSFORM THE MAIN #pad INTO A SLIDESHOW
-		// d3.select('.document').classed('slideshow', true)
-			// .select('#pad').classed('slideshow', true)
-		// TRANSFORM ALL .media-container TO .slide
-		const slidewidth = main.node().clientWidth || main.node().offsetWidth || main.node().scrollWidth
-		const inner = main.select('.inner')
-
-		if (d3.selectAll('.slide').size() === 0) {
-			inner.select('.meta-info').classed('slide', true)
-			inner.select('.head').classed('slide', true)
-		}
-
-		d3.selectAll('.title-slide, .description-layout:not(.hide), .media-layout > .media-container:not(.lead-container):not(.hide), .media-layout > .meta-container:not(.hide)')
-			.classed('slide', true)
-
-		// PREVENT GROUPS FROM ANIMATING IN
-		d3.selectAll('.media-group-items').classed('animate-in', false)
-
-		// ADD BUTTON TO SAVE AND GENERATE PDF AT THE END
-		const status_slide = d3.select('.meta-status')
-		if (status_slide.node()) {
-			const last_slide = d3.selectAll('.slide').last().node()
-			last_slide.parentNode.append(status_slide.node())
-			status_slide.classed('slide', true)
-		}
-
-		const slides = d3.selectAll('.slide')
-
-		// ADD BUTTONS TO NAVIGATE
-		inner.addElems('button', 'slide-nav', [{ label: '&lsaquo;', class: 'prev' }, { label: '&rsaquo;', class: 'next' }])
-		.each(function (d) { d3.select(this).classed(d.class, true) })
-			.classed('hide', d => {
-				const sel = d3.select(this)
-				let focus_id = 0
-				d3.selectAll('.slide').each(function (c, i) {
-					if (d3.select(this).classed('slide-in-view')) focus_id = i
-				})
-				return (d.class === 'prev' && focus_id === 0) || (d.class === 'next' && focus_id === d3.sels)
-			}).html(d => d.label)
-		.on('click', d => {
-			if (d.class === 'prev') switchslide(idx - 1)
-			else if (d.class === 'next') switchslide(idx + 1)
-		}).on('mouseup', function () {
-			d3.event.stopPropagation()
-			// LOSE FOCUS OF THIS BUTTON TO RE-ENABLE KEYBOARD NAVIGATION
-			this.blur()
-		})
-
-		// IF THE SLIDE IN VIEW IS HIDDEN (e.g. AFTER CLICKING ON A REPEAT SECTION BUTTON), THEN AUTO MOVE TO THE NEXT SLIDE
-		// const slideinview = d3.select('.slide.slide-in-view')
-		// if (slideinview.classed('hide')) {
-		// 	let focus_id = 0
-		// 	slides.each(function (c, i) {
-		// 		if (d3.select(this).classed('slide-in-view')) focus_id = i
-		// 	})
-		// 	if (focus_id < slides.size() - 1) switchslide(focus_id - 1, focus_id + 1)
-		// 	else switchslide(focus_id + 1, focus_id - 1)
-		// 	console.log(slideinview)
-		// 	slideinview.classed('slide slide-next slide-prev slide-in-view', false)
-		// }
-
-		// ADD DOTS
-		footer.select('.dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
-		.classed('highlight', (d, i) => i === 0)
-		.on('click', (d, i) => { switchslide(i) })
-
-		inner.on('scroll', function () {
-			if (this.scrollLeft % slidewidth === 0) {
-				idx = Math.round(this.scrollLeft / slidewidth)
-				d3.selectAll('.dot').classed('highlight', (d, i) => i === idx)
-				d3.selectAll('button.slide-nav').classed('hide', d => {
-					return (d.class === 'prev' && idx === 0) || (d.class === 'next' && idx === slides.size() - 1)
-				})
-			}
-		})
-	}
-	function switchslide (i) {
-		const slidewidth = main.node().clientWidth || main.node().offsetWidth || main.node().scrollWidth
-		main.select('.inner').node().scrollTo({
-			top: 0,
-			left: i * slidewidth,
-			behavior: 'smooth'
-		})
-
-		if (editing) {
-			main.selectAll('.focus').classed('focus', false)
-			const containers = main.selectAll('.media-container, .meta-container')
-			containers.selectAll('.inset')
-				.style('max-height', null)
-			d3.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
-		}
-
-		return idx = i
-	}
-
-
+	
 	<% if (locals.metadata?.user?.uuid) { %>
 		exploration.setUseFullPromptForSelect(true);
 		exploration.updateExplorationList(() => {
 			const docBtn = d3.select('div.exploration-local');
-			const data = { id: <%- locals.data?.id %> };
+			const data = { id: pad.id };
 			if (data.id) {
 				docBtn.data([data]);
 				exploration.setVisible(true);

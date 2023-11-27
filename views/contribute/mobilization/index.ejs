@@ -8,20 +8,22 @@
 <html lang='<%- language %>'>
 <head>
 
-	<%- include ('partials/head.ejs') %>
+	<%- include ('../../partials/head.ejs') %>
+
+	<script type='text/javascript' src='/js/contribute/mobilization/main.js'></script>
 
 </head>
 
 <body>
 
-<%- include ('partials/translations.ejs') %> 
-<%- include ('partials/navigate/menu-languages.ejs') %> 
+<%- include ('../../partials/translations.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %> 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
 <div class='main-content'>
 <header>
 	<div class='inner'>
-		<%- include ('partials/menu-logo.ejs') %> 
+		<%- include ('../../partials/navigate/sidebar.ejs') %> 
 	</div>
 </header>
 
@@ -66,7 +68,8 @@
 				<div class='body'>
 					<h1 class="google-translate-attr"><%- vocabulary['name mobilization'][language] %></h1>
 					<div class='input'>
-						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='fixLabel(this); enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]() %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
+						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]['preposition'] %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
+						<!-- TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 						<label aria-colspan="google-translate-attr" class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
 					</div>
 				</div>
@@ -95,7 +98,8 @@
 				<div class='body'>
 					<h1 class="google-translate-attr"><%- vocabulary['select campaign language'][language] %></h1>
 					<div class='filter'>
-						<input type='text' id='language' onblur='fixLabel(this)'>
+						<input type='text' id='language'>
+						<!-- TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 						<label class="google-translate-attr" for='language'><%- vocabulary['search'][language]['object'] %></label>
 
 						<menu>
@@ -203,17 +207,6 @@
 						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%- locals.sourceinfo?.description || locals.data?.description %></textarea>
 						<label class='placeholder google-translate-attr' for='description'><%- vocabulary['describe intent'][language] %></label>
 					</div>
-					<script type='text/javascript'>
-						function adjustarea(node) { 
-							node.style.height = `${ node.scrollHeight - 30 }px` // WE HAVE A 2x10px PADDING IN THE CSS
-							const submit = d3.select(node.parentNode).select('button[type=submit]').node()
-							d3.select(node).findAncestor('modal').select('.head button.next').node().disabled = node.value.trim().length === 0 
-						}
-						d3.selectAll('textarea').each(function () { 
-							adjustarea(this) 
-							fixLabel(this)
-						})
-					</script>
 				</div>
 				<div class='foot'>
 				</div>
@@ -239,7 +232,8 @@
 					<div class='body'>
 						<h1 class="google-translate-attr"><%- vocabulary['select template'][language] %></h1>
 						<div class='filter'>
-							<input type='text' id='templates' onblur='fixLabel(this)'>
+							<input type='text' id='templates'>
+							<!-- TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 							<label class="google-translate-attr" for='templates'><%- vocabulary['search'][language]['object'] %></label>
 
 							<menu>
@@ -294,14 +288,27 @@
 					<div class='body'>
 						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
 						<div class='filter'>
-							<input type='text' id='contributors' onblur='fixLabel(this)'>
+							<input type='text' id='contributors'>
+							<!-- TO DO: CHECK THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language]['person'] %></label>
 
 							<menu>
 								<% locals.cohort.forEach(c => { %>
-									<li class='<% if ((locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) || locals.data?.cohort.includes(c.id)) { %>checked<% } %>'>
-										<div class='hide'>
-											<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' <% if ((locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) || locals.data?.cohort.includes(c.id)) { %>checked<% } %>>
+									<% if (
+										(locals.sourceinfo 
+											&& locals.metadata.page.query?.copy?.some(d => d !== 'true')
+										) || locals.data?.cohort.includes(c.id)
+										|| locals.metadata.page.query.pinboard?.length > 0
+									) { %>
+										<li class='checked'>
+											<div class='hide'>
+												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' checked>
+												<!-- TO DO: CHECK IF THIS WORKS: IT SHOULD SELECT CONTRIBUTORS BASED ON WHETHER IT IS A FOLLOW UP OR A DEPTH CAMPAIGN -->
+									<% } else { %>
+										<li>
+											<div class='hide'>
+												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)'>
+									<% } %>
 										</div>
 										<div class='main'>
 											<label for='c-<%- c.id %>'><%- c.ownername %></label>
@@ -323,7 +330,6 @@
 			</div>
 		<% } %>
 		<!-- LAST MODAL: LIMIT CONTRIBUTIONS -->
-		<!-- TO DO: ADD TOGGLE FOR THIS -->
 		<div class='modal m-7 hide'>
 			<div class='inner'>
 				<div class='head meta-status status-1'>
@@ -378,156 +384,7 @@
 <footer>
 </footer>
 
-<%- include ('./partials/footer.ejs') %> 
-
-<script type='text/javascript'>
-	const activity = '<%- locals.metadata.page.activity %>';
-	const lang = '<%- language %>';
-	const editing = false
-
-	// CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
-	const queryparams = new URLSearchParams(url.search)
-	const source = queryparams.get('source')
-
-	if (source) {
-		d3.select('main#mobilize-new form')
-			.addElem('input')
-			.attrs({ 
-				'type': 'hidden',
-				'name': 'source',
-				'value': +source
-			})
-	}
-
-	d3.selectAll('input[type=text]')
-	.each(function () { fixLabel(this) })
-
-	d3.selectAll('.filter input[type=text]')
-	.on('keyup', function () {
-		const node = this
-		const menu = d3.select(node).findAncestor('filter').select('menu')
-
-		menu.selectAll('li')
-			.classed('hide', function () {
-				return !this.textContent.trim().toLowerCase()
-				.includes(node.value.trim().toLowerCase())
-			})
-	})
-
-	
-	function preventSubmit (node, evt) {
-		if (evt.code === 'Enter' || evt.keyCode === 13) {
-			evt.preventDefault()
-			node.blur()
-			d3.select(node).findAncestor('modal').select('.head button.next').node().click()
-		}
-	}
-	function enableNext (node) {
-		const parent = d3.select(node).findAncestor('modal')
-		const button = parent.select('.head button.next:not(.hide)').node()
-		const disabled = ((node.nodeName === 'TEXTAREA' || node.type === 'text') && node.value.trim().length === 0)
-			|| (parent.selectAll('li').node() !== null && parent.selectAll('li.checked').size() === 0)
-		
-		if (button) button.disabled = disabled
-		parent.select('.head').classed('status-0', disabled)
-			.classed('status-1', !disabled)
-	}
-	function next (node) {
-		const current = d3.select(node).findAncestor('modal')
-		const next = current.node().nextElementSibling
-		if (next.classList.contains('modal')) {
-			d3.selectAll('.modal').classed('hide', true)
-			d3.select(next).classed('hide', false)
-		}
-	}
-	function prev (node) {
-		const current = d3.select(node).findAncestor('modal')
-		const next = current.node().previousElementSibling
-		if (next.classList.contains('modal')) {
-			d3.selectAll('.modal').classed('hide', true)
-			d3.select(next).classed('hide', false)
-		}
-	}
-	function togglePublic (node) {
-		d3.selectAll('.public').classed('hide', !node.checked).each(function () { enableNext(this) })
-		d3.selectAll('.private').classed('hide', node.checked).each(function () { enableNext(this) })
-		d3.select('#pad-limit').node().value = node.checked ? 1000 : 3 // THIS IS AN ARBITRARY LARGE NUMBER
-	}
-	function toggleCronJob (node) {
-		const sel = d3.select(node)
-		const parent = sel.findAncestor('cron-option')
-		parent.select('input[type=date]').attr('disabled', node.checked ? null : true)
-	}
-	function togglePadLimit (node) {
-		const sel = d3.select(node)
-		const parent = sel.findAncestor('pad-limit-option')
-		parent.select('input[type=number]').attr('disabled', node.checked ? null : true)
-		console.log(node.checked)
-		if (!node.checked) {
-			parent.addElem('input')
-			.attrs({
-				'id': 'hidden-pad-limit',
-				'type': 'hidden',
-				'name': 'pad_limit',
-				'value': 0
-			})
-		} else {
-			parent.select('input#hidden-pad-limit')
-			.remove()
-		}
-	}
-	function offsetMinEndDate (node) {
-		const sel = d3.select(node)
-		const parent = sel.findAncestor('modal')
-
-		const start = new Date(node.value)
-		const end = new Date(node.value)
-		end.setDate(end.getDate() + 1)
-
-		const dd = String(end.getDate()).padStart(2, '0')
-		const mm = String(end.getMonth() + 1).padStart(2, '0')
-		const yyyy = end.getFullYear()
-
-		parent.select('input[name="end_date"]')
-			.attr('min', `${yyyy}-${mm}-${dd}`)
-
-		// IF THE START DATE IS NOT NOW, THEN CHANGE THE status VALUE FOR THE MOBILIZATION
-		const now = new Date()
-		parent.select('input[name="status"]').node().value = start >= now ? 0 : 1
-	}
-	function toggleChecked (node) {
-		const parent = d3.select(node).findAncestor('modal')
-		parent.selectAll('li')
-			.classed('checked', function () { return d3.select(this).select('input').node().checked })
-		// d3.select(node).findAncestor('li').moveToBack()
-		const count = parent.selectAll('li.checked').size()
-		parent.select('.contributor-count')
-			.html(_ => {
-				return vocabulary['invited contributors'][language](count)
-			})
-		// IF THERE IS A FILTER MENU, CLEAR SEARCH TERM
-		if (parent.select('.filter input[type=text]').node()) {
-			parent.select('.filter input[type=text]').node().value = null
-			fixLabel(parent.select('.filter input[type=text]').node())
-			parent.selectAll('menu li').classed('hide', false)
-		}
-	}
-	function selectAllOpts (node) {
-		const parent = d3.select(node).findAncestor('modal')
-		parent.select('.global-opt').toggleClass('active')
-			.select('button').html(_ => parent.select('.global-opt').classed('active') ? '<%- vocabulary["deselect all"][language] %>' : '<%- vocabulary["select all"][language] %>')
-		parent.selectAll('li:not(.hide) input[type=checkbox]').each(function () { 
-			this.checked = parent.select('.global-opt').classed('active')
-			toggleChecked(this) 
-		})
-	}
-
-	<% if (locals.metadata.page.query.pinboard?.length > 0) { %>
-		// IF THIS IS A DEPTH CAMPAIGN, THEN AUTO-SELECT ALL CONTRIBUTORS
-		d3.select('.m-6 .foot .global-opt button').node().click()
-	<% } %>
-
-</script>
+<%- include ('../../partials/footer.ejs') %> 
 
 </body>
 </html>

@@ -200,6 +200,8 @@ async function updatestatus(_id, _object_id, _mobilization, uuid, ownId) {
 	}
 }
 function retrievepins (_object_id, uuid, ownId) {
+	// TO DO: THE ERROR OF RANDOM PINS SHOWING UP AFTER e.g. REMOVING A PIN FROM A PAD LIKELY COMES FROM THIS
+	// MUST CHECK THAT THIS WORKS CORRECTLY
 	return DB.pgp.as.format(`
 		SELECT pb.id, pb.title,
 			CASE WHEN EXISTS (

@@ -5,11 +5,12 @@ const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	const { req } = kwargs || {}
+	let { req, filters } = kwargs || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
-	const [ f_space, order, page, full_filters ] = await filter(req)
+	if (!filters?.length) filters = await filter(req)
+	const [ f_space, order, page, full_filters ] = filters
 
 	// TO DO: INTEGRATE engagement METRICS
 	// AND ADAPT CODE TO RESEMBLE pads/load/data.js

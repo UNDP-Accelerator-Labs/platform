@@ -1,14 +1,16 @@
-const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
 const { metafields, DB } = include('config/')
+const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
-	let { tags, type, pads, mobilizations, countries, regions, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { tags, type, pads, language, mobilizations, countries, regions, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (tags && !Array.isArray(tags)) tags = [tags]
 	if (pads && !Array.isArray(pads)) pads = [pads]
 	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations]
 	if (countries && !Array.isArray(countries)) countries = [countries]
 	if (regions && !Array.isArray(regions)) regions = [regions]
 	if (!type) type = 'thematic_areas'
+
+	if (language) language = checklanguage(language)
 
 	return new Promise(async resolve => {
 
@@ -18,6 +20,9 @@ module.exports = async (req, res) => {
 		if (tags) {
 			general_filters.push(DB.pgp.as.format(`t.id IN ($1:csv)`, [ tags ]))
 			if (timeseries) platform_filters.push(DB.pgp.as.format(`t.tag_id IN ($1:csv)`, [ tags ]))
+		}
+		if (language) {
+			general_filters.push(DB.pgp.as.format(`t.language = $1`, [ language ]))
 		}
 		if (pads) platform_filters.push(DB.pgp.as.format(`t.pad IN ($1:csv)`, [ pads ]))
 		if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))

@@ -8,7 +8,9 @@ const obsvars = {
 	characterDataOldValue: false
 }
 const observer = new MutationObserver(evt => {
-	setTimeout(_ => {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value) 
+
+	setTimeout(async _ => {
 		if (evt.unique('type', true).includes('attributes')
 			&& evt.unique('attributeName', true).includes('class')
 			&& evt.map(d => d.oldValue).join(' ').includes('focus')
@@ -22,9 +24,9 @@ const observer = new MutationObserver(evt => {
 				let item = evt.find(d => d.oldValue.includes('focus'))
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
 
-				if (editing) {
-					if (!publicpage) partialSave('media')
-					else updateStatus()
+				if (page.activity === 'edit') {
+					if (page.type === 'private') partialSave('media')
+					else await updateStatus()
 				}
 			}
 		}
@@ -32,6 +34,10 @@ const observer = new MutationObserver(evt => {
 })
 // MEDIA PROTOTYPE
 const Media = function (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	let { parent, container, sibling, type, datum, focus, lang } = kwargs || {}
 	let { id, level, name } = datum
 	if (!id) id = datum.id = uuidv4()
@@ -60,32 +66,32 @@ const Media = function (kwargs) {
 	})
 
 	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-	if ((templated || level === 'meta') && datum.instruction) {
+	if ((pad.type === 'templated' || level === 'meta') && datum.instruction) {
 		this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
 			.attr('data-placeholder', d => d.instruction) // TO DO: IF TRANSLATION IS AVAILABLE TRANSLATE
 			.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
 			.html(d => d)
 	}
-	if (editing || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
+	if (editing || page.activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	this.media = this.container.addElems('div', level, d => [d], d => d.type)
 		.classed(`${level}-${type}`, true)
 	.each(function (d) {
 		if (name) d3.select(this).classed(`${level}-${name}`, true)
 	})
-	if ((editing && !templated) || activity === 'preview') {
+	if ((editing && pad.type === 'blank') || page.activity === 'preview') {
 		this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
-		// .classed('hide', instruction && activity !== 'preview')
+		// .classed('hide', instruction && page.activity !== 'preview')
 		this.placement.addElems('div', 'opt', [
-			{ label: 'north', value: 'move-up', fn: _ => this.move('move-up') },
-			{ label: 'close', value: 'delete', fn: _ => this.rmMedia() },
-			{ label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+			{ label: 'north', value: 'move-up', fn: async _ => await this.move('move-up') },
+			{ label: 'close', value: 'delete', fn: async _ => await this.rmMedia() },
+			{ label: 'south', value: 'move-down', fn: async _ => await this.move('move-down') }
 		]).each(function (d) { d3.select(this).classed(d.value, true) })
 		.on('click', d => {
 			d3.event.stopPropagation()
 			d.fn()
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).on('mouseup', _ => d3.event.stopPropagation())
@@ -100,7 +106,8 @@ const Media = function (kwargs) {
 		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
 		// ENABLE CHANGE REQUIREMENTS ONLY IF THE USER IS SUDO
 		// THIS IS MAINLY FOR DEBUGGING IF THE REQUIREMENT WAS NOT PROPERLY SET IN THE TEMPLATE
-		if (rights > 2) {
+		/*
+		if (rights > 2) { // THIS NOW REQUIRES AN ASYNC CALL TO POST('/load/rights')
 			this.required.addElems('input')
 				.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
 				.on('change', function (d) {
@@ -108,25 +115,29 @@ const Media = function (kwargs) {
 					d3.select(this.parentNode).select('label').classed('active', d.required)
 
 					if (editing) {
-						if (!publicpage) partialSave(d.level)
+						if (page.type === 'private') partialSave(d.level)
 						else updateStatus()
 					}
 				})
 		}
+		*/
 		this.required.addElems('label')
 			.attr('for', requirement_id)
 			.classed('active', d => d.required)
-			.classed('hide', d => !d.required)// && rights < 3)
+			.classed('hide', d => !d.required)
 			.html('*')
 	}
 
 	if (editing) observer.observe(this.container.node(), obsvars)
 }
-Media.prototype.rmMedia = function () {
+Media.prototype.rmMedia = async function () {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const datum = this.container.datum()
 	const { level, type, name } = datum
 
-	if (activity !== 'preview') {
+	if (page.activity !== 'preview') {
 		if (type === 'img') {
 			const deleted = JSON.parse(window.sessionStorage.getItem('deleted')) || []
 			deleted.push(datum.src)
@@ -146,11 +157,14 @@ Media.prototype.rmMedia = function () {
 		if (input) input.disabled = false
 	}
 	if (editing) {
-		if (!publicpage) partialSave(level)
-		else updateStatus()
+		if (page.type === 'private') partialSave(level)
+		else await updateStatus()
 	}
 }
 Media.prototype.move = function (dir) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	let sourceTop = this.container.node().offsetTop
 	let sourceHeight = this.container.node().offsetHeight
 	let sourceMargin = parseInt(getComputedStyle(this.container.node()).marginBottom)
@@ -160,7 +174,7 @@ Media.prototype.move = function (dir) {
 	const metaLayout = d3.select('.meta-layout')
 	const openInset = metaLayout.selectAll('.inset').filter(function () { return this.style.maxHeight.length })
 	// CHECK WHETHER AN INSET IS OPEN
-	new Promise(resolve => {
+	return new Promise(resolve => {
 		if (openInset.node() && this.container.classed('meta-container')) {
 			openInset.node().style.maxHeight = null
 			window.setTimeout(_ => {
@@ -170,7 +184,7 @@ Media.prototype.move = function (dir) {
 				resolve()
 			}, 500)
 		} else resolve()
-	}).then(_ => {
+	}).then(async _ => {
 		if (dir.includes('up')) { // THE SOURCE IS MOVING UP AND THE TARGET IS MOVING DOWN
 			const target = this.container.node().previousSibling
 			if (target) {
@@ -179,16 +193,20 @@ Media.prototype.move = function (dir) {
 				const moveTarget = sourceHeight + sourceMargin
 				this.container.classed('move', true).style('transform', `translateY(${moveSource}px)`)
 				d3.select(target).classed('move', true).style('transform', `translateY(${moveTarget}px)`)
-				window.setTimeout(_ => {
-					this.container.classed('move', false).style('transform', null)
-					d3.select(target).classed('move', false).style('transform', null)
-					this.container.node().parentNode.insertBefore(this.container.node(), target)
+				
+				await new Promise(resolve => {
+					window.setTimeout(async _ => {
+						this.container.classed('move', false).style('transform', null)
+						d3.select(target).classed('move', false).style('transform', null)
+						this.container.node().parentNode.insertBefore(this.container.node(), target)
 
-					if (editing) {
-						if (!publicpage) partialSave(level)
-						else updateStatus()
-					}
-				}, 1000)
+						if (editing) {
+							if (page.type === 'private') partialSave(level)
+							else await updateStatus()
+						}
+						resolve()
+					}, 1000)
+				})
 				if (openInset.node()) window.setTimeout(_ => openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`, 1250)
 
 				// TO DO: CONTINUE HERE
@@ -208,27 +226,37 @@ Media.prototype.move = function (dir) {
 				const moveTarget = sourceTop - targetTop
 				this.container.classed('move', true).style('transform', `translateY(${moveSource}px)`)
 				d3.select(target).classed('move', true).style('transform', `translateY(${moveTarget}px)`)
-				window.setTimeout(_ => {
-					this.container.classed('move', false).style('transform', null)
-					d3.select(target).classed('move', false).style('transform', null)
-					this.container.node().parentNode.insertBefore(target, this.container.node())
-					if (openInset.node()) openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`
+				
+				await new Promise(resolve => {
+					window.setTimeout(async _ => {
+						this.container.classed('move', false).style('transform', null)
+						d3.select(target).classed('move', false).style('transform', null)
+						this.container.node().parentNode.insertBefore(target, this.container.node())
+						if (openInset.node()) openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`
 
-					if (editing) {
-						if (!publicpage) partialSave(level)
-						else updateStatus()
-					}
-				}, 1000)
+						if (editing) {
+							if (page.type === 'private') partialSave(level)
+							else await updateStatus()
+						}
+						resolve()
+					}, 1000)
+				})
 				if (openInset.node()) window.setTimeout(_ => openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`, 1250)
 			}
 		}
-	})
+		return false
+	}).catch(err => console.log(err))
 }
 // META PROTOTYPE
 const Meta = function (kwargs) {
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+
 	const { type, maxheight, focus } = kwargs
 	// Meta IS AN INSTANCE OF Media WITH AN INSET
 	Media.call(this, kwargs)
+	
+	this.metafields = JSON.parse(d3.select('data[name="pad"]').node()?.value)?.metafields || {}
+
 	// TWEAK THE Media INSTANCES
 	this.container.classed('media-container', false).classed('meta-container', true)
 		.each(d => d.level = 'meta')
@@ -254,11 +282,16 @@ Meta.prototype.expand = function (kwargs) {
 	}, timeout)
 }
 const Taglist = function (kwargs) {
-	const { type, list, imglink, altimglink, datum, opencode, lang } = kwargs || {}
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
+	const { type, list, imglink, altimglink, datum, lang } = kwargs || {}
 	const { tags, constraint } = datum || {}
 	// Taglist IS AN INSTANCE OF Meta
 	Meta.call(this, kwargs)
 	const meta = this
+
+	const opencode = meta.metafields.find(d => d.label === name)?.opencode || false
 
 	const initialvalues = meta.media.attr('data-placeholder', vocabulary['missing tag'][language])
 	if (imglink) {
@@ -344,7 +377,7 @@ const Taglist = function (kwargs) {
 					})
 				}
 				if (editing) {
-					if (!publicpage) switchButtons(lang)
+					if (page.type === 'private') switchButtons(lang)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			}
@@ -421,6 +454,9 @@ const Taglist = function (kwargs) {
 Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
 Taglist.prototype.constructor = Taglist
 Taglist.prototype.recode = async function (opencode = true) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const meta = this
 	const filter = meta.filter.select(`input#filter-${meta.id}`)
 	const val = filter.node().value.trim().toLowerCase()
@@ -463,7 +499,7 @@ Taglist.prototype.recode = async function (opencode = true) {
 						d3.select(this.parentNode).classed('disabled', false)
 					})
 				}
-			}).on('change', function () {
+			}).on('change', async function () {
 				const checked = meta.inset.selectAll(`.inset-${meta.type} .tag input:checked`).data()
 
 				if (meta.constraint && checked.length >= meta.constraint) {
@@ -499,12 +535,12 @@ Taglist.prototype.recode = async function (opencode = true) {
 					}
 
 					if (editing) {
-						if (!publicpage) {
+						if (page.type === 'private') {
 							switchButtons(meta.lang)
 							partialSave('media')
 						} else {
 							window.sessionStorage.setItem('changed-content', true)
-							updateStatus()
+							await updateStatus()
 						}
 					}
 				}
@@ -542,10 +578,9 @@ Taglist.prototype.recode = async function (opencode = true) {
 		})
 	}
 	if (editing) {
-		if (!publicpage) switchButtons(meta.lang)
+		if (page.type === 'private') switchButtons(meta.lang)
 		else window.sessionStorage.setItem('changed-content', true)
 	}
-
 }
 
 function addLoader (sel) {
@@ -558,9 +593,10 @@ function addLoader (sel) {
 }
 
 function populateSection (data, lang = 'en', section) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	// MEDIA
 	return new Promise(async resolve => {
-		if (data.type === 'title' && publicpage) addTitle({ data, lang, section })
+		if (data.type === 'title' && page.type === 'public') addTitle({ data, lang, section })
 		if (data.type === 'img') addImg({ data, lang, section })
 		if (data.type === 'mosaic') addMosaic({ data, lang, section })
 		if (data.type === 'video') addVideo({ data, lang, section })
@@ -583,6 +619,9 @@ function populateSection (data, lang = 'en', section) {
 }
 // THIS CAN PROBABLY BE MOVED TO upload.js
 function uploadImg (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const { form, lang, sibling, container, focus } = kwargs
 	fetch(form.action, {
 		method: form.method,
@@ -604,7 +643,7 @@ function uploadImg (kwargs) {
 		setTimeout(_ => notification.remove(), 4000)
 
 		if (editing) {
-			if (!publicpage) switchButtons(lang)
+			if (page.type === 'private') switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)
 		}
 		return json
@@ -612,6 +651,9 @@ function uploadImg (kwargs) {
 	.catch(err => { if (err) throw err })
 }
 function deleteImg (sel, lang = 'en') {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const deleted = JSON.parse(window.sessionStorage.getItem('deleted')) || []
 	const container = sel.findAncestor('media-container')
 	const datum = container.datum()
@@ -638,7 +680,7 @@ function deleteImg (sel, lang = 'en') {
 		else mosaic.classed('x2', items.size() < 3)
 
 		if (editing) {
-			if (!publicpage) switchButtons(lang)
+			if (page.type === 'private') switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)
 		}
 	}
@@ -664,6 +706,9 @@ function addImgs (kwargs) {
 	}
 }
 function uploadVideo (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	editing = page.activity === 'edit'
+
 	const { form, lang, sibling, container, focus } = kwargs
 	const ellipsis = d3.select('.media-layout').addElems('div', 'lds-ellipsis')
 	ellipsis.addElem('div')
@@ -691,7 +736,7 @@ function uploadVideo (kwargs) {
 		}
 		setTimeout(_ => notification.remove(), 4000)
 		if (editing) {
-			if (!publicpage) switchButtons(lang)
+			if (page.type === 'private') switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)
 		}
 		return json
@@ -710,26 +755,38 @@ function uploadVideo (kwargs) {
 	.catch(err => { if (err) throw err })
 }
 function autofillTitle () {
-	if (head.select('.title').node()?.innerText.trim().length === 0) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
+	const main = d3.select('#pad')
+
+	if (main.select('.head .title').node()?.innerText.trim().length === 0) {
 		const firstText = main.select('.layout:not(.description-layout) .media-txt').node()
-		if (firstText && firstText.innerText) head.select('.title').html(_ => {
-			const cutoff = 75
-			if (firstText.innerText.split('\n').length > 1) {
-				if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
-				else return `${firstText.innerText.split('\n')[0]}`
-			} else {
-				if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
-				else return `${firstText.innerText}`
-			}
-			if (editing) {
-				if (!publicpage) partialSave('title')
-				else updateStatus()
-			}
-		})
+		if (firstText && firstText.innerText) {
+			main.select('.head .title')
+			.html(async _ => {
+				const cutoff = 75
+				if (firstText.innerText.split('\n').length > 1) {
+					if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
+					else return `${firstText.innerText.split('\n')[0]}`
+				} else {
+					if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
+					else return `${firstText.innerText}`
+				}
+				if (editing) {
+					if (page.type === 'private') partialSave('title')
+					else await updateStatus()
+				}
+			})
+		}
 	}
 }
 
 function addSection (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	return new Promise(async resolve => {
 		const { data, lang, sibling, repeated, focus } = kwargs || {}
 		let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
@@ -738,17 +795,18 @@ function addSection (kwargs) {
 		if (!structure) structure = []
 		if (!items) items = []
 
-		if (editing && templated && (!items.length || repeated)) items = JSON.parse(JSON.stringify(structure))
+		if (editing && pad.type === 'templated' && (!items.length || repeated)) {
+			items = JSON.parse(JSON.stringify(structure))
+		}
 
 		d3.selectAll('.media-layout').classed('focus', false)
 
 		const section = d3.select('main#pad div.inner div.body')
-			// .insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
-			.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
+			// .insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${page.activity}`)
+			.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
 			.classed('repeat', repeat || false)
-			.classed('focus', focus && !templated)
+			.classed('focus', focus && pad.type === 'blank')
 			.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
-		// .on('click.focus', function () { d3.select(this).classed('focus', editing && !templated) })
 		.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
 		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
@@ -756,8 +814,9 @@ function addSection (kwargs) {
 
 		// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
 		if (
-			((editing || activity === 'preview') && section_id !== 0 && !templated)
-			|| (templated
+			((editing || page.activity === 'preview') && section_id !== 0 && pad.type === 'blank')
+			|| (
+				pad.type === 'templated'
 				&& repeat
 				&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
 					.filter((d, i) => i === 0).node() !== section.node()
@@ -773,14 +832,14 @@ function addSection (kwargs) {
 				d.fn()
 
 				if (editing) {
-					if (!publicpage) switchButtons(lang)
+					if (page.type === 'private') switchButtons(lang)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			}).on('mouseup', _ => d3.event.stopPropagation())
 				.addElems('i', 'material-icons google-translate-attr')
 				.html(d => d.label)
 
-			function rmSection () {
+			async function rmSection () {
 				// FOR META INPUT
 				section.selectAll('.media-container, .meta-container').data()
 				.forEach(d => {
@@ -797,20 +856,20 @@ function addSection (kwargs) {
 					.select('.repeat-container').classed('hide', false)
 
 				if (editing) {
-					if (!publicpage) partialSave('media')
-					else updateStatus()
+					if (page.type === 'private') partialSave('media')
+					else await updateStatus()
 				}
 			}
 		}
 
 		const header = section.addElems('div', 'section-header', d => {
-			if (templated && d.title?.length === 0) return []
+			if (pad.type === 'templated' && d.title?.length === 0) return []
 			else if (!editing && d.title?.length === 0) return []
 			else return [d]
 		}).addElems('h1')
 			.attrs({
 				'data-placeholder': d => vocabulary['section header'][language],
-				'contenteditable': editing && !templated ? true : null
+				'contenteditable': editing && pad.type === 'blank' ? true : null
 			}).html(d => d.title)
 		.on('keydown', function () {
 			const evt = d3.event
@@ -818,14 +877,14 @@ function addSection (kwargs) {
 				evt.preventDefault()
 				this.blur()
 			}
-		}).on('blur', _ => {
+		}).on('blur', async _ => {
 			if (editing) {
-				if (!publicpage) partialSave('media')
-				else updateStatus()
+				if (page.type === 'private') partialSave('media')
+				else await updateStatus()
 			}
 		})
 
-		if (templated && lead) {
+		if (pad.type === 'templated' && lead) {
 			const medialead = new Media({
 				parent: section.node(),
 				type: 'lead',
@@ -837,10 +896,10 @@ function addSection (kwargs) {
 
 			medialead.media.attrs({
 				'data-placeholder': d => vocabulary['lead paragraph'][language],
-				'contenteditable': editing && !templated ? true : null
+				'contenteditable': editing && pad.type === 'blank' ? true : null
 			}).html(d => d.lead)
 		}
-		if (editing && templated && repeat) {
+		if (editing && pad.type === 'templated' && repeat) {
 			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
 			d3.selectAll('.layout.repeat').filter(d => d.group === group)
 				.select('.repeat-container').classed('hide', true)
@@ -867,8 +926,8 @@ function addSection (kwargs) {
 				d3.select(new_section).classed('animate-in', true)
 
 				if (editing) {
-					if (!publicpage) partialSave('media')
-					else updateStatus()
+					if (page.type === 'private') partialSave('media')
+					else await updateStatus()
 				}
 
 			}).addElems('div').attrs({
@@ -889,6 +948,8 @@ function addSection (kwargs) {
 }
 
 function addTitle (kwargs) {
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, txt, instruction, constraint, required } = data || {}
 	if (!level) level = 'media'
@@ -932,6 +993,10 @@ function addTitle (kwargs) {
 	if (focus) media.media.node().focus()
 }
 function addImg (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
 	let { id, level, type, name, src, textalign, scale, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -976,7 +1041,7 @@ function addImg (kwargs) {
 			else if (d.key === 'h-align') media.media.style('text-align', c => c.textalign = d.value)
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).addElems('i', 'material-icons google-translate-attr')
@@ -1013,7 +1078,7 @@ function addImg (kwargs) {
 	// THE PAD IS BASED ON A TEMPLATE: templated
 	// THE PAD IS IN create, preview MODE
 	// THERE IS NO IMAGE YET
-	if (templated && (activity !== 'view' || (activity === 'preview' && !src))) {
+	if (pad.type === 'templated' && (page.activity === 'edit' || (page.activity === 'preview' && !src))) {
 		let form_id = media.id//uuidv4()
 
 		if (media.input) {
@@ -1026,7 +1091,7 @@ function addImg (kwargs) {
 				'name': 'img',
 				'accept': 'image/*, .pdf',
 				'multiple': true,
-				'disabled': activity === 'preview' ? true : null
+				'disabled': page.activity === 'preview' ? true : null
 			}).on('change', function () {
 				// REMOVE IMAGES HERE
 				uploadImg({ form: this.form, lang, container: media.container, focus: true })
@@ -1036,7 +1101,7 @@ function addImg (kwargs) {
 				.classed('highlight', src ? true : false)
 				.attr('for', `input-media-img-${form_id}`)
 			.on('mousedown', function () {
-				d3.select(this).classed('highlight', activity !== 'preview')
+				d3.select(this).classed('highlight', page.activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
 			}).addElems('i', 'material-icons google-translate-attr')
@@ -1045,6 +1110,10 @@ function addImg (kwargs) {
 	}
 }
 function addMosaic (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
 	let { id, level, type, name, srcs, verticalalign, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -1088,7 +1157,7 @@ function addMosaic (kwargs) {
 			}
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).addElems('i', 'material-icons google-translate-attr')
@@ -1134,7 +1203,7 @@ function addMosaic (kwargs) {
 					}
 
 					if (editing) {
-						if (!publicpage) switchButtons(lang)
+						if (page.type === 'private') switchButtons(lang)
 						else window.sessionStorage.setItem('changed-content', true)
 					}
 				}).addElems('i', 'material-icons google-translate-attr')
@@ -1163,7 +1232,7 @@ function addMosaic (kwargs) {
 	// THE PAD IS BASED ON A TEMPLATE: templated
 	// THE PAD IS IN create, preview MODE
 	// THERE IS NO IMAGE YET
-	if (templated && (activity !== 'view' || (activity === 'preview' && !src))) {
+	if (pad.type === 'templated' && (page.activity === 'edit' || (page.activity === 'preview' && !src))) {
 		let form_id = media.id//uuidv4()
 
 		if (media.input) {
@@ -1176,7 +1245,7 @@ function addMosaic (kwargs) {
 				'name': 'img',
 				'accept': 'image/*, .pdf',
 				'multiple': true,
-				'disabled': activity === 'preview' ? true : null
+				'disabled': page.activity === 'preview' ? true : null
 			}).on('change', function () {
 				// REMOVE IMAGES HERE
 				uploadImg({ form: this.form, lang, container: media.container, focus: true })
@@ -1186,7 +1255,7 @@ function addMosaic (kwargs) {
 				.classed('highlight', srcs?.length ? true : false)
 				.attr('for', `input-media-img-${form_id}`)
 			.on('mousedown', function () {
-				d3.select(this).classed('highlight', activity !== 'preview')
+				d3.select(this).classed('highlight', page.activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
 			}).addElems('i', 'material-icons google-translate-attr')
@@ -1195,6 +1264,10 @@ function addMosaic (kwargs) {
 	}
 }
 function addVideo (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
 	let { id, level, type, name, src, textalign, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -1238,7 +1311,7 @@ function addVideo (kwargs) {
 			}
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).addElems('i', 'material-icons google-translate-attr')
@@ -1253,7 +1326,7 @@ function addVideo (kwargs) {
 			.node().load()
 	}
 
-	if (templated && (activity !== 'view' || (activity === 'preview' && !src))) {
+	if (pad.type === 'templated' && (page.activity !== 'view' || (page.activity === 'preview' && !src))) {
 		let form_id = media.id//uuidv4()
 
 		if (media.input) {
@@ -1265,7 +1338,7 @@ function addVideo (kwargs) {
 				'id': `input-media-video-${form_id}`,
 				'name': 'video',
 				'accept': 'video/mp4,video/x-m4v,video/webm,video/*',
-				'disabled': activity !== 'preview' ? true : null
+				'disabled': page.activity !== 'preview' ? true : null
 			}).on('change', function () {
 				uploadVideo({ form: this.form, lang, container: media.container })
 				form.select('label').classed('highlight', this.value?.length)
@@ -1274,7 +1347,7 @@ function addVideo (kwargs) {
 				.classed('highlight', src ? true : false)
 				.attrs({ 'for': `input-media-video-${form_id}`, 'title': 'Add a video.' })
 			.on('mousedown', function () {
-				d3.select(this).classed('highlight', activity !== 'preview')
+				d3.select(this).classed('highlight', page.activity !== 'preview')
 			}).on('mouseup', function () {
 				d3.select(this).classed('highlight', false)
 			}).addElems('i', 'material-icons google-translate-attr')
@@ -1283,6 +1356,9 @@ function addVideo (kwargs) {
 	}
 }
 function addDrawing (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, shapes, size, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -1348,7 +1424,7 @@ function addDrawing (kwargs) {
 					} else return false
 
 					if (editing) {
-						if (!publicpage) switchButtons(lang)
+						if (page.type === 'private') switchButtons(lang)
 						else window.sessionStorage.setItem('changed-content', true)
 					}
 				}).on('input', function (b) {
@@ -1436,17 +1512,17 @@ function addDrawing (kwargs) {
 			})
 		});
 		['mouseup', 'ontouchend'].forEach(evt_handler => {
-			window.addEventListener(evt_handler, evt => {
+			window.addEventListener(evt_handler, async evt => {
 				if (canvas.node()['__drawing__']) {
 					canvas.node()['__drawing__'] = false
 
 					if (editing) {
-						if (!publicpage) {
+						if (page.type === 'private') {
 							switchButtons(lang)
 							partialSave('media')
 						} else {
 							window.sessionStorage.setItem('changed-content', true)
-							updateStatus()
+							await updateStatus()
 						}
 					}
 				}
@@ -1460,6 +1536,10 @@ function addDrawing (kwargs) {
 	if (focus) media.media.node().focus()
 }
 function addTxt (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, is_excerpt, required } = data || {}
 	if (!level) level = 'media'
@@ -1473,7 +1553,7 @@ function addTxt (kwargs) {
 	if (!is_excerpt) is_excerpt = false
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && txt?.toString().trim().length === 0) return null
+	if (!editing && page.activity !== 'preview' && txt?.toString().trim().length === 0) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
@@ -1502,7 +1582,7 @@ function addTxt (kwargs) {
 				{ key: 'h-align', label: 'format_align_center', value: 'center' },
 				{ key: 'h-align', label: 'format_align_right', value: 'right' },
 			]
-			if (!locked_excerpt || is_excerpt) para_styles.push({ key: 'excerpt', label: 'bookmark', value: is_excerpt })
+			if (!pad.template.locked_excerpt || is_excerpt) para_styles.push({ key: 'excerpt', label: 'bookmark', value: is_excerpt })
 			if (constraint) para_styles.push({ key: 'constraint', label: 'block', value: constraint })
 			return [font_styles, para_styles]
 		}).addElems('button', 'opt', d => d)
@@ -1540,7 +1620,7 @@ function addTxt (kwargs) {
 				sel.findAncestor('opt-group').selectAll('.opt')
 					.classed('active', function () { return this == sel.node() })
 				media.media.style('text-align', c => c.textalign = d.value).node().focus()
-			} else if (d.key === 'excerpt' && !locked_excerpt) {
+			} else if (d.key === 'excerpt' && !pad.template.locked_excerpt) {
 				// NEED TO DETERMINE WHETHER THE template HAS A SET EXCERPT
 				const datum = media.container.datum()
 				if (!sel.classed('active')) {
@@ -1554,7 +1634,7 @@ function addTxt (kwargs) {
 			}
 
 			if (editing && d.key !== 'constraint') {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		})
@@ -1594,6 +1674,9 @@ function addTxt (kwargs) {
 	if (focus) media.media.node().focus()
 }
 function addEmbed (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, textalign, html, src, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -1604,7 +1687,7 @@ function addEmbed (kwargs) {
 	if (!src) src = null
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && (html?.trim().length === 0 || src?.length === 0)) return null
+	if (!editing && page.activity !== 'preview' && (html?.trim().length === 0 || src?.length === 0)) return null
 
 	if (level === 'meta' && name) {
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
@@ -1636,7 +1719,7 @@ function addEmbed (kwargs) {
 				media.media.style('text-align', c => c.textalign = d.value)
 			}
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).addElems('i', 'material-icons google-translate-attr')
@@ -1679,7 +1762,7 @@ function addEmbed (kwargs) {
 		sel.classed('padded', !this.children.length)
 
 		if (editing) {
-			if (!publicpage) switchButtons(lang)
+			if (page.type === 'private') switchButtons(lang)
 			else window.sessionStorage.setItem('changed-content', true)
 		}
 	})
@@ -1743,6 +1826,10 @@ function addEmbed (kwargs) {
 	if (focus) media.media.node().focus()
 }
 function addChecklist (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -1764,9 +1851,9 @@ function addChecklist (kwargs) {
 	}
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && options?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && options?.length === 0) return null
 
-	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && pad.type === 'blank' && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	if (level === 'meta' && name) {
@@ -1813,7 +1900,7 @@ function addChecklist (kwargs) {
 			}).node().focus()
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).addElems('i', 'material-icons google-translate-attr')
@@ -1834,7 +1921,7 @@ function addChecklist (kwargs) {
 		})
 	list.call(addItem)
 
-	if (editing && !templated && level !== 'meta') {
+	if (editing && pad.type === 'blank' && level !== 'meta') {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
@@ -1861,19 +1948,19 @@ function addChecklist (kwargs) {
 				'checked': d => d.checked || null,
 				'disabled': editing ? null : true
 			})
-		.on('change', function (d) {
+		.on('change', async function (d) {
 			d.checked = this.checked
 			const sel = d3.select(this)
 			sel.findAncestor('opt').select('.checkbox label i')
 				.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
 
 			if (editing) {
-				if (!publicpage) {
+				if (page.type === 'private') {
 					switchButtons(lang)
 					partialSave('media')
 				} else {
 					window.sessionStorage.setItem('changed-content', true)
-					updateStatus()
+					await updateStatus()
 				}
 			}
 		})
@@ -1887,7 +1974,7 @@ function addChecklist (kwargs) {
 			.attrs({
 				'for': d => `check-item-${checklist_id}-${d.id}`,
 				'data-placeholder': vocabulary['new checklist item'][language],
-				'contenteditable': activity !== 'view' && !templated ? true : null
+				'contenteditable': page.activity !== 'view' && pad.type === 'blank' ? true : null
 			})
 		.on('keydown', function () {
 			const evt = d3.event
@@ -1906,12 +1993,12 @@ function addChecklist (kwargs) {
 			d3.select(this).findAncestor('opt').classed('valid', d => d.name?.length)
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).html(d => d.name)
 
-		if (editing && !templated && level !== 'meta') {
+		if (editing && pad.type === 'blank' && level !== 'meta') {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
@@ -1920,7 +2007,7 @@ function addChecklist (kwargs) {
 				list.call(addItem)
 
 				if (editing) {
-					if (!publicpage) switchButtons(lang)
+					if (page.type === 'private') switchButtons(lang)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			})
@@ -1931,6 +2018,10 @@ function addChecklist (kwargs) {
 	}
 }
 function addRadiolist (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!level) level = 'media'
@@ -1952,9 +2043,9 @@ function addRadiolist (kwargs) {
 	}
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && options?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && options?.length === 0) return null
 
-	if (editing && !options.find(d => !d.name) && !templated && level !== 'meta') options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && pad.type === 'blank' && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	if (level === 'meta' && name) {
@@ -2001,7 +2092,7 @@ function addRadiolist (kwargs) {
 			}).node().focus()
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).addElems('i', 'material-icons google-translate-attr')
@@ -2022,7 +2113,7 @@ function addRadiolist (kwargs) {
 		})
 	list.call(addItem)
 
-	if (editing && !templated && level !== 'meta') {
+	if (editing && pad.type === 'blank' && level !== 'meta') {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
@@ -2049,17 +2140,17 @@ function addRadiolist (kwargs) {
 				'checked': d => d.checked || null,
 				'disabled': editing ? null : true
 			})
-		.on('change', _ => {
+		.on('change', async _ => {
 			opts.selectAll('input[type=radio]').each(function (d) { d.checked = this.checked })
 			opts.selectAll('label i').html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
 
 			if (editing) {
-				if (!publicpage) {
+				if (page.type === 'private') {
 					switchButtons(lang)
 					partialSave('media')
 				} else {
 					window.sessionStorage.setItem('changed-content', true)
-					updateStatus()
+					await updateStatus()
 				}
 			}
 		})
@@ -2073,7 +2164,7 @@ function addRadiolist (kwargs) {
 			.attrs({
 				'for': d => `radio-item-${radiolist_id}-${d.id}`,
 				'data-placeholder': vocabulary['new checklist item'][language],
-				'contenteditable': activity !== 'view' && !templated ? true : null // TO DO: FIGURE OUT WHY HERE WE USE activity !== 'view' RATHER THAN editing
+				'contenteditable': page.activity !== 'view' && pad.type === 'blank' ? true : null // TO DO: FIGURE OUT WHY HERE WE USE activity !== 'view' RATHER THAN editing
 			})
 		.on('keydown', function () {
 			const evt = d3.event
@@ -2092,12 +2183,12 @@ function addRadiolist (kwargs) {
 			d3.select(this).findAncestor('opt').classed('valid', d => d.name?.length)
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).html(d => d.name)
 
-		if (editing && !templated && level !== 'meta') {
+		if (editing && pad.type === 'blank' && level !== 'meta') {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
@@ -2106,7 +2197,7 @@ function addRadiolist (kwargs) {
 				list.call(addItem)
 
 				if (editing) {
-					if (!publicpage) switchButtons(lang)
+					if (page.type === 'private') switchButtons(lang)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			})
@@ -2118,9 +2209,12 @@ function addRadiolist (kwargs) {
 }
 // META ELEMENTS
 function addLocations (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	// TO DO: INCLUDE CONSTRAINT
 	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, centerpoints, caption, constraint, required } = data || {}
+	let { id, level, type, name, instruction, default_centerpoint, centerpoints, caption, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'location'
 	if (!name) name = null
@@ -2128,7 +2222,7 @@ function addLocations (kwargs) {
 	let dragging = false
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && centerpoints?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && centerpoints?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
@@ -2175,7 +2269,7 @@ function addLocations (kwargs) {
 			if (markers.length === 0) meta.container.select('figcaption').html(c => c.caption = null)
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		})
@@ -2197,7 +2291,7 @@ function addLocations (kwargs) {
 				meta.container.each(c => c.centerpoints[i] = { lat: latlng.lat, lng: latlng.lng })
 
 				if (editing) {
-					if (!publicpage) switchButtons(lang)
+					if (page.type === 'private') switchButtons(lang)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
 			})
@@ -2209,8 +2303,11 @@ function addLocations (kwargs) {
 
 	const map = L.map('map')
 
-	if (markers.length) map.fitBounds(group.getBounds())
-	else map.setView([centerpoint?.lat, centerpoint?.lng], (centerpoint?.lat === 0 && centerpoint?.lng === 0) ? 2 : 13)
+	if (markers.length) { map.fitBounds(group.getBounds()); }
+	else {
+		if (!default_centerpoint) default_centerpoint = JSON.parse(d3.select('data[name="location"]').node().value).lnglat || null
+		map.setView([default_centerpoint?.lat, default_centerpoint?.lng], (default_centerpoint?.lat === 0 && default_centerpoint?.lng === 0) ? 2 : 13)
+	}
 	if (markers.length === 1) map.setZoom(10)
 
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2276,7 +2373,7 @@ function addLocations (kwargs) {
 					.html(c => c.caption = `<strong>${d.formatted}</strong> found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`)
 
 					if (editing) {
-						if (!publicpage) switchButtons(lang)
+						if (page.type === 'private') switchButtons(lang)
 						else window.sessionStorage.setItem('changed-content', true)
 					}
 				}
@@ -2330,7 +2427,7 @@ function addLocations (kwargs) {
 								meta.container.each(d => d.centerpoints[i] = { lat: latlng.lat, lng: latlng.lng })
 
 								if (editing) {
-									if (!publicpage) switchButtons(lang)
+									if (page.type === 'private') switchButtons(lang)
 									else window.sessionStorage.setItem('changed-content', true)
 								}
 							})
@@ -2343,7 +2440,7 @@ function addLocations (kwargs) {
 					meta.container.each(d => d.centerpoints.push({ lat: latlng.lat, lng: latlng.lng }))
 
 					if (editing) {
-						if (!publicpage) switchButtons(lang)
+						if (page.type === 'private') switchButtons(lang)
 						else window.sessionStorage.setItem('changed-content', true)
 					}
 				}
@@ -2352,6 +2449,9 @@ function addLocations (kwargs) {
 	}
 }
 function addIndexes (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	return new Promise(async resolve => {
 		const { data, lang, section, sibling, focus } = kwargs || {}
 		let { id, level, type, name, instruction, tags, constraint, required } = data || {}
@@ -2363,20 +2463,23 @@ function addIndexes (kwargs) {
 		tags.sort((a, b) => a.key - b.key)
 		required = required ?? false
 
-		if (!editing && activity !== 'preview' && tags?.length === 0) return null
+		if (!editing && page.activity !== 'preview' && tags?.length === 0) return null
 
 		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 		if (input) input.disabled = true
 
-		const list = await new Taglist({
+		const taglist = await POST('/apis/fetch/tags', { type: name, language })
+		taglist.sort((a, b) => a.key - b.key)
+
+		const list = new Taglist({
 			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
 			sibling,
 			type,
 			datum: { id, level, type, name, tags, instruction, constraint, required },
-			opencode: metafields.find(d => d.label === name)?.opencode || false,
 			focus: focus || false,
 			lang,
-			list: taglists[name].sort((a, b) => a.key - b.key),
+			list: taglist, 
+			// list: taglists[name].sort((a, b) => a.key - b.key),
 			imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
 			altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
 		})
@@ -2401,6 +2504,9 @@ function addIndexes (kwargs) {
 	})
 }
 async function addTags (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
 	if (!level) level = 'meta'
@@ -2409,20 +2515,23 @@ async function addTags (kwargs) {
 	if (!tags) tags = []
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && tags?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && tags?.length === 0) return null
 
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
 
-	const list = await new Taglist({
+	const taglist = await POST('/apis/fetch/tags', { type: name })
+	taglist.sort((a, b) => a.name?.localeCompare(b.name))
+
+	const list = new Taglist({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
 		sibling,
 		type,
 		datum: { id, level, type, name, tags, instruction, constraint, required },
-		opencode: metafields.find(d => d.label === name)?.opencode || false,
 		focus: focus || false,
 		lang,
-		list: taglists[name]
+		// list: taglists[name]
+		list: taglist
 	})
 
 	if (list.opts) {
@@ -2443,6 +2552,9 @@ async function addTags (kwargs) {
 	}
 }
 async function addAttachment (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+
 	const { data, lang, section, sibling, container, focus } = kwargs || {}
 	let { id, level, type, name, srcs, instruction, constraint, required } = data || {}
 	if (!level) level = 'meta'
@@ -2451,9 +2563,8 @@ async function addAttachment (kwargs) {
 	if (!srcs) srcs = []
 	required = required ?? false
 
-	if (!editing && activity !== 'preview' && srcs?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && srcs?.length === 0) return null
 
-	console.log(name)
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
 
@@ -2468,7 +2579,7 @@ async function addAttachment (kwargs) {
 	})
 
 	if (meta.opts) {
-		meta.opts.addElems('div', 'opt-group', [vocabulary['click to add attachment'][language]]) // TO DO: UPDATE TEXT
+		meta.opts.addElems('div', 'opt-group', [vocabulary['click to add attachment'][language]]) 
 			.addElems('label')
 			.html(d => d)
 
@@ -2485,7 +2596,7 @@ async function addAttachment (kwargs) {
 
 	// THIS IS THE MODAL FOR INPUT
 	if (focus) {
-		const uris = metafields.find(d => d.label === name)?.uris || [ { uri: undefined } ]
+		const uris = meta.metafields.find(d => d.label === name)?.uris || [ { uri: undefined } ]
 
 		const item = {}
 		item.headline = vocabulary['add external resource'][language]
@@ -2533,7 +2644,7 @@ async function addAttachment (kwargs) {
 		})
 		var result = await renderPromiseModal(item)
 		if (result === null) {
-			if (!srcs.length) meta.rmMedia()
+			if (!srcs.length) await meta.rmMedia()
 		} else {
 			d3.selectAll('div.screen').classed('hide', true)
 			const screen = d3.select('div.screen')
@@ -2561,7 +2672,7 @@ async function addAttachment (kwargs) {
 		img.src = `/imgs/icons/i-${d.name}.svg`
 	})
 
-	if (activity !== 'view' || (activity === 'preview' && srcs.length === 0)) { // preview ACTIVITY SHOULD BE DEPRECATED
+	if (page.activity === 'edit' || (page.activity === 'preview' && srcs.length === 0)) { // preview ACTIVITY SHOULD BE DEPRECATED
 		// THIS IS TO RELOAD A CONSENT FORM
 		if (meta.input) {
 			meta.input.addElems('label')
@@ -2576,7 +2687,11 @@ async function addAttachment (kwargs) {
 }
 
 // GROUPS
-function addGroup (kwargs) {
+async function addGroup (kwargs) {
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
 	const { data, lang, section, sibling, focus } = kwargs || {}
 	let { id, level, type, name, structure, items, values, instruction, repeat } = data || {} // NOT SURE WHY values IS USED HERE, IT IS NOT USED ANYWHERE ELSE
 	if (!level) level = 'media'
@@ -2586,9 +2701,9 @@ function addGroup (kwargs) {
 	if (!items) items = []
 	if (!values) values = []
 
-	if (!editing && activity !== 'preview' && items?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && items?.length === 0) return null
 
-	if (editing && !items.length && templated) items.push(JSON.parse(JSON.stringify(structure)))
+	if (editing && !items.length && pad.type === 'templated') items.push(JSON.parse(JSON.stringify(structure)))
 
 	const media = new Media({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
@@ -2599,7 +2714,7 @@ function addGroup (kwargs) {
 		lang
 	})
 
-	if (templated && repeat) {
+	if (pad.type === 'templated' && repeat) {
 		if (editing) {
 			media.media.addElems('div', 'add-opt')
 				.on('click', function (d) {
@@ -2638,14 +2753,14 @@ function addGroup (kwargs) {
 			d.fn(d3.select(this).findAncestor('media-group-items'))
 
 			if (editing) {
-				if (!publicpage) switchButtons(lang)
+				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
 		}).on('mouseup', _ => d3.event.stopPropagation())
 			.addElems('i', 'material-icons google-translate-attr')
 			.html(d => d.label)
 
-		function rmGroup (sel) { // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS
+		async function rmGroup (sel) { // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS
 			// FOR META INPUT
 			sel.selectAll('.media-container, .meta-container').data()
 			.forEach(d => {
@@ -2660,8 +2775,8 @@ function addGroup (kwargs) {
 			if (media.container.selectAll('.media-group-items').size() < repeat) media.media.classed('hide', false)
 
 			if (editing) {
-				if (!publicpage) partialSave('media')
-				else updateStatus()
+				if (page.type === 'private') partialSave('media')
+				else await updateStatus()
 			}
 		}
 	}
@@ -2669,6 +2784,8 @@ function addGroup (kwargs) {
 
 // SAVING BUTTON
 function switchButtons (lang = 'en') {
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+
 	if (!mediaSize) var mediaSize = getMediaSize()
 	window.sessionStorage.setItem('changed-content', true)
 	// PROVIDE FEEDBACK: UNSAVED CHANGES
@@ -2686,4 +2803,311 @@ function switchButtons (lang = 'en') {
 			if (editing) partialSave()
 		}).html(vocabulary['save changes'][language])
 	}
+}
+
+
+let idx = 0
+// FOR SLIDESHOW VIEW
+function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
+	const { data, lang, sibling, focus } = kwargs || {}
+	let { title, lead, structure, items, repeat, group, instruction } = data || {}
+	if (!title) title = ''
+	if (!lead) lead = ''
+	if (!structure) structure = []
+	if (!items) items = []
+
+	if (editing && pad.type === 'templated' && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure))
+
+	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+	// const section_id = uuidv4()
+
+	return new Promise(resolve => {
+		d3.selectAll('.media-layout').classed('focus', false)
+
+		const section = d3.select('main#pad div.inner div.body')
+			.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
+			.classed('repeat', repeat || false)
+			.datum({ type: 'section', title, lead, structure, items, repeat, group })
+		.on('click.focus', function () { d3.select(this).classed('focus', editing && pad.type === 'blank') })
+
+		// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
+		if (title || lead) {
+			const titleslide = section.addElems('div', 'title-slide')
+
+			if (title) {
+				titleslide.addElems('div', 'section-header')
+					.addElems('h1')
+					.html(d => d.title)
+			}
+
+			if (lead) {
+				const medialead = new Media({
+					parent: titleslide.node(),
+					type: 'lead',
+					datum: { type: 'lead', lead: lead },
+					lang: lang
+				})
+				// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+				if (medialead.opts) medialead.opts.remove()
+
+				medialead.media.html(d => d.lead)
+			}
+		}
+		// END SLIDE
+
+		if (repeat) {
+			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
+			d3.selectAll('.layout.repeat').filter(d => d.group === group)
+				.select('.repeat-container').classed('hide', true)
+
+			const mediarepeat = new Media({
+				parent: section.node(),
+				type: 'repeat',
+				datum: { type: 'repeat', instruction: instruction },
+				lang: lang
+			})
+			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+			if (mediarepeat.opts) mediarepeat.opts.remove()
+			if (mediarepeat.instruction) mediarepeat.instruction.remove()
+
+			mediarepeat.media.addElems('button')
+			.on('click.repeat', function () {
+				const sel = d3.select(this)
+
+				const promises = []
+				section.findAncestor('pad').selectAll('.body>*')
+				.each(function (d, i) {
+					promises.push(new Promise(async resolve => {
+						if (this === section.node()) {
+							kwargs.sibling = `section:nth-child(${i + 2})`
+							kwargs.focus = true
+
+							const new_section = await addSlides(kwargs) // THIS TOO IS DIFFERENT TO addSection
+							initSlideshow()
+						}
+						resolve()
+					}))
+				})
+
+				Promise.all(promises)
+				.then(_ => switchslide(idx))
+			}).addElems('div').attrs({
+				'data-placeholder': vocabulary['repeat section'][language]
+			}).html(d => d.instruction)
+		}
+
+		const displaypromises = []
+		if (items.length) {
+			section.each(function (d) {
+				d.items.forEach(c => displaypromises.push(new Promise(async resolvedisplay => {
+					await populateSection(c, lang, this)
+					resolvedisplay()
+				})))
+			})
+		}
+		Promise.all(displaypromises).then(_ => resolve(section))
+
+	}).then(section => {
+		return section.node()
+	})
+}
+function initSlideshow () {
+	const main = d3.select('#pad')
+	// TRANSFORM THE MAIN #pad INTO A SLIDESHOW
+	// d3.select('.document').classed('slideshow', true)
+		// .select('#pad').classed('slideshow', true)
+	// TRANSFORM ALL .media-container TO .slide
+	const slidewidth = main.node().clientWidth || main.node().offsetWidth || main.node().scrollWidth
+	const inner = main.select('.inner')
+
+	if (d3.selectAll('.slide').size() === 0) {
+		inner.select('.meta-info').classed('slide', true)
+		inner.select('.head').classed('slide', true)
+	}
+
+	d3.selectAll('.title-slide, .description-layout:not(.hide), .media-layout > .media-container:not(.lead-container):not(.hide), .media-layout > .meta-container:not(.hide)')
+		.classed('slide', true)
+
+	// PREVENT GROUPS FROM ANIMATING IN
+	d3.selectAll('.media-group-items').classed('animate-in', false)
+
+	// ADD BUTTON TO SAVE AND GENERATE PDF AT THE END
+	const status_slide = d3.select('.meta-status')
+	if (status_slide.node()) {
+		const last_slide = d3.selectAll('.slide').last().node()
+		last_slide.parentNode.append(status_slide.node())
+		status_slide.classed('slide', true)
+	}
+
+	const slides = d3.selectAll('.slide')
+
+	// ADD BUTTONS TO NAVIGATE
+	inner.addElems('button', 'slide-nav', [{ label: '&lsaquo;', class: 'prev' }, { label: '&rsaquo;', class: 'next' }])
+	.each(function (d) { d3.select(this).classed(d.class, true) })
+		.classed('hide', d => {
+			const sel = d3.select(this)
+			let focus_id = 0
+			d3.selectAll('.slide').each(function (c, i) {
+				if (d3.select(this).classed('slide-in-view')) focus_id = i
+			})
+			return (d.class === 'prev' && focus_id === 0) || (d.class === 'next' && focus_id === d3.sels)
+		}).html(d => d.label)
+	.on('click', d => {
+		if (d.class === 'prev') switchslide(idx - 1)
+		else if (d.class === 'next') switchslide(idx + 1)
+	}).on('mouseup', function () {
+		d3.event.stopPropagation()
+		// LOSE FOCUS OF THIS BUTTON TO RE-ENABLE KEYBOARD NAVIGATION
+		this.blur()
+	})
+
+	// IF THE SLIDE IN VIEW IS HIDDEN (e.g. AFTER CLICKING ON A REPEAT SECTION BUTTON), THEN AUTO MOVE TO THE NEXT SLIDE
+	// const slideinview = d3.select('.slide.slide-in-view')
+	// if (slideinview.classed('hide')) {
+	// 	let focus_id = 0
+	// 	slides.each(function (c, i) {
+	// 		if (d3.select(this).classed('slide-in-view')) focus_id = i
+	// 	})
+	// 	if (focus_id < slides.size() - 1) switchslide(focus_id - 1, focus_id + 1)
+	// 	else switchslide(focus_id + 1, focus_id - 1)
+	// 	console.log(slideinview)
+	// 	slideinview.classed('slide slide-next slide-prev slide-in-view', false)
+	// }
+
+	// ADD DOTS
+	footer.select('.dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
+	.classed('highlight', (d, i) => i === 0)
+	.on('click', (d, i) => { switchslide(i) })
+
+	inner.on('scroll', function () {
+		if (this.scrollLeft % slidewidth === 0) {
+			idx = Math.round(this.scrollLeft / slidewidth)
+			d3.selectAll('.dot').classed('highlight', (d, i) => i === idx)
+			d3.selectAll('button.slide-nav').classed('hide', d => {
+				return (d.class === 'prev' && idx === 0) || (d.class === 'next' && idx === slides.size() - 1)
+			})
+		}
+	})
+}
+function switchslide (i) {
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+
+	const main = d3.select('#pad')
+	const slidewidth = main.node().clientWidth || main.node().offsetWidth || main.node().scrollWidth
+	main.select('.inner').node().scrollTo({
+		top: 0,
+		left: i * slidewidth,
+		behavior: 'smooth'
+	})
+
+	if (editing) {
+		main.selectAll('.focus').classed('focus', false)
+		const containers = main.selectAll('.media-container, .meta-container')
+		containers.selectAll('.inset')
+			.style('max-height', null)
+		d3.selectAll('.media-input-group label, .meta-input-group label').classed('highlight', false)
+	}
+
+	return idx = i
+}
+async function renderPad () {
+	// POPULATE THE PAGE
+	const object = d3.select('data[name="object"]').node()?.value
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const { display, activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = activity === 'edit'
+
+	if (!pad.id && editing && pad.type === 'templated') {
+		// GET TEMPLATE DATA
+		const { sections } = await POST('/load/template', { id: pad.template.id })
+		
+		// APPEND locked_excerpt TO THE pad data DOM ELEMENT
+		const locked_excerpt = pad.type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt))
+		if (locked_excerpt) {
+			pad.template.locked_excerpt = locked_excerpt
+			d3.select('data[name="pad"]').attr('value', JSON.stringify(pad))
+		}
+
+		if (sections) {
+			const title_instruction = sections.map(d => d.items || d.structure).flat()
+				.find(d => d.type === 'title')?.instruction
+			if (title_instruction) d3.select('#pad .head .title').attr('data-placeholder', title_instruction)
+
+			sections.forEach(async d => {
+				if (display === 'slideshow') {
+					await addSlides({ data: d, lang: language })
+				} else {
+					await addSection({ data: d, lang: language })
+				}
+			})
+		}
+		if (display === 'slideshow') {
+			initSlideshow()
+		}
+		// CLEAR CHANGES
+		window.sessionStorage.removeItem('changed-content')
+	} else if (pad.id && ['edit', 'view'].includes(activity)) {
+		if (object !== 'review' && !pad.is_review) {
+			if (pad.title) { d3.select('#pad .head .title').html(pad.title); }
+		}
+		// GET THE DATA
+		const { sections, is_review } = await POST('/load/pad', { id: pad.id })
+
+		// APPEND locked_excerpt TO THE pad data DOM ELEMENT
+		const locked_excerpt = pad.type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt))
+		if (locked_excerpt) {
+			pad.template.locked_excerpt = locked_excerpt
+			d3.select('data[name="pad"]').attr('value', JSON.stringify(pad))
+		}
+
+		if (sections) {
+			sections.forEach(async d => {
+				if (!editing) d.items = d.items.filter(c => {
+					if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
+					else return c.has_content
+				}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
+				if (display === 'slideshow') {
+					await addSlides({ data: d, lang: language }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
+				} else {
+					await addSection({ data: d, lang: language })
+				}
+			})
+		} else { // THIS IS AN AUTO GENERATED PAD
+			if (pad.type === 'templated') { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
+				// const template = <%- JSON.stringify(locals.display_template || {}) %>;
+				// var locked_excerpt = (pad.type === 'templated' && template.sections?.some(d => d.structure.some(c => c.is_excerpt)))
+
+				// GET TEMPLATE DATA
+				const { sections } = await POST('/load/template', { id: pad.template.id })
+				
+				// APPEND locked_excerpt TO THE pad data DOM ELEMENT
+				const locked_excerpt = pad.type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt))
+				if (locked_excerpt) {
+					pad.template.locked_excerpt = locked_excerpt
+					d3.select('data[name="pad"]').attr('value', JSON.stringify(pad))
+				}
+
+				if (sections) {
+					const title_instruction = sections.map(d => d.items || d.structure).flat()
+						.find(d => d.type === 'title')?.instruction
+					if (title_instruction) d3.select('#pad .head .title').attr('data-placeholder', title_instruction)
+
+					sections.forEach(async d => {
+						if (display === 'slideshow') {
+							await addSlides({ data: d, lang: language })
+						} else {
+							await addSection({ data: d, lang: language })
+						}
+					})
+				}
+			}
+		}
+		if (display === 'slideshow') { initSlideshow(); }
+		// CLEAR CHANGES
+		window.sessionStorage.removeItem('changed-content')
+	} else (async _ => await addSection({ lang: language }))()
 }

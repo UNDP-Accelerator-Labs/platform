@@ -3,7 +3,8 @@ const { parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = req => {
 	const { uuid, rights, collaborators } = req.session || {}
-	const { object, space } = req.params || {}
+	let { object, space } = req.params || {}
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM LOAD/ APIS/ DOWNLOAD)
 	let { search, status, contributors, countries, templates, mobilizations, page, nodes } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
 	// MAKE SURE WE HAVE PAGINATION INFO
@@ -38,7 +39,7 @@ module.exports = req => {
 				OR t.version <@ (SELECT version FROM templates WHERE id IN ($1:csv) AND (status >= t.status OR (owner IN ($2:csv) OR $3 > 2))))
 			`, [ safeArr(nodes, -1), collaborators_ids, rights ])
 		}
-		else if (space === 'all') f_space = DB.pgp.as.format(`(t.status >= 2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
+		else if (space === 'published') f_space = DB.pgp.as.format(`(t.status >= 2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ collaborators_ids ])
 
 		engagementtypes.forEach(e => {
 			if (space === `${e}s`) f_space = DB.pgp.as.format(`t.id IN (SELECT docid FROM engagement WHERE user = $1 AND doctype = 'template' AND type = $2 AND t.id NOT IN (SELECT template FROM review_templates))`, [ uuid, e ])

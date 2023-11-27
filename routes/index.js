@@ -252,6 +252,11 @@ exports.render.import = require('./import/').render
 exports.dispatch.mobilize = require('./mobilize/')
 
 /* =============================================================== */
+/* =========================== BROWSE ============================ */
+/* =============================================================== */
+exports.dispatch.load = require('./load/')
+
+/* =============================================================== */
 /* ========================== IMPORT ============================= */
 /* =============================================================== */
 // TO DO: CHANGE THIS TO THE GENERAL save/ MECHANISM
@@ -978,12 +983,12 @@ exports.api.datasources = (req, res) => {
 
 exports.notfound = async(req, res) => {
 	const metadata = await helpers.datastructures.pagemetadata({ req, res })
-	res.render('error-404', metadata)
+	res.render('errors/e404', metadata)
 }
 
 exports.error = async(req, res) => {
 	const metadata = await helpers.datastructures.pagemetadata({ req, res })
-	res.render('error-500', metadata)
+	res.render('errors/e500', metadata)
 }
 
 String.prototype.simplify = function () {

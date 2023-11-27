@@ -269,6 +269,8 @@ app.get(
   routes.render.explorationInfo,
 );
 
+app.post('/load/:object', routes.check.login, routes.dispatch.load);
+
 app.post('/check/:object', routes.check.login, routes.process.check);
 
 app
@@ -348,8 +350,6 @@ app.get('/decline/:object', routes.check.login, routes.process.decline);
 
 // app.post('/intercept/:method', routes.process.intercept)
 
-app.post('/call/api', routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
-
 app.post(
   '/upload/img',
   upload.array('img'),
@@ -389,6 +389,8 @@ app
   .get(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis)
   .post(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis);
 
+
+app.post('/call/api', routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
 app.get('/api/skills', routes.check.login, routes.api.skills); // TO DO: THIS SHOULD BE DEPRECATED
 app.get('/api/methods', routes.check.login, routes.api.methods); // TO DO: THIS SHOULD BE DEPRECATED
 app

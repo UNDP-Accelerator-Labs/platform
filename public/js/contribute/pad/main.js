@@ -11,10 +11,35 @@
 // https://www.programmersought.com/article/5248306768/
 // https://stackoverflow.com/questions/926916/how-to-get-the-bodys-content-of-an-iframe-in-javascript
 
-window.addEventListener('load', function () {
+window.addEventListener('load', async function () {
+	if (!mediaSize) var mediaSize = getMediaSize()
+	await renderPad();
+
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
+	const main = d3.select('#pad')
+	const head = main.select('.head')
+	const body = main.select('.body')
+	const foot = main.select('.foot')
+	const footer = d3.select('footer')
+
+	// ADD THE INTERACTION BEHAVIOR FOR THE TITLE INPUT
+	head.select('.title')
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
+		}
+	})
+
+	initWidgetInteractions()
+
 	// SET UP THE ADJACENT DISPLAYS IF RELEVANT
 	// FOR SOURCE
 	if (d3.select('div#source').node()) {
+		// TO DO: CHANGE LOGIC HERE TO USE A data DOM ELEMENT
+		// PROBABLY BEST IN pad
 		const { id, object, review } = d3.select('div#source').node().dataset
 
 		loadHTML(`../view/pad?id=${id}${(object === "review" || review === 'true') ? '&anonymize=true' : '' }`, '#pad', '#source')
@@ -51,16 +76,26 @@ window.addEventListener('load', function () {
 		d3.select('div.display-reviews a').attr('href', `?${queryparams.toString()}`)
 	}
 
-	// CONFIGURE THE PUBLISHING OPTIONS
-	d3.select('button#submit-for-review')
-	.on('click', function () {
-		selectReviewLanguage(this);
-	})
+	// SET UP OPTIONS FOR sm DISPLAYS
+	if (['xs', 'sm'].includes(mediaSize)) {
+		d3.select('button.input-toolbox')
+		.on('touchend, click', function () {
+			d3.select(this).toggleClass('highlight')
+			d3.select('.media-input-group').node().focus()
+		})
+		d3.select('.media-input-group').on('touchend', function () { this.focus() })
+		.on('focus', function () {
+			if (this.style.maxHeight) this.style.maxHeight = null
+			else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
+		}).on('blur', function () {
+			 this.style.maxHeight = null
+			 d3.select('button.input-toolbox').classed('highlight', false)
+		})
+	}
 
 	d3.select('button.publish')
 	.on('click', function () { 
 		this.focus();
-		saveAndSubmit(this);
 	}).on('focus.dropdown', function () {
 		const form = d3.select(this.form)
 		const dropdown = form.select('.dropdown')
@@ -80,7 +115,6 @@ window.addEventListener('load', function () {
 		partialSave();
 	})
 })
-
 
 function loadHTML(url, source, target) {
 	const iframe = document.createElement('iframe')
@@ -113,11 +147,49 @@ function loadHTML(url, source, target) {
 	document.body.appendChild(iframe)
 }
 
-function saveAndSubmit (node) {
-	partialSave()
-	node.form.submit()
-	// TO DO: PROVIDE FEEDBACK
-	// CREATE A THANK YOU PAGE
-	// AND MAYBE AUTO CREATE A PUBLIC PINBOARD FOR OPEN MOBILIZATIONS
-	// SO THAT AUTHORS CAN GO CHECK THEM OUT
+async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /browse/index.js
+	// TO DO: THIS STILL NEEDS SOME WORK
+	const { name, value } = node
+	const { id } = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
+	const target_opts = await POST('/load/templates', { space: 'reviews' })
+	.then(results => {
+		return results.data.map(d => {
+			return { 
+				label: d.name, 
+				value: d.language, 
+				count: d.count, 
+				disabled: { 
+					value: d.disabled, 
+					label: vocabulary['missing reviewers'][language] 
+				}, 
+				type: 'radio', 
+				required: true 
+			}
+		})
+	})
+
+	const formdata = { action: '/request/review',  method: 'POST' }
+	const message = vocabulary['select review language'][language]
+	const opts = []
+	opts.push({ 
+		node: 'select', 
+		name: 'language', 
+		label: vocabulary['select language'][language]['singular'], 
+		options: target_opts 
+	})
+	opts.push({ 
+		node: 'input', 
+		type: 'hidden', 
+		name: 'id', 
+		value: id 
+	})
+	opts.push({ 
+		node: 'button', 
+		type: 'submit', 
+		name: name, 
+		value: value, 
+		label: vocabulary['submit for review'][language] 
+	})
+	const new_constraint = await renderFormModal({ message, formdata, opts })
 }

@@ -240,3 +240,31 @@ function limitLength(text, limit) {
 	}
 	return `${arr.slice(0, limit - 1).join('')}…`;
 }
+const dateOptions = {
+	weekday: undefined,
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+};
+
+function getContent (feature) { // THIS IS TO LOAD THE PADS, TEMPLATES, ETC
+	const object = d3.select('data[name="object"]').node().value
+	const space = d3.select('data[name="space"]').node()?.value
+	
+	const url = new URL(window.location)
+	const queryparams = new URLSearchParams(url.search)
+	
+	const reqbody = {};
+	if (space) reqbody['space'] = space
+	if (feature) { reqbody['feature'] = feature; }
+	queryparams.forEach((value, key) => {
+		if (!reqbody[key]) { reqbody[key] = value; }
+		else {
+			if (!Array.isArray(reqbody[key])) { reqbody[key] = [reqbody[key]]; }
+			reqbody[key].push(value);
+		}
+	});
+
+	// TO DO: ADD VAR keep_page
+	return POST(`/load/${object}`, reqbody)
+}

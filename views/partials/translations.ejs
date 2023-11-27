@@ -2552,21 +2552,21 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 			"pt": "Copie o link"
 		},
 		"follow up": { // USED
-			"en": transitive => {
-				if (transitive) return "Follow up"
-				else return "Follow up of"
+			"en": {
+				"verb": "Follow up",
+				"preposition": "Follow up of"
 			},
-			"fr": transitive => {
-				if (transitive) return "Donner suite"
-				else return "Suite de"
+			"fr": {
+				"verb": "Donner suite",
+				"preposition": "Suite de"
 			},
-			"es": transitive => {
-				if (transitive) return "Dar seguimiento"
-				else return "Seguimiento de"
+			"es": {
+				"verb": "Dar seguimiento",
+				"preposition": "Seguimiento de"
 			},
-			"pt": transitive => {
-				if (transitive) return "Acompanhamento"
-				else return "Acompanhamento de"
+			"pt": {
+				"verb": "Acompanhamento",
+				"preposition": "Acompanhamento de"
 			}
 		},
 		"expansion": { // USED
@@ -3096,53 +3096,33 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 			"pt": "Selecione " + modules.find(d => d.type === 'reviews')?.reviewers + " revisores (opcional)"
 		},
 		"review": { // USED
-			"en": (verb, plural, preposition) => {
-				if (verb) return "Review"
-				else {
-					if (plural) {
-						if (preposition) return "Reviews of"
-						else return "Reviews"
-					} else {
-						if (preposition) return "Review of"
-						else return "Review"
-					}
-				}
+			"en": {
+				"verb": "Review",
+				"preposition": "Review of",
+				"singular": "Review",
+				"plural": "Reviews"
+				// "Reviews of"
 			},
-			"fr": (verb, plural, preposition) => {
-				if (verb) return "Relire"
-				else {
-					if (plural) {
-						if (preposition) return "Relectures de"
-						else return "Relectures"
-					} else {
-						if (preposition) return "Relecture de"
-						else return "Relecture"
-					}
-				}
+			"fr": {
+				"verb": "Relire",
+				"preposition": "Relecture de",
+				"singular": "Relecture",
+				"plural": "Relectures"
+				// "Relectures de"
 			},
-			"es": (verb, plural, preposition) => {
-				if (verb) return "Esa reseña"
-				else {
-					if (plural) {
-						if (preposition) return "Reseñas de"
-						else return "Reseñas"
-					} else {
-						if (preposition) return "Revisión de"
-						else return "Revisión"
-					}
-				}
+			"es": {
+				"verb": "Esa reseña",
+				"preposition": "Revisión de",
+				"singular": "Revisión",
+				"plural": "Reseñas"
+				// "Reseñas de"
 			},
-			"pt": (verb, plural, preposition) => {
-				if (verb) return "Rever"
-				else {
-					if (plural) {
-						if (preposition) return "Comentários de"
-						else return "Comentários"
-					} else {
-						if (preposition) return "Comente"
-						else return "Comente de"
-					}
-				}
+			"pt": {
+				"verb": "Rever",
+				"preposition": "Comente",
+				"singular": "Comente de",
+				"plural": "Comentários"
+				// "Comentários de"
 			}
 		},
 		"my reviews" : { // USED
@@ -3347,7 +3327,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 		},
 		"close": { // USED
 			"en": "Close",
-			"fr": "Ferme",
+			"fr": "Fermer",
 			"es": "Cerrar",
 			"pt": "Fechar"
 		},

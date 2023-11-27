@@ -144,6 +144,6 @@ module.exports = (req, res) => {
 			const metadata = await datastructures.pagemetadata({ connection: t, req })
 			return Object.assign(metadata, { cohort, templates, sourceinfo, data })
 		})
-	}).then(data => res.status(200).render('mobilization-new', data)) // CHANGE THE NAME TO MOBILIZATION
+	}).then(data => res.status(200).render('contribute/mobilization/', data)) // CHANGE THE NAME TO MOBILIZATION
 	.catch(err => console.log(err))
 }

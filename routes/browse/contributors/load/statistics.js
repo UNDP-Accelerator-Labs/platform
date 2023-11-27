@@ -5,10 +5,12 @@ const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
-	const { req } = kwargs || {}
+	let { req, filters } = kwargs || {}
 	const { uuid, rights, collaborators } = req.session || {}
+	
 	// GET FILTERS
-	const [ f_space, page, full_filters ] = await filter(req) // THERE IS ONLY ONE f_space FOR NOW SO WE DO NOT NEED TO USE IT. IT IS ONLY HERE FOR CONSISTENCY
+	if (!filters?.length) filters = await filter(req)
+	const [ f_space, page, full_filters ] = filters // THERE IS ONLY ONE f_space FOR NOW SO WE DO NOT NEED TO USE IT. IT IS ONLY HERE FOR CONSISTENCY
 	
 	return conn.task(t => {
 		const batch = []

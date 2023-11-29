@@ -1,3 +1,6 @@
+const { own_app_url, app_title_short, app_title, translations } = include('config/');
+const { email: sendEmail } = include('routes/helpers/')
+
 exports.deviceInfo = (req) => {
   const userAgent = req.headers["user-agent"];
   const useragent = require("useragent");
@@ -11,8 +14,6 @@ exports.deviceInfo = (req) => {
 
 
 exports.sendDeviceCode = (_kwarg) => {
-  const { email: sendEmail } = include('routes/helpers/')
-
   const { conn, uuid, email, name, req } = _kwarg;
   let code = 0;
   while (`${code}`.length < 6) {
@@ -20,8 +21,8 @@ exports.sendDeviceCode = (_kwarg) => {
     code %= 1000000;
   }
 
-  const { protocol, hostname: host } = req || {}
-  const resetLink = `${protocol}://${host}/forget-password`;
+  const resetLink = `${own_app_url}forget-password`;
+  const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 
   // Save the code to the database
   return conn
@@ -35,12 +36,12 @@ exports.sendDeviceCode = (_kwarg) => {
       // TO DO: translate
       await sendEmail({
         to: email,
-        subject: `Device Confirmation`,
+        subject: `[${platformName}] Device Confirmation`,
         html: `
         <div>
           <p>Dear ${name},</p>
           <br/>
-          <p>We have noticed that you recently attempted to log in or update your account from a new device.
+          <p>We have noticed that you recently attempted to log in or update your <a href="${own_app_url}">${platformName}</a> account from a new device.
           To ensure the security of your account, we require your confirmation before adding this device to your list of trusted devices or update your record.</p>
           <p>Please confirm this device using the OTP (One Time Password) below:</p>
           <h3>${code}</h3>

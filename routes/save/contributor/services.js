@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { email: sendEmail, sessionupdate, removeSubdomain } = include("routes/helpers/");
-const { DB } = include("config/");
+const { DB, own_app_url, app_title, app_title_short, translations } = include("config/");
 
 exports.confirmEmail = async (_kwarg) => {
   const { uuid, email, name, old_email, req } = _kwarg;
@@ -15,20 +15,21 @@ exports.confirmEmail = async (_kwarg) => {
     { expiresIn: "1h", issuer: mainHost }
   );
 
-  const confirmationLink = `${protocol}://${host}/confirm-email/${token}`;
+  const confirmationLink = `${protocol}://${host}/confirm-email/${token}#`;
+  const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 
   // Send the email to the user
   // TO DO: translate
   return await sendEmail({
     to: email,
-    subject: `Email Address Confirmation`,
+    subject: `[${platformName}] Email Address Confirmation`,
     html: `
             <div>
               <p>Dear ${name},</p>
               <br/>
-              <p>We have noticed that you recently attempted to change your email address.</p>
-              <p>To confirm your new email address, please click on the link below:</p>
-              <a href="${confirmationLink}">Confirm Email Address</a>
+              <p>We have noticed that you recently attempted to change your email address on the <a href="${own_app_url}">${platformName}</a>.</p>
+              <p>To confirm your new email address, please click on the link below or confirm your email address:</p>
+              <a href="${confirmationLink}">${confirmationLink}</a>
               <br/>
               <p>This link expires in 1 hour. If you did not initiate this change, please ignore this email or contact our support team.</p>
               <br/>
@@ -97,14 +98,15 @@ exports.updateNewEmail = async (req, res, next) => {
           });
         })
         .then(async () => {
+          const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
           await sendEmail({
             to: old_email,
-            subject: `Email Address Update Notification`,
+            subject: `[${platformName}] Email Address Update Notification`,
             html: `
                     <div>
                       <p>Dear ${name},</p>
                       <br/>
-                      <p>We are writing to inform you that your email address has been updated.</p>
+                      <p>We are writing to inform you that your email address has been updated for the <a href="${own_app_url}">${platformName}</a>.</p>
                       <p>If you made this change, please disregard this notification.</p>
                       <p>However, if you did not authorize this change, please contact our support team immediately.</p>
                       <br/>

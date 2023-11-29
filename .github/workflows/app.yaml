@@ -14,9 +14,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 100
-          fetch-tags: true
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
 
       - name: Docker login
         uses: azure/docker-login@v1
@@ -44,9 +44,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 100
-          fetch-tags: true
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
 
       - name: Set env
         run: echo "IMAGE_TAG=$(make -s name)" >> $GITHUB_ENV
@@ -65,9 +65,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 100
-          fetch-tags: true
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
 
       - name: Set env
         run: echo "IMAGE_TAG=$(make -s name)" >> $GITHUB_ENV

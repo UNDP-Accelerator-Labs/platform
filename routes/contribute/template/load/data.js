@@ -7,7 +7,9 @@ module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	let { req, authorized } = kwargs || {}
 
-	const { id } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { id, source } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let workingID = id ?? source
+
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 
@@ -22,6 +24,7 @@ module.exports = async kwargs => {
 		// GET THE TEMPLATE DATA
 		return conn.oneOrNone(`
 			SELECT t.id, t.title, t.owner, t.description, t.sections, t.status, t.slideshow,
+			nlevel(t.version) > 1 AS copy,
 
 				CASE WHEN t.id IN (SELECT template FROM review_templates)
 					THEN TRUE
@@ -46,11 +49,19 @@ module.exports = async kwargs => {
 			) e ON e.docid = t.id
 
 			WHERE t.id = $3::INT
-		;`, [ engagement.cases || false, uuid, id ])
-		.then(async results => {
-			results.readCount = await pagestats.getReadCount(id, 'template');
-			const data = await join.users(results, [ language, 'owner' ])
-			return data;
+		;`, [ engagement.cases || false, uuid, workingID ])
+		.then(async result => {
+			if (result) {
+				if (!id) { // THIS IS IN CASE A TEMPLATE IS BEING COPIED
+					result.id = null
+					result.source = +source
+				}
+				result.copy = result.copy || ![null, undefined, 0].includes(source)
+
+				result.readCount = await pagestats.getReadCount(id, 'template');
+				const data = await join.users(result, [ language, 'owner' ])
+				return data;
+			} else return null
 		})
 	}
 }

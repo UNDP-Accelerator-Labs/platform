@@ -33,7 +33,9 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        'img-src': csp_links,
+        'img-src': csp_links.concat([
+          'blob:',
+        ]),
         'script-src': csp_links,
         'script-src-attr': [
           "'self'",

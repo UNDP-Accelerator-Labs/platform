@@ -28,7 +28,7 @@
 		<% } %>
 
 		<% if (Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
-			<p><%- vocabulary['filter'][language](false, true) %></p>
+			<p><%- vocabulary['filter'][language]['plural'] %></p>
 			<div class='filters-group'>
 				<div class='active-filters'>
 					<% for (let key in query) { %>

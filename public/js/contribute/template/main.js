@@ -1,22 +1,35 @@
-window.addEventListener('load', function () {
-	if (!mediaSize) var mediaSize = getMediaSize()	
+window.addEventListener('load', async function () {
+	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
 
-	initWidgetInteractions()
+	await renderTemplate ();
+	initWidgetInteractions(metafields);
 
-	// SET UP OPTIONS FOR sm DISPLAYS
-	if (mediaSize === 'xs') {
-		d3.select('button.input-toolbox')
-		.on('touchend, click', function () {
-			d3.select(this).toggleClass('highlight')
-			d3.select('.media-input-group').node().focus()
-		})
-		d3.select('.media-input-group').on('touchend', function () { this.focus() })
-		.on('focus', function () {
-			if (this.style.maxHeight) this.style.maxHeight = null
-			else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
-		}).on('blur', function () {
-			 this.style.maxHeight = null
-			 d3.select('button.input-toolbox').classed('highlight', false)
-		})
-	}
+	const main = d3.select('main')
+	const head = main.select('.head')
+
+	// ADD THE INTERACTION BEHAVIOR FOR THE TITLE INPUT
+	head.select('.title')
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
+		}
+	}).on('blur', async _ => await partialSave('title'))
+
+	// ADD THE INTERACTION BEHAVIOR FOR THE DESCRIPTION INPUT
+	d3.select('.description-layout .txt-container.lead')
+	.on('click', function () {
+		d3.select(this).classed('focus', true)
+	}).select('.media-txt')
+	.on('blur', async _ => await partialSave('description'))
+
+	// ADD THE INTERACTION BEHAVIOR FOR THE SAVE BUTTON ON sm DISLAYS
+	d3.select(`div.save.${mediaSize} form button`)
+	.on('click', async _ => await partialSave())
+
+	// ADD THE INTERACTION BEHAVRIOR FOR THE SLIDESHOW TOGGLE
+	d3.select('input#slideshow-status')
+	.on('change', async _ => await partialSave())
+	
 })

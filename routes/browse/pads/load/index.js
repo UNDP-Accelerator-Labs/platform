@@ -1,3 +1,4 @@
+exports.ids = require('./ids.js')
 exports.data = require('./data.js')
 exports.samples = require('./samples.js')
 exports.filters_menu = require('./filters_menu.js')

@@ -25,7 +25,7 @@ const observer = new MutationObserver(evt => {
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
 
 				if (page.activity === 'edit') {
-					if (page.type === 'private') partialSave('media')
+					if (page.type === 'private') await partialSave('media')
 					else await updateStatus()
 				}
 			}
@@ -110,12 +110,12 @@ const Media = function (kwargs) {
 		if (rights > 2) { // THIS NOW REQUIRES AN ASYNC CALL TO POST('/load/rights')
 			this.required.addElems('input')
 				.attrs({ 'id': requirement_id, 'type': 'checkbox', 'checked': d => d.required ? true : null })
-				.on('change', function (d) {
+				.on('change', async function (d) {
 					d.required = this.checked
 					d3.select(this.parentNode).select('label').classed('active', d.required)
 
 					if (editing) {
-						if (page.type === 'private') partialSave(d.level)
+						if (page.type === 'private') await partialSave(d.level)
 						else updateStatus()
 					}
 				})
@@ -157,7 +157,7 @@ Media.prototype.rmMedia = async function () {
 		if (input) input.disabled = false
 	}
 	if (editing) {
-		if (page.type === 'private') partialSave(level)
+		if (page.type === 'private') await partialSave(level)
 		else await updateStatus()
 	}
 }
@@ -201,7 +201,7 @@ Media.prototype.move = function (dir) {
 						this.container.node().parentNode.insertBefore(this.container.node(), target)
 
 						if (editing) {
-							if (page.type === 'private') partialSave(level)
+							if (page.type === 'private') await partialSave(level)
 							else await updateStatus()
 						}
 						resolve()
@@ -235,7 +235,7 @@ Media.prototype.move = function (dir) {
 						if (openInset.node()) openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`
 
 						if (editing) {
-							if (page.type === 'private') partialSave(level)
+							if (page.type === 'private') await partialSave(level)
 							else await updateStatus()
 						}
 						resolve()
@@ -537,7 +537,7 @@ Taglist.prototype.recode = async function (opencode = true) {
 					if (editing) {
 						if (page.type === 'private') {
 							switchButtons(meta.lang)
-							partialSave('media')
+							await partialSave('media')
 						} else {
 							window.sessionStorage.setItem('changed-content', true)
 							await updateStatus()
@@ -592,30 +592,26 @@ function addLoader (sel) {
 	return loader
 }
 
-function populateSection (data, lang = 'en', section) {
+async function populateSection (data, lang = 'en', section) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	// MEDIA
-	return new Promise(async resolve => {
-		if (data.type === 'title' && page.type === 'public') addTitle({ data, lang, section })
-		if (data.type === 'img') addImg({ data, lang, section })
-		if (data.type === 'mosaic') addMosaic({ data, lang, section })
-		if (data.type === 'video') addVideo({ data, lang, section })
-		if (data.type === 'drawing') addDrawing({ data, lang, section })
-		if (data.type === 'txt') addTxt({ data, lang, section })
-		if (data.type === 'embed') addEmbed({ data, lang, section })
-		if (data.type === 'checklist') addChecklist({ data, lang, section })
-		if (data.type === 'radiolist') addRadiolist({ data, lang, section })
-		// META
-		if (data.type === 'location') addLocations({ data, lang, section })
-		if (data.type === 'index') await addIndexes({ data, lang, section })
-		if (data.type === 'tag') addTags({ data, lang, section })
-		if (data.type === 'attachment') addAttachment({ data, lang, section })
-		// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
-		// GROUP
-		if (data.type === 'group') addGroup({ data, lang, section })
-
-		resolve()
-	})
+	if (data.type === 'title' && page.type === 'public') addTitle({ data, lang, section })
+	if (data.type === 'img') addImg({ data, lang, section })
+	if (data.type === 'mosaic') addMosaic({ data, lang, section })
+	if (data.type === 'video') addVideo({ data, lang, section })
+	if (data.type === 'drawing') addDrawing({ data, lang, section })
+	if (data.type === 'txt') addTxt({ data, lang, section })
+	if (data.type === 'embed') addEmbed({ data, lang, section })
+	if (data.type === 'checklist') addChecklist({ data, lang, section })
+	if (data.type === 'radiolist') addRadiolist({ data, lang, section })
+	// META
+	if (data.type === 'location') addLocations({ data, lang, section })
+	if (data.type === 'index') await addIndexes({ data, lang, section })
+	if (data.type === 'tag') await addTags({ data, lang, section })
+	if (data.type === 'attachment') await addAttachment({ data, lang, section })
+	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+	// GROUP
+	if (data.type === 'group') addGroup({ data, lang, section })
 }
 // THIS CAN PROBABLY BE MOVED TO upload.js
 function uploadImg (kwargs) {
@@ -774,7 +770,7 @@ function autofillTitle () {
 					else return `${firstText.innerText}`
 				}
 				if (editing) {
-					if (page.type === 'private') partialSave('title')
+					if (page.type === 'private') await partialSave('title')
 					else await updateStatus()
 				}
 			})
@@ -782,169 +778,176 @@ function autofillTitle () {
 	}
 }
 
-function addSection (kwargs) {
+async function addSection (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 
-	return new Promise(async resolve => {
-		const { data, lang, sibling, repeated, focus } = kwargs || {}
-		let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
-		if (!title) title = ''
-		if (!lead) lead = ''
-		if (!structure) structure = []
-		if (!items) items = []
+	const { data, lang, sibling, repeated, focus } = kwargs || {}
+	let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
+	if (!title) title = ''
+	if (!lead) lead = ''
+	if (!structure) structure = []
+	if (!items) items = []
 
-		if (editing && pad.type === 'templated' && (!items.length || repeated)) {
-			items = JSON.parse(JSON.stringify(structure))
-		}
+	if (editing && pad.type === 'templated' && (!items.length || repeated)) {
+		items = JSON.parse(JSON.stringify(structure))
+	}
 
-		d3.selectAll('.media-layout').classed('focus', false)
+	d3.selectAll('.media-layout').classed('focus', false)
 
-		const section = d3.select('main#pad div.inner div.body')
-			// .insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${page.activity}`)
-			.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
-			.classed('repeat', repeat || false)
-			.classed('focus', focus && pad.type === 'blank')
-			.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
-		.on('click.focus', function () { d3.select(this).classed('focus', editing) })
+	const section = d3.select('main#pad div.inner div.body')
+		// .insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${page.activity}`)
+		.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
+		.classed('repeat', repeat || false)
+		.classed('focus', focus && pad.type === 'blank')
+		.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
+	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
-		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
-		const section_id = [].indexOf.call(d3.selectAll('section.media-layout').nodes(), section.node())
+	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+	const section_id = [].indexOf.call(d3.selectAll('section.media-layout').nodes(), section.node())
 
-		// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
-		if (
-			((editing || page.activity === 'preview') && section_id !== 0 && pad.type === 'blank')
-			|| (
-				pad.type === 'templated'
-				&& repeat
-				&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
-					.filter((d, i) => i === 0).node() !== section.node()
-			)
-		) {
-			const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
-			placement.addElems('div', 'opt', [
-				// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') },
-				{ label: 'close', value: 'delete', fn: _ => rmSection() },
-				// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
-			]).on('click', d => {
-				d3.event.stopPropagation()
-				d.fn()
+	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
+	if (
+		((editing || page.activity === 'preview') && section_id !== 0 && pad.type === 'blank')
+		|| (
+			pad.type === 'templated'
+			&& repeat
+			&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
+				.filter((d, i) => i === 0).node() !== section.node()
+		)
+	) {
+		const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
+		placement.addElems('div', 'opt', [
+			// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') },
+			{ label: 'close', value: 'delete', fn: _ => rmSection() },
+			// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+		]).on('click', d => {
+			d3.event.stopPropagation()
+			d.fn()
 
-				if (editing) {
-					if (page.type === 'private') switchButtons(lang)
-					else window.sessionStorage.setItem('changed-content', true)
-				}
-			}).on('mouseup', _ => d3.event.stopPropagation())
-				.addElems('i', 'material-icons google-translate-attr')
-				.html(d => d.label)
-
-			async function rmSection () {
-				// FOR META INPUT
-				section.selectAll('.media-container, .meta-container').data()
-				.forEach(d => {
-					if (d.name) {
-						const input = d3.select(`#input-meta-${d.name}`).node()
-						if (input) input.disabled = false
-					}
-				})
-
-				section.remove()
-				// MAKE SURE THE OPTION TO REPEAT IS DISPLAYED
-				const section_group = d3.selectAll('.layout.repeat').filter(d => d.group === group)
-				section_group.filter((d, i) => i === section_group.size() - 1)
-					.select('.repeat-container').classed('hide', false)
-
-				if (editing) {
-					if (page.type === 'private') partialSave('media')
-					else await updateStatus()
-				}
-			}
-		}
-
-		const header = section.addElems('div', 'section-header', d => {
-			if (pad.type === 'templated' && d.title?.length === 0) return []
-			else if (!editing && d.title?.length === 0) return []
-			else return [d]
-		}).addElems('h1')
-			.attrs({
-				'data-placeholder': d => vocabulary['section header'][language],
-				'contenteditable': editing && pad.type === 'blank' ? true : null
-			}).html(d => d.title)
-		.on('keydown', function () {
-			const evt = d3.event
-			if (evt.code === 'Enter' || evt.keyCode === 13) {
-				evt.preventDefault()
-				this.blur()
-			}
-		}).on('blur', async _ => {
 			if (editing) {
-				if (page.type === 'private') partialSave('media')
+				if (page.type === 'private') switchButtons(lang)
+				else window.sessionStorage.setItem('changed-content', true)
+			}
+		}).on('mouseup', _ => d3.event.stopPropagation())
+			.addElems('i', 'material-icons google-translate-attr')
+			.html(d => d.label)
+
+		async function rmSection () {
+			// FOR META INPUT
+			section.selectAll('.media-container, .meta-container').data()
+			.forEach(d => {
+				if (d.name) {
+					const input = d3.select(`#input-meta-${d.name}`).node()
+					if (input) input.disabled = false
+				}
+			})
+
+			section.remove()
+			// MAKE SURE THE OPTION TO REPEAT IS DISPLAYED
+			const section_group = d3.selectAll('.layout.repeat').filter(d => d.group === group)
+			section_group.filter((d, i) => i === section_group.size() - 1)
+				.select('.repeat-container').classed('hide', false)
+
+			if (editing) {
+				if (page.type === 'private') await partialSave('media')
 				else await updateStatus()
 			}
-		})
-
-		if (pad.type === 'templated' && lead) {
-			const medialead = new Media({
-				parent: section.node(),
-				type: 'lead',
-				datum: { type: 'lead', level: 'media', lead: lead },
-				lang: lang
-			})
-			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-			if (medialead.opts) medialead.opts.remove()
-
-			medialead.media.attrs({
-				'data-placeholder': d => vocabulary['lead paragraph'][language],
-				'contenteditable': editing && pad.type === 'blank' ? true : null
-			}).html(d => d.lead)
 		}
-		if (editing && pad.type === 'templated' && repeat) {
-			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
-			d3.selectAll('.layout.repeat').filter(d => d.group === group)
-				.select('.repeat-container').classed('hide', true)
+	}
 
-			const mediarepeat = new Media({
-				parent: section.node(),
-				type: 'repeat',
-				datum: { type: 'repeat', level: 'media', instruction: instruction },
-				lang: lang
-			})
-			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-			if (mediarepeat.opts) mediarepeat.opts.remove()
-			if (mediarepeat.instruction) mediarepeat.instruction.remove()
-
-			mediarepeat.media.addElems('button')
-			.on('click', async function () {
-				const sel = d3.select(this)
-
-				kwargs.sibling = section.node().nextSibling
-				kwargs.repeated = true
-				kwargs.focus = true
-
-				const new_section = await addSection(kwargs)
-				d3.select(new_section).classed('animate-in', true)
-
-				if (editing) {
-					if (page.type === 'private') partialSave('media')
-					else await updateStatus()
-				}
-
-			}).addElems('div').attrs({
-				'data-placeholder': d => vocabulary['repeat section'][language]
-			}).html(d => d.instruction)
+	const header = section.addElems('div', 'section-header', d => {
+		if (pad.type === 'templated' && d.title?.length === 0) return []
+		else if (!editing && d.title?.length === 0) return []
+		else return [d]
+	}).addElems('h1')
+		.attrs({
+			'data-placeholder': d => vocabulary['section header'][language],
+			'contenteditable': editing && pad.type === 'blank' ? true : null
+		}).html(d => d.title)
+	.on('keydown', function () {
+		const evt = d3.event
+		if (evt.code === 'Enter' || evt.keyCode === 13) {
+			evt.preventDefault()
+			this.blur()
 		}
-
-		if (items.length) {
-			const promises = []
-			section.each(function (d) {
-				promises.push(d.items.map(async c => await populateSection (c, lang, this)))
-			})
-			await Promise.all(promises.flat())
+	}).on('blur', async _ => {
+		if (editing) {
+			if (page.type === 'private') await partialSave('media')
+			else await updateStatus()
 		}
-
-		resolve(section.node())
 	})
+
+	if (pad.type === 'templated' && lead) {
+		const medialead = new Media({
+			parent: section.node(),
+			type: 'lead',
+			datum: { type: 'lead', level: 'media', lead: lead },
+			lang: lang
+		})
+		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+		if (medialead.opts) medialead.opts.remove()
+
+		medialead.media.attrs({
+			'data-placeholder': d => vocabulary['lead paragraph'][language],
+			'contenteditable': editing && pad.type === 'blank' ? true : null
+		}).html(d => d.lead)
+	}
+	if (editing && pad.type === 'templated' && repeat) {
+		// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
+		d3.selectAll('.layout.repeat').filter(d => d.group === group)
+			.select('.repeat-container').classed('hide', true)
+
+		const mediarepeat = new Media({
+			parent: section.node(),
+			type: 'repeat',
+			datum: { type: 'repeat', level: 'media', instruction: instruction },
+			lang: lang
+		})
+		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+		if (mediarepeat.opts) mediarepeat.opts.remove()
+		if (mediarepeat.instruction) mediarepeat.instruction.remove()
+
+		mediarepeat.media.addElems('button')
+		.on('click', async function () {
+			const sel = d3.select(this)
+
+			kwargs.sibling = section.node().nextSibling
+			kwargs.repeated = true
+			kwargs.focus = true
+
+			const new_section = await addSection(kwargs)
+			d3.select(new_section).classed('animate-in', true)
+
+			if (editing) {
+				if (page.type === 'private') await partialSave('media')
+				else await updateStatus()
+			}
+
+		}).addElems('div').attrs({
+			'data-placeholder': d => vocabulary['repeat section'][language]
+		}).html(d => d.instruction)
+	}
+
+	if (items.length) {
+		// const promises = []
+		// section.each(function (d) {
+		// 	promises.push(d.items.map(async c => await populateSection (c, lang, this)))
+		// })
+		// await Promise.all(promises.flat())
+
+		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
+		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
+		const { items: pageitems } = section.datum()
+		for (let s = 0; s < pageitems.length; s++) {
+			await populateSection(pageitems[s], lang, section.node())
+		}
+
+		// await Promise.all(pageitems.map(async d => await populateSection(d, lang, section.node())))
+	}
+
+	return section.node()
 }
 
 function addTitle (kwargs) {
@@ -1519,7 +1522,7 @@ function addDrawing (kwargs) {
 					if (editing) {
 						if (page.type === 'private') {
 							switchButtons(lang)
-							partialSave('media')
+							await partialSave('media')
 						} else {
 							window.sessionStorage.setItem('changed-content', true)
 							await updateStatus()
@@ -1957,7 +1960,7 @@ function addChecklist (kwargs) {
 			if (editing) {
 				if (page.type === 'private') {
 					switchButtons(lang)
-					partialSave('media')
+					await partialSave('media')
 				} else {
 					window.sessionStorage.setItem('changed-content', true)
 					await updateStatus()
@@ -2147,7 +2150,7 @@ function addRadiolist (kwargs) {
 			if (editing) {
 				if (page.type === 'private') {
 					switchButtons(lang)
-					partialSave('media')
+					await partialSave('media')
 				} else {
 					window.sessionStorage.setItem('changed-content', true)
 					await updateStatus()
@@ -2448,60 +2451,57 @@ function addLocations (kwargs) {
 		}
 	}
 }
-function addIndexes (kwargs) {
+async function addIndexes (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = page.activity === 'edit'
 
-	return new Promise(async resolve => {
-		const { data, lang, section, sibling, focus } = kwargs || {}
-		let { id, level, type, name, instruction, tags, constraint, required } = data || {}
-		if (!level) level = 'meta'
-		if (!type) type = 'index'
-		if (!name) name = null
-		if (!tags) tags = []
-		// MAKE SURE THE SDGs ARE SORTED BY key
-		tags.sort((a, b) => a.key - b.key)
-		required = required ?? false
+	const { data, lang, section, sibling, focus } = kwargs || {}
+	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
+	if (!level) level = 'meta'
+	if (!type) type = 'index'
+	if (!name) name = null
+	if (!tags) tags = []
+	// MAKE SURE THE SDGs ARE SORTED BY key
+	tags.sort((a, b) => a.key - b.key)
+	required = required ?? false
 
-		if (!editing && page.activity !== 'preview' && tags?.length === 0) return null
+	if (!editing && page.activity !== 'preview' && tags?.length === 0) return null
 
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
+	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
+	if (input) input.disabled = true
 
-		const taglist = await POST('/apis/fetch/tags', { type: name, language })
-		taglist.sort((a, b) => a.key - b.key)
+	const options = await POST('/apis/fetch/tags', { type: name, language })
+	options.sort((a, b) => a.key - b.key)
 
-		const list = new Taglist({
-			parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
-			sibling,
-			type,
-			datum: { id, level, type, name, tags, instruction, constraint, required },
-			focus: focus || false,
-			lang,
-			list: taglist, 
-			// list: taglists[name].sort((a, b) => a.key - b.key),
-			imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
-			altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
-		})
-
-		if (list.opts) {
-			list.opts.addElem('div', 'opt-group')
-				.datum(vocabulary['click to see options'][language])
-			.addElems('label', 'instruction')
-				.html(d => d)
-
-			if (constraint) {
-				const opt = list.opts.addElem('div', 'opt-group')
-					.datum({ key: 'constraint', label: 'block', value: constraint })
-					.addElems('button', 'opt active')
-				opt.addElems('i', 'material-icons google-translate-attr')
-					.html(d => d.label)
-				opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
-					.html(d => d.value - tags.length)
-			}
-		}
-		resolve()
+	const list = new Taglist({
+		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
+		sibling,
+		type,
+		datum: { id, level, type, name, tags, instruction, constraint, required },
+		focus: focus || false,
+		lang,
+		list: options, 
+		// list: taglists[name].sort((a, b) => a.key - b.key),
+		imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
+		altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
 	})
+
+	if (list.opts) {
+		list.opts.addElem('div', 'opt-group')
+			.datum(vocabulary['click to see options'][language])
+		.addElems('label', 'instruction')
+			.html(d => d)
+
+		if (constraint) {
+			const opt = list.opts.addElem('div', 'opt-group')
+				.datum({ key: 'constraint', label: 'block', value: constraint })
+				.addElems('button', 'opt active')
+			opt.addElems('i', 'material-icons google-translate-attr')
+				.html(d => d.label)
+			opt.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
+				.html(d => d.value - tags.length)
+		}
+	}
 }
 async function addTags (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
@@ -2520,8 +2520,8 @@ async function addTags (kwargs) {
 	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
 	if (input) input.disabled = true
 
-	const taglist = await POST('/apis/fetch/tags', { type: name })
-	taglist.sort((a, b) => a.name?.localeCompare(b.name))
+	const options = await POST('/apis/fetch/tags', { type: name })
+	options.sort((a, b) => a.name?.localeCompare(b.name))
 
 	const list = new Taglist({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
@@ -2531,7 +2531,7 @@ async function addTags (kwargs) {
 		focus: focus || false,
 		lang,
 		// list: taglists[name]
-		list: taglist
+		list: options
 	})
 
 	if (list.opts) {
@@ -2642,7 +2642,7 @@ async function addAttachment (kwargs) {
 				})
 			}
 		})
-		var result = await renderPromiseModal(item)
+		const result = await renderPromiseModal(item)
 		if (result === null) {
 			if (!srcs.length) await meta.rmMedia()
 		} else {
@@ -2676,10 +2676,10 @@ async function addAttachment (kwargs) {
 		// THIS IS TO RELOAD A CONSENT FORM
 		if (meta.input) {
 			meta.input.addElems('label')
-			.on('click', d => {
+			.on('click', async d => {
 				kwargs.focus = true
 				kwargs.container = meta.container
-				addAttachment(kwargs)
+				await addAttachment(kwargs)
 			}).addElems('i', 'material-icons google-translate-attr')
 			.html('badge')
 		}
@@ -2687,7 +2687,7 @@ async function addAttachment (kwargs) {
 }
 
 // GROUPS
-async function addGroup (kwargs) {
+function addGroup (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
@@ -2725,23 +2725,38 @@ async function addGroup (kwargs) {
 							return data
 						})
 						d.items.push(JSON.parse(JSON.stringify(new_structure)))
-					}).call(addItems)
+					})
+					addItems(media.container)
 					if (media.container.selectAll('.media-group-items').size() >= repeat) media.media.classed('hide', true)
 				})
 			.addElems('i', 'material-icons google-translate-attr')
 				.html('add_circle')
 		}
 	}
-	media.container.call(addItems)
+	addItems(media.container)
 
 
-	function addItems (sel) {
+	async function addItems (sel) {
 		// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
-		const groups = sel.insertElems('.media-group', 'div', 'media media-group-items', d => d.items)
-		.each(async function (c) {
+		// const promises = []
+		const groups = sel.insertElems('.media-group', 'div', 'media media-group-items', d => d.items) // UNLIKE IN templates, items IS A NESTED ARRAY HERE AS GROUPS CAN BE REPEATED
+		.each(function (c, j) {
 			this.innerHTML = ''
-			await Promise.all(c.map(async b => await populateSection(b, lang, this)))
+			// promises.concat(c.map(async b => await populateSection(b, lang, this)))
 		})
+		// await Promise.all(promises)
+		
+		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
+		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
+		for (let g = 0; g < groups.size(); g ++) {
+			const group = groups.filter((d, i) => i === g)
+			const groupitems = group.datum()
+			for (let s = 0; s < groupitems.length; s++) {
+				await populateSection(groupitems[s], lang, group.node())
+			}
+		}
+		// for (let )
+
 		groups.classed('animate-in', (d, i) => i === groups.size() - 1)
 		// THIS IS THE SAME AS IN MEDIA, BUT IN MEDIA WE PREVENT THESE OPTIONS WHEN TEMPLATED
 		// HERE THEY ARE MADE AVAILABLE FOR REMOVING GROUP REPETITIONS
@@ -2775,7 +2790,7 @@ async function addGroup (kwargs) {
 			if (media.container.selectAll('.media-group-items').size() < repeat) media.media.classed('hide', false)
 
 			if (editing) {
-				if (page.type === 'private') partialSave('media')
+				if (page.type === 'private') await partialSave('media')
 				else await updateStatus()
 			}
 		}
@@ -2799,8 +2814,8 @@ function switchButtons (lang = 'en') {
 		menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
 		menu_logo.selectAll('div.save').classed('hide saved', false)
 			.select('button')
-		.on('click', _ => {
-			if (editing) partialSave()
+		.on('click', async _ => {
+			if (editing) await partialSave()
 		}).html(vocabulary['save changes'][language])
 	}
 }
@@ -2808,7 +2823,7 @@ function switchButtons (lang = 'en') {
 
 let idx = 0
 // FOR SLIDESHOW VIEW
-function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
+async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
@@ -2824,96 +2839,102 @@ function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VI
 
 	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
 	// const section_id = uuidv4()
+	d3.selectAll('.media-layout').classed('focus', false)
 
-	return new Promise(resolve => {
-		d3.selectAll('.media-layout').classed('focus', false)
+	const section = d3.select('main#pad div.inner div.body')
+		.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
+		.classed('repeat', repeat || false)
+		.datum({ type: 'section', title, lead, structure, items, repeat, group })
+	.on('click.focus', function () { d3.select(this).classed('focus', editing && pad.type === 'blank') })
 
-		const section = d3.select('main#pad div.inner div.body')
-			.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
-			.classed('repeat', repeat || false)
-			.datum({ type: 'section', title, lead, structure, items, repeat, group })
-		.on('click.focus', function () { d3.select(this).classed('focus', editing && pad.type === 'blank') })
+	// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
+	if (title || lead) {
+		const titleslide = section.addElems('div', 'title-slide')
 
-		// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
-		if (title || lead) {
-			const titleslide = section.addElems('div', 'title-slide')
-
-			if (title) {
-				titleslide.addElems('div', 'section-header')
-					.addElems('h1')
-					.html(d => d.title)
-			}
-
-			if (lead) {
-				const medialead = new Media({
-					parent: titleslide.node(),
-					type: 'lead',
-					datum: { type: 'lead', lead: lead },
-					lang: lang
-				})
-				// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-				if (medialead.opts) medialead.opts.remove()
-
-				medialead.media.html(d => d.lead)
-			}
+		if (title) {
+			titleslide.addElems('div', 'section-header')
+				.addElems('h1')
+				.html(d => d.title)
 		}
-		// END SLIDE
 
-		if (repeat) {
-			// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
-			d3.selectAll('.layout.repeat').filter(d => d.group === group)
-				.select('.repeat-container').classed('hide', true)
-
-			const mediarepeat = new Media({
-				parent: section.node(),
-				type: 'repeat',
-				datum: { type: 'repeat', instruction: instruction },
+		if (lead) {
+			const medialead = new Media({
+				parent: titleslide.node(),
+				type: 'lead',
+				datum: { type: 'lead', lead: lead },
 				lang: lang
 			})
 			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-			if (mediarepeat.opts) mediarepeat.opts.remove()
-			if (mediarepeat.instruction) mediarepeat.instruction.remove()
+			if (medialead.opts) medialead.opts.remove()
 
-			mediarepeat.media.addElems('button')
-			.on('click.repeat', function () {
-				const sel = d3.select(this)
-
-				const promises = []
-				section.findAncestor('pad').selectAll('.body>*')
-				.each(function (d, i) {
-					promises.push(new Promise(async resolve => {
-						if (this === section.node()) {
-							kwargs.sibling = `section:nth-child(${i + 2})`
-							kwargs.focus = true
-
-							const new_section = await addSlides(kwargs) // THIS TOO IS DIFFERENT TO addSection
-							initSlideshow()
-						}
-						resolve()
-					}))
-				})
-
-				Promise.all(promises)
-				.then(_ => switchslide(idx))
-			}).addElems('div').attrs({
-				'data-placeholder': vocabulary['repeat section'][language]
-			}).html(d => d.instruction)
+			medialead.media.html(d => d.lead)
 		}
+	}
+	// END SLIDE
 
-		const displaypromises = []
-		if (items.length) {
-			section.each(function (d) {
-				d.items.forEach(c => displaypromises.push(new Promise(async resolvedisplay => {
-					await populateSection(c, lang, this)
-					resolvedisplay()
-				})))
+	if (repeat) {
+		// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
+		d3.selectAll('.layout.repeat').filter(d => d.group === group)
+			.select('.repeat-container').classed('hide', true)
+
+		const mediarepeat = new Media({
+			parent: section.node(),
+			type: 'repeat',
+			datum: { type: 'repeat', instruction: instruction },
+			lang: lang
+		})
+		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+		if (mediarepeat.opts) mediarepeat.opts.remove()
+		if (mediarepeat.instruction) mediarepeat.instruction.remove()
+
+		mediarepeat.media.addElems('button')
+		.on('click.repeat', function () {
+			const sel = d3.select(this)
+
+			const promises = []
+			section.findAncestor('pad').selectAll('.body>*')
+			.each(function (d, i) {
+				promises.push(new Promise(async resolve => {
+					if (this === section.node()) {
+						kwargs.sibling = `section:nth-child(${i + 2})`
+						kwargs.focus = true
+
+						const new_section = await addSlides(kwargs) // THIS TOO IS DIFFERENT TO addSection
+						initSlideshow()
+					}
+					resolve()
+				}))
 			})
-		}
-		Promise.all(displaypromises).then(_ => resolve(section))
 
-	}).then(section => {
-		return section.node()
-	})
+			Promise.all(promises)
+			.then(_ => switchslide(idx))
+		}).addElems('div').attrs({
+			'data-placeholder': vocabulary['repeat section'][language]
+		}).html(d => d.instruction)
+	}
+
+	// const displaypromises = []
+	if (items.length) {
+		
+		// section.each(function (d) {
+		// 	d.items.forEach(c => displaypromises.push(new Promise(async resolvedisplay => {
+		// 		await populateSection(c, lang, this)
+		// 		resolvedisplay()
+		// 	})))
+		// })
+
+		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
+		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
+		const { items: pageitems } = section.datum()
+		for (let s = 0; s < pageitems; s++) {
+			await populateSection(pageitems[s], lang, section.node())	
+		}
+
+		// await Promise.all(pageitems.map(async d => await populateSection(d, lang, section.node())))
+
+	}
+	// Promise.all(displaypromises).then(_ => resolve(section))
+	return section.node()
 }
 function initSlideshow () {
 	const main = d3.select('#pad')
@@ -2979,7 +3000,7 @@ function initSlideshow () {
 	// }
 
 	// ADD DOTS
-	footer.select('.dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
+	d3.select('footer .dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
 	.classed('highlight', (d, i) => i === 0)
 	.on('click', (d, i) => { switchslide(i) })
 

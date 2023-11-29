@@ -2,7 +2,6 @@ window.addEventListener('load', async function () {
 	const { display } = d3.select('.slides').node().dataset
 	if (display === 'carousel') { await renderCarousel(); }
 	else if (display === 'mosaic') { await renderMosaic(); }
-	await renderMap()
 })
 // THIS IS NOT USED FOR NOW
 async function selectCountry () {

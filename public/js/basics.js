@@ -247,7 +247,7 @@ const dateOptions = {
 	day: 'numeric',
 };
 
-function getContent (feature) { // THIS IS TO LOAD THE PADS, TEMPLATES, ETC
+function getContent (params = {}) { // THIS IS TO LOAD THE PADS, TEMPLATES, ETC
 	const object = d3.select('data[name="object"]').node().value
 	const space = d3.select('data[name="space"]').node()?.value
 	
@@ -256,7 +256,11 @@ function getContent (feature) { // THIS IS TO LOAD THE PADS, TEMPLATES, ETC
 	
 	const reqbody = {};
 	if (space) reqbody['space'] = space
-	if (feature) { reqbody['feature'] = feature; }
+	
+	for (key in params) {
+		reqbody[key] = params[key];
+	}
+	
 	queryparams.forEach((value, key) => {
 		if (!reqbody[key]) { reqbody[key] = value; }
 		else {

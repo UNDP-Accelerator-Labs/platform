@@ -130,14 +130,17 @@
 								}
 							}
 							.body {
+								display: block;
 								padding: 0 15px;
-								width: calc(300px - 30px);
+								width: 100%;
+								box-sizing: border-box;
 
 								a {
 									color: $c-light-blue;
 								}
 
 								.media-title {
+									width: 100%;
 									a {
 										text-decoration: none;
 										color: $c-dark-blue;

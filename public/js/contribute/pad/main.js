@@ -13,15 +13,13 @@
 
 window.addEventListener('load', async function () {
 	if (!mediaSize) var mediaSize = getMediaSize()
-	await renderPad();
-
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
+	await renderPad();
+	initWidgetInteractions(pad.metafields, pad.type);
 
 	const main = d3.select('#pad')
 	const head = main.select('.head')
-	const body = main.select('.body')
-	const foot = main.select('.foot')
-	const footer = d3.select('footer')
 
 	// ADD THE INTERACTION BEHAVIOR FOR THE TITLE INPUT
 	head.select('.title')
@@ -31,9 +29,11 @@ window.addEventListener('load', async function () {
 			evt.preventDefault()
 			this.blur()
 		}
-	})
+	}).on('blur', async _ => await partialSave('title'))
 
-	initWidgetInteractions()
+	// ADD THE INTERACTION FOR THE SAVE BUTTON ON sm DISLAYS
+	d3.select(`div.save.${mediaSize} form button`)
+	.on('click', async _ => await partialSave())
 
 	// SET UP THE ADJACENT DISPLAYS IF RELEVANT
 	// FOR SOURCE
@@ -76,23 +76,6 @@ window.addEventListener('load', async function () {
 		d3.select('div.display-reviews a').attr('href', `?${queryparams.toString()}`)
 	}
 
-	// SET UP OPTIONS FOR sm DISPLAYS
-	if (['xs', 'sm'].includes(mediaSize)) {
-		d3.select('button.input-toolbox')
-		.on('touchend, click', function () {
-			d3.select(this).toggleClass('highlight')
-			d3.select('.media-input-group').node().focus()
-		})
-		d3.select('.media-input-group').on('touchend', function () { this.focus() })
-		.on('focus', function () {
-			if (this.style.maxHeight) this.style.maxHeight = null
-			else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
-		}).on('blur', function () {
-			 this.style.maxHeight = null
-			 d3.select('button.input-toolbox').classed('highlight', false)
-		})
-	}
-
 	d3.select('button.publish')
 	.on('click', function () { 
 		this.focus();
@@ -108,11 +91,6 @@ window.addEventListener('load', async function () {
 		const form = d3.select(this.form)
 		const dropdown = form.select('.dropdown')
 		if (dropdown.node()) dropdown.node().style.maxHeight = null
-	})
-
-	d3.select('div.save form button')
-	.on('click', function () {
-		partialSave();
 	})
 })
 

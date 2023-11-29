@@ -1753,8 +1753,12 @@ div.document.slideshow {
 			.slide {
 				position: relative;
 				flex: none;
-				align-self: center;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-self: flex-start;
 				width: 100vw !important;
+				min-height: 100vh;
 				max-height: 100%;
 				box-sizing: border-box;
 				padding: 0 60px 60px 60px;
@@ -1765,6 +1769,7 @@ div.document.slideshow {
 
 				div.required {
 					left: 0;
+					top: 50%;
 				}
 				.opts {
 					.opt-group {

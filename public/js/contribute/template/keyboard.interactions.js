@@ -3,6 +3,13 @@ window.addEventListener('keydown', function (e) {
 	e = e || event
 	keyTrack.push(e.keyCode)
 
+	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = activity === 'edit'
+
+	const main = d3.select('main')
+	const head = main.select('.head')
+	const footer = d3.select('footer')
+
 	if (editing) {
 		// SHIFT + ENTER LEAVES THE FOCUSED CELL
 		if (keyTrack.includes(16) && e.keyCode === 13
@@ -34,6 +41,13 @@ window.addEventListener('keydown', function (e) {
 })
 window.addEventListener('keyup', function (e) {
 	e = e || event
+
+	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = activity === 'edit'
+
+	const main = d3.select('main')
+	const head = main.select('.head')
+	const footer = d3.select('footer')
 
 	if (editing) {
 		if (
@@ -89,6 +103,12 @@ window.addEventListener('keyup', function (e) {
 })
 window.addEventListener('mouseup', function (e) {
 	e = e || event
+
+	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = activity === 'edit'
+
+	const main = d3.select('main')
+
 	if (editing) {
 		const focused_node = d3.select('.focus')
 		const target = d3.select(e.target)

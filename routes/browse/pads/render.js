@@ -158,7 +158,9 @@ module.exports = async (req, res) => {
 			} else batch.push(null)
 			if (public && !pinboard) {
 				// THIS IS FOR THE BANNER AT THE TOP OF PUBLIC PAGES
-				batch.push(load.samlpes({ connection: t, req, res, filters: filter_result }))
+				// batch.push(load.samples({ connection: t, req, res, filters: filter_result }))
+				// THIS IS NO LONGER NEEDED
+				batch.push(null)
 			} else batch.push(null)
 
 			let [ data,

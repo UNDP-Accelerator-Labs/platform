@@ -13,39 +13,39 @@
 	<% if (object === 'reviews') { %>
 		<li class='<% if (space === "pending") { %>active<% } %>'>
 			<a href='./pending'>
-				<button><%- vocabulary['space'][language](object, 'pending') %><div class='count'><%- locals.stats?.pending %></div></button>
+				<button><%- vocabulary['space'][language][object]['pending'] %><div class='count'><%- locals.stats?.pending %></div></button>
 			</a>
 		</li>
 		<li class='<% if (space === "ongoing") { %>active<% } %>'>
 			<a href='./ongoing'>
-				<button><%- vocabulary['space'][language](object, 'ongoing') %><div class='count'><%- locals.stats?.ongoing %></div></button>
+				<button><%- vocabulary['space'][language][object]['ongoing'] %><div class='count'><%- locals.stats?.ongoing %></div></button>
 			</a>
 		</li>
 		<li class='<% if (space === "past") { %>active<% } %>'>
 			<a href='./past'>
-				<button><%- vocabulary['space'][language](object, 'past') %><div class='count'><%- locals.stats?.past %></div></button>
+				<button><%- vocabulary['space'][language][object]['past'] %><div class='count'><%- locals.stats?.past %></div></button>
 			</a>
 		</li>
 	<% } else if (object === 'mobilizations') { %>
 		<li class='<% if (space === "scheduled") { %>active<% } %>'>
 			<a href='./scheduled'>
-				<button><%- vocabulary['space'][language](object, 'scheduled') %><div class='count'><%- locals.stats?.scheduled %></div></button>
+				<button><%- vocabulary['space'][language][object]['scheduled'] %><div class='count'><%- locals.stats?.scheduled %></div></button>
 			</a>
 		</li>
 		<li class='<% if (space === "ongoing") { %>active<% } %>'>
 			<a href='./ongoing'>
-				<button><%- vocabulary['space'][language](object, 'ongoing') %><div class='count'><%- locals.stats?.ongoing %></div></button>
+				<button><%- vocabulary['space'][language][object]['ongoing'] %><div class='count'><%- locals.stats?.ongoing %></div></button>
 			</a>
 		</li>
 		<li class='<% if (space === "past") { %>active<% } %>'>
 			<a href='./past'>
-				<button><%- vocabulary['space'][language](object, 'past') %><div class='count'><%- locals.stats?.past %></div></button>
+				<button><%- vocabulary['space'][language][object]['past'] %><div class='count'><%- locals.stats?.past %></div></button>
 			</a>
 		</li>
 	<% } else if (object === 'contributors') { %>
 		<li class='<% if (space === "invited") { %>active<% } %>'>
 			<a href='./invited'>
-				<button><%- vocabulary['space'][language](object, 'invited') %>
+				<button><%- vocabulary['space'][language][object]['invited'] %>
 					<div class='count'><%- locals.stats?.invited %></div>
 				</button>
 			</a>
@@ -55,8 +55,8 @@
 		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
-					<input type='text' id='pinboards' onblur='fixLabel(this)'>
-					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %></label>
+					<input type='text' id='pinboards' value='<% if (locals.pinboard?.title.length > 20) { %><%= `${locals.pinboard?.title.slice(0, 20)}…` %><% } else { %><%= locals.pinboard?.title %><% } %>'>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language][object]['pinned'] %></label>
 				</div>
 
 				<div id='pinboards-list-xs' class='dropdown'>
@@ -72,7 +72,7 @@
 		<% } %>
 		<li class='<% if (space === "all") { %>active<% } %>'>
 			<a href='./all'>
-				<button><%- vocabulary['space'][language](object, 'all') %>
+				<button><%- vocabulary['space'][language][object]['all'] %>
 					<div class='count'><%- locals.stats?.all %></div>
 				</button>
 			</a>
@@ -86,7 +86,7 @@
 		})) { %>
 			<li class='<% if (space === "private") { %>active<% } %>'>
 				<a onclick='redirect({ location: "./private", params: [{ key: "page", value: 1 }] })'>
-					<button><%- vocabulary['space'][language](object, 'private') %>
+					<button><%- vocabulary['space'][language][object]['private'] %>
 						<div class='count'><%- locals.stats?.private %></div>
 					</button>
 				</a>
@@ -94,7 +94,7 @@
 		<% } %>
 		<li class='<% if (space === "shared") { %>active<% } %>'>
 			<a onclick='redirect({ location: "./shared", params: [{ key: "page", value: 1 }] })'>
-				<button><%- vocabulary['space'][language](object, 'shared') %>
+				<button><%- vocabulary['space'][language][object]['shared'] %>
 					<div class='count'><%- locals.stats?.shared %></div>
 					<!-- TO DO: CHANGE TRANSLATION TERM preprint TO SHARED -->
 				</button>
@@ -106,28 +106,36 @@
 		) { %>
 			<li class='<% if (space === "curated") { %>active<% } %>'>
 				<a onclick='redirect({ location: "./curated", params: [{ key: "page", value: 1 }] })'>
-					<button><%- vocabulary['space'][language](object, 'curated') %>
+					<button><%- vocabulary['space'][language][object]['curated'] %>
 						<div class='count'><%- locals.stats?.curated %></div>
 					</button>
 				</a>
 			</li>
 		<% } %>
-		<% const plist = (locals.pinboards_list ?? []).filter(d => d.id !== locals.pinboard?.id && d.count); %>
+		<% 
+			// const plist = (locals.pinboards_list ?? []).filter(d => d.id !== locals.pinboard?.id && d.count); 
+			const plist = (locals.pinboards_list ?? []).filter(d => d.count); 
+		%>
 		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read) && plist.length)
 		{ %>
 			<li class='filter <% if (space === "pinned") { %>active<% } %>'>
 				<div class='inner'>
-					<input type='text' id='pinboards'>
-					<!-- TO DO: CHECK THIS IS HANDLED THROUGH setup.js -->
-					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language](object, 'pinned') %><span class='count'><%- plist.length ?? 0 %></span></label>
+					<input type='text' id='pinboards' value='<% if (locals.pinboard?.title.length > 20) { %><%= `${locals.pinboard?.title.slice(0, 20)}…` %><% } else { %><%= locals.pinboard?.title %><% } %>'>
+					<label for='pindboards' class="google-translate-attr"><%- vocabulary['space'][language][object]['pinned'] %><span class='count'><%- plist.length ?? 0 %></span></label>
 				</div>
 
 				<div id='pinboards-list-lg' class='dropdown'>
 					<menu>
 						<% plist.forEach(d => { %>
-							<li>
-								<a href='./pinned?pinboard=<%- d.id %>' class="google-translate-attr"><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span><span class='count'><%- d.count %></span></a>
+							<% if (d.id === locals.pinboard?.id) { %>
+							<li class='highlight'>
+								<a class='google-translate-attr'><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span><span class='count'><%- d.count %></span></a>
 							</li>
+							<% } else { %>
+							<li>
+								<a href='./pinned?pinboard=<%- d.id %>' class='google-translate-attr'><%- d.is_exploration ? `${explorationVocab['exploration']}:&nbsp;` : ''%><span class="notranslate"><%- d.title %></span><span class='count'><%- d.count %></span></a>
+							</li>
+							<% } %>
 						<% }) %>
 					</menu>
 				</div>
@@ -138,7 +146,7 @@
 		{ %>
 			<li class='<% if (space === "reviewing") { %>active<% } %>'>
 				<a href='./reviewing'>
-					<button><%- vocabulary['space'][language](object, 'reviewing') %>
+					<button><%- vocabulary['space'][language][object]['reviewing'] %>
 						<div class='count'><%- locals.stats?.reviewing %></div>
 					</button>
 				</a>
@@ -148,7 +156,7 @@
 		<!-- <% if (!['pads', 'reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
 				<a onclick='redirect({ location: "./public", params: [{ key: "page", value: 1 }] })>
-					<button><%- vocabulary['space'][language](object, 'public') %>
+					<button><%- vocabulary['space'][language][object]['public'] %>
 						<div class='count'><%- locals.stats?.public %></div>
 					</button>
 				</a>
@@ -157,7 +165,7 @@
 
 		<li class='<% if (space === "published") { %>active<% } %>'>
 			<a onclick='redirect({ location: "./published", params: [{ key: "page", value: 1 }] })'>
-				<button><%- vocabulary['space'][language](object, 'all') %>
+				<button><%- vocabulary['space'][language][object]['all'] %>
 					<div class='count'><%- locals.stats?.all %></div>
 				</button>
 			</a>
@@ -168,7 +176,7 @@
 		{ %>
 			<li class='<% if (space === "reviews") { %>active<% } %>'>
 				<a href='./reviews'>
-					<button><%- vocabulary['space'][language](object, 'reviews') %>
+					<button><%- vocabulary['space'][language][object]['reviews'] %>
 						<div class='count'><%- locals.metadata.menu.review_templates.filter(function (d, i, self) { return self.findIndex(c => c.template === d.template) === i }).length %></div>
 						<!-- ABOVE IS A METHOD FOR EXTRACTING UNIQUE VALUES INSPIRED BY https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates -->
 					</button>
@@ -177,10 +185,3 @@
 		<% } %>
 	<% } %>
 </menu>
-
-<% if (space === 'pinned' && locals.pinboard) { %>
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-	updateTab('<%- locals.pinboard.title %>')
-</script>
-<% } %>
-

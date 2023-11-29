@@ -289,80 +289,77 @@ function compileContent (attr) {
 
 	return content
 }
-function partialSave (attr) {
+async function partialSave (attr) {
 	const object = d3.select('data[name="object"]').node().value
 
-	return new Promise(resolve => {
-		console.log('saving')
-		// FIRST CHECK IF THIS IS A NEW PAD
-		const content = compileContent(attr)
-		// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
-		const url = new URL(window.location)
-		const queryparams = new URLSearchParams(url.search)
-		let id = queryparams.get('id')
-		if (id) content.id = +id
-		const template = queryparams.get('template')
-		if (template) content.template = +template
-		const mobilization = queryparams.get('mobilization')
-		if (mobilization) content.mobilization = +mobilization
+	console.log('saving')
+	// FIRST CHECK IF THIS IS A NEW PAD
+	const content = compileContent(attr)
+	// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
+	const url = new URL(window.location)
+	const queryparams = new URLSearchParams(url.search)
+	let id = queryparams.get('id')
+	if (id) content.id = +id
+	const template = queryparams.get('template')
+	if (template) content.template = +template
+	const mobilization = queryparams.get('mobilization')
+	if (mobilization) content.mobilization = +mobilization
 
-		POST(`/save/${object}`, content)
-		.then(async res => {
-			// ADD THE NOTIFICATION
-			window.sessionStorage.removeItem('changed-content')
+	return await POST(`/save/${object}`, content)
+	.then(async res => {
+		// ADD THE NOTIFICATION
+		window.sessionStorage.removeItem('changed-content')
 
-			if (!mediaSize) var mediaSize = getMediaSize()
-			if (['xs', 'sm'].includes(mediaSize)) {
-				const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
-				save_btn.select('button')
-					.html(vocabulary['changes saved'][language])
-				window.setTimeout(_ => {
-					save_btn.classed('saved', false)
-					.select('button').each(function () { this.disabled = true })
-						.html(vocabulary['save'][language])
-				}, 1000)
-			} else {
-				const menu_logo = d3.select('nav#site-title .inner')
-				menu_logo.select('.save').classed('saved', true)
-					.select('button')
-					.html(vocabulary['changes saved'][language])
-				window.setTimeout(_ => {
-					menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
-					menu_logo.selectAll('div.save').classed('hide', true)
-				}, 1000)
-			}
+		if (!mediaSize) var mediaSize = getMediaSize()
+		if (['xs', 'sm'].includes(mediaSize)) {
+			const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
+			save_btn.select('button')
+				.html(vocabulary['changes saved'][language])
+			window.setTimeout(_ => {
+				save_btn.classed('saved', false)
+				.select('button').each(function () { this.disabled = true })
+					.html(vocabulary['save'][language])
+			}, 1000)
+		} else {
+			const menu_logo = d3.select('nav#site-title .inner')
+			menu_logo.select('.save').classed('saved', true)
+				.select('button')
+				.html(vocabulary['changes saved'][language])
+			window.setTimeout(_ => {
+				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
+				menu_logo.selectAll('div.save').classed('hide', true)
+			}, 1000)
+		}
 
-			// REMOVE ITEMS TO DELETE
-			window.sessionStorage.removeItem('deleted')
-			// CHANGE THE URL TO INCLUDE THE PAD ID
-			if (!id) { // INSERT
-				id = res.data.id
-				queryparams.append('id', id)
-				url.search = queryparams.toString()
-				// BASED ON:
-				// https://usefulangle.com/post/81/javascript-change-url-parameters
-				// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
-				const nextURL = url.toString().replace('contribute', 'edit')
-				const nextTitle = 'Update pad' // TO DO: RESET FOR TEMPLATE
-				const nextState = { additionalInformation: 'Updated the URL with JS' }
-				window.history.pushState(nextState, nextTitle, nextURL)
-				// REMOVE THE templates MENU
-				// d3.select('nav#filter').remove()
+		// REMOVE ITEMS TO DELETE
+		window.sessionStorage.removeItem('deleted')
+		// CHANGE THE URL TO INCLUDE THE PAD ID
+		if (!id) { // INSERT
+			id = res.data.id
+			queryparams.append('id', id)
+			url.search = queryparams.toString()
+			// BASED ON:
+			// https://usefulangle.com/post/81/javascript-change-url-parameters
+			// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
+			const nextURL = url.toString().replace('contribute', 'edit')
+			const nextTitle = 'Update pad' // TO DO: RESET FOR TEMPLATE
+			const nextState = { additionalInformation: 'Updated the URL with JS' }
+			window.history.pushState(nextState, nextTitle, nextURL)
+			// REMOVE THE templates MENU
+			// d3.select('nav#filter').remove()
 
-				// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
-				d3.selectAll('div.meta-status form input[name="id"]').attr('value', id)
-				// d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
-			}
+			// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
+			d3.selectAll('div.meta-status form input[name="id"]').attr('value', id)
+			// d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
+		}
 
-			await updateStatus(res.data.status)
-			resolve(id)
-
-		}).catch(err => console.log(err))
-	})
+		await updateStatus(res.data.status)
+		return id
+	}).catch(err => console.log(err))
 }
 async function updateStatus (_status) {
 	if (!_status) {
-		const curr_status = await getContent('status')
+		const curr_status = await getContent({ feature: 'status' })
 		const completion = getStatus()
 		if (completion) _status = Math.max(1, curr_status)
 		else _status = 0
@@ -377,8 +374,8 @@ async function updateStatus (_status) {
 	metastatus.select('div.btn-group form button.generate-pdf')
 		.attr('disabled', _status > 0 ? null : true)
 }
-function saveAndSubmit (node) {
-	partialSave()
+async function saveAndSubmit (node) {
+	await partialSave()
 	node.form.submit()
 	// TO DO: PROVIDE FEEDBACK
 	// CREATE A THANK YOU PAGE

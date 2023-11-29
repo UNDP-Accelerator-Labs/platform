@@ -38,35 +38,42 @@ module.exports = async (req, res) => {
 				} else {
 					const batch = []
 					// GET ALL TAG LISTS
-					batch.push(
-						DB.general.task(t1 => {
-							const batch1 = metafields.filter(d => ['tag', 'index'].includes(d.type))
-							.map(d => {
-								return t1.any(`
-									SELECT id, key, name, type FROM tags
-									WHERE type = $1
-										AND language = (COALESCE((SELECT language FROM tags WHERE type = $1 AND language = $2 LIMIT 1), 'en'))
-								;`, [ d.label, language ])
-								.then(results => {
-									const obj = {}
-									obj[d.label] = results
-									return obj
-								}).catch(err => console.log(err))
-							})
-							return t1.batch(batch1)
-							.then(results => {
-								if (results.length) return flatObj.call(results)
-								else return []
-							}).catch(err => console.log(err))
-						})
-					)
+					// batch.push(
+					// 	DB.general.task(t1 => {
+					// 		const batch1 = metafields.filter(d => ['tag', 'index'].includes(d.type))
+					// 		.map(d => {
+					// 			return t1.any(`
+					// 				SELECT id, key, name, type FROM tags
+					// 				WHERE type = $1
+					// 					AND language = (COALESCE((SELECT language FROM tags WHERE type = $1 AND language = $2 LIMIT 1), 'en'))
+					// 			;`, [ d.label, language ])
+					// 			.then(results => {
+					// 				const obj = {}
+					// 				obj[d.label] = results
+					// 				return obj
+					// 			}).catch(err => console.log(err))
+					// 		})
+					// 		return t1.batch(batch1)
+					// 		.then(results => {
+					// 			if (results.length) return flatObj.call(results)
+					// 			else return []
+					// 		}).catch(err => console.log(err))
+					// 	})
+					// )
+					batch.push(null)
 
 					if (!id) { // THIS IS A NEW TEMPLATE
 					 	if (source) { // CREATE A TEMPLATE BASED ON EXISTING ONE
-							batch.push(t.oneOrNone(`
-								SELECT title, description, sections, 0 AS status, slideshow FROM templates
-								WHERE id = $1
-							;`, [ +source ]))
+							// batch.push(t.oneOrNone(`
+							// 	SELECT title, description, sections, 0 AS status, slideshow FROM templates
+							// 	WHERE id = $1::INT
+							// ;`, [ source ]))
+
+							batch.push(load.data({ connection: t, req, authorized: true })
+							.then(result => {
+								delete result.sections
+								return result
+							}).catch(err => console.log(err)))
 						} else batch.push(null)
 					} else { // EDIT THE TEMPLATE
 						// const engagement = engagementsummary({ doctype: 'template', engagementtypes, docid: +id, uuid })

@@ -50,14 +50,22 @@
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
 <%
+	console.log(locals.data)
 	const templatedata = {
 		id: locals.data?.id ?? null,
-		// type: templated ? 'templated' : 'blank',
+		source: locals.data?.source ?? null,
+		copy: locals.data?.copy ?? false,
+		
+		// type: review_template ? 'templated' : 'blank',
 		// template: templated ? locals.display_template : {},
-		source: locals.source ?? null,
+		
+		category: review_template ? 'review' : 'standard',
+		language: review_language || null,
 		metafields: metafields || {},
 		media_value_keys: locals.metadata.site.media_value_keys || [],
+		
 		// is_review: locals.data?.is_review || false,
+		
 		title: locals.data?.title ?? null
 	}
 %>
@@ -97,7 +105,7 @@
 						<% if (['contribute', 'edit'].includes(activity)) { %>
 							<div class='save xs google-translate-attr'>
 								<form>
-									<button type='button' onclick='partialSave()' disabled><%- vocabulary['save'][language] %></button>
+									<button type='button' disabled><%- vocabulary['save'][language] %></button>
 								</form>
 							</div>
 						<% } %>
@@ -135,9 +143,9 @@
 					<a href='<%- `/${language}/browse/templates/private` %>' class='return'><%- vocabulary['back to browse'][language] %></a>
 				<% } %>
 				<% if (['contribute', 'edit'].includes(activity)) { %>
-					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>' onblur='partialSave("title")' contenteditable></div>
+					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>' contenteditable><% if (!locals.data?.id && locals.data?.source) { %><%= `[${vocabulary['copy'][language]['preposition']}] ${locals.data?.title}` %><% } else { %><%= locals.data?.title %><% } %></div>
 				<% } else { %>
-					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>'></div>
+					<div class='title' data-placeholder='<%- vocabulary["untitled template"][language] %>'><%= locals.data?.title %></div>
 				<% } %>
 				<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
 					<% if (activity === 'edit') { %>
@@ -159,13 +167,13 @@
 					<div class='input-type'>
 						<label><%- vocabulary['description'][language] %></label>
 					</div>
-					<div class='media-container txt-container lead' onclick='d3.select(this).classed("focus", true)'>
-						<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][language] %>' onblur='partialSave("description")' contenteditable><% if (review_template) { %><%- locals.template_description || vocabulary["review template description"][language](languages.find(d => d.language === review_language).name) %><% } else { %><%- locals.template_description %><% } %></div>
+					<div class='media-container txt-container lead'>
+						<div class='media media-txt template' data-placeholder='<%- vocabulary["missing template description"][language] %>' contenteditable><% if (review_template) { %><%- locals.data?.description || vocabulary["review template description"][language](languages.find(d => d.language === review_language).name) %><% } else { %><%- locals.data?.description %><% } %></div>
 						<!-- TO DO: TRANSLATE LANGUAGE NAME (e.g. FRENCH > FRANÇAIS) -->
 					</div>
 					<% if (!review_template) { %>
 						<div class='input-slideshow'>
-							<input id='slideshow-status' type='checkbox' class='toggle' name='slideshow' value='true' <% if (locals.data?.slideshow) { %>checked<% } %> onchange='partialSave()'>
+							<input id='slideshow-status' type='checkbox' class='toggle' name='slideshow' value='true' <% if (locals.data?.slideshow) { %>checked<% } %>>
 							<label for='slideshow-status'></label>
 							<p><%- vocabulary['show template as slideshow'][language] %></p>
 						</div>
@@ -292,69 +300,5 @@
 
 <%- include ('../../partials/footer.ejs') %>
 
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-	
-
-	const taglists = <%- JSON.stringify(locals.tags || {}) %>;
-	let status = <%- locals.data?.status || 0 %>;
-
-	let activity = '<%- activity %>';
-	// let published = false
-	const editing = ['contribute', 'edit'].includes(activity)
-	const review_template = <%- JSON.stringify(review_template) %>
-
-	const main = d3.select('main')
-	const head = main.select('.head')
-	const body = main.select('.body')
-	const descriptionLayout = body.select('.description-layout')
-	const footer = d3.select('footer')
-
-
-	head.select('.title')
-	.on('keydown', function () {
-		const evt = d3.event
-		if (evt.code === 'Enter' || evt.keyCode === 13) {
-			evt.preventDefault()
-			this.blur()
-		}
-	})
-
-	
-
-	// POPULATE THE PAGE
-	<% if (locals.data) { %>
-		const data = <%- JSON.stringify(locals.data || {}) %>;
-		if (activity === 'contribute') data.title = `[${vocabulary['copy'][language]['preposition']}] ${data.title}` // THIS IS A COPIED TEMPLATE
-
-		head.select('.title').html(data.title)
-		descriptionLayout.select('.media-container .media-txt').text(data.description)
-		if (data.sections) {
-			data.sections.forEach(d => {
-				addSection({ data: d, lang: language })
-			})
-		}
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	<% } else { %>
-		addSection({ lang: language })
-		<% if (review_template) { %>
-			const radiodata = {
-				level: 'meta',
-				type: 'radiolist',
-				name: 'review_score',
-				options: [{ name: vocabulary['accept'][language], value: 1 }, { name: vocabulary['reject'][language], value: 0 }],
-				instruction: vocabulary['accept or reject pad'][language],
-				required: true,
-				editable: false
-			}
-			addRadiolist({ data: radiodata, lang: language, focus: false })
-		<% } else { %>
-			addTitle({ lang: language })
-		<% } %>
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	<% } %>
-
-</script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const { modules, DB } = include('config/')
+const { followup_count, modules, DB } = include('config/')
 const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = async _kwargs => {
@@ -56,7 +56,7 @@ module.exports = async _kwargs => {
 					)
 			;`, [ id, collaborators_ids, rights ])
 			.then(result => {
-				if (result.bool) {
+				if (result?.bool) {
 					if (!(publish === 'def' && result.status >= 2)) return { authorized: true, redirect: 'edit' }
 					else return { authorized: true, redirect: 'view' }
 				} else return { authorized: rights >= read, redirect: 'view' }

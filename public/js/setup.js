@@ -101,7 +101,6 @@ function scrollToPad (target) {
 		behavior: 'smooth'
 	})
 };
-
 function redirect (_kwargs) {
 	let { location, params, keep_status } = _kwargs
 	
@@ -129,14 +128,12 @@ function redirect (_kwargs) {
 	
 	return window.location = `${location}?${queryparams.toString()}`;
 };
-
 function checkForEnter (evt, node) {
 	if (evt.code === 'Enter' || evt.keyCode === 13) {
 		evt.preventDefault()
 		node.blur()
 	}
 };
-
 function toggleOptions (node) {
 	const { object } = node.dataset || {}
 	
@@ -182,16 +179,14 @@ function toggleOptions (node) {
 		partialSave()
 	}
 }
-
-function updateTab (value) {
-	const input = d3.select(`.${mediaSize} input[type=text]#pinboards`).node()
-	if (input) {
-		if (value.length > 25) value = `${value.slice(0, 25)}…`
-		input.value = value
-		fixLabel(input)
+function updateTab (value) { // TO DO: THIS IS NOT WORKING FOR SOME REASON WHEN SAVING A PINBOARD TITLE
+	const input = d3.select(`nav.tabs input[type=text]#pinboards`)
+	if (input.node()) {
+		if (value.length > 20) { value = `${value.slice(0, 20)}…` }
+		input.attr('value', value)
+		// fixLabel(input)
 	}
 };
-
 function expandstats (node) {
 	const sel = d3.select(node)
 	const statistics = d3.select(sel.findAncestor('stat-group').node().parentNode)
@@ -214,7 +209,7 @@ async function renderCarousel () {
 	const panel = container.findAncestor('panel')
 	const dots = panel.select('.dots')
 	
-	let slides = await getContent('samples')
+	let slides = await getContent({ feature: 'samples' })
 	if (!slides.length) return panel.remove()
 
 	const slide = container.addElems('div', 'slide', slides)
@@ -278,7 +273,7 @@ async function renderMosaic () {
 	const container = d3.select('.slides')
 	const panel = container.findAncestor('panel')
 	
-	let slides = await getContent('samples')
+	let slides = await getContent({ feature: 'samples' })
 	if (!slides.length) return panel.remove()
 
 	// TO DO: LOAD MOSAIC DATA DYNAMICALLY HERE

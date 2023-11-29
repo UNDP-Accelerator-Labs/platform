@@ -1,11 +1,18 @@
 const { modules, DB, ownDB } = include('config/')
 const { safeArr, DEFAULT_UUID } = include('routes/helpers')
 
-exports.pin = (req, res) => {
-	const { uuid, collaborators } = req.session || {}
-	const { board_id, board_title, object_id, mobilization } = req.body || {}
+const { ids: padsids } = include('routes/browse/pads/load')
 
-	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
+exports.pin = async (req, res) => {
+	const { uuid, collaborators } = req.session || {}
+	let { board_id, board_title, object_id, mobilization, load_object } = req.body || {}
+
+	if (!object_id && load_object) {
+		object_id = await padsids({ req, res })
+		console.log(object_id)
+	}
+
+	// const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (!board_id) { // CREATE NEW BOARD
 		if (board_title?.trim().length > 0) {
@@ -81,7 +88,7 @@ exports.unpin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
 	const { board_id, object_id, mobilization } = req.body || {}
 
-	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
+	// const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (object_id) {
 		return DB.general.tx(gt => {

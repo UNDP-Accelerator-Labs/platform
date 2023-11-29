@@ -18,7 +18,7 @@ module.exports = (req, res) => {
 		else if (object === 'template') return template.render(req, res)
 		else if (object === 'review') return pad.render(req, res)
 		else if (object === 'contributor') return contributor(req, res)
-		else if (object === 'resource') return resource(req, res)
+		else if (object === 'resource') return resource.render(req, res)
 		else if (object === 'mobilization') return mobilization(req, res)
 
 		else {

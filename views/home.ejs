@@ -183,14 +183,8 @@
 
 <%- include ('./partials/footer.ejs') %>
 
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-	
-
 <% if (!locals.metadata?.user?.uuid) { %>
-	sessionStorage.removeItem('explorationHintUserHiddenCount');
-	sessionStorage.removeItem('explorationPrompt');
-	sessionStorage.removeItem('explorationId');
+	<script type='text/javascript' src='/js/home/explorations.js' defer></script>
 <% } // logged out (!uuid) %>
-</script>
 </body>
 </html>

@@ -1,11 +1,11 @@
-if (!mediaSize) var mediaSize = getMediaSize()
-
 window.addEventListener('load', async function () {
+	if (!mediaSize) var mediaSize = getMediaSize()
+
 	const object = d3.select('data[name="object"]').node().value
+	const space = d3.select('data[name="space"]').node().value
 	const { load, id: page, pages, display } = JSON.parse(d3.select('data[name="page"]').node().value)
 
 	await renderSections()
-	if (object === 'pads') { await renderMap(); }
 
 	d3.select('button#open-pinboard-preview')
 	.on('click', function () {
@@ -34,7 +34,7 @@ window.addEventListener('load', async function () {
 		partialSave('section-description', this.dataset.id)
 	})
 
-	// REPRINT STATTUS TOGGLES IN FILTERS MENU IF sm DISPLY
+	// REPRINT STATUS TOGGLES IN FILTERS MENU IF sm DISPLY
 	if (mediaSize === 'xs') {
 		const status_toggles = d3.select('#search-and-filter form .status').node()
 		const parent = d3.select('#search-and-filter form .filters').node()
@@ -112,7 +112,7 @@ window.addEventListener('load', async function () {
 
 	// MAIN SEARCH BAR INTERACTION
 	d3.selectAll('.filter input[type=text]')
-	.on('keyup', function () {
+	.on('keyup.dropdown', function () {
 		const node = this
 		const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
 		dropdown.selectAll('menu li')
@@ -120,7 +120,7 @@ window.addEventListener('load', async function () {
 				return !this.textContent.trim().toLowerCase()
 				.includes(node.value.trim().toLowerCase())
 			})
-	}).on('focus', function () {
+	}).on('focus.dropdown', function () {
 		const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
 		let { top, height } = this.getBoundingClientRect()
 		top = top + height
@@ -138,7 +138,7 @@ window.addEventListener('load', async function () {
 			d3.event.preventDefault()
 			// this.previousElementSibling.setAttribute('checked', '')
 		})
-	}).on('blur', function () {
+	}).on('blur.dropdown', function () {
 		const filter = d3.select(this).findAncestor('filter')
 		const dropdown = filter.select('.dropdown')
 		if (dropdown.node()) dropdown.node().style.maxHeight = null
@@ -146,6 +146,108 @@ window.addEventListener('load', async function () {
 			setTimeout(_ => filter.classed('expand', false), 250)
 		}
 	})
+	// OTHER FILTER MODULE INTERACTIONS
+	let curSelectSTM = 'stm-browse';
+	let hasUsedExploration = false;
+
+	d3.selectAll('#search-field')
+	.on('focus', () => {
+		updateExplorationHint();
+	});
+
+	// PIN ALL SEARCH BAR
+	if (object === 'pads') {
+		d3.select('#pin-all')
+		.on('keydown', function (d) { // EVERYWHERE ELSE THIS IS keyup BUT WE USE keydown HERE TO PREVENT THE FORM FROM FIRING WHEN THE Enter KEY IS PRESSED (TRIGGERED ON keydown)
+			const evt = d3.event
+			const node = this
+			const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
+			dropdown.selectAll('menu li')
+				.classed('hide', function () {
+					return !this.textContent.trim().toLowerCase()
+					.includes(node.value.trim().toLowerCase())
+				})
+
+			if (evt.code === 'Enter' || evt.keyCode === 13) {
+				evt.preventDefault()
+				d3.select('#new-pinboard').node().click()
+			}
+		}).on('focus', function (d) {
+			const filters = d3.select('#search-and-filter')
+			const filter = d3.select(this).findAncestor('filter')
+			const dropdown = filter.select('.dropdown')
+			if (dropdown.node()) dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+			if (filters.node()) filters.node().style.overflow = 'visible'
+
+			if (mediaSize === 'xs') filter.classed('expand', true)
+
+			dropdown.selectAll('li').on('mousedown', function () {
+				d3.event.preventDefault()
+			})
+		}).on('blur', function () {
+			const filters = d3.select('#search-and-filter')
+			const filter = d3.select(this).findAncestor('filter')
+			const dropdown = filter.select('.dropdown')
+
+			if (dropdown.node()) dropdown.node().style.maxHeight = null
+			if (filters.node) filters.node().style.overflow = 'auto'
+
+			fixLabel(this) // THIS IS NOT WORKING
+
+			if (mediaSize === 'xs') {
+				setTimeout(_ => filter.classed('expand', false), 250)
+			}
+		})
+		
+		d3.select('#new-pinboard')
+		.on('click', async function () {
+			const node = d3.select('#pin-all').node()
+
+			if (node.value.trim().length) {
+				const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
+
+				const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
+					const match = [...this.childNodes].filter(function (d) {
+						return d.nodeType === Node.TEXT_NODE
+					}).map(d => d.textContent.trim().toLowerCase()).join(' ')
+					return match === node.value.trim().toLowerCase()
+				})
+
+				if (existingBoard.node()) { // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
+					pinAll(existingBoard.node().previousElementSibling)
+				} else { // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
+					// const pads = await getContent({ feature: 'ids', limit: null });
+
+					const reqbody = {
+						board_title: node.value.trim(), 
+						action: 'insert', 
+						object: object.slice(0, -1),
+						limit: null,
+						space,
+						load_object: true
+					};
+
+					const url = new URL(window.location)
+					const queryparams = new URLSearchParams(url.search)
+					queryparams.forEach((value, key) => {
+						if (key !== 'page') {
+							if (!reqbody[key]) { reqbody[key] = value; }
+							else {
+								if (!Array.isArray(reqbody[key])) { reqbody[key] = [reqbody[key]]; }
+								reqbody[key].push(value);
+							}
+						}
+					});
+
+					const { board_id } = await POST('/pin', reqbody)
+					window.location = `./pinned?pinboard=${board_id}`
+				}
+				// RESET DROPDOWN
+				this.value = ''
+				dropdown.selectAll('menu li').classed('hide', false)
+			}
+		})
+	}
 
 	// HANDLE LAZY LOADING IF ACTIVATED
 	if (load === 'lazy') {
@@ -307,4 +409,45 @@ function rmtag (node, d) {
 	const input = filter.selectAll('input').filter(function () { return this.value.toString() === d.id.toString() }).node()
 	input.checked = false
 	toggletag(input, d)
+}
+async function pinAll (node) {
+	const object = d3.select('data[name="object"]').node().value
+	const space = d3.select('data[name="space"]').node().value
+
+	node.checked = true
+	const id = node.value
+
+	const reqbody = {
+		board_id: id,
+		action: 'insert', 
+		object: object.slice(0, -1),
+		limit: null,
+		space,
+		load_object: true
+	}
+
+	const url = new URL(window.location)
+	const queryparams = new URLSearchParams(url.search)
+	queryparams.forEach((value, key) => {
+		if (key !== 'page') {
+			if (!reqbody[key]) { reqbody[key] = value; }
+			else {
+				if (!Array.isArray(reqbody[key])) { reqbody[key] = [reqbody[key]]; }
+				reqbody[key].push(value);
+			}
+		}
+	});
+
+	// TO DO: THIS COULD BE IMPROVED HERE AND IN THE BACKEND TO USE full_filters INSTEAD OF PASSING BACK AND FORTH THE FULL LIST OF PAD IDs
+	// await POST('/pin', { 
+	// 	board_id: id, 
+	// 	object_id: <%- JSON.stringify(locals.pads) %>, 
+	// 	action: 'insert', 
+	// 	object: object.slice(0, -1)
+	// })
+
+	console.log(reqbody)
+
+	await POST('/pin', reqbody)
+	location.reload()
 }

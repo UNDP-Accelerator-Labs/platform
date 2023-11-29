@@ -143,7 +143,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 							;`, [ metadata_sql ]))
 						}
 
-						if (+mobilization !== 0) {
+						if (+mobilization !== -1) {
 							// SAVE MOBILIZATION INFO
 							// batch1.push(t.none(`
 							// 	INSERT INTO mobilization_contributions (pad, mobilization) VALUES ($1, $2)

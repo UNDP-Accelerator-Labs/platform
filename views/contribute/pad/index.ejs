@@ -167,12 +167,11 @@
 									<input type='hidden' name='source' value='<%- locals.source %>'>
 									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
-								<!-- TO DO: CHECK IF THIS IS NOT AN ERROR, ALTHOUGH IT IS DISABLED -->
 									<button type='button' class='publish' name='status' value='1' onclick='saveAndSubmit(this);' disabled><%- vocabulary['submit'][language] %></button>
 								<!-- IF THERE IS A TOKEN WITH A CALLBACK URL, THEN THIS SHOULD AUTO SUBMIT AND SEND BACK THE PAD ID TO THE REQUESTING SOURCE -->
 								<% } else if (token && action === 'publish_and_share') { %>
 									<input type='hidden' name='token' value='<%- token %>'>
-									<button type='submit' class='publish' name='status' value='3' disabled><%- vocabulary['publish'][language] %></button>
+									<button type='submit' class='publish' name='status' value='3' disabled><%- vocabulary['save'][language] %></button>
 								<% } else { %>
 									<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
 								<% } %>
@@ -184,7 +183,6 @@
 									<!-- TO DO: INTERCEPT AND partialSave -->
 									<button type='submit' class='publish google-translate-attr' name='status' value='1'><%- vocabulary['submit'][language] %></button>
 								<% } else { %>
-
 									<% if (locals.data?.status === 2 && locals.data?.review_status === 1) { %>
 										<!-- THE PAD IS ALREADY A PREPRINT AND SUBMITTED FOR REVIEW -->
 										<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
@@ -193,7 +191,11 @@
 									<% } %>
 								<% } %>
 							<% } %>
-							<% if (object !== 'review' && !publicpage) { %>
+							<% if (
+								object !== 'review' 
+								&& !publicpage
+								&& !(token && action === 'publish_and_share')
+							) { %>
 								<div class='dropdown'>
 									<menu class='opts'>
 										<% if (modules.some(d => d.type === 'reviews')) { %>
@@ -284,7 +286,7 @@
 							<a href='<%- `/${language}/browse/pads/private` %>' class='return google-translate-attr'><%- vocabulary['back to browse'][language] %></a>
 						<% } %>
 						<% if (editing) { %>
-							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>' onblur='partialSave("title")' contenteditable></div>
+							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>' contenteditable></div>
 						<% } else { %>
 							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>'></div>
 						<% } %>
@@ -477,22 +479,10 @@
 </footer>
 
 <%- include ('../../partials/footer.ejs') %>
-
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 	
-	<% if (locals.metadata?.user?.uuid) { %>
-		exploration.setUseFullPromptForSelect(true);
-		exploration.updateExplorationList(() => {
-			const docBtn = d3.select('div.exploration-local');
-			const data = { id: pad.id };
-			if (data.id) {
-				docBtn.data([data]);
-				exploration.setVisible(true);
-				exploration.addDocButtons(docBtn, false);
-			}
-		});
-	<% } %>
+<% if (locals.metadata?.user?.uuid) { %>
+	<script type='text/javascript' src='/js/contribute/pad/explorations.js' defer></script>
+<% } %>
 
-</script>
 </body>
 </html>

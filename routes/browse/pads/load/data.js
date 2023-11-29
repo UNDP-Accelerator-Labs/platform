@@ -2,6 +2,7 @@ const { page_content_limit, followup_count, metafields, modules, engagementtypes
 const { checklanguage, datastructures, engagementsummary, parsers, array, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
+const ids = require('./ids.js')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
@@ -26,16 +27,9 @@ module.exports = async kwargs => {
 		// THIS IS WHY WE SET THE SEED
 		return t.one(`SELECT setseed(1);`)
 		.then(_ => {
-			return t.any(`
-				SELECT id FROM pads p
-				WHERE TRUE
-					$1:raw
-					AND p.id NOT IN (SELECT review FROM reviews)
-				$2:raw
-				LIMIT $3 OFFSET $4
-			;`, [ full_filters, order, page_content_limit, (page - 1) * page_content_limit ])
+			return ids({ connection: conn, req, res, filters })
 			.then(async pads => {
-				pads = pads.map(d => d.id)
+				// pads = pads.map(d => d.id)
 				padlist = DB.pgp.as.format(pads.length === 0 ? '(NULL)' : '($1:csv)', [ pads ])
 
 				const ownId = await ownDB();

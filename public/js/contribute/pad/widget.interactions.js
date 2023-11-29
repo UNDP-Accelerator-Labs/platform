@@ -1,5 +1,10 @@
-function initWidgetInteractions () {
-	const { metafields } = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+function initWidgetInteractions (metafields, padtype) {
+	if (!mediaSize) var mediaSize = getMediaSize()
+	if (!metafields && !padtype) {
+		const { metafields: pmeta, type: ptype } = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+		metafields = pmeta
+		type = ptype
+	}
 
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
@@ -108,7 +113,7 @@ function initWidgetInteractions () {
 	})
 
 	// DETERMINE WHETHER THE INPUT BAR NEEDS TO BE NAVIGATED (i.e., SCROLLED)
-	if (pad.type === 'blank') {
+	if (padtype === 'blank') {
 		d3.select('.media-input-group')
 		.each(function () {
 			const node = this
@@ -140,6 +145,23 @@ function initWidgetInteractions () {
 					behavior: 'smooth'
 				})
 			})
+		})
+	}
+
+	// SET UP OPTIONS FOR sm DISPLAYS
+	if (['xs', 'sm'].includes(mediaSize)) {
+		d3.select('button.input-toolbox')
+		.on('touchend, click', function () {
+			d3.select(this).toggleClass('highlight')
+			d3.select('.media-input-group').node().focus()
+		})
+		d3.select('.media-input-group').on('touchend', function () { this.focus() })
+		.on('focus', function () {
+			if (this.style.maxHeight) this.style.maxHeight = null
+			else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
+		}).on('blur', function () {
+			 this.style.maxHeight = null
+			 d3.select('button.input-toolbox').classed('highlight', false)
 		})
 	}
 }

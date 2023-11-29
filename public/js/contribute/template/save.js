@@ -1,4 +1,6 @@
 function retrieveItems (sel, datum, items) {
+	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
+
 	// MEDIA OR META
 	if (datum.type === 'title') {
 		datum.instruction = (sel.select('.media-title').node() || sel.select('.meta-title').node())['outerText' || 'textContent' || 'innerText']
@@ -55,6 +57,13 @@ function retrieveItems (sel, datum, items) {
 }
 
 function compileContent (attr) {
+	const template = JSON.parse(d3.select('data[name="template"]').node()?.value)
+
+	const main = d3.select('main')
+	const head = main.select('.head')
+	const body = main.select('.body')
+	const descriptionLayout = body.select('.description-layout')
+
 	const content = {}
 	// COLLECT TITLE
 	let title = head.select('.title').node().innerText
@@ -143,28 +152,30 @@ function compileContent (attr) {
 	const completion = []
 	completion.push(title?.trim().length > 0)
 
-	<% if (!review_template) { %>
-		metafields.filter(d => d.required).forEach(d => {
+	if (template.category !== 'review') {
+		template.metafields.filter(d => d.required).forEach(d => {
 			completion.push(sections.map(c => c.structure)?.flat().some(c => c.name === d.label))
 		})
-	<% } else { %>
+	} else {
 		completion.push(sections.map(d => d.structure)?.flat()?.length > 0)
-	<% } %>
-	if (completion.every(d => d === true)) status = Math.max(1, status)
-	else status = 0
-	content.status = status
+	}
+	// if (completion.every(d => d === true)) status = Math.max(1, status)
+	// else status = 0
+	content.completion = completion.every(d => d === true)
 
 	return content
 }
 
-function partialSave (attr) {
+async function partialSave (attr) {
 	console.log('saving')
+	const template = JSON.parse(d3.select('data[name="template"]').node()?.value)
+
 	// FIRST CHECK IF THIS IS A NEW TEMPLATE
 	// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
 	const url = new URL(window.location)
 	const queryparams = new URLSearchParams(url.search)
-	const id = queryparams.get('id')
-	const source = queryparams.get('source')
+	let id = queryparams.get('id')
+	let source = queryparams.get('source')
 	// IF IT HAS, THEN FOR THE FIRST SAVE, COMPILE EVERYTHING IN CASE IT IS A COPY OF A TEMPLATE
 	let content
 	if (id) {
@@ -176,12 +187,12 @@ function partialSave (attr) {
 		if (source) content.source = +source
 	}
 
-	<% if (review_template) { %>
+	if (template.category === 'review') {
 		content.review_template = true
-		content.review_language = '<%- review_language %>'
-	<% } %>
+		content.review_language = template.language
+	}
 
-	POST('/save/template', content)
+	return await POST('/save/template', content)
 	.then(res => {
 		// ADD THE NOTIFICATION
 		window.sessionStorage.removeItem('changed-content')
@@ -212,7 +223,8 @@ function partialSave (attr) {
 
 		// CHANGE THE URL TO INCLUDE THE PAD ID
 		if (!id) { // INSERT
-			queryparams.append('id', res.object)
+			id = res.data.id
+			queryparams.append('id', id)
 			url.search = queryparams.toString()
 			// BASED ON:
 			// https://usefulangle.com/post/81/javascript-change-url-parameters
@@ -225,15 +237,22 @@ function partialSave (attr) {
 			// d3.select('nav#filter').remove()
 
 			// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
-			d3.selectAll('div.meta-status form input[name="id"]').attr('value', res.object)
+			d3.selectAll('div.meta-status form input[name="id"]').attr('value', id)
 		}
-		// ACTIVATE THE PUBLISHING OPTIONS AT THE END
-		const metastatus = d3.select('div.meta-status')
-			.classed('status-0 status-1', false)
-			.classed(`status-${content.status}`, true)
-		metastatus.select('div.btn-group form button.publish')
-			.attr('disabled', content.status >= 1 ? null : true)
-		metastatus.select('div.btn-group form button.generate-pdf')
-			.attr('disabled', content.status > 0 ? null : true)
+
+		updateStatus(res.data.status)
+		return id
+		
 	}).catch(err => console.log(err))
+}
+
+function updateStatus (_status) {
+	// ACTIVATE THE PUBLISHING OPTIONS AT THE END
+	const metastatus = d3.select('div.meta-status')
+		.classed('status-0 status-1 status-2', false)
+		.classed(`status-${_status}`, true)
+	metastatus.select('div.btn-group form button.publish')
+		.attr('disabled', _status >= 1 ? null : true)
+	metastatus.select('div.btn-group form button.generate-pdf')
+		.attr('disabled', _status > 0 ? null : true)
 }

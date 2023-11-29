@@ -4,6 +4,7 @@ const pads = require('../browse/pads/')
 const pad = require('../contribute/pad/')
 const templates = require('../browse/templates/')
 const template = require('../contribute/template/')
+const resource = require('../contribute/resource/')
 const files = require('../browse/files/')
 const reviews = require('../browse/reviews/')
 const mobilizations = require('../browse/mobilizations/')
@@ -18,7 +19,8 @@ module.exports = async (req, res) => {
 		let data 
 		
 		if (object === 'pads') {
-			if (feature === 'locations') { data = await pads.load.locations({ req }) }
+			if (feature === 'ids') { data = await pads.load.ids({ req }) }
+			else if (feature === 'locations') { data = await pads.load.locations({ req }) }
 			else if (feature === 'samples') { data = await pads.load.samples({ req }) }
 			else { data = await pads.load.data({ req }); }
 		} else if (object === 'pad') {
@@ -38,6 +40,9 @@ module.exports = async (req, res) => {
 	// } else if (object === 'rights') {
 	// 	data = await DB.general.one(`SELECT rights FROM users WHERE uuid = $1;`, [ uuid ])
 	// 	res.status(200).json(data)
+	} else if (object === 'resource') {
+		data = await resource.load.data({ req })
+		res.status(200).json(data)
 	} else if (object === 'metadata') {
 		if (!Array.isArray(feature)) feature = [feature]
 		data = {}

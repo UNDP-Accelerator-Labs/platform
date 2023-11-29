@@ -80,179 +80,171 @@
 			"pt": "Espaços"
 		},
 		"space": {
-			"en": (object, space) => {
-				if (['pad', 'pads'].includes(object)) {
-					if (space === 'private') return "My pads"
-					if (space === 'curated') return "Content curation"
-					if (space === 'pinned') return "My collections"
-					if (space === 'shared') return "Shared pads"
-					if (space === 'reviewing') return "Under review"
-					if (space === 'public') return "Public pads"
-					if (space === 'all') return "All published pads"
-				} else if (['template', 'templates'].includes(object)) {
-					if (space === 'private') return "My templates"
-					if (space === 'curated') return "Content curation"
-					if (space === 'shared') return "Shared templates"
-					if (space === 'public') return "Public templates"
-					if (space === 'reviews') return "Review templates"
-					if (space === 'all') return "All published templates"
-				} else if (['file', 'files'].includes(object)) {
-					if (space === 'private') return "My files"
-					if (space === 'curated') return "Content curation"
-					if (space === 'shared') return "Shared files"
-					if (space === 'public') return "Public files"
-					if (space === 'all') return "All published files"
-				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'pending') return "Pending reviews"
-					if (space === 'ongoing') return "Accepted reviews"
-					if (space === 'past') return "Completed reviews"
-				} else if (['mobilization', 'mobilizations'].includes(object)) {
-					if (space === 'scheduled') return "Scheduled campaigns"
-					if (space === 'ongoing') return "Ongoing campaigns"
-					if (space === 'past') return "Past campaigns"
-				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'all') return "All contributors"
-					if (space === 'invited') return "My contributors"
-					if (space === 'pinned') return "My teams"
+			"en": {
+				"pads": {
+					"private": "My pads",
+					"curated": "Content curation",
+					"pinned": "My collections",
+					"shared": "Shared pads",
+					"reviewing": "Under review",
+					"public": "Public pads",
+					"all": "All published pads",
+				},
+				"templates": {
+					"private": "My templates",
+					"curated": "Content curation",
+					"shared": "Shared templates",
+					"public": "Public templates",
+					"reviews": "Review templates",
+					"all": "All published templates",
+				},
+				"files": {
+					"private": "My files",
+					"curated": "Content curation",
+					"shared": "Shared files",
+					"public": "Public files",
+					"all": "All published files",
+				},
+				"rerviews": {
+					"pending": "Pending reviews",
+					"ongoing": "Accepted reviews",
+					"past": "Completed reviews"
+
+				},
+				"mobilizations": {
+					"scheduled": "Scheduled campaigns",
+					"ongoing": "Ongoing campaigns",
+					"past": "Past campaigns"
+				},
+				"contributors": {
+					"all": "All contributors",
+					"invited": "My contributors",
+					"pinned": "My teams"
 				}
 			},
-			"fr": (object, space) => {
-				if (['pad', 'pads'].includes(object)) {
-					if (space === 'private') return "Mes bloc-notes"
-					if (space === 'curated') return "Curation de contenu"
-					if (space === 'pinned') return "Mes collections"
-					if (space === 'shared') return "Bloc-notes partagés"
-					if (space === 'reviewing') return "En cours de relecture"
-					if (space === 'public') return "Bloc-notes publics"
-					if (space === 'all') return "Tous les bloc-notes publiés"
-				} else if (['template', 'templates'].includes(object)) {
-					if (space === 'private') return "Mes gabarits"
-					if (space === 'curated') return "Curation de contenu"
-					if (space === 'shared') return "Gabarits partagés"
-					if (space === 'public') return "Gabarits publics"
-					if (space === 'reviews') return "Gabarits pour relectures"
-					if (space === 'all') return "Tous les gabarits publiés"
-				} else if (['file', 'files'].includes(object)) {
-					if (space === 'private') return "Mes fichiers"
-					if (space === 'curated') return "Curation de contenu"
-					if (space === 'shared') return "Fichiers partagés"
-					if (space === 'public') return "Fichiers publics"
-					if (space === 'all') return "Tous les fichiers publiés"
-				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'pending') return "Relectures en attente"
-					if (space === 'ongoing') return "Relectures en cours"
-					if (space === 'past') return "Relectures terminées"
-				} else if (['mobilization', 'mobilizations'].includes(object)) {
-					if (space === 'scheduled') return "Campagnes programmées"
-					if (space === 'ongoing') return "Campagnes en cours"
-					if (space === 'past') return "Campagnes passées"
-				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'all') return "Tou.te.s les contribut.rices.eurs"
-					if (space === 'invited') return "Mes contribut.rices.eurs"
-					if (space === 'pinned') return "Mes équipes"
+			"fr": {
+				"pads": {
+					"private": "Mes bloc-notes",
+					"curated": "Curation de contenu",
+					"pinned": "Mes collections",
+					"shared": "Bloc-notes partagés",
+					"reviewing": "En cours de relecture",
+					"public": "Bloc-notes publics",
+					"all": "Tous les bloc-notes publiés",
+				}, 
+				"templates": {
+					"private": "Mes gabarits",
+					"curated": "Curation de contenu",
+					"shared": "Gabarits partagés",
+					"public": "Gabarits publics",
+					"reviews": "Gabarits pour relectures",
+					"all": "Tous les gabarits publiés",
+				},
+				"files": {
+					"private": "Mes fichiers",
+					"curated": "Curation de contenu",
+					"shared": "Fichiers partagés",
+					"public": "Fichiers publics",
+					"all": "Tous les fichiers publiés",
+				},
+				"rerviews": {
+					"pending": "Relectures en attente",
+					"ongoing": "Relectures en cours",
+					"past": "Relectures terminées"
+				},
+				"mobilizations": {
+					"scheduled": "Campagnes programmées",
+					"ongoing": "Campagnes en cours",
+					"past": "Campagnes passées"
+				},
+				"contributors": {
+					"all": "Tou.te.s les contribut.rices.eurs",
+					"invited": "Mes contribut.rices.eurs",
+					"pinned": "Mes équipes"
 				}
 			},
-			"es": (object, space) => {
-				if (['pad', 'pads'].includes(object)) {
-					if (space === 'private') return "Mis libretas"
-					if (space === 'curated') return "Curación de contenidos"
-					if (space === 'pinned') return "Mis colecciones"
-					if (space === 'shared') return "Libretas compartidas"
-					if (space === 'reviewing') return "Bajo revisión"
-					if (space === 'public') return "Libretas publicas"
-					if (space === 'all') return "Todas las libretas publicadas"
-				} else if (['template', 'templates'].includes(object)) {
-					if (space === 'private') return "Mis plantillas"
-					if (space === 'curated') return "Curación de contenidos"
-					if (space === 'shared') return "Plantillas compartidas"
-					if (space === 'public') return "Plantillas publicas"
-					if (space === 'reviews') return "Plantilla para reseñas"
-					if (space === 'all') return "Todas las plantillas publicadas"
-				} else if (['file', 'files'].includes(object)) {
-					if (space === 'private') return "Mis archivos"
-					if (space === 'curated') return "Curación de contenidos"
-					if (space === 'shared') return "Archivos compartidos"
-					if (space === 'public') return "Archivos públicos"
-					if (space === 'all') return "Todos los archivos públicados"
-				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'pending') return "Revisiones pendientes"
-					if (space === 'ongoing') return "Revisiones aceptadas"
-					if (space === 'past') return "Revisiones completadas"
-				} else if (['mobilization', 'mobilizations'].includes(object)) {
-					if (space === 'scheduled') return "Campañas programadas"
-					if (space === 'ongoing') return "Campañas en curso"
-					if (space === 'past') return "Campañas pasadas"
-				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'all') return "Tod.a.o.s l.a.o.s contribuyentes"
-					if (space === 'invited') return "Mis contribuyentes"
-					if (space === 'pinned') return "Mis equipos"
+			"es": {
+				"pads": {
+					"private": "Mis libretas",
+					"curated": "Curación de contenidos",
+					"pinned": "Mis colecciones",
+					"shared": "Libretas compartidas",
+					"reviewing": "Bajo revisión",
+					"public": "Libretas publicas",
+					"all": "Todas las libretas publicadas",
+				},
+				"templates": {
+					"private": "Mis plantillas",
+					"curated": "Curación de contenidos",
+					"shared": "Plantillas compartidas",
+					"public": "Plantillas publicas",
+					"reviews": "Plantilla para reseñas",
+					"all": "Todas las plantillas publicadas",
+				},
+				"files": {
+					"private": "Mis archivos",
+					"curated": "Curación de contenidos",
+					"shared": "Archivos compartidos",
+					"public": "Archivos públicos",
+					"all": "Todos los archivos públicados",
+				},
+				"rerviews": {
+					"pending": "Revisiones pendientes",
+					"ongoing": "Revisiones aceptadas",
+					"past": "Revisiones completadas"
+				},
+				"mobilizations": {
+					"scheduled": "Campañas programadas",
+					"ongoing": "Campañas en curso",
+					"past": "Campañas pasadas"
+				},
+				"contributors": {
+					"all": "Tod.a.o.s l.a.o.s contribuyentes",
+					"invited": "Mis contribuyentes",
+					"pinned": "Mis equipos"
 				}
 			},
-			"pt": (object, space) => {
-				if (['pad', 'pads'].includes(object)) {
-					if (space === 'private') return "Meus blocos de notas"
-					if (space === 'curated') return "Restauração de conteúdo"
-					if (space === 'pinned') return "Minhas coleções"
-					if (space === 'shared') return "Blocos de notas compartilhados"
-					if (space === 'reviewing') return "Sob revisão"
-					if (space === 'public') return "Blocos de notas públicos"
-					if (space === 'all') return "Todos os blocos de notas publicados"
-				} else if (['template', 'templates'].includes(object)) {
-					if (space === 'private') return "Meus modelos"
-					if (space === 'curated') return "Restauração de conteúdo"
-					if (space === 'shared') return "Modelos compartilhados"
-					if (space === 'public') return "Modelos públicos"
-					if (space === 'reviews') return "Modelo para comentários"
-					if (space === 'all') return "Todos os modelos publicados"
-				} else if (['file', 'files'].includes(object)) {
-					if (space === 'private') return "Meus arquivos"
-					if (space === 'curated') return "Restauração de conteúdo"
-					if (space === 'shared') return "Arquivos compartilhados"
-					if (space === 'public') return "Arquivos públicos"
-					if (space === 'all') return "Todos os arquivos publicados"
-				} else if (['review', 'reviews'].includes(object)) {
-					if (space === 'pending') return "Revisões pendentes"
-					if (space === 'ongoing') return "Revisões aceitos"
-					if (space === 'past') return "Revisões concluídas"
-				} else if (['mobilization', 'mobilizations'].includes(object)) {
-					if (space === 'scheduled') return "Campanhas agendadas"
-					if (space === 'ongoing') return "Campanhas em andamento"
-					if (space === 'past') return "Campanhas anteriores"
-				} else if (['contributor', 'contributors'].includes(object)) {
-					if (space === 'all') return "Todos os ontribuidor.e.a.s"
-					if (space === 'invited') return "Meus contribuidor.e.a.s"
-					if (space === 'pinned') return "Minhas equipes"
+			"pt": {
+				"pads": {
+					"private": "Meus blocos de notas",
+					"curated": "Restauração de conteúdo",
+					"pinned": "Minhas coleções",
+					"shared": "Blocos de notas compartilhados",
+					"reviewing": "Sob revisão",
+					"public": "Blocos de notas públicos",
+					"all": "Todos os blocos de notas publicados",
+				},
+				"templates": {
+					"private": "Meus modelos",
+					"curated": "Restauração de conteúdo",
+					"shared": "Modelos compartilhados",
+					"public": "Modelos públicos",
+					"reviews": "Modelo para comentários",
+					"all": "Todos os modelos publicados",
+				},
+				"files": {
+					"private": "Meus arquivos",
+					"curated": "Restauração de conteúdo",
+					"shared": "Arquivos compartilhados",
+					"public": "Arquivos públicos",
+					"all": "Todos os arquivos publicados",
+				},
+				"rerviews": {
+					"pending": "Revisões pendentes",
+					"ongoing": "Revisões aceitos",
+					"past": "Revisões concluídas"
+				},
+				"mobilizations": {
+					"scheduled": "Campanhas agendadas",
+					"ongoing": "Campanhas em andamento",
+					"past": "Campanhas anteriores"
+				},
+				"contributors": {
+					"all": "Todos os ontribuidor.e.a.s",
+					"invited": "Meus contribuidor.e.a.s",
+					"pinned": "Minhas equipes"
 				}
 			}
-			// "pt": (object, space) => {
-			// 	if (['pad', 'pads'].includes(object)) {
-			// 		if (space === 'private') return
-			// 		if (space === 'curated') return
-			// 		if (space === 'pinned') return
-			// 		if (space === 'shared') return
-			// 		if (space === 'reviewing') return
-			// 		if (space === 'public') return
-			// 	} else if (['template', 'templates'].includes(object)) {
-			// 		if (space === 'private') return
-			// 		if (space === 'curated') return
-			// 		if (space === 'shared') return
-			// 		if (space === 'reviews') return
-			// 	} else if (['file', 'files'].includes(object)) {
-			// 		if (space === 'private') return
-			// 		if (space === 'curated') return
-			// 		if (space === 'shared') return
-			// 		if (space === 'public') return
-			// 	} else if (['review', 'reviews'].includes(object)) {
-			// 		if (space === 'private') return
-			// 		if (space === 'shared') return
-			// 	} else if (['mobilization', 'mobilizations'].includes(object)) {
-			// 		if (space === 'ongoing') return
-			// 		if (space === 'past') return
-			// 	} else if (['contributor', 'contributors'].includes(object)) {
-			// 		if (space === 'invited') return
-			// 		if (space === 'pinned') return
-			// 	}
-			// }
 		},
 
 		"import pads": {
@@ -268,31 +260,31 @@
 			"pt": "<strong>Escolha um arquivo .xlsx</strong> ou arraste-o aqui."
 		},
 		"chose file": {
-			"en": filetype => {
-				if (filetype === 'xlsx') return "Please choose a <strong>.xlsx file.</strong>"
+			"en": {
+				"xlsx": "Please choose a <strong>.xlsx file.</strong>"
 			},
-			"fr": filetype => {
-				if (filetype === 'xlsx') return "Veuillez choisir un fichier <strong>.xlsx.</strong>"
+			"fr": {
+				"xlsx": "Veuillez choisir un fichier <strong>.xlsx.</strong>"
 			},
-			"es": filetype => {
-				if (filetype === 'xlsx') return "Elija un archivo <strong>.xlsx.</strong>"
+			"es": {
+				"xlsx": "Elija un archivo <strong>.xlsx.</strong>"
 			},
-			"pt": filetype => {
-				if (filetype === 'xlsx') return "Escolha um arquivo <strong>.xlsx.</strong>"
+			"pt": {
+				"xlsx": "Escolha um arquivo <strong>.xlsx.</strong>"
 			}
 		},
 		"chose only one file": {
-			"en": filetype => {
-				if (filetype === 'xlsx') return "Please choose <strong>only one .xlsx file.</strong>"
+			"en": {
+				"xlsx": "Please choose <strong>only one .xlsx file.</strong>"
 			},
-			"fr": filetype => {
-				if (filetype === 'xlsx') return "Veuillez choisir <strong>un seul fichier .xlsx.</strong>"
+			"fr": {
+				"xlsx": "Veuillez choisir <strong>un seul fichier .xlsx.</strong>"
 			},
-			"es": filetype => {
-				if (filetype === 'xlsx') return "Elija <strong>solo un archivo .xlsx.</strong>"
+			"es": {
+				"xlsx": "Elija <strong>solo un archivo .xlsx.</strong>"
 			},
-			"pt": filetype => {
-				if (filetype === 'xlsx') return "Escolha <strong>apenas um arquivo .xlsx.</strong>"
+			"pt": {
+				"xlsx": "Escolha <strong>apenas um arquivo .xlsx.</strong>"
 			}
 		},
 		"import to workspace or mobilization": {
@@ -302,16 +294,16 @@
 			"pt": "Escolha um espaço de trabalho ou campanha para importar os blocos de notas."
 		},
 		"generated template": { // USED
-			"en": filename => "Template generated from the columns in “" + filename + "”.",
-			"fr": filename => "Gabarit généré à partir des colonnes du fichier « " + filename + " ».",
-			"es": filename => "Plantilla generada a partir de columnas de archivo “" + filename + "”.",
-			"pt": filename => "Modelo gerado a partir das colunas do arquivo “" + filename + "”."
+			"en": "Template generated from the columns in “$1”.",
+			"fr": "Gabarit généré à partir des colonnes du fichier « $1 ».",
+			"es": "Plantilla generada a partir de columnas de archivo “$1”.",
+			"pt": "Modelo gerado a partir das colunas do arquivo “$1”."
 		},
 		"import table description": {
-			"en": (rowcount, colcount, displayed) => rowcount + " entries and " + colcount + " columns (" + rowcount + " x " + colcount + " table) were detected. " + displayed + " entries are displayed.",
-			"fr": (rowcount, colcount, displayed) => rowcount + " entrées et " + colcount + " colonnes (un tableau de " + rowcount + " x " + colcount + ") ont été détectées. " + displayed + " entrées sont affichées.",
-			"es": (rowcount, colcount, displayed) => "Se detectaron " + rowcount + " entradas y " + colcount + " columnas (una tabla de " + rowcount + " x " + colcount + "). Se muestran " + displayed + " entradas.",
-			"pt": (rowcount, colcount, displayed) => rowcount + " entradas e " + colcount + " colunas (uma tabela " + rowcount + " x " + colcount + ") foram detectadas. " + displayed + " entradas são exibidas."
+			"en": "$1 entries and $2 columns ($1 x $2 table) were detected. $3 entries are displayed.",
+			"fr": "$1 entrées et $2 colonnes (un tableau de $1 x $2) ont été détectées. $3 entrées sont affichées.",
+			"es": "Se detectaron $1 entradas y $2 columnas (una tabla de $1 x $2). Se muestran $3 entradas.",
+			"pt": "$1 entradas e $2 colunas (uma tabela $1 x $2) foram detectadas. $3 entradas são exibidas."
 		},
 		"select destination": {
 			"en": "Select a destination",
@@ -1001,33 +993,25 @@
 
 		// },
 		"filter": { // USED
-			"en": (verb, plural) => {
-				if (verb) return "Filter"
-				else {
-					if (plural) return "Filters"
-					else return "Filter"
-				}
+			"en": {
+				"verb": "Filter",
+				"plural": "Filters",
+				"singular": "Filter"
 			},
-			"fr": (verb, plural) => {
-				if (verb) return "Filtrer"
-				else {
-					if (plural) return "Filtres"
-					else return "Filtre"
-				}
+			"fr": {
+				"verb": "Filtrer",
+				"plural": "Filtres",
+				"singular": "Filtre"
 			},
-			"es": (verb, plural) => {
-				if (verb) return "Filtrar"
-				else {
-					if (plural) return "Filtros"
-					else return "Filtro"
-				}
+			"es": {
+				"verb": "Filtrar",
+				"plural": "Filtros",
+				"singular": "Filtro"
 			},
-			"pt": (verb, plural) => {
-				if (verb) return "Filtro"
-				else {
-					if (plural) return "Filtros"
-					else return "Filtro"
-				}
+			"pt": {
+				"verb": "Filtro",
+				"plural": "Filtros",
+				"singular": "Filtro"
 			}
 		},
 		"apply filters": { // USED
@@ -2361,8 +2345,12 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 				"checklist": "request a response from multiple choices",
 				"radiolist": "request a unique response from multiple choices",
 				"location": "request a location",
-				"index": "request one or more SDG tags", // TO DO: UPDATE THIS
-				"tag": "request one or more thematic area tags", // TO DO: UPDATE THIS
+				"index": "request one or more indexes",
+				"tag": "request one or more tags",
+				"sdgs": "request one or more SDG tags",
+				"thematic_areas": "request one or more thematic area tags",
+				"methods": "request one or more methodology tags",
+				"datasources": "request one or more data tags",
 				"attachment": "request an external resource"
 			},
 			"fr": {
@@ -2375,8 +2363,12 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 				"checklist": "demander une réponse parmi plusieurs choix",
 				"radiolist": "demander une réponse unique parmi plusieurs choix",
 				"location": "demander un emplacement",
-				"index": "demander une ou plusieurs étiquettes ODDs",
-				"tag": "demander une ou plusieurs étiquettes thématiques",
+				"index": "demander une ou plusieures indexations",
+				"tag": "demander une ou plusieurs étiquettes",
+				"sdgs": "demander une ou plusieurs étiquettes ODDs",
+				"thematic_areas": "demander une ou plusieurs étiquettes thématiques",
+				"methods": "demander une ou plusieurs étiquettes de méthode",
+				"datasources": "demander une ou plusieurs étiquettes de données",
 				"attachment": "demander une ressources externes"
 			},
 			"es": {
@@ -2389,8 +2381,12 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 				"checklist": "solicitar una respuesta de múltiples opciones",
 				"radiolist": "solicitar una única respuesta entre varias opciones",
 				"location": "solicitar una ubicación",
-				"index": "solicitar una o más etiquetas de ODS",
-				"tag": "solicitar una o más etiquetas de área temática",
+				"index": "solicitar uno o más índices",
+				"tag": "solicitar una o más etiquetas",
+				"sdgs": "solicitar una o más etiquetas de ODS",
+				"thematic_areas": "solicitar una o más etiquetas de área temática",
+				"methods": "solicitar una o más etiquetas de metodología",
+				"datasources": "solicitar una o más etiquetas de datos",
 				"attachment": "solicitar un recurso externo"
 			},
 			"pt": {
@@ -2403,9 +2399,13 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 				"checklist": "solicitar uma resposta de várias escolhas",
 				"radiolist": "solicitar uma resposta única de várias opções",
 				"location": "solicite uma localização",
-				"index": "solicitar um ou mais etiquetas de ODS",
-				"tag": "solicitar uma ou mais etiquetas de área temática",
-				"attachment": "solicitar um recurso externo"
+				"index": "solicitar uno o más índices",
+				"tag": "solicitar uma ou mais etiquetas",
+				"sdgs": "solicitar um ou mais etiquetas de ODS",
+				"thematic_areas": "solicitar uma ou mais etiquetas de área temática",
+				"methods": "solicitar una o más etiquetas de metodología",
+				"datasources": "request one or more data tags",
+				"attachment": "solicitar una o más etiquetas de datos"
 			}
 		},
 		"expect": {
@@ -2990,17 +2990,17 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 		},
 
 		"dblclick to preview": {
-			"en": object => {
-				if (object === "pad") return "Double click to view pad."
+			"en": {
+				"pad": "Double click to view pad."
 			},
-			"fr": object => {
-				if (object === "pad") return "Double-cliquez pour afficher le bloc-notes."
+			"fr": {
+				"pad": "Double-cliquez pour afficher le bloc-notes."
 			},
-			"es": object => {
-				if (object === "pad") return "Haga doble clic para ver la libreta."
+			"es": {
+				"pad": "Haga doble clic para ver la libreta."
 			},
-			"pt": object => {
-				if (object === "pad") return "Clique duas vezes para visualizar o bloco de notas."
+			"pt": {
+				"pad": "Clique duas vezes para visualizar o bloco de notas."
 			}
 		},
 		"click to search or add locations": {

@@ -4,13 +4,14 @@ window.addEventListener('keydown', function (e) {
 	keyTrack.push(e.keyCode)
 	
 	const { display, activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 	
 	const main = d3.select('#pad')
 	const head = main.select('.head')
 	const footer = d3.select('footer')
 
-	if (activity === 'edit') {
+	if (editing) {
 		// SHIFT + ENTER LEAVES THE FOCUSED CELL
 		if (keyTrack.includes(16) && e.keyCode === 13
 			&& (main.selectAll('.media-container.focus, .meta-container.focus').size())
@@ -55,13 +56,14 @@ window.addEventListener('keydown', function (e) {
 window.addEventListener('keyup', function (e) {
 	e = e || event
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 	
 	const main = d3.select('#pad')
 	const head = main.select('.head')
 	const footer = d3.select('footer')
 
-	if (page.activity === 'edit') {
+	if (editing) {
 		if (
 			![d3.selectAll('header input[type=text]').nodes(), head.selectAll('div.title').nodes(), main.selectAll('.section-header h1').nodes(), main.selectAll('input[type=text], input[type=number]').nodes(), footer.selectAll('textarea').nodes()].flat().includes(document.activeElement)
 			&& !(main.selectAll('.layout.focus *:focus').size())
@@ -112,7 +114,7 @@ window.addEventListener('keyup', function (e) {
 					)
 				)
 			) {
-				if (page.activity === 'edit') {
+				if (editing) {
 					if (page.type === 'private') switchButtons(language)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
@@ -126,9 +128,10 @@ window.addEventListener('keyup', function (e) {
 window.addEventListener('mouseup', function (e) {
 	e = e || event
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = page.activity === 'edit'
 	const main = d3.select('#pad')
 
-	if (page.activity === 'edit') {
+	if (editing) {
 		const focused_node = d3.select('.focus')
 		const target = d3.select(e.target)
 		const media = target.findAncestor('media')

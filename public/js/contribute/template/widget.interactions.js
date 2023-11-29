@@ -1,20 +1,24 @@
-function initWidgetInteractions () {
-	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
+function initWidgetInteractions (metafields) {
+	if (!mediaSize) var mediaSize = getMediaSize()
+	if (!metafields) {
+		const { metafields: tmeta } = JSON.parse(d3.select('data[name="template"]').node()?.value)
+		metafields = tmeta
+	}
 
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-layout.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addSection({ lang: language, sibling: this['__active_node__'], focus: true })
+	}).on('click', async function () {
+		await addSection({ lang: language, sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
 	d3.select('.media-input-group #input-media-repeat-section')
 	.on('mousedown', function () {
 		this['__active_node__'] = d3.selectAll('.media-layout.focus').nodes()?.last()?.nextSibling
-	}).on('click', function () {
-		addSection({ data: { repeat: true }, lang: language, sibling: this['__active_node__'], focus: true })
+	}).on('click', async function () {
+		await addSection({ data: { repeat: true }, lang: language, sibling: this['__active_node__'], focus: true })
 		this['__active_node__'] = null
 	})
 
@@ -139,4 +143,21 @@ function initWidgetInteractions () {
 			})
 		})
 	})
+
+	// SET UP OPTIONS FOR sm DISPLAYS
+	if (['xs', 'sm'].includes(mediaSize)) {
+		d3.select('button.input-toolbox')
+		.on('touchend, click', function () {
+			d3.select(this).toggleClass('highlight')
+			d3.select('.media-input-group').node().focus()
+		})
+		d3.select('.media-input-group').on('touchend', function () { this.focus() })
+		.on('focus', function () {
+			if (this.style.maxHeight) this.style.maxHeight = null
+			else this.style.maxHeight = `${Math.min(this.scrollHeight, screen.height * .75)}px`
+		}).on('blur', function () {
+			 this.style.maxHeight = null
+			 d3.select('button.input-toolbox').classed('highlight', false)
+		})
+	}
 }

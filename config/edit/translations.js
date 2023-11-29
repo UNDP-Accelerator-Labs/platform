@@ -105,12 +105,18 @@ exports.translations = {
         appDesc,
         resetLink,
         baseURL,
+        suiteURL,
       ) => `
         <p>
         Hello ${newName}!
         </p><p>
         Welcome to the <a href="${baseURL}">${appTitle}</a>.<br/>
         We are excited to share with you the ${appTitle} of the UNDP Accelerator Labs.
+        This ${
+          baseURL.includes('consent.') ? 'archive' : 'platform'
+        } is part of the
+        <a href="${suiteURL}">SDG Innovation Commons Suite</a>. With your account
+        you have access to all its platforms.
         </p>
         ${appDesc}
         <p>
@@ -135,12 +141,18 @@ exports.translations = {
         appDesc,
         resetLink,
         baseURL,
+        suiteURL,
       ) => `
         <p>
         ¡Hola ${newName}!
         </p><p>
         Bienvenido/a a la <a href="${baseURL}">${appTitle}</a>.<br/>
         Nos emociona compartir con ustedes la ${appTitle} de los Laboratorios de Aceleración del PNUD.
+        Esta ${
+          baseURL.includes('consent.') ? 'archivo' : 'plataforma'
+        } es parte de la
+        <a href="${suiteURL}">Suite de la Comunidad de Innovación SDG</a>.
+        Con tu cuenta tienes acceso a todas sus plataformas.
         </p>
         ${appDesc}
         <p>

@@ -1,4 +1,4 @@
-const { modules, own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
+const { modules, app_suite_url, own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
 const { email: sendemail } = include('routes/helpers/')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
@@ -101,7 +101,7 @@ module.exports =async (req, res) => {
 								to: email,
 								cc: initiatorEmail,
 								subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(platformName),
-								html: (temail['new user body'][language] ?? temail['new user body']['en'])(name, username, initiatorEmail, platformName, platformDesc, resetLink, own_app_url),
+								html: (temail['new user body'][language] ?? temail['new user body']['en'])(name, username, initiatorEmail, platformName, platformDesc, resetLink, own_app_url, app_suite_url),
 							})
 							return result
 						} else return result

@@ -342,6 +342,7 @@
 									</div>
 								</li>
 							<% } %>
+							<% if (false) { // notification block toggle %>
 							<li class='google-translate-attr'>
 								<label class='instruction'><%- vocabulary['email notifications'][language] %></label>
 								<div class='input-group'>
@@ -349,6 +350,9 @@
 									<label for='email-notifications' data-content='<% if (locals.data?.notifications) { %><%- vocabulary["yes"][language].toUpperCase() %><% } else { %><%- vocabulary["no"][language].toUpperCase() %><% } %>'></label>
 								</div>
 							</li>
+							<% } else { // notification block hidden %>
+								<input type='hidden' id='email-notifications' name='email_notifications' value='true' %>>
+							<% } // notification block end %>
 						</ul>
 					</div>
 				</form>
@@ -411,7 +415,7 @@
 			const evt = d3.event
 			if (evt.code === 'Enter' || evt.keyCode === 13) {
 				evt.preventDefault()
-			}	
+			}
 		}).on('keyup', function () {
 			const evt = d3.event
 			if (evt.code === 'Enter' || evt.keyCode === 13) {
@@ -515,7 +519,7 @@
 				const evt = d3.event
 				if (evt.code === 'Enter' || evt.keyCode === 13) {
 					evt.preventDefault()
-				}	
+				}
 			}).on('keyup.checkEnter', function (d) {
 				const evt = d3.event
 				const node = this
@@ -550,7 +554,7 @@
 					} else {
 						addPinOption.call(dropdown.node(), node.value.trim())
 					}
-					
+
 					// RESET DROPDOWN
 					this.value = ''
 					dropdown.selectAll('menu li').classed('hide', false)

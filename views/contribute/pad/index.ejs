@@ -151,7 +151,7 @@
 						<% } %>
 						<form method='GET' action='/publish/<%- `${object}s` %>'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
-							<% 
+							<%
 								const currentpage_url = new URL(locals.metadata.page.currentpage_url)
 								const queryparams = new URLSearchParams(currentpage_url.search)
 								const token = queryparams.get('token')
@@ -206,7 +206,7 @@
 													</button>
 												</li>
 											<% } %>
-											<% if ((locals.data?.status || 0) <= 2 
+											<% if ((locals.data?.status || 0) <= 2
 												&& (locals.data?.review_status === 0))
 											{ %>
 												<li class='opt google-translate-attr'>
@@ -224,7 +224,7 @@
 												</li>
 											<% } %>
 											<% if (
-												(locals.data?.status || 0) <= 2 
+												(locals.data?.status || 0) <= 2
 												&& (locals.data?.publishable !== undefined ? locals.data?.publishable : true)
 
 											) { %>

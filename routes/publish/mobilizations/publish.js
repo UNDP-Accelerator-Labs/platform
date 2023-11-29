@@ -1,4 +1,4 @@
-const { app_title, DB, ownDB } = include('config/')
+const { own_app_url, app_title_short, app_title, DB, ownDB, translations } = include('config/');
 const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID, limitLength } = include('routes/helpers/')
 
 const cron = require('node-cron')
@@ -127,11 +127,13 @@ module.exports = (req, res) => {
 					.then(async results => {
 						const bcc = results.map(d => d.email)
 
+						const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 						await sendemail({
 							to: email,
 							bcc,
-							subject: `[${app_title}] New campaign`,
-							html: `Dear contributor, you are invited to participate in a new documentation campaign on the ${app_title} platform.
+							subject: `[${platformName}] New campaign`,
+							html: `Dear contributor, you are invited to participate in a new documentation
+								campaign on the <a href="${own_app_url}">${platformName}</a>.
 								Here is some information about the campaign:
 								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE
 						})

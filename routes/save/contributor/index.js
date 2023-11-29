@@ -1,5 +1,5 @@
-const { modules, own_app_url, app_title, app_languages, DB, translations } = include('config/')
-const { email: sendemail, sessionupdate } = include('routes/helpers/')
+const { modules, app_suite_url, own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
+const { email: sendemail } = include('routes/helpers/')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
@@ -42,7 +42,7 @@ module.exports =async (req, res) => {
 					/* $6 */ language,
 					/* $7 */ JSON.stringify(secondary_languages || []),
 					/* $8 */ rights,
-					/* $9 */ notifications || false,
+					/* $9 */ true,  // notifications
 					/* $10 */ reviewer || false
 				], d => d.uuid)
 				.then(result => {
@@ -62,7 +62,7 @@ module.exports =async (req, res) => {
 								return obj
 							})
 
-							const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`						
+							const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`
 							batch.push(t.any(sql)
 							.then(results => {
 								const team_members = results.map(d => {
@@ -73,7 +73,7 @@ module.exports =async (req, res) => {
 										return obj
 									})
 								}).flat()
-								
+
 								const sql = DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')
 								return t.none(sql)
 								.catch(err => console.log(err))
@@ -95,11 +95,13 @@ module.exports =async (req, res) => {
 						if (result !== uuid) {
 							// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
 							const temail = translations['email notifications'];
+							const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+							const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
 							await sendemail({
 								to: email,
 								cc: initiatorEmail,
-								subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(app_title),
-								html: (temail['new user body'][language] ?? temail['new user body']['en'])(username, app_title, resetLink, own_app_url),
+								subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(platformName),
+								html: (temail['new user body'][language] ?? temail['new user body']['en'])(name, username, initiatorEmail, platformName, platformDesc, resetLink, own_app_url, app_suite_url),
 							})
 							return result
 						} else return result
@@ -163,7 +165,7 @@ module.exports =async (req, res) => {
 										/* $6 */ language,
 										/* $7 */ JSON.stringify(secondary_languages || []),
 										/* $8 */ update_rights,
-										/* $9 */ notifications || false,
+										/* $9 */ true,  // notifications
 										/* $10 */ reviewer || false,
 										/* $11 */ id
 									]
@@ -194,7 +196,7 @@ module.exports =async (req, res) => {
 								/* $6 */ language,
 								/* $7 */ JSON.stringify(secondary_languages || []),
 								/* $8 */ update_rights,
-								/* $9 */ notifications || false,
+								/* $9 */ true,  // notifications
 								/* $10 */ reviewer || false,
 								/* $11 */ id
 							])
@@ -222,7 +224,7 @@ module.exports =async (req, res) => {
 					// 			DO NOTHING
 					// 	;`, [ d, id ]))
 					// })
-					
+
 				}
 				if (new_teams?.length > 0) {
 					const insert_teams = new_teams.map(d => {
@@ -232,7 +234,7 @@ module.exports =async (req, res) => {
 						return obj
 					})
 
-					const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`						
+					const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`
 					batch.push(t.any(sql)
 					.then(results => {
 						const team_members = results.map(d => {
@@ -243,7 +245,7 @@ module.exports =async (req, res) => {
 								return obj
 							})
 						}).flat()
-						
+
 						const sql = `${DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')} ON CONFLICT ON CONSTRAINT unique_team_member DO NOTHING;`
 						return t.none(sql)
 						.then(_ => results)
@@ -268,8 +270,8 @@ module.exports =async (req, res) => {
 							DELETE FROM teams t
 							WHERE t.host = $1
 								AND t.id IN (
-									SELECT team 
-									FROM team_members 
+									SELECT team
+									FROM team_members
 									GROUP BY team
 									HAVING COUNT (member) = 1
 									AND $1 = ANY (array_agg(member))
@@ -292,7 +294,6 @@ module.exports =async (req, res) => {
 						await t.one(`
 							SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
 							COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
-
 							CASE WHEN u.language IN ($1:csv)
 								THEN u.language
 								ELSE 'en'
@@ -332,10 +333,11 @@ module.exports =async (req, res) => {
 					// SEND EMAIL IF THE CHANGES ARE NOT SELF-TRIGGERED
 					if (id !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+						const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 						await sendemail({
 							to: email,
-							subject: `[${app_title}] Your account information has been modified`,
-							html: `Your account information has been modified by ${username} via the ${app_title} application.` // TO DO: TRANSLATE
+							subject: `[${platformName}] Your account information has been modified`,
+							html: `Your account information has been modified by ${username} via the <a href="${own_app_url}">${platformName}</a>.` // TO DO: TRANSLATE
 						})
 						return null
 					} else return null

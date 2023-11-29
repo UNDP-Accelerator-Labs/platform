@@ -10,6 +10,7 @@ const {
   DB,
   csp_links,
   app_base_host,
+  getVersionObject,
 } = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
@@ -21,7 +22,6 @@ const PgSession = require('connect-pg-simple')(session);
 
 const multer = require('multer');
 const upload = multer({ dest: './tmp' });
-const fs = require('fs');
 const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
@@ -148,49 +148,16 @@ function setAccessControlAllowOrigin(req, res, next) {
 const routes = require('./routes/');
 
 // HEALTH-CHECK + INFO
-let versionObj = null;
-
-function getVersionString() {
-  return new Promise((resolve) => {
-    if (versionObj !== null) {
-      resolve(versionObj);
-      return;
-    }
-    fs.readFile('version.txt', (err, data) => {
-      if (err) {
-        versionObj = {
-          name: 'no version available',
-          commit: 'unknown',
-          date: 'unknown',
-          app: `${app_id}`,
-        };
-      } else {
-        const lines = data.toString().split(/[\r\n]+/);
-        versionObj = {
-          name: lines[0] || 'no version available',
-          commit: lines[1] || 'unknown',
-          date: lines[2] || 'unknown',
-          app: `${app_id}`,
-        };
-      }
-      resolve(versionObj);
-    });
-  });
-}
-
-app.get('/version/', (req, res) => {
-  getVersionString()
-    .then((vo) => res.send(vo))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send({
-        name: 'error while reading version',
-        commit: 'unknown',
-        date: 'unknown',
-        app: `${app_id}`,
-      });
-    });
+app.get('/version/', async (req, res) => {
+  const vo = await getVersionObject();
+  if (vo.error) {
+    res.status(500).send(vo);
+  } else {
+    res.send(vo);
+  }
 });
+
+app.get('/sitemap.xml', routes.sitemap);
 
 // PUBLIC VIEWS
 app.get('/', routes.redirect.home, routes.dispatch.public);
@@ -415,16 +382,16 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // RUN THE SERVER
-app.listen(process.env.PORT || 2000, (_) => {
+app.listen(process.env.PORT || 2000, async (_) => {
   console.log(`the app is running on port ${process.env.PORT || 2000}`);
-  getVersionString()
-    .then((vo) => {
-      console.log('name', vo.name);
-      console.log('commit', vo.commit);
-      console.log('deployed', vo.date);
-      console.log('app_id', app_id);
-    })
-    .catch((err) => console.log(err));
+  const vo = await getVersionObject();
+  console.log('name', vo.name);
+  console.log('commit', vo.commit);
+  console.log('deployed', vo.date);
+  console.log('app_id', app_id);
+  if (vo.error) {
+    console.log('error reading version.txt');
+  }
 });
 
 // INITIATE ALL CRON JOBS

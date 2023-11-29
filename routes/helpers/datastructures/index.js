@@ -20,7 +20,6 @@ const {
 const checklanguage = require('../language')
 const join = require('../joins')
 const array = require('../array');
-const { checkDevice } = require('../../login/device-info');
 
 function stripExplorationId(url) {
 	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');

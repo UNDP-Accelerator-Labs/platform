@@ -146,14 +146,6 @@ window.addEventListener('load', async function () {
 			setTimeout(_ => filter.classed('expand', false), 250)
 		}
 	})
-	// OTHER FILTER MODULE INTERACTIONS
-	let curSelectSTM = 'stm-browse';
-	let hasUsedExploration = false;
-
-	d3.selectAll('#search-field')
-	.on('focus', () => {
-		updateExplorationHint();
-	});
 
 	// PIN ALL SEARCH BAR
 	if (object === 'pads') {

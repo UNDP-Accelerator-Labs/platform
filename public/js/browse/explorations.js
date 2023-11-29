@@ -1,6 +1,15 @@
+// EXPLORATION MODULE
+let curSelectSTM = 'stm-browse';
+let hasUsedExploration = false;
+
 let isExplorationInit = false;
 const fixedEid = d3.select('data[name="fixedEid"]').node().value;
 const formExplorationId = d3.select('#form-exploration-id');
+
+d3.selectAll('#search-field')
+.on('focus', () => {
+	updateExplorationHint();
+});
 
 exploration.addExplorationMain(d3.select('div.exploration'), () => {
 	hasUsedExploration = exploration.hasExploration();
@@ -51,7 +60,8 @@ function doSelectSTM(stm) {
 }
 
 function updateExplorationHint() {
-	d3.selectAll('.stm-hint').classed('stm-hidden', () => {
+	d3.selectAll('.stm-hint')
+	.classed('stm-hidden', () => {
 		if (sessionStorage.explorationHintUserHiddenCount && +sessionStorage.explorationHintUserHiddenCount > 1) {
 			return true;
 		}

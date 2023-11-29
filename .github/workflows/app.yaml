@@ -3,7 +3,7 @@ name: Deployment
 on:
   push:
     branches:
-      - master
+      - '*'
     tags:
       - 'v*'
 
@@ -15,9 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Fetch tags
+      - name: Fetch history
         run: |
-          git fetch --tags
+          git fetch --unshallow
 
       - name: Docker login
         uses: azure/docker-login@v1
@@ -46,9 +46,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Fetch tags
+      - name: Fetch history
         run: |
-          git fetch --tags
+          git fetch --unshallow
 
       - name: Set env
         run: echo "IMAGE_TAG=$(make -s name)" >> $GITHUB_ENV
@@ -68,9 +68,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Fetch tags
+      - name: Fetch history
         run: |
-          git fetch --tags
+          git fetch --unshallow
 
       - name: Set env
         run: echo "IMAGE_TAG=$(make -s name)" >> $GITHUB_ENV

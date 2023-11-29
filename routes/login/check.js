@@ -24,7 +24,7 @@ module.exports = async (req, res, next) => {
 				if (result) {
 					return t.any(`SELECT COALESCE(rights, 0)::INT AS rights FROM users WHERE uuid = $1;`, [ uuid ], d => d.rights)
 					.then(results => {
-						if (!results) {
+						if (!results?.length) {
 							return false;
 						}
 						req.session.rights = results[0].rights

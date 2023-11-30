@@ -39,12 +39,14 @@
 <meta names='apple-mobile-web-app-status-bar-style' content='black-translucent'>
 <meta name='theme-color' content='#16a0d6e7'/>
 
-<!-- Different versions -->
+<!-- Canonical URL -->
 <link rel="canonical" href="<%= canonical %>" />
+<% if (currentpage_url.pathname.includes('/en/')) { %>
 <link rel="alternate" href="<%= canonical.replace('/en/', '/fr/') %>" hreflang="fr" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/es/') %>" hreflang="es" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/pt/') %>" hreflang="pt" />
 <link rel="alternate" href="<%= canonical %>" hreflang="x-default" />
+<% } // NOTE: only serve alternates for the canonical page %>
 
 <!-- Facebook Meta Tags -->
 <meta property="og:url" content="<%= url %>" >

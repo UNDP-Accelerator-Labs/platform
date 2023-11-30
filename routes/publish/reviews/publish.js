@@ -1,4 +1,4 @@
-const { app_suite, app_title, modules, DB } = include('config/')
+const { app_title_short, translations, app_title, modules, DB } = include('config/')
 const { checklanguage, parsers, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -90,6 +90,7 @@ module.exports = (req, res) => {
 									console.log('check accepted')
 									console.log(accepted)
 									console.log(language)
+									const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 
 									return DB.general.task(gt => {
 										const gbatch = []
@@ -106,7 +107,7 @@ module.exports = (req, res) => {
 											return Promise.all(user_info.map(d => {
 												return sendemail({
 													to: d.email,
-													subject: `[${app_title}] Reviews for "${title}" are in`,
+													subject: `[${platformName}] Reviews for "${title}" are in!`,
 													html
 												})
 											}))
@@ -121,7 +122,7 @@ module.exports = (req, res) => {
 											let html = ''
 											if (accepted) {
 												// TO DO: TRANSLATE
-												html = `Congrats! Your submission has been accepted and has automatically been published at <a href='http${process.env.NODE_ENV === 'production' ? 's' : ''}://${host}/${language}/browse/pads/public?pads=${source}'>http${process.env.NODE_ENV === 'production' ? 's' : ''}://${host}/${language}/browse/pads/public?id=${source}</a>.
+												html = `Congrats! Your submission "${title}" has been accepted and has automatically been published at <a href='http${process.env.NODE_ENV === 'production' ? 's' : ''}://${host}/${language}/browse/pads/public?pads=${source}'>http${process.env.NODE_ENV === 'production' ? 's' : ''}://${host}/${language}/browse/pads/public?id=${source}</a>.
 												Click <a href='http://${host}/${language}/view/pad?id=${source}&display=adjacent-reviews'>here</a> to see the reviews.`
 											} else {
 												// TO DO: TRANSLATE
@@ -133,7 +134,7 @@ module.exports = (req, res) => {
 											return Promise.all(user_info.map(d => {
 												return sendemail({
 													to: d.email,
-													subject: `[${app_title}] Your submission "${title}" has been reviewed`,
+													subject: `[${platformName}] Your submission "${title}" has been reviewed`,
 													html
 												})
 											}))

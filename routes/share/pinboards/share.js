@@ -1,4 +1,4 @@
-const { app_title, DB } = include('config/')
+const { DB, own_app_url, app_title, app_title_short, translations } = include('config/')
 const { email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -36,13 +36,14 @@ module.exports = (req, res) => {
 						AND notifications = TRUE
 				;`, [ safeArr(contributor, DEFAULT_UUID), uuid ])
 				.then(results => {
+					const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 					// SEND EMAIL NOTIFICATION
 					// NEED TO CHECK IF EMAIL NOTIFICATIONS IS ACTIVATED
 					return Promise.all(results.map(d => {
 						sendemail({
 							to: d.email,
-							subject: `[${app_title}] Collections`,
-							html: `Dear contributor, ${username} has shared with you the follow collection on the ${app_title} platform:
+							subject: `[${platformName}] Collections`,
+							html: `Dear contributor, ${username} has shared with you the follow collection on the <a href="${own_app_url}">${platformName}</a>:
 								<br><br><strong>${title}</strong>
 								<br><br>Please click <a href='${referer}'>this link</a> to view the collection.` // TO DO: TRANSLATE AND STYLIZE
 						})

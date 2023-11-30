@@ -1,14 +1,20 @@
 <%
   const allUrls = locals.metadata.all_urls;
+  const own_app_url = locals.metadata.own_app_url;
   const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
 %><%- xmlHeader %>
 <urlset
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
   xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
     http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"><% allUrls.forEach((entry) => { %>
   <url>
-    <loc><%- entry.url %></loc>
+    <loc><%- own_app_url %>en<%- entry.url %></loc>
+    <xhtml:link rel="alternate" hreflang="en" href="<%= own_app_url %>en<%= entry.url %>"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="<%= own_app_url %>fr<%= entry.url %>"/>
+    <xhtml:link rel="alternate" hreflang="es" href="<%= own_app_url %>es<%= entry.url %>"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="<%= own_app_url %>pt<%= entry.url %>"/>
     <lastmod><%- entry.date %></lastmod>
   </url><% }) // loop %>
 </urlset>

@@ -38,7 +38,13 @@
 <meta name='apple-mobile-web-app-capable' content='yes'>
 <meta names='apple-mobile-web-app-status-bar-style' content='black-translucent'>
 <meta name='theme-color' content='#16a0d6e7'/>
+
+<!-- Different versions -->
 <link rel="canonical" href="<%= canonical %>" />
+<link rel="alternate" href="<%= canonical.replace('/en/', '/fr/') %>" hreflang="fr" />
+<link rel="alternate" href="<%= canonical.replace('/en/', '/es/') %>" hreflang="es" />
+<link rel="alternate" href="<%= canonical.replace('/en/', '/pt/') %>" hreflang="pt" />
+<link rel="alternate" href="<%= canonical %>" hreflang="x-default" />
 
 <!-- Facebook Meta Tags -->
 <meta property="og:url" content="<%= url %>" >

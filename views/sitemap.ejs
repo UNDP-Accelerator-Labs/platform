@@ -5,10 +5,7 @@
 %><%- xmlHeader %>
 <urlset
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml"
-  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-    http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"><% allUrls.forEach((entry) => { %>
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"><% allUrls.forEach((entry) => { %>
   <url>
     <loc><%- own_app_url %>en<%- entry.url %></loc>
     <xhtml:link rel="alternate" hreflang="en" href="<%= own_app_url %>en<%= entry.url %>" />

@@ -41,12 +41,12 @@
 
 <!-- Canonical URL -->
 <link rel="canonical" href="<%= canonical %>" />
-<% if (currentpage_url.pathname.includes('/en/')) { %>
+<% if (currentpage_url.pathname.includes('/en/')) { // NOTE: only serve alternates for the canonical page %>
 <link rel="alternate" href="<%= canonical.replace('/en/', '/fr/') %>" hreflang="fr" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/es/') %>" hreflang="es" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/pt/') %>" hreflang="pt" />
 <link rel="alternate" href="<%= canonical %>" hreflang="x-default" />
-<% } // NOTE: only serve alternates for the canonical page %>
+<% } // end alternates %>
 
 <!-- Facebook Meta Tags -->
 <meta property="og:url" content="<%= url %>" >

@@ -11,10 +11,10 @@
     http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"><% allUrls.forEach((entry) => { %>
   <url>
     <loc><%- own_app_url %>en<%- entry.url %></loc>
-    <xhtml:link rel="alternate" hreflang="en" href="<%= own_app_url %>en<%= entry.url %>"></xhtml:link>
-    <xhtml:link rel="alternate" hreflang="fr" href="<%= own_app_url %>fr<%= entry.url %>"></xhtml:link>
-    <xhtml:link rel="alternate" hreflang="es" href="<%= own_app_url %>es<%= entry.url %>"></xhtml:link>
-    <xhtml:link rel="alternate" hreflang="pt" href="<%= own_app_url %>pt<%= entry.url %>"></xhtml:link>
+    <xhtml:link rel="alternate" hreflang="en" href="<%= own_app_url %>en<%= entry.url %>" />
+    <xhtml:link rel="alternate" hreflang="fr" href="<%= own_app_url %>fr<%= entry.url %>" />
+    <xhtml:link rel="alternate" hreflang="es" href="<%= own_app_url %>es<%= entry.url %>" />
+    <xhtml:link rel="alternate" hreflang="pt" href="<%= own_app_url %>pt<%= entry.url %>" />
     <lastmod><%- new Date(entry.date).toISOString() %></lastmod>
   </url><% }) // loop %>
 </urlset>

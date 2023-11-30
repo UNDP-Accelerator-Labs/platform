@@ -8,7 +8,7 @@
 <html lang='<%- locals.metadata.page.language %>'>
 <head>
 
-<%- include ('partials/head.ejs') %> 
+<%- include ('../../partials/head.ejs') %> 
 
 <script type='text/javascript' src='/scripts/xlsx/dist/xlsx.full.min.js'></script>
 
@@ -24,8 +24,6 @@
 <script type='text/javascript' src='/js/contribute/xlsx/main.js'></script>
 <script type='text/javascript' src='/js/contribute/xlsx/save.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/render.js'></script>
-
-<%# include ('contribute/pad/render.ejs') %> 
 
 </head>
 
@@ -50,18 +48,18 @@
 <data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
 <data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
 
-<%- include ('partials/translations.ejs') %> 
-<%- include ('partials/navigate/menu-languages.ejs') %> 
+<%- include ('../../partials/translations.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %> 
 
 
 <div class='main-content import'>
 	<header>
 		<div class='inner'>
-			<%- include ('partials/navigate/sidebar.ejs') %> 
+			<%- include ('../../partials/navigate/sidebar.ejs') %> 
 		</div>
 	</header>
 
-	<%- include ('partials/modals.ejs') %>
+	<%- include ('../../partials/modals.ejs') %>
 
 	<div class='table'>
 		<main id='import-module' class='import-module'>

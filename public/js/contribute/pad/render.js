@@ -1220,9 +1220,10 @@ function addMosaic (kwargs) {
 			if (err) console.log(err)
 		}
 
-		if (d.isURL() || d.isBlob()) img.src = d
-		// else img.src = `/${d}`
-		else {
+		if (d.isURL() || d.isBlob()) {
+			img.src = d
+			// NOTE: THIS DOES NOT WORK BECAUSE OF csp
+		} else {
 			if (d3.select('data[name="app_storage"]').node()) {
 				const app_storage = d3.select('data[name="app_storage"]').node().value
 				img.src = new URL(`${app_storage}/${d}`).href

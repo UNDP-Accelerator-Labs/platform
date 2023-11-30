@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
 		}).then(async tags => {
 			const metadata = await datastructures.pagemetadata({ req, map })
 			return Object.assign(metadata, { tags })
-		}).then(data => res.render('import', data))
+		}).then(data => res.render('contribute/xlsx/', data))
 		.catch(err => console.log(err))
 	}
 }

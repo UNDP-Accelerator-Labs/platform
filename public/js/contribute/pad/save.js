@@ -52,6 +52,9 @@ function retrieveItems (sel, datum, items) {
 function getStatus () {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value) 
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
+	const main = d3.select('#pad')
+	const body = main.select('.body')
 	
 	const completion = []
 
@@ -127,6 +130,8 @@ function getStatus () {
 function compileContent (attr) {
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 	const main = d3.select('#pad')
+	const body = main.select('.body')
+
 	const content = {}
 	// COLLECT TITLE
 	// let title = d3.select('#pad .head .title').node().innerText

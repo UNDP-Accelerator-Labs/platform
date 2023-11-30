@@ -1,5 +1,5 @@
 let keyTrack = []
-window.addEventListener('keydown', function (e) {
+window.addEventListener('keydown', async function (e) {
 	e = e || event
 	keyTrack.push(e.keyCode)
 	
@@ -21,7 +21,7 @@ window.addEventListener('keydown', function (e) {
 				.selectAll('.media-txt, .media-embed, .media-checklist .list-item, .media-radiolist .list-item')
 			.each(function () { this.blur() })
 			main.selectAll('.media-container .inset, .meta-container .inset').style('max-height', null)
-			autofillTitle()
+			await autofillTitle()
 		}
 		// PROVIDE HIGHLIGHT FEEDBACK
 		if (
@@ -125,7 +125,7 @@ window.addEventListener('keyup', function (e) {
 
 	keyTrack = keyTrack.filter(d => d !== e.keyCode)
 })
-window.addEventListener('mouseup', function (e) {
+window.addEventListener('mouseup', async function (e) {
 	e = e || event
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = page.activity === 'edit'
@@ -159,7 +159,7 @@ window.addEventListener('mouseup', function (e) {
 				focused_node.classed('focus', false)
 			}
 		} else {
-			autofillTitle()
+			await autofillTitle()
 		}
 	}
 })

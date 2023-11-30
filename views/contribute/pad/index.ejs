@@ -32,9 +32,12 @@
 <script type='text/javascript' src='/js/contribute/pad/main.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/render.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/save.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/widget.interactions.js'></script>
+<script type='text/javascript' src='/js/contribute/pad/toolbar.interactions.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/keyboard.interactions.js'></script>
 <script type='text/javascript' src='/js/contribute/comment.js'></script>
+<% if (locals.metadata?.user?.uuid) { %>
+	<script type='text/javascript' src='/js/exploration.js'></script>
+<% } %>
 
 </head>
 
@@ -73,9 +76,6 @@
 <%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 <%- include('../../partials/pagestats.ejs') %>
-<% if (locals.metadata?.user?.uuid) { %>
-	<%- include ('../../partials/exploration.ejs') %>
-<% } %>
 
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
@@ -167,7 +167,7 @@
 									<input type='hidden' name='source' value='<%- locals.source %>'>
 									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
 								<% } else if (publicpage) { %>
-									<button type='button' class='publish' name='status' value='1' onclick='saveAndSubmit(this);' disabled><%- vocabulary['submit'][language] %></button>
+									<button id='save-and-submit' type='button' class='publish' name='status' value='1' disabled><%- vocabulary['submit'][language] %></button>
 								<!-- IF THERE IS A TOKEN WITH A CALLBACK URL, THEN THIS SHOULD AUTO SUBMIT AND SEND BACK THE PAD ID TO THE REQUESTING SOURCE -->
 								<% } else if (token && action === 'publish_and_share') { %>
 									<input type='hidden' name='token' value='<%- token %>'>
@@ -210,7 +210,7 @@
 												&& (locals.data?.review_status === 0))
 											{ %>
 												<li class='opt google-translate-attr'>
-													<button id='submit-for-review' type='button' name='review_status' value='1' onclick='selectReviewLanguage(this);'>
+													<button id='submit-for-review' type='button' name='review_status' value='1'>
 														<%- vocabulary['submit for review'][language] %>
 													</button>
 												</li>
@@ -382,7 +382,7 @@
 				<% if (!templated || ![null, undefined].includes(locals.display_template.medium)) { %>
 					<% metafields.forEach(d => { %>
 						<button class='labeled google-translate-attr' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
-							<img src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' onerror='this.onerror=null; this.src="/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg"' />
+							<img class='meta-icon' data-src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' data-fallback='/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg' />
 							<label class='lg xl xxl'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
 						</button>
 					<% }) %>

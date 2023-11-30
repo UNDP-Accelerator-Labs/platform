@@ -44,7 +44,10 @@ app.use(
           'sdg-innovation-commons.org',
         ],
         'style-src': csp_links,
-        'connect-src': csp_links,
+        'connect-src': csp_links.concat([
+          // 'blob:http:://localhost:2000/'
+          'blob:',
+        ]),
         'frame-src': [
           "'self'",
           '*.sdg-innovation-commons.org',

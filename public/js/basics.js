@@ -272,3 +272,11 @@ function getContent (params = {}) { // THIS IS TO LOAD THE PADS, TEMPLATES, ETC
 	// TO DO: ADD VAR keep_page
 	return POST(`/load/${object}`, reqbody)
 }
+async function getLanguage () {
+	const { languages } = await POST('/load/metadata', { feature: 'languages' })
+	const url = new URL(window.location)
+	const language = url.pathname.substring(1).split('/')[0]
+
+	if (languages.some(d => d === language)) return language
+	else return 'en'
+}

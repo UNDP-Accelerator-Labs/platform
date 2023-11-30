@@ -50,6 +50,7 @@
 <script type='text/javascript' src='/js/browse/save.js'></script>
 <script type='text/javascript' src='/js/browse/keyboard.interactions.js'></script>
 <script type='text/javascript' src='/js/browse/download.js'></script>
+<script type='text/javascript' src='/js/exploration.js'></script>
 
 </head>
 
@@ -61,8 +62,6 @@
 
 <%- include ('../partials/navigate/menu-languages.ejs') %>
 <%- include ('../partials/modals.ejs') %>
-
-<%- include ('../partials/exploration.ejs') %>
 
 <% if (is_intropage) { %>
 <div class='public-page-header'>
@@ -212,7 +211,6 @@
 								<% } %>
 
 								<% if (locals.pinboard.description) { %>
-									<!-- <div class='description' onblur='partialSave()'><%- (locals.pinboard.description) %></div> -->
 									<div class='description lead'><%- (locals.pinboard.description) %></div>
 								<% } %>
 							<% } %>

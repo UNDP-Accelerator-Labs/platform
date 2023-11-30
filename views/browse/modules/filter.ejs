@@ -65,9 +65,9 @@
 			<% } // object is pads %>
 			<div class='search google-translate-attr'>
 				<% if (query?.search?.length) { %>
-					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' onblur='fixLabel(this)'>
+					<input type='text' name='search' id='search-field' class='has-value' value='<%- query?.search %>' >
 				<% } else { %>
-					<input type='text' name='search' id='search-field' onblur='fixLabel(this)'>
+					<input type='text' name='search' id='search-field'>
 				<% } %>
 				<label for='search-field'><%- vocabulary['search'][language][object === 'contributors' ? 'person' : 'object'] %></label>
 				<button id='search' type='submit'><img src='/imgs/icons/i-search.svg'></button>
@@ -79,7 +79,7 @@
 						<section>
 							<% for (let key in d) { %>
 								<div class='filter google-translate-attr'>
-									<input type='text' id='<%- key %>' onblur='fixLabel(this)'>
+									<input type='text' id='<%- key %>'>
 									<label for='<%- key %>'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language]['plural'].capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
 									<div class='dropdown'>
 										<menu class="google-translate-attr">
@@ -90,7 +90,7 @@
 															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id?.toString())) { %>disabled<% } %>>
 														<% }) %>
 													<% } %>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id?.toString())) { %>checked<% } %> onchange='addequivalents(this); toggletag(this, <%- JSON.stringify(c) %>)'>
+													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id?.toString())) { %>checked<% } %> data-id='<%= c.id %>' data-name='<%= c.name %>'>
 													<label for='<%- key %>-<%- c.id %>'><%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary['unknown'][language]) %><span class='count'><%- c.count %></span></label>
 												</li>
 											<% }) %>
@@ -103,7 +103,7 @@
 										<% active_filters.forEach(c => { %>
 											<div class='tag' data-id='<%- c.id %>'>
 												<label class='name' title='<%- Number.isInteger(c.name) ? c.name : (c.name?.capitalize() || vocabulary["unknown"][language]) %>'><%- Number.isInteger(c.name) ? c.name : ((c.name?.length > 15 ? `${c.name.slice(0, 15).capitalize()}…` : c.name.capitalize()) || vocabulary['unknown'][language]) %></label>
-												<label class='close' onclick='rmtag(this, <%- JSON.stringify(c) %>)'></label>
+												<label class='close' data-id='<%= c.id %>' data-name='<%= c.name %>'></label>
 											</div>
 										<% }) %>
 									</div>
@@ -133,7 +133,7 @@
 					<menu>
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
-								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' onchange='this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit()' <% if (!query?.status || query?.status?.some(c => +c === d.status)) { %>checked<% } %>>
+								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' <% if (!query?.status || query?.status?.some(c => +c === d.status)) { %>checked<% } %>>
 								<label for='status-<%- d.status %>' data-content='<%- simplifyNumber(d.count) %>'></label>
 								<p>
 									<%- vocabulary['status'][language](object, d.status, d.count) %>
@@ -157,7 +157,7 @@
 									<menu>
 										<% locals.pinboards_list?.filter(pb => !pb.is_exploration).forEach(d => { %>
 											<li class='pinboard'>
-												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all' onchange='pinAll(this)'>
+												<input id='board-<%- d.id %>-object-all' type='radio' value='<%- d.id %>' name='pin-all'>
 												<label class='title notranslate' for='board-<%- d.id %>-object-all'><%- d.title %><span class='count'><%- d.count %></span></label>
 											</li>
 										<% }) %>
@@ -166,18 +166,18 @@
 							</div>
 						<% } %>
 
-						<button type='button' class='download m lg xl xxl' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+						<button type='button' class='download m lg xl xxl'><%- vocabulary['download all'][language] %></button>
 					</div>
 				<% } else if (object === 'contributors') { %>
 					<div class='global-actions'>
-						<button type='button' class='download m lg xl xxl google-translate-attr' onclick='setDownloadOptions()'><%- vocabulary['download all'][language] %></button>
+						<button type='button' class='download m lg xl xxl google-translate-attr'><%- vocabulary['download all'][language] %></button>
 						<!-- TO DO: FINISH DOWNLOAD ALL USERS -->
 					</div>
 				<% } %>
 			<% } %>
 
 			<% if (locals.filters_menu?.length) { %>
-				<button type='button' class='expand-filters' onclick='expandfilters(this)'>
+				<button type='button' class='expand-filters'>
 					<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
 				</button>
 			<% } %>

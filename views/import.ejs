@@ -2,6 +2,8 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
+	const metafields = locals.metadata.site.metafields
+	const participations = locals.metadata.menu.participations
 %>
 <html lang='<%- locals.metadata.page.language %>'>
 <head>
@@ -18,6 +20,7 @@
 	crossorigin=''></script>
 
 <script type='text/javascript' src='/js/contribute/xlsx/main.js'></script>
+<script type='text/javascript' src='/js/contribute/xlsx/save.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/render.js'></script>
 
 <%# include ('contribute/pad/render.ejs') %> 
@@ -30,14 +33,15 @@
 <% 
 	const pagedata = {
 		type: 'private',
-		activity: 'preview'
+		activity: 'preview',
+		participations: participations || []
 	}
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
 <%
 	const paddata = {
 		type: 'templated',
-		// metafields: metafields || {},
+		metafields: metafields || {},
 		media_value_keys: locals.metadata.site.media_value_keys || []
 	}
 %>
@@ -69,11 +73,10 @@
 				</div>
 				<div class='body'>
 					<!-- INSPIRED BY https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
-					<div class='input-group' ondrop='dropHandler(event, this)' ondragover='event.preventDefault(); this.classList.toggle("accept")' ondragleave='this.classList.toggle("accept")'>
-						
+					<div id='import-file' class='input-group'>
 						<div class='drop-zone'>
 							<!-- <p>Drag one or more files to this <i>drop zone</i>.</p> -->
-							<input type='file' id='upload' onchange='parseXLSX(event.target.files[0], this)' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
+							<input type='file' id='upload' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
 							<button>
 								<label class="google-translate-attr" for='upload'><%- vocabulary['upload source file'][language] %></label>
 							</button>
@@ -111,131 +114,29 @@
 </div>
 
 <script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-	const publicpage = false // THIS IS FOR THE PAD PREVIEW
+	// const publicpage = false // THIS IS FOR THE PAD PREVIEW
 
-	const pagebody = d3.select('body')
-	const searchForm = pagebody.select('form#contribute')
-	const main = d3.select('div.table main')
-	const layout = main.select('div.inner')
-	const head = layout.select('div.head')
-	const body = layout.select('div.body')
-	const foot = layout.select('div.foot')
+	
+	// const main = d3.select('div.table main')
+	// const layout = main.select('div.inner')
+	// const head = layout.select('div.head')
+	// const body = layout.select('div.body')
+	// const foot = layout.select('div.foot')
 
 	// THE FOLLOWING VARIABLES ARE FOR THE pad PREVIEW
-	let activity = 'preview'
-	let templated = true
+	// let activity = 'preview'
+	// let templated = true
 	// let previewing = false
-	const editing = false
+	// const editing = false
 
-	const metafields = <%- JSON.stringify(locals.metadata?.site?.metafields || {}) %>
+	// const metafields = <%- JSON.stringify(locals.metadata?.site?.metafields || {}) %>
 	const taglists = <%- JSON.stringify(locals.tags || {}) %>
-
-	const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg']
-
 	
 
 	// CATCH THE SEARCH PARAMS
 	// INSPIRED BY https://stackoverflow.com/questions/5384712/intercept-a-form-submit-in-javascript-and-prevent-normal-submission
-	async function catchSubmit (evt) {
-		if (evt.preventDefault) evt.preventDefault()
-		
-		// 1) SELECT MOBILIZATION TO CONTRIBUTE TO
-		const target_opts = <%- JSON.stringify(locals.metadata.menu.participations.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1)) %>.map(d => { 
-			return { label: d.title, value: d.id, type: 'radio' } 
-		})
-		
-		target_opts.unshift({ 
-			label: vocabulary['space'][language]['pads']['private'], 
-			value: -1, 
-			type: 'radio' 
-		})
-
-		const message = vocabulary['import to workspace or mobilization'][language]
-		const opts = [
-			{ 
-				node: 'select', 
-				name: 'mobilization', 
-				label: vocabulary['select destination'][language],
-				options: target_opts 
-			},
-			{ 
-				node: 'button', 
-				type: 'button', 
-				label: vocabulary['import'][language],
-				resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value 
-			}
-		]
-		console.log(target_opts)
-		const mobilization = await renderPromiseModal({ message, opts })
-		console.log(mobilization)
-
-		// IF NO MOBILIZATION HAS BEEN SELECTED, THE USER HAS LIKELY JUST CANCELED THE OPERATION SO DO NO PROCEED WITH THE SUBMIT
-		if ([null, undefined].includes(mobilization)) return false
-
-		// COMPILE PADS AND TEMPLATE
-		const pads = await compilePads()
-		const template = await compileTemplate()
-
-		// 2) SAVE IMAGES
-		const fd = new FormData()
-		const promises = []
-		const imgs = pads.map(d => d.imgs).flat().unique().filter(d => !d?.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
-
-		if (imgs.length) {
-			imgs.forEach(d => {
-				promises.push(new Promise(async resolve => {
-					const blob = await fetch(d).then(res => res.blob())
-					const ts = new Date().getTime()
-					const originalname = d
-					resolve({ blob: blob, originalname: originalname })
-				}))
-			})
-			const blobs = await Promise.all(promises)
-			blobs.forEach(b => {
-				fd.append('img', b.blob, b.originalname)
-			})
-
-			// THIS IS SIMILAR TO THE uploadImg FUNCTION IN pad.js
-			// WE NEED TO USE THE fetch API, AND NOT THE POST HELPER FUNCTION FOR SOME REASON
-			const files = await fetch('/upload/img', { method: 'POST', body: fd })
-			.then(response => response.json())
-			.then(results => {
-				const notification = d3.select('body')
-					.addElem('div', 'notification')
-					.addElem('div')
-					.html(vocabulary['image upload success'][language])
-				setTimeout(_ => notification.remove(), 4000)
-				return results
-			}).catch(err => { if (err) throw (err) })
-
-			if (files?.length) {
-				pads.forEach(d => {
-					d.sections.forEach(c => {
-						c.items.forEach(b => {
-							if (b.type === 'img') b.src = files.find(a => b?.src?.includes(a.originalname))?.src
-							if (b.type === 'mosaic') {
-								b.srcs = b.srcs.map(a => {
-									return files.find(z => a.includes(z.originalname))?.src
-								})
-							}
-						})
-					})
-				})
-			}
-		} else console.log('no images to upload')
-
-		// 3) SAVE PADS
-		// pads.forEach(d => d.sections = JSON.stringify(d.sections))
-		// const results = await POST('/storeImport', { pads, template, mobilization })
-		addGlobalLoader()
-		const results = await POST('/upload/xlsx', { pads, template, mobilization })
-		rmGlobalLoader()
-		window.location.href = `/${language}/browse/pads/private`
-
-		return false
-	}
-	if (searchForm.node().attachEvent) searchForm.node().attachEvent('submit', catchSubmit)
-	else searchForm.node().addEventListener('submit', catchSubmit)
+	
+	
 </script>
 </body>
 </html>

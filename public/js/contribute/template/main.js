@@ -2,7 +2,7 @@ window.addEventListener('load', async function () {
 	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
 
 	await renderTemplate ();
-	initWidgetInteractions(metafields);
+	initToolbarInteractions(metafields);
 
 	const main = d3.select('main')
 	const head = main.select('.head')

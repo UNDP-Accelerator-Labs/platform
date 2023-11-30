@@ -1,5 +1,24 @@
 window.addEventListener('load', function () {
+	d3.select('div#import-file')
+	.on('drop', function () {
+		const evt = d3.event;
+		dropHandler(evt, this);
+	}).on('dragover', function () {
+		const evt = d3.event;
+		evt.preventDefault(); 
+		this.classList.toggle('accept');
+	}).on('dragleave', function () {
+		this.classList.toggle('accept');
+	});
 
+	d3.select('input[type=file]#upload')
+	.on('change', function () {
+		parseXLSX(event.target.files[0], this);
+	});
+
+	const searchForm = d3.select('body form#contribute')
+	if (searchForm.node().attachEvent) searchForm.node().attachEvent('submit', catchSubmit)
+	else searchForm.node().addEventListener('submit', catchSubmit)
 })
 
 function dropHandler(evt, node) { 
@@ -63,7 +82,7 @@ function parseXLSX (file, node) {
 			images = media.map((m, i) => {
 				const name = workbook.files[m].name // .split('media/')[1]
 				const buffer = workbook.files[m].content.buffer // workbook.files[m]._data?.getContent()
-				
+
 				const blob = new Blob([buffer], {'type': 'image/png'})
 				const urlCreator = window.URL || window.webkitURL
 				const imageUrl = urlCreator.createObjectURL(blob)
@@ -96,6 +115,10 @@ function parseXLSX (file, node) {
 			}
 		})
 		// HIDE THE LOADING BUTTON
+		const main = d3.select('div.table main')
+		const layout = main.select('div.inner')
+		const head = layout.select('div.head')
+
 		main.select('.input-group').classed('hide', true)
 		head.classed('status-0', false)
 			.classed('status-1', true)
@@ -251,6 +274,13 @@ function parseGroups (json, keys) {
 	Promise.all(cols).then(data => renderTable(data))
 }
 function renderTable (cols, update = false) {
+	const { metafields } = JSON.parse(d3.select('data[name="pad"]').node().value)
+
+	const main = d3.select('div.table main')
+	const layout = main.select('div.inner')
+	const body = layout.select('div.body')
+	const foot = layout.select('div.foot')
+
 	body.select('.btn-group').classed('hide', false)
 	const table = body.addElems('div', 'table-container')
 		.addElems('table', 'xls-preview', [cols])
@@ -662,7 +692,7 @@ function compileLocations (idx) {
 	})		
 }
 async function compilePads (idx, structureOnly = false) {
-	const { media_value_keys } = d3.select('data[name="pad"]').node().value
+	const { metafields, media_value_keys } = JSON.parse(d3.select('data[name="pad"]').node().value)
 	const { name: userlocation } = JSON.parse(d3.select('data[name="location"]').node().value)
 
 	const cols = d3.select('table.xls-preview').datum()
@@ -1004,6 +1034,7 @@ async function compilePads (idx, structureOnly = false) {
 }
 
 async function compileTemplate () {
+	const { metafields } = JSON.parse(d3.select('data[name="pad"]').node().value)
 	const cols = d3.select('table.xls-preview').datum()
 
 	const template = {}

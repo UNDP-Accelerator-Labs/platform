@@ -3,7 +3,7 @@
 	const language = locals.metadata.page.language
 	include ('../../partials/translations.ejs')
 %>
-<script type='text/javascript'>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 
 const include_incomplete = false
 

@@ -1,3 +1,6 @@
+// INIT EXPLORATION
+const exploration = new Exploration();
+
 // EXPLORATION MODULE
 let curSelectSTM = 'stm-browse';
 let hasUsedExploration = false;

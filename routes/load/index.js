@@ -1,4 +1,4 @@
-const { modules, metafields } = include('config/')
+const { app_languages, modules, metafields, ownDB, DB } = include('config/')
 
 const pads = require('../browse/pads/')
 const pad = require('../contribute/pad/')
@@ -13,7 +13,7 @@ const contributors = require('../browse/contributors/')
 module.exports = async (req, res) => {
 	const { object, instance } = req.params || {}
 	const { uuid } = req.session || {}
-	const { feature } = req.body || {}
+	let { feature } = req.body || {}
 
 	if (modules.some(d => [object, `${object}s`].includes(d.type))) {
 		let data 
@@ -46,10 +46,13 @@ module.exports = async (req, res) => {
 	} else if (object === 'metadata') {
 		if (!Array.isArray(feature)) feature = [feature]
 		data = {}
-		feature.forEach(d => {
-			if (d === 'metafields') data['metafields'] = metafields
-			else if (d === 'modules') data['modules'] = modules
-		})
+		for (let i = 0; i < feature.length; i++) {
+			const f = feature[i]
+			if (f === 'metafields') data['metafields'] = metafields
+			else if (f === 'modules') data['modules'] = modules
+			else if (f === 'ownDB') data['ownDB'] = await ownDB()
+			else if (f === 'languages') data['languages'] = app_languages
+		}
 		res.status(200).json(data)
 	} else res.redirect('/module-error')
 }

@@ -4,19 +4,26 @@ window.addEventListener('load', function () {
 	const queryparams = new URLSearchParams(url.search)
 	const source = queryparams.get('source')
 
+	const mobilization = d3.select('main#mobilize-new form')
+
 	if (source) {
-		d3.select('main#mobilize-new form')
+		mobilization
 			.addElem('input')
-			.attrs({ 
-				'type': 'hidden',
-				'name': 'source',
-				'value': +source
-			})
+		.attrs({ 
+			'type': 'hidden',
+			'name': 'source',
+			'value': +source
+		})
 	}
 
-	// d3.selectAll('input[type=text]')
-	// .each(function () { fixLabel(this) })
-	// TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js
+	mobilization.selectAll('.modal .head button[type=button].back')
+	.on('click', function () {
+		prev(this);
+	});
+	mobilization.selectAll('.modal .head button[type=button].next')
+	.on('click', function () {
+		next(this);
+	});
 
 	d3.selectAll('.filter input[type=text]')
 	.on('keyup', function () {
@@ -34,6 +41,54 @@ window.addEventListener('load', function () {
 		adjustarea(this) 
 		fixLabel(this)
 	})
+
+	mobilization.select('.modal.m-1 input#title')
+	.on('keydown', function () {
+		preventSubmit(this, event);
+	}).on('keyup', function () {
+		enableNext(this);
+	}).on('blur', function () { 
+		enableNext(this);
+	});
+	mobilization.select('.modal.m-1 .foot input#public-status')
+	.on('change', function () {
+		togglePublic(this);
+	});
+	mobilization.selectAll('.modal.m-2 .body input[type=radio], .modal.m-5 .body input[type=radio], .modal.m-6 .body input[type=radio]')
+	.on('change', function () {
+		toggleChecked(this); 
+		enableNext(this);
+	});
+	mobilization.select('.modal.m-3 .body input#cron-start')
+	.on('change', function () {
+		toggleCronJob(this);
+	});
+	mobilization.select('.modal.m-3 .body input#cron-end')
+	.on('change', function () {
+		toggleCronJob(this);
+	});
+	mobilization.select('.modal.m-3 .body input#start-date')
+	.on('change', function () {
+		offsetMinEndDate(this);
+	});
+	mobilization.select('.modal.m-4 .body textarea#description')
+	.on('keyup', function () {
+		adjustarea(this); 
+		enableNext(this);
+	}).on('blur', function () {
+		fixLabel(this); 
+		enableNext(this);
+	});
+	mobilization.select('.modal.m-6 .foot .global-opt button')
+	.on('click', function () {
+		selectAllOpts(this); 
+		enableNext(this);
+	});
+	mobilization.select('.modal.m-7 .body input#limit-pads')
+	.on('change', function () {
+		togglePadLimit(this);
+	});
+
 })
 
 function adjustarea(node) { 

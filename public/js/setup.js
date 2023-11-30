@@ -1,19 +1,15 @@
 if (!mediaSize) var mediaSize = getMediaSize()
-window.addEventListener('load', function () {
+window.addEventListener('load', async function () {
 	/* SET PATHS
 	NOT language NEEDS TO BE SET AS A GLOBAL VAR IN THE MAIN ejs FILE */
 	const url = new URL(window.location);
 	let pathname = url.pathname.substring(1);
-	if (pathname.split('/').length > 1) { pathname = `${pathname.split('/').slice(1).join('/')}${url.search}`; };
+	if (pathname.split('/').length > 1) { 
+		pathname = `${pathname.split('/').slice(1).join('/')}${url.search}`; 
+	};
+	const { languages } = await POST('/load/metadata', { feature: 'languages' })
 	languages.forEach(d => {
-		d3.select(`#lang-${d.language} a`).attr('href', `/${d.language}/${pathname}`);
-	});
-
-	// EXPAND NAVIGATION ON SMALL DISPLAYS
-	d3.select('button#expand-nav')
-	.on('click', function () {
-		d3.select(this).toggleClass('close');
-		d3.select('header').toggleClass('open');
+		d3.select(`#lang-${d} a`).attr('href', `/${d}/${pathname}`);
 	});
 
 	// SET NAVIGATION LINKS FOR TABS
@@ -100,33 +96,6 @@ function scrollToPad (target) {
 		left: 0,
 		behavior: 'smooth'
 	})
-};
-function redirect (_kwargs) {
-	let { location, params, keep_status } = _kwargs
-	
-	const url = new URL(window.location)
-	const queryparams = new URLSearchParams(url.search)
-	
-	// const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
-
-	// filter_keys.push('search')
-	// for (const key of queryparams.keys()) {
-	// 	if (!filter_keys.includes(key)) queryparams.delete(key)
-	// }
-	// return window.location = `${location}?${queryparams.toString()}`
-
-	if (!keep_status) { queryparams.delete('status'); }
-	
-	if (params && !Array.isArray(params)) params = [params]
-	if (params?.length) {
-		params.forEach(d => {
-			if (d.key && d.value) { queryparams.set(d.key, d.value); }
-		})
-	};
-
-	if (!location) { location = `${url.origin}${url.pathname}` }
-	
-	return window.location = `${location}?${queryparams.toString()}`;
 };
 function checkForEnter (evt, node) {
 	if (evt.code === 'Enter' || evt.keyCode === 13) {
@@ -317,4 +286,11 @@ async function renderMosaic () {
 	window.onresize = (evt) => {
 		renderMosaic()
 	};
-}
+};
+function filterDropdown (node) {
+	const dropdown = d3.select(node).findAncestor('dropdown')
+	dropdown.selectAll('ul li:not(.filter):not(.padding)')
+		.classed('hide', function () {
+			return !this.textContent.trim().toLowerCase().includes(node.value.trim().toLowerCase())
+		});
+};

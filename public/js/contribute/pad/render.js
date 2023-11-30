@@ -750,17 +750,18 @@ function uploadVideo (kwargs) {
 	})
 	.catch(err => { if (err) throw err })
 }
-function autofillTitle () {
+async function autofillTitle () {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = page.activity === 'edit'
 
 	const main = d3.select('#pad')
+	const head = main.select('.head')
 
-	if (main.select('.head .title').node()?.innerText.trim().length === 0) {
+	if (head.select('.title').node()?.innerText.trim().length === 0) {
 		const firstText = main.select('.layout:not(.description-layout) .media-txt').node()
 		if (firstText && firstText.innerText) {
-			main.select('.head .title')
-			.html(async _ => {
+			head.select('.title')
+			.html(_ => {
 				const cutoff = 75
 				if (firstText.innerText.split('\n').length > 1) {
 					if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
@@ -769,11 +770,11 @@ function autofillTitle () {
 					if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
 					else return `${firstText.innerText}`
 				}
-				if (editing) {
-					if (page.type === 'private') await partialSave('title')
-					else await updateStatus()
-				}
 			})
+			if (editing) {
+				if (page.type === 'private') await partialSave('title')
+				else await updateStatus()
+			}
 		}
 	}
 }

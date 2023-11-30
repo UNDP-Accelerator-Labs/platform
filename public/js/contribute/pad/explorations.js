@@ -1,3 +1,6 @@
+// INIT EXPLORATION
+const exploration = new Exploration();
+
 exploration.setUseFullPromptForSelect(true);
 exploration.updateExplorationList(() => {
 	const docBtn = d3.select('div.exploration-local');

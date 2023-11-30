@@ -60,7 +60,7 @@
 						<button type='button' class='back' disabled>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>disabled<% } %>>
+						<button type='button' class='next' <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>disabled<% } %>>
 							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 						</button>
 					</div>
@@ -68,29 +68,29 @@
 				<div class='body'>
 					<h1 class="google-translate-attr"><%- vocabulary['name mobilization'][language] %></h1>
 					<div class='input'>
-						<input id='title' type='text' name='title' onkeydown='preventSubmit(this, event)' onkeyup='enableNext(this)' onblur='enableNext(this)' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]['preposition'] %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
-						<!-- TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
+						<input id='title' type='text' name='title' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]['preposition'] %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
 						<label aria-colspan="google-translate-attr" class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
 					</div>
 				</div>
 				<div class='foot'>
 					<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
-						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' onchange='togglePublic(this)' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %> <% if (locals.data?.id) { %>disabled<% } %>>
+						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %> <% if (locals.data?.id) { %>disabled<% } %>>
 						<label for='public-status'></label>
 						<p class="google-translate-attr"><%- vocabulary['public mobilization'][language] %></p>
 					<% } %>
 				</div>
 			</div>
 		</div>
+
 		<!-- SECOND MODAL: LANGUAGE -->
 		<div class='modal m-2 hide'>
 			<div class='inner'>
 				<div class='head meta-status <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
-						<button type='button' class='back' onclick='prev(this)'>
+						<button type='button' class='back'>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>disabled<% } %>>
+						<button type='button' class='next' <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>disabled<% } %>>
 							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 						</button>
 					</div>
@@ -99,14 +99,13 @@
 					<h1 class="google-translate-attr"><%- vocabulary['select campaign language'][language] %></h1>
 					<div class='filter'>
 						<input type='text' id='language'>
-						<!-- TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 						<label class="google-translate-attr" for='language'><%- vocabulary['search'][language]['object'] %></label>
 
 						<menu>
 							<% languages.forEach(c => { %>
 								<li <% if ((locals.sourceinfo?.language || locals.data?.language) === c.language) { %>class='checked'<% } %>>
 									<div class='hide'>
-										<input type='radio' id='c-<%- c.language %>' name='language' value='<%- c.language %>' onchange='toggleChecked(this); enableNext(this)' <% if (locals.sourceinfo?.language === c.language) { %>checked<% } %>>
+										<input type='radio' id='c-<%- c.language %>' name='language' value='<%- c.language %>' <% if (locals.sourceinfo?.language === c.language) { %>checked<% } %>>
 									</div>
 									<div class='main grow'>
 										<label for='c-<%- c.language %>'><%- c.name %></label>
@@ -127,15 +126,14 @@
 				<div class='inner'>
 					<div class='head meta-status status-1'>
 						<div class='btn-group'>
-							<button type='button' class='back' onclick='prev(this)'>
+							<button type='button' class='back'>
 								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 							</button>
-							<button type='button' class='next' onclick='next(this)'>
+							<button type='button' class='next'>
 								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 							</button>
 						</div>
 					</div>
-
 					<div class='body'>
 						<h1 class="google-translate-attr"><%- vocabulary['set mobilization dates'][language] %></h1>
 						<p class="google-translate-attr"><%- vocabulary['mobilization dates default'][language] %></p>
@@ -160,20 +158,20 @@
 						<!-- OPTION FOR START TODAY -->
 						<div class='cron-option start'>
 							<div class='toggle-option'>
-								<input id='cron-start' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+								<input id='cron-start' type='checkbox' class='toggle' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
 								<label for='cron-start'></label>
 								<p class="google-translate-attr"><%- vocabulary['set start date'][language] %></p>
 							</div>
 
 							<div>
-								<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' onchange='offsetMinEndDate(this)' disabled>
+								<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' disabled>
 							</div>
 						</div>
 
 						<!-- OPTION FOR NO END DATE -->
 						<div class='cron-option end'>
 							<div class='toggle-option'>
-								<input id='cron-end' type='checkbox' class='toggle' onchange='toggleCronJob(this)' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+								<input id='cron-end' type='checkbox' class='toggle' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
 								<label for='cron-end'></label>
 								<p class="google-translate-attr"><%- vocabulary['set end date'][language] %></p>
 							</div>
@@ -193,10 +191,10 @@
 			<div class='inner'>
 				<div class='head meta-status <% if (!locals.sourceinfo?.description && !locals.data?.description) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
-						<button type='button' class='back' onclick='prev(this)'>
+						<button type='button' class='back'>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
-						<button type='button' class='next' onclick='next(this)' <% if (!locals.sourceinfo?.description || !locals.data?.description) { %>disabled<% } %>>
+						<button type='button' class='next' <% if (!locals.sourceinfo?.description || !locals.data?.description) { %>disabled<% } %>>
 							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 						</button>
 					</div>
@@ -204,7 +202,7 @@
 				<div class='body'>
 					<h1 class='google-translate-attr'><%- vocabulary['state objectives'][language] %></h1>
 					<div class='input'>
-						<textarea id='description' name='description' onkeyup='adjustarea(this); enableNext(this)' onblur='fixLabel(this); enableNext(this)' required><%- locals.sourceinfo?.description || locals.data?.description %></textarea>
+						<textarea id='description' name='description' required><%- locals.sourceinfo?.description || locals.data?.description %></textarea>
 						<label class='placeholder google-translate-attr' for='description'><%- vocabulary['describe intent'][language] %></label>
 					</div>
 				</div>
@@ -218,13 +216,13 @@
 				<div class='inner'>
 					<div class='head meta-status status-0'>
 						<div class='btn-group'>
-							<button type='button' class='back' onclick='prev(this)'>
+							<button type='button' class='back'>
 								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 							</button>
 							<button type='submit' class='next public hide' disabled>
 								<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
 							</button>
-							<button type='button' class='next private' onclick='next(this)' disabled>
+							<button type='button' class='next private' disabled>
 								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 							</button>
 						</div>
@@ -233,14 +231,13 @@
 						<h1 class="google-translate-attr"><%- vocabulary['select template'][language] %></h1>
 						<div class='filter'>
 							<input type='text' id='templates'>
-							<!-- TO DO: MAKE SURE THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 							<label class="google-translate-attr" for='templates'><%- vocabulary['search'][language]['object'] %></label>
 
 							<menu>
 								<% locals.templates.forEach(t => { %>
 									<li class='status-<%- t.status %>'>
 										<div class='hide'>
-											<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>' onchange='toggleChecked(this); enableNext(this)'>
+											<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>'>
 										</div>
 										<div class='preview' title='Preview template.'>
 											<a href='../view/template?id=<%- t.id %>' target='_blank'><i class='material-icons google-translate-attr'>visibility</i></a>
@@ -270,11 +267,11 @@
 				<div class='inner'>
 					<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) && !locals.data?.cohort?.length) { %>status-0<% } else { %>status-1<% } %>'>
 						<div class='btn-group'>
-							<button type='button' class='back' onclick='prev(this)'>
+							<button type='button' class='back'>
 								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 							</button>
 							<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
-								<button type='button' class='next' onclick='next(this)' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
+								<button type='button' class='next' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
 									<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
 								</button>
 							<% } else { %> 
@@ -284,12 +281,10 @@
 							<% } %>
 						</div>
 					</div>
-
 					<div class='body'>
 						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
 						<div class='filter'>
 							<input type='text' id='contributors'>
-							<!-- TO DO: CHECK THE onblur='fixLabel(this)' IS HANDLED BY setup.js -->
 							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language]['person'] %></label>
 
 							<menu>
@@ -302,12 +297,12 @@
 									) { %>
 										<li class='checked'>
 											<div class='hide'>
-												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)' checked>
+												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' checked>
 												<!-- TO DO: CHECK IF THIS WORKS: IT SHOULD SELECT CONTRIBUTORS BASED ON WHETHER IT IS A FOLLOW UP OR A DEPTH CAMPAIGN -->
 									<% } else { %>
 										<li>
 											<div class='hide'>
-												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' onchange='toggleChecked(this); enableNext(this)'>
+												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>'>
 									<% } %>
 										</div>
 										<div class='main'>
@@ -322,7 +317,7 @@
 					</div>
 					<div class='foot stretch'>
 						<div class='global-opt'>
-							<button type='button' onclick='selectAllOpts(this); enableNext(this)'><%- vocabulary['select all'][language] %></button>
+							<button type='button'><%- vocabulary['select all'][language] %></button>
 						</div>
 						<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](locals.data?.cohort?.length ?? 0) %></div>
 					</div>
@@ -334,7 +329,7 @@
 			<div class='inner'>
 				<div class='head meta-status status-1'>
 					<div class='btn-group'>
-						<button type='button' class='back' onclick='prev(this)'>
+						<button type='button' class='back'>
 							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
 						</button>
 						<button type='submit' class='next'>
@@ -351,7 +346,6 @@
 				</div>
 
 				<div class='body'>
-
 					<h1 class="google-translate-attr">Limit the number of pads each contributor can submit</h1>
 					<!-- TO DO: TRANSLATE -->
 					<p class="google-translate-attr">By default, a contributor can submit as many pads as they like.</p>
@@ -359,7 +353,7 @@
 
 					<div class='pad-limit-option'>
 						<div class='toggle-option'>
-							<input id='limit-pads' type='checkbox' class='toggle' onchange='togglePadLimit(this)' <% if (locals.data?.pad_limit) { %>checked<% } %>>
+							<input id='limit-pads' type='checkbox' class='toggle' <% if (locals.data?.pad_limit) { %>checked<% } %>>
 							<label for='limit-pads'></label>
 						</div>
 

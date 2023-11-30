@@ -29,13 +29,6 @@
 
 <%- include ('../../partials/head.ejs') %> 
 
-<!-- FOR PRINT/ PDF GENERATION -->
-<script type='text/javascript'>
-	// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
-	window.PagedConfig = {
-		auto: false // disable automatic script execution on document load
-	}
-</script>
 <script type='text/javascript' src='/scripts/pagedjs/dist/paged.polyfill.js'></script>
 <link rel='stylesheet' type='text/css' href='/css/pagedjs.interface.css'>
 
@@ -56,13 +49,14 @@
 </div>
 
 
-<script type='text/javascript'>
-	const metafields = <%- JSON.stringify(metafields || {}) %>
+<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
 
-	const centerpoint = <%- JSON.stringify(locals.metadata.user.country.lnglat || {}) %>
+	// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
+	window.PagedConfig = {
+		auto: false // disable automatic script execution on document load
+	}
 
 	const templated = <%- JSON.stringify(templated) %>;
-	let activity = '<%- activity %>';
 
 	// POPULATE THE PAGE
 	const data = <%- JSON.stringify(locals.data || {}) %>;

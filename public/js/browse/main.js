@@ -34,12 +34,57 @@ window.addEventListener('load', async function () {
 		partialSave('section-description', this.dataset.id)
 	})
 
+	// SET PAGINATION LINKS
+	d3.selectAll('nav.pagination a.page-link')
+	.on('click', function () {
+		const { value } = this.dataset
+		redirect({ location: null, params: [{ key: 'page', value }] })
+	})
+	// SET TAB LINKS
+	// TO NOTE: ULTIMATELY IT MIGHT BE BETTER TO DEPRECATE THIS
+	// BECAUSE IT RESULTS IN SITUATIONS WHERE NOTHING IS DISPLAYED
+	// e.g. WHEN FILTERING IN ./published THEN NAVIGATING TO ./private
+	// THE USER MAY NOT HAVE ANY ./private PADS THAT MEET THE FILTERING CRITERIA
+	d3.selectAll('nav.tabs menu li a')
+	.on('click', function () {
+		const { location } = this.dataset
+		redirect({ location, params: [{ key: 'page', value: 1 }], rm: ['pinboard', 'status', 'section'] }) // THE rm HERE IS TO REMOVE ANY params IN THE query THAT SHOULD NOT BE CARRIED OVER FROM ONE TAB TO ANOTHER
+	})
+	// ADD INTERACTION FOR MAIN SEARCH AND FILTER MODULE
 	// REPRINT STATUS TOGGLES IN FILTERS MENU IF sm DISPLY
+	const filter_module = d3.select('#search-and-filter')
 	if (mediaSize === 'xs') {
-		const status_toggles = d3.select('#search-and-filter form .status').node()
-		const parent = d3.select('#search-and-filter form .filters').node()
+		const status_toggles = filter_module.select('form .status').node()
+		const parent = filter_module.select('form .filters').node()
 		parent.appendChild(status_toggles)
 	}
+	filter_module.selectAll('.filters .filter .dropdown input[type=checkbox]')
+	.on('change', function () {
+		const { id, name } = this.dataset;
+		addequivalents(this); 
+		toggletag(this, { id, name })
+	});
+	filter_module.selectAll('.filters .active-filters .tag .close')
+	.on('click', function () {
+		const { id, name } = this.dataset;
+		rmtag(this, { id, name });
+	});
+	filter_module.selectAll('.status input.toggle')
+	.on('change', function () {
+		this.form.requestSubmit[this.form.querySelector("button#search")] || this.form.submit();
+	});
+	filter_module.selectAll('.global-actions .dropdown .pinboard input[type=radio]')
+	.on('change', function () {
+		pinAll(this);
+	});
+	filter_module.select('.global-actions button.download')
+	.on('click', function () {
+		setDownloadOptions();
+	});
+	filter_module.select('button.expand-filters')
+	.on('click', function () {
+		expandfilters(this);
+	});
 
 	// HANDLE TABS DROPDOWNS FOR SMALL DISPLAYS
 	if (['xs', 'sm'].includes(mediaSize)) {

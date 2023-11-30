@@ -151,7 +151,7 @@ module.exports = async (req, res) => {
 					.then(result => {
 						delete result.sections
 						return result
-					}).catch(err => console.log(err))) // THIS IS SIMPLIFIED NOW
+					}).catch(err => console.log(err)))
 				}
 
 				if (id && engagementtypes?.length > 0) { // EDIT THE PAD

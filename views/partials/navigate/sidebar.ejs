@@ -75,7 +75,7 @@
 															<ul>
 																<% if (locals.metadata.menu.templates.length > 2) { %>
 																	<li class='filter xs sm m lg xl xxl'>
-																		<input type='text' id='filter-pad-templates' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																		<input type='text' id='filter-pad-templates'>
 																		<label for='filter-pad-templates'><%- vocabulary['filter'][language]['verb'] %></label>
 																	</li>
 																	<li class='padding'></li>
@@ -121,7 +121,7 @@
 															<% if (locals.metadata.menu.participations
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1).length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-pad-mobilizations' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-pad-mobilizations'>
 																	<label for='filter-pad-mobilizations'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>
@@ -190,7 +190,7 @@
 														<ul>
 															<% if (locals.metadata.menu.templates.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-templates-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-templates-copy'>
 																	<label for='filter-templates-copy'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>
@@ -237,7 +237,7 @@
 															<!-- TO DO: FINISH THIS WITH A FILTER MENU -->
 															<!-- <% if (locals.metadata.menu.templates.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-templates-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-templates-copy' onkeyup='filterDropdown(this)'>
 																	<label for='filter-templates-copy'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>
@@ -273,7 +273,7 @@
 								<li>
 									<form action='/upload/file' method='POST' enctype='multipart/form-data'>
 										<img src='/imgs/icons/i-pad.svg'>
-										<input type='file' id='input-file-all' name='file' accept='application/pdf, image/*,video/*,audio/*' onchange='uploadFile(this.form, "<%- language %>")' multiple>
+										<input type='file' id='input-file-all' name='file' accept='application/pdf, image/*,video/*,audio/*' multiple>
 										<label for='input-file-all' title='Upload a file.'><%- vocabulary['file'][language](false) %></label>
 									</form>
 								</li>
@@ -323,7 +323,7 @@
 														<ul>
 															<% if (locals.metadata.menu.pinboards.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-deep-dive-pinbords' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-deep-dive-pinbords'>
 																	<label for='filter-deep-dive-pinbords'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>
@@ -357,7 +357,7 @@
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.filter(d => !d.target_id).length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-mobilization-followup' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-mobilization-followup'>
 																	<label for='filter-mobilization-followup'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>
@@ -391,7 +391,7 @@
 														<ul>
 															<% if (locals.metadata.menu.mobilizations.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-mobilization-copy' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-mobilization-copy'>
 																	<label for='filter-mobilization-copy'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>
@@ -426,7 +426,7 @@
 															<% if (locals.metadata.menu.participations
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child).length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
-																	<input type='text' id='filter-mobilization-child' onblur='fixLabel(this)' onkeyup='filterDropdown(this)'>
+																	<input type='text' id='filter-mobilization-child'>
 																	<label for='filter-mobilization-child'><%- vocabulary['filter'][language]['verb'] %></label>
 																</li>
 																<li class='padding'></li>

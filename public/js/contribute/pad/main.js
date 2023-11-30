@@ -16,7 +16,7 @@ window.addEventListener('load', async function () {
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 
 	await renderPad();
-	initWidgetInteractions(pad.metafields, pad.type);
+	initToolbarInteractions(pad.metafields, pad.type);
 
 	const main = d3.select('#pad')
 	const head = main.select('.head')
@@ -34,7 +34,16 @@ window.addEventListener('load', async function () {
 	// ADD THE INTERACTION FOR THE SAVE BUTTON ON sm DISLAYS
 	d3.select(`div.save.${mediaSize} form button`)
 	.on('click', async _ => await partialSave())
-
+	// ADD THE INTERACTION FOR THE SAVE BUTTON FOR PUBLIC MOBILIZAIONS
+	d3.select('button#save-and-submit')
+	.on('click', function () {
+		saveAndSubmit(this);
+	});
+	// ADD THE INTERACTION FOR THE REQUEST FOR REVIEW
+	d3.select('button#submit-for-review')
+	.on('click', function () {
+		selectReviewLanguage(this);
+	})
 	// SET UP THE ADJACENT DISPLAYS IF RELEVANT
 	// FOR SOURCE
 	if (d3.select('div#source').node()) {

@@ -307,6 +307,9 @@ async function populateSection (data, lang = 'en', section) {
 	if (data.type === 'group') await addGroup({ data, lang, section })
 }
 async function autofillTitle () {
+	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = activity === 'edit'
+
 	const main = d3.select('main')
 	const head = main.select('.head')
 
@@ -315,7 +318,7 @@ async function autofillTitle () {
 		if (!firstText.innerText || !firstText.innerText.length) firstText = main.selectAll('.media, .meta').filter(function () { return this.innerText && this.innerText.length }).node()
 		if (firstText && firstText.innerText) {
 			head.select('.title')
-			.html(async _ => {
+			.html(_ => {
 				const cutoff = 75
 				if (firstText.innerText.split('\n').length > 1) {
 					if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
@@ -324,8 +327,8 @@ async function autofillTitle () {
 					if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
 					else return `${firstText.innerText}`
 				}
-				await partialSave('title')
 			})
+			if (editing) { await partialSave('title'); }
 		}
 	}
 }

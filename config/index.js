@@ -25,6 +25,8 @@ let {
 } = require('./edit/');
 const fs = require('fs');
 
+const { lodashNonce } = require('./nonces/')
+
 exports.translations = translations;
 
 exports.app_id = app_id;
@@ -171,13 +173,14 @@ exports.welcome_module = welcome_module;
 
 exports.fixed_uuid = fixed_uuid;
 
+exports.lodashNonce = lodashNonce
+
 // ADD LIST OF DOMAIN NAMES OF ALL IMAGES, JS SCRIPT AND STYLESHEETS REQUIRED BY THE BROWSER TO RENDER CORRECTLY
 exports.csp_links = [
   "'self'",
   '*.sdg-innovation-commons.org',
   'sdg-innovation-commons.org',
-  "'unsafe-inline'",
-  "'unsafe-eval'",
+  `'nonce-${lodashNonce}'`,
   'https://translate.google.com',
   'https://translate.googleapis.com',
   'https://translate-pa.googleapis.com',

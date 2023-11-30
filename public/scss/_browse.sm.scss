@@ -1481,6 +1481,7 @@ div.browse {
 									font-size: $t-mid-small;
 									line-height: 1.3em;
 									white-space: pre-line;
+									overflow-wrap: break-word;
 
 									a {
 										color: $c-dark-grey;

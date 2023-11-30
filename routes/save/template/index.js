@@ -2,7 +2,7 @@ const { DB } = include('config/')
 const { limitLength } = include('routes/helpers/')
 
 module.exports = (req, res) => {
-	const { id, review_template, review_language, source } = req.body || {}
+	const { id, review_template, review_language, source, completion } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
 	if (req.body?.title) req.body.title = limitLength(req.body.title, 99)
 
@@ -11,7 +11,7 @@ module.exports = (req, res) => {
 	if (!id) { // INSERT OBJECT
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
-			.filter(key => !['id', 'review_template', 'review_language'].includes(key))
+			.filter(key => !['id', 'completion', 'review_template', 'review_language'].includes(key))
 			.reduce((obj, key) => {
 				obj[key] = req.body[key]
 				return obj
@@ -24,7 +24,7 @@ module.exports = (req, res) => {
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
-		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'review_template', 'review_language'].includes(d)), 'templates') + condition
+		saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'completion', 'review_template', 'review_language'].includes(d)), 'templates') + condition
 	}
 
 	DB.conn.tx(t => {
@@ -51,16 +51,37 @@ module.exports = (req, res) => {
 					WHERE templates.id = $1
 						AND source.id = templates.source
 				;`, [ newID ]))
-			}
+			} // TO DO: APPEND THE newID IF THERE IS NO SOURCE AND APPEND source OTHERWISE
 			// UPDATE THE TIMESTAMP
 			batch.push(t.none(`
 				UPDATE templates SET update_at = NOW() WHERE id = $1::INT
 			;`, [ newID || id]))
 
+			// UPDATE STATUS
+			batch.push(t.one(`
+				SELECT status FROM templates
+				WHERE id = $1::INT
+			;`, [ newID || id ], d => d.status)
+			.then(status => {
+				if (completion) status = Math.max(1, status)
+				else status = 0
+
+				return t.none(`
+					UPDATE templates SET status = $1::INT
+					WHERE id = $2::INT
+				;`, [ status, newID || id ])
+				.then(_ => status)
+				.catch(err => err)
+			}).catch(err => console.log(err)))
+
 			return t.batch(batch)
-			.then(_ => newID)
-			.catch(err => console.log(err))
+			.then(results => {
+				const status = results[results.length - 1]
+				return { id: newID, status }
+			}).catch(err => console.log(err))
+			// .then(_ => newID)
+			// .catch(err => console.log(err))
 		})
-	}).then(newID => res.json({ status: 200, message: 'Successfully saved.', object: newID }))
+	}).then(data => res.json({ status: 200, message: 'Successfully saved.', data }))
 	.catch(err => console.log(err))
 }

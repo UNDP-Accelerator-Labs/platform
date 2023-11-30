@@ -462,45 +462,34 @@
 				}
 			}
 		}
-		.foot {
-			margin: 10px 0;
-			text-align: center;
+	}
+	.foot {
+		margin: 10px 0;
+		text-align: center;
 
-			/*button {
-				border: none;
-				outline: none;
-				height: 45px;
-				width: 100%;
-				border-radius: 5px;
-				padding: 0 30px;
-				font-size: $t-main;
-				background-color: $c-light-2;
-				color: $c-dark-1;
-				cursor: pointer;
-				transition: background-color .25s;
-			}
-			button:hover {
-				background-color: $c-dark-1;
-				color: #FFF;
-			}*/
-			button {
-				width: 100%;
-				min-height: 30px;
-				border: 1px solid $c-dark-blue;
-				outline: none;
-				background-color: transparent;
-				padding: 0 30px;
-				font-size: $t-main;
-				cursor: pointer;
-				transition: background-color .25s;
+		button {
+			width: 100%;
+			min-height: 30px;
+			border: 1px solid $c-dark-blue;
+			outline: none;
+			background-color: transparent;
+			padding: 0 30px;
+			font-size: $t-main;
+			cursor: pointer;
+			transition: background-color .25s;
 
-				.sub {
-					font-size: $t-small;
-					color: $c-light-grey;
-				}
+			.sub {
+				font-size: $t-small;
+				color: $c-light-grey;
 			}
 		}
+		p {
+			text-align: left;
+			margin-top: 5px;
+			font-size: $t-mid-small;
+		}
 	}
+	
 }
 .modal.longlist {
 

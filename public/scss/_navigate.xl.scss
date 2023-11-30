@@ -332,6 +332,17 @@ nav.pinboard-sections {
 									}
 								}
 
+								&.highlight {
+									background-color: $c-light-blue;
+									color: $c-dark-grey;
+
+									a {
+										.count {
+											color: #FFF;
+										}
+									}
+								}
+
 								&:hover {
 									background-color: $c-light-3;
 								}

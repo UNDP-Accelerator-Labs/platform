@@ -14,14 +14,14 @@
 	<div class='stat-group'>
 		<div class='statistic'>
 			<h1><%- simplifyNumber(locals.stats?.filtered) %></h1>
-			<p><%- vocabulary[object.slice(0, -1)]?.[language](locals.stats?.filtered !== 1)?.capitalize() || object.capitalize() %></p>
+			<p><%- vocabulary[object.slice(0, -1)]?.[language][locals.stats?.filtered !== 1 ? 'plural' : 'singular']?.capitalize() || object.capitalize() %></p>
 			
 			<% if (locals.metadata.page.count > 1) { %>
 				<small><%- vocabulary['showing range'][language](locals.stats?.displayed * (page - 1) + 1, Math.min(locals.stats?.displayed * page, locals.stats?.filtered)) %></small>
 			<% } else if (typeof page === 'string') { %>
 				<small><%- vocabulary['showing letter'][language](locals.stats?.displayed, page) %></small>
 			<% } %>
-			<div class='expand-stats xs'><button onclick='expandstats(this)'></button></div>
+			<div class='expand-stats xs'><button id='expand-statistics'></button></div>
 		</div>
 	</div>
 	<% if (locals.stats?.contributors > 0 || (locals.metadata.page.map && locals.stats?.filtered > 0) || locals.stats?.tags?.some(d => d.count > 0)) { %>
@@ -29,7 +29,7 @@
 			<% if (locals.stats?.contributors) { %>
 				<div class='statistic'>
 					<h2><%- simplifyNumber(locals.stats?.contributors) %></h2>
-					<p><%- vocabulary['contributor']?.[language](true).capitalize() %></p>
+					<p><%- vocabulary['contributor']?.[language]['plural'].capitalize() %></p>
 				</div>
 			<% } %>
 			<% if (locals.metadata.page.map && locals.stats?.filtered > 0) { %>
@@ -41,34 +41,9 @@
 			<% locals.stats?.tags?.forEach(d => { %>
 				<div class='statistic'>
 					<h2><%- simplifyNumber(d.count) %></h2>
-					<p><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language](true).capitalize() || d.type.capitalize() %></p>
+					<p><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language]['plural'].capitalize() || d.type.capitalize() %></p>
 				</div>
 			<% }) %>
 		</div>
 	<% } %>
 </div>
-<script type='text/javascript'>
-	if (!mediaSize) var mediaSize = getMediaSize()
-	function expandstats (node) {
-		if (mediaSize === 'xs') {
-			const sel = d3.select(node)
-			const statistics = d3.select(sel.findAncestor('stat-group').node().parentNode)
-			
-			d3.select('.screen').classed('hide', false)
-			statistics.classed('expand', true)
-			.addElems('button', 'close inlaid')
-			.on('click', function () {
-				d3.select(this.parentNode).classed('expand', false)
-				d3.select('.screen').classed('hide', true)
-				d3.select(this).remove()
-
-			}).html('<%- vocabulary["close"][language] %>')
-
-			// window.addEventListener('mouseup', _ => {
-			// 	statistics.classed('expand', false)
-			// 	.select('button.close').remove()
-			// 	d3.select('.screen').classed('hide', true)
-			// })
-		} else return null
-	}
-</script>

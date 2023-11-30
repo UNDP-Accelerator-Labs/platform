@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<%
+	// CREATE ALIASES
+	const uuid = locals.metadata.user.uuid
+	const languages = locals.metadata.site.languages
+	const language = locals.metadata.page.language
+%>
+<html lang='<%- language %>'>
+<head>
+
+	<%- include ('../../partials/head.ejs') %>
+
+	<script type='text/javascript' src='/js/contribute/mobilization/main.js'></script>
+
+</head>
+
+<body>
+
+<%- include ('../../partials/translations.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %> 
+
+<!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
+<div class='main-content'>
+<header>
+	<div class='inner'>
+		<%- include ('../../partials/navigate/sidebar.ejs') %> 
+	</div>
+</header>
+
+<main id='mobilize-new'>
+	<!-- FIRST MODAL: TITLE -->
+	<!-- <form action='/publish/mobilizations' method='POST'> -->
+	<form action='<% if (!locals.data?.id) { %>/publish/mobilizations<% } else { %>/save/mobilization<% } %>' method='POST'>
+
+		<% if (locals.data?.id) { %>
+			<input type='hidden' name='id' value='<%- locals.data.id %>'>
+		<% } %>
+
+		<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
+		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
+		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
+			<input type='hidden' name='template' value='<%- locals.templates.id %>'>
+			<input type='hidden' name='copy' value='true'>
+		<% } %>
+		<% if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>
+		<!-- THE NEW MOBILIZATION IS A CHILD -->
+			<input type='hidden' name='child' value='true'>
+		<% } %>
+		<% if (locals.metadata.page.query?.pinboard?.length > 0) { %>
+		<!-- THE NEW MOBILIZATION IS A DEPTH MOBILIZATION -->
+			<% locals.metadata.page.query?.pinboard.forEach(d => { %>
+				<input type='hidden' name='collection' value='<%- d %>'>
+			<% }) %>
+		<% } %>
+
+		<div class='modal m-1'>
+			<div class='inner'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back' disabled>
+							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>disabled<% } %>>
+							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+				<div class='body'>
+					<h1 class="google-translate-attr"><%- vocabulary['name mobilization'][language] %></h1>
+					<div class='input'>
+						<input id='title' type='text' name='title' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]['preposition'] %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
+						<label aria-colspan="google-translate-attr" class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
+					</div>
+				</div>
+				<div class='foot'>
+					<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
+						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %> <% if (locals.data?.id) { %>disabled<% } %>>
+						<label for='public-status'></label>
+						<p class="google-translate-attr"><%- vocabulary['public mobilization'][language] %></p>
+					<% } %>
+				</div>
+			</div>
+		</div>
+
+		<!-- SECOND MODAL: LANGUAGE -->
+		<div class='modal m-2 hide'>
+			<div class='inner'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back'>
+							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>disabled<% } %>>
+							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+				<div class='body'>
+					<h1 class="google-translate-attr"><%- vocabulary['select campaign language'][language] %></h1>
+					<div class='filter'>
+						<input type='text' id='language'>
+						<label class="google-translate-attr" for='language'><%- vocabulary['search'][language]['object'] %></label>
+
+						<menu>
+							<% languages.forEach(c => { %>
+								<li <% if ((locals.sourceinfo?.language || locals.data?.language) === c.language) { %>class='checked'<% } %>>
+									<div class='hide'>
+										<input type='radio' id='c-<%- c.language %>' name='language' value='<%- c.language %>' <% if (locals.sourceinfo?.language === c.language) { %>checked<% } %>>
+									</div>
+									<div class='main grow'>
+										<label for='c-<%- c.language %>'><%- c.name %></label>
+									</div>
+									<!-- TO DO: TRANSLATE LANGUAGE NAMES (e.g. FRENCH TO FRANÇAIS) -->
+								</li>
+							<% }) %>
+						</menu>
+					</div>
+				</div>
+				<div class='foot'>
+				</div>
+			</div>
+		</div>
+		<!-- SET DATE RANGES -->
+		<% if (!locals.data?.id) { %>
+			<div class='modal m-3 hide'>
+				<div class='inner'>
+					<div class='head meta-status status-1'>
+						<div class='btn-group'>
+							<button type='button' class='back'>
+								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							</button>
+							<button type='button' class='next'>
+								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+							</button>
+						</div>
+					</div>
+					<div class='body'>
+						<h1 class="google-translate-attr"><%- vocabulary['set mobilization dates'][language] %></h1>
+						<p class="google-translate-attr"><%- vocabulary['mobilization dates default'][language] %></p>
+
+						<% 
+							const today = new Date()
+							const tomorrow = new Date(today)
+							tomorrow.setDate(tomorrow.getDate() + 1)
+							
+							const dd = String(today.getDate()).padStart(2, '0')
+							const mm = String(today.getMonth() + 1).padStart(2, '0')
+							const yyyy = today.getFullYear()
+
+							const dd1 = String(tomorrow.getDate()).padStart(2, '0')
+							const mm1 = String(tomorrow.getMonth() + 1).padStart(2, '0')
+							const yyyy1 = tomorrow.getFullYear()
+						%>
+
+						<!-- SET THE DEFAULT STATUS OF THE PAD -->
+						<input type='hidden' name='status' value=1>
+
+						<!-- OPTION FOR START TODAY -->
+						<div class='cron-option start'>
+							<div class='toggle-option'>
+								<input id='cron-start' type='checkbox' class='toggle' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+								<label for='cron-start'></label>
+								<p class="google-translate-attr"><%- vocabulary['set start date'][language] %></p>
+							</div>
+
+							<div>
+								<input id='start-date' type='date' name='start_date' min='<%- `${yyyy}-${mm}-${dd}` %>' value='<%- `${yyyy}-${mm}-${dd}` %>' disabled>
+							</div>
+						</div>
+
+						<!-- OPTION FOR NO END DATE -->
+						<div class='cron-option end'>
+							<div class='toggle-option'>
+								<input id='cron-end' type='checkbox' class='toggle' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
+								<label for='cron-end'></label>
+								<p class="google-translate-attr"><%- vocabulary['set end date'][language] %></p>
+							</div>
+
+							<div>
+								<input id='end-date' type='date' name='end_date' min='<%- `${yyyy1}-${mm1}-${dd1}` %>' disabled>
+							</div>
+						</div>
+					</div>
+					<div class='foot'>
+					</div>
+				</div>
+			</div>
+		<% } %>
+		<!-- DESCRIPTION -->
+		<div class='modal m-4 hide'>
+			<div class='inner'>
+				<div class='head meta-status <% if (!locals.sourceinfo?.description && !locals.data?.description) { %>status-0<% } else { %>status-1<% } %>'>
+					<div class='btn-group'>
+						<button type='button' class='back'>
+							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='button' class='next' <% if (!locals.sourceinfo?.description || !locals.data?.description) { %>disabled<% } %>>
+							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+						</button>
+					</div>
+				</div>
+				<div class='body'>
+					<h1 class='google-translate-attr'><%- vocabulary['state objectives'][language] %></h1>
+					<div class='input'>
+						<textarea id='description' name='description' required><%- locals.sourceinfo?.description || locals.data?.description %></textarea>
+						<label class='placeholder google-translate-attr' for='description'><%- vocabulary['describe intent'][language] %></label>
+					</div>
+				</div>
+				<div class='foot'>
+				</div>
+			</div>
+		</div>
+		<!-- TEMPLATE -->
+		<% if (!locals.metadata.page.query?.copy?.some(d => d === "true") && !locals.data?.id) { %>
+			<div class='modal m-5 hide'>
+				<div class='inner'>
+					<div class='head meta-status status-0'>
+						<div class='btn-group'>
+							<button type='button' class='back'>
+								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							</button>
+							<button type='submit' class='next public hide' disabled>
+								<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+							</button>
+							<button type='button' class='next private' disabled>
+								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+							</button>
+						</div>
+					</div>
+					<div class='body'>
+						<h1 class="google-translate-attr"><%- vocabulary['select template'][language] %></h1>
+						<div class='filter'>
+							<input type='text' id='templates'>
+							<label class="google-translate-attr" for='templates'><%- vocabulary['search'][language]['object'] %></label>
+
+							<menu>
+								<% locals.templates.forEach(t => { %>
+									<li class='status-<%- t.status %>'>
+										<div class='hide'>
+											<input type='radio' id='t-<%- t.id %>' name='template' value='<%- t.id %>'>
+										</div>
+										<div class='preview' title='Preview template.'>
+											<a href='../view/template?id=<%- t.id %>' target='_blank'><i class='material-icons google-translate-attr'>visibility</i></a>
+										</div>
+										<div class='main'>
+											<label class="google-translate-attr" for='t-<%- t.id %>'><%- t.title || `[${vocabulary["untitled template"][language]}]` %></label>
+										</div>
+										<div class='grow position'>
+											<% if (t.owner !== uuid) { %>
+												<label class="google-translate-attr" for='t-<%- t.id %>'><%- vocabulary['created by'][language](t.ownername) %></label>
+											<% } %>
+										</div>
+										<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
+									</li>
+								<% }) %>
+							</menu>
+						</div>
+					</div>
+					<div class='foot'>
+					</div>
+				</div>
+			</div>
+		<% } %>
+		<!-- COHORT -->
+		<% if (!locals.data?.public) { %>
+			<div class='modal m-6 hide'>
+				<div class='inner'>
+					<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) && !locals.data?.cohort?.length) { %>status-0<% } else { %>status-1<% } %>'>
+						<div class='btn-group'>
+							<button type='button' class='back'>
+								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							</button>
+							<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
+								<button type='button' class='next' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
+									<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+								</button>
+							<% } else { %> 
+								<button type='submit' class='next'>
+									<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+								</button>
+							<% } %>
+						</div>
+					</div>
+					<div class='body'>
+						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
+						<div class='filter'>
+							<input type='text' id='contributors'>
+							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language]['person'] %></label>
+
+							<menu>
+								<% locals.cohort.forEach(c => { %>
+									<% if (
+										(locals.sourceinfo 
+											&& locals.metadata.page.query?.copy?.some(d => d !== 'true')
+										) || locals.data?.cohort.includes(c.id)
+										|| locals.metadata.page.query.pinboard?.length > 0
+									) { %>
+										<li class='checked'>
+											<div class='hide'>
+												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' checked>
+												<!-- TO DO: CHECK IF THIS WORKS: IT SHOULD SELECT CONTRIBUTORS BASED ON WHETHER IT IS A FOLLOW UP OR A DEPTH CAMPAIGN -->
+									<% } else { %>
+										<li>
+											<div class='hide'>
+												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>'>
+									<% } %>
+										</div>
+										<div class='main'>
+											<label for='c-<%- c.id %>'><%- c.ownername %></label>
+										</div>
+										<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
+										<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
+									</li>
+								<% }) %>
+							</menu>
+						</div>
+					</div>
+					<div class='foot stretch'>
+						<div class='global-opt'>
+							<button type='button'><%- vocabulary['select all'][language] %></button>
+						</div>
+						<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](locals.data?.cohort?.length ?? 0) %></div>
+					</div>
+				</div>
+			</div>
+		<% } %>
+		<!-- LAST MODAL: LIMIT CONTRIBUTIONS -->
+		<div class='modal m-7 hide'>
+			<div class='inner'>
+				<div class='head meta-status status-1'>
+					<div class='btn-group'>
+						<button type='button' class='back'>
+							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+						</button>
+						<button type='submit' class='next'>
+							<label class="google-translate-attr">
+								<% if (!locals.data?.id) { %>
+									<%- vocabulary['launch'][language] %>
+								<% } else { %>
+									Update mobilization
+									<!-- TO DO: TRANSLATE -->
+								<% } %>
+							</label>
+						</button>
+					</div>
+				</div>
+
+				<div class='body'>
+					<h1 class="google-translate-attr">Limit the number of pads each contributor can submit</h1>
+					<!-- TO DO: TRANSLATE -->
+					<p class="google-translate-attr">By default, a contributor can submit as many pads as they like.</p>
+					<!-- TO DO: TRANSLATE -->
+
+					<div class='pad-limit-option'>
+						<div class='toggle-option'>
+							<input id='limit-pads' type='checkbox' class='toggle' <% if (locals.data?.pad_limit) { %>checked<% } %>>
+							<label for='limit-pads'></label>
+						</div>
+
+						<div>
+							<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
+							<input id='pad-limit' type='number' name='pad_limit' value=<%- (locals.data?.pad_limit ?? 1) %> min=1 placeholder='Number of pads.' <% if (!locals.data?.pad_limit) { %>disabled<% } %>>
+							<!-- TO DO: TRANSLATE -->
+							<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
+						</div>
+					</div>					
+				</div>
+				<div class='foot'>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
+</main>
+<div class='sidebar lg xl xxl'></div>
+</div>
+
+<footer>
+</footer>
+
+<%- include ('../../partials/footer.ejs') %> 
+
+</body>
+</html>

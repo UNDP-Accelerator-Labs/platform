@@ -239,3 +239,43 @@ function limitLength(text, limit) {
 	}
 	return `${arr.slice(0, limit - 1).join('')}…`;
 }
+const dateOptions = {
+	weekday: undefined,
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+};
+
+function getContent (params = {}) { // THIS IS TO LOAD THE PADS, TEMPLATES, ETC
+	const object = d3.select('data[name="object"]').node().value
+	const space = d3.select('data[name="space"]').node()?.value
+	
+	const url = new URL(window.location)
+	const queryparams = new URLSearchParams(url.search)
+	
+	const reqbody = {};
+	if (space) reqbody['space'] = space
+	
+	for (key in params) {
+		reqbody[key] = params[key];
+	}
+	
+	queryparams.forEach((value, key) => {
+		if (!reqbody[key]) { reqbody[key] = value; }
+		else {
+			if (!Array.isArray(reqbody[key])) { reqbody[key] = [reqbody[key]]; }
+			reqbody[key].push(value);
+		}
+	});
+
+	// TO DO: ADD VAR keep_page
+	return POST(`/load/${object}`, reqbody)
+}
+async function getLanguage () {
+	const { languages } = await POST('/load/metadata', { feature: 'languages' })
+	const url = new URL(window.location)
+	const language = url.pathname.substring(1).split('/')[0]
+
+	if (languages.some(d => d === language)) return language
+	else return 'en'
+}

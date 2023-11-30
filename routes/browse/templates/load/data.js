@@ -1,4 +1,4 @@
-const { page_content_limit, modules, engagementtypes, DB } = include('config/')
+const { app_languages, page_content_limit, modules, engagementtypes, DB } = include('config/')
 const { array, checklanguage, engagementsummary, join, safeArr, DEFAULT_UUID, pagestats } = include('routes/helpers/')
 
 const filter = require('../filter')
@@ -132,6 +132,52 @@ module.exports = async kwargs => {
 				}))
 			}
 
+			// GET REVIEW TEMPLATE EXTRA INFORMATION
+			if (modules.some(d => d.type === 'reviews')) {
+				batch.push(t.any(`
+					SELECT rt.template AS id, rt.language
+					FROM review_templates rt
+					INNER JOIN templates t
+						ON t.id = rt.template
+					WHERE t.id IN $1:raw
+				;`, [ templatelist ])
+				.then(review_templates => {
+					if (review_templates?.length) {
+						return DB.general.task(gt => {
+							const gbatch = []
+							gbatch.push(gt.any(`
+								SELECT DISTINCT (name), language FROM languages
+								WHERE language IN ($1:csv)
+								ORDER BY language
+							;`, [ app_languages ]))
+							gbatch.push(gt.any(`
+								SELECT language, secondary_languages FROM users
+								-- SELECT COUNT (id)::INT AS count, language FROM users
+								-- GROUP BY language
+							;`))
+							return gt.batch(gbatch)
+							.catch(err => console.log(err))
+						}).then(languagedata => {
+							let [ languages, speakers ] = languagedata
+
+							speakers = speakers.map(d => {
+								const l = d.secondary_languages || []
+								l.push(d.language)
+								return l
+							}).flat()
+							speakers = array.count.call(speakers, { keyname: 'language' })
+
+							review_templates = join.multijoin.call(review_templates, [ speakers, 'language' ])
+							review_templates = join.multijoin.call(review_templates, [ languages, 'language' ])
+							review_templates.forEach(d => {
+								d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
+							})
+							return review_templates
+						})
+					} else return null
+				}).catch(err => console.log(err)))
+			}
+
 			// CURRENT USER ENGAGMENT WITH TEMPLATES
 			if (engagementtypes?.length > 0) {
 				batch.push(t.any(`
@@ -150,10 +196,15 @@ module.exports = async kwargs => {
 				;`, [ templatelist, engagement.coalesce, engagement.query ]).catch(err => console.log(err)))
 			}
 
+			// SELECT p.id, $2:raw
+			// FROM pads p
+			// LEFT JOIN ($3:raw) ce ON ce.docid = p.id
+			// WHERE p.id IN $1:raw
+
 			return t.batch(batch)
 			.then(results => {
 				let data = templates.map(d => { return { id: d } })
-				results.forEach(d => {
+				results.filter(d => d).forEach(d => {
 					data = join.multijoin.call(data, [ d, 'id' ])
 				})
 				return data

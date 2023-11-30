@@ -17,17 +17,19 @@ module.exports = async (req, res) => {
 		const language = checklanguage(req.params?.language || req.session.language)
 
 		// GET FILTERS
-		const [ f_space, order, page, full_filters ] = await filter(req)
+		const filter_result = await filter(req, res);
+		const [ f_space, order, page, full_filters ] = filter_result;
 		
 		DB.conn.tx(async t => {
 			const batch = []
 			
 			// PADS DATA
-			batch.push(load.data({ connection: t, req }))
+			// batch.push(load.data({ connection: t, req })) // THIS IS DEPRECATED: SEE brouse/pads/render.js FOR EXPLANATION
+			batch.push(null)
 			// FILTERS MENU DATA
-			batch.push(load.filters_menu({ connection: t, req }))
+			batch.push(load.filters_menu({ connection: t, req, filters: filter_result }))
 			// SUMMARY STATISTICS
-			batch.push(load.statistics({ connection: t, req }))
+			batch.push(load.statistics({ connection: t, req, filters: filter_result }))
 			
 			return t.batch(batch)
 			.then(async results => {
@@ -36,8 +38,7 @@ module.exports = async (req, res) => {
 					statistics
 				] = results
 
-				const { sections, pads } = data
-				console.log(statistics)
+				const { sections, pads } = data || {} // THIS SHOULD BE DEPRECATED
 				const stats = { 
 					total: array.sum.call(statistics.total, 'count'), 
 					filtered: array.sum.call(statistics.filtered, 'count'), 
@@ -46,7 +47,7 @@ module.exports = async (req, res) => {
 					ongoing: statistics.ongoing,
 					past: statistics.past,
 					
-					displayed: data.count,
+					displayed: page_content_limit,
 					breakdown: statistics.filtered,
 					persistent_breakdown: statistics.persistent
 				}

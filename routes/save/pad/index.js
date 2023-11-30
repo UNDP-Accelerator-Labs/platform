@@ -5,7 +5,7 @@ const path = require('path')
 const { BlobServiceClient } = require('@azure/storage-blob')
 
 module.exports = (req, res) => {
-	const { id, tagging, locations, metadata, deletion, mobilization, source } = req.body || {}
+	const { id, tagging, locations, metadata, deletion, mobilization, source, completion } = req.body || {}
 	if (req.body?.sections) req.body.sections = JSON.stringify(req.body.sections)
 	if (req.body?.title) req.body.title = limitLength(req.body.title, 99)
 
@@ -14,7 +14,7 @@ module.exports = (req, res) => {
 	if (!id) { // INSERT OBJECT
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
-			.filter(key => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(key))
+			.filter(key => !['id', 'completion', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(key))
 			.reduce((obj, key) => {
 				obj[key] = req.body[key]
 				return obj
@@ -27,7 +27,7 @@ module.exports = (req, res) => {
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
-		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
+		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'completion', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
 	}
 
 	DB.conn.tx(t => {
@@ -168,11 +168,30 @@ module.exports = (req, res) => {
 				UPDATE pads SET update_at = NOW() WHERE id = $1::INT
 			;`, [ newID || id]))
 
+			// UPDATE STATUS
+			batch.push(t.one(`
+				SELECT status FROM pads
+				WHERE id = $1::INT
+			;`, [ newID || id ], d => d.status)
+			.then(status => {
+				if (completion) status = Math.max(1, status)
+				else status = 0
+
+				return t.none(`
+					UPDATE pads SET status = $1::INT
+					WHERE id = $2::INT
+				;`, [ status, newID || id ])
+				.then(_ => status)
+				.catch(err => err)
+			}).catch(err => console.log(err)))
+
 			return t.batch(batch)
-				.then(_ => newID)
-				.catch(err => console.log(err))
+			.then(results => {
+				const status = results[results.length - 1]
+				return { id: newID, status }
+			}).catch(err => console.log(err))
 		})
-	}).then(newID => {
+	}).then(data => {
 		if (deletion) {
 			// TO DO: THIS DOES NOT WORK (GUESSING NO deletion IS BEING SENT)
 			const promises = deletion.map(f => {
@@ -196,7 +215,7 @@ module.exports = (req, res) => {
 					}
 				}
 			})
-			Promise.all(promises).then(_ => res.json({ status: 200, message: 'Successfully saved.', object: newID }))
-		} else res.json({ status: 200, message: 'Successfully saved.', object: newID })
+			Promise.all(promises).then(_ => res.json({ status: 200, message: 'Successfully saved.', data }))
+		} else res.json({ status: 200, message: 'Successfully saved.', data })
 	}).catch(err => console.log(err))
 }

@@ -14,6 +14,9 @@ module.exports = (req, res) => {
 				const { callback } = auth
 
 				if (src) {
+					console.log('look for resource')
+					console.log(callback)
+
 					if (callback?.referer && callback?.endpoint) {
 						const { referer, endpoint } = callback
 						const res_token = jwt.sign({ uuid, callback, resource_path: src }, process.env.APP_SUITE_SECRET, { expiresIn: 15 * 60 }) // EXPIRES IN 15 MINUTES

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<%
+	// CREATE ALIASES
+	const language = locals.metadata.page.language
+	const metafields = locals.metadata.site.metafields
+	const participations = locals.metadata.menu.participations
+%>
+<html lang='<%- locals.metadata.page.language %>'>
+<head>
+
+<%- include ('../../partials/head.ejs') %> 
+
+<script type='text/javascript' src='/scripts/xlsx/dist/xlsx.full.min.js'></script>
+
+<% if (locals.metadata.page.map) { %>
+	<link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
+		integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
+		crossorigin=''/>
+	<script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
+		integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
+		crossorigin=''></script>
+<% } %>
+
+<script type='text/javascript' src='/js/contribute/xlsx/main.js'></script>
+<script type='text/javascript' src='/js/contribute/xlsx/save.js'></script>
+<script type='text/javascript' src='/js/contribute/pad/render.js'></script>
+
+</head>
+
+<body>
+
+<!-- SET DATA ATTRIBUTES -->
+<% 
+	const pagedata = {
+		type: 'private',
+		activity: 'preview',
+		participations: participations || []
+	}
+%>
+<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
+<%
+	const paddata = {
+		type: 'templated',
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || []
+	}
+%>
+<data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
+<data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
+
+<%- include ('../../partials/translations.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %> 
+
+
+<div class='main-content import'>
+	<header>
+		<div class='inner'>
+			<%- include ('../../partials/navigate/sidebar.ejs') %> 
+		</div>
+	</header>
+
+	<%- include ('../../partials/modals.ejs') %>
+
+	<div class='table'>
+		<main id='import-module' class='import-module'>
+			<div class='inner'>
+				<div class='head meta-status status-0'>
+					<div class='btn-group'>
+						<form id='contribute'>
+							<button class="google-translate-attr" title='<%- vocabulary["import pads"][language] %>' type='submit' disabled><%- vocabulary['import pads'][language] %></button>
+						</form>
+					</div>
+				</div>
+				<div class='body'>
+					<!-- INSPIRED BY https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
+					<div id='import-file' class='input-group'>
+						<div class='drop-zone'>
+							<!-- <p>Drag one or more files to this <i>drop zone</i>.</p> -->
+							<input type='file' id='upload' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
+							<button>
+								<label class="google-translate-attr" for='upload'><%- vocabulary['upload source file'][language] %></label>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class='foot'></div>
+			</div>
+		</main>
+	</div>
+	<div class='sidebar table-sidebar'>
+		<div class='inner'>
+			<!-- <div class='btn-group hide'> -->
+			<div class='media-input-group input-group'>
+				<div class='inner'>
+					<div class='btn-group'>
+						<form>
+							<button type='button' class='column-action group' title='Group selected columns.'>
+								<!-- TO DO: TRANSLATE -->
+								<i class='material-icons google-translate-attr'>layers</i>
+							</button>
+						</form>
+						<form>
+							<button type='button' class='column-action delete' title='Delete selected column(s).'>
+								<!-- TO DO: TRANSLATE -->
+								<i class='material-icons google-translate-attr'>delete_forever</i>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

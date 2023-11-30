@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
 		.then(results => {
 			if (results.length) {
 				DB.general.any(`
-					SELECT t.id, t.name, t.type FROM tags t
+					SELECT t.id, t.name, t.type, t.key FROM tags t
 					WHERE TRUE
 						$1:raw
 						AND t.id IN ($2:csv)
@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
 		}).catch(err => console.log(err))
 	} else {
 		DB.general.any(`
-			SELECT t.id, t.name, t.type FROM tags t
+			SELECT t.id, t.name, t.type, t.key FROM tags t
 			WHERE TRUE
 				$1:raw
 				$2:raw

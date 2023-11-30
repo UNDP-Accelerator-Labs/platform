@@ -21,7 +21,7 @@
 <body>
 
 <%- include ('../../partials/translations.ejs') %> 
-<%# include ('../../partials/menu-languages.ejs') %> 
+<%# include ('../../partials/navigate/menu-languages.ejs') %> 
 <%- include ('../../partials/modals.ejs') %> 
 
 <div class='document print'>
@@ -176,7 +176,7 @@
 					return country || '<%- vocabulary["anonymous contributor"][language] %>'
 				})
 				article.addElems('div', 'meta meta-date')
-				.html(d => Function(`"use strict";return (<%- vocabulary["date"][language] %>)`)()(date))
+				.html(d => new Date(d.date).toLocaleDateString(language, dateOptions))
 
 				article.addElem('p', 'media media-txt')
 				.html(txt[0]?.split(/\n\n+/)[0].trim())
@@ -184,7 +184,7 @@
 				const taggroup = article.addElems('div', 'meta tag-group')
 				const sdgtags = taggroup.addElems('div', 'meta meta-sdgs', d => sdgs?.length ? [sdgs] : [])
 				sdgtags.addElems('span', 'sdg-label')
-					.html(d => Function(`"use strict";return (<%- vocabulary["sdg"][language] %>)`)()((d?.length || 0) > 1))
+					.html(d => vocabulary['sdg'][language][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
 				sdgtags.addElems('span', 'sdg', d => d)
 					.html(d => d.key || d)
 				taggroup.addElems('div', 'meta meta-tags', d => tags?.length ? [tags] : [])

@@ -247,15 +247,20 @@ exports.dispatch.contribute = require('./contribute/')
 // exports.dispatch.edit = require('./edit/')
 // exports.dispatch.view = require('./view/')
 
-exports.render.import = require('./import/').render
+// exports.render.import = require('./import/').render
 
 exports.dispatch.mobilize = require('./mobilize/')
+
+/* =============================================================== */
+/* =========================== BROWSE ============================ */
+/* =============================================================== */
+exports.dispatch.load = require('./load/')
 
 /* =============================================================== */
 /* ========================== IMPORT ============================= */
 /* =============================================================== */
 // TO DO: CHANGE THIS TO THE GENERAL save/ MECHANISM
-exports.process.import = require('./import/').process
+// exports.process.import = require('./import/').process
 
 
 /* =============================================================== */
@@ -1012,12 +1017,12 @@ exports.sitemap = async (req, res) => {
 
 exports.notfound = async(req, res) => {
 	const metadata = await helpers.datastructures.pagemetadata({ req, res })
-	res.render('error-404', metadata)
+	res.render('errors/e404', metadata)
 }
 
 exports.error = async(req, res) => {
 	const metadata = await helpers.datastructures.pagemetadata({ req, res })
-	res.render('error-500', metadata)
+	res.render('errors/e500', metadata)
 }
 
 String.prototype.simplify = function () {

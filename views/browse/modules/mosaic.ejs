@@ -1,56 +1,10 @@
 <%
-	const slides = locals.sample_images
-	const language = locals.metadata.page.language
 	const uuid = locals.metadata.user.uuid
 %>
 
-<div class='slides'>
+<div class='slides' data-display='mosaic'>
 	<% if (uuid) { %><div class='blank-area sidebar'>
 	<% } else { %><div class='blank-area'><% } %>
 		<h1 class='xs sm m'><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
 	</div>
 </div>
-
-<script type='text/javascript'>
-	function renderMosaic () {
-		let slides = <%- JSON.stringify(slides) %>
-		if (!mediaSize) var mediaSize = getMediaSize()
-		if (mediaSize === 'xs') slides = slides.slice(0, 11)
-		else if (mediaSize === 'sm') slides = slides.slice(0, 21)
-		else if (mediaSize === 'm') slides = slides.slice(0, 26)
-		else if (mediaSize === 'lg') {
-			<% if (uuid) { %> slides = slides.slice(0, 30)
-			<% } else { %> slides = slides.slice(0, 33)
-			<% } %>
-		} else {
-			<% if (uuid) { %> slides = slides.slice(0, 40)
-			<% } %>
-		}
-
-		const container = d3.select('div.slides')
-		const vignette = container.addElems('div', 'slide', slides)
-		.addElems('a')
-			.attr('href', d => `/<%- language %>/view/pad?id=${d.id}`)
-		const txt = vignette.addElems('div', 'media media-txt')
-		txt.addElems('p', 'country')
-			.html(d => d.country)
-		txt.addElems('h1')
-			.html(d => {
-				if (d.title?.length > 50) return d.title?.slice(0, 50).trim()
-				else return d.title
-			})
-		vignette.addElems('img')
-			.attr('src', d => {
-				<% if (locals.metadata.site.app_storage) { %> 
-					return new URL(`<%- locals.metadata.site.app_storage %>${d.img[0]}`).href
-				<% } else { %> 
-					return d.img[0]
-				<% } %>
-			})
-	}
-	renderMosaic()
-	
-	window.onresize = (evt) => {
-		renderMosaic()
-	}
-</script>

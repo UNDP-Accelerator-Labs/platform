@@ -190,7 +190,8 @@ module.exports = async (req, res) => {
 		// else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		
 		else if (space === 'published') f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])
-		
+		// THIS MEANS THAT IN published, NON sudo USERS WILL ONLY SEE PREPRINTS OF THEIR TEAM-MATES
+
 		else if (space === 'pinned') {
 			if (public) {
 				if (pinboard) {

@@ -15,24 +15,25 @@
 
 <%- include ('../../partials/head.ejs') %>
 
-<link rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css'
-	integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=='
-	crossorigin=''/>
-<script src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js'
-	integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=='
-	crossorigin=''></script>
+<script type='text/javascript' src='/js/contribute/contributor/main.js'></script>
+<script type='text/javascript' src='/js/contribute/contributor/save.js'></script>
 
 </head>
 
 <body>
 
+<% if (locals.data?.uuid) { %>
+<!-- TO DO: DEPRECATE THIS WHEN INTEGRATING reset-password AS IT IS ONLY USED FOR RESETTING -->
+	<data name='id' value='<%= locals.data.uuid %>'></data>
+<% } %>
+
 <%- include ('../../partials/translations.ejs') %>
-<%- include ('../../partials/menu-languages.ejs') %>
+<%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 <div class='main-content fit'>
 <header>
 	<div class='inner'>
-		<%- include ('../../partials/menu-logo.ejs') %>
+		<%- include ('../../partials/navigate/sidebar.ejs') %>
 	</div>
 </header>
 
@@ -190,7 +191,7 @@
 								<label class='instruction google-translate-attr'><%- vocabulary['preferred language'][language] %></label>
 								<div class='select'>
 									<input type='text' id='new-language' autocomplete='new-language' value='<%- locals.data?.languagename %>' <% if (!editable) { %>disabled<% } %>>
-									<label for='new-language' class='google-translate-attr'><%- vocabulary['select language'][language]() %></label>
+									<label for='new-language' class='google-translate-attr'><%- vocabulary['select language'][language]['singular'] %></label>
 									<% if (editable) { %>
 										<div class='dropdown'>
 											<menu>
@@ -213,7 +214,7 @@
 									<label class='instruction google-translate-attr'><%- vocabulary['other languages'][language] %></label>
 									<div class='select'>
 										<input type='text' id='secondary-languages' autocomplete='secondary-languages' value='<%- locals.languages.filter(d => locals.data?.secondary_languages?.includes(d.language)).map(d => d.name).join(", ") %>' <% if (!editable) { %>disabled<% } %>>
-										<label for='secondary-languages' class='google-translate-attr'><%- vocabulary['select language'][language](true) %></label>
+										<label for='secondary-languages' class='google-translate-attr'><%- vocabulary['select language'][language]['plural'] %></label>
 										<% if (editable) { %>
 											<div class='dropdown'>
 												<menu>
@@ -229,7 +230,7 @@
 										<% } %>
 									</div>
 								<% } else { %>
-									<button class='add-info google-translate-attr' type='button' onclick='addLanguage(this.parentNode)'>
+									<button id='add-extra-languages' class='add-info google-translate-attr' type='button'>
 										<span class='add-circle'>+</span><%- vocabulary['add other languages'][language] %>
 									</button>
 								<% } %>
@@ -301,7 +302,7 @@
 												<% locals.data?.teams.forEach(d => { %>
 													<div class='pin tag'>
 														<label class='name notranslate'><%- d.name %></label>
-														<label class='close' data-id='<%- d.id %>' data-name='teams' onclick='rmPin(this)'>x</label>
+														<label class='close' data-id='<%- d.id %>' data-name='teams'>x</label>
 													</div>
 												<% }) %>
 											</div>
@@ -334,7 +335,7 @@
 								<li class='google-translate-attr'>
 									<label class='instruction'><%- vocabulary['accept to review'][language] %></label>
 									<div class='input-group'>
-										<input type='checkbox' id='accept-reviews' name='reviewer' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.reviewer) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
+										<input type='checkbox' id='accept-reviews' name='reviewer' value='true' class='toggle' data-object='contributor' <% if (locals.data?.reviewer) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
 										<label for='accept-reviews' data-content='<% if (locals.data?.reviewer) { %><%- vocabulary["yes"][language].toUpperCase() %><% } else { %><%- vocabulary["no"][language].toUpperCase() %><% } %>'></label>
 									</div>
 								</li>
@@ -343,7 +344,7 @@
 							<li class='google-translate-attr'>
 								<label class='instruction'><%- vocabulary['email notifications'][language] %></label>
 								<div class='input-group'>
-									<input type='checkbox' id='email-notifications' name='email_notifications' value='true' class='toggle' onchange='toggleOptions(this, [`<%- vocabulary["yes"][language].toUpperCase() %>`, `<%- vocabulary["no"][language].toUpperCase() %>`])' <% if (locals.data?.notifications) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
+									<input type='checkbox' id='email-notifications' name='email_notifications' value='true' class='toggle' data-object='contributor' <% if (locals.data?.notifications) { %>checked<% } %><% if (!editable) { %> disabled<% } %>>
 									<label for='email-notifications' data-content='<% if (locals.data?.notifications) { %><%- vocabulary["yes"][language].toUpperCase() %><% } else { %><%- vocabulary["no"][language].toUpperCase() %><% } %>'></label>
 								</div>
 							</li>
@@ -354,36 +355,19 @@
 					</div>
 				</form>
 			</div>
+			
 			<div class='foot'>
 				<% if (editable && locals.data?.uuid) { %>
 					<div class='api-token'>
 						<form>
 							<!-- TO DO: TRANSLATE -->
-							<button class='request-token' type='button' onclick='requestToken(this.form)'>Request an API token</button>
+							<button class='request-token' type='button'>Request an API token</button>
 							<div class='input-group'>
-								<input type='text' name='api-token' class='hide' onclick='this.select()' readonly>
-								<button type='button' class='copy hide google-translate-attr' onclick='copyToken(this.form)'><%- vocabulary['copy'][language](true) %></button>
+								<input type='text' name='api-token' class='hide' readonly>
+								<button type='button' class='copy hide google-translate-attr'><%- vocabulary['copy'][language]['verb'] %></button>
 							</div>
 						</form>
 					</div>
-					<script type='text/javascript'>
-						async function requestToken (node) {
-							const token = await POST('/request/token')
-							if (token) {
-								const inputgroup = d3.select(node)
-								inputgroup.selectAll('.hide')
-									.classed('hide', false)
-								const input = inputgroup.select('input[type=text]')
-									.attr('value', token)
-								input.node().select()
-							}
-						}
-						function copyToken (node) {
-							const inputgroup = d3.select(node)
-							const token = inputgroup.select('input[type=text]').node().value
-							navigator.clipboard.writeText(token)
-						}
-					</script>
 				<% } %>
 				<% if (locals.data?.pads > 0) { %>
 					<div class='user-content py-5'>
@@ -409,321 +393,9 @@
 <footer></footer>
 <%- include ('../../partials/footer.ejs') %>
 
-<script type='text/javascript'>
-	if (!mediaSize) var mediaSize = getMediaSize()
-
-	function toggleOptions (node, options) {
-		for (const label of node.labels) {
-			d3.select(label).attr('data-content', node.checked ? options[0] : options[1])
-		}
-		partialSave()
-	}
-
-	function addLanguage (node) {
-		// THEN SET UP MECHANISM IN BACKEND TO ALLOW MULTIPLE LANGUAGES
-		// THEN USE THAT MECHANISM WHEN LOOKING FOR REVIEWERS
-		const sel = d3.select(node)
-		const parent = sel.findAncestor('ul')
-		const li = parent.insertElem(function () { return node }, 'li')
-		li.addElem('label', 'instruction')
-			.html('<%- vocabulary["other languages"][language] %>')
-		const input = li.addElem('div', 'select')
-		input.addElem('input')
-			.attrs({
-				'type': 'text',
-				'id': 'secondary-languages',
-				'autocomplete': 'secondary-languages'
-			})
-		input.addElem('label')
-			.attr('for', 'secondary-languages')
-			.html('<%- vocabulary["select language"][language](true) %>')
-		const dropdown = input.addElem('div', 'dropdown')
-			.addElem('menu')
-			.addElems('li', null, <%- JSON.stringify(locals.languages) %>)
-			.each(function () {
-				const sel = d3.select(this)
-				sel.addElems('input')
-					.attrs({
-						'type': 'checkbox',
-						'id': d => `secondary-language-${d.language}`,
-						'name': 'secondary_languages', // TO DO: PROBABLY CHANGE THIS SO NO CONFLICT WITH OTHER language INPUTS
-						'value': d => d.language,
-						'data-label': d => d.name.capitalize(),
-						'disabled': d => d.language === d3.select('input[name="language"]:checked').node()?.value ? true : null
-					})
-				sel.addElems('label')
-					.attr('for', d => `secondary-language-${d.language}`)
-					.html(d => d.name.capitalize())
-			})
-
-		initBlurs()
-		initDropdowns()
-		sel.remove()
-	}
-
-	<% if (locals.data?.uuid && editable) { %>
-		d3.select('button#reset-password')
-		.on('click', function () {
-			d3.select('.old-password-info')
-				.style('max-height', function () { return `${this.scrollHeight}px` })
-			.selectAll('input[type=password]')
-				.each(function () { this.required = true })
-
-			d3.select('.meta-status button').attr('disabled', true)
-
-			d3.select(this).remove()
-		})
-
-		d3.select('input#old-password')
-		.on('keydown', function () {
-			const evt = d3.event
-			if (evt.code === 'Enter' || evt.keyCode === 13) {
-				evt.preventDefault()
-			}
-		}).on('keyup', function () {
-			const evt = d3.event
-			if (evt.code === 'Enter' || evt.keyCode === 13) {
-				evt.preventDefault()
-				d3.select('button#check-old-password').node().click()
-			}
-		})
-
-		d3.select('button#check-old-password')
-		.on('click', async function () {
-			const pwsel = d3.select('input#old-password')
-			const pw = pwsel.node().value.trim()
-			pwsel.classed('error', pw.length === 0)
-
-			if (!pwsel.classed('error')) {
-				const cleared = await POST('/check/password', { id: '<%- locals.data?.uuid %>', password: pw })
-				if (cleared.status === 200) {
-					d3.select('.password-info')
-						.style('max-height', function () { return `${this.scrollHeight}px` })
-					.selectAll('input[type=password]')
-						.each(function () { this.required = true })
-
-					d3.select('.old-password-info').remove()
-				} else {
-					pwsel.classed('error', true)
-					alert(cleared.message)
-				}
-			}
-		})
-	<% } %>
-
-	function initBlurs () {
-		d3.selectAll('input[type=password]') // IT IS IMPORTANT THAT THIS COMES BEFORE THE NEXT GENERIC BLUR FUNCTION
-		.on('blur.confirm', function () {
-			const node = this
-			const sel = d3.select(this)
-			const inputgroup = d3.select(this.parentNode)
-			const confirm = d3.selectAll('input[type=password]').filter(function () { return this !== node })
-			if (checkPassword(this.value)?.length && this.name !== 'confirm_password') {
-				sel.classed('error', true)
-				inputgroup.addElems('p', 'errormessage', checkPassword(this.value))
-					.html(d => d)
-			} else {
-				d3.selectAll('input[type=password]').classed('error', this.value !== confirm.node().value)
-				inputgroup.selectAll('p.errormessage').remove()
-			}
-		})
-
-		// GENERIC BLUR FUNCTION
-		d3.selectAll('input[type=text]:not([name="api-token"]), input[type=email], input[type=password]')
-		.on('blur.fixlabel', function () {
-			fixLabel(this)
-			partialSave()
-		}).each(function () { fixLabel(this) })
-	}
-
-	function initDropdowns () {
-		const selects = d3.selectAll('.select')
-		selects.selectAll('input[type=text]')
-		.on('keyup', function () {
-			const node = this
-
-			const dropdown = d3.select(node).findAncestor('select').select('.dropdown')
-			dropdown.selectAll('menu li')
-				.classed('hide', function () {
-					return !this.textContent.trim().toLowerCase()
-						.includes(node.value.trim().toLowerCase())
-
-					&& (!dropdown.selectAll('menu li input:checked').size() || !Array.from(dropdown.selectAll('menu li input:checked').nodes())
-						.every(sel => {
-							return node.value.trim().toLowerCase().split(',')
-							.map(d => d.trim())
-							.includes(sel.parentNode.textContent.trim().toLowerCase())
-						}))
-				})
-		}).on('focus', function () {
-			const select = d3.select(this).findAncestor('select')
-			const dropdown = select.select('.dropdown')
-			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
-
-			dropdown.selectAll('label').on('mousedown', function () {
-				d3.event.preventDefault()
-			})
-
-			if (mediaSize === 'xs') select.classed('expand', true)
-
-		}).on('blur', function () {
-			const select = d3.select(this).findAncestor('select')
-			const dropdown = select.select('.dropdown')
-			dropdown.node().style.maxHeight = null
-
-			if (mediaSize === 'xs') {
-				setTimeout(_ => select.classed('expand', false), 250)
-			}
-		})
-
-		selects.selectAll('input[type=radio]')
-		.on('change', function () {
-			const node = this
-			const sel = d3.select(node)
-			sel.findAncestor('select')
-				.select('input[type=text]')
-				.node().value = node.dataset.label
-
-			d3.selectAll('input[name="secondary_languages"]')
-			.attr('disabled', function () { return this.value === node.value ? true : null })
-		})
-
-		selects.selectAll('input[type=checkbox]')
-		.on('change', function () {
-			const node = this
-			const sel = d3.select(node)
-
-			const values = []
-			sel.findAncestor('menu').selectAll('input[type=checkbox]:checked')
-				.each(function () { values.push(this.dataset.label) })
-
-			sel.findAncestor('select')
-				.select('input[type=text]')
-				.node().value = values.join(', ')
-		})
-
-		<% if (modules.some(d => d.type === 'teams' && rights >= d.rights.write)) { %>
-			selects.select('input#new-team')
-			.on('keydown', function () {
-				const evt = d3.event
-				if (evt.code === 'Enter' || evt.keyCode === 13) {
-					evt.preventDefault()
-				}
-			}).on('keyup.checkEnter', function (d) {
-				const evt = d3.event
-				const node = this
-				const newpin = d3.select(this).findAncestor('add')
-
-				if (evt.code === 'Enter' || evt.keyCode === 13) {
-					evt.preventDefault()
-					newpin.select('button').node().click()
-				}
-			})
-
-			function addPinOption (value) {
-				const dropdown = d3.select(this)
-				const li = dropdown.select('menu')
-				.addElem('li')
-				const pinItem = li.addElems('input')
-					.attrs({
-						'type': 'checkbox',
-						'id': value.simplify(),
-						'name': 'new_teams',
-						'value': value,
-						'data-label': value
-					}).each(function () {
-						this.checked = true
-					})
-				li.addElems('label', 'title')
-					.attr('for', value.simplify())
-					.html(value)
-				renderPin.call(pinItem.node())
-			}
-			function renderPin () {
-				const sel = d3.select(this)
-				const pinboard = d3.select('.pinboard-group').classed('hide', false)
-
-				if (this.checked) {
-					const pin = pinboard.select('.pinboard .pins')
-						.addElem('div', 'pin tag')
-					pin.addElem('label', 'name')
-						.classed('notranslate', true)
-						.html(this.dataset.label)
-					pin.addElem('div', 'close')
-						.attrs({ 'data-name': this.name, 'data-id': this.value })
-					.on('click', function () { rmPin(this) })
-						.html('x')
-				} else {
-					d3.select(`label.close[data-name='${this.name}'][data-id='${this.value}']`).node().click()
-				}
-			}
-
-			selects.selectAll('input[name=teams]')
-			.on('change', function () {
-				renderPin.call(this)
-			})
-			selects.select('button#add-new-team')
-			.on('click', async function (d) {
-				const newpin = d3.select(this).findAncestor('add')
-				const node = newpin.select('input[type=text]').node()
-
-				if (node.value.trim().length) {
-					const dropdown = newpin.select('.dropdown')
-
-					const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
-						return this.textContent.trim().toLowerCase() === node.value.trim().toLowerCase()
-					})
-					// IF EXIST, JUST CHECK IT
-					if (existingBoard.node()) {
-						const pinItem = existingBoard.node().previousElementSibling
-						pinItem.checked = true
-						renderPin.call(pinItem)
-					} else {
-						addPinOption.call(dropdown.node(), node.value.trim())
-					}
-
-					// RESET DROPDOWN
-					this.value = ''
-					dropdown.selectAll('menu li').classed('hide', false)
-				}
-			})
-		<% } %>
-	}
-
-	function rmPin (node) {
-		const sel = d3.select(node)
-		const id = node.dataset.id
-		const name = node.dataset.name
-		const input = d3.select(`input[name='${name}'][value='${id}']`)
-		input.attr('checked', null)
-		input.node().checked = false
-		sel.findAncestor('pin').remove()
-
-		const pinboard = d3.select('.pinboard-group')
-		if (!pinboard.selectAll('.pin').size()) pinboard.classed('hide', true)
-
-		partialSave()
-	}
-
-	function partialSave () {
-		// CHECK WHETHER GOOD TO SAVE
-		const metastatus = d3.select('.meta-status').classed('status-0 status-1', false)
-
-		if (d3.selectAll('input:required').filter(function () {
-			return !(this.validity.valid && !this.classList.contains('error'))
-		}).size() === 0) {
-			metastatus.classed('status-1', true)
-			.select('button').attr('disabled', null)
-		} else {
-			metastatus.classed('status-0', true)
-			.select('button').attr('disabled', true)
-		}
-	}
-
-	initBlurs()
-	initDropdowns()
-
-</script>
+<% if (locals.data?.uuid && editable) { %>
+	<script type='text/javascript' src='/js/contribute/contributor/update.password.js' defer></script>
+<% } %>
 
 </body>
 </html>

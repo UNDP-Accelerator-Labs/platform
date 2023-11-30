@@ -33,16 +33,20 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        'img-src': csp_links,
+        'img-src': csp_links.concat([
+          'blob:',
+        ]),
         'script-src': csp_links,
         'script-src-attr': [
           "'self'",
-          "'unsafe-inline'",
           '*.sdg-innovation-commons.org',
           'sdg-innovation-commons.org',
         ],
         'style-src': csp_links,
-        'connect-src': csp_links,
+        'connect-src': csp_links.concat([
+          // 'blob:http:://localhost:2000/'
+          'blob:',
+        ]),
         'frame-src': [
           "'self'",
           '*.sdg-innovation-commons.org',
@@ -204,9 +208,9 @@ app
 app
   .route('/:language/view/:object')
   .get(routes.check.login, routes.dispatch.contribute);
-app
-  .route('/:language/import/:object')
-  .get(routes.check.login, routes.render.import);
+// app
+//   .route('/:language/import/:object')
+//   .get(routes.check.login, routes.render.import);
 app
   .route('/:language/mobilize/:object')
   .get(routes.check.login, routes.dispatch.mobilize);
@@ -235,6 +239,8 @@ app.get(
   routes.check.login,
   routes.render.explorationInfo,
 );
+
+app.post('/load/:object', routes.check.login, routes.dispatch.load);
 
 app.post('/check/:object', routes.check.login, routes.process.check);
 
@@ -315,8 +321,6 @@ app.get('/decline/:object', routes.check.login, routes.process.decline);
 
 // app.post('/intercept/:method', routes.process.intercept)
 
-app.post('/call/api', routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
-
 app.post(
   '/upload/img',
   upload.array('img'),
@@ -341,7 +345,7 @@ app.post(
   routes.check.login,
   routes.process.upload,
 );
-app.post('/upload/xlsx', routes.check.login, routes.process.import); // TO DO: CHANGE path SCHEMA
+// app.post('/upload/xlsx', routes.check.login, routes.process.import); // TO DO: CHANGE path SCHEMA
 
 app.post('/screenshot', routes.process.screenshot);
 
@@ -356,6 +360,8 @@ app
   .get(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis)
   .post(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis);
 
+
+app.post('/call/api', routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
 app.get('/api/skills', routes.check.login, routes.api.skills); // TO DO: THIS SHOULD BE DEPRECATED
 app.get('/api/methods', routes.check.login, routes.api.methods); // TO DO: THIS SHOULD BE DEPRECATED
 app

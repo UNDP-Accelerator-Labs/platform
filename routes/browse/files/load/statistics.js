@@ -6,11 +6,13 @@ const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
-	const { req } = kwargs || {}
+	let { req, filters } = kwargs || {}
 
 	const { uuid, rights, collaborators } = req.session || {}
+	
 	// GET FILTERS
-	const [ f_space, order, page, full_filters ] = await filter(req)
+	if (!filters?.length) filters = await filter(req)
+	const [ f_space, order, page, full_filters ] = filters
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 

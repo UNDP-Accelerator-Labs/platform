@@ -5,13 +5,14 @@ const filter = require('../filter')
 
 module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.general
-	const { req } = kwargs || {}
+	let { req, filters } = kwargs || {}
 	const { object } = req.params || {}
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	// GET FILTERS
-	const [ f_space, page, full_filters ] = await filter(kwargs.req)
+	if (!filters?.length) filters = await filter(req)
+	const [ f_space, page, full_filters ] = filters
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 	// const team_rights = modules.find()

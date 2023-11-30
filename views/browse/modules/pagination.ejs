@@ -7,44 +7,44 @@
 			<% if (locals.metadata.page.count <= 3) { %>
 				<% for (let i = 1; i < locals.metadata.page.count + 1; i++) { %>
 					<li>
-						<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+						<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-value='<%= i %>'><%= i %></a>
 					</li>
 				<% } %>
 			<% } else { %>
 				<% if (locals.metadata.page.id <= 2) { %>
 					<% for (let i = 1; i < Math.min(4, locals.metadata.page.count + 1); i++) { %>
 						<li>
-							<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+							<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-value='<%= i %>'><%= i %></a>
 						</li>
 					<% } %>
 					<% if (locals.metadata.page.count > 3) { %>
 						<li>…</li>
 						<li>
-							<a class='page-link' data-page='<%- locals.metadata.page.count %>'><%- locals.metadata.page.count %></a>
+							<a class='page-link' data-value='<%= locals.metadata.page.count %>'><%= locals.metadata.page.count %></a>
 						</li>
 					<% } %>
 				<% } else if (locals.metadata.page.id > 2 && locals.metadata.page.id <= (locals.metadata.page.count + 1) - 3) { %>
 					<li>
-						<a class='page-link' data-page='<%- 1 %>'>1</a>
+						<a class='page-link' data-value='1'>1</a>
 					</li>
 					<li>…</li>
 					<% for (let i = locals.metadata.page.id - 1; i < locals.metadata.page.id + 2; i++) { %>
 						<li>
-							<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+							<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-value='<%= i %>'><%= i %></a>
 						</li>
 					<% } %>
 					<li>…</li>
 					<li>
-						<a class='page-link' data-page='<%- locals.metadata.page.count %>'><%- locals.metadata.page.count %></a>
+						<a class='page-link' data-value='<%= locals.metadata.page.count %>'><%= locals.metadata.page.count %></a>
 					</li>
 				<% } else { %>
 					<li>
-						<a class='page-link' data-page='<%- 1 %>'>1</a>
+						<a class='page-link' data-value='1'>1</a>
 					</li>
 					<li>…</li>
 					<% for (let i = locals.metadata.page.count - 2; i < locals.metadata.page.count + 1; i++) { %>
 						<li>
-							<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-page='<%- i %>'><%- i %></a>
+							<a class='page-link <% if (i === locals.metadata.page.id) { %>active<% } %>' data-value='<%= i %>'><%= i %></a>
 						</li>
 					<% } %>
 				<% } %>

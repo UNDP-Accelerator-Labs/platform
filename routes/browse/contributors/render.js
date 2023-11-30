@@ -12,8 +12,10 @@ module.exports = async (req, res) => {
 		const { object, space } = req.params || {}
 		const { pinboard, display } = req.query || {}
 		const language = checklanguage(req.params?.language || req.session.language)
+		
 		// GET FILTERS
-		const [ f_space, page, full_filters ] = await filter(req)
+		const filter_result = await filter(req);
+		const [ f_space, page, full_filters ] = filter_result;
 
 		if (space === 'pinned' && page) res.redirect(`./invited?page=${page}`)
 		else {
@@ -21,11 +23,12 @@ module.exports = async (req, res) => {
 				const batch = []
 
 				// PADS DATA
-				batch.push(load.data({ connection: t, req }))
+				// batch.push(load.data({ connection: t, req }))  // THIS IS DEPRECATED: SEE brouse/pads/render.js FOR EXPLANATION
+				batch.push(null)
 				// FILTERS_MENU
-				batch.push(load.filters_menu({ connection: t, req }))
+				batch.push(load.filters_menu({ connection: t, req, filters: filter_result }))
 				// SUMMARY STATISTICS
-				batch.push(load.statistics({ connection: t, req }))
+				batch.push(load.statistics({ connection: t, req, filters: filter_result }))
 
 				// PINBOARDS LIST
 				if (modules.some(d => d.type === 'teams' && d.rights.read <= rights)) {
@@ -72,7 +75,7 @@ module.exports = async (req, res) => {
 						pinboard // CURRENTLY DISLAYED TEAM (IF APPLICABLE)
 					] = results
 
-					const { sections } = data
+					const { sections } = data || {} // THIS SHOULD BE DEPRECATED
 					const stats = {
 						total: array.sum.call(statistics.total, 'count'),
 						filtered: array.sum.call(statistics.filtered, 'count'),

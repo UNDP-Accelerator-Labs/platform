@@ -2481,8 +2481,7 @@ async function addIndexes (kwargs) {
 		datum: { id, level, type, name, tags, instruction, constraint, required },
 		focus: focus || false,
 		lang,
-		list: options, 
-		// list: taglists[name].sort((a, b) => a.key - b.key),
+		list: options,
 		imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
 		altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
 	})
@@ -2531,7 +2530,6 @@ async function addTags (kwargs) {
 		datum: { id, level, type, name, tags, instruction, constraint, required },
 		focus: focus || false,
 		lang,
-		// list: taglists[name]
 		list: options
 	})
 

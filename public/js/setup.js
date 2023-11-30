@@ -35,8 +35,8 @@ window.addEventListener('load', async function () {
 
 	// TOGGLE OPTIONS
 	d3.selectAll('input.toggle')
-	.on('change', function () {
-		toggleOptions(this)
+	.on('change', async function () {
+		await toggleOptions(this)
 	})
 
 	// ENSURE FOCUS ON contentEditable
@@ -103,7 +103,7 @@ function checkForEnter (evt, node) {
 		node.blur()
 	}
 };
-function toggleOptions (node) {
+async function toggleOptions (node) {
 	const { object } = node.dataset || {}
 	
 	for (const label of node.labels) {
@@ -143,7 +143,7 @@ function toggleOptions (node) {
 			subnode.disabled = !node.checked
 			d3.select(subnode).findAncestor('li').select('p').classed('disabled', !node.checked)
 		}
-		partialSave('pinboard', node.dataset.id)
+		await partialSave('pinboard', node.dataset.id)
 	} else if (object === 'contributor') {
 		partialSave()
 	}

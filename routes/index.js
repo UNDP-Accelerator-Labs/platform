@@ -247,7 +247,7 @@ exports.dispatch.contribute = require('./contribute/')
 // exports.dispatch.edit = require('./edit/')
 // exports.dispatch.view = require('./view/')
 
-exports.render.import = require('./import/').render
+// exports.render.import = require('./import/').render
 
 exports.dispatch.mobilize = require('./mobilize/')
 
@@ -260,7 +260,7 @@ exports.dispatch.load = require('./load/')
 /* ========================== IMPORT ============================= */
 /* =============================================================== */
 // TO DO: CHANGE THIS TO THE GENERAL save/ MECHANISM
-exports.process.import = require('./import/').process
+// exports.process.import = require('./import/').process
 
 
 /* =============================================================== */

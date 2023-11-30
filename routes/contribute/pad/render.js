@@ -1,4 +1,4 @@
-const { followup_count, modules, engagementtypes, metafields, DB, ownDB } = include('config/')
+const { followup_count, modules, engagementtypes, metafields, map, DB, ownDB } = include('config/')
 const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
 const check_authorization = require('./authorization.js')
@@ -241,7 +241,7 @@ module.exports = async (req, res) => {
 					// const item_attachments = parsers.getPadImgs(data)
 
 					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
-					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt })
+					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt, map })
 					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
 				}).then(data => {
 					// IF DISPLAY FOR PRINT, RENDER PRINT

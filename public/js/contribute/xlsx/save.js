@@ -48,7 +48,9 @@ async function catchSubmit (evt) {
 	// 2) SAVE IMAGES
 	const fd = new FormData()
 	const promises = []
-	const imgs = pads.map(d => d.imgs).flat().unique().filter(d => !d?.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
+	const imgs = pads.map(d => d.imgs).flat().unique()
+		.filter(d => !d?.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
+		.filter(d => d)
 
 	if (imgs.length) {
 		imgs.forEach(d => {
@@ -97,7 +99,7 @@ async function catchSubmit (evt) {
 	// pads.forEach(d => d.sections = JSON.stringify(d.sections))
 	// const results = await POST('/storeImport', { pads, template, mobilization })
 	addGlobalLoader()
-	const results = await POST('/upload/xlsx', { pads, template, mobilization })
+	const results = await POST('/save/xlsx', { pads, template, mobilization })
 	rmGlobalLoader()
 	window.location.href = `/${language}/browse/pads/private`
 

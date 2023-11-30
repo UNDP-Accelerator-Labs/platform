@@ -1,4 +1,6 @@
-window.addEventListener('load', function () {
+window.addEventListener('load', async function () {
+	await initDropdowns()
+
 	d3.selectAll('input[type=password]') // IT IS IMPORTANT THAT THIS COMES BEFORE THE NEXT GENERIC BLUR FUNCTION
 	.on('blur.confirm', function () {
 		const node = this
@@ -18,8 +20,35 @@ window.addEventListener('load', function () {
 	// GENERIC BLUR FUNCTION
 	d3.selectAll('input[type=text]:not([name="api-token"]), input[type=email], input[type=password]')
 	.on('blur.save', function () {
-		partialSave()
-	})
+		partialSave();
+	});
+
+	// ADD INTERACTION FOR EXTRA LANGUAGES OPTION
+	d3.select('#add-extra-languages')
+	.on('click', async function () {
+		await addLanguage(this.parentNode);
+	});
+
+	// SET UP TOKEN REQUEST
+	const apiToken = d3.select('.api-token')
+	apiToken.select('.request-token')
+	.on('click', async function () {
+		await requestToken(this.form);
+	});
+	apiToken.select('input[name="api-token"]')
+	.on('click', function () { 
+		this.select();
+	});
+	apiToken.select('button.copy')
+	.on('click', function () {
+		copyToken(this.form);
+	});
+
+	// ADD PIN/TAG INTERACTIONS
+	d3.selectAll('.tag label.close')
+	.on('click', function () {
+		rmPin(this);
+	});
 })
 
 async function requestToken (node) {
@@ -39,7 +68,7 @@ function copyToken (node) {
 	navigator.clipboard.writeText(token)
 }
 
-function addLanguage (node) {
+async function addLanguage (node) {
 	// THEN SET UP MECHANISM IN BACKEND TO ALLOW MULTIPLE LANGUAGES
 	// THEN USE THAT MECHANISM WHEN LOOKING FOR REVIEWERS
 	const sel = d3.select(node)
@@ -76,8 +105,8 @@ function addLanguage (node) {
 				.html(d => d.name.capitalize())
 		})
 
-	initBlurs()
-	initDropdowns()
+	// initBlurs()
+	await initDropdowns()
 	sel.remove()
 }
 
@@ -131,4 +160,125 @@ function rmPin (node) {
 	if (!pinboard.selectAll('.pin').size()) pinboard.classed('hide', true)
 
 	partialSave()
+}
+
+async function initDropdowns () {
+	if (!mediaSize) var mediaSize = getMediaSize()
+	const { rights } = await POST('/check/module_rights', { module_type: 'teams' })
+
+	const selects = d3.selectAll('.select')
+	selects.selectAll('input[type=text]')
+	.on('keyup', function () {
+		const node = this
+
+		const dropdown = d3.select(node).findAncestor('select').select('.dropdown')
+		dropdown.selectAll('menu li')
+			.classed('hide', function () {
+				return !this.textContent.trim().toLowerCase()
+					.includes(node.value.trim().toLowerCase())
+
+				&& (!dropdown.selectAll('menu li input:checked').size() || !Array.from(dropdown.selectAll('menu li input:checked').nodes())
+					.every(sel => {
+						return node.value.trim().toLowerCase().split(',')
+						.map(d => d.trim())
+						.includes(sel.parentNode.textContent.trim().toLowerCase())
+					}))
+			})
+	}).on('focus', function () {
+		const select = d3.select(this).findAncestor('select')
+		const dropdown = select.select('.dropdown')
+		dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+
+		dropdown.selectAll('label').on('mousedown', function () {
+			d3.event.preventDefault()
+		})
+
+		if (mediaSize === 'xs') select.classed('expand', true)
+
+	}).on('blur', function () {
+		const select = d3.select(this).findAncestor('select')
+		const dropdown = select.select('.dropdown')
+		dropdown.node().style.maxHeight = null
+
+		if (mediaSize === 'xs') {
+			setTimeout(_ => select.classed('expand', false), 250)
+		}
+	})
+
+	selects.selectAll('input[type=radio]')
+	.on('change', function () {
+		const node = this
+		const sel = d3.select(node)
+		sel.findAncestor('select')
+			.select('input[type=text]')
+			.node().value = node.dataset.label
+
+		d3.selectAll('input[name="secondary_languages"]')
+		.attr('disabled', function () { return this.value === node.value ? true : null })
+	})
+
+	selects.selectAll('input[type=checkbox]')
+	.on('change', function () {
+		const node = this
+		const sel = d3.select(node)
+
+		const values = []
+		sel.findAncestor('menu').selectAll('input[type=checkbox]:checked')
+			.each(function () { values.push(this.dataset.label) })
+
+		sel.findAncestor('select')
+			.select('input[type=text]')
+			.node().value = values.join(', ')
+	})
+
+	// <% if (modules.some(d => d.type === 'teams' && rights >= d.rights.write)) { %>
+	if (rights.write) {
+		selects.select('input#new-team')
+		.on('keydown', function () {
+			const evt = d3.event
+			if (evt.code === 'Enter' || evt.keyCode === 13) {
+				evt.preventDefault()
+			}
+		}).on('keyup.checkEnter', function (d) {
+			const evt = d3.event
+			const node = this
+			const newpin = d3.select(this).findAncestor('add')
+
+			if (evt.code === 'Enter' || evt.keyCode === 13) {
+				evt.preventDefault()
+				newpin.select('button').node().click()
+			}
+		})
+
+		selects.selectAll('input[name=teams]')
+		.on('change', function () {
+			renderPin.call(this)
+		})
+		selects.select('button#add-new-team')
+		.on('click', async function (d) {
+			const newpin = d3.select(this).findAncestor('add')
+			const node = newpin.select('input[type=text]').node()
+
+			if (node.value.trim().length) {
+				const dropdown = newpin.select('.dropdown')
+
+				const existingBoard = dropdown.selectAll('menu li:not(.hide) .title').filter(function () {
+					return this.textContent.trim().toLowerCase() === node.value.trim().toLowerCase()
+				})
+				// IF EXIST, JUST CHECK IT
+				if (existingBoard.node()) {
+					const pinItem = existingBoard.node().previousElementSibling
+					pinItem.checked = true
+					renderPin.call(pinItem)
+				} else {
+					addPinOption.call(dropdown.node(), node.value.trim())
+				}
+
+				// RESET DROPDOWN
+				this.value = ''
+				dropdown.selectAll('menu li').classed('hide', false)
+			}
+		})
+	}
+	
 }

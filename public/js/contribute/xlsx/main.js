@@ -16,6 +16,12 @@ window.addEventListener('load', function () {
 		parseXLSX(event.target.files[0], this);
 	});
 
+	// ADD COLUMN-ACTION BUTTONS INTERACTION
+	d3.select('.sidebar button.column-action.group')
+	.on('click', _ => groupColumns());
+	d3.select('.sidebar button.column-action.delete')
+	.on('click', _ => dropColumns());
+
 	const searchForm = d3.select('body form#contribute')
 	if (searchForm.node().attachEvent) searchForm.node().attachEvent('submit', catchSubmit)
 	else searchForm.node().addEventListener('submit', catchSubmit)
@@ -873,6 +879,8 @@ async function compilePads (idx, structureOnly = false) {
 					if (metafields.some(b => b.type !== 'location' && b.label === c.type)) {
 						if (['tag', 'index'].includes(metafields.find(b => b.label === c.type)?.type)) {
 							if (!structureOnly) {
+								const tag_or_index_info = await POST('/apis/fetch/tags', { type: c.type, language })
+
 								if (Array.isArray(c.entries[i])) {
 									item.tags = c.entries[i].filter(b => ![null, undefined].includes(b))
 										.map(b => { 
@@ -880,7 +888,7 @@ async function compilePads (idx, structureOnly = false) {
 											obj.id = undefined
 											if (metafields.find(b => b.label === c.type)?.type === 'index') {
 												obj.key = +b
-												obj.name = taglists[c.type].find(a => a.key === +b)?.name
+												obj.name = tag_or_index_info.find(a => a.key === +b)?.name
 											} else {
 												obj.key = null
 												obj.name = b
@@ -893,7 +901,7 @@ async function compilePads (idx, structureOnly = false) {
 									obj.id = undefined
 									if (metafields.find(b => b.label === c.type)?.type === 'index') {
 										obj.key = +c.entries[i]
-										obj.name = taglists[c.type].find(b => b.key === +c.entries[i])?.name
+										obj.name = tag_or_index_info.find(b => b.key === +c.entries[i])?.name
 									} else {
 										obj.key = null
 										obj.name = c.entries[i]

@@ -1064,7 +1064,6 @@ async function addIndexes (kwargs) {
 		focus: focus || false,
 		lang,
 		list: options
-		// list: taglists[name]
 	})
 
 	if (focus) taglist.media.node().focus()
@@ -1096,7 +1095,6 @@ async function addTags (kwargs) {
 		focus: focus || false,
 		lang,
 		list: options
-		// list: taglists[name]
 	})
 
 	if (focus) taglist.media.node().focus()

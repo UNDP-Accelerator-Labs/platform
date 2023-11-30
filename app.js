@@ -209,9 +209,9 @@ app
 app
   .route('/:language/view/:object')
   .get(routes.check.login, routes.dispatch.contribute);
-app
-  .route('/:language/import/:object')
-  .get(routes.check.login, routes.render.import);
+// app
+//   .route('/:language/import/:object')
+//   .get(routes.check.login, routes.render.import);
 app
   .route('/:language/mobilize/:object')
   .get(routes.check.login, routes.dispatch.mobilize);
@@ -346,7 +346,7 @@ app.post(
   routes.check.login,
   routes.process.upload,
 );
-app.post('/upload/xlsx', routes.check.login, routes.process.import); // TO DO: CHANGE path SCHEMA
+// app.post('/upload/xlsx', routes.check.login, routes.process.import); // TO DO: CHANGE path SCHEMA
 
 app.post('/screenshot', routes.process.screenshot);
 

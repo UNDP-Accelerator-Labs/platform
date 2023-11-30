@@ -13,6 +13,7 @@ const {
 	browse_display,
 	welcome_module,
 	page_content_limit,
+	map,
 	DB,
 	ownDB,
 	lodashNonce,
@@ -82,7 +83,8 @@ exports.sessionsummary = async _kwargs => {
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
-	const { page, pagecount, map, display, mscale, excerpt, req, res } = _kwargs || {}
+	let { page, pagecount, map: map_arg, display, mscale, excerpt, req, res } = _kwargs || {}
+	if (!map_arg) map_arg = map // GET IT FROM THE CONFIG FILE. THIS IS A FALLBACK IN CASE IT IS NOT PROPERLY PASSED
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 	let activity = path[1]
@@ -321,7 +323,7 @@ exports.pagemetadata = (_kwargs) => {
 				query: parsedQuery,
 
 				lazyload,
-				map: map || false,
+				map: map_arg || false,
 				mscale: mscale || 'contain',
 				display: display || browse_display,
 				page_content_limit,

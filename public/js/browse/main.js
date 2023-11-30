@@ -20,18 +20,18 @@ window.addEventListener('load', async function () {
 	d3.select('div#pinboard-title')
 	.on('keydowwn', function () {
 		checkForEnter(d3.event, this)
-	}).on('blur', function () {
-		partialSave('pinboard', this.dataset.id)
+	}).on('blur', async function () {
+		await partialSave('pinboard', this.dataset.id)
 	})
 
 	d3.select('div#pinboard-description')
-	.on('blur', function () {
-		partialSave('pinboard', this.dataset.id)
+	.on('blur', async function () {
+		await partialSave('pinboard', this.dataset.id)
 	})
 
 	d3.select('div#pinboard-section-description')
-	.on('blur', function () {
-		partialSave('section-description', this.dataset.id)
+	.on('blur', async function () {
+		await partialSave('section-description', this.dataset.id)
 	})
 
 	// SET PAGINATION LINKS

@@ -39,7 +39,6 @@ app.use(
         'script-src': csp_links,
         'script-src-attr': [
           "'self'",
-          "'unsafe-inline'",
           '*.sdg-innovation-commons.org',
           'sdg-innovation-commons.org',
         ],

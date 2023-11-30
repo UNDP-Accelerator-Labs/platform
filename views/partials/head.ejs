@@ -14,6 +14,9 @@
 	const url = `${currentpage_url.origin}${currentpage_url.pathname}${querylength ? `?${currentpage_query.toString()}` : ''}`
 	const canonicalPath = currentpage_url.pathname.replace(/^\/[^\/]{2}\//, '/en/');
 	const canonical = `https://${currentpage_url.host}${canonicalPath}${currentpage_url.search}`;
+	// NOTE: since we're using hreflang the canonical page here is the language page
+	// this is different from the sitemap where the canonical page is english
+	const canonLang = ['en', 'es', 'pt', 'fr'].includes(language) ? language : 'en';
 
 	const country_page_title = locals.metadata?.page?.instance_title || locals?.pinboard?.title || ''; //COUNTRY INSTANCE TITLE OR COLLECTION TITLE
 	const title = `${locals.metadata?.page?.title}${country_page_title ? `: ${country_page_title}` : ''}` //DEFAULT PAGE TITLE => ADD COUNTRY NAME TITLE IF IT EXIST
@@ -40,7 +43,7 @@
 <meta name='theme-color' content='#16a0d6e7'/>
 
 <!-- Canonical URLs -->
-<link rel="canonical" href="<%= canonical %>" />
+<link rel="canonical" href="<%= canonical.replace('/en/', `/${canonLang}/`) %>" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/fr/') %>" hreflang="fr" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/es/') %>" hreflang="es" />
 <link rel="alternate" href="<%= canonical.replace('/en/', '/pt/') %>" hreflang="pt" />

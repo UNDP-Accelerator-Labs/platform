@@ -996,18 +996,20 @@ exports.sitemap = async (req, res) => {
 			SELECT p.id, p.update_at FROM pads p WHERE p.status > 2
 		;`)).map((row) => ({
 			url: `/view/pad?id=${row.id}`,
-			date: new Date(toTimestamp(row.update_at)).toISOString(),
+			date: toTimestamp(row.update_at),
 		}))
 	});
+	const all_urls = [
+		{
+			url: '/home/',
+			date: maxDate,
+		},
+		...pads,
+	];
+	all_urls.sort((a, b) => -(a.date - b.date));
 	const obj = {
 		metadata: {
-			all_urls: [
-				{
-					url: '/home/',
-					date: new Date(maxDate).toISOString(),
-				},
-				...pads,
-			],
+			all_urls,
 			own_app_url,
 		},
 	};

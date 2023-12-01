@@ -41,8 +41,9 @@ async function updateDomTree(lang) {
 
 	const { languages } = await POST('/load/metadata', { feature: 'languages' })
 	const isMainLanguage = lang !== 'en' && languages.some(d => d === lang)
-	d3.selectAll('.google-translate-attr')
-			.classed('notranslate', function() {
+	// d3.selectAll('.google-translate-attr')
+	d3.selectAll('[data-vocab]')
+		.classed('notranslate', function() {
 			return d3.select(this).classed('notranslate') || isMainLanguage;
 		});
 }

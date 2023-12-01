@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', function () {
 	d3.selectAll('textarea[name="message"]')
 	.on('focus', function () {
 		changeLabel(this, true)

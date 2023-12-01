@@ -1,4 +1,4 @@
-window.addEventListener('load', async function () {
+window.addEventListener('DOMContentLoaded', async function () {
 	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
 
 	await renderTemplate ();

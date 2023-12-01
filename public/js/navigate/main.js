@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', function () {
 	if (!mediaSize) var mediaSize = getMediaSize()
 	
 	// EXPAND NAVIGATION ON SMALL DISPLAYS

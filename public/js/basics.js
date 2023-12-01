@@ -183,7 +183,7 @@ function ensureIcon(classSel, name, altName, timingShort, timingTotal) {
 	setTimeout(iconUpdate, timingTotal);
 	ensureIconRegistered = true;
 }
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
 	let eye_icon = '/imgs/icons/i-eye';
     if (!mediaSize) {
 		var mediaSize = getMediaSize();

@@ -1,4 +1,4 @@
-window.addEventListener('load', async function () {
+window.addEventListener('DOMContentLoaded', async function () {
 	const object = d3.select('data[name="object"]').node().value
 	const space = d3.select('data[name="space"]').node().value
 	const page = JSON.parse(d3.select('data[name="page"]').node().value)

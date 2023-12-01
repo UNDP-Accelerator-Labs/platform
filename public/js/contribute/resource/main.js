@@ -1,4 +1,4 @@
-window.addEventListener('load', async _ => {
+window.addEventListener('DOMContentLoaded', async _ => {
 	const rights = JSON.parse(d3.select('data[name="rights"]').node().value)
 
 	// LOAD DATA

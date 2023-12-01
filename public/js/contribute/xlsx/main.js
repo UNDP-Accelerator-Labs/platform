@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', function () {
 	d3.select('div#import-file')
 	.on('drop', function () {
 		const evt = d3.event;

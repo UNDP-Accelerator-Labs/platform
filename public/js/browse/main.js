@@ -1,4 +1,4 @@
-window.addEventListener('load', async function () {
+window.addEventListener('DOMContentLoaded', async function () {
 	if (!mediaSize) var mediaSize = getMediaSize()
 
 	const object = d3.select('data[name="object"]').node().value

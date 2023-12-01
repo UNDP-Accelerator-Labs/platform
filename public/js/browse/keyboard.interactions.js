@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', function () {
 	const page = JSON.parse(d3.select('data[name="page"]').node().value)
 
 	if (page.display === 'slideshow') {

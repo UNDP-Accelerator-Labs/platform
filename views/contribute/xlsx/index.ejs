@@ -48,7 +48,6 @@
 <data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
 <data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
 
-<%- include ('../../partials/translations.ejs') %> 
 <%- include ('../../partials/navigate/menu-languages.ejs') %> 
 
 
@@ -67,7 +66,7 @@
 				<div class='head meta-status status-0'>
 					<div class='btn-group'>
 						<form id='contribute'>
-							<button class="google-translate-attr" title='<%- vocabulary["import pads"][language] %>' type='submit' disabled><%- vocabulary['import pads'][language] %></button>
+							<button class="google-translate-attr" type='submit' data-vocab='import pads' disabled></button>
 						</form>
 					</div>
 				</div>
@@ -78,7 +77,7 @@
 							<!-- <p>Drag one or more files to this <i>drop zone</i>.</p> -->
 							<input type='file' id='upload' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'>
 							<button>
-								<label class="google-translate-attr" for='upload'><%- vocabulary['upload source file'][language] %></label>
+								<label class="google-translate-attr" for='upload' data-vocab='upload source file'></label>
 							</button>
 						</div>
 					</div>

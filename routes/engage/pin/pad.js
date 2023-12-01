@@ -9,7 +9,6 @@ exports.pin = async (req, res) => {
 
 	if (!object_id && load_object) {
 		object_id = await padsids({ req, res })
-		console.log(object_id)
 	}
 
 	// const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)

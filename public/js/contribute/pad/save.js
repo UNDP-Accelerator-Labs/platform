@@ -58,7 +58,8 @@ function getStatus () {
 	
 	const completion = []
 
-	const title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title'][language]
+	// const title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title'][language]
+	const title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
 	completion.push(title?.trim()?.length > 0)
 
 	let metacompletion = JSON.parse(JSON.stringify(pad.metafields)).filter(d => d.required).map(d => d.label)
@@ -135,7 +136,8 @@ function compileContent (attr) {
 	const content = {}
 	// COLLECT TITLE
 	// let title = d3.select('#pad .head .title').node().innerText
-	let title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title'][language]
+	// let title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title'][language]
+	let title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
 	if (title) title = limitLength(title, 99);
 	// MAYBE INCLUDE ALERT IF title IS EMPTY
 	// COLLECT ALL MEDIA
@@ -319,17 +321,20 @@ async function partialSave (attr) {
 		if (['xs', 'sm'].includes(mediaSize)) {
 			const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 			save_btn.select('button')
-				.html(vocabulary['changes saved'][language])
+				// .html(vocabulary['changes saved'][language])
+				.html(vocabulary['changes saved'])
 			window.setTimeout(_ => {
 				save_btn.classed('saved', false)
 				.select('button').each(function () { this.disabled = true })
-					.html(vocabulary['save'][language])
+					// .html(vocabulary['save'][language])
+					.html(vocabulary['save'])
 			}, 1000)
 		} else {
 			const menu_logo = d3.select('nav#site-title .inner')
 			menu_logo.select('.save').classed('saved', true)
 				.select('button')
-				.html(vocabulary['changes saved'][language])
+				// .html(vocabulary['changes saved'][language])
+				.html(vocabulary['changes saved'])
 			window.setTimeout(_ => {
 				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
 				menu_logo.selectAll('div.save').classed('hide', true)

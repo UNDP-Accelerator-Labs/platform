@@ -346,20 +346,25 @@ async function confirmRemoval (action) {
 	if (flagged.size() === 1) form.submit()
 	else {
 		let message = ''
-		if (action === 'delete') message = vocabulary['what pads to delete'][language]
-		else if (action === 'unpublish') message = vocabulary['what pads to unpublish'][language]
+		// if (action === 'delete') message = vocabulary['what pads to delete'][language]
+		// else if (action === 'unpublish') message = vocabulary['what pads to unpublish'][language]
+		
+		if (action === 'delete') message = vocabulary['what pads to delete']
+		else if (action === 'unpublish') message = vocabulary['what pads to unpublish']
 
 		const opts = [
 			{ 
 				node: 'button', 
 				type: 'button', 
-				label: vocabulary['all selected'][language], 
+				// label: vocabulary['all selected'][language], 
+				label: vocabulary['all selected'], 
 				resolve: _ => d3.selectAll('article .outer.expand').data().map(d => d.id) 
 			},
 			{
 				node: 'button',
 				type: 'button',
-				label: `${vocabulary['only'][language]} <strong>${datum.title}</strong>`,
+				// label: `${vocabulary['only'][language]} <strong>${datum.title}</strong>`,
+				label: `${vocabulary['only']} <strong>${datum.title}</strong>`,
 				resolve: [ datum.id ]
 			}
 		]
@@ -423,13 +428,15 @@ function toggletag (node, d) {
 		const tag = taggroup.addElem('div', 'tag')
 		.attr('data-id', d.id)
 		tag.addElems('label', 'name')
-		.attr('title', Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown'][language]))
+		// .attr('title', Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown'][language]))
+		.attr('title', Number.isInteger(d.name) ? d.name : (d.name?.capitalize() || vocabulary['unknown']))
 		.html(_ => {
 			if (Number.isInteger(d.name)) return d.name
 			else if (d.name) {
 				if (d.name.length > 15) return `${d.name.slice(0, 15).capitalize()}…`
 				else return d.name.capitalize()
-			} else return vocabulary['unknown'][language]
+			// } else return vocabulary['unknown'][language]
+			} else return vocabulary['unknown']
 		})
 		tag.addElems('label', 'close')
 		.on('click', function () { rmtag(this, d) })

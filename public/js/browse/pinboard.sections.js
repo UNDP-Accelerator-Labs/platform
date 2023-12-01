@@ -118,7 +118,8 @@ async function addSection (node) {
 	opts.push({ 
 		node: 'button', 
 		type: 'submit', 
-		label: vocabulary['save'][language], 
+		// label: vocabulary['save'][language], 
+		label: vocabulary['save'], 
 		disabled: !singlesection 
 	})
 	//d3.select('.modal input[name=sections]:checked').node().value

@@ -41,15 +41,13 @@
 
 <body>
 
-<%- include ('../../partials/translations.ejs') %> 
-<%# include ('../../partials/navigate/menu-languages.ejs') %> 
 <%- include ('../../partials/modals.ejs') %> 
 
 <div class='document'>
 </div>
 
 
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
+<script type='text/javascript'>
 
 	// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
 	window.PagedConfig = {
@@ -130,25 +128,8 @@
 
 	
 
-	// IF PSEUDONIMIZED
-	// <div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
-	// <div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
 
-	// IF INCLUDE TEMPLATE INFORMATION
-	// <% if (!publicpage) { %>
-	// 	<div class='meta-container template-container'>
-	// 		<div class='meta meta-template'>
-	// 			<i><%- vocabulary['pad based on'][language] %> </i>
-	// 			<a href='/<%# language %>/view/template?id=<%# locals.display_template.id %>'>
-	// 			<%# locals.display_template.title %></a>
-	// 		</div>
-	// 	</div>
-	// <% } %>
-	// <div class='media-container txt-container'>
-	// 	<div class='media media-txt'>
-	// 		<%# locals.display_template.description %>
-	// 	</div>
-	// </div>
+
 	
 
 

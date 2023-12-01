@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', function () {
 	// CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
 	const url = new URL(window.location)
 	const queryparams = new URLSearchParams(url.search)
@@ -184,7 +184,8 @@ function toggleChecked (node) {
 	const count = parent.selectAll('li.checked').size()
 	parent.select('.contributor-count')
 		.html(_ => {
-			return vocabulary['invited contributors'][language](count)
+			// return vocabulary['invited contributors'][language](count)
+			return `${count} ${vocabulary['invited contributors'][count !== 1 ? 'plural' : 'singular']}`
 		})
 	// IF THERE IS A FILTER MENU, CLEAR SEARCH TERM
 	if (parent.select('.filter input[type=text]').node()) {
@@ -196,7 +197,10 @@ function toggleChecked (node) {
 function selectAllOpts (node) {
 	const parent = d3.select(node).findAncestor('modal')
 	parent.select('.global-opt').toggleClass('active')
-		.select('button').html(_ => parent.select('.global-opt').classed('active') ? vocabulary['deselect all'][language] : vocabulary['select all'][language])
+		// .select('button').html(_ => parent.select('.global-opt').classed('active') ? vocabulary['deselect all'][language] : vocabulary['select all'][language])
+		.select('button').html(_ => {
+			return parent.select('.global-opt').classed('active') ? vocabulary['deselect all'] : vocabulary['select all']
+		})
 	parent.selectAll('li:not(.hide) input[type=checkbox]').each(function () { 
 		this.checked = parent.select('.global-opt').classed('active')
 		toggleChecked(this) 

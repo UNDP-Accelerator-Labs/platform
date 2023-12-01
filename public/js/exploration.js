@@ -1,3 +1,4 @@
+// TO DO: STILL A PB WITH VOCABULARY HERE
 class Exploration {
     constructor() {
         this.past = [];
@@ -159,7 +160,7 @@ class Exploration {
             return;
         }
         this.listUpdateActive = true;
-        GET(`/exploration/list?lang=${language}`, true, true).then((result) => {
+        GET(`/exploration/list?lang=${this.language}`, true, true).then((result) => {
             this.consent = true;
             this.listUpdateActive = false;
             const explorations = result['explorations'];
@@ -190,7 +191,8 @@ class Exploration {
             .classed('notranslate', true)
             .attrs({
                 'value': (d) => this.normalizeExplorationPrompt(d['prompt']),
-                'label': (d) => `${vocabulary['exploration'][language]['last_access']} ${d['last_access_ago']}`,
+                // 'label': (d) => `${vocabulary['exploration'][language]['last_access']} ${d['last_access_ago']}`,
+                'label': (d) => `${vocabulary['last_access']} ${d['last_access_ago']}`,
             });
             cb && cb();
         });
@@ -287,18 +289,36 @@ class Exploration {
     }
 
     consentFeature() {
-        const explorationInfoUrl = `/${language}/exploration-info/`;
+        const explorationInfoUrl = `/${this.language}/exploration-info/`;
+        // const message = `
+        //     <h2 class="google-translate-attr">${vocabulary['exploration'][language]['welcome']}</h2>
+        //     <p class="google-translate-attr">${vocabulary['exploration'][language]['explain']}</p>
+        //     <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['exploration'][language]['info']}</a>
+        //     <p class="google-translate-attr">${vocabulary['exploration'][language]['indicate']}</p>
+        // `;
         const message = `
-            <h2 class="google-translate-attr">${vocabulary['exploration'][language]['welcome']}</h2>
-            <p class="google-translate-attr">${vocabulary['exploration'][language]['explain']}</p>
-            <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['exploration'][language]['info']}</a>
-            <p class="google-translate-attr">${vocabulary['exploration'][language]['indicate']}</p>
+            <h2 class="google-translate-attr">${vocabulary['welcome']}</h2>
+            <p class="google-translate-attr">${vocabulary['explain']}</p>
+            <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['info']}</a>
+            <p class="google-translate-attr">${vocabulary['indicate']}</p>
         `;
         renderPromiseModal({
             message,
             opts: [
-                { node: 'button', type: 'button', label: vocabulary['exploration'][language]['feature-approve'], resolve: true },
-                { node: 'button', type: 'button', label: vocabulary['exploration'][language]['feature-reject'], resolve: false },
+                { 
+                    node: 'button', 
+                    type: 'button', 
+                    // label: vocabulary['exploration'][language]['feature-approve'], 
+                    label: vocabulary['feature-approve'], 
+                    resolve: true 
+                },
+                { 
+                    node: 'button', 
+                    type: 'button', 
+                    // label: vocabulary['exploration'][language]['feature-reject'], 
+                    label: vocabulary['feature-reject'], 
+                    resolve: false 
+                },
             ],
         }).then((consent) => {
             if(!consent) {  // not given consent or closed window
@@ -363,9 +383,10 @@ class Exploration {
         .attrs({
             'for': `exploration-main`,
         })
-        .text(vocabulary['exploration'][language]['intro']);
+        // .text(vocabulary['exploration'][language]['intro']);
+        .text(vocabulary['intro']);
         this.maybeAddDatalist(sel);
-        const explorationInfoUrl = `/${language}/exploration-info/`;
+        const explorationInfoUrl = `/${this.language}/exploration-info/`;
         const infoButton = sel.addElem('a')
         .attrs({
             'href': explorationInfoUrl,
@@ -409,8 +430,10 @@ class Exploration {
         .addElems('option', 'exploration-short-list', [
             {
                 id: null,
-                prompt: vocabulary['exploration'][language]['select'],
-                short: vocabulary['exploration'][language]['select'],
+                // prompt: vocabulary['exploration'][language]['select'],
+                prompt: vocabulary['select'],
+                // short: vocabulary['exploration'][language]['select'],
+                short: vocabulary['select'],
             },
             ...this.past,
         ]).attrs({
@@ -469,7 +492,8 @@ class Exploration {
 
         function addTitle(curSel) {
             curSel.addElem('span')
-            .text(vocabulary['exploration'][language]['doc-begin'])
+            // .text(vocabulary['exploration'][language]['doc-begin'])
+            .text(vocabulary['doc-begin'])
             .classed('exploration-title', true)
             .classed('google-translate-attr', true);
         }
@@ -478,14 +502,16 @@ class Exploration {
             curSel.addElem('button')
             .classed('exploration-btn-approve', true)
             .classed('google-translate-attr', true)
-            .text(vocabulary['exploration'][language]['doc-approve'])
+            // .text(vocabulary['exploration'][language]['doc-approve'])
+            .text(vocabulary['doc-approve'])
             .on('click', (d) => {
                 that.setDocAction(d.id, true);
             });
             curSel.addElem('button')
             .classed('exploration-btn-dislike', true)
             .classed('google-translate-attr', true)
-            .text(vocabulary['exploration'][language]['doc-dislike'])
+            // .text(vocabulary['exploration'][language]['doc-dislike'])
+            .text(vocabulary['doc-dislike'])
             .on('click', (d) => {
                 that.setDocAction(d.id, false);
             });

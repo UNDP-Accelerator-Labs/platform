@@ -20,8 +20,6 @@
 
 <body>
 
-<%- include ('../../partials/translations.ejs') %> 
-<%# include ('../../partials/navigate/menu-languages.ejs') %> 
 <%- include ('../../partials/modals.ejs') %> 
 
 <div class='document print'>
@@ -172,8 +170,8 @@
 
 				article.addElems('div', 'meta meta-contributor')
 				.html(d => {
-					if (iso3 === 'NUL') return '<%- vocabulary["global"][language] %>'
-					return country || '<%- vocabulary["anonymous contributor"][language] %>'
+					if (iso3 === 'NUL') return vocabulary['global']
+					return country || vocabulary['anonymous contributor']
 				})
 				article.addElems('div', 'meta meta-date')
 				.html(d => new Date(d.date).toLocaleDateString(language, dateOptions))

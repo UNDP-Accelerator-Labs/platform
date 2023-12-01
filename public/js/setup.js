@@ -1,5 +1,31 @@
+const debugging = false
 if (!mediaSize) var mediaSize = getMediaSize()
-window.addEventListener('load', async function () {
+window.addEventListener('DOMContentLoaded', async function () {
+	d3.selectAll('[data-vocab]')
+	.html(function () {
+		return printTranslation(this);
+	});
+	d3.selectAll('[data-vocabprefix]')
+	.each(function () {
+		const prefix = printTranslation(this)
+		if (this.value) { this.value = `[${prefix}] ${this.value}`; }
+		else {
+			if (this.textContent) {
+				this.textContent = `[${prefix}] ${this.textContent}`;
+			} else if (this.innerText) {
+				this.innerText = `[${prefix}] ${this.innerText}`;
+			}
+		}
+	});
+	d3.selectAll('[data-placeholder]')
+	.attr('data-placeholder', function () {
+		return printTranslation(this);
+	});
+	d3.selectAll('[data-content]')
+	.attr('data-content', function () {
+		return printTranslation(this);
+	});
+
 	/* SET PATHS
 	NOT language NEEDS TO BE SET AS A GLOBAL VAR IN THE MAIN ejs FILE */
 	const url = new URL(window.location);
@@ -89,6 +115,44 @@ window.addEventListener('scroll', function () {
 	d3.select('button.scroll-nav').classed('hide', document.documentElement.scrollTop > 60)
 });
 
+function printTranslation (node) {
+	const vocab = node.dataset.vocab || node.dataset.vocabprefix || node.dataset.placeholder || node.dataset.content
+	// FIRST, CHECK IF THE vocab IS A JSON OBJECT (ARRAY)
+	const regex = /\[(["'][\w\d\s-]+["'](,\s*["'][\w\d\s-]+["'])*)\]/
+	if (regex.test(vocab)) {
+		try {
+			const arr = JSON.parse(vocab)
+			const term = arr.reduce((acc, val) => {
+				if (acc[val]) { return acc[val]; }
+				else { return acc; }
+			}, vocabulary)
+			if (term) { return term; }
+			else {
+				throwerr();
+				return arr[0];
+			}
+		} catch (err) {
+			if (debugging) console.log(err);
+			throwerr();
+			return null;
+		}
+	} else {
+		if (vocabulary[vocab]) { return vocabulary[vocab]; }
+		else {
+			throwerr();
+			return vocab;
+		}
+	}
+
+	function throwerr () {
+		if (debugging) {
+			console.log('an error occurred trying to translate')
+			console.log(vocab)
+			console.log('for')
+			console.log(node)
+		}
+	}
+}
 
 function scrollToPad (target) {
 	window.scrollTo({

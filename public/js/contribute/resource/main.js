@@ -3,7 +3,7 @@ window.addEventListener('load', async _ => {
 
 	// LOAD DATA
 	const [ data, templates ] = await getContent()
-	const { modules } = await POST('/load/metadata', { feature: [ 'modules' ] })
+	// const { modules } = await POST('/load/metadata', { feature: [ 'modules' ] })
 
 	// CREATE MODAL
 	const headline = 'Select a resource.' // TO DO: TRANSLATE

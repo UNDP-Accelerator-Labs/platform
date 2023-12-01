@@ -11,7 +11,7 @@
 // https://www.programmersought.com/article/5248306768/
 // https://stackoverflow.com/questions/926916/how-to-get-the-bodys-content-of-an-iframe-in-javascript
 
-window.addEventListener('load', async function () {
+window.addEventListener('DOMContentLoaded', async function () {
 	if (!mediaSize) var mediaSize = getMediaSize()
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 
@@ -148,7 +148,8 @@ async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /b
 				count: d.count, 
 				disabled: { 
 					value: d.disabled, 
-					label: vocabulary['missing reviewers'][language] 
+					// label: vocabulary['missing reviewers'][language] 
+					label: vocabulary['missing reviewers'] 
 				}, 
 				type: 'radio', 
 				required: true 
@@ -157,12 +158,14 @@ async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /b
 	})
 
 	const formdata = { action: '/request/review',  method: 'POST' }
-	const message = vocabulary['select review language'][language]
+	// const message = vocabulary['select review language'][language]
+	const message = vocabulary['select review language']
 	const opts = []
 	opts.push({ 
 		node: 'select', 
 		name: 'language', 
-		label: vocabulary['select language'][language]['singular'], 
+		// label: vocabulary['select language'][language]['singular'], 
+		label: vocabulary['select language']['singular'], 
 		options: target_opts 
 	})
 	opts.push({ 
@@ -176,7 +179,8 @@ async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /b
 		type: 'submit', 
 		name: name, 
 		value: value, 
-		label: vocabulary['submit for review'][language] 
+		// label: vocabulary['submit for review'][language] 
+		label: vocabulary['submit for review'] 
 	})
 	const new_constraint = await renderFormModal({ message, formdata, opts })
 }

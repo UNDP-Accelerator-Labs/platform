@@ -1,4 +1,4 @@
-window.addEventListener('load', async function () {
+window.addEventListener('DOMContentLoaded', async function () {
 	await initDropdowns()
 
 	d3.selectAll('input[type=password]') // IT IS IMPORTANT THAT THIS COMES BEFORE THE NEXT GENERIC BLUR FUNCTION
@@ -75,7 +75,8 @@ async function addLanguage (node) {
 	const parent = sel.findAncestor('ul')
 	const li = parent.insertElem(function () { return node }, 'li')
 	li.addElem('label', 'instruction')
-		.html(vocabulary['other languages'][language])
+		// .html(vocabulary['other languages'][language])
+		.html(vocabulary['other languages'])
 	const input = li.addElem('div', 'select')
 	input.addElem('input')
 		.attrs({
@@ -85,7 +86,8 @@ async function addLanguage (node) {
 		})
 	input.addElem('label')
 		.attr('for', 'secondary-languages')
-		.html(vocabulary['select language'][language]['plural'])
+		// .html(vocabulary['select language'][language]['plural'])
+		.html(vocabulary['select language']['plural'])
 	const dropdown = input.addElem('div', 'dropdown')
 		.addElem('menu')
 		.addElems('li', null, languages)

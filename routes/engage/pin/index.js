@@ -8,7 +8,6 @@ module.exports = (req, res) => {
 	const { rights } = req.session || {}
 	const { action, object } = req.body || {}
 
-
 	if (modules.some(d => d.type === `${object}s`)) {		
 		if (object === 'pad') {
 			if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {

@@ -51,8 +51,6 @@
 
 <%- include('./browse/modules/data.ejs') %>
 
-<%- include ('./partials/translations.ejs') %>
-
 <%- include ('./partials/navigate/menu-languages.ejs') %>
 <%- include ('./partials/modals.ejs') %>
 
@@ -87,32 +85,33 @@
 				<!-- MAP -->
 				<%- include ('./browse/modules/map') %>
 			<% } else { %>
-				<h1 class='site-title'><%- locals.metadata.site.title %></h1>
+				<h1 class='site-title'><%= locals.metadata.site.title %></h1>
 			<% } %>
 			<div id='statistics'>
 				<div class='stat-group'>
 					<div class='statistic'>
-						<h1><%- simplifyNumber(locals.stats?.total) %></h1>
-						<p class="google-translate-attr"><%- vocabulary[object.slice(0, -1)]?.[language][locals.stats?.total !== 1 ? 'plural' : 'singular']?.capitalize() || object.capitalize() %></p>
+						<h1><%= simplifyNumber(locals.stats?.total) %></h1>
+						<p class="google-translate-attr" data-vocab='["<%= object.slice(0, -1) %>", "<%= locals.stats?.total !== 1 ? "plural" : "singular" %>"]'></p>
 					</div>
 				</div>
 				<div class='stat-group'>
 					<% if (locals.stats?.contributors) { %>
 						<div class='statistic'>
-							<h2><%- simplifyNumber(locals.stats?.contributors) %></h2>
-							<p class="google-translate-attr"><%- vocabulary['contributor']?.[language]['plural'].capitalize() %></p>
+							<h2><%= simplifyNumber(locals.stats?.contributors) %></h2>
+							<p class="google-translate-attr" data-vocab='["contributor", "plural"]'></p>
 						</div>
 					<% } %>
 					<% if (locals.metadata.page.map && locals.stats?.total > 0) { %>
 						<div class='statistic'>
-							<h2><%- simplifyNumber(locals.locations || 0) %></h2>
-							<p class="google-translate-attr"><%- vocabulary['distinct locations'][language]((locals.locations || 0) !== 1) %></p>
+							<h2><%= simplifyNumber(locals.locations || 0) %></h2>
+							<p class="google-translate-attr" data-vocab='["distinct locations", "<%= (locals.locations || 0) !== 1 ? "plural" : "singular" %>"]'></p>
 						</div>
 					<% } %>
 					<% locals.stats?.tags?.forEach(d => { %>
 						<div class='statistic'>
-							<h2><%- simplifyNumber(d.count) %></h2>
-							<p class="google-translate-attr"><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language]['plural'].capitalize() || d.type.capitalize() %></p>
+							<h2><%= simplifyNumber(d.count) %></h2>
+							<p class="google-translate-attr" data-vocab='["<%= d.type.slice(0, -1).replace(/_/g, " ") %>", "plural"]'>
+							</p>
 						</div>
 					<% }) %>
 				</div>
@@ -121,14 +120,14 @@
 			<nav class='enter'>
 				<% if (!logged) { %>
 					<a href='/<%- language %>/browse/pads/public'>
-						<button type='button' class='highlight google-translate-attr'><%- vocabulary['browse publications'][language] %></button>
+						<button type='button' class='highlight google-translate-attr' data-vocab='browse publications'></button>
 					</a>
-					<a href='/login'><button class="google-translate-attr" type='button'><%- vocabulary['log in'][language] %></button></a>
+					<a href='/login'><button class="google-translate-attr" type='button' data-vocab='log in'></button></a>
 					<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 					<!-- TO DO: TRANSLATE -->
 				<% } else { %>
 					<a href='/<%- language %>/browse/pads/published'>
-						<button type='button' class='highlight google-translate-attr'><%- vocabulary['browse publications'][language] %></button>
+						<button type='button' class='highlight google-translate-attr' data-vocab='browse publications'></button>
 					</a>
 				<% } %>
 			</nav>
@@ -153,7 +152,7 @@
 
 	<div class='public-page-panel blue browse-countries'>
 		<div class='inner'>
-			<h3 class="google-translate-attr"><%- vocabulary['browse by country'][language] %></h3>
+			<h3 class="google-translate-attr" data-vocab='browse by country'></h3>
 			<ul class='columns'>
 			<% locals.countries.forEach(d => { %>
 				<li>
@@ -162,7 +161,7 @@
 					<% } else { %>
 						<%- d.country %>
 					<% } %>
-					<small class="google-translate-attr"><strong><%- d.count ?? 0 %></strong> <%- vocabulary['pad'][language][(d.count ?? 0) !== 1 ? 'plural' : 'singular'].toLowerCase() %></small>
+					<small class="google-translate-attr"><strong><%- d.count ?? 0 %></strong> <span data-vocab='["pad", "<%= (d.count ?? 0) !== 1 ? "plural" : "singular" %>"]'></span></small>
 				</li>
 			<% }) %>
 			</ul>
@@ -170,7 +169,7 @@
 	</div>
 	<div class='public-page-panel'>
 		<div class='inner'>
-			<h3 class="google-translate-attr"><%- vocabulary['browse collections'][language] %></h3>
+			<h3 class="google-translate-attr" data-vocab='browse collections'></h3>
 			<p class='description'>Collections are curated by our community members.</p>
 			<!-- TO DO: TRANSLATE -->
 			<ul class='columns'>
@@ -179,8 +178,10 @@
 				<li>
 					<a href='/<%- language %>/browse/pads/pinned?pinboard=<%- d.id %>' target='_blank'><%- d.title %></a>
 					<!-- TO DO: FIX THIS -->
-					<small class="google-translate-attr"><strong><%- d.count %></strong> <%- vocabulary['pad'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase() %></small>
-					<small class='contributor google-translate-attr'><%- vocabulary['curation credit'][language](d.owner, d.ownername, 'contributors') %></small>
+					<small class="google-translate-attr"><strong><%- d.count %></strong> <span data-vocab='["pad", "<%= d.count !== 1 ? "plural" : "singular" %>"]'></span></small>
+					<small class='contributor google-translate-attr'>
+						<span data-vocab='["curation credit"]'></span> <a href='/<%= language %>/browse/pads/published?contributors=<%= d.owner %>'><%= d.ownername %></a>.
+					</small>
 				</li>
 			<% }) %>
 			</ul>

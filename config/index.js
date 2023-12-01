@@ -180,7 +180,7 @@ exports.csp_links = [
   "'self'",
   '*.sdg-innovation-commons.org',
   'sdg-innovation-commons.org',
-  `'nonce-${lodashNonce}'`,
+  // `'nonce-${lodashNonce}'`,
   'https://translate.google.com',
   'https://translate.googleapis.com',
   'https://translate-pa.googleapis.com',

@@ -14,12 +14,16 @@
 	<div class='stat-group'>
 		<div class='statistic'>
 			<h1><%- simplifyNumber(locals.stats?.filtered) %></h1>
-			<p><%- vocabulary[object.slice(0, -1)]?.[language][locals.stats?.filtered !== 1 ? 'plural' : 'singular']?.capitalize() || object.capitalize() %></p>
+			<p data-vocab='["<%= object.slice(0, -1) %>", "<%= locals.stats?.filtered !== 1 ? "plural" : "singular" %>"]'></p>
 			
 			<% if (locals.metadata.page.count > 1) { %>
-				<small><%- vocabulary['showing range'][language](locals.stats?.displayed * (page - 1) + 1, Math.min(locals.stats?.displayed * page, locals.stats?.filtered)) %></small>
+				<small>
+					<span data-vocab='showing range'></span> [ <%= locals.stats?.displayed * (page - 1) + 1 %> – <%= Math.min(locals.stats?.displayed * page, locals.stats?.filtered) %> ]
+				</small>
 			<% } else if (typeof page === 'string') { %>
-				<small><%- vocabulary['showing letter'][language](locals.stats?.displayed, page) %></small>
+				<small>
+					<span data-vocab='showing'></span> <%= locals.stats?.displayed %> <span data-vocab='names start with'></span> <%= page %>
+				</small>
 			<% } %>
 			<div class='expand-stats xs'><button id='expand-statistics'></button></div>
 		</div>
@@ -29,19 +33,19 @@
 			<% if (locals.stats?.contributors) { %>
 				<div class='statistic'>
 					<h2><%- simplifyNumber(locals.stats?.contributors) %></h2>
-					<p><%- vocabulary['contributor']?.[language]['plural'].capitalize() %></p>
+					<p data-vocab='["contributor", "<%= locals.stats.contributors !== 1 ? "plural" : "singular" %>"]'></p>
 				</div>
 			<% } %>
 			<% if (locals.metadata.page.map && locals.stats?.filtered > 0) { %>
 				<div class='statistic'>
 					<h2><%- simplifyNumber(locals.clusters[locals.clusters.length - 1]?.length) %></h2>
-					<p><%- vocabulary['distinct locations'][language](locals.clusters[locals.clusters.length - 1]?.length !== 1) %></p>
+					<p data-vocab='["distinct locations", "<%= locals.clusters[locals.clusters.length - 1]?.length !== 1 ? "plural" : "singular" %>"]'></p>
 				</div>
 			<% } %>
 			<% locals.stats?.tags?.forEach(d => { %>
 				<div class='statistic'>
 					<h2><%- simplifyNumber(d.count) %></h2>
-					<p><%- vocabulary[d.type.slice(0, -1).replace(/_/g, ' ')]?.[language]['plural'].capitalize() || d.type.capitalize() %></p>
+					<p data-vocab='["<%= d.type.slice(0, -1).replace(/_/g, " ") %>", "<%= d.count !== 1 ? "plural" : "singular" %>"]'></p>
 				</div>
 			<% }) %>
 		</div>

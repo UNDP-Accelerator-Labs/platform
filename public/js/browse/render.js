@@ -4,7 +4,8 @@ const Entry = function (_kwargs) {
 	let { 
 		parent, 
 		data, 
-		language, 
+		language,
+		vocabulary,
 		object, 
 		space, 
 		modules, 
@@ -79,38 +80,44 @@ const Entry = function (_kwargs) {
 						&& ['private', 'curated', 'shared'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
 				) {
-					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || vocabulary['anonymous contributor'][language] }]
+					// data = [{ href: `?contributors=${d.owner}`, name: d.ownername || vocabulary['anonymous contributor'][language] }]
+					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || vocabulary['anonymous contributor'] }]
 
 					if (d.locations?.length) {
 						d.locations.forEach(c => {
 							data.push({ 
 								href: `?countries=${c.iso3}`, 
-								name: (c.iso3 === 'NUL') ? vocabulary['global'][language] : (c.country || vocabulary['anonymous contributor'][language]) 
+								// name: (c.iso3 === 'NUL') ? vocabulary['global'][language] : (c.country || vocabulary['anonymous contributor'][language]) 
+								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor']) 
 							})
 						})
 					} else {
 						data.push({ 
 							href: `?countries=${d.iso3}`, 
-							name: (d.iso3 === 'NUL') ? vocabulary['global'][language] : (d.country || vocabulary['anonymous contributor'][language]) 
+							// name: (d.iso3 === 'NUL') ? vocabulary['global'][language] : (d.country || vocabulary['anonymous contributor'][language]) 
+							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor']) 
 						})
 					}
 				} else if (object === 'reviews') {
 					data = [{ 
 						href: d.is_review ? `?contributors=${d.owner}` : null, 
-						name: space === 'private' ? d.is_review ? d.ownername : vocabulary['blinded for review'][language] : null 
+						// name: space === 'private' ? d.is_review ? d.ownername : vocabulary['blinded for review'][language] : null 
+						name: space === 'private' ? d.is_review ? d.ownername : vocabulary['blinded for review'] : null 
 					}]
 				} else {
 					if (d.locations?.length) {
 						data = d.locations.map(c => {
 							return { 
 								href: `?countries=${c.iso3}`, 
-								name: (c.iso3 === 'NUL') ? vocabulary['global'][language] : (c.country || vocabulary['anonymous contributor'][language]) 
+								// name: (c.iso3 === 'NUL') ? vocabulary['global'][language] : (c.country || vocabulary['anonymous contributor'][language]) 
+								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor']) 
 							}
 						})
 					} else {
 						data = [{ 
 							href: `?countries=${d.iso3}`, 
-							name: (d.iso3 === 'NUL') ? vocabulary['global'][language] : (d.country || vocabulary['anonymous contributor'][language]) 
+							// name: (d.iso3 === 'NUL') ? vocabulary['global'][language] : (d.country || vocabulary['anonymous contributor'][language]) 
+							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor']) 
 						}]
 					}
 				}
@@ -128,11 +135,13 @@ const Entry = function (_kwargs) {
 					} else if (d.start_date) {
 						if (object === 'contributors') {
 							const start = new Date(d.start_date).toLocaleDateString(language, dateOptions)
-							let str = `${vocabulary['joined on'][language]} ${start}`
+							// let str = `${vocabulary['joined on'][language]} ${start}`
+							let str = `${vocabulary['joined on']} ${start}`
 
 							if (d.end_date) {
 								const end = new Date(d.end_date).toLocaleDateString(language, dateOptions)
-								str += `, ${vocabulary['left on'][language].toLowerCase()} ${end}`
+								// str += `, ${vocabulary['left on'][language].toLowerCase()} ${end}`
+								str += `, ${vocabulary['left on'].toLowerCase()} ${end}`
 							}
 							return str
 						} else {
@@ -156,12 +165,36 @@ const Entry = function (_kwargs) {
 					const opts = []
 
 					if (['private', 'pinned'].includes(space) && object !== 'reviews') {
-						if (d.editable) opts.push({ node: 'button', type: 'button', classname: 'delete', label: vocabulary['delete'][language], fn: deleteArticles })
+						if (d.editable) opts.push({ 
+							node: 'button', 
+							type: 'button', 
+							classname: 'delete', 
+							// label: vocabulary['delete'][language], 
+							label: vocabulary['delete'], 
+							fn: deleteArticles
+						})
 					} else if (space === 'curated') {
-						if (d.editable && !d.owner) opts.push({ node: 'button', type: 'button', classname: 'delete', label: vocabulary['delete'][language], fn: deleteArticles })
+						if (d.editable && !d.owner) opts.push({ 
+							node: 'button', 
+							type: 'button', 
+							classname: 'delete', 
+							// label: vocabulary['delete'][language], 
+							label: vocabulary['delete'], 
+							fn: deleteArticles 
+						})
 					}
 					if (object === 'pads') {
-						opts.push({ node: 'button', type: 'button', classname: 'download', label: vocabulary['download'][language], name: 'pads', value: d.id, disabled: d.status < 2, fn: setDownloadOptions })
+						opts.push({ 
+							node: 'button', 
+							type: 'button', 
+							classname: 'download', 
+							// label: vocabulary['download'][language], 
+							label: vocabulary['download'], 
+							name: 'pads', 
+							value: d.id, 
+							disabled: d.status < 2, 
+							fn: setDownloadOptions 
+						})
 					}
 					// CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
 					if (['files', 'pads'].includes(object)) {
@@ -175,7 +208,8 @@ const Entry = function (_kwargs) {
 										name: 'status', 
 										value: 2, 
 										classname: 'preprint', 
-										label: vocabulary['object status'][language][object.slice(0, -1)][2]['singular'] 
+										// label: vocabulary['object status'][language][object.slice(0, -1)][2]['singular'] 
+										label: vocabulary['object status'][object.slice(0, -1)][2]['singular'] 
 									})
 								}
 								if (d.status <= 2 && d.review_status === 0) {
@@ -184,7 +218,8 @@ const Entry = function (_kwargs) {
 											name: 'review_status', 
 											value: 1, 
 											classname: 'review',
-											label: vocabulary['submit for review'][language], 
+											// label: vocabulary['submit for review'][language], 
+											label: vocabulary['submit for review'], 
 											fn: selectReviewLanguage 
 										})
 									}
@@ -195,7 +230,8 @@ const Entry = function (_kwargs) {
 										name: 'status', 
 										value: 2, 
 										classname: 'internally', 
-										label: vocabulary['internally'][language]
+										// label: vocabulary['internally'][language]
+										label: vocabulary['internally']
 									})
 								}
 								if (d.status <= 2 && d.publishable) {
@@ -204,7 +240,8 @@ const Entry = function (_kwargs) {
 											name: 'status', 
 											value: 3, 
 											classname: 'externally', 
-											label: vocabulary['externally'][language]
+											// label: vocabulary['externally'][language]
+											label: vocabulary['externally']
 										})
 									}
 								}
@@ -223,7 +260,8 @@ const Entry = function (_kwargs) {
 										&& publish_dropdown.length
 									), 
 								classname: 'publish', 
-								label: vocabulary['publish'][language], 
+								// label: vocabulary['publish'][language], 
+								label: vocabulary['publish'], 
 								dropdown: publish_dropdown, 
 								inputs: [
 									{ name: 'id', value: d.id }, 
@@ -239,7 +277,8 @@ const Entry = function (_kwargs) {
 									value: d.id, 
 									disabled: !d.editable, 
 									classname: 'unpublish', 
-									label: vocabulary['unpublish'][language], 
+									// label: vocabulary['unpublish'][language], 
+									label: vocabulary['unpublish'], 
 									fn: unpublishArticles 
 								})
 							}
@@ -255,7 +294,8 @@ const Entry = function (_kwargs) {
 									value: d.id, 
 									disabled: !d.editable, 
 									classname: 'publish', 
-									label: vocabulary['publish'][language], 
+									// label: vocabulary['publish'][language], 
+									label: vocabulary['publish'], 
 									inputs: [{ name: 'status', value: 2 }] 
 								})
 							}
@@ -269,7 +309,8 @@ const Entry = function (_kwargs) {
 										value: d.id, 
 										disabled: !d.editable, 
 										classname: 'unpublish', 
-										label: vocabulary['unpublish'][language], 
+										// label: vocabulary['unpublish'][language], 
+										label: vocabulary['unpublish'], 
 										fn: unpublishArticles 
 									})
 								}
@@ -285,7 +326,8 @@ const Entry = function (_kwargs) {
 										node: 'button',
 										type: 'submit',
 										classname: 'accept',
-										label: vocabulary['accept'][language],
+										// label: vocabulary['accept'][language],
+										label: vocabulary['accept'],
 										value: d.id,
 										inputs: [{ name: 'template', value: d.review_template }]
 									})
@@ -296,7 +338,8 @@ const Entry = function (_kwargs) {
 											node: 'button',
 											type: 'submit',
 											classname: 'decline',
-											label: vocabulary['decline'][language],
+											// label: vocabulary['decline'][language],
+											label: vocabulary['decline'],
 											value: d.id
 										})
 									}
@@ -312,7 +355,8 @@ const Entry = function (_kwargs) {
 											value: d.id, 
 											disabled: !(d.editable && [1, 2].includes(d.status) && d.is_review), 
 											classname: 'publish', 
-											label: vocabulary['publish'][language], 
+											// label: vocabulary['publish'][language], 
+											label: vocabulary['publish'], 
 											inputs: [{ name: 'status', value: 2 }, { name: 'source', value: d.source }] 
 										})
 									}
@@ -325,7 +369,8 @@ const Entry = function (_kwargs) {
 								node: 'button', 
 								type: 'button', 
 								classname: 'copy', 
-								label: vocabulary['copy link'][language], 
+								// label: vocabulary['copy link'][language], 
+								label: vocabulary['copy link'], 
 								value: d.id, 
 								inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }], 
 								fn: copyLink 
@@ -336,7 +381,8 @@ const Entry = function (_kwargs) {
 							type: 'button', 
 							disabled: d.pads === 0, 
 							classname: 'download', 
-							label: vocabulary['download'][language], 
+							// label: vocabulary['download'][language], 
+							label: vocabulary['download'], 
 							name: 'mobilizations', 
 							value: d.id, 
 							fn: setDownloadOptions 
@@ -350,7 +396,8 @@ const Entry = function (_kwargs) {
 								type: 'submit', 
 								disabled: !(d.editable && d.status === 1), 
 								classname: 'demobilize', 
-								label: vocabulary['demobilize'][language], 
+								// label: vocabulary['demobilize'][language], 
+								label: vocabulary['demobilize'], 
 								value: d.id 
 							})
 						}
@@ -362,7 +409,8 @@ const Entry = function (_kwargs) {
 								type: 'submit', 
 								disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), 
 								classname: 'followup', 
-								label: vocabulary['follow up'][language]['verb'], 
+								// label: vocabulary['follow up'][language]['verb'], 
+								label: vocabulary['follow up']['verb'], 
 								name: 'source', 
 								value: d.id 
 							})
@@ -375,7 +423,8 @@ const Entry = function (_kwargs) {
 								type: 'submit', 
 								disabled: !(d.editable && d.status === 2), 
 								classname: 'copy', 
-								label: vocabulary['copy'][language]['verb'], 
+								// label: vocabulary['copy'][language]['verb'], 
+								label: vocabulary['copy']['verb'], 
 								name: 'source', 
 								value: d.id, 
 								inputs: [{ name: 'copy', value: true }] 
@@ -387,7 +436,8 @@ const Entry = function (_kwargs) {
 								node: 'button', 
 								type: 'button', 
 								classname: 'revoke', 
-								label: vocabulary['revoke'][language], 
+								// label: vocabulary['revoke'][language], 
+								label: vocabulary['revoke'], 
 								name: 'contributor', 
 								value: d.id, 
 								disabled: ![null, undefined].includes(d.end_date), 
@@ -463,7 +513,8 @@ const Entry = function (_kwargs) {
 								count: d.count, 
 								disabled: { 
 									value: d.disabled, 
-									label: vocabulary['missing reviewers'][language] 
+									// label: vocabulary['missing reviewers'][language] 
+									label: vocabulary['missing reviewers'] 
 								}, 
 								type: 'radio', 
 								required: true 
@@ -478,20 +529,23 @@ const Entry = function (_kwargs) {
 						return { label: d.name, value: d.id, type: 'checkbox', classname: d.secondary_languages.join(' ') }
 					}) // TO DO: IMPROVE THIS
 					const formdata = { action: '/request/review', method: 'POST' }
-					const message = vocabulary['select review language'][language]
+					// const message = vocabulary['select review language'][language]
+					const message = vocabulary['select review language']
 
 					const opts = []
 					opts.push({ 
 						node: 'select', 
 						name: 'language', 
-						label: vocabulary['select language'][language]['singular'], 
+						// label: vocabulary['select language'][language]['singular'], 
+						label: vocabulary['select language']['singular'], 
 						options: target_opts, 
 						fn: updateReviewerList 
 					})
 					opts.push({ 
 						node: 'select', 
 						name: 'reviewers', 
-						label: vocabulary['select reviewers'][language], 
+						// label: vocabulary['select reviewers'][language], 
+						label: `${vocabulary['select']} ${modules.find(d => d.type === 'reviews')?.reviewers} ${vocabulary['reviewers']} (${vocabulary['optional']})`,
 						options: reviewer_opts, 
 						classname: 'reviewer-list hide', 
 						fn: countReviewers 
@@ -512,7 +566,8 @@ const Entry = function (_kwargs) {
 						name: name, 
 						value: value, 
 						disabled: true, 
-						label: vocabulary['submit for review'][language] 
+						// label: vocabulary['submit for review'][language] 
+						label: vocabulary['submit for review'] 
 					})
 					const new_constraint = await renderFormModal({ message, formdata, opts })
 					// THIS IS A FORM MODAL SO IT SHOULD RELOAD THE PAGE
@@ -559,10 +614,12 @@ const Entry = function (_kwargs) {
 					navigator.clipboard.writeText(link)
 
 					sel.classed('active', true)
-					.html(vocabulary['copied'][language])
+					// .html(vocabulary['copied'][language])
+					.html(vocabulary['copied'])
 					setTimeout(_ => {
 						sel.classed('active', false)
-						.html(vocabulary['copy link'][language])
+						// .html(vocabulary['copy link'][language])
+						.html(vocabulary['copy link'])
 					}, 1000)
 				}
 				async function revoke () {
@@ -571,7 +628,8 @@ const Entry = function (_kwargs) {
 
 					// SET END DATE
 					const formdata = { action: `/delete/${object}`,  method: 'GET' }
-					const message = vocabulary['set user end date'][language]
+					// const message = vocabulary['set user end date'][language]
+					const message = vocabulary['set user end date']
 					const opts = []
 
 					const today = new Date()
@@ -580,16 +638,30 @@ const Entry = function (_kwargs) {
 					const yyyy = today.getFullYear()
 
 					// opts.push({ node: 'input', type: 'date', name: 'invite', value: `${yyyy}-${mm}-${dd}` })
-					opts.push({ node: 'input', type: 'date', name: 'date', value: `${yyyy}-${mm}-${dd}` })
+					opts.push({ 
+						node: 'input', 
+						type: 'date', 
+						name: 'date', 
+						value: `${yyyy}-${mm}-${dd}` 
+					})
 					// opts.push({ node: 'input', type: 'email', name: 'email' })
 
 					// SET WHETHER TO EXCLUDE OR TO REMOVE RIGHTS
 					// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'revoke', placeholder: 'Remove user rights', checked: true, default: true }) // TO DO: TRANSLATE
 					// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'delete', placeholder: 'Exclude from platform and suite', checked: false, default: true }) // TO DO: TRANSLATE
 
-					opts.push({ node: 'input', type: 'hidden', name: 'id', value: value })
-
-					opts.push({ node: 'button', type: 'submit', label: vocabulary['revoke'][language] })
+					opts.push({ 
+						node: 'input', 
+						type: 'hidden', 
+						name: 'id', 
+						value: value 
+					})
+					opts.push({ 
+						node: 'button', 
+						type: 'submit', 
+						// label: vocabulary['revoke'][language] 
+						label: vocabulary['revoke'] 
+					})
 					const new_constraint = await renderFormModal({ message, formdata, opts })
 				}
 			}
@@ -621,7 +693,8 @@ const Entry = function (_kwargs) {
 					renderImgZoom({ src: img.replace('/sm/', '/') })
 				})
 			.addElems('img', 'vignette')
-				.attrs({ 'loading': 'lazy', 'alt': _ => vocabulary['missing image'][language] })
+				// .attrs({ 'loading': 'lazy', 'alt': _ => vocabulary['missing image'][language] })
+				.attrs({ 'loading': 'lazy', 'alt': _ => vocabulary['missing image'] })
 			.each(function (d) {
 				const node = this
 				const img = new Image()
@@ -654,7 +727,8 @@ const Entry = function (_kwargs) {
 				if (d.items !== undefined) {
 					const obj = {}
 					obj.type = 'item'
-					obj.label = vocabulary['item'][language][d.items !== 1 ? 'plural' : 'singular']
+					// obj.label = vocabulary['item'][language][d.items !== 1 ? 'plural' : 'singular']
+					obj.label = vocabulary['item'][d.items !== 1 ? 'plural' : 'singular']
 					obj.count = d.items
 					data.push(obj)
 				}
@@ -664,7 +738,8 @@ const Entry = function (_kwargs) {
 					const obj = {}
 					obj.type = 'contributor'
 					// obj.label = vocabulary['contributor'][language][d.count !== 1 ? 'plural' : 'singular']
-					obj.label = vocabulary['contributor'][language][d.participants !== 1 ? 'plural' : 'singular']
+					// obj.label = vocabulary['contributor'][language][d.participants !== 1 ? 'plural' : 'singular']
+					obj.label = vocabulary['contributor'][d.participants !== 1 ? 'plural' : 'singular']
 					obj.count = d.contributors
 					obj.text = `${d.contributors} <small class='total'>/ ${d.participants}</small>`
 					data.push(obj)
@@ -672,7 +747,8 @@ const Entry = function (_kwargs) {
 				if (d.private_associated_pads !== undefined) { // THIS IS DEPRECATED
 					const obj = {}
 					obj.type = 'pad'
-					obj.label = `${vocabulary['object status'][language]['pad'][0][d.private_associated_pads !== 1 ? 'plural' : 'singular']} ${vocabulary['pad'][language][d.private_associated_pads !== 1 ? 'plural' : 'singular'].toLowerCase()}`
+					// obj.label = `${vocabulary['object status'][language]['pad'][0][d.private_associated_pads !== 1 ? 'plural' : 'singular']} ${vocabulary['pad'][language][d.private_associated_pads !== 1 ? 'plural' : 'singular'].toLowerCase()}`
+					obj.label = `${vocabulary['object status']['pad'][0][d.private_associated_pads !== 1 ? 'plural' : 'singular']} ${vocabulary['pad'][d.private_associated_pads !== 1 ? 'plural' : 'singular'].toLowerCase()}`
 					obj.count = d.private_associated_pads
 					obj.href = `/${language}/browse/pads/curated?${object}=${d.id}&status=0&status=1`
 					data.push(obj)
@@ -682,7 +758,8 @@ const Entry = function (_kwargs) {
 					const { contributors, total } = d.participants
 					const obj = {}
 					obj.type = 'contributor'
-					obj.label = vocabulary['contributor'][language][total !== 1 ? 'plural' : 'singular']
+					// obj.label = vocabulary['contributor'][language][total !== 1 ? 'plural' : 'singular']
+					obj.label = vocabulary['contributor'][total !== 1 ? 'plural' : 'singular']
 					obj.count = contributors
 					obj.text = `${contributors} <small class='total'>/ ${total}</small>`
 					data.push(obj)
@@ -691,7 +768,8 @@ const Entry = function (_kwargs) {
 					d.associated_pads.forEach(c => {
 						const obj = {}
 						obj.type = 'pad'
-						obj.label = vocabulary['object status'][language]['pad'][c.status][c.count !== 1 ? 'plural' : 'singular']
+						// obj.label = vocabulary['object status'][language]['pad'][c.status][c.count !== 1 ? 'plural' : 'singular']
+						obj.label = vocabulary['object status']['pad'][c.status][c.count !== 1 ? 'plural' : 'singular']
 						obj.count = c.count
 						let space = 'private'
 						if (c.status === 2) space = 'shared'
@@ -704,7 +782,8 @@ const Entry = function (_kwargs) {
 					d.associated_mobilizations.forEach(c => {
 						const obj = {}
 						obj.type = 'mobilization'
-						obj.label = vocabulary['mobilization'][language][c.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+						// obj.label = vocabulary['mobilization'][language][c.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+						obj.label = vocabulary['mobilization'][c.count !== 1 ? 'plural' : 'singular'].toLowerCase()
 						obj.count = c.count
 						let space = 'ongoing'
 						if (c.status === 2) space = 'past'
@@ -716,8 +795,8 @@ const Entry = function (_kwargs) {
 				if (d.ongoing_associated_mobilizations !== undefined) {
 					const obj = {}
 					obj.type = 'mobilization'
-					// obj.label = vocabulary['mobilization']['language'][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
-					obj.label = vocabulary['mobilization'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+					// obj.label = vocabulary['mobilization'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+					obj.label = vocabulary['mobilization'][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
 					obj.count = d.ongoing_associated_mobilizations
 					obj.href = `/${language}/browse/mobilizations/ongoing?${object}=${d.id}`
 					data.push(obj)
@@ -726,7 +805,7 @@ const Entry = function (_kwargs) {
 					const obj = {}
 					obj.type = 'mobilization'
 					// obj.label = vocabulary['mobilization'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
-					obj.label = vocabulary['mobilization'][language][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
+					obj.label = vocabulary['mobilization'][d.count !== 1 ? 'plural' : 'singular'].toLowerCase()
 					obj.count = d.past_associated_mobilizations
 					obj.href = `/${language}/browse/mobilizations/ongoing?${object}=${d.id}`
 					data.push(obj)
@@ -788,8 +867,10 @@ const Entry = function (_kwargs) {
 				})
 			title.addElems('span')
 				.html(d => {
-					if (d.is_review) return `[${vocabulary['review'][language]['preposition']}] ${d.source_title}`
-					else return d.title || d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]?.[language]}]`
+					// if (d.is_review) return `[${vocabulary['review'][language]['preposition']}] ${d.source_title}`
+					// else return d.title || d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]?.[language]}]`
+					if (d.is_review) return `[${vocabulary['review']['preposition']}] ${d.source_title}`
+					else return d.title || d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]}]`
 				})
 		}.bind(this),
 		txt: function (_sel) {
@@ -827,7 +908,8 @@ const Entry = function (_kwargs) {
 						else return `/${language}/view/${object.slice(0, -1)}?${queryparams.toString()}`
 					}//, 'target': '_blank'
 				}).html(d => {
-					if (d.txt.length > 500) return `${d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ').slice(0, 500)}… <span class='read-more'>[${vocabulary['read more'][language]}]</span>`
+					// if (d.txt.length > 500) return `${d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ').slice(0, 500)}… <span class='read-more'>[${vocabulary['read more'][language]}]</span>`
+					if (d.txt.length > 500) return `${d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ').slice(0, 500)}… <span class='read-more'>[${vocabulary['read more']}]</span>`
 					else return d.txt.replace(/\n/g, ' ').replace(/\s+/, ' ')
 				})
 		}.bind(this),
@@ -836,7 +918,8 @@ const Entry = function (_kwargs) {
 			const taggroup = _sel.addElems('div', 'meta tag-group')
 			const sdgs = taggroup.addElems('div', 'meta meta-sdgs', d => d.sdgs?.length ? [d.sdgs] : [])
 			sdgs.addElems('span')
-				.html(d => vocabulary['sdg'][language][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
+				// .html(d => vocabulary['sdg'][language][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
+				.html(d => vocabulary['sdg'][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
 			sdgs.addElems('a', 'sdg-link', d => d)
 				.attr('href', d => `?sdgs=${d.key || d}`)
 				.html(d => d.key || d)
@@ -871,7 +954,8 @@ const Entry = function (_kwargs) {
 				const followup = treeinfo.addElems('div', 'meta meta-followup')
 					.attr('title', d => d.source_title)
 				followup.addElems('i')
-					.html(`${vocabulary['follow up'][language]['preposition']}: `)
+					// .html(`${vocabulary['follow up'][language]['preposition']}: `)
+					.html(`${vocabulary['follow up']['preposition']}: `)
 				followup.addElems('a')
 					.attrs({
 						'href': d => {
@@ -884,7 +968,8 @@ const Entry = function (_kwargs) {
 				const forward = treeinfo.addElems('div', 'meta meta-forward')
 					.attr('title', d => d.source_title)
 				forward.addElems('i')
-					.html(vocabulary['forwarded from'][language])
+					// .html(vocabulary['forwarded from'][language])
+					.html(vocabulary['forwarded from'])
 				forward.addElems('a')
 					.attrs({
 						'href': d => {
@@ -897,7 +982,8 @@ const Entry = function (_kwargs) {
 				const copy = treeinfo.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
 					.attr('title', d => d.source_title)
 				copy.addElems('i')
-					.html(`${vocabulary['copy'][language]['preposition']}: `)
+					// .html(`${vocabulary['copy'][language]['preposition']}: `)
+					.html(`${vocabulary['copy']['preposition']}: `)
 				copy.addElems('a')
 					.attrs({
 						'href': d => {
@@ -910,7 +996,8 @@ const Entry = function (_kwargs) {
 				const child = treeinfo.addElems('div', 'meta meta-child', d => d.source && d.is_child ? [d] : [])
 					.attr('title', d => d.source_title)
 				child.addElems('i')
-					.html(`${vocabulary['expansion'][language]}: `)
+					// .html(`${vocabulary['expansion'][language]}: `)
+					.html(`${vocabulary['expansion']}: `)
 				child.addElems('a')
 					.attrs({
 						'href': d => {
@@ -922,19 +1009,22 @@ const Entry = function (_kwargs) {
 
 			_sel.addElems('div', 'meta meta-mobilization', d => d.mobilization ? [d] : [])
 				.attr('title', d => d.mobilization_title)
-				.html(`<i>${vocabulary['mobilization'][language]['singular']}:</i> `)
+				// .html(`<i>${vocabulary['mobilization'][language]['singular']}:</i> `)
+				.html(`<i>${vocabulary['mobilization']['singular']}:</i> `)
 			.addElems('a')
 				.attr('href', d => `?mobilizations=${d.mobilization}`)
 				.html(d => d.mobilization_title?.length > 25 ? `${d.mobilization_title.slice(0, 25)}…` : d.mobilization_title)
 
 			if (object === 'mobilizations') {
 				_sel.addElems('div', 'meta meta-public', d => d.public ? [d] : [])
-					.html(`<i>${vocabulary['public mobilization'][language]}</i> `)
+					// .html(`<i>${vocabulary['public mobilization'][language]}</i> `)
+					.html(`<i>${vocabulary['public mobilization']}</i> `)
 			}
 
 			_sel.addElems('div', 'meta meta-template', d => d.template ? [d] : [])
 				.attr('title', d => d.template_title)
-				.html(`<i>${vocabulary['template'][language]['singular']}:</i> `)
+				// .html(`<i>${vocabulary['template'][language]['singular']}:</i> `)
+				.html(`<i>${vocabulary['template']['singular']}:</i> `)
 			.addElems('a')
 				.attrs({
 					'href': d => `/${language}/view/template?id=${d.template}`
@@ -945,7 +1035,8 @@ const Entry = function (_kwargs) {
 				_sel.addElems('div', 'meta meta-reviewers', d => {
 					return !d.reviewer_pooled && ![null, undefined].includes(d.reviewers) ? [d] : []
 				}).html(d => {
-					return `<strong>${d.reviewers}</strong><small> / ${modules.find(d => d.type === 'reviews').reviewers}</small> ${vocabulary['reviewers accepted'][language][d.reviewers !== 1 ? 'plural' : 'singular']}`
+					// return `<strong>${d.reviewers}</strong><small> / ${modules.find(d => d.type === 'reviews').reviewers}</small> ${vocabulary['reviewers accepted'][language][d.reviewers !== 1 ? 'plural' : 'singular']}`
+					return `<strong>${d.reviewers}</strong><small> / ${modules.find(d => d.type === 'reviews').reviewers}</small> ${vocabulary['reviewers accepted'][d.reviewers !== 1 ? 'plural' : 'singular']}`
 				})
 			}
 		}.bind(this),
@@ -956,7 +1047,8 @@ const Entry = function (_kwargs) {
 				if (this.data.followups?.length) {
 					const btn = group.addElems('div', 'create follow-up')
 					btn.addElems('button')
-						.html(vocabulary['follow up'][language]['verb'])
+						// .html(vocabulary['follow up'][language]['verb'])
+						.html(vocabulary['follow up']['verb'])
 					.on('click', function () { this.focus() })
 					.on('focus', _ => {
 						const dropdown = btn.select('.dropdown')
@@ -989,7 +1081,8 @@ const Entry = function (_kwargs) {
 				if (this.data.forwards?.length) {
 					const btn = group.addElems('div', 'create forward')
 					btn.addElems('button')
-						.html(vocabulary['forward'][language])
+						// .html(vocabulary['forward'][language])
+						.html(vocabulary['forward'])
 					.on('click', function () { this.focus() })
 					.on('focus', _ => {
 						const dropdown = btn.select('.dropdown')
@@ -1272,9 +1365,11 @@ const Entry = function (_kwargs) {
 					.attr('for', `new-pinboard-${this.id}`)
 					.html(_ => {
 						if (object === 'contributors') {
-							return vocabulary['assign to teams'][language]
+							// return vocabulary['assign to teams'][language]
+							return vocabulary['assign to teams']
 						} else {
-							return vocabulary['add to collection'][language]
+							// return vocabulary['add to collection'][language]
+							return vocabulary['add to collection']
 						}
 					})
 				newpin.addElems('button')
@@ -1335,14 +1430,18 @@ const Entry = function (_kwargs) {
 				const opts = []
 				opts.push({ 
 					type: 'button', 
-					class: vocabulary['confirm']['en'], // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['confirm'][language], 
+					// class: vocabulary['confirm']['en'], // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					class: 'Confirm', // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					// label: vocabulary['confirm'][language], 
+					label: vocabulary['confirm'], 
 					fn: confirmRemoval 
 				})
 				opts.push({ 
 					type: 'button', 
-					class: vocabulary['cancel']['en'], // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['cancel'][language], 
+					// class: vocabulary['cancel']['en'], // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					class: 'Cancel', // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					// label: vocabulary['cancel'][language], 
+					label: vocabulary['cancel'], 
 					fn: unpublishArticles 
 				})
 				return opts
@@ -1370,14 +1469,18 @@ const Entry = function (_kwargs) {
 				const opts = []
 				opts.push({ 
 					type: 'button', 
-					class: vocabulary['confirm']['en'],  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['confirm'][language], 
+					// class: vocabulary['confirm']['en'],  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					class: 'Confirm',  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					// label: vocabulary['confirm'][language], 
+					label: vocabulary['confirm'], 
 					fn: confirmRemoval 
 				})
 				opts.push({ 
 					type: 'button', 
-					class: vocabulary['cancel']['en'],  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['cancel'][language], 
+					// class: vocabulary['cancel']['en'],  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					class: 'Cancel',  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
+					// label: vocabulary['cancel'][language], 
+					label: vocabulary['cancel'], 
 					fn: deleteArticles 
 				})
 				return opts
@@ -1406,7 +1509,8 @@ const Entry = function (_kwargs) {
 					else return `/imgs/icons/i-${object.slice(0, -1)}.svg`
 				})
 			name.addElems('span')
-				.html(d => d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]?.[language]}]`)
+				// .html(d => d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]?.[language]}]`)
+				.html(d => d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]}]`)
 
 
 			_sel.addElems('div', 'meta meta-email')
@@ -1431,6 +1535,7 @@ function renderVignette (_section, _kwargs) {
 		parent: _section,
 		data,
 		language,
+		vocabulary,
 		object,
 		space,
 		modules: JSON.parse(d3.select('data[name="modules"]').node()?.value),

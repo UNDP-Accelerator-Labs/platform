@@ -79,7 +79,6 @@ const Media = function (kwargs) {
 
 	if (this.editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
 	
-	console.log(objecttype, level, datum)
 	if ((objecttype === 'templated' || level === 'meta') && datum.instruction) {
 		this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
 			.attr('data-placeholder', d => d.instruction) // TO DO: IF TRANSLATION IS AVAILABLE TRANSLATE

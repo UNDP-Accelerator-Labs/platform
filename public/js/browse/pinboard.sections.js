@@ -118,7 +118,6 @@ async function addSection (node) {
 	opts.push({ 
 		node: 'button', 
 		type: 'submit', 
-		// label: vocabulary['save'][language], 
 		label: vocabulary['save'], 
 		disabled: !singlesection 
 	})

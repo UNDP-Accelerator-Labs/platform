@@ -9,6 +9,7 @@ module.exports = async kwargs => {
 
 	let { id, source } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	let workingID = id ?? source
+	if (!workingID) return { message: 'No id found.' }
 
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)

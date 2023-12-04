@@ -1,9 +1,14 @@
-function initToolbarInteractions (metafields, padtype) {
+function initToolbarInteractions (kwargs) {
+	let { metafields, type: objecttype, main } = kwargs 
 	if (!mediaSize) var mediaSize = getMediaSize()
-	if (!metafields && !padtype) {
-		const { metafields: pmeta, type: ptype } = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	
+	const object = d3.select('data[name="object"]').node()?.value
+
+	if (!metafields && !objecttype) {
+		const { metafields: pmeta } = JSON.parse(d3.select('data[name="site"]').node()?.value)
+		const { type } = JSON.parse(d3.select('data[name="data"]').node().value)
 		metafields = pmeta
-		type = ptype
+		objecttype = type
 	}
 
 	// LOAD THE ICONS IN THE TOOLBAR
@@ -24,12 +29,14 @@ function initToolbarInteractions (metafields, padtype) {
 		img.src = src
 	})
 
+	const objectdata = { object, type: objecttype, main };
+
 	// ADD ALL INTERACTION WITH MEDIA AND META INPUT BUTTONS
 	d3.select('.media-input-group #input-media-section')
 	.on('mousedown', function () {
 		this['__active_node__']	= d3.selectAll('.media-layout.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addSection({ lang: language, sibling: this['__active_node__'], focus: true })
+		addSection({ lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -39,7 +46,7 @@ function initToolbarInteractions (metafields, padtype) {
 	})
 	d3.select('.media-input-group #input-media-img')
 	.on('change', function () {
-		uploadImg({ form: this.form, lang: language, sibling: this['__active_node__'], focus: true })
+		uploadImg({ form: this.form, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -49,7 +56,7 @@ function initToolbarInteractions (metafields, padtype) {
 	})
 	d3.select('.media-input-group #input-media-video')
 	.on('change', function () {
-		uploadVideo({ form: this.form, lang: language, sibling: this['__active_node__'], focus: true })
+		uploadVideo({ form: this.form, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -57,7 +64,7 @@ function initToolbarInteractions (metafields, padtype) {
 	.on('mousedown', function () {
 		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addDrawing({ lang: language, sibling: this['__active_node__'], focus: true })
+		addDrawing({ lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -65,7 +72,7 @@ function initToolbarInteractions (metafields, padtype) {
 	.on('mousedown', function () {
 		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addTxt({ lang: language, sibling: this['__active_node__'], focus: true })
+		addTxt({ lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -73,7 +80,7 @@ function initToolbarInteractions (metafields, padtype) {
 	.on('mousedown', function () {
 		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addEmbed({ lang: language, sibling: this['__active_node__'], focus: true })
+		addEmbed({ lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -81,7 +88,7 @@ function initToolbarInteractions (metafields, padtype) {
 	.on('mousedown', function () {
 		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addChecklist({ lang: language, sibling: this['__active_node__'], focus: true })
+		addChecklist({ lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -89,7 +96,7 @@ function initToolbarInteractions (metafields, padtype) {
 	.on('mousedown', function () {
 		this['__active_node__']	= d3.selectAll('.media-container.focus, .meta-container.focus').nodes()?.last()?.nextSibling
 	}).on('click', function () {
-		addRadiolist({ lang: language, sibling: this['__active_node__'], focus: true })
+		addRadiolist({ lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 		this['__active_node__'] = null
 	})
 
@@ -110,20 +117,20 @@ function initToolbarInteractions (metafields, padtype) {
 				instruction: d.instruction, 
 				options: d.options || null 
 			}
-			if (d.type === 'txt') addTxt({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'embed') addEmbed({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'drawing') addDrawing({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'checklist') addChecklist({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'radiolist') addRadiolist({ data, lang: language, sibling: this['__active_node__'], focus: true })
+			if (d.type === 'txt') addTxt({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
+			if (d.type === 'embed') addEmbed({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
+			if (d.type === 'drawing') addDrawing({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
+			if (d.type === 'checklist') addChecklist({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
+			if (d.type === 'radiolist') addRadiolist({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 			// THE FOLLOWING ARE ALWAYS META
-			if (d.type === 'tag') addTags({ data, lang: language, sibling: this['__active_node__'], focus: true })
-			if (d.type === 'index') addIndexes({ data, lang: language, sibling: this['__active_node__'], focus: true })
+			if (d.type === 'tag') addTags({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
+			if (d.type === 'index') addIndexes({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 			if (d.type === 'location') {
 				// ADD DEFAULT LOCATION FOR MAP CENTERING
 				data.default_location = JSON.parse(d3.select('data[name="location"]').node().value).lnglat
-				addLocations({ data, lang: language, sibling: this['__active_node__'], focus: true })
+				addLocations({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 			}
-			if (d.type === 'attachment') addAttachment({ data, lang: language, sibling: this['__active_node__'], focus: true })
+			if (d.type === 'attachment') addAttachment({ data, lang: language, sibling: this['__active_node__'], focus: true, objectdata })
 
 			d3.select(this).select('label').style('width', 0)
 			this['__active_node__'] = null
@@ -131,7 +138,7 @@ function initToolbarInteractions (metafields, padtype) {
 	})
 
 	// DETERMINE WHETHER THE INPUT BAR NEEDS TO BE NAVIGATED (i.e., SCROLLED)
-	if (padtype === 'blank') {
+	if (objecttype === 'blank') {
 		d3.select('.media-input-group')
 		.each(function () {
 			const node = this

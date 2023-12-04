@@ -64,7 +64,7 @@ const Media = function (kwargs) {
 	})
 	if (this.editable) {
 		this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-		this.opts.addElems('div', 'opt-group', [vocabulary['write instruction'][language]])
+		this.opts.addElems('div', 'opt-group', [vocabulary['write instruction']])
 			.addElems('label')
 				.html(d => d)
 	}
@@ -107,7 +107,7 @@ const Media = function (kwargs) {
 	}
 	// THE FOLLOWING IS DIFFERENT FROM THE Media CONSTRUCTOR IN pads.js
 	this.response = this.container.addElems('div', 'response template', [type])
-		.html(d => vocabulary['expect'][language][d])
+		.html(d => vocabulary['expect'][d])
 
 	if (this.editable) observer.observe(this.container.node(), obsvars)
 }
@@ -238,8 +238,8 @@ const Taglist = function (kwargs) {
 			
 			if (d.key === 'constraint') {
 				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input'][language]['tags']} <input type='number' name='length' value=${datum.constraint || list.length || 5} min=1> ${vocabulary['input type'][language]['tags']}`
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'][language], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+					const message = `${vocabulary['limit input']['tags']} <input type='number' name='length' value=${datum.constraint || list.length || 5} min=1> ${vocabulary['input type']['tags']}`
+					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
 					const new_constraint = await renderPromiseModal({ message, opts })
 
 					datum.constraint = +new_constraint
@@ -260,7 +260,7 @@ const Taglist = function (kwargs) {
 	}
 
 	_self.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][name] || vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][name] || vocabulary['request'][type],
 		'contenteditable': _self.editable ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -271,7 +271,7 @@ const Taglist = function (kwargs) {
 	if (_self.inset) {
 		const panel = _self.inset.addElems('div', `inset-${type}`)
 			.addElems('ul', 'panel')
-		panel.addElems('li', 'instruction', [{ value: vocabulary['tag instruction'][language] }])
+		panel.addElems('li', 'instruction', [{ value: vocabulary['tag instruction'] }])
 			.html(d => `* ${d.value}`)
 		panel.addElems('li', 'opt', list)
 		.each(function (d, i) {
@@ -390,7 +390,7 @@ async function addSection (kwargs) {
 	const header = section.addElems('div', 'section-header')
 		.addElems('h1')
 		.attrs({ 
-			'data-placeholder': d => vocabulary['section header'][language],
+			'data-placeholder': d => vocabulary['section header'],
 			'contenteditable': editing ? true : null 
 		}).html(d => d.title)
 	.on('keydown', function () {
@@ -414,7 +414,7 @@ async function addSection (kwargs) {
 	if (medialead.response) medialead.response.remove()
 
 	medialead.media.attrs({ 
-		'data-placeholder': d => vocabulary['lead paragraph'][language],
+		'data-placeholder': d => vocabulary['lead paragraph'],
 		'contenteditable': editing ? true : null 
 	}).html(d => d.lead)
 
@@ -432,7 +432,7 @@ async function addSection (kwargs) {
 
 		mediarepeat.media.addElems('button')
 		.addElems('div').attrs({ 
-			'data-placeholder': d => vocabulary['repeat section'][language],
+			'data-placeholder': d => vocabulary['repeat section'],
 			'contenteditable': editing ? true : null 
 		}).html(d => d.instruction)
 		.on('blur', async _ => { if (editing) { await partialSave('media') } })
@@ -479,7 +479,7 @@ function addTitle (kwargs) {
 	if (media.input) media.input.remove()
 
 	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -516,7 +516,7 @@ function addImg (kwargs) {
 	})
 	
 	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -553,7 +553,7 @@ function addDrawing (kwargs) {
 	})
 
 	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -621,9 +621,8 @@ function addTxt (kwargs) {
 				sel.classed('active', datum.is_excerpt)
 			} else if (d.key === 'constraint') {
 				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input'][language]['characters']} <input type='number' name='length' value=${datum.constraint || 9999} min=1> ${vocabulary['input type'][language]['characters']}`
-					// const message = vocabulary['limit input'][language]('characters', `<input type='number' name='length' value=${datum.constraint || 9999} min=1>`)
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'][language], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+					const message = `${vocabulary['limit input']['characters']} <input type='number' name='length' value=${datum.constraint || 9999} min=1> ${vocabulary['input type']['characters']}`
+					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
 					const new_constraint = await renderPromiseModal({ message, opts })
 
 					datum.constraint = +new_constraint
@@ -645,7 +644,7 @@ function addTxt (kwargs) {
 	}
 
 	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -682,7 +681,7 @@ function addEmbed (kwargs) {
 	})
 
 	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	}).classed('padded', true)
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -737,7 +736,7 @@ function addChecklist (kwargs) {
 	// TO DO: CHANGE THIS INSTRUCTION TO MEDIA TEXT
 	media.media.addElem('div', 'instruction')
 		.attrs({ 
-			'data-placeholder': d => vocabulary['request'][language][type],
+			'data-placeholder': d => vocabulary['request'][type],
 			'contenteditable': editing ? true : null 
 		}).on('keydown', _ => { if (editing) switchButtons(lang) })
 		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -783,7 +782,7 @@ function addChecklist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({ 
 				'for': d => `check-item-${checklist_id}-${d.id}`,
-				'data-placeholder': vocabulary['new checklist item'][language],
+				'data-placeholder': vocabulary['new checklist item'],
 				'contenteditable': editable ? true : null
 			})
 		.on('keydown', function (d) {
@@ -868,7 +867,7 @@ function addRadiolist (kwargs) {
 
 	media.media.addElem('div', 'instruction')
 		.attrs({ 
-			'data-placeholder': d => vocabulary['request'][language][type],
+			'data-placeholder': d => vocabulary['request'][type],
 			'contenteditable': editing ? true : null // NOTE HERE THE editing (INSTEAD OF editable) IS IMPORTANT: WE CAN SET A PREDEFINED INSTRUCTION, BUT THE INTENTION IS TO ALWAYS ALLOW THE EDITOR TO TAILOR WORDING TO THEIR LIKING
 		}).on('keydown', _ => { if (editing) switchButtons(lang) })
 		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -914,7 +913,7 @@ function addRadiolist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({ 
 				'for': d => `radio-item-${radiolist_id}-${d.id}`,
-				'data-placeholder': vocabulary['new checklist item'][language],
+				'data-placeholder': vocabulary['new checklist item'],
 				'contenteditable': editable ? true : null
 			})
 		.on('keydown', function (d) {
@@ -998,9 +997,8 @@ function addLocations (kwargs) {
 			
 			if (d.key === 'constraint') {
 				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input'][language]['locations']} <input type='number' name='length' value=${datum.constraint || 10} min=1> ${vocabulary['input type'][language]['locations']}`
-					// const message = vocabulary['limit input'][language]('locations', `<input type='number' name='length' value=${datum.constraint || 10} min=1>`)
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'][language], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+					const message = `${vocabulary['limit input']['locations']} <input type='number' name='length' value=${datum.constraint || 10} min=1> ${vocabulary['input type']['locations']}`
+					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
 					const new_constraint = await renderPromiseModal({ message, opts })
 
 					datum.constraint = +new_constraint
@@ -1021,7 +1019,7 @@ function addLocations (kwargs) {
 	}
 
 	meta.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -1031,7 +1029,7 @@ function addLocations (kwargs) {
 	if (meta.inset) {
 		meta.inset.addElems('div', `inset-${type}`)
 			.addElems('ul', 'panel')
-			.addElems('li', 'instruction', [{ value: vocabulary['location instruction'][language] }])
+			.addElems('li', 'instruction', [{ value: vocabulary['location instruction'] }])
 			.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END FOR SMS DEPLOYMENT
 	}
 
@@ -1125,7 +1123,7 @@ function addAttachment (kwargs) {
 	})
 
 	meta.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	}).classed('padded', true)
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -1172,9 +1170,8 @@ async function addGroup (kwargs) {
 			
 			if (d.key === 'repeat') {
 				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input'][language]['groups']} <input type='number' name='length' value=${datum.constraint || 5} min=1> ${vocabulary['input type'][language]['groups']}`
-					// const message = vocabulary['limit input'][language]('groups', `<input type='number' name='length' value=${datum.constraint || 5} min=1>`)
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['repeat group'][language], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
+					const message = `${vocabulary['limit input']['groups']} <input type='number' name='length' value=${datum.constraint || 5} min=1> ${vocabulary['input type']['groups']}`
+					const opts = [{ node: 'button', type: 'button', label: vocabulary['repeat group'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
 					const new_repeat = await renderPromiseModal({ message, opts })
 
 					datum.repeat = +new_repeat
@@ -1198,7 +1195,7 @@ async function addGroup (kwargs) {
 	if (media.response) media.response.remove()
 
 	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][language][type],
+		'data-placeholder': d => vocabulary['request'][type],
 		'contenteditable': editing ? true : null 
 	})
 	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
@@ -1237,7 +1234,7 @@ function switchButtons (lang = 'en') {
 	if (mediaSize === 'xs') {
 		d3.select('.meta-status .btn-group .save button')
 		.each(function () { this.disabled = false })
-			.html(vocabulary['save changes'][language])
+			.html(vocabulary['save changes'])
 	} else {
 		const menu_logo = d3.select('nav#site-title .inner')
 		window.sessionStorage.setItem('changed-content', true)
@@ -1245,7 +1242,7 @@ function switchButtons (lang = 'en') {
 		menu_logo.selectAll('div.save').classed('hide saved', false)
 			.select('button')
 		.on('click', async _ => await partialSave())
-			.html(vocabulary['save changes'][language])
+			.html(vocabulary['save changes'])
 	}
 }
 
@@ -1284,8 +1281,8 @@ async function renderTemplate () {
 				level: 'meta',
 				type: 'radiolist',
 				name: 'review_score',
-				options: [{ name: vocabulary['accept'][language], value: 1 }, { name: vocabulary['reject'][language], value: 0 }],
-				instruction: vocabulary['accept or reject pad'][language],
+				options: [{ name: vocabulary['accept'], value: 1 }, { name: vocabulary['reject'], value: 0 }],
+				instruction: vocabulary['accept or reject pad'],
 				required: true,
 				editable: false
 			}

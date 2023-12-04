@@ -37,7 +37,7 @@ function dropHandler(evt, node) {
 		const items = evt.dataTransfer.items
 		if (items.length > 1) {
 			sel.classed('accept', false).classed('reject', true)
-			label.html(vocabulary['chose only one file'][language]['xlsx'])
+			label.html(vocabulary['chose only one file']['xlsx'])
 		} else {
 			const item = items[0]
 			if (item.kind === 'file') {
@@ -46,11 +46,11 @@ function dropHandler(evt, node) {
 					parseXLSX(file, d3.select(node).select('input[type=file]').node())
 				} else {
 					sel.classed('accept', false).classed('reject', true)
-					label.html(vocabulary['chose file'][language]['xlsx'])
+					label.html(vocabulary['chose file']['xlsx'])
 				}
 			} else {
 				sel.classed('accept', false).classed('reject', true)
-				label.html(vocabulary['chose file'][language]['xlsx'])
+				label.html(vocabulary['chose file']['xlsx'])
 			}
 		}
 	} else {
@@ -58,14 +58,14 @@ function dropHandler(evt, node) {
 		const items = evt.dataTransfer.files
 		if (items.length > 1) {
 			sel.classed('accept', false).classed('reject', true)
-			label.html(vocabulary['chose only one file'][language]['xlsx'])
+			label.html(vocabulary['chose only one file']['xlsx'])
 		} else {
 			const file = evt.dataTransfer.files[0]
 			if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
 				parseXLSX(file, d3.select(node).select('input[type=file]').node())
 			} else {
 				sel.classed('accept', false).classed('reject', true)
-				label.html(vocabulary['chose file'][language]['xlsx'])
+				label.html(vocabulary['chose file']['xlsx'])
 			}
 		}
 
@@ -597,14 +597,13 @@ function renderTable (cols, update = false) {
 		
 		previewPad(idx)
 	}).addElems('span')
-		.html(vocabulary['dblclick to preview'][language]['pad'])
+		.html(vocabulary['dblclick to preview']['pad'])
 	
 	foot.addElems('p', 'summary')
 		.html(_ => {
 			const rowcount = Math.max(...cols.map(c => c.entries.length))
 			const colcount = cols.length
-			// return vocabulary['import table description'][language](rowcount, colcount, Math.min(show, rowcount))
-			return vocabulary['import table description'][language]
+			return vocabulary['import table description']
 				.replace(/\$1/g, rowcount)
 				.replace(/\$2/g, colcount)
 				.replace(/\$3/g, Math.min(show, rowcount))
@@ -1049,8 +1048,7 @@ async function compileTemplate () {
 
 	// THIS IS COPIED FROM template.ejs
 	const title = d3.select('input#upload').attr('data-fname').slice(0, 99) // THIS IS NECESSARY BECAUSE THE DB IS ONLY SET TO STORE 99 VARCHAR
-	// const description = vocabulary['generated template'][language](title.trim())
-	const description = vocabulary['generated template'][language]
+	const description = vocabulary['generated template']
 		.replace(/\$1/g, title.trim())
 
 	const data = await compilePads(0, true)

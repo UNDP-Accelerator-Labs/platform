@@ -13,12 +13,16 @@
 
 window.addEventListener('DOMContentLoaded', async function () {
 	if (!mediaSize) var mediaSize = getMediaSize()
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const { id, type, source } = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const { metafields } = JSON.parse(d3.select('data[name="site"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value
 
-	await renderPad();
-	initToolbarInteractions(pad.metafields, pad.type);
+	if (initExploration) initExploration()
 
-	const main = d3.select('#pad')
+	const main = d3.select(`#${mainobject}`)
+	await renderPad({ object: mainobject, type, id, main });
+	initToolbarInteractions({ metafields, type, main });
+
 	const head = main.select('.head')
 
 	// ADD THE INTERACTION BEHAVIOR FOR THE TITLE INPUT
@@ -46,18 +50,26 @@ window.addEventListener('DOMContentLoaded', async function () {
 	})
 	// SET UP THE ADJACENT DISPLAYS IF RELEVANT
 	// FOR SOURCE
-	if (d3.select('div#source').node()) {
-		// TO DO: CHANGE LOGIC HERE TO USE A data DOM ELEMENT
-		// PROBABLY BEST IN pad
-		const { id, object, review } = d3.select('div#source').node().dataset
+	if (d3.select('#source').node()) {
+		const main = d3.select(`#source`)
+		
+		if (['xs', 'sm'].includes(mediaSize)) { 
+			// xs AND sm DISPLAYS DO NOT SUPPORT ADJACENT VIEWS
+			main.remove();
+			d3.selectAll('.split-screen').classed('split-screen', false)
+		} else {
+			// TO DO: CHANGE LOGIC HERE TO USE A data DOM ELEMENT
+			// PROBABLY BEST IN pad
+			// const { id, object, review } = d3.select('div#source').node().dataset
+			await renderPad({ object: 'source', type: undefined, id: source, main });
+			// loadHTML(`../view/pad?id=${id}${(object === "review" || review === 'true') ? '&anonymize=true' : '' }`, '#pad', '#source')
 
-		loadHTML(`../view/pad?id=${id}${(object === "review" || review === 'true') ? '&anonymize=true' : '' }`, '#pad', '#source')
+			const url = new URL(window.location)
+			if (!queryparams) var queryparams = new URLSearchParams(url.search)
+			queryparams.delete('display')
 
-		const url = new URL(window.location)
-		if (!queryparams) var queryparams = new URLSearchParams(url.search)
-		queryparams.delete('display')
-
-		d3.select('div.display-source a').attr('href', `?${queryparams.toString()}`)
+			d3.select('div.display-source a').attr('href', `?${queryparams.toString()}`)
+		}
 	} else if (d3.select('div.display-option.display-source').node()) {
 		const url = new URL(window.location)
 		if (!queryparams) var queryparams = new URLSearchParams(url.search)
@@ -66,6 +78,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 		d3.select('div.display-source a').attr('href', `?${queryparams.toString()}`)
 	}
 	// OR FOR REVIEW
+	// TO DO: FINISH HERE
 	if (d3.selectAll('div.review').size()) {
 		d3.select('div.review').each(function () {
 			const { id, idx } = this.dataset
@@ -118,6 +131,9 @@ function loadHTML(url, source, target) {
 		}
 	}
 
+	// TO DO: FINISH HERE
+	// renderPad()
+
 	function extractTarget (node, source, target) {
 		const doc = d3.select(node.contentDocument || node.contentWindow.document)
 			.select(source)
@@ -148,7 +164,6 @@ async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /b
 				count: d.count, 
 				disabled: { 
 					value: d.disabled, 
-					// label: vocabulary['missing reviewers'][language] 
 					label: vocabulary['missing reviewers'] 
 				}, 
 				type: 'radio', 
@@ -158,13 +173,11 @@ async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /b
 	})
 
 	const formdata = { action: '/request/review',  method: 'POST' }
-	// const message = vocabulary['select review language'][language]
 	const message = vocabulary['select review language']
 	const opts = []
 	opts.push({ 
 		node: 'select', 
 		name: 'language', 
-		// label: vocabulary['select language'][language]['singular'], 
 		label: vocabulary['select language']['singular'], 
 		options: target_opts 
 	})
@@ -179,7 +192,6 @@ async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /b
 		type: 'submit', 
 		name: name, 
 		value: value, 
-		// label: vocabulary['submit for review'][language] 
 		label: vocabulary['submit for review'] 
 	})
 	const new_constraint = await renderFormModal({ message, formdata, opts })

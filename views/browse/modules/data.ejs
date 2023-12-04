@@ -26,10 +26,16 @@
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <data name='space' value='<%= space %>'></data>
-<data name='modules' value='<%= JSON.stringify(modules) %>'></data>
 <% if (modules.some(d => d.type === 'pinboards')) { %>
 	<data name='pinboards' value='<%= JSON.stringify(locals.pinboards_list || []) %>'></data>
 <% } %>
+<% 
+	const sitedata = {
+		modules: modules || {},
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
 <% 
 	const pagedata = {
 		type: publicpage ? 'public' : 'private',
@@ -37,7 +43,8 @@
 		pages: locals.metadata.page.count,
 		id: locals.metadata.page.id,
 		load: locals.metadata.page.lazyload ? 'lazy' : 'pages',
-		mapscale
+		mapscale,
+		language
 	}
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>

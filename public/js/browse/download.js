@@ -58,12 +58,12 @@ async function setDownloadOptions () {
 		const years = (data.map(d => d.data).flat()).unique()
 
 		formdata = { action: '/apis/download/pads',  method: 'POST' }
-		message = vocabulary['select download options'][language]
+		message = vocabulary['select download options']
 
 		opts.push({ 
 			node: 'select', 
 			name: 'output', 
-			label: vocabulary['select format'][language], 
+			label: vocabulary['select format'], 
 			options: target_opts, 
 			classname: 'csv xlsx json geojson docx pdf', 
 			fn: resetFeatures 
@@ -73,7 +73,7 @@ async function setDownloadOptions () {
 			type: 'checkbox', 
 			name: 'use_templates', 
 			value: true, 
-			placeholder: vocabulary['use templates'][language], 
+			placeholder: vocabulary['use templates'], 
 			checked: true, 
 			default: true, 
 			classname: 'hide csv xlsx json geojson' 
@@ -83,7 +83,7 @@ async function setDownloadOptions () {
 			type: 'checkbox', 
 			name: 'include_data', 
 			value: true, 
-			placeholder: vocabulary['include data'][language], 
+			placeholder: vocabulary['include data'], 
 			checked: true, 
 			default: true, 
 			classname: 'hide csv xlsx json geojson docx' 
@@ -115,7 +115,7 @@ async function setDownloadOptions () {
 			type: 'checkbox', 
 			name: 'include_imgs', 
 			value: true, 
-			placeholder: vocabulary['include media'][language], 
+			placeholder: vocabulary['include media'], 
 			default: true, 
 			classname: 'hide csv xlsx json geojson' 
 		})
@@ -126,7 +126,7 @@ async function setDownloadOptions () {
 				type: 'checkbox', 
 				name: 'include_tags', 
 				value: true, 
-				placeholder: vocabulary['include tags'][language], 
+				placeholder: vocabulary['include tags'], 
 				default: true, 
 				classname: 'hide csv xlsx json geojson' 
 			})
@@ -137,7 +137,7 @@ async function setDownloadOptions () {
 				type: 'checkbox', 
 				name: 'include_locations', 
 				value: true, 
-				placeholder: vocabulary['include locations'][language], 
+				placeholder: vocabulary['include locations'], 
 				default: true, 
 				classname: 'hide csv xlsx json geojson' 
 			})
@@ -148,7 +148,7 @@ async function setDownloadOptions () {
 				type: 'checkbox', 
 				name: 'include_metafields', 
 				value: true, 
-				placeholder: vocabulary['include metafields'][language], 
+				placeholder: vocabulary['include metafields'], 
 				default: true, 
 				classname: 'hide csv xlsx json geojson' 
 			})
@@ -158,7 +158,7 @@ async function setDownloadOptions () {
 			type: 'checkbox', 
 			name: 'include_engagement', 
 			value: true, 
-			placeholder: vocabulary['include engagement'][language], 
+			placeholder: vocabulary['include engagement'], 
 			default: true, 
 			classname: 'hide csv xlsx json geojson'
 		})
@@ -167,7 +167,7 @@ async function setDownloadOptions () {
 			type: 'checkbox', 
 			name: 'include_comments', 
 			value: true, 
-			placeholder: vocabulary['include comments'][language], 
+			placeholder: vocabulary['include comments'], 
 			default: true, 
 			classname: 'hide csv xlsx json geojson' 
 		})
@@ -215,12 +215,12 @@ async function setDownloadOptions () {
 				type: 'radio'
 			},
 			{
-				label: vocabulary['country'][language],
+				label: vocabulary['country'],
 				value: 'country',
 				type: 'radio'
 			},
 			{
-				label: vocabulary['contributor'][language]['singular'],
+				label: vocabulary['contributor']['singular'],
 				value: 'ownername',
 				type: 'radio'
 			},
@@ -232,7 +232,7 @@ async function setDownloadOptions () {
 		]
 		if (modules.some(d => d.type === 'templates')) {
 			chapter_opts.push({
-				label: vocabulary['template'][language]['singular'],
+				label: vocabulary['template']['singular'],
 				value: 'template',
 				type: 'radio'
 			})
@@ -266,7 +266,7 @@ async function setDownloadOptions () {
 			name: 'render', 
 			value: true, 
 			disabled:true, 
-			label: vocabulary['download'][language], 
+			label: vocabulary['download'], 
 			classname: 'submit hide csv xlsx json geojson docx' 
 		})
 		// DOWNLOAD FOR PDF
@@ -277,7 +277,7 @@ async function setDownloadOptions () {
 			name: 'render', 
 			value: true, 
 			disabled: true, 
-			label: vocabulary['download'][language], 
+			label: vocabulary['download'], 
 			classname: 'submit pdf', 
 			fn: downloadPDF 
 		})
@@ -329,12 +329,12 @@ async function setDownloadOptions () {
 	} else if (object === 'contributors') {
 		
 		formdata = { action: '/apis/download/contributors',  method: 'POST' }
-		message = vocabulary['select download options'][language]
+		message = vocabulary['select download options']
 
 		opts.push({ 
 			node: 'select', 
 			name: 'output', 
-			label: vocabulary['select format'][language], 
+			label: vocabulary['select format'], 
 			options: target_opts 
 		})
 		opts.push({ 
@@ -342,7 +342,7 @@ async function setDownloadOptions () {
 			type: 'checkbox', 
 			name: 'include_data', 
 			value: true, 
-			placeholder: vocabulary['include data'][language], 
+			placeholder: vocabulary['include data'], 
 			checked: true, 
 			default: true 
 		})
@@ -396,7 +396,7 @@ async function setDownloadOptions () {
 			type: 'submit', 
 			name: 'render', 
 			value: true, 
-			label: vocabulary['download'][language]
+			label: vocabulary['download']
 		})
 	}
 

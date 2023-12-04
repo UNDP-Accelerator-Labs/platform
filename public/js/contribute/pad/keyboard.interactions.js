@@ -3,11 +3,12 @@ window.addEventListener('keydown', async function (e) {
 	e = e || event
 	keyTrack.push(e.keyCode)
 	
+	const mainobject = d3.select('data[name="object"]').node()?.value
 	const { display, activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	const editing = activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
 	
-	const main = d3.select('#pad')
+	const main = d3.select(`#${mainobject}`)
 	const head = main.select('.head')
 	const footer = d3.select('footer')
 
@@ -55,11 +56,13 @@ window.addEventListener('keydown', async function (e) {
 })
 window.addEventListener('keyup', function (e) {
 	e = e || event
+	const mainobject = d3.select('data[name="object"]').node()?.value
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+
+	const editing = page.activity === 'edit'
 	
-	const main = d3.select('#pad')
+	const main = d3.select(`#${mainobject}`)
 	const head = main.select('.head')
 	const footer = d3.select('footer')
 
@@ -127,9 +130,12 @@ window.addEventListener('keyup', function (e) {
 })
 window.addEventListener('mouseup', async function (e) {
 	e = e || event
-	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
-	const main = d3.select('#pad')
+	const mainobject = d3.select('data[name="object"]').node()?.value
+	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	
+	const editing = activity === 'edit'
+	
+	const main = d3.select(`#${mainobject}`)
 
 	if (editing) {
 		const focused_node = d3.select('.focus')

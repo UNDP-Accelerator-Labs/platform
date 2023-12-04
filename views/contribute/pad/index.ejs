@@ -49,7 +49,8 @@
 	const pagedata = {
 		type: publicpage ? 'public' : 'private',
 		display: pagedisplay,
-		activity: editing ? 'edit' : 'view'
+		activity: editing ? 'edit' : 'view',
+		language
 	}
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
@@ -59,13 +60,20 @@
 		type: templated ? 'templated' : 'blank',
 		template: templated ? locals.display_template : {},
 		source: locals.source ?? null,
-		metafields: metafields || {},
-		media_value_keys: locals.metadata.site.media_value_keys || [],
 		is_review: locals.data?.is_review || false,
 		title: locals.data?.title ?? null
 	}
 %>
 <data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
+<%
+	const sitedata = {
+		modules: modules || {},
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || [],
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
 <data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
 <% if (locals.metadata.site.app_storage) { %>
 	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
@@ -99,7 +107,16 @@
 				</a>
 			</div>
 		<% } %>
-		<div id='source' data-id='<%= locals.source %>' data-object='<%= object %>' data-review='locals.data?.is_review || false' class='document split-screen m lg xl xxl'></div>
+		<div class='document source-container split-screen m lg xl xxl'>
+			<main id='source' class='pad'>
+				<div class='inner'>
+					<div class='head'>
+						<div class='title'></div>
+					</div>
+					<div class='body'></div>
+				</div>
+			</main>
+		</div>
 	<% } else { %>
 		<div class='display-option display-source m lg xl xxl <% if (locals.data?.reviews?.length > 0) { %>split-screen<% } %>'>
 			<a>
@@ -136,7 +153,7 @@
 
 <!-- PB HERE WITH THE else if FOR SLIDESHOW OF A PAD THAT HAS A SOURCE BUT IS NOT DISPLAYED ADJACENT -->
 <div class='document<% if ((locals.source || locals.data?.reviews?.length > 0) && !["adjacent-source", "adjacent-reviews", "slideshow"].includes(pagedisplay)) { %> offset<% } else if (locals.source && pagedisplay === "adjacent-source") { %> split-screen right<% } else if (locals.data?.reviews?.length > 0 && pagedisplay === "adjacent-reviews") { %> split-screen left<% } else if (pagedisplay === "slideshow") { %> slideshow<% } %>'>
-	<main id='pad' class='pad'>
+	<main id='<%= object %>' class='pad'>
 		<div class='inner'>
 			<% if (editing) { %>
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
@@ -278,9 +295,9 @@
 							<a href='<%- `/${language}/browse/pads/private` %>' class='return google-translate-attr' data-vocab='back to browse'></a>
 						<% } %>
 						<% if (editing) { %>
-							<div class='title google-translate-attr' data-placeholder='untitled pad' contenteditable></div>
+							<div class='title' data-placeholder='untitled pad' contenteditable></div>
 						<% } else { %>
-							<div class='title google-translate-attr' data-placeholder='untitled pad'></div>
+							<div class='title' data-placeholder='untitled pad'></div>
 						<% } %>
 						<!-- TO DO: FIX THIS: FOR SOME REASON NOTHING WORKS HERE WHEN IN REVIEW MODE -->
 						<% if (!anonymized) { %>
@@ -291,14 +308,14 @@
 									</div>
 									<div class='meta meta-country'><%- locals.data?.country %></div>
 									<div class='meta meta-date google-translate-attr'>
-										<%= new Date(locals.data?.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+										<%= new Date(locals.data?.date.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 									</div>
 								<% } else { %>
 									<div class='contributor'>
 										<span data-vocab='credit'></span> <a href='/<%= language %>/browse/pads/public?countries=<%= locals.data?.iso3 %>'><%= locals.data?.country %></a>.
 									</div>
 									<div class='meta meta-date google-translate-attr'>
-										<%= new Date(locals.data?.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+										<%= new Date(locals.data?.date.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 									</div>
 								<% } %>
 							<% } %>
@@ -495,7 +512,7 @@
 	
 <% if (locals.metadata?.user?.uuid) { %>
 	<script type='text/javascript' src='/js/exploration.js' defer></script>
-	<script type='text/javascript' src='/js/contribute/pad/explorations.js' defer></script>
+	<script type='text/javascript' src='/js/contribute/pad/exploration.js' defer></script>
 <% } %>
 
 </body>

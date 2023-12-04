@@ -16,23 +16,23 @@ async function catchSubmit (evt) {
 	})
 	
 	target_opts.unshift({ 
-		label: vocabulary['space'][language]['pads']['private'], 
+		label: vocabulary['space']['pads']['private'], 
 		value: -1, 
 		type: 'radio' 
 	})
 
-	const message = vocabulary['import to workspace or mobilization'][language]
+	const message = vocabulary['import to workspace or mobilization']
 	const opts = [
 		{ 
 			node: 'select', 
 			name: 'mobilization', 
-			label: vocabulary['select destination'][language],
+			label: vocabulary['select destination'],
 			options: target_opts 
 		},
 		{ 
 			node: 'button', 
 			type: 'button', 
-			label: vocabulary['import'][language],
+			label: vocabulary['import'],
 			resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value 
 		}
 	]
@@ -74,7 +74,7 @@ async function catchSubmit (evt) {
 			const notification = d3.select('body')
 				.addElem('div', 'notification')
 				.addElem('div')
-				.html(vocabulary['image upload success'][language])
+				.html(vocabulary['image upload success'])
 			setTimeout(_ => notification.remove(), 4000)
 			return results
 		}).catch(err => { if (err) throw (err) })

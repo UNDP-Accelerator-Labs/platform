@@ -50,7 +50,7 @@ window.addEventListener('DOMContentLoaded', async _ => {
 					opts.push({
 						node: 'div',
 						class: 'divider',
-						label: vocabulary['or'][language]
+						label: vocabulary['or']
 					})
 					if (templates[key]?.length) {
 						template_opts[key] = templates[key].map(d => {
@@ -68,7 +68,7 @@ window.addEventListener('DOMContentLoaded', async _ => {
 
 						if (rights[key] === 'write') {
 							template_opts[key].unshift({
-								label: vocabulary['blank pad'][language],
+								label: vocabulary['blank pad'],
 								value: 'blank',
 								type: 'radio'
 							});
@@ -142,7 +142,7 @@ window.addEventListener('DOMContentLoaded', async _ => {
 				opts.push({
 					node: 'div',
 					class: 'divider',
-					label: vocabulary['or'][language]
+					label: vocabulary['or']
 				})
 			}
 		}

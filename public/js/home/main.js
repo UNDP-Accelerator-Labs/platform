@@ -21,7 +21,7 @@ async function selectCountry () {
 		{ 
 			node: 'button', 
 			type: 'button', 
-			label: vocabulary['import'][language], 
+			label: vocabulary['import'], 
 			resolve: _ => d3.select('.modal .filter .dropdown input[type=radio]:checked').node().value 
 		}
 	]

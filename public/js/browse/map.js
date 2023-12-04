@@ -88,7 +88,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 							vocabulary,
 							object,
 							space,
-							modules: JSON.parse(d3.select('data[name="modules"]').node()?.value),
+							modules: JSON.parse(d3.select('data[name="site"]').node()?.value).modules,
 							pinboards: JSON.parse(d3.select('data[name="pinboards"]').node()?.value || '[]'),
 							engagementtypes: JSON.parse(d3.select('data[name="engagementtypes"]').node()?.value),
 							rights: JSON.parse(d3.select('data[name="rights"]').node()?.value),

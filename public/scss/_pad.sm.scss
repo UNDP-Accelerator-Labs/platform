@@ -2105,9 +2105,7 @@ footer {
 	}
 }
 
-div#source {
-	position: fixed;
-	height: 100vh;
+div.source-container {
 	background: repeating-linear-gradient(
 		-45deg,
 		transparent,
@@ -2115,6 +2113,11 @@ div#source {
 		rgba(150, 150, 150, .1) 3px,
 		rgba(150, 150, 150, .1) 6px
 	);
+
+	margin-top: 30px;
+	/*
+	position: fixed;
+	height: 100vh;
 	overflow: auto;
 	vertical-align: top;
 	filter: grayscale(1);
@@ -2132,6 +2135,7 @@ div#source {
 			}
 		}
 	}
+	*/
 }
 .document.split-screen {
 	width: calc(50% - 120px);

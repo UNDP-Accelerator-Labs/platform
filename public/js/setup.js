@@ -1,6 +1,13 @@
 const debugging = false
 if (!mediaSize) var mediaSize = getMediaSize()
 window.addEventListener('DOMContentLoaded', async function () {
+	this.vocabulary = {} // THIS IS A GLOBAL VARIABLE
+	this.language = 'en'; // THIS IS A GLOBAL VARIABLE
+	language = d3.select('data[name="page"]').node().value.language || await getLanguage()
+	Object.keys(fullVocabulary).forEach(d => {
+		this.vocabulary[d] = fullVocabulary[d][language]
+	});
+
 	d3.selectAll('[data-vocab]')
 	.html(function () {
 		return printTranslation(this);
@@ -171,7 +178,7 @@ async function toggleOptions (node) {
 	const { object } = node.dataset || {}
 	
 	for (const label of node.labels) {
-		d3.select(label).attr('data-content', node.checked ? vocabulary['yes'][language] : vocabulary['no'][language])
+		d3.select(label).attr('data-content', node.checked ? vocabulary['yes'] : vocabulary['no'])
 	}
 
 	if (object === 'pinboard') {

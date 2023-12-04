@@ -21,7 +21,7 @@ function renderModal (data, close = true) {
 				d3.selectAll('.temp-active').classed('temp-active', false)
 				screen.classed('hide', true)
 			}
-		}).html(vocabulary['close'][language])
+		}).html(vocabulary['close'])
 	}
 
 	// modal.addElems('button', 'close')
@@ -29,7 +29,7 @@ function renderModal (data, close = true) {
 	// 	modal.remove()
 	// 	d3.selectAll('.temp-active').classed('temp-active', false)
 	// 	screen.classed('hide', true)
-	// }).html(vocabulary['close'][language])
+	// }).html(vocabulary['close'])
 
 	const inner = modal.addElems('div', 'inner')
 	inner.addElems('h1', 'headline', data.headline ? [data.headline] : [])
@@ -62,7 +62,7 @@ function renderPromiseModal (data, close = true) {
 					screen.classed('hide', true)
 					resolve(null)
 				}
-			}).html(vocabulary['close'][language])
+			}).html(vocabulary['close'])
 		}
 
 		const inner = modal.addElems('div', 'inner')
@@ -103,14 +103,14 @@ function renderFormModal (data, close = true) {
 				modal.remove()
 				screen.classed('hide', true)
 			}
-		}).html(vocabulary['close'][language])
+		}).html(vocabulary['close'])
 	}
 
 	// modal.addElems('button', 'close')
 	// .on('click', function () {
 	// 	modal.remove()
 	// 	screen.classed('hide', true)
-	// }).html(vocabulary['close'][language])
+	// }).html(vocabulary['close'])
 
 	const inner = modal.addElems('div', 'inner')
 	inner.addElems('h1', 'headline', headline ? [headline] : [])
@@ -169,14 +169,14 @@ function renderLonglistFormModal (data, close = true) {
 				modal.remove()
 				screen.classed('hide', true)
 			}
-		}).html(vocabulary['close'][language])
+		}).html(vocabulary['close'])
 	}
 
 	// modal.addElems('button', 'close')
 	// .on('click', function () {
 	// 	modal.remove()
 	// 	screen.classed('hide', true)
-	// }).html(vocabulary['close'][language])
+	// }).html(vocabulary['close'])
 
 	const inner = modal.addElems('div', 'inner')
 	inner.addElems('h1', 'headline', headline ? [headline] : [])
@@ -206,7 +206,7 @@ function renderLonglistFormModal (data, close = true) {
 		.on('keyup', function () { filterDropdown(this) })
 	filter.addElems('label')
 		.attr('for', 'filter-longlist-modal')
-		.html(vocabulary['filter'][language]['verb'])
+		.html(vocabulary['filter']['verb'])
 
 	ul.addElems('li', 'padding')
 
@@ -438,7 +438,7 @@ function addInputNode (_sel, _data) {
 					modal.remove()
 					screen.classed('hide', true)
 				}
-			}).html(vocabulary['save'][language])
+			}).html(vocabulary['save'])
 		}
 	}
 }
@@ -458,7 +458,7 @@ function renderImgZoom (data) {
 		modal.remove()
 		screen.classed('hide', true)
 			.classed('dark', false)
-	}).html(vocabulary['close'][language])
+	}).html(vocabulary['close'])
 
 	const inner = modal.addElems('div', 'inner unpadded')
 	inner.addElems('img', 'zoom', src ? [src] : [])

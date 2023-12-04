@@ -201,20 +201,17 @@ async function partialSave (attr) {
 		if (mediaSize === 'xs') {
 			const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 			save_btn.select('button')
-				// .html(vocabulary['changes saved'][language])
-				.html(vocabulary['changes saved'][language])
+				.html(vocabulary['changes saved'])
 			window.setTimeout(_ => {
 				save_btn.classed('saved', false)
 				.select('button').each(function () { this.disabled = true })
-					// .html(vocabulary['save'][language])
-					.html(vocabulary['save'][language])
+					.html(vocabulary['save'])
 			}, 1000)
 		} else {
 			const menu_logo = d3.select('nav#site-title .inner')
 			menu_logo.select('.save').classed('saved', true)
 				.select('button')
-				// .html(vocabulary['changes saved'][language])
-				.html(vocabulary['changes saved'][language])
+				.html(vocabulary['changes saved'])
 			window.setTimeout(_ => {
 				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
 				menu_logo.selectAll('div.save').classed('hide', true)

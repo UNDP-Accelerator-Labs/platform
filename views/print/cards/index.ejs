@@ -182,7 +182,7 @@
 				const taggroup = article.addElems('div', 'meta tag-group')
 				const sdgtags = taggroup.addElems('div', 'meta meta-sdgs', d => sdgs?.length ? [sdgs] : [])
 				sdgtags.addElems('span', 'sdg-label')
-					.html(d => vocabulary['sdg'][language][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
+					.html(d => vocabulary['sdg'][(d?.length || 0) !== 1 ? 'plural' : 'singular'])
 				sdgtags.addElems('span', 'sdg', d => d)
 					.html(d => d.key || d)
 				taggroup.addElems('div', 'meta meta-tags', d => tags?.length ? [tags] : [])

@@ -184,7 +184,6 @@ function toggleChecked (node) {
 	const count = parent.selectAll('li.checked').size()
 	parent.select('.contributor-count')
 		.html(_ => {
-			// return vocabulary['invited contributors'][language](count)
 			return `${count} ${vocabulary['invited contributors'][count !== 1 ? 'plural' : 'singular']}`
 		})
 	// IF THERE IS A FILTER MENU, CLEAR SEARCH TERM
@@ -197,7 +196,6 @@ function toggleChecked (node) {
 function selectAllOpts (node) {
 	const parent = d3.select(node).findAncestor('modal')
 	parent.select('.global-opt').toggleClass('active')
-		// .select('button').html(_ => parent.select('.global-opt').classed('active') ? vocabulary['deselect all'][language] : vocabulary['select all'][language])
 		.select('button').html(_ => {
 			return parent.select('.global-opt').classed('active') ? vocabulary['deselect all'] : vocabulary['select all']
 		})

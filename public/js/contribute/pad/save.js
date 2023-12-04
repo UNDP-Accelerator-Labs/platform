@@ -50,19 +50,21 @@ function retrieveItems (sel, datum, items) {
 	}
 }
 function getStatus () {
+	const mainobject = d3.select('data[name="object"]').node()?.value
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value) 
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const { metafields } = JSON.parse(d3.select('data[name="site"]').node()?.value)
 
-	const main = d3.select('#pad')
+	const main = d3.select(`#${mainobject}`)
+	const head = main.select('.head')
 	const body = main.select('.body')
 	
 	const completion = []
 
-	// const title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title'][language]
-	const title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
+	const title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
 	completion.push(title?.trim()?.length > 0)
 
-	let metacompletion = JSON.parse(JSON.stringify(pad.metafields)).filter(d => d.required).map(d => d.label)
+	let metacompletion = JSON.parse(JSON.stringify(metafields)).filter(d => d.required).map(d => d.label)
 
 	function checkCompletion (d) {
 		// <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
@@ -79,8 +81,7 @@ function getStatus () {
 		}
 	}
 
-	d3.select('#pad')
-	.selectAll('.layout:not(.description-layout)')
+	main.selectAll('.layout:not(.description-layout)')
 	.each(function (d) {
 		const items = []
 		const sel = d3.select(this)
@@ -129,21 +130,22 @@ function getStatus () {
 	// else return completion.every(d => d === true)
 }
 function compileContent (attr) {
+	const mainobject = d3.select('data[name="object"]').node()?.value
+	const { media_value_keys, metafields } = JSON.parse(d3.select('data[name="site"]').node()?.value)
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
-	const main = d3.select('#pad')
+	
+	const main = d3.select(`#${mainobject}`)
+	const head = main.select('.head')
 	const body = main.select('.body')
 
 	const content = {}
 	// COLLECT TITLE
-	// let title = d3.select('#pad .head .title').node().innerText
-	// let title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title'][language]
-	let title = d3.select('#pad .head .title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
+	let title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
 	if (title) title = limitLength(title, 99);
 	// MAYBE INCLUDE ALERT IF title IS EMPTY
 	// COLLECT ALL MEDIA
 	const sections = []
-	d3.select('#pad')
-	.selectAll('.layout:not(.description-layout)')
+	main.selectAll('.layout:not(.description-layout)')
 	.each(function (d) {
 		const items = []
 		const sel = d3.select(this)
@@ -196,7 +198,7 @@ function compileContent (attr) {
 	// }
 
 	const allTags = []
-	pad.metafields.filter(d => ['tag', 'index'].includes(d.type)).forEach(d => {
+	metafields.filter(d => ['tag', 'index'].includes(d.type)).forEach(d => {
 		main.selectAll(`.${d.label}-container .tag input:checked`)
 		.each(c => {
 			// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY tags WERE ONLY THE names, NOT THE { id: INT, name: STR } OBJECT
@@ -210,7 +212,7 @@ function compileContent (attr) {
 	} else content.locations = null
 
 	const otherMetadata = []
-	pad.metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
+	metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
 	.forEach(d => {
 		main.selectAll(`.${d.label}-container`)
 		.each(c => {
@@ -221,7 +223,7 @@ function compileContent (attr) {
 		const { id, level, has_content, instruction, required, ...metadata } = d
 		const { type, name } = metadata
 		// const valuekey = Object.keys(metadata).find(c => <%- JSON.stringify(locals.metadata.site.media_value_keys) %>.includes(c))
-		const valuekey = Object.keys(metadata).find(c => pad.media_value_keys.includes(c)) // TO DO: MAKE SURE THIS WORKS
+		const valuekey = Object.keys(metadata).find(c => media_value_keys.includes(c)) // TO DO: MAKE SURE THIS WORKS
 		const value = metadata[valuekey]
 
 		if (Array.isArray(value)) {
@@ -321,19 +323,16 @@ async function partialSave (attr) {
 		if (['xs', 'sm'].includes(mediaSize)) {
 			const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
 			save_btn.select('button')
-				// .html(vocabulary['changes saved'][language])
 				.html(vocabulary['changes saved'])
 			window.setTimeout(_ => {
 				save_btn.classed('saved', false)
 				.select('button').each(function () { this.disabled = true })
-					// .html(vocabulary['save'][language])
 					.html(vocabulary['save'])
 			}, 1000)
 		} else {
 			const menu_logo = d3.select('nav#site-title .inner')
 			menu_logo.select('.save').classed('saved', true)
 				.select('button')
-				// .html(vocabulary['changes saved'][language])
 				.html(vocabulary['changes saved'])
 			window.setTimeout(_ => {
 				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)

@@ -3321,12 +3321,3 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 		"pt": ""
 	}
 }
-
-const vocabulary = {}
-let language = 'en';
-(async () => {
-	language = await getLanguage()
-	Object.keys(fullVocabulary).forEach(d => {
-		vocabulary[d] = fullVocabulary[d][language]
-	});
-})()

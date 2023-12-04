@@ -2185,9 +2185,8 @@ footer {
 		}
 	}
 }
-div#source,
-div#reviews {
-	height: 100vh;
+div.source-container,
+main#reviews {
 	background: repeating-linear-gradient(
 		-45deg,
 		transparent,
@@ -2195,6 +2194,10 @@ div#reviews {
 		rgba(150, 150, 150, .1) 3px,
 		rgba(150, 150, 150, .1) 6px
 	);
+
+	margin-top: 30px;
+	/*
+	height: 100vh;
 	overflow: auto;
 	vertical-align: top;
 	filter: grayscale(1);
@@ -2231,6 +2234,7 @@ div#reviews {
 			border-bottom: 1px solid $c-light-grey;
 		}
 	}
+	*/
 }
 .document.split-screen {
 	width: 100%;
@@ -2301,7 +2305,6 @@ div.display-option {
 div.display-option.split-screen {
 	pointer-events: none;
 	a {
-		border-left: 1px solid #FFF;
 		pointer-events: all;
 		button {
 			width: 50%;

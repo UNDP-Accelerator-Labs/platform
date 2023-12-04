@@ -19,10 +19,13 @@ const observer = new MutationObserver(evt => {
 			&& evt.find(d => d.oldValue.includes('focus')) !== evt.find(d => d.target.className.includes('focus'))
 		) {
 			const changedContent = window.sessionStorage.getItem('changed-content')
+
 			if (changedContent) {
 				// SAVE
 				let item = evt.find(d => d.oldValue.includes('focus'))
 				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
+
+				console.log('here')
 
 				if (page.activity === 'edit') {
 					if (page.type === 'private') await partialSave('media')
@@ -35,19 +38,24 @@ const observer = new MutationObserver(evt => {
 // MEDIA PROTOTYPE
 const Media = function (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	let { parent, container, sibling, type, datum, focus, lang } = kwargs || {}
+	let { parent, container, sibling, type, datum, focus, lang, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
+
 	let { id, level, name } = datum
 	if (!id) id = datum.id = uuidv4()
 	if (!level) level = 'media'
 	parent = d3.select(parent).classed('focus', focus)
+	
+	const media = this
 
+	this.object = object
 	this.type = type
 	this.name = name
 	this.lang = lang
 	this.constraint = datum.constraint
+	this.editing = (page.activity === 'edit' && object === mainobject);
 
 	this.id = id
 	this.container = (container || parent.insertElem(function () {
@@ -62,23 +70,23 @@ const Media = function (kwargs) {
 		.style('text-align', d => d.textalign)
 	.on('click.focus', function () {
 		const sel = d3.select(this)
-		sel.classed('focus', editing)
+		sel.classed('focus', media.editing)
 	})
 
-	if (editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-	if ((pad.type === 'templated' || level === 'meta') && datum.instruction) {
+	if (this.editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
+	if ((objecttype === 'templated' || level === 'meta') && datum.instruction) {
 		this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
 			.attr('data-placeholder', d => d.instruction) // TO DO: IF TRANSLATION IS AVAILABLE TRANSLATE
 			.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
 			.html(d => d)
 	}
-	if (editing || page.activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
+	if (this.editing || page.activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
 	this.media = this.container.addElems('div', level, d => [d], d => d.type)
 		.classed(`${level}-${type}`, true)
 	.each(function (d) {
 		if (name) d3.select(this).classed(`${level}-${name}`, true)
 	})
-	if ((editing && pad.type === 'blank') || page.activity === 'preview') {
+	if ((this.editing && objecttype === 'blank') || page.activity === 'preview') {
 		this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
 		// .classed('hide', instruction && page.activity !== 'preview')
 		this.placement.addElems('div', 'opt', [
@@ -90,7 +98,7 @@ const Media = function (kwargs) {
 			d3.event.stopPropagation()
 			d.fn()
 
-			if (editing) {
+			if (media.editing) {
 				if (page.type === 'private') switchButtons(lang)
 				else window.sessionStorage.setItem('changed-content', true)
 			}
@@ -99,7 +107,7 @@ const Media = function (kwargs) {
 			.html(d => d.label)
 	}
 	// ADD REQUIREMENT
-	if (editing) {
+	if (this.editing) {
 		// NOTE REQUIREMENTS CAN ONLY COME FROM A TEMPLATE
 		const requirement_id = uuidv4()
 
@@ -114,7 +122,7 @@ const Media = function (kwargs) {
 					d.required = this.checked
 					d3.select(this.parentNode).select('label').classed('active', d.required)
 
-					if (editing) {
+					if (this.editing) {
 						if (page.type === 'private') await partialSave(d.level)
 						else updateStatus()
 					}
@@ -128,11 +136,11 @@ const Media = function (kwargs) {
 			.html('*')
 	}
 
-	if (editing) observer.observe(this.container.node(), obsvars)
+	if (this.editing) observer.observe(this.container.node(), obsvars)
 }
 Media.prototype.rmMedia = async function () {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
 	const datum = this.container.datum()
 	const { level, type, name } = datum
@@ -156,14 +164,13 @@ Media.prototype.rmMedia = async function () {
 		const input = d3.select(`#input-meta-${name}`).node()
 		if (input) input.disabled = false
 	}
-	if (editing) {
+	if (this.editing) {
 		if (page.type === 'private') await partialSave(level)
 		else await updateStatus()
 	}
 }
 Media.prototype.move = function (dir) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 
 	let sourceTop = this.container.node().offsetTop
 	let sourceHeight = this.container.node().offsetHeight
@@ -200,7 +207,7 @@ Media.prototype.move = function (dir) {
 						d3.select(target).classed('move', false).style('transform', null)
 						this.container.node().parentNode.insertBefore(this.container.node(), target)
 
-						if (editing) {
+						if (this.editing) {
 							if (page.type === 'private') await partialSave(level)
 							else await updateStatus()
 						}
@@ -234,7 +241,7 @@ Media.prototype.move = function (dir) {
 						this.container.node().parentNode.insertBefore(target, this.container.node())
 						if (openInset.node()) openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`
 
-						if (editing) {
+						if (this.editing) {
 							if (page.type === 'private') await partialSave(level)
 							else await updateStatus()
 						}
@@ -249,20 +256,20 @@ Media.prototype.move = function (dir) {
 }
 // META PROTOTYPE
 const Meta = function (kwargs) {
-	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 
 	const { type, maxheight, focus } = kwargs
 	// Meta IS AN INSTANCE OF Media WITH AN INSET
 	Media.call(this, kwargs)
 	
-	this.metafields = JSON.parse(d3.select('data[name="pad"]').node()?.value)?.metafields || {}
+	this.metafields = JSON.parse(d3.select('data[name="site"]').node()?.value)?.metafields || {}
 
 	// TWEAK THE Media INSTANCES
 	this.container.classed('media-container', false).classed('meta-container', true)
 		.each(d => d.level = 'meta')
 		.on('click.expand', _ => this.expand({ forceopen: true }))
 	this.media.classed(`media media-${type}`, false).classed(`meta meta-${type}`, true)
-	if (editing) this.inset = this.container.addElems('div', `inset ${type}-inset-container`)
+	if (this.editing) this.inset = this.container.addElems('div', `inset ${type}-inset-container`)
 	// OPEN THE INSET
 	if (focus) this.expand({ timeout: 250, maxheight: maxheight })
 }
@@ -272,18 +279,21 @@ Meta.prototype.expand = function (kwargs) {
 	let { timeout, maxheight, forceopen } = kwargs
 	if (!timeout) timeout = 0
 
-	window.setTimeout(_ => {
-		if (this.inset.node().style.maxHeight && !forceopen) this.inset.node().style.maxHeight = null
-		else {
-			this.inset.node().style.maxHeight = `${maxheight ? Math.min(this.inset.node().scrollHeight, maxheight) : this.inset.node().scrollHeight}px`
-			const input = this.inset.select('input[type=text]').node()
-			// if (input) input.focus()
-		}
-	}, timeout)
+	if (!this.inset?.node()) { 
+		return false; 
+	} else {
+		window.setTimeout(_ => {
+			if (this.inset.node().style.maxHeight && !forceopen) this.inset.node().style.maxHeight = null
+			else {
+				this.inset.node().style.maxHeight = `${maxheight ? Math.min(this.inset.node().scrollHeight, maxheight) : this.inset.node().scrollHeight}px`
+				const input = this.inset.select('input[type=text]').node()
+				// if (input) input.focus()
+			}
+		}, timeout)
+	}
 }
 const Taglist = function (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 
 	const { type, list, imglink, altimglink, datum, lang } = kwargs || {}
 	const { tags, constraint } = datum || {}
@@ -293,7 +303,6 @@ const Taglist = function (kwargs) {
 
 	const opencode = meta.metafields.find(d => d.label === name)?.opencode || false
 
-	// const initialvalues = meta.media.attr('data-placeholder', vocabulary['missing tag'][language])
 	const initialvalues = meta.media.attr('data-placeholder', vocabulary['missing tag'])
 	if (imglink) {
 		initialvalues
@@ -377,7 +386,7 @@ const Taglist = function (kwargs) {
 						return d.value - checked.length
 					})
 				}
-				if (editing) {
+				if (meta.editing) {
 					if (page.type === 'private') switchButtons(lang)
 					else window.sessionStorage.setItem('changed-content', true)
 				}
@@ -440,8 +449,6 @@ const Taglist = function (kwargs) {
 		meta.filter.addElem('label')
 			.attr('for', `filter-${meta.id}`)
 			.html(_ => {
-				// if (opencode) return vocabulary['search or add'][language]
-				// else return vocabulary['search'][language]['object']
 				if (opencode) return vocabulary['search or add']
 				else return vocabulary['search']['object']
 			})
@@ -458,7 +465,6 @@ Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE A
 Taglist.prototype.constructor = Taglist
 Taglist.prototype.recode = async function (opencode = true) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 
 	const meta = this
 	const filter = meta.filter.select(`input#filter-${meta.id}`)
@@ -537,7 +543,7 @@ Taglist.prototype.recode = async function (opencode = true) {
 						})
 					}
 
-					if (editing) {
+					if (meta.editing) {
 						if (page.type === 'private') {
 							switchButtons(meta.lang)
 							await partialSave('media')
@@ -580,7 +586,7 @@ Taglist.prototype.recode = async function (opencode = true) {
 			return d.value - checked.length
 		})
 	}
-	if (editing) {
+	if (meta.editing) {
 		if (page.type === 'private') switchButtons(meta.lang)
 		else window.sessionStorage.setItem('changed-content', true)
 	}
@@ -595,33 +601,36 @@ function addLoader (sel) {
 	return loader
 }
 
-async function populateSection (data, lang = 'en', section) {
+async function populateSection (data, lang = 'en', section, objectdata) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
 	// MEDIA
-	if (data.type === 'title' && page.type === 'public') addTitle({ data, lang, section })
-	if (data.type === 'img') addImg({ data, lang, section })
-	if (data.type === 'mosaic') addMosaic({ data, lang, section })
-	if (data.type === 'video') addVideo({ data, lang, section })
-	if (data.type === 'drawing') addDrawing({ data, lang, section })
-	if (data.type === 'txt') addTxt({ data, lang, section })
-	if (data.type === 'embed') addEmbed({ data, lang, section })
-	if (data.type === 'checklist') addChecklist({ data, lang, section })
-	if (data.type === 'radiolist') addRadiolist({ data, lang, section })
+	if (data.type === 'title' && page.type === 'public') addTitle({ data, lang, section, objectdata })
+	if (data.type === 'img') addImg({ data, lang, section, objectdata })
+	if (data.type === 'mosaic') addMosaic({ data, lang, section, objectdata })
+	if (data.type === 'video') addVideo({ data, lang, section, objectdata })
+	if (data.type === 'drawing') addDrawing({ data, lang, section, objectdata })
+	if (data.type === 'txt') addTxt({ data, lang, section, objectdata })
+	if (data.type === 'embed') addEmbed({ data, lang, section, objectdata })
+	if (data.type === 'checklist') addChecklist({ data, lang, section, objectdata })
+	if (data.type === 'radiolist') addRadiolist({ data, lang, section, objectdata })
 	// META
-	if (data.type === 'location') addLocations({ data, lang, section })
-	if (data.type === 'index') await addIndexes({ data, lang, section })
-	if (data.type === 'tag') await addTags({ data, lang, section })
-	if (data.type === 'attachment') await addAttachment({ data, lang, section })
-	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+	if (data.type === 'location') addLocations({ data, lang, section, objectdata })
+	if (data.type === 'index') await addIndexes({ data, lang, section, objectdata })
+	if (data.type === 'tag') await addTags({ data, lang, section, objectdata })
+	if (data.type === 'attachment') await addAttachment({ data, lang, section, objectdata })
+	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section, objectdata }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
 	// GROUP
-	if (data.type === 'group') addGroup({ data, lang, section })
+	if (data.type === 'group') addGroup({ data, lang, section, objectdata })
 }
 // THIS CAN PROBABLY BE MOVED TO upload.js
 function uploadImg (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 
-	const { form, lang, sibling, container, focus } = kwargs
+	const { form, lang, sibling, container, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
+
+	const editing = (page.activity === 'edit' && object !== 'source');
+
 	fetch(form.action, {
 		method: form.method,
 		body: new FormData(form)
@@ -637,7 +646,6 @@ function uploadImg (kwargs) {
 		else {
 			notification = d3.select('body').addElem('div', 'notification')
 				.addElem('div')
-				// .html(vocabulary['image upload success'][language])
 				.html(vocabulary['image upload success'])
 		}
 		setTimeout(_ => notification.remove(), 4000)
@@ -650,9 +658,13 @@ function uploadImg (kwargs) {
 	}).then(data => addImgs({ data, lang, sibling, container, focus }))
 	.catch(err => { if (err) throw err })
 }
-function deleteImg (sel, lang = 'en') {
+function deleteImg (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+
+	const { sel, lang, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
+
+	const editing = (page.activity === 'edit' && object !== 'source');
 
 	const deleted = JSON.parse(window.sessionStorage.getItem('deleted')) || []
 	const container = sel.findAncestor('media-container')
@@ -707,9 +719,12 @@ function addImgs (kwargs) {
 }
 function uploadVideo (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	editing = page.activity === 'edit'
 
-	const { form, lang, sibling, container, focus } = kwargs
+	const { form, lang, sibling, container, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
+
+	const editing = (page.activity === 'edit' && object !== 'source');
+
 	const ellipsis = d3.select('.media-layout').addElems('div', 'lds-ellipsis')
 	ellipsis.addElem('div')
 	ellipsis.addElem('div')
@@ -732,7 +747,6 @@ function uploadVideo (kwargs) {
 		else {
 			notification = d3.select('body').addElem('div', 'notification')
 			.addElem('div')
-			// .html(`${vocabulary['successful upload mediatype'][language]["video"]}<i class="material-icons google-translate-attr">done</i>`)
 			.html(`${vocabulary['successful upload mediatype']["video"]}<i class="material-icons google-translate-attr">done</i>`)
 		}
 		setTimeout(_ => notification.remove(), 4000)
@@ -756,10 +770,12 @@ function uploadVideo (kwargs) {
 	.catch(err => { if (err) throw err })
 }
 async function autofillTitle () {
+	const mainobject = d3.select('data[name="object"]').node()?.value
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	// THIS IS A PARTICULAR CASE WHERE EDITING CAN SOLELEY BE BASED ON THE page VARIABLES, SINCE IT IS THE page MAIN OBJECT THAT NEEDS TO BE UPDATED
+	const editing = (page.activity === 'edit' && mainobject !== 'source');
 
-	const main = d3.select('#pad')
+	const main = d3.select(`#${mainobject}`)
 	const head = main.select('.head')
 
 	if (head.select('.title').node()?.innerText.trim().length === 0) {
@@ -785,28 +801,29 @@ async function autofillTitle () {
 }
 
 async function addSection (kwargs) {
-	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, sibling, repeated, focus } = kwargs || {}
+	const { data, lang, sibling, repeated, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype, main } = objectdata || {}
 	let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
 	if (!title) title = ''
 	if (!lead) lead = ''
 	if (!structure) structure = []
 	if (!items) items = []
 
-	if (editing && pad.type === 'templated' && (!items.length || repeated)) {
+	const editing = (page.activity === 'edit' && object === mainobject);
+
+	if (editing && objecttype === 'templated' && (!items.length || repeated)) {
 		items = JSON.parse(JSON.stringify(structure))
 	}
 
 	d3.selectAll('.media-layout').classed('focus', false)
 
-	const section = d3.select('main#pad div.inner div.body')
-		// .insertElem(function () { return sibling || d3.select('main#pad div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${page.activity}`)
+	const section = main.select('div.inner div.body')
 		.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
 		.classed('repeat', repeat || false)
-		.classed('focus', focus && pad.type === 'blank')
+		.classed('focus', focus && objecttype === 'blank')
 		.datum({ id, type: 'section', title, lead, structure, items, repeat, group })
 	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
 
@@ -815,9 +832,9 @@ async function addSection (kwargs) {
 
 	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
 	if (
-		((editing || page.activity === 'preview') && section_id !== 0 && pad.type === 'blank')
+		((editing || page.activity === 'preview') && section_id !== 0 && objecttype === 'blank')
 		|| (
-			pad.type === 'templated'
+			objecttype === 'templated'
 			&& repeat
 			&& d3.selectAll('.layout.repeat').filter(d => d.group === group)
 				.filter((d, i) => i === 0).node() !== section.node()
@@ -864,14 +881,13 @@ async function addSection (kwargs) {
 	}
 
 	const header = section.addElems('div', 'section-header', d => {
-		if (pad.type === 'templated' && d.title?.length === 0) return []
+		if (objecttype === 'templated' && d.title?.length === 0) return []
 		else if (!editing && d.title?.length === 0) return []
 		else return [d]
 	}).addElems('h1')
 		.attrs({
-			// 'data-placeholder': d => vocabulary['section header'][language],
 			'data-placeholder': d => vocabulary['section header'],
-			'contenteditable': editing && pad.type === 'blank' ? true : null
+			'contenteditable': editing && objecttype === 'blank' ? true : null
 		}).html(d => d.title)
 	.on('keydown', function () {
 		const evt = d3.event
@@ -886,23 +902,23 @@ async function addSection (kwargs) {
 		}
 	})
 
-	if (pad.type === 'templated' && lead) {
+	if (objecttype === 'templated' && lead) {
 		const medialead = new Media({
 			parent: section.node(),
 			type: 'lead',
-			datum: { type: 'lead', level: 'media', lead: lead },
-			lang: lang
+			datum: { type: 'lead', level: 'media', lead },
+			lang,
+			objectdata
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
 		if (medialead.opts) medialead.opts.remove()
 
 		medialead.media.attrs({
-			// 'data-placeholder': d => vocabulary['lead paragraph'][language],
 			'data-placeholder': d => vocabulary['lead paragraph'],
-			'contenteditable': editing && pad.type === 'blank' ? true : null
+			'contenteditable': editing && objecttype === 'blank' ? true : null
 		}).html(d => d.lead)
 	}
-	if (editing && pad.type === 'templated' && repeat) {
+	if (editing && objecttype === 'templated' && repeat) {
 		// HIDE THE PREVIOUS REPEAT BUTTONS FOR THE GROUP
 		d3.selectAll('.layout.repeat').filter(d => d.group === group)
 			.select('.repeat-container').classed('hide', true)
@@ -910,8 +926,9 @@ async function addSection (kwargs) {
 		const mediarepeat = new Media({
 			parent: section.node(),
 			type: 'repeat',
-			datum: { type: 'repeat', level: 'media', instruction: instruction },
-			lang: lang
+			datum: { type: 'repeat', level: 'media', instruction },
+			lang,
+			objectdata
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
 		if (mediarepeat.opts) mediarepeat.opts.remove()
@@ -934,41 +951,36 @@ async function addSection (kwargs) {
 			}
 
 		}).addElems('div').attrs({
-			// 'data-placeholder': d => vocabulary['repeat section'][language]
 			'data-placeholder': d => vocabulary['repeat section']
 		}).html(d => d.instruction)
 	}
 
 	if (items.length) {
-		// const promises = []
-		// section.each(function (d) {
-		// 	promises.push(d.items.map(async c => await populateSection (c, lang, this)))
-		// })
-		// await Promise.all(promises.flat())
-
 		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
 		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
 		const { items: pageitems } = section.datum()
 		for (let s = 0; s < pageitems.length; s++) {
-			await populateSection(pageitems[s], lang, section.node())
+			await populateSection(pageitems[s], lang, section.node(), objectdata)
 		}
-
-		// await Promise.all(pageitems.map(async d => await populateSection(d, lang, section.node())))
 	}
 
 	return section.node()
 }
 
 function addTitle (kwargs) {
-	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, txt, instruction, constraint, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'title'
 	if (!name) name = null
 	if (!txt) txt = ''
 	required = true
+
+	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = (activity === 'edit' && object === mainobject);
 
 	if (!editing && txt?.toString().trim().length === 0) return null
 
@@ -978,7 +990,8 @@ function addTitle (kwargs) {
 		type,
 		datum: { id, level, type, name, txt, instruction, constraint, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
 	// (PRESUMABLY THIS IS NOT NEEDED BECAUSE addTitle IS ONLY USED IN THE SPECIFIC CASE OF A TEMPLATED PAD THAT IS DEPLOYED IN A PUBLIC MOBILIZATION)
@@ -986,7 +999,6 @@ function addTitle (kwargs) {
 	if (media.input) media.input.remove()
 
 	media.media.attrs({
-		// 'data-placeholder': vocabulary['untitled pad'][language],
 		'data-placeholder': vocabulary['untitled pad'],
 		'contenteditable': editing ? true : null
 	}).html(d => d.txt)
@@ -1007,10 +1019,11 @@ function addTitle (kwargs) {
 }
 function addImg (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, container, focus } = kwargs || {}
+	const { data, lang, section, sibling, container, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
 	let { id, level, type, name, src, textalign, scale, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'img'
@@ -1019,6 +1032,8 @@ function addImg (kwargs) {
 	if (!textalign) textalign = 'left'
 	if (!scale) scale = 'original'
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && src?.length === 0) return null
 
@@ -1034,7 +1049,8 @@ function addImg (kwargs) {
 		type,
 		datum: { id, level, type, name, textalign, scale, src, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1061,7 +1077,6 @@ function addImg (kwargs) {
 			.html(d => d.label)
 	}
 
-	// media.media.attr('data-placeholder', d => vocabulary['missing image'][language])
 	media.media.attr('data-placeholder', d => vocabulary['missing image'])
 
 	if (src) {
@@ -1092,7 +1107,7 @@ function addImg (kwargs) {
 	// THE PAD IS BASED ON A TEMPLATE: templated
 	// THE PAD IS IN create, preview MODE
 	// THERE IS NO IMAGE YET
-	if (pad.type === 'templated' && (page.activity === 'edit' || (page.activity === 'preview' && !src))) {
+	if (objecttype === 'templated' && (page.activity === 'edit' || (page.activity === 'preview' && !src))) {
 		let form_id = media.id//uuidv4()
 
 		if (media.input) {
@@ -1108,7 +1123,7 @@ function addImg (kwargs) {
 				'disabled': page.activity === 'preview' ? true : null
 			}).on('change', function () {
 				// REMOVE IMAGES HERE
-				uploadImg({ form: this.form, lang, container: media.container, focus: true })
+				uploadImg({ form: this.form, lang, container: media.container, focus: true, objectdata })
 				form.select('label').classed('highlight', this.value?.length)
 			})
 			form.addElems('label')
@@ -1125,10 +1140,11 @@ function addImg (kwargs) {
 }
 function addMosaic (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, container, focus } = kwargs || {}
+	const { data, lang, section, sibling, container, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
 	let { id, level, type, name, srcs, verticalalign, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'mosaic'
@@ -1136,6 +1152,8 @@ function addMosaic (kwargs) {
 	if (!srcs) srcs = []
 	if (!verticalalign) verticalalign = 'center'
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && srcs?.length === 0) return null
 
@@ -1151,7 +1169,8 @@ function addMosaic (kwargs) {
 		type,
 		datum: { id, level, type, name, verticalalign, srcs, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1198,7 +1217,7 @@ function addMosaic (kwargs) {
 					const source = sel.findAncestor('mosaic-item').node()
 					const parent = media.media.node()
 
-					if (d.value === 'delete') deleteImg(sel.findAncestor('mosaic-item').select('img'), lang)
+					if (d.value === 'delete') deleteImg({ sel: sel.findAncestor('mosaic-item').select('img'), lang, objectdata })
 					if (d.value === 'move-up') {
 						const prev = source.previousSibling
 						parent.insertBefore(source, prev)
@@ -1247,7 +1266,7 @@ function addMosaic (kwargs) {
 	// THE PAD IS BASED ON A TEMPLATE: templated
 	// THE PAD IS IN create, preview MODE
 	// THERE IS NO IMAGE YET
-	if (pad.type === 'templated' && (page.activity === 'edit' || (page.activity === 'preview' && !src))) {
+	if (objecttype === 'templated' && (page.activity === 'edit' || (page.activity === 'preview' && !src))) {
 		let form_id = media.id//uuidv4()
 
 		if (media.input) {
@@ -1263,7 +1282,7 @@ function addMosaic (kwargs) {
 				'disabled': page.activity === 'preview' ? true : null
 			}).on('change', function () {
 				// REMOVE IMAGES HERE
-				uploadImg({ form: this.form, lang, container: media.container, focus: true })
+				uploadImg({ form: this.form, lang, container: media.container, focus: true, objectdata })
 				form.select('label').classed('highlight', this.value?.length)
 			})
 			form.addElems('label')
@@ -1280,10 +1299,11 @@ function addMosaic (kwargs) {
 }
 function addVideo (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, container, focus } = kwargs || {}
+	const { data, lang, section, sibling, container, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
 	let { id, level, type, name, src, textalign, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'video'
@@ -1291,6 +1311,8 @@ function addVideo (kwargs) {
 	if (!src) src = null
 	if (!textalign) textalign = 'left'
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && src?.length === 0) return null
 
@@ -1306,7 +1328,8 @@ function addVideo (kwargs) {
 		type,
 		datum: { id, level, type, name, textalign, src, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1341,7 +1364,9 @@ function addVideo (kwargs) {
 			.node().load()
 	}
 
-	if (pad.type === 'templated' && (page.activity !== 'view' || (page.activity === 'preview' && !src))) {
+
+	// TO DO: FINISH REPLACING WITH objecttype
+	if (objecttype === 'templated' && (page.activity !== 'view' || (page.activity === 'preview' && !src))) {
 		let form_id = media.id//uuidv4()
 
 		if (media.input) {
@@ -1355,7 +1380,7 @@ function addVideo (kwargs) {
 				'accept': 'video/mp4,video/x-m4v,video/webm,video/*',
 				'disabled': page.activity !== 'preview' ? true : null
 			}).on('change', function () {
-				uploadVideo({ form: this.form, lang, container: media.container })
+				uploadVideo({ form: this.form, lang, container: media.container, objectdata })
 				form.select('label').classed('highlight', this.value?.length)
 			})
 			form.addElems('label')
@@ -1372,9 +1397,10 @@ function addVideo (kwargs) {
 }
 function addDrawing (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, shapes, size, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'drawing'
@@ -1383,6 +1409,8 @@ function addDrawing (kwargs) {
 	shapes = shapes.filter(d => d.points.length)
 	if (!size) size = []
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && shapes?.length === 0) return null
 
@@ -1397,7 +1425,8 @@ function addDrawing (kwargs) {
 		type,
 		datum: { id, level, type, name, shapes, size, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1552,10 +1581,11 @@ function addDrawing (kwargs) {
 }
 function addTxt (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, is_excerpt, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'txt'
@@ -1567,6 +1597,8 @@ function addTxt (kwargs) {
 	if (!txt) txt = ''
 	if (!is_excerpt) is_excerpt = false
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && page.activity !== 'preview' && txt?.toString().trim().length === 0) return null
 
@@ -1581,7 +1613,8 @@ function addTxt (kwargs) {
 		type,
 		datum: { id, level, type, name, fontsize, fontweight, fontstyle, textalign, txt, instruction, constraint, is_excerpt, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1660,7 +1693,6 @@ function addTxt (kwargs) {
 	}
 
 	media.media.attrs({
-		// 'data-placeholder': vocabulary['empty txt'][language],
 		'data-placeholder': vocabulary['empty txt'],
 		'contenteditable': editing ? true : null
 	}).styles({
@@ -1691,9 +1723,10 @@ function addTxt (kwargs) {
 }
 function addEmbed (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, textalign, html, src, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'embed'
@@ -1702,6 +1735,8 @@ function addEmbed (kwargs) {
 	if (!html) html = ''
 	if (!src) src = null
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && page.activity !== 'preview' && (html?.trim().length === 0 || src?.length === 0)) return null
 
@@ -1716,7 +1751,8 @@ function addEmbed (kwargs) {
 		type,
 		datum: { id, level, type, name, src, textalign, html, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1743,7 +1779,6 @@ function addEmbed (kwargs) {
 	}
 
 	media.media.attrs({
-		// 'data-placeholder': vocabulary['empty embed'][language],
 		'data-placeholder': vocabulary['empty embed'],
 		'contenteditable': editing
 	}).classed('padded', true)
@@ -1844,10 +1879,11 @@ function addEmbed (kwargs) {
 }
 function addChecklist (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
 	let { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'checklist'
@@ -1868,9 +1904,11 @@ function addChecklist (kwargs) {
 	}
 	required = required ?? false
 
+	const editing = (page.activity === 'edit' && object === mainobject);
+
 	if (!editing && page.activity !== 'preview' && options?.length === 0) return null
 
-	if (editing && !options.find(d => !d.name) && pad.type === 'blank' && level !== 'meta') options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && objecttype === 'blank' && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	if (level === 'meta' && name) {
@@ -1884,7 +1922,8 @@ function addChecklist (kwargs) {
 		type,
 		datum: { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -1938,7 +1977,7 @@ function addChecklist (kwargs) {
 		})
 	list.call(addItem)
 
-	if (editing && pad.type === 'blank' && level !== 'meta') {
+	if (editing && objecttype === 'blank' && level !== 'meta') {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
@@ -1990,9 +2029,8 @@ function addChecklist (kwargs) {
 			.addElems('label',  'list-item')
 			.attrs({
 				'for': d => `check-item-${checklist_id}-${d.id}`,
-				// 'data-placeholder': vocabulary['new checklist item'][language],
 				'data-placeholder': vocabulary['new checklist item'],
-				'contenteditable': page.activity !== 'view' && pad.type === 'blank' ? true : null
+				'contenteditable': page.activity !== 'view' && objecttype === 'blank' ? true : null
 			})
 		.on('keydown', function () {
 			const evt = d3.event
@@ -2016,7 +2054,7 @@ function addChecklist (kwargs) {
 			}
 		}).html(d => d.name)
 
-		if (editing && pad.type === 'blank' && level !== 'meta') {
+		if (editing && objecttype === 'blank' && level !== 'meta') {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
@@ -2037,10 +2075,11 @@ function addChecklist (kwargs) {
 }
 function addRadiolist (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
 	let { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required } = data || {}
 	if (!level) level = 'media'
 	if (!type) type = 'radiolist'
@@ -2061,9 +2100,11 @@ function addRadiolist (kwargs) {
 	}
 	required = required ?? false
 
+	const editing = (page.activity === 'edit' && object === mainobject);
+
 	if (!editing && page.activity !== 'preview' && options?.length === 0) return null
 
-	if (editing && !options.find(d => !d.name) && pad.type === 'blank' && level !== 'meta') options.push({ checked: false })
+	if (editing && !options.find(d => !d.name) && objecttype === 'blank' && level !== 'meta') options.push({ checked: false })
 	if (!editing) options = options.filter(d => d.name)
 
 	if (level === 'meta' && name) {
@@ -2077,7 +2118,8 @@ function addRadiolist (kwargs) {
 		type,
 		datum: { id, level, type, name, fontsize, fontweight, fontstyle, options, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (media.opts) {
@@ -2131,7 +2173,7 @@ function addRadiolist (kwargs) {
 		})
 	list.call(addItem)
 
-	if (editing && pad.type === 'blank' && level !== 'meta') {
+	if (editing && objecttype === 'blank' && level !== 'meta') {
 		media.media.addElems('div', 'add-opt')
 			.on('click', function () {
 				media.container.each(d => {
@@ -2181,9 +2223,8 @@ function addRadiolist (kwargs) {
 			.addElems('label', 'list-item')
 			.attrs({
 				'for': d => `radio-item-${radiolist_id}-${d.id}`,
-				// 'data-placeholder': vocabulary['new checklist item'][language],
 				'data-placeholder': vocabulary['new checklist item'],
-				'contenteditable': page.activity !== 'view' && pad.type === 'blank' ? true : null // TO DO: FIGURE OUT WHY HERE WE USE activity !== 'view' RATHER THAN editing
+				'contenteditable': page.activity !== 'view' && objecttype === 'blank' ? true : null // TO DO: FIGURE OUT WHY HERE WE USE activity !== 'view' RATHER THAN editing
 			})
 		.on('keydown', function () {
 			const evt = d3.event
@@ -2207,7 +2248,7 @@ function addRadiolist (kwargs) {
 			}
 		}).html(d => d.name)
 
-		if (editing && pad.type === 'blank' && level !== 'meta') {
+		if (editing && objecttype === 'blank' && level !== 'meta') {
 			opts.addElems('div', 'rm')
 				.addElems('i', 'material-icons google-translate-attr')
 				.html('clear')
@@ -2229,10 +2270,11 @@ function addRadiolist (kwargs) {
 // META ELEMENTS
 function addLocations (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
 	// TO DO: INCLUDE CONSTRAINT
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, instruction, default_centerpoint, centerpoints, caption, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'location'
@@ -2240,6 +2282,8 @@ function addLocations (kwargs) {
 	if (!centerpoints) centerpoints = []
 	let dragging = false
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && page.activity !== 'preview' && centerpoints?.length === 0) return null
 
@@ -2253,11 +2297,11 @@ function addLocations (kwargs) {
 		datum: { id, level, type, name, centerpoints, caption, instruction, constraint, required },
 		focus: focus || false,
 		lang,
+		objectdata,
 		maxheight: 300
 	})
 
 	if (meta.opts) {
-		// meta.opts.addElems('div', 'opt-group', [vocabulary['click to search or add locations'][language]])
 		meta.opts.addElems('div', 'opt-group', [vocabulary['click to search or add locations']])
 			.addElems('label')
 			.html(d => d)
@@ -2276,7 +2320,6 @@ function addLocations (kwargs) {
 
 	function rmPin (marker, container) {
 		const btn = document.createElement('BUTTON')
-		// btn.innerHTML = vocabulary['remove pin'][language]
 		btn.innerHTML = vocabulary['remove pin']
 		btn.addEventListener('click', _ => {
 			group.removeLayer(marker)
@@ -2353,7 +2396,6 @@ function addLocations (kwargs) {
 
 		filter.addElem('label')
 			.attr('for', 'search-field')
-			// .html(vocabulary['search place'][language])
 			.html(vocabulary['search place'])
 
 		filter.addElems('button',  'search')
@@ -2416,13 +2458,7 @@ function addLocations (kwargs) {
 		}).on('mousedown', e => {
 			offset[0] = [e.containerPoint.x, e.containerPoint.x]
 			if (!dragging) timer = window.setTimeout(_ => addLocation(e.latlng), 1000)
-		})
-		// .on('touchstart', e => {
-		// 	offset[0] = [e.containerPoint.x, e.containerPoint.x]
-		// 	if (!dragging) timer = window.setTimeout(_ => addLocation(e.latlng), 1000)
-		// })
-		.on('mousemove', e => offset[1] = [e.containerPoint.x, e.containerPoint.x])
-		// .on('touchmove', e => offset[1] = [e.containerPoint.x, e.containerPoint.x])
+		}).on('mousemove', e => offset[1] = [e.containerPoint.x, e.containerPoint.x])
 
 		function addLocation (latlng) {
 			const duplicate = markers.find(d => {
@@ -2472,9 +2508,10 @@ function addLocations (kwargs) {
 }
 async function addIndexes (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'index'
@@ -2483,6 +2520,8 @@ async function addIndexes (kwargs) {
 	// MAKE SURE THE SDGs ARE SORTED BY key
 	tags.sort((a, b) => a.key - b.key)
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && page.activity !== 'preview' && tags?.length === 0) return null
 
@@ -2499,6 +2538,7 @@ async function addIndexes (kwargs) {
 		datum: { id, level, type, name, tags, instruction, constraint, required },
 		focus: focus || false,
 		lang,
+		objectdata,
 		list: options,
 		imglink: d => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`,  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
 		altimglink: d => `/imgs/sdgs/${lang}/G${d.key || d}.svg`  // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
@@ -2506,7 +2546,6 @@ async function addIndexes (kwargs) {
 
 	if (list.opts) {
 		list.opts.addElem('div', 'opt-group')
-			// .datum(vocabulary['click to see options'][language])
 			.datum(vocabulary['click to see options'])
 		.addElems('label', 'instruction')
 			.html(d => d)
@@ -2524,15 +2563,18 @@ async function addIndexes (kwargs) {
 }
 async function addTags (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, instruction, tags, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'tag'
 	if (!name) name = null
 	if (!tags) tags = []
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && page.activity !== 'preview' && tags?.length === 0) return null
 
@@ -2549,12 +2591,12 @@ async function addTags (kwargs) {
 		datum: { id, level, type, name, tags, instruction, constraint, required },
 		focus: focus || false,
 		lang,
+		objectdata,
 		list: options
 	})
 
 	if (list.opts) {
 		list.opts.addElem('div', 'opt-group')
-			// .datum(vocabulary['click to see options'][language])
 			.datum(vocabulary['click to see options'])
 		.addElems('label', 'instruction')
 			.html(d => d)
@@ -2572,15 +2614,18 @@ async function addTags (kwargs) {
 }
 async function addAttachment (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, container, focus } = kwargs || {}
+	const { data, lang, section, sibling, container, focus, objectdata } = kwargs || {}
+	const { object } = objectdata || {}
 	let { id, level, type, name, srcs, instruction, constraint, required } = data || {}
 	if (!level) level = 'meta'
 	if (!type) type = 'attachment'
 	if (!name) name = null
 	if (!srcs) srcs = []
 	required = required ?? false
+
+	const editing = (page.activity === 'edit' && object === mainobject);
 
 	if (!editing && page.activity !== 'preview' && srcs?.length === 0) return null
 
@@ -2594,11 +2639,11 @@ async function addAttachment (kwargs) {
 		type,
 		datum: { id, level, type, name, srcs, instruction, required },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
 	if (meta.opts) {
-		// meta.opts.addElems('div', 'opt-group', [vocabulary['click to add attachment'][language]]) 
 		meta.opts.addElems('div', 'opt-group', [vocabulary['click to add attachment']]) 
 			.addElems('label')
 			.html(d => d)
@@ -2619,7 +2664,6 @@ async function addAttachment (kwargs) {
 		const uris = meta.metafields.find(d => d.label === name)?.uris || [ { uri: undefined } ]
 
 		const item = {}
-		// item.headline = vocabulary['add external resource'][language]
 		item.headline = vocabulary['add external resource']
 		item.opts = []
 
@@ -2629,7 +2673,6 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'button',
 					type: 'button',
-					// label: vocabulary['link file'][language],
 					label: vocabulary['link file'],
 					resolve: _ => {
 						return new Promise(async resolve => {
@@ -2642,7 +2685,6 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'input',
 					type: 'url',
-					// placeholder: vocabulary['paste link'][language],
 					placeholder: vocabulary['paste link'],
 					// value: srcs.length ? srcs[0] : null,
 					class: 'full-width',
@@ -2661,7 +2703,6 @@ async function addAttachment (kwargs) {
 				item.opts.push({
 					node: 'div',
 					class: 'divider',
-					// label: vocabulary['or'][language].toUpperCase()
 					label: vocabulary['or'].toUpperCase()
 				})
 			}
@@ -2713,10 +2754,11 @@ async function addAttachment (kwargs) {
 // GROUPS
 function addGroup (kwargs) {
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
 	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
+	const { data, lang, section, sibling, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype } = objectdata || {}
 	let { id, level, type, name, structure, items, values, instruction, repeat } = data || {} // NOT SURE WHY values IS USED HERE, IT IS NOT USED ANYWHERE ELSE
 	if (!level) level = 'media'
 	if (!type) type = 'group'
@@ -2725,9 +2767,11 @@ function addGroup (kwargs) {
 	if (!items) items = []
 	if (!values) values = []
 
+	const editing = (page.activity === 'edit' && object === mainobject);
+
 	if (!editing && page.activity !== 'preview' && items?.length === 0) return null
 
-	if (editing && !items.length && pad.type === 'templated') items.push(JSON.parse(JSON.stringify(structure)))
+	if (editing && !items.length && objecttype === 'templated') items.push(JSON.parse(JSON.stringify(structure)))
 
 	const media = new Media({
 		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
@@ -2735,10 +2779,11 @@ function addGroup (kwargs) {
 		type,
 		datum: { id, level, type, name, structure, items, instruction, repeat },
 		focus: focus || false,
-		lang
+		lang,
+		objectdata
 	})
 
-	if (pad.type === 'templated' && repeat) {
+	if (objecttype === 'templated' && repeat) {
 		if (editing) {
 			media.media.addElems('div', 'add-opt')
 				.on('click', function (d) {
@@ -2776,7 +2821,7 @@ function addGroup (kwargs) {
 			const group = groups.filter((d, i) => i === g)
 			const groupitems = group.datum()
 			for (let s = 0; s < groupitems.length; s++) {
-				await populateSection(groupitems[s], lang, group.node())
+				await populateSection(groupitems[s], lang, group.node(), objectdata)
 			}
 		}
 		// for (let )
@@ -2823,7 +2868,7 @@ function addGroup (kwargs) {
 
 // SAVING BUTTON
 function switchButtons (lang = 'en') {
-	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit' // TO DO: FIX HERE
 
 	if (!mediaSize) var mediaSize = getMediaSize()
 	window.sessionStorage.setItem('changed-content', true)
@@ -2831,7 +2876,6 @@ function switchButtons (lang = 'en') {
 	if (mediaSize === 'xs') {
 		d3.select('.meta-status .btn-group .save button')
 		.each(function () { this.disabled = false })
-			// .html(vocabulary['save changes'][language])
 			.html(vocabulary['save changes'])
 	} else {
 		const menu_logo = d3.select('nav#site-title .inner')
@@ -2841,7 +2885,6 @@ function switchButtons (lang = 'en') {
 			.select('button')
 		.on('click', async _ => {
 			if (editing) await partialSave()
-		// }).html(vocabulary['save changes'][language])
 		}).html(vocabulary['save changes'])
 	}
 }
@@ -2851,27 +2894,29 @@ let idx = 0
 // FOR SLIDESHOW VIEW
 async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
 	const page = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = page.activity === 'edit'
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
 
-	const { data, lang, sibling, focus } = kwargs || {}
+	const { data, lang, sibling, focus, objectdata } = kwargs || {}
+	const { object, type: objecttype, main } = objectdata || {}
 	let { title, lead, structure, items, repeat, group, instruction } = data || {}
 	if (!title) title = ''
 	if (!lead) lead = ''
 	if (!structure) structure = []
 	if (!items) items = []
 
-	if (editing && pad.type === 'templated' && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure))
+	const editing = (page.activity === 'edit' && object === mainobject);
+
+	if (editing && objecttype === 'templated' && (!items.length || sibling)) items = JSON.parse(JSON.stringify(structure))
 
 	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
 	// const section_id = uuidv4()
 	d3.selectAll('.media-layout').classed('focus', false)
 
-	const section = d3.select('main#pad div.inner div.body')
+	const section = main.select('div.inner div.body')
 		.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
 		.classed('repeat', repeat || false)
 		.datum({ type: 'section', title, lead, structure, items, repeat, group })
-	.on('click.focus', function () { d3.select(this).classed('focus', editing && pad.type === 'blank') })
+	.on('click.focus', function () { d3.select(this).classed('focus', editing && objecttype === 'blank') })
 
 	// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
 	if (title || lead) {
@@ -2887,8 +2932,9 @@ async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR
 			const medialead = new Media({
 				parent: titleslide.node(),
 				type: 'lead',
-				datum: { type: 'lead', lead: lead },
-				lang: lang
+				datum: { type: 'lead', lead },
+				lang,
+				objectdata
 			})
 			// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
 			if (medialead.opts) medialead.opts.remove()
@@ -2906,8 +2952,9 @@ async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR
 		const mediarepeat = new Media({
 			parent: section.node(),
 			type: 'repeat',
-			datum: { type: 'repeat', instruction: instruction },
-			lang: lang
+			datum: { type: 'repeat', instruction },
+			lang,
+			objectdata
 		})
 		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
 		if (mediarepeat.opts) mediarepeat.opts.remove()
@@ -2933,38 +2980,25 @@ async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR
 			})
 
 			Promise.all(promises)
-			.then(_ => switchslide(idx))
+			.then(_ => switchslide(main, idx))
 		}).addElems('div').attrs({
-			// 'data-placeholder': vocabulary['repeat section'][language]
 			'data-placeholder': vocabulary['repeat section']
 		}).html(d => d.instruction)
 	}
 
 	// const displaypromises = []
 	if (items.length) {
-		
-		// section.each(function (d) {
-		// 	d.items.forEach(c => displaypromises.push(new Promise(async resolvedisplay => {
-		// 		await populateSection(c, lang, this)
-		// 		resolvedisplay()
-		// 	})))
-		// })
-
 		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
 		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
 		const { items: pageitems } = section.datum()
 		for (let s = 0; s < pageitems; s++) {
-			await populateSection(pageitems[s], lang, section.node())	
+			await populateSection(pageitems[s], lang, section.node(), objectdata)
 		}
-
-		// await Promise.all(pageitems.map(async d => await populateSection(d, lang, section.node())))
-
 	}
 	// Promise.all(displaypromises).then(_ => resolve(section))
 	return section.node()
 }
-function initSlideshow () {
-	const main = d3.select('#pad')
+function initSlideshow (main) {
 	// TRANSFORM THE MAIN #pad INTO A SLIDESHOW
 	// d3.select('.document').classed('slideshow', true)
 		// .select('#pad').classed('slideshow', true)
@@ -3005,8 +3039,8 @@ function initSlideshow () {
 			return (d.class === 'prev' && focus_id === 0) || (d.class === 'next' && focus_id === d3.sels)
 		}).html(d => d.label)
 	.on('click', d => {
-		if (d.class === 'prev') switchslide(idx - 1)
-		else if (d.class === 'next') switchslide(idx + 1)
+		if (d.class === 'prev') switchslide(main, idx - 1)
+		else if (d.class === 'next') switchslide(main, idx + 1)
 	}).on('mouseup', function () {
 		d3.event.stopPropagation()
 		// LOSE FOCUS OF THIS BUTTON TO RE-ENABLE KEYBOARD NAVIGATION
@@ -3029,7 +3063,7 @@ function initSlideshow () {
 	// ADD DOTS
 	d3.select('footer .dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
 	.classed('highlight', (d, i) => i === 0)
-	.on('click', (d, i) => { switchslide(i) })
+	.on('click', (d, i) => { switchslide(main, i) })
 
 	inner.on('scroll', function () {
 		if (this.scrollLeft % slidewidth === 0) {
@@ -3041,10 +3075,9 @@ function initSlideshow () {
 		}
 	})
 }
-function switchslide (i) {
-	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit'
+function switchslide (main, i) {
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit' // TO DO: FIX HERE
 
-	const main = d3.select('#pad')
 	const slidewidth = main.node().clientWidth || main.node().offsetWidth || main.node().scrollWidth
 	main.select('.inner').node().scrollTo({
 		top: 0,
@@ -3062,19 +3095,23 @@ function switchslide (i) {
 
 	return idx = i
 }
-async function renderPad () {
-	// POPULATE THE PAGE
-	const object = d3.select('data[name="object"]').node()?.value
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
-	const { display, activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+async function renderPad (kwargs) {
+	let { object, type, id, main } = kwargs
+	// TYPE CAN BE templated, OR blank
+	// OBJECT CAN BE pad, source OR review
 
-	if (!pad.id && editing && pad.type === 'templated') {
+	// POPULATE THE PAGE
+	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+	const mainobject = d3.select('data[name="object"]').node()?.value;
+	const { display, activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+	const editing = (activity === 'edit' && object === mainobject);
+
+	if (editing && !id && type === 'templated') {
 		// GET TEMPLATE DATA
 		const { sections } = await POST('/load/template', { id: pad.template.id })
 		
 		// APPEND locked_excerpt TO THE pad data DOM ELEMENT
-		const locked_excerpt = pad.type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt))
+		const locked_excerpt = (object === 'pad' && type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt)))
 		if (locked_excerpt) {
 			pad.template.locked_excerpt = locked_excerpt
 			d3.select('data[name="pad"]').attr('value', JSON.stringify(pad))
@@ -3083,57 +3120,60 @@ async function renderPad () {
 		if (sections) {
 			const title_instruction = sections.map(d => d.items || d.structure).flat()
 				.find(d => d.type === 'title')?.instruction
-			if (title_instruction) d3.select('#pad .head .title').attr('data-placeholder', title_instruction)
+			if (title_instruction) { main.select('.head .title').attr('data-placeholder', title_instruction); }
+
+			const objectdata = { object, type, main }
 
 			sections.forEach(async d => {
 				if (display === 'slideshow') {
-					await addSlides({ data: d, lang: language })
+					await addSlides({ data: d, lang: language, objectdata })
 				} else {
-					await addSection({ data: d, lang: language })
+					await addSection({ data: d, lang: language, objectdata })
 				}
 			})
 		}
-		if (display === 'slideshow') {
-			initSlideshow()
-		}
+		if (display === 'slideshow') { initSlideshow(main); }
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
-	} else if (pad.id && ['edit', 'view'].includes(activity)) {
-		if (object !== 'review' && !pad.is_review) {
-			if (pad.title) { d3.select('#pad .head .title').html(pad.title); }
-		}
+	} else if (id && ['edit', 'view'].includes(activity)) {
 		// GET THE DATA
-		const { sections, is_review } = await POST('/load/pad', { id: pad.id })
+		const { title, sections, is_review, template } = await POST('/load/pad', { id })
+
+		if (object !== 'review' && !is_review) {
+			if (title) { main.select('.head .title').html(title); }
+		}
+		if (object === 'source' && !type) {
+			type = template ? 'templated' : 'blank'
+		}
 
 		// APPEND locked_excerpt TO THE pad data DOM ELEMENT
-		const locked_excerpt = pad.type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt))
+		const locked_excerpt = (object === 'pad' && type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt)))
 		if (locked_excerpt) {
 			pad.template.locked_excerpt = locked_excerpt
 			d3.select('data[name="pad"]').attr('value', JSON.stringify(pad))
 		}
 
 		if (sections) {
+			const objectdata = { object, type, main }
+
 			sections.forEach(async d => {
 				if (!editing) d.items = d.items.filter(c => {
 					if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
 					else return c.has_content
 				}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
 				if (display === 'slideshow') {
-					await addSlides({ data: d, lang: language }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
+					await addSlides({ data: d, lang: language, objectdata }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
 				} else {
-					await addSection({ data: d, lang: language })
+					await addSection({ data: d, lang: language, objectdata })
 				}
 			})
 		} else { // THIS IS AN AUTO GENERATED PAD
-			if (pad.type === 'templated') { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
-				// const template = <%- JSON.stringify(locals.display_template || {}) %>;
-				// var locked_excerpt = (pad.type === 'templated' && template.sections?.some(d => d.structure.some(c => c.is_excerpt)))
-
+			if (type === 'templated') { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
 				// GET TEMPLATE DATA
 				const { sections } = await POST('/load/template', { id: pad.template.id })
 				
 				// APPEND locked_excerpt TO THE pad data DOM ELEMENT
-				const locked_excerpt = pad.type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt))
+				const locked_excerpt = (object === 'pad' && type === 'templated' && sections?.some(d => d.structure.some(c => c.is_excerpt)))
 				if (locked_excerpt) {
 					pad.template.locked_excerpt = locked_excerpt
 					d3.select('data[name="pad"]').attr('value', JSON.stringify(pad))
@@ -3142,20 +3182,25 @@ async function renderPad () {
 				if (sections) {
 					const title_instruction = sections.map(d => d.items || d.structure).flat()
 						.find(d => d.type === 'title')?.instruction
-					if (title_instruction) d3.select('#pad .head .title').attr('data-placeholder', title_instruction)
+					if (title_instruction) { main.select('.head .title').attr('data-placeholder', title_instruction); }
+
+					const objectdata = { object, type, main }
 
 					sections.forEach(async d => {
 						if (display === 'slideshow') {
-							await addSlides({ data: d, lang: language })
+							await addSlides({ data: d, lang: language, objectdata })
 						} else {
-							await addSection({ data: d, lang: language })
+							await addSection({ data: d, lang: language, objectdata })
 						}
 					})
 				}
 			}
 		}
-		if (display === 'slideshow') { initSlideshow(); }
+		if (display === 'slideshow') { initSlideshow(main); }
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
-	} else (async _ => await addSection({ lang: language }))()
+	} else {
+		const objectdata = { object, type, main }
+		await addSection({ lang: language, objectdata })
+	}
 }

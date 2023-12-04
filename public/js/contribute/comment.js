@@ -17,7 +17,7 @@ function changeLabel (node, focus) {
 		const sel = d3.select(label)
 		const username = d3.select('data[name="username"]').node()?.value
 		if (focus || node.value.trim().length > 0) sel.html(username)
-		else sel.html(vocabulary['comment publicly'][language])
+		else sel.html(vocabulary['comment publicly'])
 	}
 }
 

@@ -1,3 +1,5 @@
+import { language, languages } from '/js/config/translations.js'
+
 var googleTranslateElement;
 
 const currentpage_url = new URL(window.location)

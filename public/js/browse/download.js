@@ -1,4 +1,6 @@
-async function setDownloadOptions () {
+import { language, vocabulary } from '/js/config/translations.js'
+
+export async function setDownloadOptions () {
 	const object = d3.select('data[name="object"]').node().value
 	const space = d3.select('data[name="space"]').node().value
 	

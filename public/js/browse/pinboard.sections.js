@@ -1,3 +1,5 @@
+import { language, vocabulary } from '/js/config/translations.js'
+
 // TO DO: DEPRECATE THIS IN FAVOR OF A COLLECTION OF COLLECTIONS APPROACH
 d3.selectAll('.make-editable:not(.section-title)')
 .on('click', function () {

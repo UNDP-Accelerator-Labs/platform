@@ -1,3 +1,6 @@
+import { language, vocabulary } from '/js/config/translations.js'
+import { Entry } from '/js/browse/render.js'
+
 window.addEventListener('DOMContentLoaded', async function () {
 	const object = d3.select('data[name="object"]').node().value
 	const space = d3.select('data[name="space"]').node().value

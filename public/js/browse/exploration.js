@@ -1,8 +1,7 @@
+import { Exploration } from '/js/exploration.js'
 // INIT EXPLORATION
-function initExploration () {
-	var exploration = new Exploration();
-
-	console.log('loaded exploration')
+export function initExploration () {
+	const exploration = new Exploration();
 
 	// EXPLORATION MODULE
 	let curSelectSTM = 'stm-browse';
@@ -96,4 +95,6 @@ function initExploration () {
 			sessionStorage.explorationHintUserHiddenCount = 1;
 		}
 	});
+
+	return exploration;
 }

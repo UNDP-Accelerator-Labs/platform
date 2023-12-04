@@ -1,21 +1,8 @@
+import { language, vocabulary } from '/js/config/translations.js'
 const debugging = false
 if (!mediaSize) var mediaSize = getMediaSize()
-window.addEventListener('DOMContentLoaded', async function () {
-	this.vocabulary = {} // THIS IS A GLOBAL VARIABLE
-	this.language = d3.select('data[name="page"]').node().value.language
-	if (!language) {
-		const { language, languages } = await getLanguage()
-		this.language = language || 'en' // THIS IS A GLOBAL VARIABLE
-		this.languages = languages || [] // THIS IS A GLOBAL VARIABLE
-	} else {
-		const { languages } = await getLanguage()
-		this.languages = languages || []
-	}
 
-	Object.keys(fullVocabulary).forEach(d => {
-		this.vocabulary[d] = fullVocabulary[d][language]
-	});
-
+async function DOMLoad () {
 	d3.selectAll('[data-vocab]')
 	.html(function () {
 		return printTranslation(this);
@@ -125,7 +112,14 @@ window.addEventListener('DOMContentLoaded', async function () {
 
 		filter_form.select('form').node().submit()
 	})
-});
+}
+
+if (document.readyState === 'loading') {
+	window.addEventListener('DOMContentLoaded', DOMLoad)
+} else {
+	DOMLoad()
+}
+
 window.addEventListener('scroll', function () {
 	d3.select('button.scroll-nav').classed('hide', document.documentElement.scrollTop > 60)
 });

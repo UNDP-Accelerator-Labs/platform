@@ -1,4 +1,4 @@
-const fullVocabulary = {
+export const fullVocabulary = {
 	"contribute": {
 		"en": "Contribute",
 		"fr": "Contribuer",
@@ -3320,3 +3320,23 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 		"pt": ""
 	}
 }
+
+export const vocabulary = {} // THIS IS A GLOBAL VARIABLE
+let lang = d3.select('data[name="page"]').node().value.language
+let langs = []
+
+if (!lang) {
+	const { language, languages } = await getLanguage()
+	lang = language || 'en' // THIS IS A GLOBAL VARIABLE
+	langs = languages || [] // THIS IS A GLOBAL VARIABLE
+} else {
+	const { languages } = await getLanguage()
+	langs = languages || []
+}
+
+Object.keys(fullVocabulary).forEach(d => {
+	vocabulary[d] = fullVocabulary[d][lang]
+});
+
+export const language = lang
+export const languages = langs

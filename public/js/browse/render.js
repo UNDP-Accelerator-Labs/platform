@@ -1,4 +1,11 @@
-const Entry = function (_kwargs) {
+import { language, vocabulary } from '/js/config/translations.js'
+import { deleteArticles, confirmRemoval, unpublishArticles } from '/js/browse/main.js'
+import { setDownloadOptions } from '/js/browse/download.js'
+import { initExploration } from '/js/browse/exploration.js'
+
+const exploration = initExploration()
+
+export const Entry = function (_kwargs) {
 	if (!mediaSize) var mediaSize = getMediaSize()
 
 	let { 
@@ -1452,11 +1459,11 @@ const Entry = function (_kwargs) {
 			.html(d => d.countryname)
 		}.bind(this),
 		exploration: (_sel) => {
-			// exploration.addDocButtons(_sel, true);
+			exploration.addDocButtons(_sel, true);
 		},
 	}
 }
-function renderVignette (_section, _kwargs) {
+export function renderVignette (_section, _kwargs) {
 	if (!mediaSize) var mediaSize = getMediaSize()
 	const { data, object, space, page } = _kwargs
 
@@ -1524,7 +1531,7 @@ function renderVignette (_section, _kwargs) {
 		render.exploration(entry.foot)
 	}
 }
-async function renderSections () {
+export async function renderSections () {
 	if (!mediaSize) var mediaSize = getMediaSize()
 	const { sections: data } = await getContent()
 

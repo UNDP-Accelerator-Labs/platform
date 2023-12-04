@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 	const space = d3.select('data[name="space"]').node().value
 	const { load, id: page, pages, display, language } = JSON.parse(d3.select('data[name="page"]').node().value)
 
-	if (initExploration) initExploration()
+	// if (typeof initExploration !== undefined) { initExploration(); }
 
 	await renderSections()
 

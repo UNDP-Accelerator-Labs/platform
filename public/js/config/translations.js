@@ -85,15 +85,14 @@ const fullVocabulary = {
 				"public": "Public files",
 				"all": "All published files",
 			},
-			"rerviews": {
+			"reviews": {
 				"pending": "Pending reviews",
 				"ongoing": "Accepted reviews",
 				"past": "Completed reviews"
-
 			},
 			"mobilizations": {
 				"scheduled": "Scheduled campaigns",
-				"ongoing": "Ongoing campaigns",
+				"ongoing": "ongoing campaigns",
 				"past": "Past campaigns"
 			},
 			"contributors": {
@@ -127,7 +126,7 @@ const fullVocabulary = {
 				"public": "Fichiers publics",
 				"all": "Tous les fichiers publiés",
 			},
-			"rerviews": {
+			"reviews": {
 				"pending": "Relectures en attente",
 				"ongoing": "Relectures en cours",
 				"past": "Relectures terminées"
@@ -168,7 +167,7 @@ const fullVocabulary = {
 				"public": "Archivos públicos",
 				"all": "Todos los archivos públicados",
 			},
-			"rerviews": {
+			"reviews": {
 				"pending": "Revisiones pendientes",
 				"ongoing": "Revisiones aceptadas",
 				"past": "Revisiones completadas"
@@ -209,7 +208,7 @@ const fullVocabulary = {
 				"public": "Arquivos públicos",
 				"all": "Todos os arquivos publicados",
 			},
-			"rerviews": {
+			"reviews": {
 				"pending": "Revisões pendentes",
 				"ongoing": "Revisões aceitos",
 				"past": "Revisões concluídas"

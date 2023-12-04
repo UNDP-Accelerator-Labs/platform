@@ -128,7 +128,7 @@
 
 <!-- ONLY MAKE REVIEWS VIEWABLE IF THE PAD BELONGS TO THE CURRENT USER, OR IF THE CURRENT USER IS ONE OF THE REVIEWERS -->
 <% if (locals.data?.reviews?.length > 0
-	&& (locals.data.owner === locals.metadata.user.uuid || locals.data.reviews.some(d => d.owner === locals.metadata.user.uuid))
+	&& (locals.data.owner === locals.metadata.user.uuid || locals.data.reviews.some(d => d.owner === locals.metadata.user.uuid) || rights > 2)
 ){ %>
 	<% if (pagedisplay === 'adjacent-reviews') { %>
 		<div class='display-option display-reviews split-screen right lg xl xxl google-translate-attr'>
@@ -138,7 +138,14 @@
 		</div>
 		<div id='reviews' class='document split-screen right lg xl xxl'>
 			<% locals.data.reviews.forEach((d, i) => { %>
-				<div id='review-<%- i %>' class='review' data-id='<%= d.id %>' data-idx='<%= i %>'></div>
+				<main id='review-<%- i %>' class='review pad' data-id='<%= d.id %>' data-idx='<%= i %>'>
+					<div class='inner'>
+						<div class='head'>
+							<div class='title'><span data-vocab='["review", "singular"]'></span>#<%= i + 1 %></div>
+						</div>
+						<div class='body'></div>
+					</div>
+				</main>
 			<% }) %>
 		</div>
 	<% } else { %>
@@ -347,7 +354,7 @@
 								<div class='meta meta-template google-translate-attr'>
 									<i data-vocab='pad based on'></i>&nbsp;
 									<a href='/<%- language %>/view/template?id=<%- locals.display_template.id %>'>
-									<%- locals.display_template.title %></a>
+									<%= locals.display_template.title %></a>
 								</div>
 							</div>
 						<% } %>

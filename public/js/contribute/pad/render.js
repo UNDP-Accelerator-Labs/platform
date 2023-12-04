@@ -57,7 +57,11 @@ const Media = function (kwargs) {
 	this.constraint = datum.constraint
 	this.editing = (page.activity === 'edit' && object === mainobject);
 
-	this.id = id
+	if (this.editing) {
+		this.id = id
+	} else {
+		this.id = `${object}-${id}`
+	}
 	this.container = (container || parent.insertElem(function () {
 		// return sibling || parent.select('.repeat-container').node()
 		if (this.contains(sibling)) return sibling
@@ -74,6 +78,8 @@ const Media = function (kwargs) {
 	})
 
 	if (this.editing) this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
+	
+	console.log(objecttype, level, datum)
 	if ((objecttype === 'templated' || level === 'meta') && datum.instruction) {
 		this.instruction = this.container.addElems('div', 'instruction', d => [d], d => d.type)
 			.attr('data-placeholder', d => d.instruction) // TO DO: IF TRANSLATION IS AVAILABLE TRANSLATE
@@ -3142,7 +3148,7 @@ async function renderPad (kwargs) {
 		if (object !== 'review' && !is_review) {
 			if (title) { main.select('.head .title').html(title); }
 		}
-		if (object === 'source' && !type) {
+		if (['source', 'review'].includes(object) && !type) {
 			type = template ? 'templated' : 'blank'
 		}
 

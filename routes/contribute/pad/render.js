@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
 				else if (id) template_clause = DB.pgp.as.format(`id IN (SELECT template FROM pads WHERE id = $1::INT)`, [ id ])
 				else template_clause = DB.pgp.as.format('FALSE')
 				batch.push(t.oneOrNone(`
-					SELECT id, medium FROM templates
+					SELECT id, title, medium FROM templates
 					WHERE $1:raw
 				;`, [ template_clause ]))
 

@@ -1452,13 +1452,13 @@ const Entry = function (_kwargs) {
 			.html(d => d.countryname)
 		}.bind(this),
 		exploration: (_sel) => {
-			exploration.addDocButtons(_sel, true);
+			// exploration.addDocButtons(_sel, true);
 		},
 	}
 }
 function renderVignette (_section, _kwargs) {
 	if (!mediaSize) var mediaSize = getMediaSize()
-	const { data, object, space, page, language } = _kwargs
+	const { data, object, space, page } = _kwargs
 
 	const entry = new Entry({
 		parent: _section,

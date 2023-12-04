@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 	const { metafields } = JSON.parse(d3.select('data[name="site"]').node()?.value)
 	const mainobject = d3.select('data[name="object"]').node()?.value
 
-	if (initExploration) initExploration()
+	// if (typeof initExploration !== undefined) { initExploration(); }
 
 	const main = d3.select(`#${mainobject}`)
 	await renderPad({ object: mainobject, type, id, main });
@@ -51,18 +51,14 @@ window.addEventListener('DOMContentLoaded', async function () {
 	// SET UP THE ADJACENT DISPLAYS IF RELEVANT
 	// FOR SOURCE
 	if (d3.select('#source').node()) {
-		const main = d3.select(`#source`)
+		const mainsource = d3.select(`#source`)
 		
 		if (['xs', 'sm'].includes(mediaSize)) { 
 			// xs AND sm DISPLAYS DO NOT SUPPORT ADJACENT VIEWS
-			main.remove();
+			mainsource.remove();
 			d3.selectAll('.split-screen').classed('split-screen', false)
 		} else {
-			// TO DO: CHANGE LOGIC HERE TO USE A data DOM ELEMENT
-			// PROBABLY BEST IN pad
-			// const { id, object, review } = d3.select('div#source').node().dataset
-			await renderPad({ object: 'source', type: undefined, id: source, main });
-			// loadHTML(`../view/pad?id=${id}${(object === "review" || review === 'true') ? '&anonymize=true' : '' }`, '#pad', '#source')
+			await renderPad({ object: 'source', type: undefined, id: source, main: mainsource });
 
 			const url = new URL(window.location)
 			if (!queryparams) var queryparams = new URLSearchParams(url.search)
@@ -78,18 +74,25 @@ window.addEventListener('DOMContentLoaded', async function () {
 		d3.select('div.display-source a').attr('href', `?${queryparams.toString()}`)
 	}
 	// OR FOR REVIEW
-	// TO DO: FINISH HERE
-	if (d3.selectAll('div.review').size()) {
-		d3.select('div.review').each(function () {
-			const { id, idx } = this.dataset
-			loadHTML(`../view/pad?id=${id}`, '#pad', `#review-${idx}`)
-		})
+	if (d3.selectAll('main.review').size()) {		
+		const mainreviews = d3.selectAll('#reviews main.review')
+		if (['xs', 'sm'].includes(mediaSize)) { 
+			// xs AND sm DISPLAYS DO NOT SUPPORT ADJACENT VIEWS
+			mainreviews.each(function () { d3.select(this).remove(); });
+			d3.selectAll('.split-screen').classed('split-screen', false)
+		} else {
+			for (let i = 0; i < mainreviews.size(); i++) {
+				const node = mainreviews.nodes()[i]
+				const { id, idx } = node.dataset
+				await renderPad({ object: 'review', type: undefined, id, main: d3.select(node) });
+			}
 
-		const url = new URL(window.location)
-		if (!queryparams) var queryparams = new URLSearchParams(url.search)
-		queryparams.delete('display')
+			const url = new URL(window.location)
+			if (!queryparams) var queryparams = new URLSearchParams(url.search)
+			queryparams.delete('display')
 
-		d3.select('div.display-reviews a').attr('href', `?${queryparams.toString()}`)
+			d3.select('div.display-reviews a').attr('href', `?${queryparams.toString()}`)
+		}
 	} else if (d3.select('div.display-option.display-reviews').node()) {
 		const url = new URL(window.location) // url IS ALREADY DEFINED SOMEWHERE ELSE
 		if (!queryparams) var queryparams = new URLSearchParams(url.search)
@@ -116,6 +119,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 	})
 })
 
+/* // THIS WAS THE OLD LOGIC FOR LOADING ADJACENT PADS
 function loadHTML(url, source, target) {
 	const iframe = document.createElement('iframe')
 	iframe.style.display = 'none'
@@ -149,6 +153,7 @@ function loadHTML(url, source, target) {
 	}
 	document.body.appendChild(iframe)
 }
+*/
 
 async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME AS IN /browse/index.js
 	// TO DO: THIS STILL NEEDS SOME WORK

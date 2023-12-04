@@ -2,8 +2,16 @@ const debugging = false
 if (!mediaSize) var mediaSize = getMediaSize()
 window.addEventListener('DOMContentLoaded', async function () {
 	this.vocabulary = {} // THIS IS A GLOBAL VARIABLE
-	this.language = 'en'; // THIS IS A GLOBAL VARIABLE
-	language = d3.select('data[name="page"]').node().value.language || await getLanguage()
+	this.language = d3.select('data[name="page"]').node().value.language
+	if (!language) {
+		const { language, languages } = await getLanguage()
+		this.language = language || 'en' // THIS IS A GLOBAL VARIABLE
+		this.languages = languages || [] // THIS IS A GLOBAL VARIABLE
+	} else {
+		const { languages } = await getLanguage()
+		this.languages = languages || []
+	}
+
 	Object.keys(fullVocabulary).forEach(d => {
 		this.vocabulary[d] = fullVocabulary[d][language]
 	});

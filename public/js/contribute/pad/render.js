@@ -2921,7 +2921,7 @@ async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR
 		.insertElem(function () { return sibling }, 'section', `media-layout layout ${page.activity}`)
 		.classed('repeat', repeat || false)
 		.datum({ type: 'section', title, lead, structure, items, repeat, group })
-	.on('click.focus', function () { d3.select(this).classed('focus', editing && objecttype === 'blank') })
+	.on('click.focus', function () { d3.select(this).classed('focus', editing && objecttype === 'blank'); })
 
 	// THIS ALL GOES INTO A SLIDE: THIS IS ACTUALLY THE ONLY THING THAT CHANGES
 	if (title || lead) {
@@ -2996,7 +2996,7 @@ async function addSlides (kwargs) { // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR
 		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
 		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
 		const { items: pageitems } = section.datum()
-		for (let s = 0; s < pageitems; s++) {
+		for (let s = 0; s < pageitems.length; s++) {
 			await populateSection(pageitems[s], lang, section.node(), objectdata)
 		}
 	}
@@ -3017,6 +3017,9 @@ function initSlideshow (main) {
 	}
 
 	d3.selectAll('.title-slide, .description-layout:not(.hide), .media-layout > .media-container:not(.lead-container):not(.hide), .media-layout > .meta-container:not(.hide)')
+		.each(function () {
+			console.log(this)
+		})
 		.classed('slide', true)
 
 	// PREVENT GROUPS FROM ANIMATING IN
@@ -3123,19 +3126,21 @@ async function renderPad (kwargs) {
 		}
 
 		if (sections) {
+			const objectdata = { object, type, main };
+			
 			const title_instruction = sections.map(d => d.items || d.structure).flat()
 				.find(d => d.type === 'title')?.instruction
 			if (title_instruction) { main.select('.head .title').attr('data-placeholder', title_instruction); }
 
-			const objectdata = { object, type, main }
+			for (let s = 0; s < sections.length; s ++) {
+				const data = sections[s];
 
-			sections.forEach(async d => {
 				if (display === 'slideshow') {
 					await addSlides({ data: d, lang: language, objectdata })
 				} else {
 					await addSection({ data: d, lang: language, objectdata })
 				}
-			})
+			}
 		}
 		if (display === 'slideshow') { initSlideshow(main); }
 		// CLEAR CHANGES
@@ -3161,17 +3166,21 @@ async function renderPad (kwargs) {
 		if (sections) {
 			const objectdata = { object, type, main }
 
-			sections.forEach(async d => {
-				if (!editing) d.items = d.items.filter(c => {
-					if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
-					else return c.has_content
-				}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
-				if (display === 'slideshow') {
-					await addSlides({ data: d, lang: language, objectdata }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
-				} else {
-					await addSection({ data: d, lang: language, objectdata })
+			for (let s = 0; s < sections.length; s ++) {
+				const data = sections[s]
+
+				if (!editing) {
+					d.items = data.items.filter(c => {
+						if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
+						else return c.has_content
+					}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING
 				}
-			})
+				if (display === 'slideshow') {
+					await addSlides({ data, lang: language, objectdata }) // TO DO: RESTRICT THIS TO ONLY TEMPLATED PADS OR view MODE
+				} else {
+					await addSection({ data, lang: language, objectdata })
+				}
+			}
 		} else { // THIS IS AN AUTO GENERATED PAD
 			if (type === 'templated') { // IF IT IS TEMPLATED, THEN DISPLAY TEMPLATE STRUCTURE
 				// GET TEMPLATE DATA
@@ -3185,19 +3194,20 @@ async function renderPad (kwargs) {
 				}
 
 				if (sections) {
+					const objectdata = { object, type, main }
+
 					const title_instruction = sections.map(d => d.items || d.structure).flat()
 						.find(d => d.type === 'title')?.instruction
 					if (title_instruction) { main.select('.head .title').attr('data-placeholder', title_instruction); }
 
-					const objectdata = { object, type, main }
-
-					sections.forEach(async d => {
+					for (let s = 0; s < sections.length; s ++) {
+						const data = sections[s]
 						if (display === 'slideshow') {
-							await addSlides({ data: d, lang: language, objectdata })
+							await addSlides({ data, lang: language, objectdata })
 						} else {
-							await addSection({ data: d, lang: language, objectdata })
+							await addSection({ data, lang: language, objectdata })
 						}
-					})
+					}
 				}
 			}
 		}

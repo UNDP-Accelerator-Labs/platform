@@ -1254,22 +1254,24 @@ async function renderTemplate () {
 	const editing = activity === 'edit'
 
 	if (template.id) {
-		const data = await POST('/load/template', { id: template.id })
+		const { sections } = await POST('/load/template', { id: template.id })
 
-		if (data.sections) {
-			data.sections.forEach(async d => {
-				await addSection({ data: d, lang: language })
-			})
+		if (sections) {
+			for (let s = 0; s < sections.length; s++) {
+				const data = sections[s]
+				await addSection({ data, lang: language })
+			}
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')
 	} else if (template.source) {
-		const data = await POST('/load/template', { id: template.source })
+		const { sections } = await POST('/load/template', { id: template.source })
 
-		if (data.sections) {
-			data.sections.forEach(async d => {
-				await addSection({ data: d, lang: language })
-			})
+		if (sections) {
+			for (let s = 0; s < sections.length; s++) {
+				const data = sections[s]
+				await addSection({ data, lang: language })
+			}
 		}
 		// CLEAR CHANGES
 		window.sessionStorage.removeItem('changed-content')

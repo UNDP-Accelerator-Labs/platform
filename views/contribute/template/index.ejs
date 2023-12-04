@@ -43,7 +43,6 @@
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
 <%
-	console.log(locals.data)
 	const templatedata = {
 		id: locals.data?.id ?? null,
 		source: locals.data?.source ?? null,
@@ -167,17 +166,7 @@
 						<label data-vocab='description'></label>
 					</div>
 					<div class='media-container txt-container lead'>
-						<div class='media media-txt template' data-placeholder='missing template description' contenteditable>
-							<% if (review_template) { %>
-								<% if (locals.data?.description) { %>
-									<%= locals.data?.description %>
-								<% } else { %>
-									<span data-vocab='review template description'></span> <%= languages.find(d => d.language === review_language).name %>
-								<% } %>
-							<% } else { %>
-								<%= locals.data?.description %>
-							<% } %>
-						</div>
+						<div class='media media-txt template' data-placeholder='missing template description' contenteditable><% if (review_template) { %><% if (locals.data?.description) { %><%= locals.data?.description %><% } else { %><span data-vocab='review template description'></span> <%= languages.find(d => d.language === review_language).name %><% } %><% } else { %><%= locals.data?.description %><% } %></div>
 						<!-- TO DO: TRANSLATE LANGUAGE NAME (e.g. FRENCH > FRANÇAIS) -->
 					</div>
 					<% if (!review_template) { %>

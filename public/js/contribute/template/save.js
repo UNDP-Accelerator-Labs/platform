@@ -140,7 +140,7 @@ function compileContent (attr) {
 	// COMPILE THE CONTENT
 	content.title = title // ALWAYS SAVE THE TITLE
 	content.slideshow = slideshow // ALWAYS SAVE THE SLIDESHOW OPTION
-	if (!attr || attr === 'description') content.description = description
+	if (!attr || attr === 'description') content.description = description.trim()
 	if (!attr || ['lead', 'media', 'meta'].includes(attr)
 	|| sections.map(d => d.structure).flat().unique('type', true).includes(attr)) {
 		content.sections = sections

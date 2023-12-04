@@ -995,24 +995,36 @@ exports.sitemap = async (req, res) => {
 		return (await t.any(`
 			SELECT p.id, p.update_at FROM pads p WHERE p.status > 2
 		;`)).map((row) => ({
-			// NOTE: always use en as canonical language
-			url: `${own_app_url}en/view/pad?id=${row.id}`,
-			date: new Date(toTimestamp(row.update_at)).toISOString(),
+			url: `/view/pad?id=${row.id}`,
+			date: toTimestamp(row.update_at),
 		}))
 	});
+	const all_urls = [
+		{
+			url: '/home/',
+			date: maxDate,
+		},
+		...pads,
+	];
+	all_urls.sort((a, b) => -(a.date - b.date));
 	const obj = {
 		metadata: {
-			all_urls: [
-				{
-					url: `${own_app_url}en/home/`, // NOTE: canonical home
-					date: new Date(maxDate).toISOString(),
-				},
-				...pads,
-			],
+			all_urls,
+			own_app_url,
 		},
 	};
 	res.setHeader('content-type', 'application/xml');
 	res.render('sitemap', obj);
+}
+
+exports.robots = async (req, res) => {
+	const obj = {
+		metadata: {
+			own_app_url,
+		}
+	};
+	res.setHeader('content-type', 'text/plain');
+	res.render('robots', obj);
 }
 
 exports.notfound = async(req, res) => {

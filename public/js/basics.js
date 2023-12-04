@@ -276,6 +276,6 @@ async function getLanguage () {
 	const url = new URL(window.location)
 	const language = url.pathname.substring(1).split('/')[0]
 
-	if (languages.some(d => d === language)) return language
-	else return 'en'
+	if (languages.some(d => d === language)) return { language, languages }
+	else return { language: 'en', languages }
 }

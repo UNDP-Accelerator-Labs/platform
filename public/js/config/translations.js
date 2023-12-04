@@ -3324,8 +3324,11 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
 const vocabulary = {}
 let language = 'en';
+let languages = [];
 (async () => {
-	language = await getLanguage()
+	let lang = await getLanguage()
+	language = lang.language || 'en'
+	languages = lang.languages || []
 	Object.keys(fullVocabulary).forEach(d => {
 		vocabulary[d] = fullVocabulary[d][language]
 	});

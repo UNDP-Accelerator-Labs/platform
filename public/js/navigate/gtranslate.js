@@ -1,13 +1,15 @@
 var googleTranslateElement;
 
+const currentpage_url = new URL(window.location)
+const fullHost = `${currentpage_url.origin}`;
+const mainHost = fullHost.endsWith('azurewebsites.net') ? fullHost : fullHost.split('.').slice(-2).join('.');
+
 function setCookie(key, value, expiry) {
   const expires = new Date();
   expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
-  const domain = '<%= mainHost %>';
-  document.cookie = `${key}=${value};expires=${expires.toUTCString()};domain=${domain}`;
+  document.cookie = `${key}=${value};expires=${expires.toUTCString()};domain=${mainHost}`;
 }
 async function googleTranslateElementInit() {
-	const language = await getLanguage()
 	setCookie('GoogleAccountsLocale_session', `${language}`);
 	setCookie('googtrans', `/en/${language}`, 1);
 
@@ -38,9 +40,8 @@ async function updateDomTree(lang) {
 	if (!lang) {
 		lang = 'en';
 	}
-
-	const { languages } = await POST('/load/metadata', { feature: 'languages' })
 	const isMainLanguage = lang !== 'en' && languages.some(d => d === lang)
+
 	// d3.selectAll('.google-translate-attr')
 	d3.selectAll('[data-vocab]')
 		.classed('notranslate', function() {

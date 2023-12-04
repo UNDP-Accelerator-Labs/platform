@@ -33,9 +33,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        'img-src': csp_links.concat([
-          'blob:',
-        ]),
+        'img-src': csp_links.concat(['blob:']),
         'script-src': csp_links,
         'script-src-attr': [
           "'self'",
@@ -160,6 +158,7 @@ app.get('/version/', async (req, res) => {
 });
 
 app.get('/sitemap.xml', routes.sitemap);
+app.get('/robots.txt', routes.robots);
 
 // PUBLIC VIEWS
 app.get('/', routes.redirect.home, routes.dispatch.public);
@@ -359,7 +358,6 @@ app
   .route('/apis/:action/:object')
   .get(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis)
   .post(routes.check.login, setAccessControlAllowOrigin, routes.dispatch.apis);
-
 
 app.post('/call/api', routes.process.callapi); // TO DO: CHECK WHAT THIS IS FOR
 app.get('/api/skills', routes.check.login, routes.api.skills); // TO DO: THIS SHOULD BE DEPRECATED

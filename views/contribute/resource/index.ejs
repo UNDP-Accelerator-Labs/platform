@@ -19,12 +19,12 @@
 
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
-<% 
+<%
 	const rightsobj = {};
 	modules.forEach(d => {
 		let { write } = d.rights;
-		if (typeof write === 'object') { write = write.blank; } 
-		
+		if (typeof write === 'object') { write = write.blank; }
+
 		rightsobj[d.type] = null
 		if (write <= rights) {
 			rightsobj[d.type] = 'write'

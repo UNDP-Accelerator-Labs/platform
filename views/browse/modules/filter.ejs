@@ -108,7 +108,7 @@
 								if (active_filters.length) { %>
 									<div class='active-filters'>
 										<% active_filters.forEach(c => { %>
-											<div class='tag' data-id='<%- c.id %>'>	
+											<div class='tag' data-id='<%- c.id %>'>
 												<% if (Number.isInteger(c.name)) { %>
 													<label class='name' title='<%= c.name %>'>
 														<%= c.name %>
@@ -139,7 +139,7 @@
 					<div class='order'>
 						<menu>
 							<li>
-								<input type='checkbox' class='toggle' name='orderby' value='random' id='order-random' <% if (query?.orderby?.includes('random')) { %>checked<% } %>> 
+								<input type='checkbox' class='toggle' name='orderby' value='random' id='order-random' <% if (query?.orderby?.includes('random')) { %>checked<% } %>>
 								<label for='order-random'></label>
 								<p class='google-translate-attr' data-vocab='serendipitous search'></p>
 							</li>
@@ -171,7 +171,7 @@
 							<div class='add filter pinboards google-translate-attr'>
 								<input type='text' id='pin-all'>
 								<label for='pin-all'>
-									<span data-vocab='["add all", "<%= (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span> <%= locals.stats?.filtered ?? 0 %> <span data-vocab='["pads to pinboard", "<%= (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span>	
+									<span data-vocab='["add all", "<%= (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span> <%= locals.stats?.filtered ?? 0 %> <span data-vocab='["pads to pinboard", "<%= (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span>
 								</label>
 								<button id='new-pinboard' type='button'></button>
 								<div class='dropdown'>

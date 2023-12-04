@@ -528,10 +528,10 @@ nav.pinboard-sections {
 					left: 50%;
 					transform: translateX(-50%);
 					z-index: 99;
-					
+
 					menu {
 						justify-content: flex-start;
-					
+
 						li {
 							display: flex;
 							align-items: center;
@@ -543,7 +543,7 @@ nav.pinboard-sections {
 								& > div {
 									width: 45px;
 									text-align: center;
-									
+
 									i {
 										color: $c-dark-grey;
 									}

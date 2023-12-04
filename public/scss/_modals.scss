@@ -272,9 +272,9 @@
 				input + label {
 					top: 1px;
 				}
-				input:focus {
-					/* border-color: $c-light-yellow; */
-				}
+				// input:focus {
+				// 	/* border-color: $c-light-yellow; */
+				// }
 				input[type=date] {
 					padding-bottom: 5px;
 					border: none;
@@ -489,7 +489,7 @@
 			font-size: $t-mid-small;
 		}
 	}
-	
+
 }
 .modal.longlist {
 

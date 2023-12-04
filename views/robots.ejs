@@ -1,0 +1,34 @@
+<%
+  const own_app_url = locals.metadata.own_app_url;
+%>User-agent: *
+Allow: /
+
+# we disallow all api endpoints that reply to GET requests
+# we do allow the /login page to enable direct links to it
+# and we allow /transfer to ensure forwarding links get captured correctly
+
+# path prefixes
+Disallow: /accept/
+Disallow: /api/
+Disallow: /apis/
+Disallow: /confirm-email/
+Disallow: /decline/
+Disallow: /delete/
+Disallow: /exploration/
+Disallow: /forward/
+Disallow: /logout/
+Disallow: /publish/
+Disallow: /request/
+Disallow: /reset/
+Disallow: /save/
+Disallow: /share/
+Disallow: /unpublish/
+
+# direct paths
+Disallow: /confirm-device
+Disallow: /forget-password
+Disallow: /module-error
+Disallow: /resend-otp-code
+Disallow: /reset-password
+
+Sitemap: <%- own_app_url %>sitemap.xml

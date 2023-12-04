@@ -10,7 +10,7 @@
 <html lang='<%- language %>'>
 <head>
 
-<%- include ('../../partials/head.ejs') %> 
+<%- include ('../../partials/head.ejs') %>
 
 <script type='text/javascript' src='/scripts/html2canvas/dist/html2canvas.js'></script>
 <script type='text/javascript' src='/scripts/jspdf/dist/jspdf.umd.min.js'></script>
@@ -20,7 +20,7 @@
 
 <body>
 
-<%- include ('../../partials/modals.ejs') %> 
+<%- include ('../../partials/modals.ejs') %>
 
 <div class='document print'>
 </div>
@@ -39,10 +39,10 @@
 	async function download () {
 		for (let i = 0; i < chunks.length; i++) {
 			const results = await Promise.all(renderCards(chunks[i]))
-			
+
 			<% if (render) { %>
 				const { width: orwidth, height: orheight, imgdata: orimgdata } = results[0]
-			
+
 				const pdf = new jsPDF({ unit: 'px', format: [ orwidth, orheight ], hotfixes: ['px_scaling'] })
 				pdf.addImage(orimgdata, 'png', 0, 0, orwidth, orheight)
 				results.shift()
@@ -122,7 +122,7 @@
 				// ADD THE TITLE
 				const article = d3.select('div.document')
 				.addElem('article', 'print card')
-				
+
 
 				if (img) {
 					const imgnode = article.addElem('img')
@@ -135,10 +135,10 @@
 							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
 							let imgdata = canvas.toDataURL('image/png')
 							imgdata.replace(/^data:image\/png/, 'data:application/octet-stream')
-							
+
 							const { width, height } = canvas
 							resolve({ imgdata, width, height })
-							
+
 						}).catch(err => console.log(err))
 					}
 					blob.onerror = function () {
@@ -147,12 +147,12 @@
 							// HELPFUL SOLUTION HERE: https://stackoverflow.com/questions/18581379/how-to-save-the-contents-of-a-div-as-a-image
 							let imgdata = canvas.toDataURL('image/png')
 							imgdata.replace(/^data:image\/png/, 'data:application/octet-stream')
-							
+
 							const { width, height } = canvas
 							resolve({ imgdata, width, height })
 						}).catch(err => console.log(err))
 					}
-					
+
 					<% if (locals.metadata.site.app_storage) { %>
 						const source = new URL(`<%- locals.metadata.site.app_storage %>${img[0]}`).href
 					<% } else { %>
@@ -161,7 +161,7 @@
 					// blob.src = img
 					blob.src = source
 				}
-				
+
 				article.addElem('small', 'media media-source')
 				.html(`id: ${id}`)
 
@@ -189,7 +189,7 @@
 				.addElems('div', 'tag', d => d)
 					.addElems('label')
 					.html(d => d.name.capitalize())
-				
+
 				article.addElem('small', 'meta meta-source')
 				.html(`Source: ${window.location.origin}/<%- language %>/view/pad?id=${id}`)
 			})

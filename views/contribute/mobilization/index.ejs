@@ -16,13 +16,13 @@
 
 <body>
 
-<%- include ('../../partials/navigate/menu-languages.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
 <div class='main-content'>
 <header>
 	<div class='inner'>
-		<%- include ('../../partials/navigate/sidebar.ejs') %> 
+		<%- include ('../../partials/navigate/sidebar.ejs') %>
 	</div>
 </header>
 
@@ -36,7 +36,7 @@
 		<% } %>
 
 		<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
-		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
+		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE:
 		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
 			<input type='hidden' name='template' value='<%- locals.templates.id %>'>
 			<input type='hidden' name='copy' value='true'>
@@ -74,7 +74,7 @@
 								<input id='title' type='text' name='title' data-vocabprefix='expansion' value='<%= locals.sourceinfo.title %>'>
 							<% } else { %>
 								<input id='title' type='text' name='title' data-vocabprefix='["follow up","preposition"]' value='<%= locals.sourceinfo.title %>'>
-							<% } %> 
+							<% } %>
 						<% } else if (locals.data?.title) { %>
 							<input id='title' type='text' name='title' value='<%= locals.data.title %>'>
 						<% } %>
@@ -147,11 +147,11 @@
 						<h1 class="google-translate-attr" data-vocab='set mobilization dates'></h1>
 						<p class="google-translate-attr" data-vocab='mobilization dates default'></p>
 
-						<% 
+						<%
 							const today = new Date()
 							const tomorrow = new Date(today)
 							tomorrow.setDate(tomorrow.getDate() + 1)
-							
+
 							const dd = String(today.getDate()).padStart(2, '0')
 							const mm = String(today.getMonth() + 1).padStart(2, '0')
 							const yyyy = today.getFullYear()
@@ -254,7 +254,7 @@
 										<div class='main'>
 											<% if (t.title) { %>
 												<label class="google-translate-attr" for='t-<%- t.id %>'><%- t.title %></label>
-											<% } else { %> 
+											<% } else { %>
 												<label class="google-translate-attr" for='t-<%- t.id %>'>[<span data-vocab='untitled template'></span>]</label>
 											<% } %>
 										</div>
@@ -287,7 +287,7 @@
 								<button type='button' class='next' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
 									<label class="google-translate-attr" data-vocab='next'></label>
 								</button>
-							<% } else { %> 
+							<% } else { %>
 								<button type='submit' class='next'>
 									<label class="google-translate-attr" data-vocab='launch'></label>
 								</button>
@@ -303,7 +303,7 @@
 							<menu>
 								<% locals.cohort.forEach(c => { %>
 									<% if (
-										(locals.sourceinfo 
+										(locals.sourceinfo
 											&& locals.metadata.page.query?.copy?.some(d => d !== 'true')
 										) || locals.data?.cohort.includes(c.id)
 										|| locals.metadata.page.query.pinboard?.length > 0
@@ -378,7 +378,7 @@
 							<!-- TO DO: TRANSLATE -->
 							<label for='pad-limit' class='inline small google-translate-attr' data-vocab='submissions per contributor'></label>
 						</div>
-					</div>					
+					</div>
 				</div>
 				<div class='foot'>
 				</div>
@@ -393,7 +393,7 @@
 <footer>
 </footer>
 
-<%- include ('../../partials/footer.ejs') %> 
+<%- include ('../../partials/footer.ejs') %>
 
 </body>
 </html>

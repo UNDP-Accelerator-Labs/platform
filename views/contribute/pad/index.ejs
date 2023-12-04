@@ -37,7 +37,6 @@
 <script type='text/javascript' src='/js/contribute/pad/toolbar.interactions.js'></script>
 <script type='text/javascript' src='/js/contribute/pad/keyboard.interactions.js'></script>
 <script type='text/javascript' src='/js/contribute/comment.js'></script>
-
 </head>
 
 <body>
@@ -45,7 +44,7 @@
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <data name='username' value='<%= locals.metadata.user.name %>'></data>
-<% 
+<%
 	const pagedata = {
 		type: publicpage ? 'public' : 'private',
 		display: pagedisplay,
@@ -216,7 +215,7 @@
 								<% } %>
 							<% } %>
 							<% if (
-								object !== 'review' 
+								object !== 'review'
 								&& !publicpage
 								&& !(token && action === 'publish_and_share')
 							) { %>
@@ -516,10 +515,10 @@
 </footer>
 
 <%- include ('../../partials/footer.ejs') %>
-	
+
 <% if (locals.metadata?.user?.uuid) { %>
-	<script type='text/javascript' src='/js/exploration.js' defer></script>
-	<script type='text/javascript' src='/js/contribute/pad/exploration.js' defer></script>
+	<!-- <script type='text/javascript' src='/js/exploration.js'></script> -->
+	<!-- <script type='text/javascript' src='/js/contribute/pad/exploration.js'></script> -->
 <% } %>
 
 </body>

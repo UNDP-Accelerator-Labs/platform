@@ -129,7 +129,7 @@
 									border-left: 1px dotted $c-light-grey;
 									font-size: $t-mid-small;
 									line-height: 1.5em;
-									vertical-align: middle;
+									// vertical-align: middle;  // ignored because of block
 									box-sizing: border-box;
 								}
 								.input-group {

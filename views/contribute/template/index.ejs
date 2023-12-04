@@ -35,7 +35,7 @@
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <data name='username' value='<%= locals.metadata.user.name %>'></data>
-<% 
+<%
 	const pagedata = {
 		type: publicpage ? 'public' : 'private',
 		activity: editing ? 'edit' : 'view'
@@ -47,17 +47,17 @@
 		id: locals.data?.id ?? null,
 		source: locals.data?.source ?? null,
 		copy: locals.data?.copy ?? false,
-		
+
 		// type: review_template ? 'templated' : 'blank',
 		// template: templated ? locals.display_template : {},
-		
+
 		category: review_template ? 'review' : 'standard',
 		language: review_language || null,
 		metafields: metafields || {},
 		media_value_keys: locals.metadata.site.media_value_keys || [],
-		
+
 		// is_review: locals.data?.is_review || false,
-		
+
 		title: locals.data?.title ?? null
 	}
 %>
@@ -275,7 +275,7 @@
 												<div class='meta meta-data'>
 													<div class='meta meta-contributor'><a href='../browse/templates/shared?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
 													<div class='meta meta-date google-translate-attr'>
-														<%= new Date(c.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>	
+														<%= new Date(c.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 													</div>
 												</div>
 											</div>

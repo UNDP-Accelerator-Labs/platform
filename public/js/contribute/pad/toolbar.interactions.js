@@ -1,4 +1,21 @@
-function initToolbarInteractions (kwargs) {
+import { language } from '/js/config/translations.js'
+import { getMediaSize } from '/js/main.js'
+import {
+	addSection,
+	uploadImg,
+	uploadVideo,	
+	addDrawing,
+	addTxt,
+	addEmbed,
+	addChecklist,
+	addRadiolist,
+	addLocations,
+	addIndexes,
+	addTags,
+	addAttachment
+} from '/js/contribute/pad/render.js'
+
+export function initToolbarInteractions (kwargs) {
 	let { metafields, type: objecttype, main } = kwargs 
 	if (!mediaSize) var mediaSize = getMediaSize()
 	

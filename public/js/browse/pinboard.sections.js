@@ -1,4 +1,7 @@
 import { language, vocabulary } from '/js/config/translations.js'
+import { getMediaSize, fixLabel, selectElementContents, checkForEnter } from '/js/main.js'
+import { renderFormModal } from '/js/modals.js'
+import { partialSave } from '/js/browse/save.js'
 
 // TO DO: DEPRECATE THIS IN FAVOR OF A COLLECTION OF COLLECTIONS APPROACH
 d3.selectAll('.make-editable:not(.section-title)')

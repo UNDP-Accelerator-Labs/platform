@@ -31,53 +31,15 @@
 		crossorigin=''></script>
 <% } %>
 
-<script type='text/javascript' src='/js/contribute/pad/main.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/render.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/save.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/toolbar.interactions.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/keyboard.interactions.js'></script>
-<script type='text/javascript' src='/js/contribute/comment.js'></script>
+<%- include ('./modules/data.ejs') %>
+
+<script type='module' src='/js/contribute/pad/load.js'></script>
+<script type='module' src='/js/contribute/pad/keyboard.interactions.js'></script>
+<script type='module' src='/js/contribute/comment/load.js'></script>
 
 </head>
 
 <body>
-
-<!-- SET DATA ATTRIBUTES -->
-<data name='object' value='<%= object %>'></data>
-<data name='username' value='<%= locals.metadata.user.name %>'></data>
-<% 
-	const pagedata = {
-		type: publicpage ? 'public' : 'private',
-		display: pagedisplay,
-		activity: editing ? 'edit' : 'view',
-		language
-	}
-%>
-<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
-<%
-	const paddata = {
-		id: locals.data?.id ?? null,
-		type: templated ? 'templated' : 'blank',
-		template: templated ? locals.display_template : {},
-		source: locals.source ?? null,
-		is_review: locals.data?.is_review || false,
-		title: locals.data?.title ?? null
-	}
-%>
-<data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
-<%
-	const sitedata = {
-		modules: modules || {},
-		metafields: metafields || {},
-		media_value_keys: locals.metadata.site.media_value_keys || [],
-		ownDB: locals.metadata.site.own_db
-	}
-%>
-<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
-<data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
-<% if (locals.metadata.site.app_storage) { %>
-	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
-<% } %>
 
 <%- include ('../../partials/navigate/menu-languages.ejs') %>
 
@@ -288,7 +250,6 @@
 				</div>
 				<% if (pagedisplay !== 'slideshow') { %>
 					<button class='scroll-nav'><label class='rotate'>&rsaquo;</label></button>
-					<!-- TO DO: MAKE SURE THE scrollToPad IS BE PROPERLY HANDLED IN js/setup.js -->
 				<% } %>
 			<% } %>
 
@@ -313,7 +274,7 @@
 									<div class='contributor google-translate-attr'>
 										<span data-vocab='credit'></span> <a href='/<%= language %>/browse/pads/public?contributors=<%= locals.data?.owner %>'><%= locals.data?.ownername %></a>.
 									</div>
-									<div class='meta meta-country'><%- locals.data?.country %></div>
+									<div class='meta meta-country'><%= locals.data?.country %></div>
 									<div class='meta meta-date google-translate-attr'>
 										<%= new Date(locals.data?.date.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 									</div>
@@ -453,7 +414,7 @@
 								<div class='meta meta-data'>
 									<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- d.ownername %></a></div>
 									<div class='meta meta-date google-translate-attr'>
-										<%= new Date(d.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+										<%= new Date(d.date.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 									</div>
 								</div>
 							</div>
@@ -477,7 +438,7 @@
 													<div class='meta meta-data'>
 														<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
 														<div class='meta meta-date google-translate-attr'>
-															<%= new Date(c.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+															<%= new Date(c.date.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 														</div>
 													</div>
 												</div>
@@ -518,8 +479,8 @@
 <%- include ('../../partials/footer.ejs') %>
 	
 <% if (locals.metadata?.user?.uuid) { %>
-	<script type='text/javascript' src='/js/exploration.js' defer></script>
-	<script type='text/javascript' src='/js/contribute/pad/exploration.js' defer></script>
+	<!-- <script type='text/javascript' src='/js/exploration.js' defer></script> -->
+	<!-- <script type='text/javascript' src='/js/contribute/pad/exploration.js' defer></script> -->
 <% } %>
 
 </body>

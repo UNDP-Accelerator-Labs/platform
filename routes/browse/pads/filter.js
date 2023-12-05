@@ -6,7 +6,8 @@ module.exports = async (req, res) => {
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 
 	let { space, object, instance } = req.params || {}
-	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : null // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	if (!instance) instance = Object.keys(req.query)?.length ? req.query.instance : Object.keys(req.body)?.length ? req.body.instance : null // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, section, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const language = checklanguage(req.params?.language || req.session.language)
@@ -68,6 +69,7 @@ module.exports = async (req, res) => {
 									// instanceId: shortStringAsNum(`${result?.iso3}`.toLowerCase()),  // create a numeric id based on the iso3 characters
 									instanceId: shortStringAsNum(`${decodeURI(instance)}`.toLowerCase()),  // create a numeric id based on the iso3 characters
 									docType: 'country',
+									instance,
 								};
 							}
 						}).catch(err => console.log(err))
@@ -97,6 +99,7 @@ module.exports = async (req, res) => {
 										description: result?.description,
 										instanceId: result?.id,
 										docType: 'pinboard',
+										instance,
 									}
 								}).catch(err => console.log(err))
 							} else {
@@ -107,6 +110,7 @@ module.exports = async (req, res) => {
 									title: result?.name,
 									instanceId: result?.id,
 									docType: 'team',
+									instance,
 								};
 							}
 						}).catch(err => console.log(err))

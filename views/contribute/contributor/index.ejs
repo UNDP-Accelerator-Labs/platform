@@ -15,17 +15,14 @@
 
 <%- include ('../../partials/head.ejs') %>
 
-<script type='text/javascript' src='/js/contribute/contributor/main.js'></script>
-<script type='text/javascript' src='/js/contribute/contributor/save.js'></script>
+<%- include ('./modules/data.ejs') %>
+
+<script type='module' src='/js/contribute/contributor/load.js'></script>
+<!-- <script type='text/javascript' src='/js/contribute/contributor/save.js'></script> -->
 
 </head>
 
 <body>
-
-<% if (locals.data?.uuid) { %>
-<!-- TO DO: DEPRECATE THIS WHEN INTEGRATING reset-password AS IT IS ONLY USED FOR RESETTING -->
-	<data name='id' value='<%= locals.data.uuid %>'></data>
-<% } %>
 
 <%- include ('../../partials/navigate/menu-languages.ejs') %>
 
@@ -391,10 +388,6 @@
 
 <footer></footer>
 <%- include ('../../partials/footer.ejs') %>
-
-<% if (locals.data?.uuid && editable) { %>
-	<script type='text/javascript' src='/js/contribute/contributor/update.password.js' defer></script>
-<% } %>
 
 </body>
 </html>

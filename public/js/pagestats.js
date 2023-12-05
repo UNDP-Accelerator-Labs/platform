@@ -1,3 +1,5 @@
+import { POST } from '/js/fetch.js'
+
 const pagestats = JSON.parse(d3.select('data[name="pagestats"]').node().value)
 
 const totalTime = pagestats.readtime;

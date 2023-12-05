@@ -8,9 +8,10 @@ const assets = [
 	'/js/Array.prototype.extensions.js',
 	'/js/String.prototype.extensions.js',
 	'/js/Math.extensions.js',
-	'/js/upload.js'
+	// '/js/upload.js'
 ]
 
+// TO DO: UPDATE app.serviceWorker
 
 const APP_ASSETS = 'acclab-app-assets'
 self.addEventListener('install', evt => {

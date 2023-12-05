@@ -1,4 +1,30 @@
+import { vocabulary } from '/js/config/translations.js'
+import { getMediaSize, limitLength, getContent } from '/js/main.js'
+import { POST } from '/js/fetch.js'
+
 // THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
+export function switchButtons (lang = 'en') {
+	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit' // TO DO: FIX HERE
+
+	if (!mediaSize) var mediaSize = getMediaSize()
+	window.sessionStorage.setItem('changed-content', true)
+	// PROVIDE FEEDBACK: UNSAVED CHANGES
+	if (mediaSize === 'xs') {
+		d3.select('.meta-status .btn-group .save button')
+		.each(function () { this.disabled = false })
+			.html(vocabulary['save changes'])
+	} else {
+		const menu_logo = d3.select('nav#site-title .inner')
+		window.sessionStorage.setItem('changed-content', true)
+		menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
+		menu_logo.selectAll('div.save').classed('hide saved', false)
+			.select('button')
+		.on('click', async _ => {
+			if (editing) await partialSave()
+		}).html(vocabulary['save changes'])
+	}
+}
+
 function retrieveItems (sel, datum, items) {
 	// MEDIA
 	if (datum.type === 'title') {
@@ -298,7 +324,7 @@ function compileContent (attr) {
 
 	return content
 }
-async function partialSave (attr) {
+export async function partialSave (attr) {
 	const object = d3.select('data[name="object"]').node().value
 
 	console.log('saving')
@@ -366,7 +392,7 @@ async function partialSave (attr) {
 		return id
 	}).catch(err => console.log(err))
 }
-async function updateStatus (_status) {
+export async function updateStatus (_status) {
 	if (!_status) {
 		const curr_status = await getContent({ feature: 'status' })
 		const completion = getStatus()
@@ -383,7 +409,7 @@ async function updateStatus (_status) {
 	metastatus.select('div.btn-group form button.generate-pdf')
 		.attr('disabled', _status > 0 ? null : true)
 }
-async function saveAndSubmit (node) {
+export async function saveAndSubmit (node) {
 	await partialSave()
 	node.form.submit()
 	// TO DO: PROVIDE FEEDBACK

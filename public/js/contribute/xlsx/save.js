@@ -1,3 +1,9 @@
+import { vocabulary } from '/js/config/translations.js'
+import { addGlobalLoader, rmGlobalLoader } from '/js/main.js'
+import { POST } from '/js/fetch.js'
+import { compilePads, compileTemplate } from '/js/contribute/xlsx/main.js'
+import { renderPromiseModal } from '/js/modals.js'
+
 async function catchSubmit (evt) {
 	const { participations } = JSON.parse(d3.select('data[name="page"]').node().value);
 

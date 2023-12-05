@@ -1,3 +1,5 @@
+import { POST } from '/js/fetch.js'
+
 export const fullVocabulary = {
 	"contribute": {
 		"en": "Contribute",
@@ -3319,6 +3321,15 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 		"es": "",
 		"pt": ""
 	}
+}
+
+async function getLanguage () {
+	const { languages } = await POST('/load/metadata', { feature: 'languages' })
+	const url = new URL(window.location)
+	const language = url.pathname.substring(1).split('/')[0]
+
+	if (languages.some(d => d === language)) return { language, languages }
+	else return { language: 'en', languages }
 }
 
 export const vocabulary = {} // THIS IS A GLOBAL VARIABLE

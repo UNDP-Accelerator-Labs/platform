@@ -1,4 +1,20 @@
-function initToolbarInteractions (metafields) {
+import { language } from '/js/config/translations.js'
+import { 
+	addSection, 
+	addImg, 
+	addDrawing, 
+	addTxt, 
+	addEmbed, 
+	addChecklist, 
+	addRadiolist, 
+	addLocations, 
+	addIndexes, 
+	addTags, 
+	addAttachment,
+	addGroup
+} from '/js/contribute/template/render.js'
+
+export function initToolbarInteractions (metafields) {
 	if (!mediaSize) var mediaSize = getMediaSize()
 	if (!metafields) {
 		const { metafields: tmeta } = JSON.parse(d3.select('data[name="template"]').node()?.value)

@@ -1,3 +1,27 @@
+import { vocabulary } from '/js/config/translations.js'
+import { getMediaSize, limitLength } from '/js/main.js'
+import { POST } from '/js/fetch.js'
+
+// SAVING BUTTON
+export function switchButtons (lang = 'en') {
+	if (!mediaSize) var mediaSize = getMediaSize()
+	window.sessionStorage.setItem('changed-content', true)
+	// PROVIDE FEEDBACK: UNSAVED CHANGES
+	if (mediaSize === 'xs') {
+		d3.select('.meta-status .btn-group .save button')
+		.each(function () { this.disabled = false })
+			.html(vocabulary['save changes'])
+	} else {
+		const menu_logo = d3.select('nav#site-title .inner')
+		window.sessionStorage.setItem('changed-content', true)
+		menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
+		menu_logo.selectAll('div.save').classed('hide saved', false)
+			.select('button')
+		.on('click', async _ => await partialSave())
+			.html(vocabulary['save changes'])
+	}
+}
+
 function retrieveItems (sel, datum, items) {
 	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
 
@@ -166,7 +190,7 @@ function compileContent (attr) {
 	return content
 }
 
-async function partialSave (attr) {
+export async function partialSave (attr) {
 	console.log('saving')
 	const template = JSON.parse(d3.select('data[name="template"]').node()?.value)
 

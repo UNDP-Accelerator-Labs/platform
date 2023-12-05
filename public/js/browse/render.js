@@ -1,8 +1,13 @@
 import { language, vocabulary } from '/js/config/translations.js'
+import { getMediaSize, fixLabel, dateOptions, getContent } from '/js/main.js'
+import { POST } from '/js/fetch.js'
 import { deleteArticles, confirmRemoval, unpublishArticles } from '/js/browse/main.js'
 import { setDownloadOptions } from '/js/browse/download.js'
 import { initExploration } from '/js/browse/exploration.js'
+import { renderFormModal, renderImgZoom } from '/js/modals.js'
 
+// TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
+// THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
 const exploration = initExploration()
 
 export const Entry = function (_kwargs) {
@@ -145,8 +150,8 @@ export const Entry = function (_kwargs) {
 							return str
 						} else {
 							if (d.end_date) {
-								return new Date(d.start_date).toLocaleDateString(language, dateOptions) + ' – ' + new Date(d.end_date).toLocaleDateString(language, dateOptions)
-							} else return new Date(d.start_date).toLocaleDateString(language, dateOptions)
+								return new Date(d.start_date?.date || d.start_date).toLocaleDateString(language, dateOptions) + ' – ' + new Date(d.end_date?.date || d.end_date).toLocaleDateString(language, dateOptions)
+							} else return new Date(d.start_date?.date || d.start_date).toLocaleDateString(language, dateOptions)
 						}
 					}
 					else return d.email
@@ -899,7 +904,7 @@ export const Entry = function (_kwargs) {
 				if (version_depth > 1) {
 					const versiontree = treeinfo.addElems('div', 'meta meta-versiontree')
 						.addElems('a')
-						.attr('href', d => `versiontree?nodes=${d.id}`)
+						.attr('href', d => `/${language}/browse/pads/versiontree?nodes=${d.id}`)
 					versiontree.addElems('img')
 						.attr('src', '/imgs/icons/i-versiontree.svg')
 					versiontree.addElems('small')
@@ -910,7 +915,7 @@ export const Entry = function (_kwargs) {
 				const followup = treeinfo.addElems('div', 'meta meta-followup')
 					.attr('title', d => d.source_title)
 				followup.addElems('i')
-					.html(`${vocabulary['follow up']['preposition']}: `)
+					.html(`${vocabulary['follow up']['preposition']}:&nbsp;`)
 				followup.addElems('a')
 					.attrs({
 						'href': d => {
@@ -923,7 +928,7 @@ export const Entry = function (_kwargs) {
 				const forward = treeinfo.addElems('div', 'meta meta-forward')
 					.attr('title', d => d.source_title)
 				forward.addElems('i')
-					.html(vocabulary['forwarded from'])
+					.html(`${vocabulary['forwarded from']}:&nbsp;`)
 				forward.addElems('a')
 					.attrs({
 						'href': d => {
@@ -936,7 +941,7 @@ export const Entry = function (_kwargs) {
 				const copy = treeinfo.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
 					.attr('title', d => d.source_title)
 				copy.addElems('i')
-					.html(`${vocabulary['copy']['preposition']}: `)
+					.html(`${vocabulary['copy']['preposition']}:&nbsp;`)
 				copy.addElems('a')
 					.attrs({
 						'href': d => {
@@ -1223,7 +1228,7 @@ export const Entry = function (_kwargs) {
 					const lgas = lglis.addElems('a');
 					lgas.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `${explorationVocab['exploration']}: ${d.title}` : d.title);
+						.html(d => d.is_exploration ? `${vocabulary['exploration']['exploration']}: ${d.title}` : d.title);
 					lgas.addElems('span', 'count')
 						.html(d => d.count);
 					const xslis = d3.select('#pinboards-list-xs menu')
@@ -1231,7 +1236,7 @@ export const Entry = function (_kwargs) {
 					const xsas = xslis.addElems('a');
 					xsas.classed('notranslate', true)
 						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `${explorationVocab['exploration']}: ${d.title}` : d.title);
+						.html(d => d.is_exploration ? `${vocabulary['exploration']['exploration']}: ${d.title}` : d.title);
 					xsas.addElems('span', 'count')
 						.html(d => d.count);
 				}

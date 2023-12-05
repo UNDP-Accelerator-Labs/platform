@@ -1,7 +1,11 @@
-import { language, vocabulary } from '/js/config/translations.js'
-import { openPreview, setShareOptions, expandfilters, addequivalents, toggletag, rmtag, pinAll } from '/js/browse/main.js'
+import { language } from '/js/config/translations.js'
+import { getMediaSize, fixLabel, getContent, checkForEnter } from '/js/main.js'
+import { GET, POST } from '/js/fetch.js'
+import { redirect, openPreview, setShareOptions, expandfilters, addequivalents, toggletag, rmtag, pinAll } from '/js/browse/main.js'
 import { renderSections, renderVignette } from '/js/browse/render.js'
 import { setDownloadOptions } from '/js/browse/download.js'
+import { initSlideshowNavigation } from '/js/browse/keyboard.interactions.js'
+import { partialSave } from '/js/browse/save.js'
 
 console.log('file loaded')
 
@@ -11,7 +15,7 @@ async function DOMLoad () {
 
 	const object = d3.select('data[name="object"]').node().value
 	const space = d3.select('data[name="space"]').node().value
-	const { load, id: page, pages, display, language } = JSON.parse(d3.select('data[name="page"]').node().value)
+	const { load, id: page, pages, display } = JSON.parse(d3.select('data[name="page"]').node().value)
 
 	await renderSections()
 
@@ -292,6 +296,11 @@ async function DOMLoad () {
 				dropdown.selectAll('menu li').classed('hide', false)
 			}
 		})
+	}
+
+	// INITIALIZE THE SLIDESHOW INTERACTION
+	if (display === 'slideshow') {
+		initSlideshowNavigation()
 	}
 
 	// HANDLE LAZY LOADING IF ACTIVATED

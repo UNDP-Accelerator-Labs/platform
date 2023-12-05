@@ -1,5 +1,7 @@
+import { limitLength, updateTab } from '/js/main.js'
+import { POST } from '/js/fetch.js'
 // THIS IS TO SAVE PPINBOARDS
-async function partialSave (object, id) {
+export async function partialSave (object, id) {
 	if (!object) object = 'pinboard'
 
 	if (object === 'pinboard') {

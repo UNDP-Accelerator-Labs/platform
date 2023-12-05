@@ -1,7 +1,9 @@
 import { language, vocabulary } from '/js/config/translations.js'
+import { multiSelection, getContent } from '/js/main.js'
+import { POST } from '/js/fetch.js'
 import { Entry } from '/js/browse/render.js'
 
-window.addEventListener('DOMContentLoaded', async function () {
+async function DOMLoad () {
 	const object = d3.select('data[name="object"]').node().value
 	const space = d3.select('data[name="space"]').node().value
 	const page = JSON.parse(d3.select('data[name="page"]').node().value)
@@ -63,6 +65,8 @@ window.addEventListener('DOMContentLoaded', async function () {
 			async function loadPopup (popup, pads, page = 1) {
 				let { data, count } = await POST(`/${language}/browse/pads/${space}`, { pads, page }) // TO DO: CHANGE TO getContent
 				const max_pages = Math.ceil(pads.length / count)
+
+				let idx = 0;
 
 				const section = document.createElement('section')
 				section.classList.add('container')
@@ -231,4 +235,10 @@ window.addEventListener('DOMContentLoaded', async function () {
 			})
 		}
 	}
-})
+}
+
+if (document.readyState === 'loading') {
+	window.addEventListener('DOMContentLoaded', DOMLoad)
+} else {
+	DOMLoad()
+}

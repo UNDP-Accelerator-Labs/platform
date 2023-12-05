@@ -1,33 +1,9 @@
-window.addEventListener('DOMContentLoaded', function () {
-	d3.select('div#import-file')
-	.on('drop', function () {
-		const evt = d3.event;
-		dropHandler(evt, this);
-	}).on('dragover', function () {
-		const evt = d3.event;
-		evt.preventDefault(); 
-		this.classList.toggle('accept');
-	}).on('dragleave', function () {
-		this.classList.toggle('accept');
-	});
+import { vocabulary, language } from '/js/config/translations.js'
+import { toggleClass, getContent } from '/js/main.js'
+import { POST } from '/js/fetch.js'
+import { renderPromiseModal } from '/js/modals.js'
 
-	d3.select('input[type=file]#upload')
-	.on('change', function () {
-		parseXLSX(event.target.files[0], this);
-	});
-
-	// ADD COLUMN-ACTION BUTTONS INTERACTION
-	d3.select('.sidebar button.column-action.group')
-	.on('click', _ => groupColumns());
-	d3.select('.sidebar button.column-action.delete')
-	.on('click', _ => dropColumns());
-
-	const searchForm = d3.select('body form#contribute')
-	if (searchForm.node().attachEvent) searchForm.node().attachEvent('submit', catchSubmit)
-	else searchForm.node().addEventListener('submit', catchSubmit)
-})
-
-function dropHandler(evt, node) { 
+export function dropHandler(evt, node) { 
 	evt.preventDefault()
 	const sel = d3.select(node)
 	const label = sel.select('.drop-zone button label')
@@ -71,8 +47,7 @@ function dropHandler(evt, node) {
 
 	}
 }
-
-function parseXLSX (file, node) {
+export function parseXLSX (file, node) {
 	const reader = new FileReader()
 
 	d3.select(node).attr('data-fname', file.name)
@@ -619,7 +594,6 @@ function renderTable (cols, update = false) {
 	const nextState = { additionalInformation: 'Updated the URL with JS' }
 	window.history.pushState(nextState, nextTitle, nextURL)
 }
-
 function seekPrefix (arr) {
 	// INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
 	const A = arr.filter(d => d).concat().sort()
@@ -630,7 +604,6 @@ function seekPrefix (arr) {
 	while (i < L && a1.charAt(i) === a2.charAt(i)) i++
 	return a1.substring(0, i)
 }
-
 function splitValues (col, separator) {
 	if (!separator) return null
 	const cols = d3.select('table.xls-preview').datum()
@@ -663,7 +636,7 @@ function splitValues (col, separator) {
 	})
 	renderTable(cols)
 }
-function groupColumns () {
+export function groupColumns () {
 	const cols = d3.select('table.xls-preview').datum()
 	const selected = d3.selectAll('table.xls-preview thead .column-selection .selected')
 
@@ -674,7 +647,7 @@ function groupColumns () {
 		parseGroups(cols, keys)
 	}
 }
-function dropColumns () {
+export function dropColumns () {
 	let cols = d3.select('table.xls-preview').datum()
 	const dropkeys = d3.select('table.xls-preview thead').selectAll('.selected').data().map(d => d.key)
 	renderTable(cols.filter(d => !dropkeys.includes(d.key)))
@@ -696,7 +669,7 @@ function compileLocations (idx) {
 		}
 	})		
 }
-async function compilePads (idx, structureOnly = false) {
+export async function compilePads (idx, structureOnly = false) {
 	const { metafields, media_value_keys } = JSON.parse(d3.select('data[name="pad"]').node().value)
 	const { name: userlocation } = JSON.parse(d3.select('data[name="location"]').node().value)
 
@@ -1039,8 +1012,7 @@ async function compilePads (idx, structureOnly = false) {
 	})
 	return Promise.all(pads)
 }
-
-async function compileTemplate () {
+export async function compileTemplate () {
 	const { metafields } = JSON.parse(d3.select('data[name="pad"]').node().value)
 	const cols = d3.select('table.xls-preview').datum()
 
@@ -1114,7 +1086,6 @@ async function compileTemplate () {
 
 	return template
 }
-
 async function previewPad (idx) {
 	const cols = d3.select('table.xls-preview').datum()
 	const data = await compilePads(idx)

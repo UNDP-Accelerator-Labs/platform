@@ -1,17 +1,5 @@
 // THIS IS BASED ON: https://arctype.com/blog/pwa-sqlite/
-const assets = [
-  '/',
-  '/favicon.ico',
-  '/imgs/*',
-  '/js/*',
-  '/css/*',
-  // '/js/d3.prototype.extensions.js',
-  // '/js/Date.prototype.extensions.js',
-  // '/js/Array.prototype.extensions.js',
-  // '/js/String.prototype.extensions.js',
-  // '/js/Math.extensions.js',
-  // '/js/upload.js',
-];
+const assets = ['/', '/favicon.ico', '/imgs/*', '/js/*', '/css/*'];
 
 const APP_ASSETS = 'acclab-app-assets';
 self.addEventListener('install', (evt) => {

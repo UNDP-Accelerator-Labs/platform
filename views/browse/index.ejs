@@ -54,20 +54,13 @@
 		crossorigin=''></script>
 <% } %>
 
-<script type='text/javascript' src='/js/browse/main.js'></script>
-<script type='text/javascript' src='/js/browse/render.js'></script>
-<script type='text/javascript' src='/js/browse/save.js'></script>
-<script type='text/javascript' src='/js/browse/keyboard.interactions.js'></script>
-<script type='text/javascript' src='/js/browse/download.js'></script>
-<script type='text/javascript' src='/js/exploration.js'></script>
+<%- include ('./modules/data.ejs') %>
+
+<script type='module' src='/js/browse/load.js'></script>
 
 </head>
 
 <body>
-
-<%- include ('./modules/data.ejs') %>
-
-<%- include ('../partials/translations.ejs') %>
 
 <%- include ('../partials/navigate/menu-languages.ejs') %>
 <%- include ('../partials/modals.ejs') %>
@@ -119,7 +112,7 @@
 					<div class='inner'>
 						<div class='xs sm'>
 							<div class='spaces'>
-								<button class='space google-translate-attr'><%- vocabulary['spaces'][language] %></button>
+								<button class='space google-translate-attr' data-vocab='spaces'></button>
 								<div class='dropdown'>
 									<%- include('./modules/tabs.ejs') %>
 								</div>
@@ -149,39 +142,41 @@
 									<input type='hidden' name='id' value='<%- locals.pinboard.id %>'>
 									<menu class='opts google-translate-attr'>
 										<li>
-											<p class='<% if (locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['slideshow'][language] %>: </p>
+											<p class='<% if (locals.pinboard.display_map) { %>disabled<% } %>'><span data-vocab='slideshow'></span>: </p>
 											<input type='checkbox' class='toggle' data-object='pinboard' data-id='<%= locals.pinboard.id %>' id='display-slideshow' value='true' name='slideshow' <% if (locals.pinboard.slideshow) { %>checked<% } %> <% if (locals.pinboard.display_map) { %>disabled<% } %>>
-											<label for='display-slideshow' data-content='<% if (locals.pinboard.slideshow) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+											<label for='display-slideshow' data-content='<% if (locals.pinboard.slideshow) { %>yes<% } else { %>no<% } %>'></label>
 										</li>
 										<li>
-											<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display filters'][language] %>: </p>
+											<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><span data-vocab='display filters'></span>: </p>
 											<input type='checkbox' class='toggle' data-object='pinboard' data-id='<%= locals.pinboard.id %>' id='display-filters' value='true' name='display_filters' <% if (locals.pinboard.display_filters) { %>checked<% } %> <% if (locals.pinboard.slideshow) { %>disabled<% } %>>
-											<label for='display-filters' data-content='<% if (locals.pinboard.display_filters) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+											<label for='display-filters' data-content='<% if (locals.pinboard.display_filters) { %>yes<% } else { %>no<% } %>'></label>
 										</li>
 										<li>
 											<ul>
 												<li>
-													<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><%- vocabulary['display map'][language] %>: </p>
+													<p class='<% if (locals.pinboard.slideshow) { %>disabled<% } %>'><span data-vocab='display map'></span>: </p>
 													<input type='checkbox' class='toggle' data-object='pinboard' data-id='<%= locals.pinboard.id %>' id='display-map' value='true' name='display_map' <% if (locals.pinboard.display_map) { %>checked<% } %> <% if (locals.pinboard.slideshow) { %>disabled<% } %>>
-													<label for='display-map' data-content='<% if (locals.pinboard.display_map) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+													<label for='display-map' data-content='<% if (locals.pinboard.display_map) { %>yes<% } else { %>no<% } %>'></label>
 												</li>
 												<li>
-													<p class='<% if (locals.pinboard.slideshow || !locals.pinboard.display_map) { %>disabled<% } %>'><%- vocabulary['full screen'][language] %>: </p>
+													<p class='<% if (locals.pinboard.slideshow || !locals.pinboard.display_map) { %>disabled<% } %>'><span data-vocab='full-screen'></span>: </p>
 													<input type='checkbox' class='toggle' data-object='pinboard' data-id='<%= locals.pinboard.id %>' id='display-fullscreen' value='true' name='display_fullscreen' <% if (locals.pinboard.display_fullscreen) { %>checked<% } %> <% if ((locals.pinboard.slideshow) || !locals.pinboard.display_map) { %>disabled<% } %>>
-													<label for='display-fullscreen' data-content='<% if (locals.pinboard.display_fullscreen) { %><%- vocabulary["yes"][language] %><% } else { %><%- vocabulary["no"][language] %><% } %>'></label>
+													<label for='display-fullscreen' data-content='<% if (locals.pinboard.display_fullscreen) { %>yes<% } else { %>no<% } %>'></label>
 												</li>
 											</ul>
 										</li>
 									</menu>
 									<div class='btn-group google-translate-attr'>
-										<button id='open-pinboard-preview' type='button'><%- vocabulary['preview'][language] %></button>
+										<button id='open-pinboard-preview' type='button' data-vocab='preview'></button>
 
 										<button id='share-pinboard' type='button' data-id='<%= locals.pinboard.id %>' data-contributors='<%- JSON.stringify(locals.pinboard.contributors) %>'>Share</button>
 										<!-- TO DO: TRANSLATE -->
 										<!-- TO DO: CHECK THIS WORKS WITH THE INJECTION OF DATA -->
 
-										<% if (locals.pinboard.status === 1) { %><button type='submit' class='publish' name='status' value='3'><%- vocabulary['publish'][language] %></button>
-										<% } else { %><button type='submit' class='publish' disabled><%- vocabulary['publish'][language] %></button>
+										<% if (locals.pinboard.status === 1) { %>
+											<button type='submit' class='publish' name='status' value='3' data-vocab='publish'></button>
+										<% } else { %>
+											<button type='submit' class='publish' data-vocab='publish' disabled></button>
 										<% } %>
 									</div>
 								</form>
@@ -190,8 +185,7 @@
 
 						<div class='head google-translate-attr'>
 							<% if (editable_pinboard) { %>
-								<div id='pinboard-title' class='title' data-id='<%= locals.pinboard.id %>' data-placeholder='<%- vocabulary["untitled pad"][language] %>' contenteditable><%- locals.pinboard.title %></div>
-								<!-- TO DO: CHECK focus CLASS IS SET THROUGH setup.js WHEN FOCUSING -->
+								<div id='pinboard-title' class='title' data-id='<%= locals.pinboard.id %>' data-placeholder='untitled pad' contenteditable><%- locals.pinboard.title %></div>
 
 								<% if (!locals.metadata.page.instanceReadCount) { %>
 									<div class='engagement-group page-stats'>
@@ -205,9 +199,11 @@
 								<div id='pinboard-description' class='description lead' data-id='<%= locals.pinboard.id %>' data-placeholder='Provide a short description for this pinboard.' contenteditable><%- (locals.pinboard.description) %></div><!-- TO DO: TRANSLATE -->
 								<!-- TO DO: CHECK THIS SAVE PPROPERLY THROUGH js/browse/index.js -->
 							<% } else { %>
-								<div class='title' data-placeholder='<%- vocabulary["untitled pad"][language] %>'><%- locals.pinboard.title %></div>
+								<div class='title' data-placeholder='untitled pad'><%- locals.pinboard.title %></div>
 
-								<div class='contributor'><%- vocabulary['curation credit'][language](locals.pinboard.owner, locals.pinboard.ownername, 'contributors') %></div>
+								<div class='contributor'>
+									<span data-vocab='curation credit'></span> <a href='/<%= language %>/browse/pads/published?contributors=<%= locals.pinboard.owner %>'><%= locals.pinboard.ownername %></a>.
+								</div>
 								<% if (locals.pinboard?.country) { %><div class='meta meta-country'><%- locals.pinboard?.country %></div><% } %>
 
 								<% if (!locals.metadata.page.instanceReadCount) { %>
@@ -230,7 +226,7 @@
 										<div class='inner'>
 											<div class='xs sm'>
 												<div class='spaces'>
-													<button class='space google-translate-attr'><%- vocabulary['section'][language](true) %></button>
+													<button class='space google-translate-attr' data-vocab='["section", "plural"]'></button>
 													<div class='dropdown'>
 														<%- include('./modules/pinboard-sections.ejs') %>
 													</div>
@@ -275,9 +271,7 @@
 						<%- include ('./modules/map') %>
 					<% } else { %>
 						<% if (object === 'pads' && pagedisplay !== 'slideshow' && locals.pads?.length === 0) { %>
-							<small class='no-results m lg xl xxl google-translate-attr'>
-								<%- vocabulary['pads to display'][language](0) %>
-							</small>
+							<small class='no-results m lg xl xxl google-translate-attr'>0 <span data-vocab='["pads to display", "plural"]'></span></small>
 						<% } %>
 					<% } %>
 
@@ -289,9 +283,7 @@
 							</div>
 						</div>
 						<% if (locals.stats?.filtered === 0) { %>
-							<small class='no-results xs google-translate-attr'>
-								<%- vocabulary['pads to display'][language](0) %>
-							</small>
+							<small class='no-results xs google-translate-attr'>0 <span data-vocab='["pads to display", "plural"]'></span></small>
 						<% } %>
 					<% } %>
 				</div>
@@ -300,7 +292,7 @@
 					<div class='public-page-panel sm-padding'>
 						<div class='inner'>
 							<nav class='enter google-translate-attr'>
-								<a href='/login'><button type='button' class='highlight'><%- vocabulary['log in'][language] %></button></a>
+								<a href='/login'><button type='button' class='highlight' data-vocab='log in'></button></a>
 								<!-- <button type='button' onclick='selectCountry()'>Get in touch</button> -->
 								<!-- TO DO: TRANSLATE -->
 							</nav>
@@ -310,7 +302,7 @@
 
 				<div class='outer lg xl xxl'>
 					<% if (pages > 1 && pagedisplay !== 'slideshow' && mapscale !== 'full-screen') { %>
-						<p class='nav-info google-translate-attr'>&larr; <%- vocabulary['navigate here'][language] %></p>
+						<p class='nav-info google-translate-attr'>&larr; <span data-vocab='navigate here'></span></p>
 					<% } %>
 				</div>
 				<div class='lds-ellipsis hide'><div></div><div></div><div></div><div></div></div>
@@ -345,6 +337,12 @@
 
 
 <%- include ('../partials/footer.ejs') %>
+
+<!-- fixedEid IS SET IN modules/filter.ejs -->
+<% if (locals.metadata?.user?.uuid) { %>
+	<!-- <script type='text/javascript' src='/js/exploration.js'></script> -->
+	<!-- <script type='text/javascript' src='/js/browse/exploration.js'></script> -->
+<% } // logged in (uuid) %>
 
 </body>
 </html>

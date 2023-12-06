@@ -52,7 +52,10 @@ exports.metafields = [
     required: true,
     uris: [
       {
-        uri: process.env.NODE_ENV === 'production' ? 'https://consent.sdg-innovation-commons.org/en/contribute/resource' : 'http://localhost:2000/en/contribute/resource',
+        uri:
+          process.env.NODE_ENV === 'production'
+            ? 'https://consent.sdg-innovation-commons.org/en/contribute/resource'
+            : 'http://localhost:2000/en/contribute/resource',
       },
       { uri: undefined },
     ],

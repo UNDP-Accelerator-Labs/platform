@@ -19,10 +19,11 @@ module.exports = async (req, res) => {
 		let data 
 		
 		if (object === 'pads') {
-			if (feature === 'ids') { data = await pads.load.ids({ req }) }
-			else if (feature === 'locations') { data = await pads.load.locations({ req }) }
-			else if (feature === 'samples') { data = await pads.load.samples({ req }) }
-			else { data = await pads.load.data({ req }); }
+			// FOR PADS, res NEEDS TO BE PASSED FOR CHECKING THE instance IN /routes/browse/pads/filter.js
+			if (feature === 'ids') { data = await pads.load.ids({ req, res }) }
+			else if (feature === 'locations') { data = await pads.load.locations({ req, res }) }
+			else if (feature === 'samples') { data = await pads.load.samples({ req, res }) }
+			else { data = await pads.load.data({ req, res }); }
 		} else if (object === 'pad') {
 			if (feature === 'status') { data = await pad.load.status({ req }) }
 			else { data = await pad.load.data({ req }) }

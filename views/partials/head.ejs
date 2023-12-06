@@ -35,6 +35,8 @@
 	if(language == 'fr') ogp_locale = 'fr_FR'
 	else if (language == 'es') ogp_locale = 'es_ES'
 	else if(language == 'pt') ogp_locale = 'pt_PT'
+
+	const nonce = locals.metadata?.page?.nonce
 %>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, target-densitydpi=device-dpi'>
@@ -71,6 +73,8 @@
 
 <title><%- title %></title>
 
+<!-- <script type='text/javascript' src='/js/config/translations.js'></script> -->
+
 <script type='text/javascript' src='/scripts/d3/dist/d3.min.js'></script>
 <script type='text/javascript' src='/scripts/d3-selection-multi/build/d3-selection-multi.min.js'></script>
 
@@ -83,17 +87,20 @@
 <script type='text/javascript' src='/js/Math.extensions.js'></script>
 <script type='text/javascript' src='/js/Array.prototype.extensions.js'></script>
 <script type='text/javascript' src='/js/Date.prototype.extensions.js'></script>
-<script type='text/javascript' src='/js/basics.js'></script>
-<script type='text/javascript' src='/js/upload.js'></script>
+<!-- <script type='text/javascript' src='/js/basics.js'></script> -->
 
-<script type='text/javascript' src='/js/setup.js'></script>
-<script type='text/javascript' src='/js/navigate/main.js'></script>
-<script type='text/javascript' src='/js/navigate/gtranslate.js'></script>
+<!-- TO DO: MODULARIZE modules.js -->
+<!-- <script type='module' src='/js/modals.js'></script> -->
+<script type='module' src='/js/load.js'></script>
+<script type='module' src='/js/navigate/load.js'></script>
+<script type='module' src='/js/navigate/gtranslate.js'></script>
+<!-- <script type='text/javascript' src='/js/upload.js'></script> -->
 
 <!-- Google Translate CDN -->
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script type='text/javascript' nonce="<%- nonce %>" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <!-- <script src = '/socket.io/socket.io.js'></script> -->
 
 <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined'>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
 <link rel='stylesheet' type='text/css' href='/css/dispatch.css'>

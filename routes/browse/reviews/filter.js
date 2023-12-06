@@ -3,7 +3,9 @@ const { modules, engagementtypes, metafields, DB } = include('config/')
 const { checklanguage, datastructures, parsers } = include('routes/helpers/')
 
 module.exports = req => {
-	const { object, space } = req.params || {}
+	let { object, space } = req.params || {}
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	
 	const { uuid, country, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 	let { search, status, contributors, countries, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}

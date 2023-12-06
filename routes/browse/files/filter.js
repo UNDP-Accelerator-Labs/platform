@@ -3,7 +3,8 @@ const { parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = req => {
 	const { uuid, country, rights, collaborators } = req.session || {}
-	const { space } = req.params || {}
+	let { space } = req.params || {}
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 	let { files, search, status, contributors, countries, regions, page, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)

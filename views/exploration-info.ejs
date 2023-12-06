@@ -8,7 +8,6 @@
 <%- include ('partials/head.ejs') %>
 </head>
 <body>
-<%- include ('partials/translations.ejs') %>
 <%- include ('partials/navigate/menu-languages.ejs') %>
 
 <div class='main-content'>
@@ -17,8 +16,7 @@
 		<%- include ('partials/navigate/sidebar.ejs') %>
 	</div>
 </header>
-<div class="browse google-translate-attr exploration-info">
-	<%- vocabulary['exploration'][language]['full-info'] %>
+<div class="browse google-translate-attr exploration-info" data-vocab='["exploration", "full-info"]'>
 </div>
 <div class='sidebar lg'></div>
 </div>

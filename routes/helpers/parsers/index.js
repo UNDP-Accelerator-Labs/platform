@@ -122,7 +122,7 @@ function extractItem (d = {}, section = null, group = null) {
 				else {
 					items = d.items[0].map(c => { // THIS IS MAYBE A BIT HACKY (SINCE VERY SPECIFIC)
 						const obj = {}
-						for (key in c) {
+						for (let key in c) {
 							obj[key] = c[key]
 							if (!['type', 'instruction'].includes(key)) {
 								if (obj.type === 'checklist' && key === 'options') obj[key].forEach(b => b.checked = false) // IF CHECKLIST, THEN WE NEED TO KEEP THE OPTIONS AND WE FORCE A NON RESPONSE (checked = false)

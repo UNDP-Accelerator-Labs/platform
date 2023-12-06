@@ -5,7 +5,7 @@ module.exports = req => {
 	const { uuid, rights } = req.session || {}
 
 	let { space } = req.params || {}
-	if (!space) space = req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM DOWNLOAD)
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 	const { limit } = req.body || {} // THIS IS IN THE CASE OF AJAX REQUESTS, TO LIMIT TO A CERTAIN LETTER OR NOT
 
 	// TO DO: UPDATE BELOW BASED ON FILTERS PASSED

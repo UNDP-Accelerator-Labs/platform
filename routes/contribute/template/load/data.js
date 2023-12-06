@@ -9,6 +9,7 @@ module.exports = async kwargs => {
 
 	let { id, source } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	let workingID = id ?? source
+	if (!workingID) return { message: 'No id found.' }
 
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
@@ -25,6 +26,13 @@ module.exports = async kwargs => {
 		return conn.oneOrNone(`
 			SELECT t.id, t.title, t.owner, t.description, t.sections, t.status, t.slideshow,
 			nlevel(t.version) > 1 AS copy,
+
+				CASE
+					WHEN AGE(now(), t.date) < '0 second'::interval
+						THEN jsonb_build_object('interval', 'positive', 'date', to_char(t.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(t.date, now())), 'hours', EXTRACT(hour FROM AGE(t.date, now())), 'days', EXTRACT(day FROM AGE(t.date, now())), 'months', EXTRACT(month FROM AGE(t.date, now())))
+					ELSE jsonb_build_object('interval', 'negative', 'date', to_char(t.date, 'DD Mon YYYY'), 'minutes', EXTRACT(minute FROM AGE(now(), t.date)), 'hours', EXTRACT(hour FROM AGE(now(), t.date)), 'days', EXTRACT(day FROM AGE(now(), t.date)), 'months', EXTRACT(month FROM AGE(now(), t.date)))
+				END AS date,
+
 
 				CASE WHEN t.id IN (SELECT template FROM review_templates)
 					THEN TRUE

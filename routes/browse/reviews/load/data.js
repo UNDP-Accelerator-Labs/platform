@@ -10,6 +10,8 @@ module.exports = async kwargs => {
 	const { uuid, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
+	console.log('loading reviews')
+
 	// GET FILTERS
 	const [ f_space, order, page, full_filters ] = await filter(req)
 

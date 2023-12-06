@@ -1,0 +1,17 @@
+<% 
+	const sitedata = {
+		languages: locals.languages
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
+<% 
+	const pagedata = {
+		editable: !locals.data || locals.data.editable,
+		language: locals.metadata.page.language
+	}
+%>
+<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
+<% if (locals.data?.uuid) { %>
+<!-- TO DO: DEPRECATE THIS WHEN INTEGRATING reset-password AS IT IS ONLY USED FOR RESETTING -->
+	<data name='id' value='<%= locals.data.uuid %>'></data>
+<% } %>

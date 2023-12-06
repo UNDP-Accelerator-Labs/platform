@@ -10,7 +10,7 @@
 <div id='filters'>
 	<div class='inner google-translate-attr'>
 		<% if (query.search?.length) { %>
-			<p><%- vocabulary['search terms'][language] %></p>
+			<p data-vocab='search terms'></p>
 			<div class='filters-group search-filters'>
 				<div class='active-filters'>
 					<div class='tag' data-type='Contributor' data-value='<%- query.search %>'>
@@ -28,7 +28,7 @@
 		<% } %>
 
 		<% if (Object.keys(query)?.filter(key => key in locals.filters_menu)?.length) { %>
-			<p><%- vocabulary['filter'][language]['plural'] %></p>
+			<p data-vocab='["filter", "plural"]'></p>
 			<div class='filters-group'>
 				<div class='active-filters'>
 					<% for (let key in query) { %>
@@ -36,7 +36,8 @@
 							<% query[key].forEach(d => { %>
 								<% if (locals.filters_menu[key]?.some(c => c.id.toString() === d)) { %>
 									<div class='tag' data-type='<%- key %>' data-value='<%- d %>'>
-										<label class='type'><%- vocabulary[key.slice(0, -1).replace(/_/g, ' ')]?.[language]['singular'].capitalize() || vocabulary[key.replace(/_/g, ' ')]?.[language].capitalize() || key.capitalize() %></label>
+										<label class='type' data-vocab='["<%= key.slice(0, -1)?.replace(/_/g, " ") %>", "singular"]' data-altvocab='["<%= key.replace(/_/g, " ") %>", "singlar"]'>
+										</label>
 										<label class='name'>
 											<!-- TO DO: FIX PROBLEM HERE WITH SDGS -->
 											<% if (locals.filters_menu[key]?.find(c => c.id.toString() === d)?.name.length > 25) { %>

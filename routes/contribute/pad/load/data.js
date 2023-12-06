@@ -1,4 +1,4 @@
-const { engagementtypes, DB, modules } = include('config/')
+const { engagementtypes, modules, DB } = include('config/')
 const { checklanguage, engagementsummary, join, pagestats } = include('routes/helpers/')
 
 const check_authorization = require('../authorization.js')

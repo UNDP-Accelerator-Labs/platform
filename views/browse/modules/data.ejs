@@ -3,15 +3,15 @@
 	const activity = locals.metadata.page.activity
 	const publicpage = locals.metadata.page.public || activity === 'preview'
 	const modules = locals.metadata.site.modules
-	
+
 	const metafields = locals.metadata.site.metafields // NOT USED FOR NOW, BUT PROBABLY NEEDED
-	
+
 	const space = locals.metadata.page.space
 	const object = locals.metadata.page.object
-	
+
 	const languages = locals.metadata.site.languages // NOT USED FOR NOW, BUT PROBABLY NEEDED
 	const language = locals.metadata.page.language // NOT USED FOR NOW, BUT PROBABLY NEEDED
-	
+
 	const rights = locals.metadata.user.rights
 	const pagedisplay = locals.metadata.page.display
 	const pages = locals.metadata.page.count
@@ -26,18 +26,28 @@
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <data name='space' value='<%= space %>'></data>
-<data name='modules' value='<%= JSON.stringify(modules) %>'></data>
+<% if (locals.instance_vars?.instance) { %>
+	<data name='instance' value='<%= locals.instance_vars.instance %>'></data>
+<% } %>
 <% if (modules.some(d => d.type === 'pinboards')) { %>
 	<data name='pinboards' value='<%= JSON.stringify(locals.pinboards_list || []) %>'></data>
 <% } %>
-<% 
+<%
+	const sitedata = {
+		modules: modules || {},
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
+<%
 	const pagedata = {
 		type: publicpage ? 'public' : 'private',
 		display: pagedisplay,
 		pages: locals.metadata.page.count,
 		id: locals.metadata.page.id,
 		load: locals.metadata.page.lazyload ? 'lazy' : 'pages',
-		mapscale
+		mapscale,
+		language
 	}
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
@@ -50,14 +60,14 @@
 	const rightsobj = {}
 	rightsobj[object] = 'read'
 	if (rights >= write) rightsobj[object] = 'write'
-	
+
 	rightsobj['pin-to-pinboards'] = null
 	if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) {
 		rightsobj['pin-to-pinboards'] = 'write'
 	} else if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read)) {
 		rightsobj['pin-to-pinboards'] = 'read'
 	}
-	
+
 	rightsobj['pin-to-teams'] = null
 	if (modules.some(d => d.type === 'teams' && rights >= d.rights.write)) {
 		rightsobj['pin-to-teams'] = 'write'

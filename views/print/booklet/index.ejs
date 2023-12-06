@@ -27,7 +27,7 @@
 	<!-- <meta property='og:image' content='https://ia.media-imdb.com/images/rock.jpg' /> -->
 <% } %>
 
-<%- include ('../../partials/head.ejs') %> 
+<%- include ('../../partials/head.ejs') %>
 
 <script type='text/javascript' src='/scripts/pagedjs/dist/paged.polyfill.js'></script>
 <link rel='stylesheet' type='text/css' href='/css/pagedjs.interface.css'>
@@ -41,16 +41,13 @@
 
 <body>
 
-<%- include ('../../partials/translations.ejs') %> 
-<%# include ('../../partials/navigate/menu-languages.ejs') %> 
-<%- include ('../../partials/modals.ejs') %> 
+<%- include ('../../partials/modals.ejs') %>
 
 <div class='document'>
 </div>
 
 
-<script type='text/javascript' nonce='<%= locals.metadata.page.nonce %>'>
-
+<script type='text/javascript'>
 	// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
 	window.PagedConfig = {
 		auto: false // disable automatic script execution on document load
@@ -94,7 +91,7 @@
 				// ADD THE TITLE
 				const article = d3.select('div.document')
 				.addElem('article')
-				
+
 				article.addElem('h1', 'title')
 				.html(data.title)
 
@@ -105,7 +102,7 @@
 		})
 	}
 
-	class MyHandler extends Paged.Handler { 
+	class MyHandler extends Paged.Handler {
 		// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
 		constructor(chunker, polisher, caller) {
 			super(chunker, polisher, caller);
@@ -128,28 +125,11 @@
 
 
 
-	
 
-	// IF PSEUDONIMIZED
-	// <div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
-	// <div class='contributor'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
 
-	// IF INCLUDE TEMPLATE INFORMATION
-	// <% if (!publicpage) { %>
-	// 	<div class='meta-container template-container'>
-	// 		<div class='meta meta-template'>
-	// 			<i><%- vocabulary['pad based on'][language] %> </i>
-	// 			<a href='/<%# language %>/view/template?id=<%# locals.display_template.id %>'>
-	// 			<%# locals.display_template.title %></a>
-	// 		</div>
-	// 	</div>
-	// <% } %>
-	// <div class='media-container txt-container'>
-	// 	<div class='media media-txt'>
-	// 		<%# locals.display_template.description %>
-	// 	</div>
-	// </div>
-	
+
+
+
 
 
 
@@ -158,7 +138,7 @@
 	// 		.html('download')
 
 	// // TO DO: POPULATE THE PAGE IN A MUCH SIMPLER LAYOUT
-	
+
 
 	// function clicker () {
 	// 	// window.print()

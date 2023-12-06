@@ -23,7 +23,7 @@
 	if (typeof writepads === 'object') minwritepads = Math.min(writepads.blank, writepads.templated)
 
 	const writablemodules = modules.filter(d => !['pinboards', 'teams'].includes(d.type))
-		.map(d => { 
+		.map(d => {
 			const { write } = d.rights
 			if (typeof write === 'object') return Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 			else return write
@@ -40,7 +40,7 @@
 
 		<% if (rights >= Math.min(...writablemodules)) { %>
 			<div class='create'>
-				<button><%- vocabulary['new'][language] %></button>
+				<button data-vocab='new'></button>
 				<div class='dropdown main'>
 					<ul>
 						<% if (modules.some(d => d.type === 'pads')) { %>
@@ -49,7 +49,7 @@
 								<li>
 									<button class="google-translate-attr">
 										<img src='/imgs/icons/i-pad.svg'>
-										<label><%- vocabulary['pad'][language]['singular'].capitalize() %></label>
+										<label data-vocab='["pad", "singular"]'></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='dropdown'>
@@ -59,7 +59,7 @@
 												<li class="google-translate-attr">
 													<a href='/<%- language %>/contribute/pad'>
 			 											<button>
-															<label><%- vocabulary['blank pad'][language] %></label>
+															<label data-vocab='blank pad'></label>
 														</button>
 													</a>
 												</li>
@@ -68,7 +68,7 @@
 												<% if (locals.metadata.menu.templates?.length > 0) { %>
 													<li class="google-translate-attr">
 														<button>
-															<label><%- vocabulary['templated pad'][language] %></label>
+															<label data-vocab='templated pad'></label>
 															<span class='expandable'>></span>
 														</button>
 														<div class='dropdown leaf'>
@@ -76,7 +76,7 @@
 																<% if (locals.metadata.menu.templates.length > 2) { %>
 																	<li class='filter xs sm m lg xl xxl'>
 																		<input type='text' id='filter-pad-templates'>
-																		<label for='filter-pad-templates'><%- vocabulary['filter'][language]['verb'] %></label>
+																		<label for='filter-pad-templates' data-vocab='["filter", "verb"]'></label>
 																	</li>
 																	<li class='padding'></li>
 																<% } // locals.metadata.menu.templates 2 %>
@@ -87,18 +87,14 @@
 																				<button class='wrapable'>
 																					<label><%- t.title %></label>
 																					<% if (t.owner !== uuid) { %>
-																						<div class='sub'>
-																							<%- vocabulary['created by'][language](t.ownername) %>
-																						</div>
+																						<div class='sub'><span data-vocab='created by'></span> <%= t.ownername %></div>
 																					<% } // t.owner %>
 																				</button>
 																			<% } else { // t.title %>
 																				<button class='wrapable'>
-																					<label>[<%- vocabulary['untitled template'][language] %>]</label>
+																					<label>[<span data-vocab='untitled template'></span>]</label>
 																					<% if (t.owner !== uuid) { %>
-																						<div class='sub'>
-																							<%- vocabulary['created by'][language](t.ownername) %>
-																						</div>
+																						<div class='sub'><span data-vocab='created by'></span> <%= t.ownername %></div>
 																					<% } // t.owner %>
 																				</button>
 																			<% } // t.title %>
@@ -113,7 +109,7 @@
 											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
 												<li class="google-translate-attr">
 													<button>
-														<label><%- vocabulary['campaign pad'][language] %></label>
+														<label data-vocab='campaign pad'></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown leaf'>
@@ -122,7 +118,7 @@
 															.filter(p => (!(p.source && !p.copy) || p.child) && p.status === 1).length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-pad-mobilizations'>
-																	<label for='filter-pad-mobilizations'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-pad-mobilizations' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %>
@@ -135,9 +131,9 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%= vocabulary['launched by'][language] %> <%= d.ownername %> <%= vocabulary['on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+																					<span data-vocab='launched by'></span> <%= d.ownername %> <span data-vocab='on'></span> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } else { %>
-																					<%= vocabulary['launched on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+																					<span data-vocab='launched on'></span> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -154,7 +150,7 @@
 											<% if (rights >= (writepads.blank ?? writepads) ?? Infinity) { %>
 												<li class='lg xl xxl google-translate-attr'>
 													<a href='/<%- language %>/contribute/xlsx'>
-														<button><%- vocabulary['import pads'][language] %></button>
+														<button data-vocab='import pads'></button>
 													</a>
 												</li>
 											<% } %>
@@ -168,7 +164,7 @@
 								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-template.svg'>
-										<label><%- vocabulary['template'][language]['singular'].capitalize() %></label>
+										<label data-vocab='["template", "singular"]'></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='dropdown'>
@@ -176,14 +172,14 @@
 											<li>
 												<a href='/<%- language %>/contribute/template'>
 													<button>
-														<label><%- vocabulary['blank template'][language] %></label>
+														<label data-vocab='blank template'></label>
 													</button>
 												</a>
 											</li>
 											<% if (locals.metadata.menu.templates?.length > 0) { %>
 												<li>
 													<button>
-														<label><%- vocabulary['copy template'][language] %></label>
+														<label data-vocab='copy template'></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown leaf'>
@@ -191,7 +187,7 @@
 															<% if (locals.metadata.menu.templates.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-templates-copy'>
-																	<label for='filter-templates-copy'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-templates-copy' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %>
@@ -203,16 +199,16 @@
 																				<label><%- t.title %></label>
 																				<% if (t.owner !== uuid) { %>
 																					<div class='sub'>
-																						<%- vocabulary['created by'][language](t.ownername) %>
+																						<span data-vocab='created by'></span> <%= t.ownername %>
 																					</div>
 																				<% } %>
 																			</button>
 																		<% } else { %>
 																			<button class='wrapable'>
-																				<label>[<%- vocabulary['untitled template'][language] %>]</label>
+																				<label>[<span data-vocab='untitled template'></span>]</label>
 																				<% if (t.owner !== uuid) { %>
 																					<div class='sub'>
-																						<%- vocabulary['created by'][language](t.ownername) %>
+																						<span data-vocab='created by'></span> <%= t.ownername %>
 																					</div>
 																				<% } %>
 																			</button>
@@ -229,7 +225,7 @@
 											)) { %>
 												<li>
 													<button>
-														<label><%- vocabulary['review template'][language] %></label>
+														<label data-vocab='review template'></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown leaf'>
@@ -238,7 +234,7 @@
 															<!-- <% if (locals.metadata.menu.templates.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-templates-copy' onkeyup='filterDropdown(this)'>
-																	<label for='filter-templates-copy'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-templates-copy' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %> -->
@@ -274,7 +270,7 @@
 									<form action='/upload/file' method='POST' enctype='multipart/form-data'>
 										<img src='/imgs/icons/i-pad.svg'>
 										<input type='file' id='input-file-all' name='file' accept='application/pdf, image/*,video/*,audio/*' multiple>
-										<label for='input-file-all' title='Upload a file.'><%- vocabulary['file'][language](false) %></label>
+										<label for='input-file-all' title='Upload a file.' data-vocab='["file", "singular"]'></label>
 									</form>
 								</li>
 							<% } %>
@@ -285,7 +281,7 @@
 									<a href='/<%- language %>/contribute/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
-											<label><%- vocabulary['contributor'][language]['singular'].capitalize() %></label>
+											<label data-vocab='["contributor", "singular"]'></label>
 										</button>
 									</a>
 								</li>
@@ -297,7 +293,7 @@
 								<li class="google-translate-attr">
 									<button>
 										<img src='/imgs/icons/i-mobilization.svg'>
-										<label><%- vocabulary['mobilization'][language]['singular'].capitalize() %></label>
+										<label data-vocab='["mobilization", "singular"]'></label>
 										<span class='expandable'>></span>
 									</button>
 									<div class='dropdown'>
@@ -305,9 +301,7 @@
 											<li>
 												<a href='/<%- language %>/mobilize/cohort'>
 													<button>
-														<label>
-															<%- vocabulary['call for contributions'][language] %>
-														</label>
+														<label data-vocab='call for contributions'></label>
 													</button>
 												</a>
 											</li>
@@ -324,7 +318,7 @@
 															<% if (locals.metadata.menu.pinboards.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-deep-dive-pinbords'>
-																	<label for='filter-deep-dive-pinbords'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-deep-dive-pinbords' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %>
@@ -350,7 +344,7 @@
 											<% if (locals.metadata.menu.mobilizations?.filter(d => !d.target_id).length > 0) { %>
 												<li>
 													<button>
-														<label><%- vocabulary['followup mobilization'][language] %></label>
+														<label data-vocab='followup mobilization'></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown leaf'>
@@ -358,7 +352,7 @@
 															<% if (locals.metadata.menu.mobilizations.filter(d => !d.target_id).length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-mobilization-followup'>
-																	<label for='filter-mobilization-followup'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-mobilization-followup' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %>
@@ -370,7 +364,7 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%= vocabulary['launched by'][language] %> <%= d.ownername %>
+																					<span data-vocab='launched by'></span> <%= d.ownername %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -384,7 +378,7 @@
 											<% if (locals.metadata.menu.mobilizations?.length > 0) { %>
 												<li>
 													<button>
-														<label><%- vocabulary['copy mobilization'][language] %></label>
+														<label data-vocab='copy mobilization'></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown leaf'>
@@ -392,7 +386,7 @@
 															<% if (locals.metadata.menu.mobilizations.length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-mobilization-copy'>
-																	<label for='filter-mobilization-copy'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-mobilization-copy' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %>
@@ -403,7 +397,7 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%= vocabulary['launched by'][language] %> <%= d.ownername %>
+																					<span data-vocab='launched by'></span> <%= d.ownername %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -418,7 +412,7 @@
 												<li>
 													<!-- CANNOT DISTRIBUTE A FOLLOW UP MOBILIZATION -->
 													<button>
-														<label><%- vocabulary['expand mobilization'][language] %></label>
+														<label data-vocab='expand mobilization'></label>
 														<span class='expandable'>></span>
 													</button>
 													<div class='dropdown leaf'>
@@ -427,7 +421,7 @@
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child).length > 2) { %>
 																<li class='filter xs sm m lg xl xxl'>
 																	<input type='text' id='filter-mobilization-child'>
-																	<label for='filter-mobilization-child'><%- vocabulary['filter'][language]['verb'] %></label>
+																	<label for='filter-mobilization-child' data-vocab='["filter", "verb"]'></label>
 																</li>
 																<li class='padding'></li>
 															<% } %>
@@ -440,9 +434,9 @@
 																			<label><%- d.title %></label>
 																			<div class='sub'>
 																				<% if (d.owner !== uuid) { %>
-																					<%= vocabulary['launched by'][language] %> <%= d.ownername %> <%= vocabulary['on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+																					<psan data-vocab='launched by'></psan> <%= d.ownername %> <span data-vocab='on'> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } else { %>
-																					<%= vocabulary['launched on'][language] %> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+																					<span data-vocab='launched on'></span> <%= new Date(d.start_date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
 																				<% } %>
 																			</div>
 																		</button>
@@ -459,17 +453,6 @@
 								</li>
 							<% } %>
 						<% } %>
-						<% if (locals.metadata?.site?.modules?.includes('analyses')) { %>
-							<% if (rights >= (modules.find(d => d.type === 'analyses')?.rights.write ?? Infinity)) { %>
-								<li class="google-translate-attr">
-									<button>
-										<label><%- vocabulary['analyse']?.[language](false, false)?.capitalize() || 'Analysis' %></label>
-										<span class='expandable'>></span>
-									</button>
-								</li>
-
-							<% } %>
-						<% } %>
 					</ul>
 				</div>
 			</div>
@@ -484,7 +467,7 @@
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
 			<div class='save lg xl xxl hide google-translate-attr'>
-				<button><%- vocabulary['save'][language] %></button>
+				<button data-vocab='save'></button>
 			</div>
 		<% } %>
 	</div>
@@ -506,14 +489,14 @@
 			<li>
 		<% } %>
 			<% if (d.type === 'mobilizations') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/ongoing'><%- vocabulary[d.type.slice(0, -1)]?.[language]['plural']?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/ongoing' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } else if (d.type === 'contributors') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/invited'><%- vocabulary[d.type.slice(0, -1)]?.[language]['plural']?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/invited' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } else if (d.type === 'reviews') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/pending'><%- vocabulary["review"][language]["plural"]?.capitalize() %></a>
-			<% } 
+				<a href='/<%- language %>/browse/<%- d.type %>/pending' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+			<% }
 			else { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/private'><%- vocabulary[d.type.slice(0, -1)]?.[language]['plural']?.capitalize() || d.type.capitalize() %></a>
+				<a href='/<%- language %>/browse/<%- d.type %>/private' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } %>
 		</li>
 	<% }) %>

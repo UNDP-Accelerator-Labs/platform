@@ -10,20 +10,21 @@
 
 	<%- include ('../../partials/head.ejs') %>
 
-	<script type='text/javascript' src='/js/contribute/mobilization/main.js'></script>
+	<%- include ('./modules/data.ejs') %>
+	
+	<script type='module' src='/js/contribute/mobilization/load.js'></script>
 
 </head>
 
 <body>
 
-<%- include ('../../partials/translations.ejs') %> 
-<%- include ('../../partials/navigate/menu-languages.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 <!-- IF THIS PAD IS A FOLLOW UP, THEN DO NOT ADD THE MENU TO SAVE SCREEN SPACE -->
 <div class='main-content'>
 <header>
 	<div class='inner'>
-		<%- include ('../../partials/navigate/sidebar.ejs') %> 
+		<%- include ('../../partials/navigate/sidebar.ejs') %>
 	</div>
 </header>
 
@@ -37,7 +38,7 @@
 		<% } %>
 
 		<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
-		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE: 
+		<!-- THE NEW MOBILIZATION IS A COPY, SO THE USER CANNOT SELECT THE TEMPLATE:
 		IT DEFAULTS TO THE ONE OF THE SOURCE MOBILIZATION -->
 			<input type='hidden' name='template' value='<%- locals.templates.id %>'>
 			<input type='hidden' name='copy' value='true'>
@@ -58,25 +59,35 @@
 				<div class='head meta-status <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back' disabled>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							<label class="google-translate-attr" data-vocab='back'></label>
 						</button>
 						<button type='button' class='next' <% if (!locals.sourceinfo?.title && !locals.data?.title) { %>disabled<% } %>>
-							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+							<label class="google-translate-attr" data-vocab='next'></label>
 						</button>
 					</div>
 				</div>
 				<div class='body'>
-					<h1 class="google-translate-attr"><%- vocabulary['name mobilization'][language] %></h1>
+					<h1 class="google-translate-attr" data-vocab='name mobilization'></h1>
 					<div class='input'>
-						<input id='title' type='text' name='title' <% if (locals.sourceinfo?.title) { %>value='<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>[<%- vocabulary['copy'][language]['preposition'] %>]<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>[<%- vocabulary['expansion'][language] %>]<% } else { %>[<%- vocabulary['follow up'][language]['preposition'] %>]<% } %> <%- locals.sourceinfo.title %>'<% } else if (locals.data?.title) { %>value='<%- locals.data.title %>'<% } %>>
-						<label aria-colspan="google-translate-attr" class='placeholder' for='title'><%- vocabulary['add mobilization title'][language] %></label>
+						<% if (!locals.data?.title && locals.sourceinfo?.title) { %>
+							<% if (locals.metadata.page.query?.copy?.some(d => d === "true")) { %>
+								<input id='title' type='text' name='title' data-vocabprefix='["copy", "preposition"]' value='<%= locals.sourceinfo.title %>'>
+							<% } else if (locals.metadata.page.query?.child?.some(d => d === "true")) { %>
+								<input id='title' type='text' name='title' data-vocabprefix='expansion' value='<%= locals.sourceinfo.title %>'>
+							<% } else { %>
+								<input id='title' type='text' name='title' data-vocabprefix='["follow up","preposition"]' value='<%= locals.sourceinfo.title %>'>
+							<% } %>
+						<% } else if (locals.data?.title) { %>
+							<input id='title' type='text' name='title' value='<%= locals.data.title %>'>
+						<% } %>
+						<label aria-colspan="google-translate-attr" class='placeholder' for='title' data-vocab='add mobilization title'></label>
 					</div>
 				</div>
 				<div class='foot'>
 					<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
 						<input id='public-status' type='checkbox' class='toggle' name='public' value='true' <% if (locals.sourceinfo?.public || locals.data?.public) { %>checked<% } %> <% if (locals.data?.id) { %>disabled<% } %>>
 						<label for='public-status'></label>
-						<p class="google-translate-attr"><%- vocabulary['public mobilization'][language] %></p>
+						<p class="google-translate-attr" data-vocab='public mobilization'></p>
 					<% } %>
 				</div>
 			</div>
@@ -88,18 +99,18 @@
 				<div class='head meta-status <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back'>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							<label class="google-translate-attr" data-vocab='back'></label>
 						</button>
 						<button type='button' class='next' <% if (!locals.sourceinfo?.language && !locals.data?.language) { %>disabled<% } %>>
-							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+							<label class="google-translate-attr" data-vocab='next'></label>
 						</button>
 					</div>
 				</div>
 				<div class='body'>
-					<h1 class="google-translate-attr"><%- vocabulary['select campaign language'][language] %></h1>
+					<h1 class="google-translate-attr" data-vocab='select mobilization language'></h1>
 					<div class='filter'>
 						<input type='text' id='language'>
-						<label class="google-translate-attr" for='language'><%- vocabulary['search'][language]['object'] %></label>
+						<label class="google-translate-attr" for='language' data-vocab='["search", "object"]'></label>
 
 						<menu>
 							<% languages.forEach(c => { %>
@@ -127,22 +138,22 @@
 					<div class='head meta-status status-1'>
 						<div class='btn-group'>
 							<button type='button' class='back'>
-								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+								<label class="google-translate-attr" data-vocab='back'></label>
 							</button>
 							<button type='button' class='next'>
-								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+								<label class="google-translate-attr" data-vocab='next'></label>
 							</button>
 						</div>
 					</div>
 					<div class='body'>
-						<h1 class="google-translate-attr"><%- vocabulary['set mobilization dates'][language] %></h1>
-						<p class="google-translate-attr"><%- vocabulary['mobilization dates default'][language] %></p>
+						<h1 class="google-translate-attr" data-vocab='set mobilization dates'></h1>
+						<p class="google-translate-attr" data-vocab='mobilization dates default'></p>
 
-						<% 
+						<%
 							const today = new Date()
 							const tomorrow = new Date(today)
 							tomorrow.setDate(tomorrow.getDate() + 1)
-							
+
 							const dd = String(today.getDate()).padStart(2, '0')
 							const mm = String(today.getMonth() + 1).padStart(2, '0')
 							const yyyy = today.getFullYear()
@@ -160,7 +171,7 @@
 							<div class='toggle-option'>
 								<input id='cron-start' type='checkbox' class='toggle' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
 								<label for='cron-start'></label>
-								<p class="google-translate-attr"><%- vocabulary['set start date'][language] %></p>
+								<p class="google-translate-attr" data-vocab='set start date'></p>
 							</div>
 
 							<div>
@@ -173,7 +184,7 @@
 							<div class='toggle-option'>
 								<input id='cron-end' type='checkbox' class='toggle' <% if (locals.sourceinfo?.public) { %>checked<% } %>>
 								<label for='cron-end'></label>
-								<p class="google-translate-attr"><%- vocabulary['set end date'][language] %></p>
+								<p class="google-translate-attr" data-vocab='set end date'></p>
 							</div>
 
 							<div>
@@ -192,18 +203,18 @@
 				<div class='head meta-status <% if (!locals.sourceinfo?.description && !locals.data?.description) { %>status-0<% } else { %>status-1<% } %>'>
 					<div class='btn-group'>
 						<button type='button' class='back'>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							<label class="google-translate-attr" data-vocab='back'></label>
 						</button>
 						<button type='button' class='next' <% if (!locals.sourceinfo?.description || !locals.data?.description) { %>disabled<% } %>>
-							<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+							<label class="google-translate-attr" data-vocab='next'></label>
 						</button>
 					</div>
 				</div>
 				<div class='body'>
-					<h1 class='google-translate-attr'><%- vocabulary['state objectives'][language] %></h1>
+					<h1 class='google-translate-attr' data-vocab='state objectives'></h1>
 					<div class='input'>
 						<textarea id='description' name='description' required><%- locals.sourceinfo?.description || locals.data?.description %></textarea>
-						<label class='placeholder google-translate-attr' for='description'><%- vocabulary['describe intent'][language] %></label>
+						<label class='placeholder google-translate-attr' for='description' data-vocab='describe intent'></label>
 					</div>
 				</div>
 				<div class='foot'>
@@ -217,21 +228,21 @@
 					<div class='head meta-status status-0'>
 						<div class='btn-group'>
 							<button type='button' class='back'>
-								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+								<label class="google-translate-attr" data-vocab='back'></label>
 							</button>
 							<button type='submit' class='next public hide' disabled>
-								<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+								<label class="google-translate-attr" data-vocab='launch'></label>
 							</button>
 							<button type='button' class='next private' disabled>
-								<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+								<label class="google-translate-attr" data-vocab='next'></label>
 							</button>
 						</div>
 					</div>
 					<div class='body'>
-						<h1 class="google-translate-attr"><%- vocabulary['select template'][language] %></h1>
+						<h1 class="google-translate-attr" data-vocab='select template'></h1>
 						<div class='filter'>
 							<input type='text' id='templates'>
-							<label class="google-translate-attr" for='templates'><%- vocabulary['search'][language]['object'] %></label>
+							<label class="google-translate-attr" for='templates' data-vocab='["search", "object"]'></label>
 
 							<menu>
 								<% locals.templates.forEach(t => { %>
@@ -243,11 +254,15 @@
 											<a href='../view/template?id=<%- t.id %>' target='_blank'><i class='material-icons google-translate-attr'>visibility</i></a>
 										</div>
 										<div class='main'>
-											<label class="google-translate-attr" for='t-<%- t.id %>'><%- t.title || `[${vocabulary["untitled template"][language]}]` %></label>
+											<% if (t.title) { %>
+												<label class="google-translate-attr" for='t-<%- t.id %>'><%- t.title %></label>
+											<% } else { %>
+												<label class="google-translate-attr" for='t-<%- t.id %>'>[<span data-vocab='untitled template'></span>]</label>
+											<% } %>
 										</div>
 										<div class='grow position'>
 											<% if (t.owner !== uuid) { %>
-												<label class="google-translate-attr" for='t-<%- t.id %>'><%- vocabulary['created by'][language](t.ownername) %></label>
+												<label class="google-translate-attr" for='t-<%- t.id %>'><span data-vocab='created by'></span><%= t.ownername %></label>
 											<% } %>
 										</div>
 										<div class='count'><label for='t-<%- t.id %>'><%- t.applications %></label></div>
@@ -268,29 +283,29 @@
 					<div class='head meta-status <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== "true")) && !locals.data?.cohort?.length) { %>status-0<% } else { %>status-1<% } %>'>
 						<div class='btn-group'>
 							<button type='button' class='back'>
-								<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+								<label class="google-translate-attr" data-vocab='back'></label>
 							</button>
 							<% if (!locals.metadata.page.query.pinboard?.length > 0) { %>
 								<button type='button' class='next' <% if (!(locals.sourceinfo && locals.metadata.page.query?.copy?.some(d => d !== 'true')) && !locals.data?.cohort?.length) { %>disabled<% } %>>
-									<label class="google-translate-attr"><%- vocabulary['next'][language] %></label>
+									<label class="google-translate-attr" data-vocab='next'></label>
 								</button>
-							<% } else { %> 
+							<% } else { %>
 								<button type='submit' class='next'>
-									<label class="google-translate-attr"><%- vocabulary['launch'][language] %></label>
+									<label class="google-translate-attr" data-vocab='launch'></label>
 								</button>
 							<% } %>
 						</div>
 					</div>
 					<div class='body'>
-						<h1 class="google-translate-attr"><%- vocabulary['invite contributors'][language] %></h1>
+						<h1 class="google-translate-attr" data-vocab='invite contributors'></h1>
 						<div class='filter'>
 							<input type='text' id='contributors'>
-							<label class="google-translate-attr" for='contributors'><%- vocabulary['search'][language]['person'] %></label>
+							<label class="google-translate-attr" for='contributors' data-vocab='["search", "person"]'></label>
 
 							<menu>
 								<% locals.cohort.forEach(c => { %>
 									<% if (
-										(locals.sourceinfo 
+										(locals.sourceinfo
 											&& locals.metadata.page.query?.copy?.some(d => d !== 'true')
 										) || locals.data?.cohort.includes(c.id)
 										|| locals.metadata.page.query.pinboard?.length > 0
@@ -317,9 +332,11 @@
 					</div>
 					<div class='foot stretch'>
 						<div class='global-opt'>
-							<button type='button'><%- vocabulary['select all'][language] %></button>
+							<button type='button' data-vocab='select all'></button>
 						</div>
-						<div class='contributor-count google-translate-attr'><%- vocabulary['invited contributors'][language](locals.data?.cohort?.length ?? 0) %></div>
+						<div class='contributor-count google-translate-attr'>
+							<%= locals.data?.cohort?.length ?? 0 %> <span data-vocab='["invited contributors", "<%= locals.data?.cohort?.length !== 1 ? "plural" : "singular" %>"]'></span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -330,12 +347,12 @@
 				<div class='head meta-status status-1'>
 					<div class='btn-group'>
 						<button type='button' class='back'>
-							<label class="google-translate-attr"><%- vocabulary['back'][language] %></label>
+							<label class="google-translate-attr" data-vocab='back'></label>
 						</button>
 						<button type='submit' class='next'>
 							<label class="google-translate-attr">
 								<% if (!locals.data?.id) { %>
-									<%- vocabulary['launch'][language] %>
+									<span data-vocab='launch'></span>
 								<% } else { %>
 									Update mobilization
 									<!-- TO DO: TRANSLATE -->
@@ -358,12 +375,12 @@
 						</div>
 
 						<div>
-							<label for='pad-limit' class='inline google-translate-attr'><%- vocabulary['limit to'][language] %></label>
+							<label for='pad-limit' class='inline google-translate-attr' data-vocab='limit to'></label>
 							<input id='pad-limit' type='number' name='pad_limit' value=<%- (locals.data?.pad_limit ?? 1) %> min=1 placeholder='Number of pads.' <% if (!locals.data?.pad_limit) { %>disabled<% } %>>
 							<!-- TO DO: TRANSLATE -->
-							<label for='pad-limit' class='inline small google-translate-attr'><%- vocabulary['submissions per contributor'][language] %></label>
+							<label for='pad-limit' class='inline small google-translate-attr' data-vocab='submissions per contributor'></label>
 						</div>
-					</div>					
+					</div>
 				</div>
 				<div class='foot'>
 				</div>
@@ -378,7 +395,7 @@
 <footer>
 </footer>
 
-<%- include ('../../partials/footer.ejs') %> 
+<%- include ('../../partials/footer.ejs') %>
 
 </body>
 </html>

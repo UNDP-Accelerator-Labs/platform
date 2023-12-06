@@ -37,18 +37,21 @@ To set up the code locally, follow these steps:
 Note: only do this if you are starting from scratch (i.e., you are not using a `.sql` dump file to set up the app).
 
 Requirements:
+
 - make sure to initialize your database using the `init.sql` file
 - make sure you have [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) installed
 
 Get the geo-data:
+
 - go to [Natural Earth](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/) and download the countries (**Download countries**) from the **Admin 0 - Countries** section, as well as the subunits (**Download map subunits**) from the **Admin 0 - Details** section
 - unzip the downloaded files
 
 Run the following command for the two `.shp` (shape)file in the unzipped folders:
+
 - in `ne_10m_admin_0_countries/`:
-`ogr2ogr -f "PostgreSQL" PG:"dbname='{your_db_name}' host='{your_host}' port='{your_port}' user='{your_psql_username}' password='{your_psql_password}'" ne_10m_admin_0_countries.shp -nln adm0 -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326`
+  `ogr2ogr -f "PostgreSQL" PG:"dbname='{your_db_name}' host='{your_host}' port='{your_port}' user='{your_psql_username}' password='{your_psql_password}'" ne_10m_admin_0_countries.shp -nln adm0 -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326`
 - in `ne_10m_admin_0_map_subunits/`:
-`ogr2ogr -f "PostgreSQL" PG:"dbname='{your_db_name}' host='{your_host}' port='{your_port}' user='{your_psql_username}' password='{your_psql_password}'" ne_10m_admin_0_map_subunits.shp -nln adm0_subunits -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326`
+  `ogr2ogr -f "PostgreSQL" PG:"dbname='{your_db_name}' host='{your_host}' port='{your_port}' user='{your_psql_username}' password='{your_psql_password}'" ne_10m_admin_0_map_subunits.shp -nln adm0_subunits -nlt PROMOTE_TO_MULTI -s_srs EPSG:4326 -t_srs EPSG:4326`
 
 Assuming you extracted both zips into the same base folder and you have a `.env` at `path/to/.env` run:
 
@@ -74,7 +77,6 @@ make script ENV=.global.env CMD=store_adm0_location.js
 This will add a couple of columns to the two tables with information on UNDP regional bureaux.
 
 For more information on using `ogr2ogr` to convert shapefiles to postgis, please refer to [this resource](https://mapscaping.com/loading-spatial-data-into-postgis/#:~:text=One%20common%20way%20to%20load,table%20in%20a%20PostgreSQL%20database.)
-
 
 ## Run the servers
 

@@ -84,7 +84,7 @@ exports.sessionsummary = async _kwargs => {
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
 	let { page, pagecount, map: map_arg, display, mscale, excerpt, req, res } = _kwargs || {}
-	if (!map_arg) map_arg = map // GET IT FROM THE CONFIG FILE. THIS IS A FALLBACK IN CASE IT IS NOT PROPERLY PASSED
+	// if (!map_arg) map_arg = map // GET IT FROM THE CONFIG FILE. THIS IS A FALLBACK IN CASE IT IS NOT PROPERLY PASSED
 	let { headers, path, params, query, session } = req || {}
 	path = path.substring(1).split('/')
 	let activity = path[1]

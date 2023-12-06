@@ -26,8 +26,8 @@ module.exports = async (req, res) => {
 				else res.redirect('/login')
 			} else if (authorized && redirect && redirect !== activity) {
 				const query = []
-				for (key in req.query) {
-					query.push(`${key}=${req.query[key]}`)
+				for (const [key, value] of req.query) {
+					query.push(`${key}=${value}`)
 				}
 				return res.redirect(`/${language}/${redirect}/pad${query.length > 0 ? `?${query.join('&')}` : ''}`)
 			} else {
@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
 				else if (id) template_clause = DB.pgp.as.format(`id IN (SELECT template FROM pads WHERE id = $1::INT)`, [ id ])
 				else template_clause = DB.pgp.as.format('FALSE')
 				batch.push(t.oneOrNone(`
-					SELECT id, medium FROM templates
+					SELECT id, title, medium FROM templates
 					WHERE $1:raw
 				;`, [ template_clause ]))
 

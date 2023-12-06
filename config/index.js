@@ -25,7 +25,7 @@ let {
 } = require('./edit/');
 const fs = require('fs');
 
-const { lodashNonce } = require('./nonces/')
+const { lodashNonce } = require('./nonces/');
 
 exports.translations = translations;
 
@@ -173,7 +173,7 @@ exports.welcome_module = welcome_module;
 
 exports.fixed_uuid = fixed_uuid;
 
-exports.lodashNonce = lodashNonce
+exports.lodashNonce = lodashNonce;
 
 // ADD LIST OF DOMAIN NAMES OF ALL IMAGES, JS SCRIPT AND STYLESHEETS REQUIRED BY THE BROWSER TO RENDER CORRECTLY
 exports.csp_links = [

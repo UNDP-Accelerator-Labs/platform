@@ -42,9 +42,9 @@
 		</li>
 		<li class='user-id'>
 			<% if (!publicpage) { %>
-				<span><%- vocabulary['logged in'][language](username, uuid) %>. | </span><a href='/logout/current' class='logout'><%- vocabulary['log out'][language] %></a>
+				<span ><span class='sm m lg xl xxl' data-vocab='logged in'></span> <a href='/<%= language %>/edit/contributor?id=<%= uuid %>'><u><%= username %></u></a>. | </span><a href='/logout/current' class='logout' data-vocab='log out'></a>
 			<% } else { %>
-				<a href='/login' class='login'><%- vocabulary['log in'][language] %></a>
+				<a href='/login' class='login' data-vocab='log in'></a>
 			<% } %>
 		</li>
 	</menu>
@@ -52,3 +52,5 @@
 <button id='expand-nav' class='expand-filters xs sm m<% if (mapscale === "full-screen" || pagedisplay === "slideshow" || pagedisplay.includes("adjacent")) { %> lg xl<% } %>'>
 	<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
 </button>
+
+<data name='language' value='<%= language %>'></data>

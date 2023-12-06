@@ -31,50 +31,16 @@
 		crossorigin=''></script>
 <% } %>
 
-<script type='text/javascript' src='/js/contribute/pad/main.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/render.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/save.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/toolbar.interactions.js'></script>
-<script type='text/javascript' src='/js/contribute/pad/keyboard.interactions.js'></script>
-<script type='text/javascript' src='/js/contribute/comment.js'></script>
-<% if (locals.metadata?.user?.uuid) { %>
-	<script type='text/javascript' src='/js/exploration.js'></script>
-<% } %>
+<%- include ('./modules/data.ejs') %>
+
+<script type='module' src='/js/contribute/pad/load.js'></script>
+<script type='module' src='/js/contribute/pad/keyboard.interactions.js'></script>
+<script type='module' src='/js/contribute/comment/load.js'></script>
 
 </head>
 
 <body>
 
-<!-- SET DATA ATTRIBUTES -->
-<data name='object' value='<%= object %>'></data>
-<data name='username' value='<%= locals.metadata.user.name %>'></data>
-<% 
-	const pagedata = {
-		type: publicpage ? 'public' : 'private',
-		display: pagedisplay,
-		activity: editing ? 'edit' : 'view'
-	}
-%>
-<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
-<%
-	const paddata = {
-		id: locals.data?.id ?? null,
-		type: templated ? 'templated' : 'blank',
-		template: templated ? locals.display_template : {},
-		source: locals.source ?? null,
-		metafields: metafields || {},
-		media_value_keys: locals.metadata.site.media_value_keys || [],
-		is_review: locals.data?.is_review || false,
-		title: locals.data?.title ?? null
-	}
-%>
-<data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
-<data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
-<% if (locals.metadata.site.app_storage) { %>
-	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
-<% } %>
-
-<%- include ('../../partials/translations.ejs') %>
 <%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 <%- include('../../partials/pagestats.ejs') %>
@@ -97,15 +63,26 @@
 <% if (locals.source) { %>
 	<% if (pagedisplay === 'adjacent-source') { %>
 		<% if (object !== 'review' && !locals.data?.is_review) { %>
-			<div class='display-option display-source split-screen lg xl xxl'><a>
-				<button><%- vocabulary['hide source'][language] %></button>
-			</a></div>
+			<div class='display-option display-source split-screen lg xl xxl'>
+				<a>
+					<button data-vocab='hide source'></button>
+				</a>
+			</div>
 		<% } %>
-		<div id='source' data-id='<%= locals.source %>' data-object='<%= object %>' data-review='locals.data?.is_review || false' class='document split-screen m lg xl xxl'></div>
+		<div class='document source-container split-screen m lg xl xxl'>
+			<main id='source' class='pad'>
+				<div class='inner'>
+					<div class='head'>
+						<div class='title'></div>
+					</div>
+					<div class='body'></div>
+				</div>
+			</main>
+		</div>
 	<% } else { %>
 		<div class='display-option display-source m lg xl xxl <% if (locals.data?.reviews?.length > 0) { %>split-screen<% } %>'>
 			<a>
-				<button><%- vocabulary['display source'][language] %></button>
+				<button data-vocab='display source'></button>
 			</a>
 		</div>
 	<% } %>
@@ -113,23 +90,30 @@
 
 <!-- ONLY MAKE REVIEWS VIEWABLE IF THE PAD BELONGS TO THE CURRENT USER, OR IF THE CURRENT USER IS ONE OF THE REVIEWERS -->
 <% if (locals.data?.reviews?.length > 0
-	&& (locals.data.owner === locals.metadata.user.uuid || locals.data.reviews.some(d => d.owner === locals.metadata.user.uuid))
+	&& (locals.data.owner === locals.metadata.user.uuid || locals.data.reviews.some(d => d.owner === locals.metadata.user.uuid) || rights > 2)
 ){ %>
 	<% if (pagedisplay === 'adjacent-reviews') { %>
 		<div class='display-option display-reviews split-screen right lg xl xxl google-translate-attr'>
 			<a>
-				<button><%- vocabulary['hide reviews'][language] %></button>
+				<button data-vocab='hide reviews'></button>
 			</a>
 		</div>
 		<div id='reviews' class='document split-screen right lg xl xxl'>
 			<% locals.data.reviews.forEach((d, i) => { %>
-				<div id='review-<%- i %>' class='review' data-id='<%= d.id %>' data-idx='<%= i %>'></div>
+				<main id='review-<%- i %>' class='review pad' data-id='<%= d.id %>' data-idx='<%= i %>'>
+					<div class='inner'>
+						<div class='head'>
+							<div class='title'><span data-vocab='["review", "singular"]'></span>#<%= i + 1 %></div>
+						</div>
+						<div class='body'></div>
+					</div>
+				</main>
 			<% }) %>
 		</div>
 	<% } else { %>
 		<div class='display-option display-reviews lg xl xxl google-translate-attr<% if (locals.source) { %> split-screen right<% } %>'>
 			<a>
-				<button><%- vocabulary['display reviews'][language] %></button>
+				<button data-vocab='display reviews'></button>
 			</a>
 		</div>
 	<% } %>
@@ -138,7 +122,7 @@
 
 <!-- PB HERE WITH THE else if FOR SLIDESHOW OF A PAD THAT HAS A SOURCE BUT IS NOT DISPLAYED ADJACENT -->
 <div class='document<% if ((locals.source || locals.data?.reviews?.length > 0) && !["adjacent-source", "adjacent-reviews", "slideshow"].includes(pagedisplay)) { %> offset<% } else if (locals.source && pagedisplay === "adjacent-source") { %> split-screen right<% } else if (locals.data?.reviews?.length > 0 && pagedisplay === "adjacent-reviews") { %> split-screen left<% } else if (pagedisplay === "slideshow") { %> slideshow<% } %>'>
-	<main id='pad' class='pad'>
+	<main id='<%= object %>' class='pad'>
 		<div class='inner'>
 			<% if (editing) { %>
 				<div class='meta-status status-<%- locals.data?.status || 0 %>'>
@@ -146,7 +130,7 @@
 						<% if (editing) { %>
 							<div class='save xs sm google-translate-attr'>
 								<form>
-									<button type='button' disabled><%- vocabulary['save'][language] %></button>
+									<button type='button' data-vocab='save' disabled></button>
 								</form>
 								<!-- TO DO: CHECK THIS IS HANDLED PROPERLY IN js/contribute/pad.js -->
 							</div>
@@ -167,34 +151,34 @@
 							{ %>
 								<% if (object === 'review') { %>
 									<input type='hidden' name='source' value='<%- locals.source %>'>
-									<button type='submit' class='publish' name='status' value='2' disabled><%- vocabulary['submit review'][language] %></button>
+									<button type='submit' class='publish' name='status' value='2' data-vocab='submit review' disabled></button>
 								<% } else if (publicpage) { %>
-									<button id='save-and-submit' type='button' class='publish' name='status' value='1' disabled><%- vocabulary['submit'][language] %></button>
+									<button id='save-and-submit' type='button' class='publish' name='status' value='1' disabled data-vocab='submit'></button>
 								<!-- IF THERE IS A TOKEN WITH A CALLBACK URL, THEN THIS SHOULD AUTO SUBMIT AND SEND BACK THE PAD ID TO THE REQUESTING SOURCE -->
 								<% } else if (token && action === 'publish_and_share') { %>
 									<input type='hidden' name='token' value='<%- token %>'>
-									<button type='submit' class='publish' name='status' value='3' disabled><%- vocabulary['save'][language] %></button>
+									<button type='submit' class='publish' name='status' value='3' data-vocab='save' disabled></button>
 								<% } else { %>
-									<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
+									<button type='button' class='publish google-translate-attr' data-vocab='publish' disabled></button>
 								<% } %>
 							<% } else { %>
 								<% if (object === 'review') { %>
 									<input type='hidden' name='source' value='<%- locals.source %>'>
-									<button type='submit' class='publish' name='status' value='2'><%- vocabulary['submit review'][language] %></button>
+									<button type='submit' class='publish' name='status' value='2' data-vocab='submit review'></button>
 								<% } else if (publicpage) { %>
 									<!-- TO DO: INTERCEPT AND partialSave -->
-									<button type='submit' class='publish google-translate-attr' name='status' value='1'><%- vocabulary['submit'][language] %></button>
+									<button type='submit' class='publish google-translate-attr' name='status' value='1' data-vocab='submit'></button>
 								<% } else { %>
 									<% if (locals.data?.status === 2 && locals.data?.review_status === 1) { %>
 										<!-- THE PAD IS ALREADY A PREPRINT AND SUBMITTED FOR REVIEW -->
-										<button type='button' class='publish google-translate-attr' disabled><%- vocabulary['publish'][language] %></button>
+										<button type='button' class='publish google-translate-attr' data-vocab='publish' disabled></button>
 									<% } else { %>
-										<button type='button' class='publish google-translate-attr'><%- vocabulary['publish'][language] %></button>
+										<button type='button' class='publish google-translate-attr' data-vocab='publish'></button>
 									<% } %>
 								<% } %>
 							<% } %>
 							<% if (
-								object !== 'review' 
+								object !== 'review'
 								&& !publicpage
 								&& !(token && action === 'publish_and_share')
 							) { %>
@@ -203,26 +187,20 @@
 										<% if (modules.some(d => d.type === 'reviews')) { %>
 											<% if ((locals.data?.status || 0) < 2) { %>
 												<li class='opt google-translate-attr'>
-													<button type='submit' name='status' value='2'>
-														<%- vocabulary['object status'][language][object][2]['singular'] %>
-													</button>
+													<button type='submit' name='status' value='2' data-vocab='["object status", "<%= object %>", "2", "singular"]'></button>
 												</li>
 											<% } %>
 											<% if ((locals.data?.status || 0) <= 2
 												&& (locals.data?.review_status === 0))
 											{ %>
 												<li class='opt google-translate-attr'>
-													<button id='submit-for-review' type='button' name='review_status' value='1'>
-														<%- vocabulary['submit for review'][language] %>
-													</button>
+													<button id='submit-for-review' type='button' name='review_status' value='1' data-vocab='submit for review'></button>
 												</li>
 											<% } %>
 										<% } else { %>
 											<% if ((locals.data?.status || 0) < 2) { %>
 												<li class='opt google-translate-attr'>
-													<button type='submit' name='status' value='2'>
-														<%- vocabulary['internally'][language] %>
-													</button>
+													<button type='submit' name='status' value='2' data-vocab='internally'></button>
 												</li>
 											<% } %>
 											<% if (
@@ -231,9 +209,7 @@
 
 											) { %>
 												<li class='opt google-translate-attr'>
-													<button type='submit' name='status' value='3'>
-														<%- vocabulary['externally'][language] %>
-													</button>
+													<button type='submit' name='status' value='3' data-vocab='externally'></button>
 												</li>
 											<% } %>
 										<% } %>
@@ -252,11 +228,11 @@
 									<input type='hidden' name='lang' value='<%- locals.metadata?.page?.lang %>'>
 									<% if (locals.data?.status === 0 || !locals.data?.status) { %>
 										<button type='submit' class='generate-pdf google-translate-attr' disabled>
-											<%- vocabulary['generate file'][language]('.pdf') %>
+											<span data-vocab='generate file'></span> .pdf
 										</button>
 									<% } else if (locals.data?.status > 0) { %>
 										<button type='submit' class='generate-pdf google-translate-attr'>
-											<%- vocabulary['generate file'][language]('.pdf') %>
+											<span data-vocab='generate file'></span> .pdf
 										</button>
 									<% } %>
 								</form>
@@ -274,7 +250,6 @@
 				</div>
 				<% if (pagedisplay !== 'slideshow') { %>
 					<button class='scroll-nav'><label class='rotate'>&rsaquo;</label></button>
-					<!-- TO DO: MAKE SURE THE scrollToPad IS BE PROPERLY HANDLED IN js/setup.js -->
 				<% } %>
 			<% } %>
 
@@ -283,36 +258,44 @@
 				<div class='head scroll-target'>
 					<% if (object !== 'review' && !locals.data?.is_review) { %>
 						<% if (locals.metadata.page.referer?.includes('browse/pads')) { %>
-							<a href='<%- locals.metadata.page.referer %>' class='return google-translate-attr'><%- vocabulary['back to browse'][language] %></a>
+							<a href='<%- locals.metadata.page.referer %>' class='return google-translate-attr' data-vocab='back to browse'></a>
 						<% } else { %>
-							<a href='<%- `/${language}/browse/pads/private` %>' class='return google-translate-attr'><%- vocabulary['back to browse'][language] %></a>
+							<a href='<%- `/${language}/browse/pads/private` %>' class='return google-translate-attr' data-vocab='back to browse'></a>
 						<% } %>
 						<% if (editing) { %>
-							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>' contenteditable></div>
+							<div class='title' data-placeholder='untitled pad' contenteditable></div>
 						<% } else { %>
-							<div class='title google-translate-attr' data-placeholder='<%- vocabulary["untitled pad"][language] %>'></div>
+							<div class='title' data-placeholder='untitled pad'></div>
 						<% } %>
 						<!-- TO DO: FIX THIS: FOR SOME REASON NOTHING WORKS HERE WHEN IN REVIEW MODE -->
 						<% if (!anonymized) { %>
 							<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
 								<% if (activity === 'edit') { %>
-									<div class='contributor google-translate-attr'><%- vocabulary['credit'][language](locals.data?.owner, locals.data?.ownername, 'contributors') %></div>
-									<div class='meta meta-country'><%- locals.data?.country %></div>
-									<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](locals.data?.date) %></div>
+									<div class='contributor google-translate-attr'>
+										<span data-vocab='credit'></span> <a href='/<%= language %>/browse/pads/public?contributors=<%= locals.data?.owner %>'><%= locals.data?.ownername %></a>.
+									</div>
+									<div class='meta meta-country'><%= locals.data?.country %></div>
+									<div class='meta meta-date google-translate-attr'>
+										<%= new Date(locals.data?.date.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+									</div>
 								<% } else { %>
-									<div class='contributor'><%- vocabulary['credit'][language](locals.data?.iso3, locals.data?.country, 'countries') %></div>
-									<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](locals.data?.date) %></div>
+									<div class='contributor'>
+										<span data-vocab='credit'></span> <a href='/<%= language %>/browse/pads/public?countries=<%= locals.data?.iso3 %>'><%= locals.data?.country %></a>.
+									</div>
+									<div class='meta meta-date google-translate-attr'>
+										<%= new Date(locals.data?.date.date)?.toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+									</div>
 								<% } %>
 							<% } %>
 						<% } %>
 					<% } else { %><!-- IF THE PAD IS A REVIEW, SO THE TITLE ONLY NEEDS TO BE THE REVIEWER ID -->
 						<% if (locals.metadata.page.referer?.includes('browse/reviews')) { %>
-							<a href='<%- locals.metadata.page.referer %>' class='return'><%- vocabulary['back to reviews'][language] %></a>
+							<a href='<%- locals.metadata.page.referer %>' class='return' data-vocab='back to reviews'></a>
 						<% } else { %>
-							<a href='<%- `/${language}/browse/reviews/ongoing` %>' class='return'><%- vocabulary['back to reviews'][language] %></a>
+							<a href='<%- `/${language}/browse/reviews/ongoing` %>' class='return' data-vocab='back to reviews'></a>
 						<% } %>
 						<div class='title google-translate-attr'>
-							<%- vocabulary['review'][language]['singular'] %> #<%- locals.data?.review_idx %>
+							<span data-vocab='["review", "singular"]'></span> #<%= locals.data?.review_idx %>
 						</div>
 					<% } %>
 					<!-- TO DO: ADD OTHER STATS -->
@@ -330,9 +313,9 @@
 						<% if (!publicpage) { %>
 							<div class='meta-container template-container'>
 								<div class='meta meta-template google-translate-attr'>
-									<i><%- vocabulary['pad based on'][language] %> </i>
+									<i data-vocab='pad based on'></i>&nbsp;
 									<a href='/<%- language %>/view/template?id=<%- locals.display_template.id %>'>
-									<%- locals.display_template.title %></a>
+									<%= locals.display_template.title %></a>
 								</div>
 							</div>
 						<% } %>
@@ -385,7 +368,11 @@
 					<% metafields.forEach(d => { %>
 						<button class='labeled google-translate-attr' id='input-meta-<%- d.label %>' title='Add one or more <%- d.name %> tag(s).'>
 							<img class='meta-icon' data-src='/imgs/icons/i-<%- d.label.replace(/\_/, "-") %>-btn.svg' alt='<%- d.name %>' data-fallback='/imgs/icons/i-generic-<%- d.type.replace(/\_/, "-") %>-btn.svg' />
-							<label class='lg xl xxl'><span><%- vocabulary['add tags'][language](d.name.toLowerCase()) %></span></label>
+							<label class='lg xl xxl'>
+								<span>
+									<span data-vocab='add tags'></span> <%= d.name.toLowerCase() %>
+								</span>
+							</label>
 						</button>
 					<% }) %>
 				<% } %>
@@ -407,14 +394,16 @@
 		<div class='filler lg'></div>
 		<div class='inner'>
 			<% if (pagedisplay !== 'slideshow') { %>
-				<h2 class="google-translate-attr"><%- locals.comments?.length || 0 %> <%- vocabulary['comment'][language](false, locals.comments?.length !== 1).toLowerCase() %></h2>
+				<h2 class="google-translate-attr">
+					<%- locals.comments?.length || 0 %> <span data-vocab='["comment", "<%= locals.comments?.length !== 1 ? "plural" : "singular" %>"]'></span>
+				</h2>
 				<form class="google-translate-attr" action='/comment' method='POST'>
 					<input type='hidden' name='id' value='<%- locals.data?.id %>'>
 					<input type='hidden' name='object' value='<%- object %>'>
 					<textarea id='input-media-comment' name='message' data-placeholder='test' required></textarea>
-					<label for='input-media-comment'><%- vocabulary['comment publicly'][language] %></label>
+					<label for='input-media-comment' data-vocab='comment publicly'></label>
 					<div class='btn-group'>
-						<button type='submit' disabled><%- vocabulary['comment'][language](true) %></button>
+						<button type='submit' data-vocab='["comment", "verb"]' disabled></button>
 					</div>
 				</form>
 
@@ -424,7 +413,9 @@
 							<div class='head'>
 								<div class='meta meta-data'>
 									<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- d.ownername %></a></div>
-									<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](d.date) %></div>
+									<div class='meta meta-date google-translate-attr'>
+										<%= new Date(d.date.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+									</div>
 								</div>
 							</div>
 							<div class='body'>
@@ -432,8 +423,11 @@
 							</div>
 							<div class='foot'>
 								<button type='button' class='expand-collapsed google-translate-attr <% if (d.replies?.length > 0) { %>wide<% }%>'>
-									<% if (d.replies?.length > 0) { %><%- vocabulary['expand replies'][language](d.replies.length) %>
-									<%} else { %><%- vocabulary['reply'][language](true) %><%} %>
+									<% if (d.replies?.length > 0) { %>
+										<span data-vocab='read'> <%= d.replies.length %> <span data-vocab='["relpy", "<%= d.replies.length !== 1 ? "plural" : "singular" %>"]'></span>
+									<%} else { %>
+										<span data-vocab='["reply", "verb"]'></span>
+									<%} %>
 								</button>
 								<div class='collapsed'>
 									<% if (d.replies?.length > 0) { %>
@@ -443,7 +437,9 @@
 												<div class='head'>
 													<div class='meta meta-data'>
 														<div class='meta meta-contributor'><a href='../browse/pads/public?contributors=<%- d.contributor %>'><%- c.ownername %></a></div>
-														<div class='meta meta-date google-translate-attr'><%- vocabulary['date'][language](c.date) %></div>
+														<div class='meta meta-date google-translate-attr'>
+															<%= new Date(c.date.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' }) %>
+														</div>
 													</div>
 												</div>
 												<div class='body'>
@@ -459,9 +455,9 @@
 										<input type='hidden' name='source' value='<%- d.id %>'>
 										<textarea id='input-media-comment-<%= i %>' name='message' data-placeholder='test' required></textarea>
 										<!-- <label for='input-media-comment' data-label='Jeremy'>Reply publicly</label> -->
-										<label for='input-media-comment<%= i %> google-translate-attr'><%- vocabulary['reply publicly'][language] %></label>
+										<label for='input-media-comment<%= i %> google-translate-attr' data-vocab='reply publicly'></label>
 										<div class='btn-group google-translate-attr'>
-											<button type='submit' disabled><%- vocabulary['reply'][language](true) %></button>
+											<button type='submit' data-vocab='["reply", "verb"]' disabled></button>
 										</div>
 									</form>
 								</div>
@@ -481,9 +477,10 @@
 </footer>
 
 <%- include ('../../partials/footer.ejs') %>
-	
+
 <% if (locals.metadata?.user?.uuid) { %>
-	<script type='text/javascript' src='/js/contribute/pad/explorations.js' defer></script>
+	<!-- <script type='text/javascript' src='/js/exploration.js'></script> -->
+	<!-- <script type='text/javascript' src='/js/contribute/pad/exploration.js'></script> -->
 <% } %>
 
 </body>

@@ -7,7 +7,6 @@
 	const query = locals.metadata.page.query
 	const language = locals.metadata.page.language
 	const rights = locals.metadata.user.rights
-    const explorationVocab = vocabulary['exploration'][language];
 
     const sections = locals.pinboard?.sections
     const section = query.section?.[0]
@@ -47,7 +46,7 @@
 							<div class='section-title editable' data-placeholder='Section' data-id='<%= d.id %>'><%- d.title %></div><!-- TO DO: TRANSLATE -->
 							<div class='count'><%- d.count ?? 0 %></div>
 						</button>
-					
+
 					</a>
 				<% } else { %>
 					<a href='?pinboard=<%- pinboard.id %>&section=<%- d.id %>'>
@@ -85,6 +84,4 @@
 	<!-- TO DO: PROBABLY AN OPTION TO REMOVE ALL sections -->
 </menu>
 
-
-
-<script type='text/javascript' src='/js/browse/pinboard.sections.js' defer></script>
+<script type='module' src='/js/browse/pinboard.sections.js'></script>

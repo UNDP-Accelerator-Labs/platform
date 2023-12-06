@@ -5,7 +5,7 @@
     const docTypes = ['pad', 'template', 'pinboard', 'team', 'country'];
 %>
 <% if (docTypes.includes(docType) && id) { %>
-    <% 
+    <%
         const pagestatsdata = {
             id: +id,
             type: docType,
@@ -14,5 +14,5 @@
         }
     %>
     <data name='pagestats' value='<%= JSON.stringify(pagestatsdata) %>'></data>
-    <script type='text/javascript' src='/js/pagestats.js' defer></script>
+    <script type='module' src='/js/pagestats.js'></script>
 <% } // is allowed type and has id %>

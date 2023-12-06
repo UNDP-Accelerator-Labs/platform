@@ -26,6 +26,13 @@ const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
 
+const swPrecache = require('sw-precache');
+swPrecache.write('./public/app.serviceWorker.js', {
+  root: './public/',
+  staticFileGlobs: ['./public/**/*'],
+  stripPrefix: './public/',
+});
+
 const app = express();
 app.disable('x-powered-by');
 

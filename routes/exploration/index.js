@@ -9,7 +9,8 @@ exports.doc = require('./doc.js');
 exports.loginCheck = (req, res, next) => {
     const { uuid } = fixed_uuid ? { uuid: fixed_uuid } : req.session || {};
     if (!uuid) {
-        return res.status(401).json({
+        return res.json({
+            status: 401,
             message: 'must be logged in',
         });
     }
@@ -26,7 +27,8 @@ exports.consentCheck = (req, res, next) => {
             SELECT confirmed_feature_exploration FROM users WHERE uuid = $1
         `, [uuid])).confirmed_feature_exploration;
         if (!hasConsent) {
-            return res.status(403).json({
+            return res.json({
+                status: 403,
                 message: `${uuid} has to consent to using the exploration feature first!`,
             });
         }

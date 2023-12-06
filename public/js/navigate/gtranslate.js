@@ -67,5 +67,5 @@ cookieStore.addEventListener('change', async ({ changed }) => {
   }
 });
 
-document.googleTranslateElementInit = googleTranslateElementInit;
-document.googleTranslateElement = null;
+window.googleTranslateElementInit = googleTranslateElementInit;
+window.googleTranslateElement = null;

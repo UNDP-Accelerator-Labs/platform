@@ -31,6 +31,7 @@ swPrecache.write('./public/app.serviceWorker.js', {
   root: './public/',
   staticFileGlobs: ['./public/**/*'],
   stripPrefix: './public/',
+  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 });
 
 const app = express();

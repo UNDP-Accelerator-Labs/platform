@@ -1,8 +1,7 @@
 // THIS IS BASED ON: https://arctype.com/blog/pwa-sqlite/
 const assets = [
   '/',
-  '/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png',
-  '/imgs/icons/*',
+  '/imgs/*',
   '/js/*',
   '/css/*'
   // '/js/d3.prototype.extensions.js',

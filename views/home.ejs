@@ -42,8 +42,8 @@
 		crossorigin=''></script>
 <% } %>
 
-<script type='text/javascript' src='/js/browse/render.js'></script>
-<script type='text/javascript' src='/js/home/main.js'></script>
+<!-- <script type='text/javascript' src='/js/browse/render.js'></script> -->
+<script type='module' src='/js/home/load.js'></script>
 
 </head>
 
@@ -192,8 +192,8 @@
 
 <%- include ('./partials/footer.ejs') %>
 
-<% if (!locals.metadata?.user?.uuid) { %>
-	<script type='text/javascript' src='/js/home/explorations.js' defer></script>
-<% } // logged out (!uuid) %>
+<!-- <% if (!locals.metadata?.user?.uuid) { %> -->
+	<!-- <script type='text/javascript' src='/js/home/explorations.js' defer></script> -->
+<!-- <% } // logged out (!uuid) %> -->
 </body>
 </html>

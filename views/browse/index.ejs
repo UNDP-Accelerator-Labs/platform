@@ -57,11 +57,6 @@
 <%- include ('./modules/data.ejs') %>
 
 <script type='module' src='/js/browse/load.js'></script>
-<!-- <script type='module' src='/js/browse/render.js'></script> -->
-<script type='text/javascript' src='/js/browse/save.js'></script>
-<script type='text/javascript' src='/js/browse/keyboard.interactions.js'></script>
-<script type='module' src='/js/browse/download.js'></script>
-
 
 </head>
 
@@ -191,7 +186,6 @@
 						<div class='head google-translate-attr'>
 							<% if (editable_pinboard) { %>
 								<div id='pinboard-title' class='title' data-id='<%= locals.pinboard.id %>' data-placeholder='untitled pad' contenteditable><%- locals.pinboard.title %></div>
-								<!-- TO DO: CHECK focus CLASS IS SET THROUGH setup.js WHEN FOCUSING -->
 
 								<% if (!locals.metadata.page.instanceReadCount) { %>
 									<div class='engagement-group page-stats'>

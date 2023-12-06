@@ -1,3 +1,16 @@
+import { language, vocabulary } from '/js/config/translations.js';
+import { initExploration } from '/js/contribute/pad/exploration.js';
+import {
+  partialSave,
+  switchButtons,
+  updateStatus,
+} from '/js/contribute/pad/save.js';
+import { POST } from '/js/fetch.js';
+import { fixLabel, toggleClass } from '/js/main.js';
+import { renderImgZoom, renderPromiseModal } from '/js/modals.js';
+
+const exploration = initExploration();
+
 const obsvars = {
   attributes: true,
   attributeFilter: ['class'],
@@ -841,7 +854,7 @@ async function populateSection(data, lang = 'en', section, objectdata) {
   if (data.type === 'group') addGroup({ data, lang, section, objectdata });
 }
 // THIS CAN PROBABLY BE MOVED TO upload.js
-function uploadImg(kwargs) {
+export function uploadImg(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
   const { form, lang, sibling, container, focus, objectdata } = kwargs || {};
@@ -951,7 +964,7 @@ function addImgs(kwargs) {
     addMosaic({ data: datum, lang, sibling, container, focus });
   }
 }
-function uploadVideo(kwargs) {
+export function uploadVideo(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
   const { form, lang, sibling, container, focus, objectdata } = kwargs || {};
@@ -1019,7 +1032,7 @@ function uploadVideo(kwargs) {
       if (err) throw err;
     });
 }
-async function autofillTitle() {
+export async function autofillTitle() {
   const mainobject = d3.select('data[name="object"]').node()?.value;
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   // THIS IS A PARTICULAR CASE WHERE EDITING CAN SOLELEY BE BASED ON THE page VARIABLES, SINCE IT IS THE page MAIN OBJECT THAT NEEDS TO BE UPDATED
@@ -1053,7 +1066,7 @@ async function autofillTitle() {
   }
 }
 
-async function addSection(kwargs) {
+export async function addSection(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -1269,7 +1282,6 @@ async function addSection(kwargs) {
 
   return section.node();
 }
-
 function addTitle(kwargs) {
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -1883,7 +1895,7 @@ function addVideo(kwargs) {
     }
   }
 }
-function addDrawing(kwargs) {
+export function addDrawing(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -2147,7 +2159,7 @@ function addDrawing(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addTxt(kwargs) {
+export function addTxt(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -2379,7 +2391,7 @@ function addTxt(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addEmbed(kwargs) {
+export function addEmbed(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -2595,7 +2607,7 @@ function addEmbed(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addChecklist(kwargs) {
+export function addChecklist(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -2863,7 +2875,7 @@ function addChecklist(kwargs) {
         .focus();
   }
 }
-function addRadiolist(kwargs) {
+export function addRadiolist(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -3136,7 +3148,7 @@ function addRadiolist(kwargs) {
   }
 }
 // META ELEMENTS
-function addLocations(kwargs) {
+export function addLocations(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3469,7 +3481,7 @@ function addLocations(kwargs) {
     }
   }
 }
-async function addIndexes(kwargs) {
+export async function addIndexes(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3535,7 +3547,7 @@ async function addIndexes(kwargs) {
     }
   }
 }
-async function addTags(kwargs) {
+export async function addTags(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3597,7 +3609,7 @@ async function addTags(kwargs) {
     }
   }
 }
-async function addAttachment(kwargs) {
+export async function addAttachment(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3918,36 +3930,6 @@ function addGroup(kwargs) {
   }
 }
 
-// SAVING BUTTON
-function switchButtons(lang = 'en') {
-  const editing =
-    JSON.parse(d3.select('data[name="page"]').node()?.value).activity ===
-    'edit'; // TO DO: FIX HERE
-
-  if (!mediaSize) var mediaSize = getMediaSize();
-  window.sessionStorage.setItem('changed-content', true);
-  // PROVIDE FEEDBACK: UNSAVED CHANGES
-  if (mediaSize === 'xs') {
-    d3.select('.meta-status .btn-group .save button')
-      .each(function () {
-        this.disabled = false;
-      })
-      .html(vocabulary['save changes']);
-  } else {
-    const menu_logo = d3.select('nav#site-title .inner');
-    window.sessionStorage.setItem('changed-content', true);
-    menu_logo.selectAll('div.create, h1, h2').classed('hide', true);
-    menu_logo
-      .selectAll('div.save')
-      .classed('hide saved', false)
-      .select('button')
-      .on('click', async (_) => {
-        if (editing) await partialSave();
-      })
-      .html(vocabulary['save changes']);
-  }
-}
-
 let idx = 0;
 // FOR SLIDESHOW VIEW
 async function addSlides(kwargs) {
@@ -4050,7 +4032,7 @@ async function addSlides(kwargs) {
                   kwargs.focus = true;
 
                   const new_section = await addSlides(kwargs); // THIS TOO IS DIFFERENT TO addSection
-                  initSlideshow();
+                  initSlideshow(main);
                 }
                 resolve();
               }),
@@ -4210,7 +4192,7 @@ function switchslide(main, i) {
 
   return (idx = i);
 }
-async function renderPad(kwargs) {
+export async function renderPad(kwargs) {
   let { object, type, id, main } = kwargs;
   // TYPE CAN BE templated, OR blank
   // OBJECT CAN BE pad, source OR review

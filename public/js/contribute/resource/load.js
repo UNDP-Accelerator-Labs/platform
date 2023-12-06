@@ -1,3 +1,7 @@
+import { language, vocabulary } from '/js/config/translations.js';
+import { getContent, uploadFile } from '/js/main.js';
+import { renderPromiseModal } from '/js/modals.js';
+
 async function DOMLoad() {
   const rights = JSON.parse(d3.select('data[name="rights"]').node().value);
 

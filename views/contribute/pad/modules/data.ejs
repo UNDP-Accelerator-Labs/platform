@@ -1,0 +1,50 @@
+<%
+	// CREATE ALIASES
+	const publicpage = locals.metadata.page.public
+	const modules = locals.metadata.site.modules
+	const metafields = locals.metadata.site.metafields
+	const activity = locals.metadata.page.activity
+	const object = locals.metadata.page.object
+	const language = locals.metadata.page.language
+	const pagedisplay = locals.metadata.page.display
+
+	let editing = ['contribute', 'edit'].includes(activity)
+
+	const templated = locals.templated || locals.display_template !== null
+%>
+<!-- SET DATA ATTRIBUTES -->
+<data name='object' value='<%= object %>'></data>
+<data name='username' value='<%= locals.metadata.user.name %>'></data>
+<% 
+	const pagedata = {
+		type: publicpage ? 'public' : 'private',
+		display: pagedisplay,
+		activity: editing ? 'edit' : 'view',
+		language
+	}
+%>
+<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
+<%
+	const paddata = {
+		id: locals.data?.id ?? null,
+		type: templated ? 'templated' : 'blank',
+		template: templated ? locals.display_template : {},
+		source: locals.source ?? null,
+		is_review: locals.data?.is_review || false,
+		title: locals.data?.title ?? null
+	}
+%>
+<data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
+<%
+	const sitedata = {
+		modules: modules || {},
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || [],
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
+<data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
+<% if (locals.metadata.site.app_storage) { %>
+	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
+<% } %>

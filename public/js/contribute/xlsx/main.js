@@ -1,37 +1,9 @@
-function DOMLoad() {
-  d3.select('div#import-file')
-    .on('drop', function () {
-      const evt = d3.event;
-      dropHandler(evt, this);
-    })
-    .on('dragover', function () {
-      const evt = d3.event;
-      evt.preventDefault();
-      this.classList.toggle('accept');
-    })
-    .on('dragleave', function () {
-      this.classList.toggle('accept');
-    });
+import { language, vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { toggleClass } from '/js/main.js';
+import { renderPromiseModal } from '/js/modals.js';
 
-  d3.select('input[type=file]#upload').on('change', function () {
-    parseXLSX(event.target.files[0], this);
-  });
-
-  // ADD COLUMN-ACTION BUTTONS INTERACTION
-  d3.select('.sidebar button.column-action.group').on('click', (_) =>
-    groupColumns(),
-  );
-  d3.select('.sidebar button.column-action.delete').on('click', (_) =>
-    dropColumns(),
-  );
-
-  const searchForm = d3.select('body form#contribute');
-  if (searchForm.node().attachEvent)
-    searchForm.node().attachEvent('submit', catchSubmit);
-  else searchForm.node().addEventListener('submit', catchSubmit);
-}
-
-function dropHandler(evt, node) {
+export function dropHandler(evt, node) {
   evt.preventDefault();
   const sel = d3.select(node);
   const label = sel.select('.drop-zone button label');
@@ -79,6 +51,72 @@ function dropHandler(evt, node) {
       }
     }
   }
+}
+export function parseXLSX(file, node) {
+  const reader = new FileReader();
+
+  d3.select(node).attr('data-fname', file.name);
+
+  reader.onload = function (e) {
+    var data = new Uint8Array(e.target.result);
+    var workbook = XLSX.read(data, { type: 'array', bookFiles: true });
+
+    let images = [];
+    if (workbook.keys) {
+      const media = workbook.keys.filter((k) => k.includes('media/image'));
+
+      images = media.map((m, i) => {
+        const name = workbook.files[m].name; // .split('media/')[1]
+        const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
+
+        const blob = new Blob([buffer], { type: 'image/png' });
+        const urlCreator = window.URL || window.webkitURL;
+        const imageUrl = urlCreator.createObjectURL(blob);
+        return { id: name?.extractDigits(), type: 'img', src: imageUrl };
+      });
+    }
+    workbook.SheetNames.forEach((s, i) => {
+      const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
+        defval: null,
+      });
+
+      let keys = Object.keys(json[0]);
+      if (images.length) {
+        // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
+        // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
+        const cols = keys.map((d) => {
+          const obj = {};
+          obj.key = d;
+          obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
+          return obj;
+        });
+        const imageCol = cols.find((d) => !d.values.length)?.key || null;
+        if (imageCol) {
+          json.forEach((d, i) => {
+            // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
+            d[imageCol] = images.find((c) => c.id === i + 1);
+          });
+        }
+      }
+      if (i === 0) {
+        // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+        const cols = parseColumns(json, keys);
+        renderTable(cols);
+      }
+    });
+    // HIDE THE LOADING BUTTON
+    const main = d3.select('div.table main');
+    const layout = main.select('div.inner');
+    const head = layout.select('div.head');
+
+    main.select('.input-group').classed('hide', true);
+    head
+      .classed('status-0', false)
+      .classed('status-1', true)
+      .select('button[type=submit]')
+      .attr('disabled', null);
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function parseXLSX(file, node) {
@@ -940,7 +978,6 @@ function renderTable(cols, update = false) {
   const nextState = { additionalInformation: 'Updated the URL with JS' };
   window.history.pushState(nextState, nextTitle, nextURL);
 }
-
 function seekPrefix(arr) {
   // INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
   const A = arr
@@ -954,7 +991,6 @@ function seekPrefix(arr) {
   while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
   return a1.substring(0, i);
 }
-
 function splitValues(col, separator) {
   if (!separator) return null;
   const cols = d3.select('table.xls-preview').datum();
@@ -997,7 +1033,7 @@ function splitValues(col, separator) {
   });
   renderTable(cols);
 }
-function groupColumns() {
+export function groupColumns() {
   const cols = d3.select('table.xls-preview').datum();
   const selected = d3.selectAll(
     'table.xls-preview thead .column-selection .selected',
@@ -1010,7 +1046,7 @@ function groupColumns() {
     parseGroups(cols, keys);
   }
 }
-function dropColumns() {
+export function dropColumns() {
   let cols = d3.select('table.xls-preview').datum();
   const dropkeys = d3
     .select('table.xls-preview thead')
@@ -1038,7 +1074,7 @@ function compileLocations(idx) {
     }
   });
 }
-async function compilePads(idx, structureOnly = false) {
+export async function compilePads(idx, structureOnly = false) {
   const { metafields, media_value_keys } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -1572,8 +1608,7 @@ async function compilePads(idx, structureOnly = false) {
     });
   return Promise.all(pads);
 }
-
-async function compileTemplate() {
+export async function compileTemplate() {
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -1806,10 +1841,4 @@ async function previewPad(idx) {
   const nextTitle = 'Preview pad';
   const nextState = { additionalInformation: 'Updated the URL with JS' };
   window.history.pushState(nextState, nextTitle, nextURL);
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
 }

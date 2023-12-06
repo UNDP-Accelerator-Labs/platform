@@ -1,4 +1,7 @@
 import { vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { getContent } from '/js/main.js';
+import { renderFormModal } from '/js/modals.js';
 
 export async function setDownloadOptions() {
   const object = d3.select('data[name="object"]').node().value;
@@ -180,12 +183,12 @@ export async function setDownloadOptions() {
       classname: 'hide csv xlsx json geojson',
     });
     // IN CASE THIS IS A SINGLE DOWNLOAD
-    if (this.name && this.value) {
+    if (this?.name && this?.value) {
       opts.push({
         node: 'input',
         type: 'hidden',
-        name: this.name,
-        value: this.value,
+        name: this?.name,
+        value: this?.value,
       });
     } else {
       // ADD THE PAGE QUERY VARIABLES

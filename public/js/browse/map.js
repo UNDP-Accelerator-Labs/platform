@@ -1,5 +1,7 @@
 import { Entry } from '/js/browse/render.js';
 import { language, vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { getContent, multiSelection } from '/js/main.js';
 
 async function DOMLoad() {
   const object = d3.select('data[name="object"]').node().value;
@@ -72,6 +74,8 @@ async function DOMLoad() {
           page,
         }); // TO DO: CHANGE TO getContent
         const max_pages = Math.ceil(pads.length / count);
+
+        let idx = 0;
 
         const section = document.createElement('section');
         section.classList.add('container');

@@ -1,4 +1,10 @@
+import { renderTemplate } from '/js/contribute/template/render.js';
+import { partialSave } from '/js/contribute/template/save.js';
+import { initToolbarInteractions } from '/js/contribute/template/toolbar.interactions.js';
+import { getMediaSize } from '/js/main.js';
+
 async function DOMLoad() {
+  if (!mediaSize) var mediaSize = getMediaSize();
   const { metafields } = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
   );

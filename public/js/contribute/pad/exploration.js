@@ -1,5 +1,6 @@
+import { Exploration } from '/js/exploration.js';
 // INIT EXPLORATION
-function initExploration() {
+export function initExploration() {
   const exploration = new Exploration();
 
   exploration.setUseFullPromptForSelect(true);

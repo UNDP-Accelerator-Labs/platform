@@ -26,6 +26,9 @@
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <data name='space' value='<%= space %>'></data>
+<% if (locals.instance_vars?.instance) { %>
+	<data name='instance' value='<%= locals.instance_vars.instance %>'></data>
+<% } %>
 <% if (modules.some(d => d.type === 'pinboards')) { %>
 	<data name='pinboards' value='<%= JSON.stringify(locals.pinboards_list || []) %>'></data>
 <% } %>

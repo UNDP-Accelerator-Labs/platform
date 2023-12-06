@@ -1,3 +1,7 @@
+import { language } from '/js/config/translations.js';
+import { autofillTitle } from '/js/contribute/template/render.js';
+import { switchButtons } from '/js/contribute/template/save.js';
+
 let keyTrack = [];
 window.addEventListener('keydown', async function (e) {
   e = e || event;

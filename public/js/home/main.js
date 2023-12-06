@@ -1,11 +1,5 @@
-window.addEventListener('DOMContentLoaded', async function DOMLoad() {
-  const { display } = d3.select('.slides').node().dataset;
-  if (display === 'carousel') {
-    await renderCarousel();
-  } else if (display === 'mosaic') {
-    await renderMosaic();
-  }
-});
+import { renderPromiseModal } from '/js/modals.js';
+
 // THIS IS NOT USED FOR NOW
 async function selectCountry() {
   // GET COUNTRIES
@@ -32,10 +26,4 @@ async function selectCountry() {
     },
   ];
   const mobilization = await renderPromiseModal({ message, opts });
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
 }

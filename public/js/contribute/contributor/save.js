@@ -1,4 +1,4 @@
-function partialSave() {
+export function partialSave() {
   // CHECK WHETHER GOOD TO SAVE
   const metastatus = d3
     .select('.meta-status')

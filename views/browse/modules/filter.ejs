@@ -78,7 +78,7 @@
 							<% for (let key in d) { %>
 								<div class='filter google-translate-attr'>
 									<input type='text' id='<%- key %>'>
-									<label for='<%- key %>' data-vocab='["<%= key.slice(0, -1)?.replace(/_/g, " ") %>", "plural"]'></label>
+									<label for='<%- key %>' data-vocab='["<%= key.slice(0, -1)?.replace(/_/g, " ") %>", "plural"]' data-altvocab='["<%= key.replace(/_/g, " ") %>", "plural"]'></label>
 									<div class='dropdown'>
 										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
@@ -209,5 +209,5 @@
 <% } %>
 
 <% if (locals.metadata?.user?.uuid) { %>
-	<data name='fixedEid' value='<%- JSON.stringify(fixedEid) %>'></data>
+	<data name='fixedEid' value='<%= fixedEid %>'></data>
 <% } %>

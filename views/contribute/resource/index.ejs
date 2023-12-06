@@ -11,30 +11,13 @@
 
 <%- include ('../../partials/head.ejs') %>
 
-<script type='text/javascript' src='/js/contribute/resource/main.js'></script>
+<%- include ('./modules/data.ejs') %>
+
+<script type='module' src='/js/contribute/resource/load.js'></script>
 
 </head>
 
 <body>
-
-<!-- SET DATA ATTRIBUTES -->
-<data name='object' value='<%= object %>'></data>
-<%
-	const rightsobj = {};
-	modules.forEach(d => {
-		let { write } = d.rights;
-		if (typeof write === 'object') { write = write.blank; }
-
-		rightsobj[d.type] = null
-		if (write <= rights) {
-			rightsobj[d.type] = 'write'
-		}
-	});
-%>
-<data name='rights' value='<%= JSON.stringify(rightsobj) %>'></data>
-<% if (locals.metadata.site.app_storage) { %>
-	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
-<% } %>
 
 <%- include ('../../partials/navigate/menu-languages.ejs') %>
 <%- include ('../../partials/modals.ejs') %>

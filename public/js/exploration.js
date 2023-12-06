@@ -1,5 +1,8 @@
 import { language, vocabulary } from '/js/config/translations.js';
+import { GET, POST, PUT } from '/js/fetch.js';
+import { renderPromiseModal } from '/js/modals.js';
 
+// TO DO: STILL A PB WITH VOCABULARY HERE
 export class Exploration {
   constructor() {
     this.past = [];

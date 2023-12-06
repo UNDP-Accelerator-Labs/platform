@@ -1,0 +1,20 @@
+<!-- SET DATA ATTRIBUTES -->
+<data name='object' value='<%= object %>'></data>
+<% 
+	const modules = locals.metadata.site.modules
+	const rightsobj = {};
+	
+	modules.forEach(d => {
+		let { write } = d.rights;
+		if (typeof write === 'object') { write = write.blank; } 
+		
+		rightsobj[d.type] = null
+		if (write <= rights) {
+			rightsobj[d.type] = 'write'
+		}
+	});
+%>
+<data name='rights' value='<%= JSON.stringify(rightsobj) %>'></data>
+<% if (locals.metadata.site.app_storage) { %>
+	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
+<% } %>

@@ -36,7 +36,7 @@
 							<% query[key].forEach(d => { %>
 								<% if (locals.filters_menu[key]?.some(c => c.id.toString() === d)) { %>
 									<div class='tag' data-type='<%- key %>' data-value='<%- d %>'>
-										<label class='type' data-vocab='["<%= key.slice(0, -1)?.replace(/_/g, " ") %>", "singular"]'>
+										<label class='type' data-vocab='["<%= key.slice(0, -1)?.replace(/_/g, " ") %>", "singular"]' data-altvocab='["<%= key.replace(/_/g, " ") %>", "singlar"]'>
 										</label>
 										<label class='name'>
 											<!-- TO DO: FIX PROBLEM HERE WITH SDGS -->

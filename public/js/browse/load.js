@@ -4,11 +4,15 @@ import {
   expandfilters,
   openPreview,
   pinAll,
+  redirect,
   rmtag,
   setShareOptions,
   toggletag,
 } from '/js/browse/main.js';
 import { renderSections, renderVignette } from '/js/browse/render.js';
+import { partialSave } from '/js/browse/save.js';
+import { GET, POST } from '/js/fetch.js';
+import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
 console.log('file loaded');
 
@@ -23,7 +27,6 @@ async function DOMLoad() {
     id: page,
     pages,
     display,
-    language,
   } = JSON.parse(d3.select('data[name="page"]').node().value);
 
   await renderSections();
@@ -365,6 +368,11 @@ async function DOMLoad() {
         dropdown.selectAll('menu li').classed('hide', false);
       }
     });
+  }
+
+  // INITIALIZE THE SLIDESHOW INTERACTION
+  if (display === 'slideshow') {
+    initSlideshowNavigation();
   }
 
   // HANDLE LAZY LOADING IF ACTIVATED

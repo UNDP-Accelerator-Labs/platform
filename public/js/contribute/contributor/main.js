@@ -1,62 +1,9 @@
-async function DOMLoad() {
-  await initDropdowns();
+import { vocabulary } from '/js/config/translations.js';
+import { partialSave } from '/js/contribute/contributor/save.js';
+import { POST } from '/js/fetch.js';
+import { fixLabel, getMediaSize } from '/js/main.js';
 
-  d3.selectAll('input[type=password]') // IT IS IMPORTANT THAT THIS COMES BEFORE THE NEXT GENERIC BLUR FUNCTION
-    .on('blur.confirm', function () {
-      const node = this;
-      const sel = d3.select(this);
-      const inputgroup = d3.select(this.parentNode);
-      const confirm = d3.selectAll('input[type=password]').filter(function () {
-        return this !== node;
-      });
-      if (
-        checkPassword(this.value)?.length &&
-        this.name !== 'confirm_password'
-      ) {
-        sel.classed('error', true);
-        inputgroup
-          .addElems('p', 'errormessage', checkPassword(this.value))
-          .html((d) => d);
-      } else {
-        d3.selectAll('input[type=password]').classed(
-          'error',
-          this.value !== confirm.node().value,
-        );
-        inputgroup.selectAll('p.errormessage').remove();
-      }
-    });
-
-  // GENERIC BLUR FUNCTION
-  d3.selectAll(
-    'input[type=text]:not([name="api-token"]), input[type=email], input[type=password]',
-  ).on('blur.save', function () {
-    partialSave();
-  });
-
-  // ADD INTERACTION FOR EXTRA LANGUAGES OPTION
-  d3.select('#add-extra-languages').on('click', async function () {
-    await addLanguage(this.parentNode);
-  });
-
-  // SET UP TOKEN REQUEST
-  const apiToken = d3.select('.api-token');
-  apiToken.select('.request-token').on('click', async function () {
-    await requestToken(this.form);
-  });
-  apiToken.select('input[name="api-token"]').on('click', function () {
-    this.select();
-  });
-  apiToken.select('button.copy').on('click', function () {
-    copyToken(this.form);
-  });
-
-  // ADD PIN/TAG INTERACTIONS
-  d3.selectAll('.tag label.close').on('click', function () {
-    rmPin(this);
-  });
-}
-
-async function requestToken(node) {
+export async function requestToken(node) {
   const token = await POST('/request/token');
   if (token) {
     const inputgroup = d3.select(node);
@@ -65,15 +12,16 @@ async function requestToken(node) {
     input.node().select();
   }
 }
-function copyToken(node) {
+export function copyToken(node) {
   const inputgroup = d3.select(node);
   const token = inputgroup.select('input[type=text]').node().value;
   navigator.clipboard.writeText(token);
 }
+export async function addLanguage(node) {
+  const { languages } = JSON.parse(
+    d3.select('data[name="site"]').node().value,
+  );
 
-async function addLanguage(node) {
-  // THEN SET UP MECHANISM IN BACKEND TO ALLOW MULTIPLE LANGUAGES
-  // THEN USE THAT MECHANISM WHEN LOOKING FOR REVIEWERS
   const sel = d3.select(node);
   const parent = sel.findAncestor('ul');
   const li = parent.insertElem(function () {
@@ -81,11 +29,16 @@ async function addLanguage(node) {
   }, 'li');
   li.addElem('label', 'instruction').html(vocabulary['other languages']);
   const input = li.addElem('div', 'select');
-  input.addElem('input').attrs({
-    type: 'text',
-    id: 'secondary-languages',
-    autocomplete: 'secondary-languages',
-  });
+  input
+    .addElem('input')
+    .attrs({
+      type: 'text',
+      id: 'secondary-languages',
+      autocomplete: 'secondary-languages',
+    })
+    .on('blur.fixlabel', function () {
+      fixLabel(this);
+    });
   input
     .addElem('label')
     .attr('for', 'secondary-languages')
@@ -96,29 +49,32 @@ async function addLanguage(node) {
     .addElems('li', null, languages)
     .each(function () {
       const sel = d3.select(this);
-      sel.addElems('input').attrs({
-        type: 'checkbox',
-        id: (d) => `secondary-language-${d.language}`,
-        name: 'secondary_languages', // TO DO: PROBABLY CHANGE THIS SO NO CONFLICT WITH OTHER language INPUTS
-        value: (d) => d.language,
-        'data-label': (d) => d.name.capitalize(),
-        disabled: (d) =>
-          d.language ===
-          d3.select('input[name="language"]:checked').node()?.value
-            ? true
-            : null,
-      });
+      sel
+        .addElems('input')
+        .attrs({
+          type: 'checkbox',
+          id: (d) => `secondary-language-${d.language}`,
+          name: 'secondary_languages', // TO DO: PROBABLY CHANGE THIS SO NO CONFLICT WITH OTHER language INPUTS
+          value: (d) => d.language,
+          'data-label': (d) => d.name.capitalize(),
+          disabled: (d) =>
+            d.language ===
+            d3.select('input[name="language"]:checked').node()?.value
+              ? true
+              : null,
+        })
+        .on('change.select', function () {
+          partialSave();
+        });
       sel
         .addElems('label')
         .attr('for', (d) => `secondary-language-${d.language}`)
         .html((d) => d.name.capitalize());
     });
 
-  // initBlurs()
   await initDropdowns();
   sel.remove();
 }
-
 function addPinOption(value) {
   const dropdown = d3.select(this);
   const li = dropdown.select('menu').addElem('li');
@@ -160,7 +116,7 @@ function renderPin() {
       .click();
   }
 }
-function rmPin(node) {
+export function rmPin(node) {
   const sel = d3.select(node);
   const id = node.dataset.id;
   const name = node.dataset.name;
@@ -174,8 +130,7 @@ function rmPin(node) {
 
   partialSave();
 }
-
-async function initDropdowns() {
+export async function initDropdowns() {
   if (!mediaSize) var mediaSize = getMediaSize();
   const { rights } = await POST('/check/module_rights', {
     module_type: 'teams',
@@ -319,10 +274,4 @@ async function initDropdowns() {
       }
     });
   }
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
 }

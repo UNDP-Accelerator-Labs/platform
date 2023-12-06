@@ -1,4 +1,7 @@
-function renderModal(data, close = true) {
+import { vocabulary } from '/js/config/translations.js';
+import { filterDropdown, fixLabel } from '/js/main.js';
+
+export function renderModal(data, close = true) {
   const { headline, opts, theme, node } = data;
 
   d3.selectAll('.temp-active').classed('temp-active', false);
@@ -53,7 +56,7 @@ function renderModal(data, close = true) {
     })
     .html((d) => d.label);
 }
-function renderPromiseModal(data, close = true) {
+export function renderPromiseModal(data, close = true) {
   const { headline, message, opts } = data;
 
   return new Promise((resolve) => {
@@ -101,7 +104,7 @@ function renderPromiseModal(data, close = true) {
       });
   });
 }
-function renderFormModal(data, close = true) {
+export function renderFormModal(data, close = true) {
   const { headline, message, formdata, opts, foot } = data;
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
@@ -173,7 +176,7 @@ function renderFormModal(data, close = true) {
       .html((d) => d.label);
   });
 }
-function renderLonglistFormModal(data, close = true) {
+export function renderLonglistFormModal(data, close = true) {
   const { headline, message, formdata, opts, foot } = data;
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
@@ -511,7 +514,7 @@ function addInputNode(_sel, _data) {
   }
 }
 
-function renderImgZoom(data) {
+export function renderImgZoom(data) {
   const { src } = data;
 
   d3.select('nav.filter').classed('open', false);

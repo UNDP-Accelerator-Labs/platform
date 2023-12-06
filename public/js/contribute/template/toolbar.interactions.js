@@ -1,4 +1,21 @@
-function initToolbarInteractions(metafields) {
+import { language } from '/js/config/translations.js';
+import {
+  addAttachment,
+  addChecklist,
+  addDrawing,
+  addEmbed,
+  addGroup,
+  addImg,
+  addIndexes,
+  addLocations,
+  addRadiolist,
+  addSection,
+  addTags,
+  addTxt,
+} from '/js/contribute/template/render.js';
+import { getMediaSize } from '/js/main.js';
+
+export function initToolbarInteractions(metafields) {
   if (!mediaSize) var mediaSize = getMediaSize();
   if (!metafields) {
     const { metafields: tmeta } = JSON.parse(

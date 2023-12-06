@@ -1,3 +1,9 @@
+import { language, vocabulary } from '/js/config/translations.js';
+import { partialSave, switchButtons } from '/js/contribute/template/save.js';
+import { POST } from '/js/fetch.js';
+import { toggleClass } from '/js/main.js';
+import { renderPromiseModal } from '/js/modals.js';
+
 const obsvars = {
   attributes: true,
   attributeFilter: ['class'],
@@ -439,7 +445,7 @@ async function populateSection(data, lang = 'en', section) {
   // GROUP
   if (data.type === 'group') await addGroup({ data, lang, section });
 }
-async function autofillTitle() {
+export async function autofillTitle() {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -483,8 +489,7 @@ async function autofillTitle() {
     }
   }
 }
-
-async function addSection(kwargs) {
+export async function addSection(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -642,10 +647,6 @@ async function addSection(kwargs) {
   }
 
   if (structure) {
-    // await section.each(async function (d) {
-    // await Promise.all(pagestructure.map(d => populateSection(d, lang, section.node())))
-    // })
-
     // THE PROMISES DO NOT SEEM TO WORK PROPERLY
     // WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
     const { structure: pagestructure } = section.datum();
@@ -697,7 +698,7 @@ function addTitle(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addImg(kwargs) {
+export function addImg(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -741,7 +742,7 @@ function addImg(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addDrawing(kwargs) {
+export function addDrawing(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -785,7 +786,7 @@ function addDrawing(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addTxt(kwargs) {
+export function addTxt(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -926,7 +927,7 @@ function addTxt(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addEmbed(kwargs) {
+export function addEmbed(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -971,7 +972,7 @@ function addEmbed(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addChecklist(kwargs) {
+export function addChecklist(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1133,7 +1134,7 @@ function addChecklist(kwargs) {
 
   if (focus) media.media.select('.instruction').node().focus();
 }
-function addRadiolist(kwargs) {
+export function addRadiolist(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1294,7 +1295,7 @@ function addRadiolist(kwargs) {
   if (focus) media.media.select('.instruction').node().focus();
 }
 // META ELEMENTS
-function addLocations(kwargs) {
+export function addLocations(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1412,7 +1413,7 @@ function addLocations(kwargs) {
 
   if (focus) meta.media.node().focus();
 }
-async function addIndexes(kwargs) {
+export async function addIndexes(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1458,7 +1459,7 @@ async function addIndexes(kwargs) {
 
   if (focus) taglist.media.node().focus();
 }
-async function addTags(kwargs) {
+export async function addTags(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1504,7 +1505,7 @@ async function addTags(kwargs) {
 
   if (focus) taglist.media.node().focus();
 }
-function addAttachment(kwargs) {
+export function addAttachment(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1557,7 +1558,7 @@ function addAttachment(kwargs) {
   if (focus) meta.media.node().focus();
 }
 // GROUPS
-async function addGroup(kwargs) {
+export async function addGroup(kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1654,7 +1655,6 @@ async function addGroup(kwargs) {
 
   if (focus) media.media.node().focus();
 
-  // items.forEach(async c => await populateSection(c, lang, media.container.node()))
   await addItems(media.container);
 
   async function addItems(sel) {
@@ -1668,39 +1668,10 @@ async function addGroup(kwargs) {
     for (let s = 0; s < structure.length; s++) {
       await populateSection(structure[s], lang, group.node());
     }
-    // await Promise.all(group.datum().map(d => populateSection(d, lang, group.node())))
-    // .each(function (c) {
-    // 	console.log(c)
-    // 	c.forEach(async b => await populateSection(b, lang, this))
-    // })
   }
 }
 
-// SAVING BUTTON
-function switchButtons(lang = 'en') {
-  if (!mediaSize) var mediaSize = getMediaSize();
-  window.sessionStorage.setItem('changed-content', true);
-  // PROVIDE FEEDBACK: UNSAVED CHANGES
-  if (mediaSize === 'xs') {
-    d3.select('.meta-status .btn-group .save button')
-      .each(function () {
-        this.disabled = false;
-      })
-      .html(vocabulary['save changes']);
-  } else {
-    const menu_logo = d3.select('nav#site-title .inner');
-    window.sessionStorage.setItem('changed-content', true);
-    menu_logo.selectAll('div.create, h1, h2').classed('hide', true);
-    menu_logo
-      .selectAll('div.save')
-      .classed('hide saved', false)
-      .select('button')
-      .on('click', async (_) => await partialSave())
-      .html(vocabulary['save changes']);
-  }
-}
-
-async function renderTemplate() {
+export async function renderTemplate() {
   // POPULATE THE PAGE
   const object = d3.select('data[name="object"]').node()?.value;
   const template = JSON.parse(

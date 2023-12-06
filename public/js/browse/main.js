@@ -6,6 +6,7 @@ export function openPreview() {
   const href = url.href.replace('/browse/', '/preview/');
   window.open(href, '_blank');
 }
+
 export async function setShareOptions(node) {
   const { id, contributors: curr_contributors } = node.dataset || {};
   const contributors = await POST(`/${language}/browse/contributors/invited`, {

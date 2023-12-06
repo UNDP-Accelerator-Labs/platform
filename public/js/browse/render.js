@@ -1,32 +1,36 @@
-import { setDownloadOptions } from '/js/browse/download.js'
-import { initExploration } from '/js/browse/exploration.js'
-import { confirmRemoval, deleteArticles, unpublishArticles } from '/js/browse/main.js'
-import { language, vocabulary } from '/js/config/translations.js'
-import { POST } from '/js/fetch.js'
-import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js'
-import { renderFormModal, renderImgZoom } from '/js/modals.js'
+import { setDownloadOptions } from '/js/browse/download.js';
+import { initExploration } from '/js/browse/exploration.js';
+import {
+  confirmRemoval,
+  deleteArticles,
+  unpublishArticles,
+} from '/js/browse/main.js';
+import { language, vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
+import { renderFormModal, renderImgZoom } from '/js/modals.js';
 
 // TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
-const exploration = initExploration()
+const exploration = initExploration();
 
 export const Entry = function (_kwargs) {
   if (!mediaSize) var mediaSize = getMediaSize();
 
-	let {
-		parent,
-		data,
-		language,
-		vocabulary,
-		object,
-		space,
-		modules,
-		pinboards,
-		engagementtypes,
-		rights,
-		app_storage,
-		page
-	} = _kwargs
+  let {
+    parent,
+    data,
+    language,
+    vocabulary,
+    object,
+    space,
+    modules,
+    pinboards,
+    engagementtypes,
+    rights,
+    app_storage,
+    page,
+  } = _kwargs;
 
   this.id = uuidv4();
   this.language = language;
@@ -97,52 +101,80 @@ export const Entry = function (_kwargs) {
     owner: function (_sel) {
       const metainfo = _sel.addElems('div', 'meta meta-data');
 
-			metainfo.addElems('div', 'meta meta-contributor', d => {
-				let data = []
-				if (
-					(['pads', 'files'].includes(object)
-						&& ['private', 'curated', 'shared'].includes(space)
-					) || ['templates' ,'mobilizations'].includes(object)
-				) {
-					data = [{ href: `?contributors=${d.owner}`, name: d.ownername || vocabulary['anonymous contributor'] }]
+      metainfo
+        .addElems('div', 'meta meta-contributor', (d) => {
+          let data = [];
+          if (
+            (['pads', 'files'].includes(object) &&
+              ['private', 'curated', 'shared'].includes(space)) ||
+            ['templates', 'mobilizations'].includes(object)
+          ) {
+            data = [
+              {
+                href: `?contributors=${d.owner}`,
+                name: d.ownername || vocabulary['anonymous contributor'],
+              },
+            ];
 
-					if (d.locations?.length) {
-						d.locations.forEach(c => {
-							data.push({
-								href: `?countries=${c.iso3}`,
-								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor'])
-							})
-						})
-					} else {
-						data.push({
-							href: `?countries=${d.iso3}`,
-							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor'])
-						})
-					}
-				} else if (object === 'reviews') {
-					data = [{
-						href: d.is_review ? `?contributors=${d.owner}` : null,
-						name: space === 'private' ? d.is_review ? d.ownername : vocabulary['blinded for review'] : null
-					}]
-				} else {
-					if (d.locations?.length) {
-						data = d.locations.map(c => {
-							return {
-								href: `?countries=${c.iso3}`,
-								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor'])
-							}
-						})
-					} else {
-						data = [{
-							href: `?countries=${d.iso3}`,
-							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor'])
-						}]
-					}
-				}
-				return data
-			}).addElems('a', 'contributor-name')
-				.attr('href', d => d.href)
-				.html(d => d.name)
+            if (d.locations?.length) {
+              d.locations.forEach((c) => {
+                data.push({
+                  href: `?countries=${c.iso3}`,
+                  name:
+                    c.iso3 === 'NUL'
+                      ? vocabulary['global']
+                      : c.country || vocabulary['anonymous contributor'],
+                });
+              });
+            } else {
+              data.push({
+                href: `?countries=${d.iso3}`,
+                name:
+                  d.iso3 === 'NUL'
+                    ? vocabulary['global']
+                    : d.country || vocabulary['anonymous contributor'],
+              });
+            }
+          } else if (object === 'reviews') {
+            data = [
+              {
+                href: d.is_review ? `?contributors=${d.owner}` : null,
+                name:
+                  space === 'private'
+                    ? d.is_review
+                      ? d.ownername
+                      : vocabulary['blinded for review']
+                    : null,
+              },
+            ];
+          } else {
+            if (d.locations?.length) {
+              data = d.locations.map((c) => {
+                return {
+                  href: `?countries=${c.iso3}`,
+                  name:
+                    c.iso3 === 'NUL'
+                      ? vocabulary['global']
+                      : c.country || vocabulary['anonymous contributor'],
+                };
+              });
+            } else {
+              data = [
+                {
+                  href: `?countries=${d.iso3}`,
+                  name:
+                    d.iso3 === 'NUL'
+                      ? vocabulary['global']
+                      : d.country || vocabulary['anonymous contributor'],
+                },
+              ];
+            }
+          }
+          return data;
+        })
+        .addElems('a', 'contributor-name')
+        .attr('href', (d) => d.href)
+        .html((d) => d.name);
 
       metainfo.addElems('div', 'meta meta-date').html((d) => {
         if (d.date) {
@@ -159,292 +191,274 @@ export const Entry = function (_kwargs) {
             );
             let str = `${vocabulary['joined on']} ${start}`;
 
-							if (d.end_date) {
-								const end = new Date(d.end_date).toLocaleDateString(language, dateOptions)
-								str += `, ${vocabulary['left on'].toLowerCase()} ${end}`
-							}
-							return str
-						} else {
-							if (d.end_date) {
-								return new Date(d.start_date?.date || d.start_date).toLocaleDateString(language, dateOptions) + ' – ' + new Date(d.end_date?.date || d.end_date).toLocaleDateString(language, dateOptions)
-							} else return new Date(d.start_date?.date || d.start_date).toLocaleDateString(language, dateOptions)
-						}
-					}
-					else return d.email
-				})
-		}.bind(this),
-		actions: function (_sel) {
-			// <%#
-			// 	let { write } = modules.find(d => d.type === object)?.rights
-			// 	if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-			// 	if (rights >= (write ?? Infinity))
-			// { %>
-			if (rights[object] === 'write') {
-				_sel.addElems('div', 'btn-group')
-				.addElems('form', 'actions', d => {
-					const opts = []
+            if (d.end_date) {
+              const end = new Date(d.end_date).toLocaleDateString(
+                language,
+                dateOptions,
+              );
+              str += `, ${vocabulary['left on'].toLowerCase()} ${end}`;
+            }
+            return str;
+          } else {
+            if (d.end_date) {
+              return (
+                new Date(
+                  d.start_date?.date || d.start_date,
+                ).toLocaleDateString(language, dateOptions) +
+                ' – ' +
+                new Date(d.end_date?.date || d.end_date).toLocaleDateString(
+                  language,
+                  dateOptions,
+                )
+              );
+            } else
+              return new Date(
+                d.start_date?.date || d.start_date,
+              ).toLocaleDateString(language, dateOptions);
+          }
+        } else return d.email;
+      });
+    }.bind(this),
+    actions: function (_sel) {
+      // <%#
+      // 	let { write } = modules.find(d => d.type === object)?.rights
+      // 	if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+      // 	if (rights >= (write ?? Infinity))
+      // { %>
+      if (rights[object] === 'write') {
+        _sel
+          .addElems('div', 'btn-group')
+          .addElems('form', 'actions', (d) => {
+            const opts = [];
 
-					if (['private', 'pinned'].includes(space) && object !== 'reviews') {
-						if (d.editable) opts.push({
-							node: 'button',
-							type: 'button',
-							classname: 'delete',
-							label: vocabulary['delete'],
-							fn: deleteArticles
-						})
-					} else if (space === 'curated') {
-						if (d.editable && !d.owner) opts.push({
-							node: 'button',
-							type: 'button',
-							classname: 'delete',
-							label: vocabulary['delete'],
-							fn: deleteArticles
-						})
-					}
-					if (object === 'pads') {
-						opts.push({
-							node: 'button',
-							type: 'button',
-							classname: 'download',
-							label: vocabulary['download'],
-							name: 'pads',
-							value: d.id,
-							disabled: d.status < 2,
-							fn: setDownloadOptions
-						})
-					}
-					// CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
-					if (['files', 'pads'].includes(object)) {
-						if (d.editable) {
-							const publish_dropdown = []
-							const exceeds_publication_limit = d.available_publications === 0
+            if (
+              ['private', 'pinned'].includes(space) &&
+              object !== 'reviews'
+            ) {
+              if (d.editable)
+                opts.push({
+                  node: 'button',
+                  type: 'button',
+                  classname: 'delete',
+                  label: vocabulary['delete'],
+                  fn: deleteArticles,
+                });
+            } else if (space === 'curated') {
+              if (d.editable && !d.owner)
+                opts.push({
+                  node: 'button',
+                  type: 'button',
+                  classname: 'delete',
+                  label: vocabulary['delete'],
+                  fn: deleteArticles,
+                });
+            }
+            if (object === 'pads') {
+              opts.push({
+                node: 'button',
+                type: 'button',
+                classname: 'download',
+                label: vocabulary['download'],
+                name: 'pads',
+                value: d.id,
+                disabled: d.status < 2,
+                fn: setDownloadOptions,
+              });
+            }
+            // CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
+            if (['files', 'pads'].includes(object)) {
+              if (d.editable) {
+                const publish_dropdown = [];
+                const exceeds_publication_limit =
+                  d.available_publications === 0;
 
-							if (modules.some(d => d.type === 'reviews')) {
-								if (d.status === 1 && !exceeds_publication_limit) {
-									publish_dropdown.push({
-										name: 'status',
-										value: 2,
-										classname: 'preprint',
-										label: vocabulary['object status'][object.slice(0, -1)][2]['singular']
-									})
-								}
-								if (d.status <= 2 && d.review_status === 0) {
-									if (!(d.status === 1 && exceeds_publication_limit)) {
-										publish_dropdown.push({
-											name: 'review_status',
-											value: 1,
-											classname: 'review',
-											label: vocabulary['submit for review'],
-											fn: selectReviewLanguage
-										})
-									}
-								}
-							} else {
-								if (d.status === 1 && !exceeds_publication_limit) {
-									publish_dropdown.push({
-										name: 'status',
-										value: 2,
-										classname: 'internally',
-										label: vocabulary['internally']
-									})
-								}
-								if (d.status <= 2 && d.publishable) {
-									if (!(d.status === 1 && exceeds_publication_limit)) {
-										publish_dropdown.push({
-											name: 'status',
-											value: 3,
-											classname: 'externally',
-											label: vocabulary['externally']
-										})
-									}
-								}
-							}
+                if (modules.some((d) => d.type === 'reviews')) {
+                  if (d.status === 1 && !exceeds_publication_limit) {
+                    publish_dropdown.push({
+                      name: 'status',
+                      value: 2,
+                      classname: 'preprint',
+                      label:
+                        vocabulary['object status'][object.slice(0, -1)][2][
+                          'singular'
+                        ],
+                    });
+                  }
+                  if (d.status <= 2 && d.review_status === 0) {
+                    if (!(d.status === 1 && exceeds_publication_limit)) {
+                      publish_dropdown.push({
+                        name: 'review_status',
+                        value: 1,
+                        classname: 'review',
+                        label: vocabulary['submit for review'],
+                        fn: selectReviewLanguage,
+                      });
+                    }
+                  }
+                } else {
+                  if (d.status === 1 && !exceeds_publication_limit) {
+                    publish_dropdown.push({
+                      name: 'status',
+                      value: 2,
+                      classname: 'internally',
+                      label: vocabulary['internally'],
+                    });
+                  }
+                  if (d.status <= 2 && d.publishable) {
+                    if (!(d.status === 1 && exceeds_publication_limit)) {
+                      publish_dropdown.push({
+                        name: 'status',
+                        value: 3,
+                        classname: 'externally',
+                        label: vocabulary['externally'],
+                      });
+                    }
+                  }
+                }
 
-							opts.push({
-								action: `/publish/${object}`,
-								method: 'GET',
-								node: 'button',
-								type: 'button',
-								value: d.id,
-								disabled:
-									!(
-										d.editable
-										&& [1, 2].includes(d.status)
-										&& publish_dropdown.length
-									),
-								classname: 'publish',
-								label: vocabulary['publish'],
-								dropdown: publish_dropdown,
-								inputs: [
-									{ name: 'id', value: d.id },
-									{ name: 'title', value: d.title }
-								]
-							})
+                opts.push({
+                  action: `/publish/${object}`,
+                  method: 'GET',
+                  node: 'button',
+                  type: 'button',
+                  value: d.id,
+                  disabled: !(
+                    d.editable &&
+                    [1, 2].includes(d.status) &&
+                    publish_dropdown.length
+                  ),
+                  classname: 'publish',
+                  label: vocabulary['publish'],
+                  dropdown: publish_dropdown,
+                  inputs: [
+                    { name: 'id', value: d.id },
+                    { name: 'title', value: d.title },
+                  ],
+                });
 
-							// if (d.status > 1) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })
-							if (d.status > 1) {
-								opts.push({
-									node: 'button',
-									type: 'button',
-									value: d.id,
-									disabled: !d.editable,
-									classname: 'unpublish',
-									label: vocabulary['unpublish'],
-									fn: unpublishArticles
-								})
-							}
-						}
-					} else if (object === 'templates') {
-						if (d.editable) {
-							if (d.status === 1) {
-								opts.push({
-									action: `/publish/${object}`,
-									method: 'GET',
-									node: 'button',
-									type: 'submit',
-									value: d.id,
-									disabled: !d.editable,
-									classname: 'publish',
-									label: vocabulary['publish'],
-									inputs: [{ name: 'status', value: 2 }]
-								})
-							}
+                // if (d.status > 1) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })
+                if (d.status > 1) {
+                  opts.push({
+                    node: 'button',
+                    type: 'button',
+                    value: d.id,
+                    disabled: !d.editable,
+                    classname: 'unpublish',
+                    label: vocabulary['unpublish'],
+                    fn: unpublishArticles,
+                  });
+                }
+              }
+            } else if (object === 'templates') {
+              if (d.editable) {
+                if (d.status === 1) {
+                  opts.push({
+                    action: `/publish/${object}`,
+                    method: 'GET',
+                    node: 'button',
+                    type: 'submit',
+                    value: d.id,
+                    disabled: !d.editable,
+                    classname: 'publish',
+                    label: vocabulary['publish'],
+                    inputs: [{ name: 'status', value: 2 }],
+                  });
+                }
 
-							if (space !== 'reviews') {
-								// if (d.status > 1 && d.retractable) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })
-								if (d.status > 1 && d.retractable) {
-									opts.push({
-										node: 'button',
-										type: 'button',
-										value: d.id,
-										disabled: !d.editable,
-										classname: 'unpublish',
-										label: vocabulary['unpublish'],
-										fn: unpublishArticles
-									})
-								}
-							}
-						}
-					} else if (object === 'reviews') {
-						if (space === 'pending') {
-							if (!d.is_review) {
-								if (d.reviewers < modules.find(d => d.type === 'reviews')?.reviewers) {
-									opts.push({
-										action: '/accept/review',
-										method: 'GET',
-										node: 'button',
-										type: 'submit',
-										classname: 'accept',
-										label: vocabulary['accept'],
-										value: d.id,
-										inputs: [{ name: 'template', value: d.review_template }]
-									})
-									if (!d.required) {
-										opts.push({
-											action: '/decline/review',
-											method: 'GET',
-											node: 'button',
-											type: 'submit',
-											classname: 'decline',
-											label: vocabulary['decline'],
-											value: d.id
-										})
-									}
-								}
-							} else {
-								if (d.editable) {
-									if (d.status === 1) {
-										opts.push({
-											action: `/publish/${object}`,
-											method: 'GET',
-											node: 'button',
-											type: 'submit',
-											value: d.id,
-											disabled: !(d.editable && [1, 2].includes(d.status) && d.is_review),
-											classname: 'publish',
-											label: vocabulary['publish'],
-											inputs: [{ name: 'status', value: 2 }, { name: 'source', value: d.source }]
-										})
-									}
-								}
-							}
-						}
-					} else if (object === 'mobilizations') {
-						if (d.status === 1) {
-							opts.push({
-								node: 'button',
-								type: 'button',
-								classname: 'copy',
-								label: vocabulary['copy link'],
-								value: d.id,
-								inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }],
-								fn: copyLink
-							})
-						}
-						opts.push({
-							node: 'button',
-							type: 'button',
-							disabled: d.pads === 0,
-							classname: 'download',
-							label: vocabulary['download'],
-							name: 'mobilizations',
-							value: d.id,
-							fn: setDownloadOptions
-						}) // TO DO: CHECK IF THIS WORKS
-
-						if (d.status === 1) {
-							opts.push({
-								action: `/unpublish/${object}`,
-								method: 'GET',
-								node: 'button',
-								type: 'submit',
-								disabled: !(d.editable && d.status === 1),
-								classname: 'demobilize',
-								label: vocabulary['demobilize'],
-								value: d.id
-							})
-						}
-						if (d.status === 2) {
-							opts.push({
-								action: `/${language}/mobilize/cohort`,
-								method: 'GET',
-								node: 'button',
-								type: 'submit',
-								disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up),
-								classname: 'followup',
-								label: vocabulary['follow up']['verb'],
-								name: 'source',
-								value: d.id
-							})
-						}
-						if (d.status === 2) {
-							opts.push({
-								action: `/${language}/mobilize/cohort`,
-								method: 'GET',
-								node: 'button',
-								type: 'submit',
-								disabled: !(d.editable && d.status === 2),
-								classname: 'copy',
-								label: vocabulary['copy']['verb'],
-								name: 'source',
-								value: d.id,
-								inputs: [{ name: 'copy', value: true }]
-							})
-						}
-					} else if (object === 'contributors') {
-						if (space === 'invited') {
-							opts.push({
-								node: 'button',
-								type: 'button',
-								classname: 'revoke',
-								label: vocabulary['revoke'],
-								name: 'contributor',
-								value: d.id,
-								disabled: ![null, undefined].includes(d.end_date),
-								fn: revoke
-							})
-						}
-					}
+                if (space !== 'reviews') {
+                  // if (d.status > 1 && d.retractable) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })
+                  if (d.status > 1 && d.retractable) {
+                    opts.push({
+                      node: 'button',
+                      type: 'button',
+                      value: d.id,
+                      disabled: !d.editable,
+                      classname: 'unpublish',
+                      label: vocabulary['unpublish'],
+                      fn: unpublishArticles,
+                    });
+                  }
+                }
+              }
+            } else if (object === 'reviews') {
+              if (space === 'pending') {
+                if (!d.is_review) {
+                  if (
+                    d.reviewers <
+                    modules.find((d) => d.type === 'reviews')?.reviewers
+                  ) {
+                    opts.push({
+                      action: '/accept/review',
+                      method: 'GET',
+                      node: 'button',
+                      type: 'submit',
+                      classname: 'accept',
+                      label: vocabulary['accept'],
+                      value: d.id,
+                      inputs: [{ name: 'template', value: d.review_template }],
+                    });
+                    if (!d.required) {
+                      opts.push({
+                        action: '/decline/review',
+                        method: 'GET',
+                        node: 'button',
+                        type: 'submit',
+                        classname: 'decline',
+                        label: vocabulary['decline'],
+                        value: d.id,
+                      });
+                    }
+                  }
+                } else {
+                  if (d.editable) {
+                    if (d.status === 1) {
+                      opts.push({
+                        action: `/publish/${object}`,
+                        method: 'GET',
+                        node: 'button',
+                        type: 'submit',
+                        value: d.id,
+                        disabled: !(
+                          d.editable &&
+                          [1, 2].includes(d.status) &&
+                          d.is_review
+                        ),
+                        classname: 'publish',
+                        label: vocabulary['publish'],
+                        inputs: [
+                          { name: 'status', value: 2 },
+                          { name: 'source', value: d.source },
+                        ],
+                      });
+                    }
+                  }
+                }
+              }
+            } else if (object === 'mobilizations') {
+              if (d.status === 1) {
+                opts.push({
+                  node: 'button',
+                  type: 'button',
+                  classname: 'copy',
+                  label: vocabulary['copy link'],
+                  value: d.id,
+                  inputs: [
+                    { name: 'template', value: d.template },
+                    { name: 'language', value: d.language },
+                  ],
+                  fn: copyLink,
+                });
+              }
+              opts.push({
+                node: 'button',
+                type: 'button',
+                disabled: d.pads === 0,
+                classname: 'download',
+                label: vocabulary['download'],
+                name: 'mobilizations',
+                value: d.id,
+                fn: setDownloadOptions,
+              }); // TO DO: CHECK IF THIS WORKS
 
               if (d.status === 1) {
                 opts.push({
@@ -578,69 +592,68 @@ export const Entry = function (_kwargs) {
           const { inputs } = datum;
           const { name, value } = d3.select(this).datum();
 
-					const target_opts = await POST('/load/templates', { space: 'reviews' })
-					.then(results => {
-						return results.data.map(d => {
-							return {
-								label: d.name,
-								value: d.language,
-								count: d.count,
-								disabled: {
-									value: d.disabled,
-									label: vocabulary['missing reviewers']
-								},
-								type: 'radio',
-								required: true
-							}
-						})
-					})
+          const target_opts = await POST('/load/templates', {
+            space: 'reviews',
+          }).then((results) => {
+            return results.data.map((d) => {
+              return {
+                label: d.name,
+                value: d.language,
+                count: d.count,
+                disabled: {
+                  value: d.disabled,
+                  label: vocabulary['missing reviewers'],
+                },
+                type: 'radio',
+                required: true,
+              };
+            });
+          });
 
-					// TO DO: FILTER THIS BASED ON USER RIGHTS >= review.rights.write
-					const reviewers = await POST(`/${language}/browse/contributors/all`, { limit: null })
-					const reviewer_opts = reviewers.data.map(d => {
-						d.secondary_languages.push(d.language)
-						return { label: d.name, value: d.id, type: 'checkbox', classname: d.secondary_languages.join(' ') }
-					}) // TO DO: IMPROVE THIS
-					const formdata = { action: '/request/review', method: 'POST' }
-					const message = vocabulary['select review language']
+          // TO DO: FILTER THIS BASED ON USER RIGHTS >= review.rights.write
+          const reviewers = await POST(
+            `/${language}/browse/contributors/all`,
+            { limit: null },
+          );
+          const reviewer_opts = reviewers.data.map((d) => {
+            d.secondary_languages.push(d.language);
+            return {
+              label: d.name,
+              value: d.id,
+              type: 'checkbox',
+              classname: d.secondary_languages.join(' '),
+            };
+          }); // TO DO: IMPROVE THIS
+          const formdata = { action: '/request/review', method: 'POST' };
+          const message = vocabulary['select review language'];
 
-					const opts = []
-					opts.push({
-						node: 'select',
-						name: 'language',
-						label: vocabulary['select language']['singular'],
-						options: target_opts,
-						fn: updateReviewerList
-					})
-					opts.push({
-						node: 'select',
-						name: 'reviewers',
-						label: `${vocabulary['select']} ${modules.find(d => d.type === 'reviews')?.reviewers} ${vocabulary['reviewers']} (${vocabulary['optional']})`,
-						options: reviewer_opts,
-						classname: 'reviewer-list hide',
-						fn: countReviewers
-					})
+          const opts = [];
+          opts.push({
+            node: 'select',
+            name: 'language',
+            label: vocabulary['select language']['singular'],
+            options: target_opts,
+            fn: updateReviewerList,
+          });
+          opts.push({
+            node: 'select',
+            name: 'reviewers',
+            label: `${vocabulary['select']} ${
+              modules.find((d) => d.type === 'reviews')?.reviewers
+            } ${vocabulary['reviewers']} (${vocabulary['optional']})`,
+            options: reviewer_opts,
+            classname: 'reviewer-list hide',
+            fn: countReviewers,
+          });
 
-					inputs.forEach(d => {
-						opts.push({
-							node: 'input',
-							type: 'hidden',
-							name: d.name,
-							value: d.value
-						})
-					})
-
-					opts.push({
-						node: 'button',
-						type: 'submit',
-						name: name,
-						value: value,
-						disabled: true,
-						label: vocabulary['submit for review']
-					})
-					const new_constraint = await renderFormModal({ message, formdata, opts })
-					// THIS IS A FORM MODAL SO IT SHOULD RELOAD THE PAGE
-				}
+          inputs.forEach((d) => {
+            opts.push({
+              node: 'input',
+              type: 'hidden',
+              name: d.name,
+              value: d.value,
+            });
+          });
 
           opts.push({
             node: 'button',
@@ -721,14 +734,10 @@ export const Entry = function (_kwargs) {
           const message = vocabulary['set user end date'];
           const opts = [];
 
-					// opts.push({ node: 'input', type: 'date', name: 'invite', value: `${yyyy}-${mm}-${dd}` })
-					opts.push({
-						node: 'input',
-						type: 'date',
-						name: 'date',
-						value: `${yyyy}-${mm}-${dd}`
-					})
-					// opts.push({ node: 'input', type: 'email', name: 'email' })
+          const today = new Date();
+          const dd = String(today.getDate()).padStart(2, '0');
+          const mm = String(today.getMonth() + 1).padStart(2, '0');
+          const yyyy = today.getFullYear();
 
           // opts.push({ node: 'input', type: 'date', name: 'invite', value: `${yyyy}-${mm}-${dd}` })
           opts.push({
@@ -739,31 +748,9 @@ export const Entry = function (_kwargs) {
           });
           // opts.push({ node: 'input', type: 'email', name: 'email' })
 
-					opts.push({
-						node: 'input',
-						type: 'hidden',
-						name: 'id',
-						value: value
-					})
-					opts.push({
-						node: 'button',
-						type: 'submit',
-						label: vocabulary['revoke']
-					})
-					const new_constraint = await renderFormModal({ message, formdata, opts })
-				}
-			}
-		}.bind(this),
-		img: function (_sel) {
-			_sel.addElems('div', 'media media-img', d => d.img?.length ? [d] : [])
-				.addElems('a', 'pad-link')
-				// .attrs({
-				// 	'href': d => {
-				// 		const queryparams = new URLSearchParams()
-				// 		if (d.id) queryparams.set('id', d.id)
-				// 		if (d.source) queryparams.set('source', d.source)
-				// 		if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
-				// 		if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
+          // SET WHETHER TO EXCLUDE OR TO REMOVE RIGHTS
+          // opts.push({ node: 'input', type: 'radio', name: 'type', value: 'revoke', placeholder: 'Remove user rights', checked: true, default: true }) // TO DO: TRANSLATE
+          // opts.push({ node: 'input', type: 'radio', name: 'type', value: 'delete', placeholder: 'Exclude from platform and suite', checked: false, default: true }) // TO DO: TRANSLATE
 
           opts.push({
             node: 'input',
@@ -822,28 +809,12 @@ export const Entry = function (_kwargs) {
 
           if (!Array.isArray(d.img)) d.img = [d.img];
 
-				if (page.display === 'slideshow' || mediaSize === 'xs') {
-					img.src = source.replace('uploads/sm/', 'uploads/')
-				} else img.src = source
-			})
-		}.bind(this),
-		stats: function (_sel) {
-			const stats = _sel.addElems('div', 'meta meta-group', d => {
-				if (['pads', 'files'].includes(object)) {
-					return []
-				} else {
-					return !d.img?.length ? [d] : []
-				}
-			})
-			.addElems('div', 'meta meta-stats', d => {
-				const data = []
-				if (d.items !== undefined) {
-					const obj = {}
-					obj.type = 'item'
-					obj.label = vocabulary['item'][d.items !== 1 ? 'plural' : 'singular']
-					obj.count = d.items
-					data.push(obj)
-				}
+          let source = undefined;
+          if (app_storage) {
+            source = new URL(`${app_storage}${d.img[0]}`).href;
+          } else {
+            source = d.img[0];
+          }
 
           if (page.display === 'slideshow' || mediaSize === 'xs') {
             img.src = source.replace('uploads/sm/', 'uploads/');
@@ -975,71 +946,91 @@ export const Entry = function (_kwargs) {
             if (d.is_review && d.review_template)
               queryparams.set('template', d.review_template);
 
-						if (object === 'reviews') {
-							if (!d.is_review && d.reviews?.length > 0) {
-								queryparams.set('display', 'adjacent-reviews')
-								return `/${language}/view/pad?${queryparams.toString()}`
-							}
-						}
-						if (object === 'files') {
-							if (d.url) {
-								return d.url
-							} else return null
-						}
-						if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?${queryparams.toString()}`
-						else return `/${language}/view/${object.slice(0, -1)}?${queryparams.toString()}`
-					},
-					'target': d => {
-						if (object === 'files') {
-							return '_blank'
-						} else {
-							return '_self'
-						}
-					}
-				}).addElems('h1')
-			title.addElems('img')
-				.attr('src', d => {
-					if (d.is_followup) return `/imgs/icons/i-followup-${object.slice(0, -1)}.svg`
-					else if (d.is_forward) return `/imgs/icons/i-forward-${object.slice(0, -1)}.svg`
-					else if (d.is_copy) return `/imgs/icons/i-copy-${object.slice(0, -1)}.svg`
-					else {
-						if (object === 'reviews') {
-							return '/imgs/icons/i-pad.svg'
-						} else {
-							return `/imgs/icons/i-${object.slice(0, -1)}.svg`
-						}
-					}
-				})
-			title.addElems('span')
-				.html(d => {
-					if (d.is_review) return `[${vocabulary['review']['preposition']}] ${d.source_title}`
-					else return d.title || d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]}]`
-				})
-		}.bind(this),
-		txt: function (_sel) {
-			_sel.addElems('div', 'media media-txt', d => {
-				if (d.txt) {
-					if (!Array.isArray(d.txt)) d.txt = [d.txt]
-					return d.txt.map(c => {
-						return {
-							id: d.id,
-							editable: d.editable,
-							source: d.source,
-							is_followup: d.is_followup,
-							is_review: d.is_review,
-							reviews: d.reviews,
-							txt: c.split(/\n\n+/)[0]
-						}
-					})
-				} else return []
-			}).addElems('a', 'pad-link')
-				.attrs({
-					'href': d => {
-						const queryparams = new URLSearchParams()
-						if (d.id) queryparams.set('id', d.id)
-						if (d.source) queryparams.set('source', d.source)
-						if (d.is_followup || d.is_review) queryparams.set('display', 'adjacent-source')
-						if ((d.is_review) && d.review_template) queryparams.set('template', d.review_template)
+            if (object === 'reviews') {
+              if (!d.is_review && d.reviews?.length > 0) {
+                queryparams.set('display', 'adjacent-reviews');
+                return `/${language}/view/pad?${queryparams.toString()}`;
+              }
+            }
+            if (object === 'files') {
+              if (d.url) {
+                return d.url;
+              } else return null;
+            }
+            if (d.editable)
+              return `/${language}/edit/${object.slice(
+                0,
+                -1,
+              )}?${queryparams.toString()}`;
+            else
+              return `/${language}/view/${object.slice(
+                0,
+                -1,
+              )}?${queryparams.toString()}`;
+          },
+          target: (d) => {
+            if (object === 'files') {
+              return '_blank';
+            } else {
+              return '_self';
+            }
+          },
+        })
+        .addElems('h1');
+      title.addElems('img').attr('src', (d) => {
+        if (d.is_followup)
+          return `/imgs/icons/i-followup-${object.slice(0, -1)}.svg`;
+        else if (d.is_forward)
+          return `/imgs/icons/i-forward-${object.slice(0, -1)}.svg`;
+        else if (d.is_copy)
+          return `/imgs/icons/i-copy-${object.slice(0, -1)}.svg`;
+        else {
+          if (object === 'reviews') {
+            return '/imgs/icons/i-pad.svg';
+          } else {
+            return `/imgs/icons/i-${object.slice(0, -1)}.svg`;
+          }
+        }
+      });
+      title.addElems('span').html((d) => {
+        if (d.is_review)
+          return `[${vocabulary['review']['preposition']}] ${d.source_title}`;
+        else
+          return (
+            d.title ||
+            d.name ||
+            `[${vocabulary[`untitled ${object.slice(0, -1)}`]}]`
+          );
+      });
+    }.bind(this),
+    txt: function (_sel) {
+      _sel
+        .addElems('div', 'media media-txt', (d) => {
+          if (d.txt) {
+            if (!Array.isArray(d.txt)) d.txt = [d.txt];
+            return d.txt.map((c) => {
+              return {
+                id: d.id,
+                editable: d.editable,
+                source: d.source,
+                is_followup: d.is_followup,
+                is_review: d.is_review,
+                reviews: d.reviews,
+                txt: c.split(/\n\n+/)[0],
+              };
+            });
+          } else return [];
+        })
+        .addElems('a', 'pad-link')
+        .attrs({
+          href: (d) => {
+            const queryparams = new URLSearchParams();
+            if (d.id) queryparams.set('id', d.id);
+            if (d.source) queryparams.set('source', d.source);
+            if (d.is_followup || d.is_review)
+              queryparams.set('display', 'adjacent-source');
+            if (d.is_review && d.review_template)
+              queryparams.set('template', d.review_template);
 
             if (object === 'reviews') {
               if (!d.is_review && d.reviews?.length > 0) {
@@ -1114,68 +1105,110 @@ export const Entry = function (_kwargs) {
       if (source) {
         var treeinfo = _sel.addElems('div', 'meta meta-tree');
 
-				if (version_depth > 1) {
-					const versiontree = treeinfo.addElems('div', 'meta meta-versiontree')
-						.addElems('a')
-						.attr('href', d => `/${language}/browse/pads/versiontree?nodes=${d.id}`)
-					versiontree.addElems('img')
-						.attr('src', '/imgs/icons/i-versiontree.svg')
-					versiontree.addElems('small')
-						.html(d => d.version_depth)
-				}
-			}
-			if (source && is_followup) {
-				const followup = treeinfo.addElems('div', 'meta meta-followup')
-					.attr('title', d => d.source_title)
-				followup.addElems('i')
-					.html(`${vocabulary['follow up']['preposition']}:&nbsp;`)
-				followup.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?id=${d.source}`
-							else return `/${language}/view/${object.slice(0, -1)}?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
-			}
-			if (source && is_forward) {
-				const forward = treeinfo.addElems('div', 'meta meta-forward')
-					.attr('title', d => d.source_title)
-				forward.addElems('i')
-					.html(`${vocabulary['forwarded from']}:&nbsp;`)
-				forward.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?id=${d.source}`
-							else return `/${language}/view/${object.slice(0, -1)}?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
-			}
-			if (source && is_copy) {
-				const copy = treeinfo.addElems('div', 'meta meta-copy', d => d.source && d.is_copy ? [d] : [])
-					.attr('title', d => d.source_title)
-				copy.addElems('i')
-					.html(`${vocabulary['copy']['preposition']}:&nbsp;`)
-				copy.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?id=${d.source}`
-							else return `/${language}/view/${object.slice(0, -1)}?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
-			}
-			if (source && is_child) {
-				const child = treeinfo.addElems('div', 'meta meta-child', d => d.source && d.is_child ? [d] : [])
-					.attr('title', d => d.source_title)
-				child.addElems('i')
-					.html(`${vocabulary['expansion']}: `)
-				child.addElems('a')
-					.attrs({
-						'href': d => {
-							if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?id=${d.source}`
-							else return `/${language}/view/${object.slice(0, -1)}?id=${d.source}`
-						}//, 'target': '_blank'
-					}).html(d => d.source_title)
-			}
+        if (version_depth > 1) {
+          const versiontree = treeinfo
+            .addElems('div', 'meta meta-versiontree')
+            .addElems('a')
+            .attr(
+              'href',
+              (d) => `/${language}/browse/pads/versiontree?nodes=${d.id}`,
+            );
+          versiontree
+            .addElems('img')
+            .attr('src', '/imgs/icons/i-versiontree.svg');
+          versiontree.addElems('small').html((d) => d.version_depth);
+        }
+      }
+      if (source && is_followup) {
+        const followup = treeinfo
+          .addElems('div', 'meta meta-followup')
+          .attr('title', (d) => d.source_title);
+        followup
+          .addElems('i')
+          .html(`${vocabulary['follow up']['preposition']}:&nbsp;`);
+        followup
+          .addElems('a')
+          .attrs({
+            href: (d) => {
+              if (d.editable)
+                return `/${language}/edit/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+              else
+                return `/${language}/view/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+            }, //, 'target': '_blank'
+          })
+          .html((d) => d.source_title);
+      }
+      if (source && is_forward) {
+        const forward = treeinfo
+          .addElems('div', 'meta meta-forward')
+          .attr('title', (d) => d.source_title);
+        forward.addElems('i').html(`${vocabulary['forwarded from']}:&nbsp;`);
+        forward
+          .addElems('a')
+          .attrs({
+            href: (d) => {
+              if (d.editable)
+                return `/${language}/edit/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+              else
+                return `/${language}/view/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+            }, //, 'target': '_blank'
+          })
+          .html((d) => d.source_title);
+      }
+      if (source && is_copy) {
+        const copy = treeinfo
+          .addElems('div', 'meta meta-copy', (d) =>
+            d.source && d.is_copy ? [d] : [],
+          )
+          .attr('title', (d) => d.source_title);
+        copy.addElems('i').html(`${vocabulary['copy']['preposition']}:&nbsp;`);
+        copy
+          .addElems('a')
+          .attrs({
+            href: (d) => {
+              if (d.editable)
+                return `/${language}/edit/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+              else
+                return `/${language}/view/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+            }, //, 'target': '_blank'
+          })
+          .html((d) => d.source_title);
+      }
+      if (source && is_child) {
+        const child = treeinfo
+          .addElems('div', 'meta meta-child', (d) =>
+            d.source && d.is_child ? [d] : [],
+          )
+          .attr('title', (d) => d.source_title);
+        child.addElems('i').html(`${vocabulary['expansion']}: `);
+        child
+          .addElems('a')
+          .attrs({
+            href: (d) => {
+              if (d.editable)
+                return `/${language}/edit/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+              else
+                return `/${language}/view/${object.slice(0, -1)}?id=${
+                  d.source
+                }`;
+            }, //, 'target': '_blank'
+          })
+          .html((d) => d.source_title);
+      }
 
       _sel
         .addElems('div', 'meta meta-mobilization', (d) =>
@@ -1576,7 +1609,7 @@ export const Entry = function (_kwargs) {
             .attr('href', (d) => `./pinned?pinboard=${d.id}`)
             .html((d) =>
               d.is_exploration
-                ? `${explorationVocab['exploration']}: ${d.title}`
+                ? `${vocabulary['exploration']['exploration']}: ${d.title}`
                 : d.title,
             );
           lgas.addElems('span', 'count').html((d) => d.count);
@@ -1589,7 +1622,7 @@ export const Entry = function (_kwargs) {
             .attr('href', (d) => `./pinned?pinboard=${d.id}`)
             .html((d) =>
               d.is_exploration
-                ? `${explorationVocab['exploration']}: ${d.title}`
+                ? `${vocabulary['exploration']['exploration']}: ${d.title}`
                 : d.title,
             );
           xsas.addElems('span', 'count').html((d) => d.count);
@@ -1602,54 +1635,10 @@ export const Entry = function (_kwargs) {
           d3.select(this).call(renderPins, d.pinboards);
         });
 
-						if (this.checked) {
-							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'insert', object: object.slice(0, -1) })
-							if (res.status === 200) {
-								pins.call(renderPins, res.pins)
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
-								renderDropdown(d.object_id);
-								renderPinNavigation(res.pinboards_list);
-							}
-						} else {
-							const res = await POST('/pin', { board_id: d.id, object_id: d.object_id, action: 'delete', object: object.slice(0, -1) })
-							if (res.status === 200) {
-								pins.call(renderPins, res.pins)
-								if (res.pinboards_list.length !== pinboards.length) {
-									location.reload();
-								}
-								pinboards = res.pinboards_list.filter((pb) => !pb.is_exploration);
-								renderDropdown(d.object_id);
-								renderPinNavigation(res.pinboards_list);
-							}
-						}
-					})
-					opts.addElems('label', 'title')
-						.classed('notranslate', true)
-						.attr('for', d => `board-${d.id}-object-${d.object_id}`)
-						.html(d => d.title)
-					.addElems('span', 'count')
-						.html(d => d.count)
-				}
-				function renderPinNavigation (_data) {
-					// NOTE: d can be undefined here for elements that were
-					// added through ejs instead of d3
-					const lglis = d3.select('#pinboards-list-lg menu')
-						.addElems('li', null, _data, (d) => d ? d.id : -1);
-					const lgas = lglis.addElems('a');
-					lgas.classed('notranslate', true)
-						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `${vocabulary['exploration']['exploration']}: ${d.title}` : d.title);
-					lgas.addElems('span', 'count')
-						.html(d => d.count);
-					const xslis = d3.select('#pinboards-list-xs menu')
-						.addElems('li', null, _data, (d) => d ? d.id : -1);
-					const xsas = xslis.addElems('a');
-					xsas.classed('notranslate', true)
-						.attr('href', d => `./pinned?pinboard=${d.id}`)
-						.html(d => d.is_exploration ? `${vocabulary['exploration']['exploration']}: ${d.title}` : d.title);
-					xsas.addElems('span', 'count')
-						.html(d => d.count);
-				}
+        const newpin = pingroup.addElems('div', 'add filter', (d) => {
+          if (object === 'contributors' && !d.editable) return [];
+          else return [d];
+        });
 
         const renderDropdown = (pid) => {
           const d = pinPbMap[pid];
@@ -1700,17 +1689,10 @@ export const Entry = function (_kwargs) {
               // if (top + 300 >= viewheight - padding) dropdown.classed('dropup', true)
               // else dropdown.classed('dropup', false)
 
-					const filter = d3.select(this).findAncestor('filter')
-					const dropdown = filter.select('.dropdown')
-					let { top, height } = this.getBoundingClientRect()
-					top = top + height
-					const viewheight = window.innerHeight
-
-					if (mediaSize === 'xs') {
-						// const { height: padding } = d3.select('#search-and-filter').node().getBoundingClientRect()
-						// if (!padding) padding = 0
-						// if (top + 300 >= viewheight - padding) dropdown.classed('dropup', true)
-						// else dropdown.classed('dropup', false)
+              filter.classed('expand', true);
+            } else if (top + 300 >= viewheight)
+              dropdown.classed('dropup', true);
+            else dropdown.classed('dropup', false);
 
             dropdown.node().style.maxHeight = `${Math.min(
               dropdown.node().scrollHeight,
@@ -1913,83 +1895,18 @@ export const Entry = function (_kwargs) {
 
       _sel.addElems('div', 'meta meta-email').html((d) => d.email);
 
-			form.addElems('button', 'opt', d => {
-				const opts = []
-				opts.push({
-					type: 'button',
-					class: 'Confirm', // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['confirm'],
-					fn: confirmRemoval
-				})
-				opts.push({
-					type: 'button',
-					class: 'Cancel', // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['cancel'],
-					fn: unpublishArticles
-				})
-				return opts
-			}).attrs({
-				'class': d => d.class.toLowerCase(),
-				'type': d => d.type,
-				'value': d => d.value
-			}).html(d => d.label)
-				.on('click', function (d) { d.fn ? d.fn.call(this, 'unpublish') : null })
-		}.bind(this),
-		delete: function (_sel) {
-			const form = _sel.addElems('form', 'delete hide')
-				.attrs({
-					'method': 'GET',
-					'action': `/delete/${object}`
-				})
-			form.addElems('input', 'pad-id')
-				.attrs({
-					'type': 'hidden',
-					'name': 'id',
-					'value': d => d.id
-				})
+      _sel.addElems('div', 'meta meta-position').html((d) => d.position);
 
-			form.addElems('button', 'opt', d => {
-				const opts = []
-				opts.push({
-					type: 'button',
-					class: 'Confirm',  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['confirm'],
-					fn: confirmRemoval
-				})
-				opts.push({
-					type: 'button',
-					class: 'Cancel',  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['cancel'],
-					fn: deleteArticles
-				})
-				return opts
-			}).attrs({
-				'class': d => d.class.toLowerCase(),
-				'type': d => d.type,
-				'value': d => d.value
-			}).html(d => d.label)
-				.on('click', function (d) { d.fn ? d.fn.call(this, 'delete') : null })
-		}.bind(this),
-		contributor: function (_sel) { // THIS DOES NOT SEEM TO BE USED
-			const name = _sel.addElems('div', 'media media-name')
-				.addElems('a', 'pad-link')
-				.attrs({
-					'href': d => {
-						let query = `id=${d.uuid}`
-						if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?${query}`
-						else return `/${language}/view/${object.slice(0, -1)}?${query}`
-					}//, 'target': '_blank'
-				}).addElems('h1')
-			name.addElems('img')
-				.attr('src', d => {
-					if (d.is_followup) return `/imgs/icons/i-followup-${object.slice(0, -1)}.svg`
-					else if (d.is_forward) return `/imgs/icons/i-forward-${object.slice(0, -1)}.svg`
-					else if (d.is_copy) return `/imgs/icons/i-copy-${object.slice(0, -1)}.svg`
-					else return `/imgs/icons/i-${object.slice(0, -1)}.svg`
-				})
-			name.addElems('span')
-				// .html(d => d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]?.[language]}]`)
-				.html(d => d.name || `[${vocabulary[`untitled ${object.slice(0, -1)}`]}]`)
+      _sel.addElems('div', 'meta meta-country').html((d) => d.countryname);
+    }.bind(this),
+    exploration: (_sel) => {
+      exploration.addDocButtons(_sel, true);
+    },
+  };
+};
+export function renderVignette(_section, _kwargs) {
+  if (!mediaSize) var mediaSize = getMediaSize();
+  const { data, object, space, page } = _kwargs;
 
   const entry = new Entry({
     parent: _section,
@@ -2087,7 +2004,7 @@ export async function renderSections() {
     });
 
     if (page.display === 'slideshow') {
-      initSlideshow();
+      initSlideshow(main);
     }
   }
 }
@@ -2098,16 +2015,51 @@ function initSlideshow() {
     d3.select('data[name="page"]').node().value,
   );
 
-	const object = d3.select('data[name="object"]').node().value
-	const space = d3.select('data[name="space"]').node().value
-	const page = JSON.parse(d3.select('data[name="page"]').node().value)
-	if (mediaSize === 'xs' && object === 'pads') { // ON sm DEVICES, FORCE DISPLAY TO COLUMNS IF NOT A SLIDESHOW
-		if (page.display !== 'slideshow') { page.display = 'columns'; }
-	}
-
-	const main = d3.select('div.browse main')
-	const layout = main.select('div.inner')
-	const sections = layout.addElems('section', `container ${object}`, data)
+  d3.select('div.browse')
+    .addElems('button', 'slide-nav', [
+      { label: '&lsaquo;', class: 'prev' },
+      { label: '&rsaquo;', class: 'next' },
+    ])
+    .each(function (d) {
+      d3.select(this).classed(d.class, true);
+    })
+    .classed('hide', (d) => {
+      const sel = d3.select(this);
+      let focus_id = 0;
+      d3.selectAll('.slide').each(function (c, i) {
+        if (d3.select(this).classed('slide-in-view')) focus_id = i;
+      });
+      if (d.class === 'prev' && focus_id === 0) {
+        if (pages && page === 1) {
+          return true;
+        } else {
+          return false;
+        }
+      } else if (d.class === 'next' && focus_id === slides.size() - 1) {
+        if (pages && page === pages) {
+          return true;
+        } else {
+          return false;
+        }
+      } else return false;
+    })
+    .html((d) => d.label)
+    .on('click', (d) => {
+      if (d.class === 'prev') switchslide(idx - 1);
+      else if (d.class === 'next') switchslide(idx + 1);
+    })
+    .on('mouseup', function () {
+      d3.event.stopPropagation();
+      // LOSE FOCUS OF THIS BUTTON TO RE-ENABLE KEYBOARD NAVIGATION
+      this.blur();
+    });
+  // ADD DOTS
+  d3.select('footer .dots')
+    .addElems('div', 'dot', new Array(slides.size()).fill(0))
+    .classed('highlight', (d, i) => i === 0)
+    .on('click', (d, i) => {
+      switchslide(i);
+    });
 
   let idx = 0;
   const slidewidth =
@@ -2163,97 +2115,4 @@ function initSlideshow() {
       });
     }
   });
-}
-function initSlideshow () {
-	const slideshow = d3.select('div.layout.slideshow')
-	const slides = slideshow.selectAll('.slide')
-	const { pages, id: page } = JSON.parse(d3.select('data[name="page"]').node().value)
-
-	d3.select('div.browse')
-	.addElems('button', 'slide-nav', [{ label: '&lsaquo;', class: 'prev' }, { label: '&rsaquo;', class: 'next' }])
-	.each(function (d) { d3.select(this).classed(d.class, true) })
-		.classed('hide', d => {
-			const sel = d3.select(this)
-			let focus_id = 0
-			d3.selectAll('.slide').each(function (c, i) {
-				if (d3.select(this).classed('slide-in-view')) focus_id = i
-			})
-			if (d.class === 'prev' && focus_id === 0) {
-				if (pages && page === 1) {
-					return true
-				} else {
-					return false
-				}
-			} else if (d.class === 'next' && focus_id === slides.size() - 1) {
-				if (pages && page === pages) {
-					return true
-				} else {
-					return false
-				}
-			} else return false
-		}).html(d => d.label)
-	.on('click', d => {
-		if (d.class === 'prev') switchslide(idx - 1)
-		else if (d.class === 'next') switchslide(idx + 1)
-	}).on('mouseup', function () {
-		d3.event.stopPropagation()
-		// LOSE FOCUS OF THIS BUTTON TO RE-ENABLE KEYBOARD NAVIGATION
-		this.blur()
-	})
-	// ADD DOTS
-	d3.select('footer .dots').addElems('div', 'dot', new Array(slides.size()).fill(0))
-	.classed('highlight', (d, i) => i === 0)
-	.on('click', (d, i) => { switchslide(i) })
-
-	let idx = 0
-	const slidewidth = slides.node().clientWidth || slides.node().offsetWidth || slides.node().scrollWidth
-
-	function switchslide (i) {
-		slideshow.node().scrollTo({
-			top: 0,
-			left: i * slidewidth,
-			behavior: 'smooth'
-		})
-
-		if (i > slides.size() - 1) {
-			if (pages && page < pages) {
-				const url = new URL(window.location)
-				const queryparams = new URLSearchParams(url.search)
-				queryparams.set('page', page + 1)
-				window.location = `${url.pathname}?${queryparams.toString()}`
-			}
-		} else if (i < 0) {
-			if (pages && page > 1) {
-				// WE KEEP THE pages AT THE BEGINNING TO MAKE SURE THE PAGINATION SCHEMA IS NUMERIC (FOR EXAMPLE, IN THE CASE OF CONTRIBUTORS, IT IS ALPHABETIC)
-				const url = new URL(window.location)
-				const queryparams = new URLSearchParams(url.search)
-				queryparams.set('page', page - 1)
-				window.location = `${url.pathname}?${queryparams.toString()}`
-			}
-		}
-
-		return idx = i
-	}
-
-	slideshow.on('scroll', function () {
-		if (this.scrollLeft % slidewidth === 0) {
-			idx = Math.round(this.scrollLeft / slidewidth)
-			d3.selectAll('.dot').classed('highlight', (d, i) => i === idx)
-			d3.selectAll('button.slide-nav').classed('hide', d => {
-				if (d.class === 'prev' && idx === 0) {
-					if (pages && page === 1) {
-						return true
-					} else {
-						return false
-					}
-				} else if (d.class === 'next' && idx === slides.size() - 1) {
-					if (pages && page === pages) {
-						return true
-					} else {
-						return false
-					}
-				} else return false
-			})
-		}
-	})
 }

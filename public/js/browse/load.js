@@ -1,4 +1,5 @@
 import { setDownloadOptions } from '/js/browse/download.js';
+import { initSlideshowNavigation } from '/js/browse/keyboard.interactions.js';
 import {
   addequivalents,
   expandfilters,
@@ -13,8 +14,6 @@ import { renderSections, renderVignette } from '/js/browse/render.js';
 import { partialSave } from '/js/browse/save.js';
 import { GET, POST } from '/js/fetch.js';
 import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
-
-console.log('file loaded');
 
 async function DOMLoad() {
   if (!mediaSize) var mediaSize = getMediaSize();

@@ -198,7 +198,7 @@ async function addSection(node) {
   if (!['xs', 'sm'].includes(mediaSize)) {
     const menu = d3.select('.pinboard-sections menu');
     const section = menu.select('li.active').node();
-    if (section?.node()) {
+    if (section) {
       menu.node().scrollTo({
         top: 0,
         left: section.offsetLeft,

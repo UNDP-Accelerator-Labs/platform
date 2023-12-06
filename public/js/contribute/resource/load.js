@@ -20,7 +20,7 @@ async function DOMLoad() {
   const module_opts = {};
   const template_opts = {};
 
-  for (let key in data) {
+  for (const key in data) {
     if (data[key].length) {
       module_opts[key] = data[key].map((d) => {
         return {

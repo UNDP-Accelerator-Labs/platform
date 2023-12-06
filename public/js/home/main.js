@@ -27,9 +27,3 @@ async function selectCountry() {
   ];
   const mobilization = await renderPromiseModal({ message, opts });
 }
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}

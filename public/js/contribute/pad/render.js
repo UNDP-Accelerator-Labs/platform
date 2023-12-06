@@ -51,8 +51,6 @@ const observer = new MutationObserver((evt) => {
           .replace('-container', '')
           .trim();
 
-        console.log('here');
-
         if (page.activity === 'edit') {
           if (page.type === 'private') await partialSave('media');
           else await updateStatus();
@@ -1491,13 +1489,11 @@ function addImg(kwargs) {
     let form_id = media.id; //uuidv4()
 
     if (media.input) {
-      const form = media.input
-        .addElems('form')
-        .attrs({
-          action: '/upload/img',
-          method: 'POST',
-          enctype: 'multipart/form-data',
-        });
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/img',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
       form
         .addElems('input')
         .attrs({
@@ -1721,13 +1717,11 @@ function addMosaic(kwargs) {
     let form_id = media.id; //uuidv4()
 
     if (media.input) {
-      const form = media.input
-        .addElems('form')
-        .attrs({
-          action: '/upload/img',
-          method: 'POST',
-          enctype: 'multipart/form-data',
-        });
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/img',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
       form
         .addElems('input')
         .attrs({
@@ -1863,13 +1857,11 @@ function addVideo(kwargs) {
     let form_id = media.id; //uuidv4()
 
     if (media.input) {
-      const form = media.input
-        .addElems('form')
-        .attrs({
-          action: '/upload/video',
-          method: 'POST',
-          enctype: 'multipart/form-data',
-        });
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/video',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
       form
         .addElems('input')
         .attrs({
@@ -4040,7 +4032,7 @@ async function addSlides(kwargs) {
                   kwargs.focus = true;
 
                   const new_section = await addSlides(kwargs); // THIS TOO IS DIFFERENT TO addSection
-                  initSlideshow();
+                  initSlideshow(main);
                 }
                 resolve();
               }),
@@ -4068,6 +4060,7 @@ async function addSlides(kwargs) {
   // Promise.all(displaypromises).then(_ => resolve(section))
   return section.node();
 }
+
 function initSlideshow(main) {
   // TRANSFORM THE MAIN #pad INTO A SLIDESHOW
   // d3.select('.document').classed('slideshow', true)

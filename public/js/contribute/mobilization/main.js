@@ -12,6 +12,7 @@ export function adjustarea(node) {
     .select('.head button.next')
     .node().disabled = node.value.trim().length === 0;
 }
+
 export function preventSubmit(node, evt) {
   if (evt.code === 'Enter' || evt.keyCode === 13) {
     evt.preventDefault();
@@ -23,6 +24,7 @@ export function preventSubmit(node, evt) {
       .click();
   }
 }
+
 export function enableNext(node) {
   const parent = d3.select(node).findAncestor('modal');
   const button = parent.select('.head button.next:not(.hide)').node();
@@ -38,6 +40,7 @@ export function enableNext(node) {
     .classed('status-0', disabled)
     .classed('status-1', !disabled);
 }
+
 export function next(node) {
   const current = d3.select(node).findAncestor('modal');
   const next = current.node().nextElementSibling;
@@ -46,6 +49,7 @@ export function next(node) {
     d3.select(next).classed('hide', false);
   }
 }
+
 export function prev(node) {
   const current = d3.select(node).findAncestor('modal');
   const next = current.node().previousElementSibling;
@@ -54,6 +58,7 @@ export function prev(node) {
     d3.select(next).classed('hide', false);
   }
 }
+
 export function togglePublic(node) {
   d3.selectAll('.public')
     .classed('hide', !node.checked)

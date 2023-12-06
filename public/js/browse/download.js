@@ -380,7 +380,7 @@ export async function setDownloadOptions() {
     const queryparams = new URLSearchParams(url.search);
     queryparams.forEach((value, key) => {
       if (key !== 'page' && value) {
-        opts.push({ node: 'input', type: 'hidden', name: key, value: value });
+        opts.push({ node: 'input', type: 'hidden', name: key, value });
       }
     });
 

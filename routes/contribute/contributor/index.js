@@ -3,12 +3,12 @@ const { checklanguage, datastructures, geo, join } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
-	
+
 	if (public) res.redirect('/login')
 	else {
 		const { referer } = req.headers || {}
 		const { id, errormessage, u_errormessage } = req.query || {}
-		
+
 		const language = checklanguage(req.params?.language || req.session.language)
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
@@ -22,8 +22,8 @@ module.exports = async (req, res) => {
 					else res.redirect('/login')
 				} else if (authorized && redirect && redirect !== activity) {
 					const query = []
-					for (let key in req.query) {
-						query.push(`${key}=${req.query[key]}`)
+					for (const [key, value] of req.query) {
+						query.push(`${key}=${value}`);
 					}
 					return res.redirect(`/${language}/${redirect}/contributor${query.length > 0 ? `?${query.join('&')}` : ''}`)
 					// return res.redirect(`/${language}/${redirect}/contributor?id=${id}`)
@@ -84,7 +84,7 @@ module.exports = async (req, res) => {
 
 							// GET BASIC INFO
 							batch1.push(t1.one(`
-								SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language, 
+								SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language,
 									u.secondary_languages, u.rights, u.notifications, u.reviewer,
 
 									CASE WHEN u.uuid = $1
@@ -110,9 +110,9 @@ module.exports = async (req, res) => {
 							;`, [ id ]))
 							// DETERMINE IF CURRENT USER IS HOST
 							batch1.push(t1.one(`
-								SELECT DISTINCT (u.uuid), 
+								SELECT DISTINCT (u.uuid),
 									(
-										u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2) 
+										u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2)
 										OR $3 > 2
 									) AS host_editor
 								FROM users u
@@ -124,7 +124,7 @@ module.exports = async (req, res) => {
 
 										COALESCE(
 										(SELECT json_agg(json_build_object(
-												'id', t.id, 
+												'id', t.id,
 												'name', t.name,
 												'editable', ((u.uuid IN (SELECT contributor FROM cohorts WHERE host = $2) OR $3 > 2) AND $4)
 											)) FROM teams t
@@ -143,14 +143,14 @@ module.exports = async (req, res) => {
 							/*
 							t.one(`
 								-- SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language, u.secondary_languages, u.rights, u.notifications, u.reviewer,
-								
+
 								-- l.name AS languagename,
 
-								-- COALESCE(su.$1:name, adm0.$1:name) AS country, 
+								-- COALESCE(su.$1:name, adm0.$1:name) AS country,
 
 								COALESCE(
 								(SELECT json_agg(json_build_object(
-										'id', t.id, 
+										'id', t.id,
 										'name', t.name
 									)) FROM teams t
 									INNER JOIN team_members tm
@@ -175,7 +175,7 @@ module.exports = async (req, res) => {
 								-- FROM users u
 								-- LEFT JOIN adm0_subunits su
 								-- 	ON su.su_a3 = u.iso3
-								-- LEFT JOIN adm0 
+								-- LEFT JOIN adm0
 								-- 	ON adm0.adm0_a3 = u.iso3
 
 								-- INNER JOIN languages l

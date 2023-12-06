@@ -1477,13 +1477,11 @@ function addImg(kwargs) {
     let form_id = media.id; //uuidv4()
 
     if (media.input) {
-      const form = media.input
-        .addElems('form')
-        .attrs({
-          action: '/upload/img',
-          method: 'POST',
-          enctype: 'multipart/form-data',
-        });
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/img',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
       form
         .addElems('input')
         .attrs({
@@ -1707,13 +1705,11 @@ function addMosaic(kwargs) {
     let form_id = media.id; //uuidv4()
 
     if (media.input) {
-      const form = media.input
-        .addElems('form')
-        .attrs({
-          action: '/upload/img',
-          method: 'POST',
-          enctype: 'multipart/form-data',
-        });
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/img',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
       form
         .addElems('input')
         .attrs({
@@ -1849,13 +1845,11 @@ function addVideo(kwargs) {
     let form_id = media.id; //uuidv4()
 
     if (media.input) {
-      const form = media.input
-        .addElems('form')
-        .attrs({
-          action: '/upload/video',
-          method: 'POST',
-          enctype: 'multipart/form-data',
-        });
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/video',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
       form
         .addElems('input')
         .attrs({

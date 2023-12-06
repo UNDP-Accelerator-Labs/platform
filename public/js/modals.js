@@ -234,216 +234,251 @@ export function renderLonglistFormModal (data, close = true) {
 	})
 }
 
-function addInputNode (_sel, _data) {
-	const { d, resolve } = _data
-	const screen = _sel.findAncestor('screen')
-	const modal = screen.select('.modal')
-	const nodeid = uuidv4()
-	
-	if (d.node === 'select') {
-		// CREATE DROPDOWN
-		const filter = _sel.addElems('div', 'filter')
+function addInputNode(_sel, _data) {
+  const { d, resolve } = _data;
+  const screen = _sel.findAncestor('screen');
+  const modal = screen.select('.modal');
+  const nodeid = uuidv4();
 
-		filter.addElems('input', 'dropbtn')
-			.attrs({
-				'id': nodeid,
-				'type': 'text'
-			})
-		.on('keyup', async function (d) {
-			const evt = d3.event
-			const node = this
-			const dropdown = d3.select(node).findAncestor('filter').select('.dropdown')
-			dropdown.selectAll('menu li')
-				.classed('hide', function () {
-					return !this.textContent.trim().toLowerCase().removeAccents()
-					.includes(node.value.trim().toLowerCase().removeAccents())
-				})
-		}).on('focus', function (d) {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = `${Math.min(dropdown.node().scrollHeight, 300)}px`
+  if (d.node === 'select') {
+    // CREATE DROPDOWN
+    const filter = _sel.addElems('div', 'filter');
 
-			dropdown.selectAll('li').on('mousedown', function () { 
-				d3.event.preventDefault()
-			})
-		}).on('blur', function () {
-			const dropdown = d3.select(this).findAncestor('filter').select('.dropdown')
-			dropdown.node().style.maxHeight = null
-			fixLabel(this)
-		})
-		
-		filter.addElems('label')
-			.attr('for', nodeid)
-		.html(c => c.label)
-		
-		const dropdown = filter.addElems('div', 'dropdown')
-			.addElems('menu')
-			.addElems('li', null, c => c.options)
-		.each(function (c) {
-			const sel = d3.select(this)
-			if (c.classname) sel.classed(c.classname, true)
+    filter
+      .addElems('input', 'dropbtn')
+      .attrs({
+        id: nodeid,
+        type: 'text',
+      })
+      .on('keyup', async function (d) {
+        const evt = d3.event;
+        const node = this;
+        const dropdown = d3
+          .select(node)
+          .findAncestor('filter')
+          .select('.dropdown');
+        dropdown.selectAll('menu li').classed('hide', function () {
+          return !this.textContent
+            .trim()
+            .toLowerCase()
+            .removeAccents()
+            .includes(node.value.trim().toLowerCase().removeAccents());
+        });
+      })
+      .on('focus', function (d) {
+        const dropdown = d3
+          .select(this)
+          .findAncestor('filter')
+          .select('.dropdown');
+        dropdown.node().style.maxHeight = `${Math.min(
+          dropdown.node().scrollHeight,
+          300,
+        )}px`;
 
-			sel.addElems('input')
-				.attrs({
-					'id': c.value.toString().simplify(),
-					'type': c.type,
-					'name': d.name,
-					'value': c.value,
-					'required': c.required || null,
-					'disabled': c.disabled?.value || null
-				})
-			.on('change', async function (b) {
-				// TO DO: MAKE THIS ONLY POSSIBLE IF THIS input TYPE IS CHECKBOX
-				const node = this
-				const sel = d3.select(this)
-				const input = sel.findAncestor('filter').select('input[type=text]').node()
-				if (c.type === 'radio') {
-					// KEEP TRACK OF SELECTED VALUE
-					if (this.checked) input.value = b.label
-					else input.value = ''
-					input.blur()
-					sel.findAncestor('dropdown').selectAll('li').classed('hide active', false)
-				} else {
-					input.value = ''
-					sel.findAncestor('dropdown').selectAll('li').classed('hide', false)
-					// KEEP TRACK OF SELECTED VALUES
-					const taggroup = _sel.addElems('div', 'active-filters')
-					const tag = taggroup.addElem('div', 'tag')
-					.datum({ id: b.value })
-					tag.addElems('label', 'name').html(_ => {
-						if (b.label.length > 30) return `${b.label.slice(0, 30)}…`
-						else return b.label
-					})
-					tag.addElems('label', 'close')
-					.on('click', _ => { 
-						rmtag(b.value) 
-						if (d.fn && typeof d.fn === 'function') d.fn.call(this, b)
-					})
-				}
-				sel.findAncestor('li').classed('active', this.checked)
-				if (!this.checked) rmtag(b.value)
+        dropdown.selectAll('li').on('mousedown', function () {
+          d3.event.preventDefault();
+        });
+      })
+      .on('blur', function () {
+        const dropdown = d3
+          .select(this)
+          .findAncestor('filter')
+          .select('.dropdown');
+        dropdown.node().style.maxHeight = null;
+        fixLabel(this);
+      });
 
-				// IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
-				if (d.fn && typeof d.fn === 'function') d.fn.call(this, b)
+    filter
+      .addElems('label')
+      .attr('for', nodeid)
+      .html((c) => c.label);
 
-				// IF SELECTING AN ITEM RESOLVES THE PROMISE, RESOLVE IT
-				if (resolve && c.type === 'radio' && d.resolve) {
-					if (typeof d.resolve === 'function') {
-						const resolved = await d.resolve(this)
-						resolve(resolved)
-					} else {
-						resolve(d.resolve)
-					}
-					modal.remove()
-					screen.classed('hide', true)
-				}
-			})
+    const dropdown = filter
+      .addElems('div', 'dropdown')
+      .addElems('menu')
+      .addElems('li', null, (c) => c.options)
+      .each(function (c) {
+        const sel = d3.select(this);
+        if (c.classname) sel.classed(c.classname, true);
 
-			sel.addElems('label', 'primary')
-				.attr('for', c => c.value.toString().simplify())
-				.html(c => c.label)
+        sel
+          .addElems('input')
+          .attrs({
+            id: c.value.toString().simplify(),
+            type: c.type,
+            name: d.name,
+            value: c.value,
+            required: c.required || null,
+            disabled: c.disabled?.value || null,
+          })
+          .on('change', async function (b) {
+            // TO DO: MAKE THIS ONLY POSSIBLE IF THIS input TYPE IS CHECKBOX
+            const node = this;
+            const sel = d3.select(this);
+            const input = sel
+              .findAncestor('filter')
+              .select('input[type=text]')
+              .node();
+            if (c.type === 'radio') {
+              // KEEP TRACK OF SELECTED VALUE
+              if (this.checked) input.value = b.label;
+              else input.value = '';
+              input.blur();
+              sel
+                .findAncestor('dropdown')
+                .selectAll('li')
+                .classed('hide active', false);
+            } else {
+              input.value = '';
+              sel
+                .findAncestor('dropdown')
+                .selectAll('li')
+                .classed('hide', false);
+              // KEEP TRACK OF SELECTED VALUES
+              const taggroup = _sel.addElems('div', 'active-filters');
+              const tag = taggroup
+                .addElem('div', 'tag')
+                .datum({ id: b.value });
+              tag.addElems('label', 'name').html((_) => {
+                if (b.label.length > 30) return `${b.label.slice(0, 30)}…`;
+                else return b.label;
+              });
+              tag.addElems('label', 'close').on('click', (_) => {
+                rmtag(b.value);
+                if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
+              });
+            }
+            sel.findAncestor('li').classed('active', this.checked);
+            if (!this.checked) rmtag(b.value);
 
-			if (c.disabled?.value) {
-				sel.addElems('label', 'secondary')
-					.attr('for', c => c.value.toString().simplify())
-					.html(c => c.disabled.label)
-			}
-		})
-		// THIS IS ALT TO USE STANDARD DROPDOWN
-		// _sel.addElems(d.node)
-		// 	.attr('name', d.name)
-		// .addElems('option', 'target-option', d => d.options)
-		// 	.attr('value', d => d.value)
-		// 	.html(d => d.label)
+            // IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
+            if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
 
-		function rmtag (id) {
-			const input = dropdown.selectAll('input').filter(d => d.value === id)
-			const taggroup = _sel.select('.active-filters')
-			const tag = taggroup.selectAll('.tag').filter(d => d.id === id)
-			input.node().checked = false
-			input.findAncestor('li').classed('active', input.node().checked)
-			tag.remove()
-			if (taggroup.selectAll('.tag').size() === 0) taggroup.remove()
-		}
-	} else {
-		_sel.addElems(d.node) //, d.classname || null)
-			.each(function (c) {
-				if (c.class) d3.select(this).classed(c.class, true) // THIS MIGHT NEED TO BE UPDATED TO classname
-			}).attrs({ 
-				'id': nodeid,
-				'type': d.type,
-				'name': d.name,
-				'value': d.value,
-				'required': d.required || null,
-				'checked': d.checked || null,
-				'disabled': d.disabled || null,
-				'accept': d.accept || null
-			}).html(c => {
-				if (d.node === 'div') return `<span>${d.label}</span>`
-				else return d.label
-			})
-		.on('click', async function () { 
-			if (['button', 'submit'].includes(d.type)) {
-				if (resolve) {
-					if (typeof d.resolve === 'function') {
-						const resolved = await d.resolve()
-						resolve(resolved)
-					}
-					else resolve(d.resolve)
-					modal.remove()
-					screen.classed('hide', true)
-				} else if (d.fn && typeof d.fn === 'function') d.fn.call(this, d)
-			}
-		}).on('keyup', async _ => {
-			const evt = d3.event
-			if (evt.code === 'Enter' || evt.keyCode === 13) {
-				if (resolve) {
-					if (typeof d.resolve === 'function') {
-						const resolved = await d.resolve()
-						resolve(resolved)
-					}
-					else resolve(d.resolve)
-					modal.remove()
-					screen.classed('hide', true)
-				}
-			}
-		}).on('change', async function () {
-			if (d.node === 'input') {
-				fixLabel(this)
-				if (d.fn && typeof d.fn === 'function') d.fn.call(this, d)
-			}
-			if (d.type === 'file' && resolve) {
-				if (typeof d.resolve === 'function') {
-					const resolved = await d.resolve(this)
-					resolve(resolved)
-				}
-				else resolve(d.resolve)
-				modal.remove()
-				screen.classed('hide', true)
-			}
-		})
-	}
+            // IF SELECTING AN ITEM RESOLVES THE PROMISE, RESOLVE IT
+            if (resolve && c.type === 'radio' && d.resolve) {
+              if (typeof d.resolve === 'function') {
+                const resolved = await d.resolve(this);
+                resolve(resolved);
+              } else {
+                resolve(d.resolve);
+              }
+              modal.remove();
+              screen.classed('hide', true);
+            }
+          });
 
-	if (d.node === 'input' && !['hidden'].includes(d.type)) {
-		_sel.addElems('label') //, d.classname || null)
-			.attr('for', nodeid)
-			.html(d.placeholder)
+        sel
+          .addElems('label', 'primary')
+          .attr('for', (c) => c.value.toString().simplify())
+          .html((c) => c.label);
 
-		if (!['checkbox', 'radio', 'date', 'email', 'file'].includes(d.type)) {
-			_sel.addElems('button', 'input-submit')
-				.attr('type', 'button')
-			.on('click', d => {
-				if (resolve) {
-					if (typeof d.resolve === 'function') {
-						const resolved = d.resolve()
-						resolve(resolved)
-					}
-					else resolve(d.resolve)
-					modal.remove()
-					screen.classed('hide', true)
-				}
-			}).html(vocabulary['save'])
-		}
-	}
+        if (c.disabled?.value) {
+          sel
+            .addElems('label', 'secondary')
+            .attr('for', (c) => c.value.toString().simplify())
+            .html((c) => c.disabled.label);
+        }
+      });
+    // THIS IS ALT TO USE STANDARD DROPDOWN
+    // _sel.addElems(d.node)
+    // 	.attr('name', d.name)
+    // .addElems('option', 'target-option', d => d.options)
+    // 	.attr('value', d => d.value)
+    // 	.html(d => d.label)
+
+    function rmtag(id) {
+      const input = dropdown.selectAll('input').filter((d) => d.value === id);
+      const taggroup = _sel.select('.active-filters');
+      const tag = taggroup.selectAll('.tag').filter((d) => d.id === id);
+      input.node().checked = false;
+      input.findAncestor('li').classed('active', input.node().checked);
+      tag.remove();
+      if (taggroup.selectAll('.tag').size() === 0) taggroup.remove();
+    }
+  } else {
+    _sel
+      .addElems(d.node) //, d.classname || null)
+      .each(function (c) {
+        if (c.class) d3.select(this).classed(c.class, true); // THIS MIGHT NEED TO BE UPDATED TO classname
+      })
+      .attrs({
+        id: nodeid,
+        type: d.type,
+        name: d.name,
+        value: d.value,
+        required: d.required || null,
+        checked: d.checked || null,
+        disabled: d.disabled || null,
+        accept: d.accept || null,
+      })
+      .html((c) => {
+        if (d.node === 'div') return `<span>${d.label}</span>`;
+        else return d.label;
+      })
+      .on('click', async function () {
+        if (['button', 'submit'].includes(d.type)) {
+          if (resolve) {
+            if (typeof d.resolve === 'function') {
+              const resolved = await d.resolve();
+              resolve(resolved);
+            } else resolve(d.resolve);
+            modal.remove();
+            screen.classed('hide', true);
+          } else if (d.fn && typeof d.fn === 'function') d.fn.call(this, d);
+        }
+      })
+      .on('keyup', async (_) => {
+        const evt = d3.event;
+        if (evt.code === 'Enter' || evt.keyCode === 13) {
+          if (resolve) {
+            if (typeof d.resolve === 'function') {
+              const resolved = await d.resolve();
+              resolve(resolved);
+            } else resolve(d.resolve);
+            modal.remove();
+            screen.classed('hide', true);
+          }
+        }
+      })
+      .on('change', async function () {
+        if (d.node === 'input') {
+          fixLabel(this);
+          if (d.fn && typeof d.fn === 'function') d.fn.call(this, d);
+        }
+        if (d.type === 'file' && resolve) {
+          if (typeof d.resolve === 'function') {
+            const resolved = await d.resolve(this);
+            resolve(resolved);
+          } else resolve(d.resolve);
+          modal.remove();
+          screen.classed('hide', true);
+        }
+      });
+  }
+
+  if (d.node === 'input' && !['hidden'].includes(d.type)) {
+    _sel
+      .addElems('label') //, d.classname || null)
+      .attr('for', nodeid)
+      .html(d.placeholder);
+
+    if (!['checkbox', 'radio', 'date', 'email', 'file'].includes(d.type)) {
+      _sel
+        .addElems('button', 'input-submit')
+        .attr('type', 'button')
+        .on('click', (d) => {
+          if (resolve) {
+            if (typeof d.resolve === 'function') {
+              const resolved = d.resolve();
+              resolve(resolved);
+            } else resolve(d.resolve);
+            modal.remove();
+            screen.classed('hide', true);
+          }
+        })
+        .html(vocabulary['save']);
+    }
+  }
 }
 
 export function renderImgZoom (data) {
@@ -487,10 +522,10 @@ export function renderImgZoom (data) {
 }
 
 window.addEventListener('keyup', function (e) {
-	e = e || event
-	if (e.key === 'Escape' || e.keyCode === 27) {
-		if (d3.select('div.screen div.modal button.close').node()) {
-			d3.select('div.screen div.modal button.close').node().click()
-		}
-	}
-})
+  e = e || event;
+  if (e.key === 'Escape' || e.keyCode === 27) {
+    if (d3.select('div.screen div.modal button.close').node()) {
+      d3.select('div.screen div.modal button.close').node().click();
+    }
+  }
+});

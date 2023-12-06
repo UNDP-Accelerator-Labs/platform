@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
 				else res.redirect('/login')
 			} else if (authorized && redirect && redirect !== activity) {
 				const query = []
-				for (key in req.query) {
+				for (let key in req.query) {
 					query.push(`${key}=${req.query[key]}`)
 				}
 				return res.redirect(`/${language}/${redirect}/pad${query.length > 0 ? `?${query.join('&')}` : ''}`)

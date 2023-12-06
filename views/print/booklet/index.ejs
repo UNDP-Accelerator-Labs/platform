@@ -27,7 +27,7 @@
 	<!-- <meta property='og:image' content='https://ia.media-imdb.com/images/rock.jpg' /> -->
 <% } %>
 
-<%- include ('../../partials/head.ejs') %> 
+<%- include ('../../partials/head.ejs') %>
 
 <script type='text/javascript' src='/scripts/pagedjs/dist/paged.polyfill.js'></script>
 <link rel='stylesheet' type='text/css' href='/css/pagedjs.interface.css'>
@@ -41,14 +41,13 @@
 
 <body>
 
-<%- include ('../../partials/modals.ejs') %> 
+<%- include ('../../partials/modals.ejs') %>
 
 <div class='document'>
 </div>
 
 
 <script type='text/javascript'>
-
 	// THE TRICK TO MAKE paagedjs WAIT: https://doc.doppio.sh/guide/cookbook/using-pagedjs.html
 	window.PagedConfig = {
 		auto: false // disable automatic script execution on document load
@@ -92,7 +91,7 @@
 				// ADD THE TITLE
 				const article = d3.select('div.document')
 				.addElem('article')
-				
+
 				article.addElem('h1', 'title')
 				.html(data.title)
 
@@ -103,7 +102,7 @@
 		})
 	}
 
-	class MyHandler extends Paged.Handler { 
+	class MyHandler extends Paged.Handler {
 		// CHECK DOC HERE: https://pagedjs.org/documentation/10-handlers-hooks-and-custom-javascript/
 		constructor(chunker, polisher, caller) {
 			super(chunker, polisher, caller);
@@ -126,11 +125,11 @@
 
 
 
-	
 
 
 
-	
+
+
 
 
 
@@ -139,7 +138,7 @@
 	// 		.html('download')
 
 	// // TO DO: POPULATE THE PAGE IN A MUCH SIMPLER LAYOUT
-	
+
 
 	// function clicker () {
 	// 	// window.print()

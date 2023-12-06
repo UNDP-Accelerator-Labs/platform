@@ -140,9 +140,9 @@
 				</a>
 			</li>
 		<% } %>
-		<% 
-			// const plist = (locals.pinboards_list ?? []).filter(d => d.id !== locals.pinboard?.id && d.count); 
-			const plist = (locals.pinboards_list ?? []).filter(d => d.count); 
+		<%
+			// const plist = (locals.pinboards_list ?? []).filter(d => d.id !== locals.pinboard?.id && d.count);
+			const plist = (locals.pinboards_list ?? []).filter(d => d.count);
 		%>
 		<% if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.read) && plist.length)
 		{ %>
@@ -196,7 +196,7 @@
 				</a>
 			</li>
 		<% } %>
-		
+
 		<!-- <% if (!['pads', 'reviews', 'templates'].includes(object)) { %>
 			<li class='<% if (space === "public") { %>active<% } %>'>
 				<a data-location='./public'>

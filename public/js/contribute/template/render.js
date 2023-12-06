@@ -5,312 +5,445 @@ import { switchButtons, partialSave } from '/js/contribute/template/save.js'
 import { renderPromiseModal } from '/js/modals.js'
 
 const obsvars = {
-	attributes: true, 
-	attributeFilter: ['class'],
-	attributeOldValue: true,
-	subtree: false, 
-	childList: false,
-	characterData: false,
-	characterDataOldValue: false
-}
-const observer = new MutationObserver(evt => {
-	setTimeout(async _ => {
-		if (evt.unique('type', true).includes('attributes') 
-			&& evt.unique('attributeName', true).includes('class') 
-			&& evt.map(d => d.oldValue).join(' ').includes('focus')
-			// && (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus'))
-			// && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
-			&& evt.find(d => d.oldValue.includes('focus')) !== evt.find(d => d.target.className.includes('focus'))
-		) {
-			const changedContent = window.sessionStorage.getItem('changed-content')
-			if (changedContent) {
-				// SAVE
-				let item = evt.find(d => d.oldValue.includes('focus'))
-				item = item.oldValue.split(' ').find(d => d.includes('-container') && !['media-container', 'meta-container'].includes(d)).replace('-container', '').trim()
-				await partialSave(item)
-			}
-		}
-	}, 100)
-})
+  attributes: true,
+  attributeFilter: ['class'],
+  attributeOldValue: true,
+  subtree: false,
+  childList: false,
+  characterData: false,
+  characterDataOldValue: false,
+};
+const observer = new MutationObserver((evt) => {
+  setTimeout(async (_) => {
+    if (
+      evt.unique('type', true).includes('attributes') &&
+      evt.unique('attributeName', true).includes('class') &&
+      evt
+        .map((d) => d.oldValue)
+        .join(' ')
+        .includes('focus') &&
+      // && (evt.map(d => d.oldValue).join(' ').includes('focus') && !evt.map(d => d.target.className).join(' ').includes('focus'))
+      // && !evt.map(d => d.target.className).filter(d => d.includes('focus')).length
+      evt.find((d) => d.oldValue.includes('focus')) !==
+        evt.find((d) => d.target.className.includes('focus'))
+    ) {
+      const changedContent = window.sessionStorage.getItem('changed-content');
+      if (changedContent) {
+        // SAVE
+        let item = evt.find((d) => d.oldValue.includes('focus'));
+        item = item.oldValue
+          .split(' ')
+          .find(
+            (d) =>
+              d.includes('-container') &&
+              !['media-container', 'meta-container'].includes(d),
+          )
+          .replace('-container', '')
+          .trim();
+        await partialSave(item);
+      }
+    }
+  }, 100);
+});
 // MEDIA PROTOTYPE
 const Media = function (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
 
-	let { parent, container, sibling, type, datum, focus, lang } = kwargs || {}
-	let { id, level, name, editable } = datum
-	if (!id) id = datum.id = uuidv4()
-	if (!level) level = 'media'
-	parent = d3.select(parent).classed('focus', focus)
+  let { parent, container, sibling, type, datum, focus, lang } = kwargs || {};
+  let { id, level, name, editable } = datum;
+  if (!id) id = datum.id = uuidv4();
+  if (!level) level = 'media';
+  parent = d3.select(parent).classed('focus', focus);
 
-	const _self = this
+  const _self = this;
 
-	this.type = type
-	this.name = name
-	this.lang = lang
-	this.constraint = datum.constraint
-	this.editable = editable
+  this.type = type;
+  this.name = name;
+  this.lang = lang;
+  this.constraint = datum.constraint;
+  this.editable = editable;
 
-	this.id = id
-	// NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
-	// this.container = (container || parent.insertElem('.repeat-container', 'div', `media-container ${type}-container template`)) // MAYBE ADD ACTIVITY AS CLASS HERE
-	this.container = (container || parent.insertElem(function () { 
-		if (this.contains(sibling)) return sibling
-		else return parent.select('.repeat-container').node()
-	}, 'div', `${level}-container ${type}-container template`))
-		.classed('focus', focus)
-	// .each(d => d.level = 'media')
-	.each(function (d) {
-		if (name) d3.select(this).classed(`${name}-container`, true)
-	}).datum(datum)
-		.style('text-align', d => d.textalign)
-	.on('click.focus', function () { 
-		const sel = d3.select(this)
-		sel.classed('focus', _self.editable)
-		// sel.findAncestor('layout').classed('focus', editing)
-	})
-	if (this.editable) {
-		this.opts = this.container.addElems('div', 'opts', d => [d], d => d.type)
-		this.opts.addElems('div', 'opt-group', [vocabulary['write instruction']])
-			.addElems('label')
-				.html(d => d)
-	}
-	if (this.editable || activity === 'preview') this.input = this.container.addElems('div', 'input-group fixed')
-	this.media = this.container.addElems('div', `${level} template`, d => [d], d => d.type)
-		.classed(`${level}-${type}`, true)
-	.each(function (d) {
-		if (name) d3.select(this).classed(`${level}-${name}`, true)
-	})
-	if (this.editable || activity === 'preview') {
-		this.placement = this.container.addElems('div', 'placement-opts', d => [d], d => d.type)
-		this.placement.addElems('div', 'opt', [
-			{ label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
-			{ label: 'close', value: 'delete', fn: _ => this.rmMedia() }, 
-			{ label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
-		]).on('click', d => {
-			d3.event.stopPropagation()
-			d.fn()
-			if (_self.editable) switchButtons(lang)
-		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.label)
-	}
-	if (this.editable) {
-		const requirement_id = uuidv4()
-		this.required = this.container.addElems('div', 'required', d => !['repeat', 'group', 'lead'].includes(d.type) ? [d] : [], d => d.type)
-		this.required.addElems('input')
-			.attrs({ 
-				'id': requirement_id, 
-				'type': 'checkbox', 
-				'checked': d => d.required ? true : null,
-				'disabled': level === 'meta' ? true : null })
-		.on('change', async function (d) { 
-			d.required = this.checked
-			await partialSave(d.level)
-		})
-		this.required.addElems('label')
-			.attr('for', requirement_id)
-			.html('*')
-	}
-	// THE FOLLOWING IS DIFFERENT FROM THE Media CONSTRUCTOR IN pads.js
-	this.response = this.container.addElems('div', 'response template', [type])
-		.html(d => vocabulary['expect'][d])
+  this.id = id;
+  // NOTE: CHANGE HERE: .container USED TO BE .media >> NEED TO UPDATE EVERYWHERE
+  // this.container = (container || parent.insertElem('.repeat-container', 'div', `media-container ${type}-container template`)) // MAYBE ADD ACTIVITY AS CLASS HERE
+  this.container = (
+    container ||
+    parent.insertElem(
+      function () {
+        if (this.contains(sibling)) return sibling;
+        else return parent.select('.repeat-container').node();
+      },
+      'div',
+      `${level}-container ${type}-container template`,
+    )
+  )
+    .classed('focus', focus)
+    // .each(d => d.level = 'media')
+    .each(function (d) {
+      if (name) d3.select(this).classed(`${name}-container`, true);
+    })
+    .datum(datum)
+    .style('text-align', (d) => d.textalign)
+    .on('click.focus', function () {
+      const sel = d3.select(this);
+      sel.classed('focus', _self.editable);
+      // sel.findAncestor('layout').classed('focus', editing)
+    });
+  if (this.editable) {
+    this.opts = this.container.addElems(
+      'div',
+      'opts',
+      (d) => [d],
+      (d) => d.type,
+    );
+    this.opts
+      .addElems('div', 'opt-group', [vocabulary['write instruction']])
+      .addElems('label')
+      .html((d) => d);
+  }
+  if (this.editable || activity === 'preview')
+    this.input = this.container.addElems('div', 'input-group fixed');
+  this.media = this.container
+    .addElems(
+      'div',
+      `${level} template`,
+      (d) => [d],
+      (d) => d.type,
+    )
+    .classed(`${level}-${type}`, true)
+    .each(function (d) {
+      if (name) d3.select(this).classed(`${level}-${name}`, true);
+    });
+  if (this.editable || activity === 'preview') {
+    this.placement = this.container.addElems(
+      'div',
+      'placement-opts',
+      (d) => [d],
+      (d) => d.type,
+    );
+    this.placement
+      .addElems('div', 'opt', [
+        { label: 'north', value: 'move-up', fn: (_) => this.move('move-up') },
+        { label: 'close', value: 'delete', fn: (_) => this.rmMedia() },
+        {
+          label: 'south',
+          value: 'move-down',
+          fn: (_) => this.move('move-down'),
+        },
+      ])
+      .on('click', (d) => {
+        d3.event.stopPropagation();
+        d.fn();
+        if (_self.editable) switchButtons(lang);
+      })
+      .on('mouseup', (_) => d3.event.stopPropagation())
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
+  }
+  if (this.editable) {
+    const requirement_id = uuidv4();
+    this.required = this.container.addElems(
+      'div',
+      'required',
+      (d) => (!['repeat', 'group', 'lead'].includes(d.type) ? [d] : []),
+      (d) => d.type,
+    );
+    this.required
+      .addElems('input')
+      .attrs({
+        id: requirement_id,
+        type: 'checkbox',
+        checked: (d) => (d.required ? true : null),
+        disabled: level === 'meta' ? true : null,
+      })
+      .on('change', async function (d) {
+        d.required = this.checked;
+        await partialSave(d.level);
+      });
+    this.required.addElems('label').attr('for', requirement_id).html('*');
+  }
+  // THE FOLLOWING IS DIFFERENT FROM THE Media CONSTRUCTOR IN pads.js
+  this.response = this.container
+    .addElems('div', 'response template', [type])
+    .html((d) => vocabulary['expect'][d]);
 
-	if (this.editable) observer.observe(this.container.node(), obsvars)
-}
+  if (this.editable) observer.observe(this.container.node(), obsvars);
+};
 Media.prototype.rmMedia = async function () {
-	const datum = this.container.datum()
-	const { level, type, name } = datum
+  const datum = this.container.datum();
+  const { level, type, name } = datum;
 
-	this.container.remove()
-	// FOR META INPUT
-	if (name) {
-		const input = d3.select(`#input-meta-${name}`).node()
-		if (input) input.disabled = false
-	}
-	if (this.editable) await (level)
-}
+  this.container.remove();
+  // FOR META INPUT
+  if (name) {
+    const input = d3.select(`#input-meta-${name}`).node();
+    if (input) input.disabled = false;
+  }
+  if (this.editable) await level;
+};
 Media.prototype.move = function (dir) {
-	const _self = this
-	let sourceTop = this.container.node().offsetTop
-	let sourceHeight = this.container.node().offsetHeight
-	let sourceMargin = parseInt(getComputedStyle(this.container.node()).marginBottom)
-	const level = this.container.datum().level
+  const _self = this;
+  let sourceTop = this.container.node().offsetTop;
+  let sourceHeight = this.container.node().offsetHeight;
+  let sourceMargin = parseInt(
+    getComputedStyle(this.container.node()).marginBottom,
+  );
+  const level = this.container.datum().level;
 
-	const layout = this.container.findAncestor('layout')
-	const openInset = layout.selectAll('.inset').filter(function () { return this.style.maxHeight.length })
-	// CHECK WHETHER AN INSET IS OPEN
-	new Promise(resolve => {
-		if (openInset.node()) {
-			openInset.node().style.maxHeight = null
-			window.setTimeout(_ => { 
-				sourceTop = this.container.node().offsetTop
-				sourceHeight = this.container.node().offsetHeight
-				sourceMargin = parseInt(getComputedStyle(this.container.node()).marginBottom)
-				resolve()
-			}, 500)
-		} else resolve()
-	}).then(_ => {
-		if (dir.includes('up')) { // THE SOURCE IS MOVING UP AND THE TARGET IS MOVING DOWN
-			const target = this.container.node().previousSibling
-			if (
-				(target && target.classList !== undefined) && 
-				(target.classList.contains('media-container') || target.classList.contains('meta-container')) &&
-				(!target.classList.contains('title-container') && !target.classList.contains('lead-container') && !target.classList.contains('media-group'))
-			) {
-				const targetTop = target.offsetTop
-				const moveSource = targetTop - sourceTop
-				const moveTarget = sourceHeight + sourceMargin
-				this.container.classed('move', true).style('transform', `translateY(${moveSource}px)`)
-				d3.select(target).classed('move', true).style('transform', `translateY(${moveTarget}px)`)
-				window.setTimeout(async _ => {
-					this.container.classed('move', false).style('transform', null)
-					d3.select(target).classed('move', false).style('transform', null)
-					this.container.node().parentNode.insertBefore(this.container.node(), target)
-					
-					if (_self.editable) await partialSave(level)
-				}, 1000)
-				if (openInset.node()) window.setTimeout(_ => openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`, 1250)
-			}
-		} else {
-			const target = this.container.node().nextSibling
-			if (target) {
-				const targetTop = target.offsetTop
-				const targetHeight = target.offsetHeight
-				const targetMargin = parseInt(getComputedStyle(target).marginBottom)
-				const moveSource = targetHeight + targetMargin
-				const moveTarget = sourceTop - targetTop
-				this.container.classed('move', true).style('transform', `translateY(${moveSource}px)`)
-				d3.select(target).classed('move', true).style('transform', `translateY(${moveTarget}px)`)
-				window.setTimeout(async _ => {
-					this.container.classed('move', false).style('transform', null)
-					d3.select(target).classed('move', false).style('transform', null)
-					this.container.node().parentNode.insertBefore(target, this.container.node())
-					if (openInset.node()) openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`
+  const layout = this.container.findAncestor('layout');
+  const openInset = layout.selectAll('.inset').filter(function () {
+    return this.style.maxHeight.length;
+  });
+  // CHECK WHETHER AN INSET IS OPEN
+  new Promise((resolve) => {
+    if (openInset.node()) {
+      openInset.node().style.maxHeight = null;
+      window.setTimeout((_) => {
+        sourceTop = this.container.node().offsetTop;
+        sourceHeight = this.container.node().offsetHeight;
+        sourceMargin = parseInt(
+          getComputedStyle(this.container.node()).marginBottom,
+        );
+        resolve();
+      }, 500);
+    } else resolve();
+  }).then((_) => {
+    if (dir.includes('up')) {
+      // THE SOURCE IS MOVING UP AND THE TARGET IS MOVING DOWN
+      const target = this.container.node().previousSibling;
+      if (
+        target &&
+        target.classList !== undefined &&
+        (target.classList.contains('media-container') ||
+          target.classList.contains('meta-container')) &&
+        !target.classList.contains('title-container') &&
+        !target.classList.contains('lead-container') &&
+        !target.classList.contains('media-group')
+      ) {
+        const targetTop = target.offsetTop;
+        const moveSource = targetTop - sourceTop;
+        const moveTarget = sourceHeight + sourceMargin;
+        this.container
+          .classed('move', true)
+          .style('transform', `translateY(${moveSource}px)`);
+        d3.select(target)
+          .classed('move', true)
+          .style('transform', `translateY(${moveTarget}px)`);
+        window.setTimeout(async (_) => {
+          this.container.classed('move', false).style('transform', null);
+          d3.select(target).classed('move', false).style('transform', null);
+          this.container
+            .node()
+            .parentNode.insertBefore(this.container.node(), target);
 
-					if (_self.editable) await partialSave(level)
-				}, 1000)
-				if (openInset.node()) window.setTimeout(_ => openInset.node().style.maxHeight = `${openInset.node().scrollHeight}px`, 1250)
-			}
-		}
-	})
-}
+          if (_self.editable) await partialSave(level);
+        }, 1000);
+        if (openInset.node())
+          window.setTimeout(
+            (_) =>
+              (openInset.node().style.maxHeight = `${
+                openInset.node().scrollHeight
+              }px`),
+            1250,
+          );
+      }
+    } else {
+      const target = this.container.node().nextSibling;
+      if (target) {
+        const targetTop = target.offsetTop;
+        const targetHeight = target.offsetHeight;
+        const targetMargin = parseInt(getComputedStyle(target).marginBottom);
+        const moveSource = targetHeight + targetMargin;
+        const moveTarget = sourceTop - targetTop;
+        this.container
+          .classed('move', true)
+          .style('transform', `translateY(${moveSource}px)`);
+        d3.select(target)
+          .classed('move', true)
+          .style('transform', `translateY(${moveTarget}px)`);
+        window.setTimeout(async (_) => {
+          this.container.classed('move', false).style('transform', null);
+          d3.select(target).classed('move', false).style('transform', null);
+          this.container
+            .node()
+            .parentNode.insertBefore(target, this.container.node());
+          if (openInset.node())
+            openInset.node().style.maxHeight = `${
+              openInset.node().scrollHeight
+            }px`;
+
+          if (_self.editable) await partialSave(level);
+        }, 1000);
+        if (openInset.node())
+          window.setTimeout(
+            (_) =>
+              (openInset.node().style.maxHeight = `${
+                openInset.node().scrollHeight
+              }px`),
+            1250,
+          );
+      }
+    }
+  });
+};
 
 const Meta = function (kwargs) {
-	const { type, maxheight, focus, lang } = kwargs
-	// Meta IS AN INSTANCE OF Media WITH AN INSET
-	Media.call(this, kwargs)
-	// TWEAK THE Media INSTANCES
-	this.container.classed('media-container', false).classed('meta-container', true)
-		.each(d => d.level = 'meta')
-		.on('click.expand', _ => this.expand({ forceopen: true }))
-	this.media.classed(`media media-${type}`, false).classed(`meta meta-${type}`, true)
-	if (this.editable) this.inset = this.container.insertElems('.response', 'div', `inset ${type}-inset-container template`)
-	// OPEN THE INSET
-	if (focus) this.expand({ timeout: 250, maxheight: maxheight })
-}
-Meta.prototype = Object.create(Media.prototype) // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
-Meta.prototype.constructor = Meta
+  const { type, maxheight, focus, lang } = kwargs;
+  // Meta IS AN INSTANCE OF Media WITH AN INSET
+  Media.call(this, kwargs);
+  // TWEAK THE Media INSTANCES
+  this.container
+    .classed('media-container', false)
+    .classed('meta-container', true)
+    .each((d) => (d.level = 'meta'))
+    .on('click.expand', (_) => this.expand({ forceopen: true }));
+  this.media
+    .classed(`media media-${type}`, false)
+    .classed(`meta meta-${type}`, true);
+  if (this.editable)
+    this.inset = this.container.insertElems(
+      '.response',
+      'div',
+      `inset ${type}-inset-container template`,
+    );
+  // OPEN THE INSET
+  if (focus) this.expand({ timeout: 250, maxheight: maxheight });
+};
+Meta.prototype = Object.create(Media.prototype); // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
+Meta.prototype.constructor = Meta;
 Meta.prototype.expand = function (kwargs) {
-	let { timeout, maxheight, forceopen } = kwargs
-	if (!timeout) timeout = 0
-	window.setTimeout(_ => {
-		if (this.inset.node().style.maxHeight && !forceopen) this.inset.node().style.maxHeight = null
-		else {
-			this.inset.node().style.maxHeight = `${maxheight ? Math.min(this.inset.node().scrollHeight, maxheight) : this.inset.node().scrollHeight}px`
-			const input = this.inset.select('input[type=text]').node()
-			if (input) input.focus()
-		}
-	}, timeout)
-}
+  let { timeout, maxheight, forceopen } = kwargs;
+  if (!timeout) timeout = 0;
+  window.setTimeout((_) => {
+    if (this.inset.node().style.maxHeight && !forceopen)
+      this.inset.node().style.maxHeight = null;
+    else {
+      this.inset.node().style.maxHeight = `${
+        maxheight
+          ? Math.min(this.inset.node().scrollHeight, maxheight)
+          : this.inset.node().scrollHeight
+      }px`;
+      const input = this.inset.select('input[type=text]').node();
+      if (input) input.focus();
+    }
+  }, timeout);
+};
 const Taglist = function (kwargs) {
-	const { type, list, url, datum, lang } = kwargs || {}
-	const { constraint, name } = datum || {}
-	// Taglist IS AN INSTANCE OF Meta
-	Meta.call(this, kwargs)
-	const _self = this
+  const { type, list, url, datum, lang } = kwargs || {};
+  const { constraint, name } = datum || {};
+  // Taglist IS AN INSTANCE OF Meta
+  Meta.call(this, kwargs);
+  const _self = this;
 
-	if (_self.opts) {
-		const opts = _self.opts.addElems('div', 'opt-group', [
-			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
-			[{ key: 'constraint', label: 'block', value: constraint }]
-		]).addElems('button', 'opt', d => d)
-		.classed('active', d => {
-			if (d.key === 'constraint') return constraint ? true : false
-		}).attr('type', 'button')
-			.each(function (d) { d3.select(this).classed(d.value, true) })
-		.on('click', async function (d) {
-			const sel = d3.select(this)
-			const datum = _self.container.datum()
-			
-			if (d.key === 'constraint') {
-				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input']['tags']} <input type='number' name='length' value=${datum.constraint || list.length || 5} min=1> ${vocabulary['input type']['tags']}`
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
-					const new_constraint = await renderPromiseModal({ message, opts })
+  if (_self.opts) {
+    const opts = _self.opts
+      .addElems('div', 'opt-group', [
+        [], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+        [{ key: 'constraint', label: 'block', value: constraint }],
+      ])
+      .addElems('button', 'opt', (d) => d)
+      .classed('active', (d) => {
+        if (d.key === 'constraint') return constraint ? true : false;
+      })
+      .attr('type', 'button')
+      .each(function (d) {
+        d3.select(this).classed(d.value, true);
+      })
+      .on('click', async function (d) {
+        const sel = d3.select(this);
+        const datum = _self.container.datum();
 
-					datum.constraint = +new_constraint
-					sel.addElems('span', 'constraint').html(new_constraint)
-				} else {
-					datum.constraint = null
-					sel.select('span', 'constraint').remove()
-				}
-				toggleClass(this, 'active')
-			}
+        if (d.key === 'constraint') {
+          if (!sel.classed('active')) {
+            const message = `${
+              vocabulary['limit input']['tags']
+            } <input type='number' name='length' value=${
+              datum.constraint || list.length || 5
+            } min=1> ${vocabulary['input type']['tags']}`;
+            const opts = [
+              {
+                node: 'button',
+                type: 'button',
+                label: vocabulary['limit length'],
+                resolve: (_) =>
+                  d3.select('.modal input[name="length"]').node().value,
+              },
+            ];
+            const new_constraint = await renderPromiseModal({ message, opts });
 
-			if (_self.editable) await partialSave('media')
-		})
-		opts.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.label)
-		opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
-			.html(d => d.value)
-	}
+            datum.constraint = +new_constraint;
+            sel.addElems('span', 'constraint').html(new_constraint);
+          } else {
+            datum.constraint = null;
+            sel.select('span', 'constraint').remove();
+          }
+          toggleClass(this, 'active');
+        }
 
-	_self.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][name] || vocabulary['request'][type],
-		'contenteditable': _self.editable ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
-	
-	// POPULATE THE INSET
-	if (_self.inset) {
-		const panel = _self.inset.addElems('div', `inset-${type}`)
-			.addElems('ul', 'panel')
-		panel.addElems('li', 'instruction', [{ value: vocabulary['tag instruction'] }])
-			.html(d => `* ${d.value}`)
-		panel.addElems('li', 'opt', list)
-		.each(function (d, i) {
-			const sel = d3.select(this)
-			sel.addElems('div')
-				.addElems('label')
-				.html(`<strong>${i + 1}.</strong>`)
-			sel.addElems('div', 'grow')
-				.addElems('label')
-				.html(d.name.capitalize())
-		})
-	}
-}
-Taglist.prototype = Object.create(Meta.prototype) // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
-Taglist.prototype.constructor = Taglist
+        if (_self.editable) await partialSave('media');
+      });
+    opts
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
+    opts
+      .addElems('span', 'constraint', (d) =>
+        d.key === 'constraint' ? [d] : [],
+      )
+      .html((d) => d.value);
+  }
 
-async function populateSection (data, lang = 'en', section) {
-	// MEDIA
-	if (data.type === 'title') addTitle({ data, lang, section })
-	if (data.type === 'img') addImg({ data, lang, section })
-	if (data.type === 'drawing') addDrawing({ data, lang, section })
-	if (data.type === 'txt') addTxt({ data, lang, section })
-	if (data.type === 'embed') addEmbed({ data, lang, section })
-	if (data.type === 'checklist') addChecklist({ data, lang, section })
-	if (data.type === 'radiolist') addRadiolist({ data, lang, section })
-	// META
-	if (data.type === 'location') addLocations({ data, lang, section })
-	if (data.type === 'index') await addIndexes({ data, lang, section })
-	if (data.type === 'tag') await addTags({ data, lang, section })
-	if (data.type === 'attachment') addAttachment({ data, lang, section })
-	// if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
-	// GROUP
-	if (data.type === 'group') await addGroup({ data, lang, section })
+  _self.media
+    .attrs({
+      'data-placeholder': (d) =>
+        vocabulary['request'][name] || vocabulary['request'][type],
+      contenteditable: _self.editable ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
+
+  // POPULATE THE INSET
+  if (_self.inset) {
+    const panel = _self.inset
+      .addElems('div', `inset-${type}`)
+      .addElems('ul', 'panel');
+    panel
+      .addElems('li', 'instruction', [
+        { value: vocabulary['tag instruction'] },
+      ])
+      .html((d) => `* ${d.value}`);
+    panel.addElems('li', 'opt', list).each(function (d, i) {
+      const sel = d3.select(this);
+      sel
+        .addElems('div')
+        .addElems('label')
+        .html(`<strong>${i + 1}.</strong>`);
+      sel.addElems('div', 'grow').addElems('label').html(d.name.capitalize());
+    });
+  }
+};
+Taglist.prototype = Object.create(Meta.prototype); // THIS IS IMPORTANT TO HAVE ACCESS TO THE prototype FUNCTIONS move AND rmMedia
+Taglist.prototype.constructor = Taglist;
+
+async function populateSection(data, lang = 'en', section) {
+  // MEDIA
+  if (data.type === 'title') addTitle({ data, lang, section });
+  if (data.type === 'img') addImg({ data, lang, section });
+  if (data.type === 'drawing') addDrawing({ data, lang, section });
+  if (data.type === 'txt') addTxt({ data, lang, section });
+  if (data.type === 'embed') addEmbed({ data, lang, section });
+  if (data.type === 'checklist') addChecklist({ data, lang, section });
+  if (data.type === 'radiolist') addRadiolist({ data, lang, section });
+  // META
+  if (data.type === 'location') addLocations({ data, lang, section });
+  if (data.type === 'index') await addIndexes({ data, lang, section });
+  if (data.type === 'tag') await addTags({ data, lang, section });
+  if (data.type === 'attachment') addAttachment({ data, lang, section });
+  // if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+  // GROUP
+  if (data.type === 'group') await addGroup({ data, lang, section });
 }
 export async function autofillTitle () {
 	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
@@ -454,40 +587,46 @@ export async function addSection (kwargs) {
 
 	return section.node()
 }
-function addTitle (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+function addTitle(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'title'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, required, editable } = data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'title';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const media = new Media({
-		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, required, editable },
-		focus: focus || false,
-		lang
-	})
-	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-	if (media.placement) media.placement.remove()
-	if (media.input) media.input.remove()
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, instruction, required, editable },
+    focus: focus || false,
+    lang,
+  });
+  // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+  if (media.placement) media.placement.remove();
+  if (media.input) media.input.remove();
 
-	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+  media.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	if (focus) media.media.node().focus()
+  if (focus) media.media.node().focus();
 }
 export function addImg (kwargs) {
 	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)

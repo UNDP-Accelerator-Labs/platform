@@ -15,7 +15,6 @@ import { renderFormModal } from '/js/modals.js'
 // https://www.programmersought.com/article/5248306768/
 // https://stackoverflow.com/questions/926916/how-to-get-the-bodys-content-of-an-iframe-in-javascript
 
-
 /* // THIS WAS THE OLD LOGIC FOR LOADING ADJACENT PADS
 function loadHTML(url, source, target) {
 	const iframe = document.createElement('iframe')
@@ -71,7 +70,7 @@ export async function selectReviewLanguage (node) { // THIS IS ALMOST THE SAME A
 		})
 	})
 
-	const formdata = { action: '/request/review',  method: 'POST' }
+	const formdata = { action: '/request/review', method: 'POST' }
 	const message = vocabulary['select review language']
 	const opts = []
 	opts.push({ 

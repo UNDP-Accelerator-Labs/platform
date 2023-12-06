@@ -3156,7 +3156,7 @@ export async function renderPad (kwargs) {
 				const data = sections[s]
 
 				if (!editing) {
-					d.items = data.items.filter(c => {
+					data.items = data.items.filter(c => {
 						if (c.type === 'group') return c.items.some(b => b.some(a => a.has_content))
 						else return c.has_content
 					}) // THIS HIDES ALL UNFILLED MEDIA ITEMS WHEN VIEWING

@@ -15,7 +15,7 @@
 		<div class='statistic'>
 			<h1><%- simplifyNumber(locals.stats?.filtered) %></h1>
 			<p data-vocab='["<%= object.slice(0, -1) %>", "<%= locals.stats?.filtered !== 1 ? "plural" : "singular" %>"]'></p>
-			
+
 			<% if (locals.metadata.page.count > 1) { %>
 				<small>
 					<span data-vocab='showing range'></span> [ <%= locals.stats?.displayed * (page - 1) + 1 %> – <%= Math.min(locals.stats?.displayed * page, locals.stats?.filtered) %> ]

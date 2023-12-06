@@ -8,7 +8,7 @@
 <html lang='<%- locals.metadata.page.language %>'>
 <head>
 
-<%- include ('../../partials/head.ejs') %> 
+<%- include ('../../partials/head.ejs') %>
 
 <script type='text/javascript' src='/scripts/xlsx/dist/xlsx.full.min.js'></script>
 
@@ -30,7 +30,7 @@
 <body>
 
 <!-- SET DATA ATTRIBUTES -->
-<% 
+<%
 	const pagedata = {
 		type: 'private',
 		activity: 'preview',
@@ -48,13 +48,13 @@
 <data name='pad' value='<%= JSON.stringify(paddata) %>'></data>
 <data name='location' value='<%= JSON.stringify(locals.metadata.user?.country) %>'></data>
 
-<%- include ('../../partials/navigate/menu-languages.ejs') %> 
+<%- include ('../../partials/navigate/menu-languages.ejs') %>
 
 
 <div class='main-content import'>
 	<header>
 		<div class='inner'>
-			<%- include ('../../partials/navigate/sidebar.ejs') %> 
+			<%- include ('../../partials/navigate/sidebar.ejs') %>
 		</div>
 	</header>
 

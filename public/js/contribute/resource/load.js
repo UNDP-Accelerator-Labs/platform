@@ -21,7 +21,7 @@ async function DOMLoad () {
 	const module_opts = {}
 	const template_opts = {}
 	
-	for (key in data) {
+	for (let key in data) {
 		if (data[key].length) {
 
 			module_opts[key] = data[key].map(d => {

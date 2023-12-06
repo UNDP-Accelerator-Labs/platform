@@ -108,491 +108,865 @@ export function parseXLSX (file, node) {
 	}
 	reader.readAsArrayBuffer(file)
 }
-function parseColumns (json, keys) {
-	return keys.map(d => {
-		const obj = {}
-		obj.key = d
-		obj.entries = json.map(c => { // ENTRIES, UNLIKE VALUES, IS EXHAUSTIVE (IT ALSO INCLUDES NULL/ MISSING VALUES)
-			// CHECK IF DATE
-			const testdate = ExcelDateToJSDate(c[d])
-			if (isValidDate(testdate) && testdate.getFullYear() >= 2019) {
-				return testdate.toISOString()
-			} else {
-				const e = c[d]
-				if (![null, undefined].includes(e) && !isNaN(e)) return +e // IF e IS A NUMBER, FORCE TYPE
-				else return e
-			}
-		})
-		let ref = obj.entries.filter(c => ![null, undefined].includes(c))
-			.map(c => typeof c === 'string' ? c.trim().toLowerCase() : c)
-		obj.values = ref.unique()
-		obj.types = ref.map(c => typeof c).unique()
 
-		if (obj.types.length > 1 && obj.types.includes('string')) {
-			// IF THERE ARE MULTIPLE TYPES AND AT LEAST ONE OF THEM IS STRING, CONVERT ALL NOT NULL ENTRIES TO STRINGS
-			obj.entries = obj.entries.map(c => {
-				if ([null, undefined].includes(c)) return c
-				else return String(c).trim()//.toLowerCase()
-			})
-			ref = obj.entries.filter(c => ![null, undefined].includes(c)).map(c => c.toLowerCase())
-			obj.values = ref.unique()
-			// obj.types = ['string']
-			obj.types = ref.map(c => typeof c).unique() // THIS SHOULD BE ['string']
-		} else if (obj.types.length === 0) {
-			// IF THERE ARE NO TYPES
-			if (ref.length && ref.unique().every(c => c === 0)) {
-				obj.entries = obj.entries.map(c => 0)
-				ref = obj.entries.filter(c => c === 0)
-				obj.values = ref.unique()
-				// obj.types = ['number']
-				obj.types = ref.map(c => typeof c).unique() // THIS SHOULD BE ['number']
-			} else {
-				obj.types = [typeof null]
-			}
-		}
+function parseXLSX(file, node) {
+  const reader = new FileReader();
 
-		// CHECK IF THERE ARE ARRAYS/ LISTS
-		obj.types.forEach(c => {
-			if (Array.isArray(c)) {
-				const listcontent = c.map(b => typeof b).unique()
-				return `list of ${listcontent}s` // TO DO: TRANSLATE
-			} else return c
-		})
+  d3.select(node).attr('data-fname', file.name);
 
-		// CHECK IF BOOLEAN COLUMN
-		// if (obj.values.length === 1 && ref.length !== json.map(c => c[d]).length) obj.bool = true
-		if (obj.types.length === 1 && obj.values.length <= 2) obj.bool = true
-		else obj.bool = false
-		// INFER TYPE
-		if (obj.entries.map(c => c ? typeof c === 'object' ? c.type === 'img' ? c.type : null : null : null)
-				.filter(c => c).unique().length // c.type === 'img' IS SET IN parseXLSX AT THE VERY BEGINNING
-			// || !obj.entries.filter(c => ![null, undefined].includes(c)).length 
-			|| ref.length === 0
-			// THERE ISN'T ANY ENTRY THAT HAS A VALUE (CASE FOR ENTIRELY EMPTY COLUMN)
-		) {
-			obj.type = 'img'
-			// obj.inferredtype = 'img'
-		} else if (ref.length - obj.values.length > parseInt(ref.length * .25)) {
-			// obj.inferredtype = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
-			obj.type = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
-		} else obj.type = 'txt'
-		// } else obj.inferredtype = 'txt'
+  reader.onload = function (e) {
+    var data = new Uint8Array(e.target.result);
+    var workbook = XLSX.read(data, { type: 'array', bookFiles: true });
 
-		return obj
-	})
+    let images = [];
+    if (workbook.keys) {
+      const media = workbook.keys.filter((k) => k.includes('media/image'));
+
+      images = media.map((m, i) => {
+        const name = workbook.files[m].name; // .split('media/')[1]
+        const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
+
+        const blob = new Blob([buffer], { type: 'image/png' });
+        const urlCreator = window.URL || window.webkitURL;
+        const imageUrl = urlCreator.createObjectURL(blob);
+        return { id: name?.extractDigits(), type: 'img', src: imageUrl };
+      });
+    }
+    workbook.SheetNames.forEach((s, i) => {
+      const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
+        defval: null,
+      });
+
+      let keys = Object.keys(json[0]);
+      if (images.length) {
+        // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
+        // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
+        const cols = keys.map((d) => {
+          const obj = {};
+          obj.key = d;
+          obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
+          return obj;
+        });
+        const imageCol = cols.find((d) => !d.values.length)?.key || null;
+        if (imageCol) {
+          json.forEach((d, i) => {
+            // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
+            d[imageCol] = images.find((c) => c.id === i + 1);
+          });
+        }
+      }
+      if (i === 0) {
+        // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+        const cols = parseColumns(json, keys);
+        renderTable(cols);
+      }
+    });
+    // HIDE THE LOADING BUTTON
+    const main = d3.select('div.table main');
+    const layout = main.select('div.inner');
+    const head = layout.select('div.head');
+
+    main.select('.input-group').classed('hide', true);
+    head
+      .classed('status-0', false)
+      .classed('status-1', true)
+      .select('button[type=submit]')
+      .attr('disabled', null);
+  };
+  reader.readAsArrayBuffer(file);
 }
-function parseGroups (json, keys) {
-	// json HERE HAS ALREADY BEEN PROCESSED (IN parseColumns)
-	const cols = keys.map(d => {
-		return new Promise(async resolve => {
-			// CHECK IF KEY IS UNIQUE OR GROUPED
-			if (Array.isArray(d)) {
-				const obj = {}
-				obj.key = `Group [${d.join(', ')}]`
-				const prefix = seekPrefix(d)
+function parseColumns(json, keys) {
+  return keys.map((d) => {
+    const obj = {};
+    obj.key = d;
+    obj.entries = json.map((c) => {
+      // ENTRIES, UNLIKE VALUES, IS EXHAUSTIVE (IT ALSO INCLUDES NULL/ MISSING VALUES)
+      // CHECK IF DATE
+      const testdate = ExcelDateToJSDate(c[d]);
+      if (isValidDate(testdate) && testdate.getFullYear() >= 2019) {
+        return testdate.toISOString();
+      } else {
+        const e = c[d];
+        if (![null, undefined].includes(e) && !isNaN(e))
+          return +e; // IF e IS A NUMBER, FORCE TYPE
+        else return e;
+      }
+    });
+    let ref = obj.entries
+      .filter((c) => ![null, undefined].includes(c))
+      .map((c) => (typeof c === 'string' ? c.trim().toLowerCase() : c));
+    obj.values = ref.unique();
+    obj.types = ref.map((c) => typeof c).unique();
 
-				const cols = json.filter(c => d.includes(c.key))
-				const zip = []
+    if (obj.types.length > 1 && obj.types.includes('string')) {
+      // IF THERE ARE MULTIPLE TYPES AND AT LEAST ONE OF THEM IS STRING, CONVERT ALL NOT NULL ENTRIES TO STRINGS
+      obj.entries = obj.entries.map((c) => {
+        if ([null, undefined].includes(c)) return c;
+        else return String(c).trim(); //.toLowerCase()
+      });
+      ref = obj.entries
+        .filter((c) => ![null, undefined].includes(c))
+        .map((c) => c.toLowerCase());
+      obj.values = ref.unique();
+      // obj.types = ['string']
+      obj.types = ref.map((c) => typeof c).unique(); // THIS SHOULD BE ['string']
+    } else if (obj.types.length === 0) {
+      // IF THERE ARE NO TYPES
+      if (ref.length && ref.unique().every((c) => c === 0)) {
+        obj.entries = obj.entries.map((c) => 0);
+        ref = obj.entries.filter((c) => c === 0);
+        obj.values = ref.unique();
+        // obj.types = ['number']
+        obj.types = ref.map((c) => typeof c).unique(); // THIS SHOULD BE ['number']
+      } else {
+        obj.types = [typeof null];
+      }
+    }
 
-				let rmprefix = false
-				let mklist = true
-				const types = cols.map(c => c.types).flat().unique()
-				
-				if (cols.map(c => c.bool).unique().includes(true)) {
-					// IF THE VALUES ARE BOLEAN, PIVOT: PUT THE key/ HEADERS INTO THE values/ CELLS
-					// AND CHECK WHETHER THE keys HAVE PREFIXES
-					const message = `The prefix <em>${prefix}</em> was detected. Should it be removed from cell values?`
-					const opts = [
-						{ node: 'button', type: 'button', label: 'Keep it', resolve: false }, 
-						{ node: 'button', type: 'button', label: 'Drop it', resolve: true }
-					]
-					rmprefix = await renderPromiseModal({ message: message, opts: opts })
-				} else if (types.length === 1 && types[0] === 'string') {
-					const message = `Merge columns into a list, or keep a single ${types[0]} with all the values?`
-					const opts = [
-						{ node: 'button', type: 'button', label: 'Make a list', resolve: true }, 
-						{ node: 'button', type: 'button', label: `Keep as ${types[0]}`, resolve: false }
-					]
-					mklist = await renderPromiseModal({ message: message, opts: opts })
-				}
+    // CHECK IF THERE ARE ARRAYS/ LISTS
+    obj.types.forEach((c) => {
+      if (Array.isArray(c)) {
+        const listcontent = c.map((b) => typeof b).unique();
+        return `list of ${listcontent}s`; // TO DO: TRANSLATE
+      } else return c;
+    });
 
-				cols.forEach(c => {
-					// IF THE VALUES ARE BOLEAN, PIVOT
-					if (c.bool) {
-						c.entries = c.entries.map(b => {
-							if (b) return rmprefix ? c.key.replace(prefix, '') : c.key
-							else return null
-						})
-					}
-					// ZIP THE entries
-					for (let i = 0; i < c.entries.length; i ++) {
-						if (c.entries[i]) {
-							if (!isNaN(c.entries[i])) c.entries[i] = +c.entries[i]
-							if (!zip[i]) zip[i] = [c.entries[i]]
-							else zip[i].push(c.entries[i])
-						}
-					}
-				})
-				obj.entries = mklist ? zip : zip.map(c => c.join(', '))
-				
-				obj.values = cols.map(c => c.entries.map(b => typeof b === 'string' ? b.trim().toLowerCase() : b))
-					.flat().filter(c => ![null, undefined].includes(c)).unique().sort()
+    // CHECK IF BOOLEAN COLUMN
+    // if (obj.values.length === 1 && ref.length !== json.map(c => c[d]).length) obj.bool = true
+    if (obj.types.length === 1 && obj.values.length <= 2) obj.bool = true;
+    else obj.bool = false;
+    // INFER TYPE
+    if (
+      obj.entries
+        .map((c) =>
+          c
+            ? typeof c === 'object'
+              ? c.type === 'img'
+                ? c.type
+                : null
+              : null
+            : null,
+        )
+        .filter((c) => c)
+        .unique().length || // c.type === 'img' IS SET IN parseXLSX AT THE VERY BEGINNING
+      // || !obj.entries.filter(c => ![null, undefined].includes(c)).length
+      ref.length === 0
+      // THERE ISN'T ANY ENTRY THAT HAS A VALUE (CASE FOR ENTIRELY EMPTY COLUMN)
+    ) {
+      obj.type = 'img';
+      // obj.inferredtype = 'img'
+    } else if (ref.length - obj.values.length > parseInt(ref.length * 0.25)) {
+      // obj.inferredtype = 'checklist' // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
+      obj.type = 'checklist'; // IF LESS THAN 3/4 OF ENTRIES ARE UNIQUE, CONSIDER A list
+    } else obj.type = 'txt';
+    // } else obj.inferredtype = 'txt'
 
-				obj.types = obj.entries.map(c => {
-					if (Array.isArray(c)) {
-						const listcontent = c.map(b => typeof b).unique()
-						return `list of ${listcontent}s`
-					} else return typeof c
-				}).unique() 
-				obj.bool = false
-				// obj.inferredtype = 'checklist'
-				obj.type = 'checklist'
-				resolve(obj)
-			}
-			else resolve(json.find(c => c.key === d))
-		})
-	})
-	Promise.all(cols).then(data => renderTable(data))
+    return obj;
+  });
 }
-function renderTable (cols, update = false) {
-	const { metafields } = JSON.parse(d3.select('data[name="pad"]').node().value)
+function parseGroups(json, keys) {
+  // json HERE HAS ALREADY BEEN PROCESSED (IN parseColumns)
+  const cols = keys.map((d) => {
+    return new Promise(async (resolve) => {
+      // CHECK IF KEY IS UNIQUE OR GROUPED
+      if (Array.isArray(d)) {
+        const obj = {};
+        obj.key = `Group [${d.join(', ')}]`;
+        const prefix = seekPrefix(d);
 
-	const main = d3.select('div.table main')
-	const layout = main.select('div.inner')
-	const body = layout.select('div.body')
-	const foot = layout.select('div.foot')
+        const cols = json.filter((c) => d.includes(c.key));
+        const zip = [];
 
-	body.select('.btn-group').classed('hide', false)
-	const table = body.addElems('div', 'table-container')
-		.addElems('table', 'xls-preview', [cols])
-		.attrs({ 
-			'border': 0,
-			'cellpadding': 0,
-			'cellspacing': 0
-		})
-	// RENDER THE TABLE HEAD
-	const moduleHead = table.addElems('thead')
-	
-	const selectCols = moduleHead.addElems('tr', 'column-selection')
-	selectCols.addElems('th', 'selection', d => d)
-		.classed('selected left right top bottom disabled', false)
-		.attr('title', 'Select column.') // TO DO: TRANSLATE
-	.on('click', function (d, i) {
-		const evt = d3.event
-		const node = this
-		const sel = d3.select(this)
+        let rmprefix = false;
+        let mklist = true;
+        const types = cols
+          .map((c) => c.types)
+          .flat()
+          .unique();
 
-		if ((evt.shiftKey || evt.metaKey || evt.ctrlKey) && sel.classed('disabled')) return null
-		if (!evt.shiftKey && !evt.metaKey && !evt.ctrlKey) d3.selectAll('tr th, tr td').classed('selected top bottom left right', false)
+        if (
+          cols
+            .map((c) => c.bool)
+            .unique()
+            .includes(true)
+        ) {
+          // IF THE VALUES ARE BOLEAN, PIVOT: PUT THE key/ HEADERS INTO THE values/ CELLS
+          // AND CHECK WHETHER THE keys HAVE PREFIXES
+          const message = `The prefix <em>${prefix}</em> was detected. Should it be removed from cell values?`;
+          const opts = [
+            {
+              node: 'button',
+              type: 'button',
+              label: 'Keep it',
+              resolve: false,
+            },
+            {
+              node: 'button',
+              type: 'button',
+              label: 'Drop it',
+              resolve: true,
+            },
+          ];
+          rmprefix = await renderPromiseModal({
+            message: message,
+            opts: opts,
+          });
+        } else if (types.length === 1 && types[0] === 'string') {
+          const message = `Merge columns into a list, or keep a single ${types[0]} with all the values?`;
+          const opts = [
+            {
+              node: 'button',
+              type: 'button',
+              label: 'Make a list',
+              resolve: true,
+            },
+            {
+              node: 'button',
+              type: 'button',
+              label: `Keep as ${types[0]}`,
+              resolve: false,
+            },
+          ];
+          mklist = await renderPromiseModal({ message: message, opts: opts });
+        }
 
-		toggleClass(this, 'selected')
-		const trs = table.selectAll('tr')
-		trs.each(function (c, j) {
-			let caps = ''
-			if (j === 0) caps = 'top'
-			else if (j === trs.size() - 1) caps = 'bottom'
+        cols.forEach((c) => {
+          // IF THE VALUES ARE BOLEAN, PIVOT
+          if (c.bool) {
+            c.entries = c.entries.map((b) => {
+              if (b) return rmprefix ? c.key.replace(prefix, '') : c.key;
+              else return null;
+            });
+          }
+          // ZIP THE entries
+          for (let i = 0; i < c.entries.length; i++) {
+            if (c.entries[i]) {
+              if (!isNaN(c.entries[i])) c.entries[i] = +c.entries[i];
+              if (!zip[i]) zip[i] = [c.entries[i]];
+              else zip[i].push(c.entries[i]);
+            }
+          }
+        });
+        obj.entries = mklist ? zip : zip.map((c) => c.join(', '));
 
-			d3.select(this).selectAll('th, td')
-			.each(function (b, k) {
-				if (k === i) {
-					const next = this.nextSibling
-					const previous = this.previousSibling
-					const sides = []
-					
-					if (!previous?.classList.contains('selected')) sides.push('left')
-					else {
-						if (sel.classed('selected')) previous?.classList.remove('right')
-						else previous?.classList.add('right')
-					}
-					
-					if (!next?.classList.contains('selected')) sides.push('right')
-					else {
-						if (sel.classed('selected')) next?.classList.remove('left')
-						else next?.classList.add('left')
-					}
+        obj.values = cols
+          .map((c) =>
+            c.entries.map((b) =>
+              typeof b === 'string' ? b.trim().toLowerCase() : b,
+            ),
+          )
+          .flat()
+          .filter((c) => ![null, undefined].includes(c))
+          .unique()
+          .sort();
 
-					d3.select(this).classed(`selected ${caps} ${sides.join(' ')}`, sel.classed('selected'))
-				}
-			})
-		})
+        obj.types = obj.entries
+          .map((c) => {
+            if (Array.isArray(c)) {
+              const listcontent = c.map((b) => typeof b).unique();
+              return `list of ${listcontent}s`;
+            } else return typeof c;
+          })
+          .unique();
+        obj.bool = false;
+        // obj.inferredtype = 'checklist'
+        obj.type = 'checklist';
+        resolve(obj);
+      } else resolve(json.find((c) => c.key === d));
+    });
+  });
+  Promise.all(cols).then((data) => renderTable(data));
+}
+function renderTable(cols, update = false) {
+  const { metafields } = JSON.parse(
+    d3.select('data[name="pad"]').node().value,
+  );
 
-		moduleHead.selectAll('.column-selection th')
-		.classed('disabled', function (c) { 
-			if (this === node) return false
-			if (c.types) {
-				if (!d.types.length) {
-					if (!c.types.length) return false
-					else if (c.types.includes('number')) return false
-					else return true
-				} else {
-					if (!c.types.length) return false
-					else if (c.types.intersection(d.types).length > 0) return false
-					else return true
-				}
-			}
-		})
+  const main = d3.select('div.table main');
+  const layout = main.select('div.inner');
+  const body = layout.select('div.body');
+  const foot = layout.select('div.foot');
 
-		// THIS IS FOR RANGE SELECTIONS
-		if (sel.classed('selected') && evt.shiftKey) {
-			let bounds = []
-			let currentidx = 0
-			const range = []
+  body.select('.btn-group').classed('hide', false);
+  const table = body
+    .addElems('div', 'table-container')
+    .addElems('table', 'xls-preview', [cols])
+    .attrs({
+      border: 0,
+      cellpadding: 0,
+      cellspacing: 0,
+    });
+  // RENDER THE TABLE HEAD
+  const moduleHead = table.addElems('thead');
 
-			moduleHead.selectAll('.column-selection th').each(function (c, j) {
-				if (d3.select(this).classed('selected')) bounds.push(j)
-				if (this === node) currentidx = j
-			})
+  const selectCols = moduleHead.addElems('tr', 'column-selection');
+  selectCols
+    .addElems('th', 'selection', (d) => d)
+    .classed('selected left right top bottom disabled', false)
+    .attr('title', 'Select column.') // TO DO: TRANSLATE
+    .on('click', function (d, i) {
+      const evt = d3.event;
+      const node = this;
+      const sel = d3.select(this);
 
-			bounds.sort((a, b) => a - b)
-			let location = bounds.indexOf(currentidx)
-			if (location === -1) {
-				bounds.push(currentidx)
-				bounds.sort((a, b) => a - b)
-				location = bounds.indexOf(currentidx)
-			}
+      if (
+        (evt.shiftKey || evt.metaKey || evt.ctrlKey) &&
+        sel.classed('disabled')
+      )
+        return null;
+      if (!evt.shiftKey && !evt.metaKey && !evt.ctrlKey)
+        d3.selectAll('tr th, tr td').classed(
+          'selected top bottom left right',
+          false,
+        );
 
-			if (location !== 0) bounds = bounds.slice(0, location + 1)
+      toggleClass(this, 'selected');
+      const trs = table.selectAll('tr');
+      trs.each(function (c, j) {
+        let caps = '';
+        if (j === 0) caps = 'top';
+        else if (j === trs.size() - 1) caps = 'bottom';
 
-			// SET RANGE OF SELECTED COLUMNS
-			moduleHead.selectAll('.column-selection th').each(function (c, j) {
-				if (!d3.select(this).classed('disabled') && j >= Math.min(...bounds) && j <= Math.max(...bounds)) {
-					range.push(j)
-				}
-			})
+        d3.select(this)
+          .selectAll('th, td')
+          .each(function (b, k) {
+            if (k === i) {
+              const next = this.nextSibling;
+              const previous = this.previousSibling;
+              const sides = [];
 
-			const trs = table.selectAll('tr')
-			trs.each(function (c, j) {
-				let caps = ''
-				if (j === 0) caps = 'top'
-				else if (j === trs.size() - 1) caps = 'bottom'
+              if (!previous?.classList.contains('selected'))
+                sides.push('left');
+              else {
+                if (sel.classed('selected'))
+                  previous?.classList.remove('right');
+                else previous?.classList.add('right');
+              }
 
-				d3.select(this).selectAll('th, td')
-				.classed('top bottom left right', false)
-				.each(function (b, k) {
-					let sides = []
-					if (!range.includes(k - 1)) sides.push('left')
-					if (!range.includes(k + 1)) sides.push('right')
-					if (range.includes(k)) {
-						d3.select(this).classed(`selected ${caps} ${sides.join(' ')}`, sel.classed('selected'))
-					}
-				})	
-			})
-		}
-	}).addElems('i', 'material-icons google-translate-attr')
-		.html('tab_unselected')
-	
-	const columnheaders = moduleHead.addElems('tr', 'column-names')
-	columnheaders.addElems('th', 'name', d => d)
-		.classed('selected left right top bottom', false)
-		.attrs({ 
-			'title': d => d.key, 
-			'contenteditable': true 
-		}).html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
-	.on('focus', function (d) {
-		d3.select(this).html(d.key)
-	}).on('blur', function (d) {
-		d.key = this.innerText
-		d3.select(this).html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
-	})
+              if (!next?.classList.contains('selected')) sides.push('right');
+              else {
+                if (sel.classed('selected')) next?.classList.remove('left');
+                else next?.classList.add('left');
+              }
 
-	const datatypes = moduleHead.addElems('tr', 'data-types')
-		.addElems('th', 'data', d => d)
-		.classed('selected left right top bottom', false)
-	datatypes.addElems('label').html(d => d.types)
-	datatypes.addElems('button', 'parse', d => d.types.includes('string') ? [d] : [])
-		.addElems('i', 'material-icons google-translate-attr')
-		.html('list')
-	.on('click', async function (d) {
-		const message = `Split the string data in this column into a list using <input type='text' name='separator' value=',' minlength=1 maxlength=1> separators.` // TO DO: TRANSLATE
-		const opts = [{ node: 'button', type: 'button', label: 'Split strings', resolve: _ => d3.select('.modal input[name="separator"]').node().value }]
-		const separator = await renderPromiseModal({ message: message, opts: opts })
-		splitValues(d.key, separator)
-	})
+              d3.select(this).classed(
+                `selected ${caps} ${sides.join(' ')}`,
+                sel.classed('selected'),
+              );
+            }
+          });
+      });
 
-	const columntypes = moduleHead.addElems('tr', 'media-types')
-		.addElems('th', 'type', d => d)
-		.classed('selected left right top bottom', false)
-	.addElems('select')
-	.on('change', function (d) {
-		const selection = this.options[this.selectedIndex].value
-		
-		if (columntypes.selectAll('option[value="title"]:checked').size()) {
-			columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', true)
-		} else columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', c => c.disabled)
-		
-		if (metafields.some(c => c.type === 'location')) {
-			if (columntypes.selectAll('option[value="location-txt"]:checked, option[value="location-lat-lng"]:checked, option[value="location-lng-lat"]:checked').size()) {
-				columntypes.selectAll('option[value="location-txt"]:not(:checked)').attr('disabled', true)
-				columntypes.selectAll('option[value="location-lat-lng"]:not(:checked)').attr('disabled', true)
-				columntypes.selectAll('option[value="location-lng-lat"]:not(:checked)').attr('disabled', true)
-			} else {
-				columntypes.selectAll('option[value="location-txt"]:not(:checked)').attr('disabled', c => c.disabled)
-				columntypes.selectAll('option[value="location-lat-lng"]:not(:checked)').attr('disabled', c => c.disabled)
-				columntypes.selectAll('option[value="location-lng-lat"]:not(:checked)').attr('disabled', c => c.disabled)
-			}
-		}
+      moduleHead
+        .selectAll('.column-selection th')
+        .classed('disabled', function (c) {
+          if (this === node) return false;
+          if (c.types) {
+            if (!d.types.length) {
+              if (!c.types.length) return false;
+              else if (c.types.includes('number')) return false;
+              else return true;
+            } else {
+              if (!c.types.length) return false;
+              else if (c.types.intersection(d.types).length > 0) return false;
+              else return true;
+            }
+          }
+        });
 
-		metafields.filter(c => c.type !== 'location').forEach(c => {
-			if (columntypes.selectAll(`option[value="${c.label}"]:checked`).size()) {
-				columntypes.selectAll(`option[value="${c.label}"]:not(:checked)`).attr('disabled', true)
-			} else columntypes.selectAll(`option[value="${c.label}"]:not(:checked)`).attr('disabled', c => c.disabled)
-		})
+      // THIS IS FOR RANGE SELECTIONS
+      if (sel.classed('selected') && evt.shiftKey) {
+        let bounds = [];
+        let currentidx = 0;
+        const range = [];
 
-		d.type = selection
-	})
-	columntypes.addElems('optgroup', 'group-media')
-		.attr('label', 'media') // TO DO: TRANSLATE ALL MEDIA values BELOW
-	.addElems('option', 'opt', d => {
-		const containsURLs = d.entries.flat().filter(c => ![null, undefined].includes(c)).every(c => typeof c === 'string' && c.isURL())
-		const obj = []
+        moduleHead.selectAll('.column-selection th').each(function (c, j) {
+          if (d3.select(this).classed('selected')) bounds.push(j);
+          if (this === node) currentidx = j;
+        });
 
-		obj.push({ label: 'title', value: 'title', disabled: d.types.some(c => ['string', 'number'].includes(c)) ? null : true })
-		obj.push({ label: 'text', value: 'txt', disabled: d.types.some(c => ['string', 'number', 'list of strings', 'list of numbers'].includes(c)) ? null : true })
-		obj.push({ label: 'embedding', value: 'embed', disabled: d.types.some(c => ['string', 'number'].includes(c)) ? null : true })
-		
-		obj.push({ label: 'image', value: 'img', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
-		// obj.push({ label: 'video', value: 'video', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
-		
-		obj.push({ label: 'checklist', value: 'checklist', disabled: !d.types.includes('object') ? null : true })
-		obj.push({ label: 'radiolist', value: 'radiolist', disabled: !d.types.includes('object') ? null : true })
+        bounds.sort((a, b) => a - b);
+        let location = bounds.indexOf(currentidx);
+        if (location === -1) {
+          bounds.push(currentidx);
+          bounds.sort((a, b) => a - b);
+          location = bounds.indexOf(currentidx);
+        }
 
-		return obj
-	}).attrs({ 
-		'value': d => d.value,
-		// 'selected': function (d) {
-		// 	const type = d3.select(this).findAncestor('type').datum().type
-		// 	if (type === d.value) return true
-		// 	else return null
-		// }, 
-		'disabled': d => d.disabled
-	}).html(d => d.label)
+        if (location !== 0) bounds = bounds.slice(0, location + 1);
 
-	const metaOpts = columntypes.addElems('optgroup', 'group-meta')
-		.attr('label', 'meta')
-	.addElems('option', 'opt', d => {
-		const containsURLs = d.entries.flat().filter(c => ![null, undefined].includes(c)).every(c => typeof c === 'string' && c.isURL())
-		const obj = []
-		// CHECK FOR LOCATIONS
-		if (metafields.some(c => c.type === 'location')) {
-			const limit = metafields.find(c => c.type === 'location')?.limit ?? null
-			// THIS ONLY AFFORDS UPLOADING ONE LOCATION PER ENTRY
-			obj.push({ label: 'location', value: 'location-txt', limit, disabled: d.types.some(c => ['string', 'list of strings'].includes(c)) ? null : true })
-			obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', limit, disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
-			obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', limit, disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
-		}
-		
-		metafields.filter(c => c.type !== 'location')
-		.forEach(c => {
-			let disabled = true
-			const containsURLs = d.entries.flat().filter(c => ![null, undefined].includes(c)).every(c => typeof c === 'string' && c.isURL())
+        // SET RANGE OF SELECTED COLUMNS
+        moduleHead.selectAll('.column-selection th').each(function (c, j) {
+          if (
+            !d3.select(this).classed('disabled') &&
+            j >= Math.min(...bounds) &&
+            j <= Math.max(...bounds)
+          ) {
+            range.push(j);
+          }
+        });
 
-			// CHECK FOR LIMITED INPUTS
-			let max_entries = 1
-			let constrained = false
-			
-			if (!['txt', 'embed'].includes(c.type)) { // THE LIMIT IS ON THE NUMBER OF ITEMS
-				if (d.entries.every(b => Array.isArray(b))) max_entries = Math.max(...d.entries.map(b => b.length))
-			} else { // THE LIMIT IS ON THE NUMBER OF CHARACTERS
-				max_entries = Math.max(...d.entries.flat().map(b => b.trim().length))
-			}
-			if (max_entries > (c.limit ?? Infinity)) constrained = true
+        const trs = table.selectAll('tr');
+        trs.each(function (c, j) {
+          let caps = '';
+          if (j === 0) caps = 'top';
+          else if (j === trs.size() - 1) caps = 'bottom';
 
-			if (c.type === 'tag' && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b)) && !constrained) disabled = null
-			if (c.type === 'index' && d.types.some(b => ['number', 'list of numbers'].includes(b)) && !constrained) disabled = null
-			
-			if (c.type === 'attachment' && d.types.some(b => ['string', 'list of strings'].includes(b) && containsURLs) && !constrained) disabled = null
+          d3.select(this)
+            .selectAll('th, td')
+            .classed('top bottom left right', false)
+            .each(function (b, k) {
+              let sides = [];
+              if (!range.includes(k - 1)) sides.push('left');
+              if (!range.includes(k + 1)) sides.push('right');
+              if (range.includes(k)) {
+                d3.select(this).classed(
+                  `selected ${caps} ${sides.join(' ')}`,
+                  sel.classed('selected'),
+                );
+              }
+            });
+        });
+      }
+    })
+    .addElems('i', 'material-icons google-translate-attr')
+    .html('tab_unselected');
 
-			if (['txt', 'embed'].includes(c.type) && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b)) && !constrained) disabled = null
-			if (c.type === 'img' && d.types.some(b => (b === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(b) && containsURLs)) && !constrained) disabled = null
-			// if (c.type === 'video') // TO DO: COMPLETE FOR VIDEO
-			if (['checklist', 'radiolist'].includes(c.type) && !d.type.includes('object')) disabled = null // THERE SHOULD BE NO CONSTRAINTS HERE AS FAR AS I CAN TELL
+  const columnheaders = moduleHead.addElems('tr', 'column-names');
+  columnheaders
+    .addElems('th', 'name', (d) => d)
+    .classed('selected left right top bottom', false)
+    .attrs({
+      title: (d) => d.key,
+      contenteditable: true,
+    })
+    .html((d) => (d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key))
+    .on('focus', function (d) {
+      d3.select(this).html(d.key);
+    })
+    .on('blur', function (d) {
+      d.key = this.innerText;
+      d3.select(this).html((d) =>
+        d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key,
+      );
+    });
 
-			obj.push({ label: c.name, value: c.label, limit: c.limit || null, disabled }) // TO DO: TRANSLATE c.name
-		})
+  const datatypes = moduleHead
+    .addElems('tr', 'data-types')
+    .addElems('th', 'data', (d) => d)
+    .classed('selected left right top bottom', false);
+  datatypes.addElems('label').html((d) => d.types);
+  datatypes
+    .addElems('button', 'parse', (d) =>
+      d.types.includes('string') ? [d] : [],
+    )
+    .addElems('i', 'material-icons google-translate-attr')
+    .html('list')
+    .on('click', async function (d) {
+      const message = `Split the string data in this column into a list using <input type='text' name='separator' value=',' minlength=1 maxlength=1> separators.`; // TO DO: TRANSLATE
+      const opts = [
+        {
+          node: 'button',
+          type: 'button',
+          label: 'Split strings',
+          resolve: (_) =>
+            d3.select('.modal input[name="separator"]').node().value,
+        },
+      ];
+      const separator = await renderPromiseModal({
+        message: message,
+        opts: opts,
+      });
+      splitValues(d.key, separator);
+    });
 
-		return obj
-	}).attrs({
-		'value': d => d.value,
-		// 'selected': function (d) {
-		// 	const type = d3.select(this).findAncestor('type').datum().type
-		// 	if (type === d.value) return true
-		// 	else return null
-		// }, 
-		'disabled': d => d.disabled
-	}).html(d => {
-		if (d.limit) return `${d.label} (limited to ${d.limit})` // TO DO: TRANSLATION
-		else return d.label
-	})
+  const columntypes = moduleHead
+    .addElems('tr', 'media-types')
+    .addElems('th', 'type', (d) => d)
+    .classed('selected left right top bottom', false)
+    .addElems('select')
+    .on('change', function (d) {
+      const selection = this.options[this.selectedIndex].value;
 
-	columntypes.each(function (d) { 
-		this.value = d.type
-	})
+      if (columntypes.selectAll('option[value="title"]:checked').size()) {
+        columntypes
+          .selectAll('option[value="title"]:not(:checked)')
+          .attr('disabled', true);
+      } else
+        columntypes
+          .selectAll('option[value="title"]:not(:checked)')
+          .attr('disabled', (c) => c.disabled);
 
-	// IMMEDIATELY DISABLE OPTIONS ACCORDING TO INFERRED TYPES
-	if (!update) columntypes.each(function (d) { this.dispatchEvent(new Event('change')) }) 
+      if (metafields.some((c) => c.type === 'location')) {
+        if (
+          columntypes
+            .selectAll(
+              'option[value="location-txt"]:checked, option[value="location-lat-lng"]:checked, option[value="location-lng-lat"]:checked',
+            )
+            .size()
+        ) {
+          columntypes
+            .selectAll('option[value="location-txt"]:not(:checked)')
+            .attr('disabled', true);
+          columntypes
+            .selectAll('option[value="location-lat-lng"]:not(:checked)')
+            .attr('disabled', true);
+          columntypes
+            .selectAll('option[value="location-lng-lat"]:not(:checked)')
+            .attr('disabled', true);
+        } else {
+          columntypes
+            .selectAll('option[value="location-txt"]:not(:checked)')
+            .attr('disabled', (c) => c.disabled);
+          columntypes
+            .selectAll('option[value="location-lat-lng"]:not(:checked)')
+            .attr('disabled', (c) => c.disabled);
+          columntypes
+            .selectAll('option[value="location-lng-lat"]:not(:checked)')
+            .attr('disabled', (c) => c.disabled);
+        }
+      }
 
-	// RENDER THE TABLE BODY
-	const show = 5 // THIS IS TO LIMIT THE NUMBER OF ROWS DISPLAYED
-	const moduleBody = table.addElems('tbody', null, [cols])
-	
-	const bodyRows = moduleBody.addElems('tr', 'column-values', d => {
-		const slices = d.map(c => { return { key: c.key, entries: c.entries.slice(0, show) } })
-		const row = []
-		slices.forEach(c => {
-			for (let i = 0; i < c.entries.length; i ++) {
-				if (!row[i]) row[i] = [{ key: c.key, cell: c.entries[i] }]
-				else row[i].push({ key: c.key, cell: c.entries[i] })
-			}
-		})
-		return row
-	}).on('mouseover', function () {
-		d3.select(this).select('.preview').classed('hide', false)
-	}).on('mouseout', function () {
-		d3.select(this).select('.preview').classed('hide', true)
-	})
-	bodyRows.addElems('td', 'value', d => d)
-		.classed('selected left right top bottom', false)
-		.style('word-break', d => typeof d.cell === 'string' && (d.cell.split(' ').length === 1 || d.cell.includes('http')) ? 'break-all' : null)
-		.html(d => {
-			if (d.cell && typeof d.cell === 'string' && d.cell.length > 100) return `${d.cell.slice(0, 100)}…` 
-			else if (d.cell && typeof d.cell === 'object') {
-				if (Array.isArray(d.cell)) {
-					return d.cell.join(', ').length > 100 ? `${d.cell.join(', ').slice(0, 100)}…` : d.cell.join(', ')
-				} else if (Object.keys(d.cell).includes('src')) { // LIKELY AN IMAGE
-					return `<img src='${d.cell.src}'>`
-				}
-			} else return d.cell
-		})
-	bodyRows.addElems('div', 'preview hide')
-	.on('dblclick', function () {
-		const sel = d3.select(this)
-		const node = sel.findAncestor('column-values').node()
-		let idx = 0
-		d3.select(node.parentNode).selectAll('tr').each(function (c, j) { if (this === node) idx = j })
-		
-		previewPad(idx)
-	}).addElems('span')
-		.html(vocabulary['dblclick to preview']['pad'])
-	
-	foot.addElems('p', 'summary')
-		.html(_ => {
-			const rowcount = Math.max(...cols.map(c => c.entries.length))
-			const colcount = cols.length
-			return vocabulary['import table description']
-				.replace(/\$1/g, rowcount)
-				.replace(/\$2/g, colcount)
-				.replace(/\$3/g, Math.min(show, rowcount))
-		})
+      metafields
+        .filter((c) => c.type !== 'location')
+        .forEach((c) => {
+          if (
+            columntypes.selectAll(`option[value="${c.label}"]:checked`).size()
+          ) {
+            columntypes
+              .selectAll(`option[value="${c.label}"]:not(:checked)`)
+              .attr('disabled', true);
+          } else
+            columntypes
+              .selectAll(`option[value="${c.label}"]:not(:checked)`)
+              .attr('disabled', (c) => c.disabled);
+        });
 
-	// PUSH BROWSER HISTORY STATE
-	const url = new URL(window.location)
-	const queryparams = new URLSearchParams(url.search)
-	queryparams.set('file', encodeURI(d3.select('input#upload').attr('data-fname')))
-	url.search = queryparams.toString()
-	const nextURL = url.toString()
-	const nextTitle = 'Processing table'
-	const nextState = { additionalInformation: 'Updated the URL with JS' }
-	window.history.pushState(nextState, nextTitle, nextURL)
+      d.type = selection;
+    });
+  columntypes
+    .addElems('optgroup', 'group-media')
+    .attr('label', 'media') // TO DO: TRANSLATE ALL MEDIA values BELOW
+    .addElems('option', 'opt', (d) => {
+      const containsURLs = d.entries
+        .flat()
+        .filter((c) => ![null, undefined].includes(c))
+        .every((c) => typeof c === 'string' && c.isURL());
+      const obj = [];
+
+      obj.push({
+        label: 'title',
+        value: 'title',
+        disabled: d.types.some((c) => ['string', 'number'].includes(c))
+          ? null
+          : true,
+      });
+      obj.push({
+        label: 'text',
+        value: 'txt',
+        disabled: d.types.some((c) =>
+          ['string', 'number', 'list of strings', 'list of numbers'].includes(
+            c,
+          ),
+        )
+          ? null
+          : true,
+      });
+      obj.push({
+        label: 'embedding',
+        value: 'embed',
+        disabled: d.types.some((c) => ['string', 'number'].includes(c))
+          ? null
+          : true,
+      });
+
+      obj.push({
+        label: 'image',
+        value: 'img',
+        disabled: d.types.some(
+          (c) =>
+            (c === 'object' && ['img', 'video'].includes(d.type)) ||
+            (['string', 'list of strings'].includes(c) && containsURLs),
+        )
+          ? null
+          : true,
+      });
+      // obj.push({ label: 'video', value: 'video', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
+
+      obj.push({
+        label: 'checklist',
+        value: 'checklist',
+        disabled: !d.types.includes('object') ? null : true,
+      });
+      obj.push({
+        label: 'radiolist',
+        value: 'radiolist',
+        disabled: !d.types.includes('object') ? null : true,
+      });
+
+      return obj;
+    })
+    .attrs({
+      value: (d) => d.value,
+      // 'selected': function (d) {
+      // 	const type = d3.select(this).findAncestor('type').datum().type
+      // 	if (type === d.value) return true
+      // 	else return null
+      // },
+      disabled: (d) => d.disabled,
+    })
+    .html((d) => d.label);
+
+  const metaOpts = columntypes
+    .addElems('optgroup', 'group-meta')
+    .attr('label', 'meta')
+    .addElems('option', 'opt', (d) => {
+      const containsURLs = d.entries
+        .flat()
+        .filter((c) => ![null, undefined].includes(c))
+        .every((c) => typeof c === 'string' && c.isURL());
+      const obj = [];
+      // CHECK FOR LOCATIONS
+      if (metafields.some((c) => c.type === 'location')) {
+        const limit =
+          metafields.find((c) => c.type === 'location')?.limit ?? null;
+        // THIS ONLY AFFORDS UPLOADING ONE LOCATION PER ENTRY
+        obj.push({
+          label: 'location',
+          value: 'location-txt',
+          limit,
+          disabled: d.types.some((c) =>
+            ['string', 'list of strings'].includes(c),
+          )
+            ? null
+            : true,
+        });
+        obj.push({
+          label: 'location (lat/ lng)',
+          value: 'location-lat-lng',
+          limit,
+          disabled:
+            d.types.includes('list of numbers') &&
+            d.values.every((c) => c.length === 2)
+              ? null
+              : true,
+        });
+        obj.push({
+          label: 'location (lng/ lat)',
+          value: 'location-lng-lat',
+          limit,
+          disabled:
+            d.types.includes('list of numbers') &&
+            d.values.every((c) => c.length === 2)
+              ? null
+              : true,
+        });
+      }
+
+      metafields
+        .filter((c) => c.type !== 'location')
+        .forEach((c) => {
+          let disabled = true;
+          const containsURLs = d.entries
+            .flat()
+            .filter((c) => ![null, undefined].includes(c))
+            .every((c) => typeof c === 'string' && c.isURL());
+
+          // CHECK FOR LIMITED INPUTS
+          let max_entries = 1;
+          let constrained = false;
+
+          if (!['txt', 'embed'].includes(c.type)) {
+            // THE LIMIT IS ON THE NUMBER OF ITEMS
+            if (d.entries.every((b) => Array.isArray(b)))
+              max_entries = Math.max(...d.entries.map((b) => b.length));
+          } else {
+            // THE LIMIT IS ON THE NUMBER OF CHARACTERS
+            max_entries = Math.max(
+              ...d.entries.flat().map((b) => b.trim().length),
+            );
+          }
+          if (max_entries > (c.limit ?? Infinity)) constrained = true;
+
+          if (
+            c.type === 'tag' &&
+            d.types.some((b) =>
+              [
+                'number',
+                'list of numbers',
+                'string',
+                'list of strings',
+              ].includes(b),
+            ) &&
+            !constrained
+          )
+            disabled = null;
+          if (
+            c.type === 'index' &&
+            d.types.some((b) => ['number', 'list of numbers'].includes(b)) &&
+            !constrained
+          )
+            disabled = null;
+
+          if (
+            c.type === 'attachment' &&
+            d.types.some(
+              (b) => ['string', 'list of strings'].includes(b) && containsURLs,
+            ) &&
+            !constrained
+          )
+            disabled = null;
+
+          if (
+            ['txt', 'embed'].includes(c.type) &&
+            d.types.some((b) =>
+              [
+                'number',
+                'list of numbers',
+                'string',
+                'list of strings',
+              ].includes(b),
+            ) &&
+            !constrained
+          )
+            disabled = null;
+          if (
+            c.type === 'img' &&
+            d.types.some(
+              (b) =>
+                (b === 'object' && ['img', 'video'].includes(d.type)) ||
+                (['string', 'list of strings'].includes(b) && containsURLs),
+            ) &&
+            !constrained
+          )
+            disabled = null;
+          // if (c.type === 'video') // TO DO: COMPLETE FOR VIDEO
+          if (
+            ['checklist', 'radiolist'].includes(c.type) &&
+            !d.type.includes('object')
+          )
+            disabled = null; // THERE SHOULD BE NO CONSTRAINTS HERE AS FAR AS I CAN TELL
+
+          obj.push({
+            label: c.name,
+            value: c.label,
+            limit: c.limit || null,
+            disabled,
+          }); // TO DO: TRANSLATE c.name
+        });
+
+      return obj;
+    })
+    .attrs({
+      value: (d) => d.value,
+      // 'selected': function (d) {
+      // 	const type = d3.select(this).findAncestor('type').datum().type
+      // 	if (type === d.value) return true
+      // 	else return null
+      // },
+      disabled: (d) => d.disabled,
+    })
+    .html((d) => {
+      if (d.limit)
+        return `${d.label} (limited to ${d.limit})`; // TO DO: TRANSLATION
+      else return d.label;
+    });
+
+  columntypes.each(function (d) {
+    this.value = d.type;
+  });
+
+  // IMMEDIATELY DISABLE OPTIONS ACCORDING TO INFERRED TYPES
+  if (!update)
+    columntypes.each(function (d) {
+      this.dispatchEvent(new Event('change'));
+    });
+
+  // RENDER THE TABLE BODY
+  const show = 5; // THIS IS TO LIMIT THE NUMBER OF ROWS DISPLAYED
+  const moduleBody = table.addElems('tbody', null, [cols]);
+
+  const bodyRows = moduleBody
+    .addElems('tr', 'column-values', (d) => {
+      const slices = d.map((c) => {
+        return { key: c.key, entries: c.entries.slice(0, show) };
+      });
+      const row = [];
+      slices.forEach((c) => {
+        for (let i = 0; i < c.entries.length; i++) {
+          if (!row[i]) row[i] = [{ key: c.key, cell: c.entries[i] }];
+          else row[i].push({ key: c.key, cell: c.entries[i] });
+        }
+      });
+      return row;
+    })
+    .on('mouseover', function () {
+      d3.select(this).select('.preview').classed('hide', false);
+    })
+    .on('mouseout', function () {
+      d3.select(this).select('.preview').classed('hide', true);
+    });
+  bodyRows
+    .addElems('td', 'value', (d) => d)
+    .classed('selected left right top bottom', false)
+    .style('word-break', (d) =>
+      typeof d.cell === 'string' &&
+      (d.cell.split(' ').length === 1 || d.cell.includes('http'))
+        ? 'break-all'
+        : null,
+    )
+    .html((d) => {
+      if (d.cell && typeof d.cell === 'string' && d.cell.length > 100)
+        return `${d.cell.slice(0, 100)}…`;
+      else if (d.cell && typeof d.cell === 'object') {
+        if (Array.isArray(d.cell)) {
+          return d.cell.join(', ').length > 100
+            ? `${d.cell.join(', ').slice(0, 100)}…`
+            : d.cell.join(', ');
+        } else if (Object.keys(d.cell).includes('src')) {
+          // LIKELY AN IMAGE
+          return `<img src='${d.cell.src}'>`;
+        }
+      } else return d.cell;
+    });
+  bodyRows
+    .addElems('div', 'preview hide')
+    .on('dblclick', function () {
+      const sel = d3.select(this);
+      const node = sel.findAncestor('column-values').node();
+      let idx = 0;
+      d3.select(node.parentNode)
+        .selectAll('tr')
+        .each(function (c, j) {
+          if (this === node) idx = j;
+        });
+
+      previewPad(idx);
+    })
+    .addElems('span')
+    .html(vocabulary['dblclick to preview']['pad']);
+
+  foot.addElems('p', 'summary').html((_) => {
+    const rowcount = Math.max(...cols.map((c) => c.entries.length));
+    const colcount = cols.length;
+    return vocabulary['import table description']
+      .replace(/\$1/g, rowcount)
+      .replace(/\$2/g, colcount)
+      .replace(/\$3/g, Math.min(show, rowcount));
+  });
+
+  // PUSH BROWSER HISTORY STATE
+  const url = new URL(window.location);
+  const queryparams = new URLSearchParams(url.search);
+  queryparams.set(
+    'file',
+    encodeURI(d3.select('input#upload').attr('data-fname')),
+  );
+  url.search = queryparams.toString();
+  const nextURL = url.toString();
+  const nextTitle = 'Processing table';
+  const nextState = { additionalInformation: 'Updated the URL with JS' };
+  window.history.pushState(nextState, nextTitle, nextURL);
 }
 function seekPrefix (arr) {
 	// INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
@@ -652,22 +1026,24 @@ export function dropColumns () {
 	const dropkeys = d3.select('table.xls-preview thead').selectAll('.selected').data().map(d => d.key)
 	renderTable(cols.filter(d => !dropkeys.includes(d.key)))
 }
-function compileLocations (idx) {
-	return new Promise(async resolve => {
-		const cols = d3.select('table.xls-preview').datum()
-		let locations = cols.find(d => d.type === 'location-txt')?.entries
-		if (!locations?.length) resolve(null)
-		else {
-			if (![null, undefined].includes(idx)) {
-				if (Array.isArray(locations[idx])) locations = locations[idx]
-				else locations = [locations[idx]]
-			} else locations = locations.flat().unique()
-			locations = locations.filter(d => d) // REMOVE ANY null VALUES
+function compileLocations(idx) {
+  return new Promise(async (resolve) => {
+    const cols = d3.select('table.xls-preview').datum();
+    let locations = cols.find((d) => d.type === 'location-txt')?.entries;
+    if (!locations?.length) resolve(null);
+    else {
+      if (![null, undefined].includes(idx)) {
+        if (Array.isArray(locations[idx])) locations = locations[idx];
+        else locations = [locations[idx]];
+      } else locations = locations.flat().unique();
+      locations = locations.filter((d) => d); // REMOVE ANY null VALUES
 
-			const results = await POST('/forwardGeocoding', { locations: locations })
-			resolve(results)
-		}
-	})		
+      const results = await POST('/forwardGeocoding', {
+        locations: locations,
+      });
+      resolve(results);
+    }
+  });
 }
 export async function compilePads (idx, structureOnly = false) {
 	const { metafields, media_value_keys } = JSON.parse(d3.select('data[name="pad"]').node().value)
@@ -1034,115 +1410,211 @@ export async function compileTemplate () {
 	// BUT WE KEEP IT FOR CONSISTENCY WITH template.ejs
 	const full_text = `${title}\n\n
 		${description}\n\n
-		${sections.map(d => d.title).join('\n\n').trim()}\n\n
-		${sections.map(d => d.lead).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'title')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'txt')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'embed')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'checklist')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'checklist')
-			.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'radiolist')
-			.map(d => d.options.map(c => c.name)).flat().join('\n\n').trim()}
+		${sections
+      .map((d) => d.title)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.lead)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'title')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'txt')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'embed')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'checklist')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'checklist')
+      .map((d) => d.options.map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'radiolist')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'radiolist')
+      .map((d) => d.options.map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}
 
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
-			.filter(d => d.type === 'txt')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
-			.filter(d => d.type === 'embed')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
-			.filter(d => d.type === 'checklist')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
-			.filter(d => d.type === 'checklist')
-			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
-			.filter(d => d.type === 'radiolist')
-			.map(d => d.instruction).join('\n\n').trim()}\n\n
-		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
-			.filter(d => d.type === 'radiolist')
-			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
-	
-	template.title = title.slice(0, 99)
-	template.description = description
-	template.sections = sections //JSON.stringify(sections)
-	template.full_text = full_text
-	template.medium = 'xlsx'
-	template.imported = true
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.structure)
+      .filter((d) => d.type === 'txt')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.structure)
+      .filter((d) => d.type === 'embed')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.structure)
+      .filter((d) => d.type === 'checklist')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.structure)
+      .filter((d) => d.type === 'checklist')
+      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.structure)
+      .filter((d) => d.type === 'radiolist')
+      .map((d) => d.instruction)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.structure)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.structure)
+      .filter((d) => d.type === 'radiolist')
+      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}`;
 
-	const completion = []
-	metafields.filter(d => d.required).forEach(d => {
-		completion.push(sections.map(c => c.structure)?.flat().some(c => c.name === d.label))
-	})
-	template.status = 0
-	if (completion.every(d => d === true)) template.status = 1
+  template.title = title.slice(0, 99);
+  template.description = description;
+  template.sections = sections; //JSON.stringify(sections)
+  template.full_text = full_text;
+  template.medium = 'xlsx';
+  template.imported = true;
 
-	return template
+  const completion = [];
+  metafields
+    .filter((d) => d.required)
+    .forEach((d) => {
+      completion.push(
+        sections
+          .map((c) => c.structure)
+          ?.flat()
+          .some((c) => c.name === d.label),
+      );
+    });
+  template.status = 0;
+  if (completion.every((d) => d === true)) template.status = 1;
+
+  return template;
 }
-async function previewPad (idx) {
-	const cols = d3.select('table.xls-preview').datum()
-	const data = await compilePads(idx)
-	const datum = data[0]
 
-	const screen = d3.select('div.screen').classed('hide', false)
-	const modal = screen.addElems('div', 'modal pad-preview')
-	modal.addElems('button', 'close')
-	.on('click', _ => window.history.back())
-	.html('Close')
+async function previewPad(idx) {
+  const cols = d3.select('table.xls-preview').datum();
+  const data = await compilePads(idx);
+  const datum = data[0];
 
-	window.onpopstate = _ => closeModal()
+  const screen = d3.select('div.screen').classed('hide', false);
+  const modal = screen.addElems('div', 'modal pad-preview');
+  modal
+    .addElems('button', 'close')
+    .on('click', (_) => window.history.back())
+    .html('Close');
 
-	function closeModal () {
-		// REORDER THE TABLE WHEN CLOSING PREVIEW
-		let neworder = []
+  window.onpopstate = (_) => closeModal();
 
-		if (datum.compileddata.find(d => d.type === 'title')) { // IF THERE IS A TITLE, ALWAYS PUSH IT TO THE FIRST COLUMN
-			neworder.push(datum.compileddata.find(d => d.type === 'title').instruction)
-		}
-		d3.selectAll('div.media-container, div.meta-container').each(d => neworder.push(d.instruction))
+  function closeModal() {
+    // REORDER THE TABLE WHEN CLOSING PREVIEW
+    let neworder = [];
 
-		neworder = neworder.map(d => cols.find(c => c.key === d))
-		
-		renderTable(neworder, true)
+    if (datum.compileddata.find((d) => d.type === 'title')) {
+      // IF THERE IS A TITLE, ALWAYS PUSH IT TO THE FIRST COLUMN
+      neworder.push(
+        datum.compileddata.find((d) => d.type === 'title').instruction,
+      );
+    }
+    d3.selectAll('div.media-container, div.meta-container').each((d) =>
+      neworder.push(d.instruction),
+    );
 
-		modal.remove()
-		screen.classed('hide', true)
-	}
+    neworder = neworder.map((d) => cols.find((c) => c.key === d));
 
-	const main = modal.addElems('div', 'document')
-		.addElems('main', 'pad')
-		.attr('id', 'pad')
-	const inner = main.addElems('div', 'inner')
-	
-	if (datum) {
-		const head = inner.addElems('div', 'head')
-		const body = inner.addElems('div', 'body')
-		
-		if (datum.title) head.addElems('div', 'title').html(datum.title)
-		if (datum.sections) {
-			datum.sections.forEach(d => {
-				addSection({ data: d, lang: language })
-			})
-		}
+    renderTable(neworder, true);
 
-		// REMOVE THE SECTION HEADER (WHICH IS ALWAYS EMPTY HERE)
-		body.select('div.section-header').remove()
-	}
+    modal.remove();
+    screen.classed('hide', true);
+  }
 
-	// UPDATE THE WINDOW HISTORY SO THAT USERS CAN CLICK ON "back" IN BROWSER
-	const url = new URL(window.location)
-	const queryparams = new URLSearchParams(url.search)
-	queryparams.set('preview', idx)
-	url.search = queryparams.toString()
-	const nextURL = url.toString()
-	const nextTitle = 'Preview pad'
-	const nextState = { additionalInformation: 'Updated the URL with JS' }
-	window.history.pushState(nextState, nextTitle, nextURL)
+  const main = modal
+    .addElems('div', 'document')
+    .addElems('main', 'pad')
+    .attr('id', 'pad');
+  const inner = main.addElems('div', 'inner');
+
+  if (datum) {
+    const head = inner.addElems('div', 'head');
+    const body = inner.addElems('div', 'body');
+
+    if (datum.title) head.addElems('div', 'title').html(datum.title);
+    if (datum.sections) {
+      datum.sections.forEach((d) => {
+        addSection({ data: d, lang: language });
+      });
+    }
+
+    // REMOVE THE SECTION HEADER (WHICH IS ALWAYS EMPTY HERE)
+    body.select('div.section-header').remove();
+  }
+
+  // UPDATE THE WINDOW HISTORY SO THAT USERS CAN CLICK ON "back" IN BROWSER
+  const url = new URL(window.location);
+  const queryparams = new URLSearchParams(url.search);
+  queryparams.set('preview', idx);
+  url.search = queryparams.toString();
+  const nextURL = url.toString();
+  const nextTitle = 'Preview pad';
+  const nextState = { additionalInformation: 'Updated the URL with JS' };
+  window.history.pushState(nextState, nextTitle, nextURL);
 }

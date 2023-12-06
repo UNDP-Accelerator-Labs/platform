@@ -39,7 +39,7 @@ html, body {
 	.mb-#{$i} {
 	  margin-bottom: $i * 0.25rem !important;
 	}
-  
+
 	.mt-#{$i} {
 		margin-top: $i * 0.25rem !important;
 	}
@@ -49,7 +49,7 @@ html, body {
 	.me-#{$i} {
 	  margin-right: $i * 0.25rem !important;
 	}
-  
+
 	.my-#{$i} {
 	  margin-top: $i * 0.25rem !important;
 	  margin-bottom: $i * 0.25rem !important;
@@ -58,7 +58,7 @@ html, body {
 	  margin-right: $i * 0.25rem !important;
 	  margin-left: $i * 0.25rem !important;
 	}
-  
+
 	.p-#{$i} {
 	  padding: $i * 0.25rem !important;
 	}
@@ -74,12 +74,12 @@ html, body {
 	.pe-#{$i} {
 	  padding-right: $i * 0.25rem !important;
 	}
-  
+
 	.px-#{$i} {
 	  padding-right: $i * 0.25rem !important;
 	  padding-left: $i * 0.25rem !important;
 	}
-  
+
 	.py-#{$i} {
 	  padding-top: $i * 0.25rem !important;
 	  padding-bottom: $i * 0.25rem !important;

@@ -97,14 +97,14 @@ exports.unpin = (req, res) => {
 				// we ignore the db and is_included fields here so we don't delete pinboards if the only
 				// pads of the board are on a different database or ignored
 				await gt.none(`
-				DELETE FROM pinboards 
+				DELETE FROM pinboards
 				WHERE id IN (
 					SELECT p.id FROM pinboards p
 					LEFT JOIN pinboard_contributors pc ON p.id = pc.pinboard
 					WHERE p.id = $1::INT
 					AND (SELECT COUNT (*) FROM pinboard_contributions WHERE pinboard = $1::INT) = 0
 					AND pc.participant = $2
-				)				
+				)
 				;`, [ board_id, uuid ])
 
 				const batch = []
@@ -212,16 +212,16 @@ function retrievepins (_object_id, uuid, ownId) {
 		SELECT pb.id, pb.title,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM exploration WHERE linked_pinboard = pb.id
-			) THEN TRUE 
-				ELSE FALSE 
+			) THEN TRUE
+				ELSE FALSE
 			END AS is_exploration,
 			TRUE AS editable
 		FROM pinboards pb
 		INNER JOIN pinboard_contributions pbc
 			ON pbc.pinboard = pb.id
-		WHERE pbc.pad IN ($1:csv) 
-			AND pbc.db = $2 
-			AND pb.owner = $3 
+		WHERE pbc.pad IN ($1:csv)
+			AND pbc.db = $2
+			AND pb.owner = $3
 			AND pbc.is_included = true
 	;`, [ safeArr(_object_id, -1), ownId, uuid ])
 }
@@ -230,14 +230,14 @@ function retrievepinboards (_owners, ownId) {
 		SELECT p.id, p.title, COALESCE(COUNT (DISTINCT (pc.pad)), 0)::INT AS count,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM exploration WHERE linked_pinboard = p.id
-			) THEN TRUE 
-				ELSE FALSE 
+			) THEN TRUE
+				ELSE FALSE
 			END AS is_exploration
 		FROM pinboards p
 		INNER JOIN pinboard_contributions pc
 			ON pc.pinboard = p.id
-		WHERE p.owner IN ($1:csv) 
-			AND pc.db = $2 
+		WHERE p.owner IN ($1:csv)
+			AND pc.db = $2
 			AND pc.is_included = true
 		GROUP BY p.id
 	;`, [ safeArr(_owners, DEFAULT_UUID), ownId ])

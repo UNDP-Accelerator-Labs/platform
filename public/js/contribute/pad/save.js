@@ -75,254 +75,345 @@ function retrieveItems (sel, datum, items) {
 		items.push(datum)
 	}
 }
-function getStatus () {
-	const mainobject = d3.select('data[name="object"]').node()?.value
-	const page = JSON.parse(d3.select('data[name="page"]').node()?.value) 
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
-	const { metafields } = JSON.parse(d3.select('data[name="site"]').node()?.value)
+function getStatus() {
+  const mainobject = d3.select('data[name="object"]').node()?.value;
+  const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
+  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  const { metafields } = JSON.parse(
+    d3.select('data[name="site"]').node()?.value,
+  );
 
-	const main = d3.select(`#${mainobject}`)
-	const head = main.select('.head')
-	const body = main.select('.body')
-	
-	const completion = []
+  const main = d3.select(`#${mainobject}`);
+  const head = main.select('.head');
+  const body = main.select('.body');
 
-	const title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
-	completion.push(title?.trim()?.length > 0)
+  const completion = [];
 
-	let metacompletion = JSON.parse(JSON.stringify(metafields)).filter(d => d.required).map(d => d.label)
+  const title =
+    head.select('.title').node()?.innerText ||
+    (body.select('.media-title').node() || body.select('.meta-title').node())
+      ?.innerText ||
+    vocabulary['missing title'];
+  completion.push(title?.trim()?.length > 0);
 
-	function checkCompletion (d) {
-		// <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
-		if (
-			(pad.type === 'templated' 
-				&& [null, undefined].includes(pad.template.medium)
-			) || page.type === 'public'
-		) {
-			if (d.required === null || d.required === undefined) throw 'there is no requirement: this should not happen'
-			if (d.required === false) return true
-			else return d.has_content === true
-		} else {
-			metacompletion = metacompletion.map(c => c === d.name ? d.has_content === true : c)
-		}
-	}
+  let metacompletion = JSON.parse(JSON.stringify(metafields))
+    .filter((d) => d.required)
+    .map((d) => d.label);
 
-	main.selectAll('.layout:not(.description-layout)')
-	.each(function (d) {
-		const items = []
-		const sel = d3.select(this)
+  function checkCompletion(d) {
+    // <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
+    if (
+      (pad.type === 'templated' &&
+        [null, undefined].includes(pad.template.medium)) ||
+      page.type === 'public'
+    ) {
+      if (d.required === null || d.required === undefined)
+        throw 'there is no requirement: this should not happen';
+      if (d.required === false) return true;
+      else return d.has_content === true;
+    } else {
+      metacompletion = metacompletion.map((c) =>
+        c === d.name ? d.has_content === true : c,
+      );
+    }
+  }
 
-		sel.selectAll('.media-container, .meta-container')
-		.each(function (c) {
-			const sel = d3.select(this)
-			const ingroup = sel.findAncestor('group-container')
-			// GROUPS
-			if (c.type === 'group') {
-				// const groupitems = []
-				sel.selectAll('.media-group-items')
-					.each(function () {
-						const sel = d3.select(this)
-						const subitems = []
-						sel.selectAll('.media-container, .meta-container')
-							.each(function (b) {
-								retrieveItems(d3.select(this), b, subitems)
-							})
-						// completion.push(!subitems.map(checkCompletion).unique().includes(false))
-						completion.push(subitems.map(checkCompletion).every(d => d === true))
-					})
-			} else {
-				if (!ingroup) retrieveItems(sel, c, items)
-				// completion.push(!items.map(checkCompletion).unique().includes(false))
-			}
-		})
-		// if (items.length) completion.push(!items.map(checkCompletion).unique().includes(false))
-		if (items.length) completion.push(items.map(checkCompletion).every(d => d === true))
-	})
+  main.selectAll('.layout:not(.description-layout)').each(function (d) {
+    const items = [];
+    const sel = d3.select(this);
 
-	// <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
-	if (
-		(pad.type === 'templated'
-			&& [null, undefined].includes(pad.template.medium)
-		) || page.type === 'public'
-	) {
-		console.log('override default requirements')
-		return completion.every(d => d === true)
-	} else {
-		console.log('default requirements')
-		return metacompletion.every(d => d === true)
-	}
-	// if (!templated) return metacompletion.every(d => d === true)
-	// else return !completion.unique().includes(false)
-	// else return completion.every(d => d === true)
+    sel.selectAll('.media-container, .meta-container').each(function (c) {
+      const sel = d3.select(this);
+      const ingroup = sel.findAncestor('group-container');
+      // GROUPS
+      if (c.type === 'group') {
+        // const groupitems = []
+        sel.selectAll('.media-group-items').each(function () {
+          const sel = d3.select(this);
+          const subitems = [];
+          sel
+            .selectAll('.media-container, .meta-container')
+            .each(function (b) {
+              retrieveItems(d3.select(this), b, subitems);
+            });
+          // completion.push(!subitems.map(checkCompletion).unique().includes(false))
+          completion.push(
+            subitems.map(checkCompletion).every((d) => d === true),
+          );
+        });
+      } else {
+        if (!ingroup) retrieveItems(sel, c, items);
+        // completion.push(!items.map(checkCompletion).unique().includes(false))
+      }
+    });
+    // if (items.length) completion.push(!items.map(checkCompletion).unique().includes(false))
+    if (items.length)
+      completion.push(items.map(checkCompletion).every((d) => d === true));
+  });
+
+  // <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
+  if (
+    (pad.type === 'templated' &&
+      [null, undefined].includes(pad.template.medium)) ||
+    page.type === 'public'
+  ) {
+    console.log('override default requirements');
+    return completion.every((d) => d === true);
+  } else {
+    console.log('default requirements');
+    return metacompletion.every((d) => d === true);
+  }
+  // if (!templated) return metacompletion.every(d => d === true)
+  // else return !completion.unique().includes(false)
+  // else return completion.every(d => d === true)
 }
-function compileContent (attr) {
-	const mainobject = d3.select('data[name="object"]').node()?.value
-	const { media_value_keys, metafields } = JSON.parse(d3.select('data[name="site"]').node()?.value)
-	const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
-	
-	const main = d3.select(`#${mainobject}`)
-	const head = main.select('.head')
-	const body = main.select('.body')
+function compileContent(attr) {
+  const mainobject = d3.select('data[name="object"]').node()?.value;
+  const { media_value_keys, metafields } = JSON.parse(
+    d3.select('data[name="site"]').node()?.value,
+  );
+  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
 
-	const content = {}
-	// COLLECT TITLE
-	let title = head.select('.title').node()?.innerText || (body.select('.media-title').node() || body.select('.meta-title').node())?.innerText || vocabulary['missing title']
-	if (title) title = limitLength(title, 99);
-	// MAYBE INCLUDE ALERT IF title IS EMPTY
-	// COLLECT ALL MEDIA
-	const sections = []
-	main.selectAll('.layout:not(.description-layout)')
-	.each(function (d) {
-		const items = []
-		const sel = d3.select(this)
+  const main = d3.select(`#${mainobject}`);
+  const head = main.select('.head');
+  const body = main.select('.body');
 
-		sel.selectAll('.media-container, .meta-container')
-		.each(function (c) {
-			const sel = d3.select(this)
-			const ingroup = sel.findAncestor('group-container')
-			// GROUPS
-			if (c.type === 'group') {
-				const groupitems = []
-				sel.selectAll('.media-group-items')
-					.each(function () {
-						const sel = d3.select(this)
-						const subitems = []
-						sel.selectAll('.media-container, .meta-container')
-							.each(function (b) {
-								retrieveItems(d3.select(this), b, subitems)
-							})
-						groupitems.push(subitems)
-					})
-				c.items = groupitems
-				items.push(c)
-			} else {
-				if (!ingroup) retrieveItems(sel, c, items)
-			}
-		})
+  const content = {};
+  // COLLECT TITLE
+  let title =
+    head.select('.title').node()?.innerText ||
+    (body.select('.media-title').node() || body.select('.meta-title').node())
+      ?.innerText ||
+    vocabulary['missing title'];
+  if (title) title = limitLength(title, 99);
+  // MAYBE INCLUDE ALERT IF title IS EMPTY
+  // COLLECT ALL MEDIA
+  const sections = [];
+  main.selectAll('.layout:not(.description-layout)').each(function (d) {
+    const items = [];
+    const sel = d3.select(this);
 
-		d.title = (sel.select('.section-header h1').node() || {}).innerText
-		d.lead = (sel.select('.media-lead').node() || {})['outerText' || 'textContent' || 'innerText']
-		d.instruction = (sel.select('.media-repeat button div').node() || {}).innerText
-		d.items = items
-		sections.push(d)
-	})
+    sel.selectAll('.media-container, .meta-container').each(function (c) {
+      const sel = d3.select(this);
+      const ingroup = sel.findAncestor('group-container');
+      // GROUPS
+      if (c.type === 'group') {
+        const groupitems = [];
+        sel.selectAll('.media-group-items').each(function () {
+          const sel = d3.select(this);
+          const subitems = [];
+          sel
+            .selectAll('.media-container, .meta-container')
+            .each(function (b) {
+              retrieveItems(d3.select(this), b, subitems);
+            });
+          groupitems.push(subitems);
+        });
+        c.items = groupitems;
+        items.push(c);
+      } else {
+        if (!ingroup) retrieveItems(sel, c, items);
+      }
+    });
 
-	// const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
-	// let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
+    d.title = (sel.select('.section-header h1').node() || {}).innerText;
+    d.lead = (sel.select('.media-lead').node() || {})[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    d.instruction = (
+      sel.select('.media-repeat button div').node() || {}
+    ).innerText;
+    d.items = items;
+    sections.push(d);
+  });
 
-	// THIS SHOULD REPLAE WHAT IS ABOVE
+  // const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
+  // let skills = main.select('.skills-container').node() ? main.select('.skills-container').datum().tags.map(d => d.name) : null
 
-	// if (main.select('.sdgs-container').node()) {
-	// 	main.selectAll('.sdgs-container').each(d => {
-	// 		d.tags.forEach(c => {
-	// 			// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY sdgs WERE ONLY THE keys, NOT THE { key: INT, name: STR } OBJECT
-	// 			if (Object.keys(c).includes('key') && Object.keys(c).includes('name')) {
-	// 				allTags.push({ id: c.key, name: c.name, type: d.type.slice(0, -1) })
-	// 			}
-	// 		})
-	// 	})
-	// }
+  // THIS SHOULD REPLAE WHAT IS ABOVE
 
-	const allTags = []
-	metafields.filter(d => ['tag', 'index'].includes(d.type)).forEach(d => {
-		main.selectAll(`.${d.label}-container .tag input:checked`)
-		.each(c => {
-			// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY tags WERE ONLY THE names, NOT THE { id: INT, name: STR } OBJECT
-			if (c.id && c.name && c.type) allTags.push({ id: c.id, type: c.type, name: c.name })
-		})
-	})
-	content.tagging = allTags
+  // if (main.select('.sdgs-container').node()) {
+  // 	main.selectAll('.sdgs-container').each(d => {
+  // 		d.tags.forEach(c => {
+  // 			// THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY sdgs WERE ONLY THE keys, NOT THE { key: INT, name: STR } OBJECT
+  // 			if (Object.keys(c).includes('key') && Object.keys(c).includes('name')) {
+  // 				allTags.push({ id: c.key, name: c.name, type: d.type.slice(0, -1) })
+  // 			}
+  // 		})
+  // 	})
+  // }
 
-	if (main.select('.location-container').node()) {
-		content.locations = main.select('.location-container')?.datum()?.centerpoints
-	} else content.locations = null
+  const allTags = [];
+  metafields
+    .filter((d) => ['tag', 'index'].includes(d.type))
+    .forEach((d) => {
+      main.selectAll(`.${d.label}-container .tag input:checked`).each((c) => {
+        // THE FILTERING HERE IS MAINLY FOR LEGACY, BECAUSE ORIGINALLY tags WERE ONLY THE names, NOT THE { id: INT, name: STR } OBJECT
+        if (c.id && c.name && c.type)
+          allTags.push({ id: c.id, type: c.type, name: c.name });
+      });
+    });
+  content.tagging = allTags;
 
-	const otherMetadata = []
-	metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
-	.forEach(d => {
-		main.selectAll(`.${d.label}-container`)
-		.each(c => {
-			retrieveItems(d3.select(this), c, otherMetadata)
-		})
-	})
-	content.metadata = otherMetadata.map(d => {
-		const { id, level, has_content, instruction, required, ...metadata } = d
-		const { type, name } = metadata
-		// const valuekey = Object.keys(metadata).find(c => <%- JSON.stringify(locals.metadata.site.media_value_keys) %>.includes(c))
-		const valuekey = Object.keys(metadata).find(c => media_value_keys.includes(c)) // TO DO: MAKE SURE THIS WORKS
-		const value = metadata[valuekey]
+  if (main.select('.location-container').node()) {
+    content.locations = main
+      .select('.location-container')
+      ?.datum()?.centerpoints;
+  } else content.locations = null;
 
-		if (Array.isArray(value)) {
-			return value.filter(c => {
-				if (valuekey === 'options') return c.checked === true
-				else return c
-			}).map(c => {
-				if (valuekey === 'options') return { type, name, value: c.name, key: c.id }
-				else return { type, name, value: c }
-			})
-		} else return { type, name, value }
-	}).flat()
+  const otherMetadata = [];
+  metafields
+    .filter((d) => !['tag', 'index', 'location'].includes(d.type))
+    .forEach((d) => {
+      main.selectAll(`.${d.label}-container`).each((c) => {
+        retrieveItems(d3.select(this), c, otherMetadata);
+      });
+    });
+  content.metadata = otherMetadata
+    .map((d) => {
+      const { id, level, has_content, instruction, required, ...metadata } = d;
+      const { type, name } = metadata;
+      // const valuekey = Object.keys(metadata).find(c => <%- JSON.stringify(locals.metadata.site.media_value_keys) %>.includes(c))
+      const valuekey = Object.keys(metadata).find((c) =>
+        media_value_keys.includes(c),
+      ); // TO DO: MAKE SURE THIS WORKS
+      const value = metadata[valuekey];
 
-	// COMPILE FULL TXT FOR SEARCH
-	const fullTxt = `${title}\n\n
-		${sections.map(d => d.title).join('\n\n').trim()}\n\n
-		${sections.map(d => d.lead).join('\n\n').trim()}\n\n
-		${sections.map(d => d.items).flat().filter(d => d.type === 'txt')
-			.map(d => d.txt).join('\n\n').trim()}\n\n
-		${sections.map(d => d.items).flat().filter(d => d.type === 'embed')
-			.map(d => d.html).join('\n\n').trim()}\n\n
-		${sections.map(d => d.items).flat().filter(d => d.type === 'checklist')
-			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-		${sections.map(d => d.items).flat().filter(d => d.type === 'radiolist')
-			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-		${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-			.filter(d => d.type === 'txt')
-			.map(d => d.txt).join('\n\n').trim()}\n\n
-		${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-			.filter(d => d.type === 'embed')
-			.map(d => d.html).join('\n\n').trim()}\n\n
-		${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-			.filter(d => d.type === 'checklist')
-			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-		${sections.map(d => d.items).flat().filter(d => d.type === 'group').map(d => d.items)
-			.filter(d => d.type === 'radiolist')
-			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+      if (Array.isArray(value)) {
+        return value
+          .filter((c) => {
+            if (valuekey === 'options') return c.checked === true;
+            else return c;
+          })
+          .map((c) => {
+            if (valuekey === 'options')
+              return { type, name, value: c.name, key: c.id };
+            else return { type, name, value: c };
+          });
+      } else return { type, name, value };
+    })
+    .flat();
 
-	// ALWAYS SEND fullTxt
-	content.full_text = fullTxt
+  // COMPILE FULL TXT FOR SEARCH
+  const fullTxt = `${title}\n\n
+		${sections
+      .map((d) => d.title)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.lead)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'txt')
+      .map((d) => d.txt)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'embed')
+      .map((d) => d.html)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'checklist')
+      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'radiolist')
+      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.items)
+      .filter((d) => d.type === 'txt')
+      .map((d) => d.txt)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.items)
+      .filter((d) => d.type === 'embed')
+      .map((d) => d.html)
+      .join('\n\n')
+      .trim()}\n\n
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.items)
+      .filter((d) => d.type === 'checklist')
+      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}
+		${sections
+      .map((d) => d.items)
+      .flat()
+      .filter((d) => d.type === 'group')
+      .map((d) => d.items)
+      .filter((d) => d.type === 'radiolist')
+      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+      .flat()
+      .join('\n\n')
+      .trim()}`;
 
-	// COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
-	const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || []
+  // ALWAYS SEND fullTxt
+  content.full_text = fullTxt;
 
-	// IF THIS IS A NEW PAD, CHECK WHETHER IT HAS A SOURCE
-	// if (activity === 'contribute')
-	// ALWAYS SEND THE SOURCE (BECAUSE reviews DEPEND ON THE SOURCE)
-	// content.source = <%- locals.source || JSON.stringify(locals.source) || JSON.stringify(null) %>;
-	content.source = pad.source;
-	// ALWAYS SAVE THE TITLE
-	content.title = title
-	if (!attr || ['title', 'lead', 'media', 'meta', 'group'].includes(attr)
-	|| sections.map(d => d.items).flat().unique('type', true).includes(attr)) {
-		content.sections = sections
-	}
-	// if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
-	// if (!attr || attr === 'location') content.location = JSON.stringify(location)
-	// if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
-	// if (!attr || attr === 'tag') content.tags = JSON.stringify(tags)
-	// if (!attr || attr === 'skills') content.skills = JSON.stringify(skills)
-	// if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
+  // COLLECT DELETED MATERIAL (THIS WILL BE CLEARED FROM SESSIONSTORAGE UPON SUCCESS)
+  const deletion = JSON.parse(window.sessionStorage.getItem('deleted')) || [];
 
-	// FULL TEXT
-	// if (!attr || ['title', 'lead', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr))
+  // IF THIS IS A NEW PAD, CHECK WHETHER IT HAS A SOURCE
+  // if (activity === 'contribute')
+  // ALWAYS SEND THE SOURCE (BECAUSE reviews DEPEND ON THE SOURCE)
+  // content.source = <%- locals.source || JSON.stringify(locals.source) || JSON.stringify(null) %>;
+  content.source = pad.source;
+  // ALWAYS SAVE THE TITLE
+  content.title = title;
+  if (
+    !attr ||
+    ['title', 'lead', 'media', 'meta', 'group'].includes(attr) ||
+    sections
+      .map((d) => d.items)
+      .flat()
+      .unique('type', true)
+      .includes(attr)
+  ) {
+    content.sections = sections;
+  }
+  // if (!attr || attr === 'meta' || meta.unique('type', true).includes(attr)) content.meta = JSON.stringify(meta)
+  // if (!attr || attr === 'location') content.location = JSON.stringify(location)
+  // if (!attr || attr === 'sdgs') content.sdgs = JSON.stringify(sdgs)
+  // if (!attr || attr === 'tag') content.tags = JSON.stringify(tags)
+  // if (!attr || attr === 'skills') content.skills = JSON.stringify(skills)
+  // if (!attr || attr === 'datasources') content.datasources = JSON.stringify(datasources)
 
+  // FULL TEXT
+  // if (!attr || ['title', 'lead', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr))
 
-	// ALWAYS SEND status
-	const completion = getStatus()
-	content.completion = completion
-	// ALWAYS SEND deletion IF THERE IS SOMETHING TO DELET
-	if (deletion.length) content.deletion = deletion
+  // ALWAYS SEND status
+  const completion = getStatus();
+  content.completion = completion;
+  // ALWAYS SEND deletion IF THERE IS SOMETHING TO DELET
+  if (deletion.length) content.deletion = deletion;
 
-	return content
+  return content;
 }
 export async function partialSave (attr) {
 	const object = d3.select('data[name="object"]').node().value

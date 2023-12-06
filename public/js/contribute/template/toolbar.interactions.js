@@ -1,4 +1,5 @@
 import { language } from '/js/config/translations.js'
+import { getMediaSize } from '/js/main.js'
 import { 
 	addSection, 
 	addImg, 

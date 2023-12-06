@@ -68,21 +68,19 @@ export function togglePadLimit (node) {
 export function offsetMinEndDate (node) {
 	const sel = d3.select(node)
 	const parent = sel.findAncestor('modal')
+  const start = new Date(node.value);
+  const end = new Date(node.value);
+  end.setDate(end.getDate() + 1);
 
-	const start = new Date(node.value)
-	const end = new Date(node.value)
-	end.setDate(end.getDate() + 1)
+  const dd = String(end.getDate()).padStart(2, '0');
+  const mm = String(end.getMonth() + 1).padStart(2, '0');
+  const yyyy = end.getFullYear();
 
-	const dd = String(end.getDate()).padStart(2, '0')
-	const mm = String(end.getMonth() + 1).padStart(2, '0')
-	const yyyy = end.getFullYear()
+  parent.select('input[name="end_date"]').attr('min', `${yyyy}-${mm}-${dd}`);
 
-	parent.select('input[name="end_date"]')
-		.attr('min', `${yyyy}-${mm}-${dd}`)
-
-	// IF THE START DATE IS NOT NOW, THEN CHANGE THE status VALUE FOR THE MOBILIZATION
-	const now = new Date()
-	parent.select('input[name="status"]').node().value = start >= now ? 0 : 1
+  // IF THE START DATE IS NOT NOW, THEN CHANGE THE status VALUE FOR THE MOBILIZATION
+  const now = new Date();
+  parent.select('input[name="status"]').node().value = start >= now ? 0 : 1;
 }
 export function toggleChecked (node) {
 	const parent = d3.select(node).findAncestor('modal')

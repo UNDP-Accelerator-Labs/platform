@@ -334,7 +334,7 @@ async function DOMLoad () {
 }
 
 if (document.readyState === 'loading') {
-	window.addEventListener('DOMContentLoaded', DOMLoad)
+  window.addEventListener('DOMContentLoaded', DOMLoad);
 } else {
-	DOMLoad()
+  DOMLoad();
 }

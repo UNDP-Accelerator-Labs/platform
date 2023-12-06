@@ -1683,6 +1683,7 @@ export async function renderTemplate() {
   const editing = activity === 'edit';
 
   if (template.id) {
+    window.pagestats = { type: 'template', id: template.id };
     const { sections } = await POST('/load/template', { id: template.id });
 
     if (sections) {
@@ -1694,6 +1695,7 @@ export async function renderTemplate() {
     // CLEAR CHANGES
     window.sessionStorage.removeItem('changed-content');
   } else if (template.source) {
+    window.pagestats = { type: 'template', id: template.source };
     const { sections } = await POST('/load/template', { id: template.source });
 
     if (sections) {

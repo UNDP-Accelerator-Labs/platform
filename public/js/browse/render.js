@@ -1,9 +1,9 @@
-import { language, vocabulary } from '/js/config/translations.js'
-import { getMediaSize, fixLabel, dateOptions, getContent } from '/js/main.js'
-import { POST } from '/js/fetch.js'
-import { deleteArticles, confirmRemoval, unpublishArticles } from '/js/browse/main.js'
 import { setDownloadOptions } from '/js/browse/download.js'
 import { initExploration } from '/js/browse/exploration.js'
+import { confirmRemoval, deleteArticles, unpublishArticles } from '/js/browse/main.js'
+import { language, vocabulary } from '/js/config/translations.js'
+import { POST } from '/js/fetch.js'
+import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js'
 import { renderFormModal, renderImgZoom } from '/js/modals.js'
 
 // TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
@@ -13,18 +13,18 @@ const exploration = initExploration()
 export const Entry = function (_kwargs) {
 	if (!mediaSize) var mediaSize = getMediaSize()
 
-	let { 
-		parent, 
-		data, 
+	let {
+		parent,
+		data,
 		language,
 		vocabulary,
-		object, 
-		space, 
-		modules, 
+		object,
+		space,
+		modules,
 		pinboards,
-		engagementtypes, 
-		rights, 
-		app_storage, 
+		engagementtypes,
+		rights,
+		app_storage,
 		page
 	} = _kwargs
 
@@ -88,7 +88,7 @@ export const Entry = function (_kwargs) {
 			metainfo.addElems('div', 'meta meta-contributor', d => {
 				let data = []
 				if (
-					(['pads', 'files'].includes(object) 
+					(['pads', 'files'].includes(object)
 						&& ['private', 'curated', 'shared'].includes(space)
 					) || ['templates' ,'mobilizations'].includes(object)
 				) {
@@ -96,34 +96,34 @@ export const Entry = function (_kwargs) {
 
 					if (d.locations?.length) {
 						d.locations.forEach(c => {
-							data.push({ 
-								href: `?countries=${c.iso3}`, 
-								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor']) 
+							data.push({
+								href: `?countries=${c.iso3}`,
+								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor'])
 							})
 						})
 					} else {
-						data.push({ 
-							href: `?countries=${d.iso3}`, 
-							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor']) 
+						data.push({
+							href: `?countries=${d.iso3}`,
+							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor'])
 						})
 					}
 				} else if (object === 'reviews') {
-					data = [{ 
+					data = [{
 						href: d.is_review ? `?contributors=${d.owner}` : null,
-						name: space === 'private' ? d.is_review ? d.ownername : vocabulary['blinded for review'] : null 
+						name: space === 'private' ? d.is_review ? d.ownername : vocabulary['blinded for review'] : null
 					}]
 				} else {
 					if (d.locations?.length) {
 						data = d.locations.map(c => {
-							return { 
-								href: `?countries=${c.iso3}`, 
-								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor']) 
+							return {
+								href: `?countries=${c.iso3}`,
+								name: (c.iso3 === 'NUL') ? vocabulary['global'] : (c.country || vocabulary['anonymous contributor'])
 							}
 						})
 					} else {
-						data = [{ 
-							href: `?countries=${d.iso3}`, 
-							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor']) 
+						data = [{
+							href: `?countries=${d.iso3}`,
+							name: (d.iso3 === 'NUL') ? vocabulary['global'] : (d.country || vocabulary['anonymous contributor'])
 						}]
 					}
 				}
@@ -169,142 +169,142 @@ export const Entry = function (_kwargs) {
 					const opts = []
 
 					if (['private', 'pinned'].includes(space) && object !== 'reviews') {
-						if (d.editable) opts.push({ 
-							node: 'button', 
-							type: 'button', 
-							classname: 'delete', 
-							label: vocabulary['delete'], 
+						if (d.editable) opts.push({
+							node: 'button',
+							type: 'button',
+							classname: 'delete',
+							label: vocabulary['delete'],
 							fn: deleteArticles
 						})
 					} else if (space === 'curated') {
-						if (d.editable && !d.owner) opts.push({ 
-							node: 'button', 
-							type: 'button', 
-							classname: 'delete', 
-							label: vocabulary['delete'], 
-							fn: deleteArticles 
+						if (d.editable && !d.owner) opts.push({
+							node: 'button',
+							type: 'button',
+							classname: 'delete',
+							label: vocabulary['delete'],
+							fn: deleteArticles
 						})
 					}
 					if (object === 'pads') {
-						opts.push({ 
-							node: 'button', 
-							type: 'button', 
-							classname: 'download', 
-							label: vocabulary['download'], 
-							name: 'pads', 
-							value: d.id, 
-							disabled: d.status < 2, 
-							fn: setDownloadOptions 
+						opts.push({
+							node: 'button',
+							type: 'button',
+							classname: 'download',
+							label: vocabulary['download'],
+							name: 'pads',
+							value: d.id,
+							disabled: d.status < 2,
+							fn: setDownloadOptions
 						})
 					}
 					// CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
 					if (['files', 'pads'].includes(object)) {
 						if (d.editable) {
 							const publish_dropdown = []
-							const exceeds_publication_limit = d.available_publications === 0 
-								
+							const exceeds_publication_limit = d.available_publications === 0
+
 							if (modules.some(d => d.type === 'reviews')) {
 								if (d.status === 1 && !exceeds_publication_limit) {
-									publish_dropdown.push({ 
-										name: 'status', 
-										value: 2, 
-										classname: 'preprint', 
-										label: vocabulary['object status'][object.slice(0, -1)][2]['singular'] 
+									publish_dropdown.push({
+										name: 'status',
+										value: 2,
+										classname: 'preprint',
+										label: vocabulary['object status'][object.slice(0, -1)][2]['singular']
 									})
 								}
 								if (d.status <= 2 && d.review_status === 0) {
 									if (!(d.status === 1 && exceeds_publication_limit)) {
-										publish_dropdown.push({ 
-											name: 'review_status', 
-											value: 1, 
+										publish_dropdown.push({
+											name: 'review_status',
+											value: 1,
 											classname: 'review',
-											label: vocabulary['submit for review'], 
-											fn: selectReviewLanguage 
+											label: vocabulary['submit for review'],
+											fn: selectReviewLanguage
 										})
 									}
 								}
 							} else {
 								if (d.status === 1 && !exceeds_publication_limit) {
-									publish_dropdown.push({ 
-										name: 'status', 
-										value: 2, 
-										classname: 'internally', 
+									publish_dropdown.push({
+										name: 'status',
+										value: 2,
+										classname: 'internally',
 										label: vocabulary['internally']
 									})
 								}
 								if (d.status <= 2 && d.publishable) {
 									if (!(d.status === 1 && exceeds_publication_limit)) {
-										publish_dropdown.push({ 
-											name: 'status', 
-											value: 3, 
-											classname: 'externally', 
+										publish_dropdown.push({
+											name: 'status',
+											value: 3,
+											classname: 'externally',
 											label: vocabulary['externally']
 										})
 									}
 								}
 							}
 
-							opts.push({ 
-								action: `/publish/${object}`, 
-								method: 'GET', 
-								node: 'button', 
-								type: 'button', 
-								value: d.id, 
-								disabled: 
+							opts.push({
+								action: `/publish/${object}`,
+								method: 'GET',
+								node: 'button',
+								type: 'button',
+								value: d.id,
+								disabled:
 									!(
-										d.editable 
-										&& [1, 2].includes(d.status) 
+										d.editable
+										&& [1, 2].includes(d.status)
 										&& publish_dropdown.length
-									), 
-								classname: 'publish', 
-								label: vocabulary['publish'], 
-								dropdown: publish_dropdown, 
+									),
+								classname: 'publish',
+								label: vocabulary['publish'],
+								dropdown: publish_dropdown,
 								inputs: [
-									{ name: 'id', value: d.id }, 
+									{ name: 'id', value: d.id },
 									{ name: 'title', value: d.title }
 								]
 							})
 
 							// if (d.status > 1) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })
 							if (d.status > 1) {
-								opts.push({ 
-									node: 'button', 
-									type: 'button', 
-									value: d.id, 
-									disabled: !d.editable, 
-									classname: 'unpublish', 
-									label: vocabulary['unpublish'], 
-									fn: unpublishArticles 
+								opts.push({
+									node: 'button',
+									type: 'button',
+									value: d.id,
+									disabled: !d.editable,
+									classname: 'unpublish',
+									label: vocabulary['unpublish'],
+									fn: unpublishArticles
 								})
 							}
 						}
 					} else if (object === 'templates') {
 						if (d.editable) {
 							if (d.status === 1) {
-								opts.push({ 
-									action: `/publish/${object}`, 
-									method: 'GET', 
-									node: 'button', 
-									type: 'submit', 
-									value: d.id, 
-									disabled: !d.editable, 
-									classname: 'publish', 
-									label: vocabulary['publish'], 
-									inputs: [{ name: 'status', value: 2 }] 
+								opts.push({
+									action: `/publish/${object}`,
+									method: 'GET',
+									node: 'button',
+									type: 'submit',
+									value: d.id,
+									disabled: !d.editable,
+									classname: 'publish',
+									label: vocabulary['publish'],
+									inputs: [{ name: 'status', value: 2 }]
 								})
 							}
 
 							if (space !== 'reviews') {
 								// if (d.status > 1 && d.retractable) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })
 								if (d.status > 1 && d.retractable) {
-									opts.push({ 
-										node: 'button', 
-										type: 'button', 
-										value: d.id, 
-										disabled: !d.editable, 
-										classname: 'unpublish', 
-										label: vocabulary['unpublish'], 
-										fn: unpublishArticles 
+									opts.push({
+										node: 'button',
+										type: 'button',
+										value: d.id,
+										disabled: !d.editable,
+										classname: 'unpublish',
+										label: vocabulary['unpublish'],
+										fn: unpublishArticles
 									})
 								}
 							}
@@ -338,16 +338,16 @@ export const Entry = function (_kwargs) {
 							} else {
 								if (d.editable) {
 									if (d.status === 1) {
-										opts.push({ 
-											action: `/publish/${object}`, 
-											method: 'GET', 
-											node: 'button', 
-											type: 'submit', 
-											value: d.id, 
-											disabled: !(d.editable && [1, 2].includes(d.status) && d.is_review), 
-											classname: 'publish', 
-											label: vocabulary['publish'], 
-											inputs: [{ name: 'status', value: 2 }, { name: 'source', value: d.source }] 
+										opts.push({
+											action: `/publish/${object}`,
+											method: 'GET',
+											node: 'button',
+											type: 'submit',
+											value: d.id,
+											disabled: !(d.editable && [1, 2].includes(d.status) && d.is_review),
+											classname: 'publish',
+											label: vocabulary['publish'],
+											inputs: [{ name: 'status', value: 2 }, { name: 'source', value: d.source }]
 										})
 									}
 								}
@@ -355,77 +355,77 @@ export const Entry = function (_kwargs) {
 						}
 					} else if (object === 'mobilizations') {
 						if (d.status === 1) {
-							opts.push({ 
-								node: 'button', 
-								type: 'button', 
-								classname: 'copy', 
-								label: vocabulary['copy link'], 
-								value: d.id, 
-								inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }], 
-								fn: copyLink 
+							opts.push({
+								node: 'button',
+								type: 'button',
+								classname: 'copy',
+								label: vocabulary['copy link'],
+								value: d.id,
+								inputs: [{ name: 'template', value: d.template }, { name: 'language', value: d.language }],
+								fn: copyLink
 							})
 						}
-						opts.push({ 
-							node: 'button', 
-							type: 'button', 
-							disabled: d.pads === 0, 
-							classname: 'download', 
-							label: vocabulary['download'], 
-							name: 'mobilizations', 
-							value: d.id, 
-							fn: setDownloadOptions 
+						opts.push({
+							node: 'button',
+							type: 'button',
+							disabled: d.pads === 0,
+							classname: 'download',
+							label: vocabulary['download'],
+							name: 'mobilizations',
+							value: d.id,
+							fn: setDownloadOptions
 						}) // TO DO: CHECK IF THIS WORKS
 
 						if (d.status === 1) {
-							opts.push({ 
-								action: `/unpublish/${object}`, 
-								method: 'GET', 
-								node: 'button', 
-								type: 'submit', 
-								disabled: !(d.editable && d.status === 1), 
-								classname: 'demobilize', 
-								label: vocabulary['demobilize'], 
-								value: d.id 
+							opts.push({
+								action: `/unpublish/${object}`,
+								method: 'GET',
+								node: 'button',
+								type: 'submit',
+								disabled: !(d.editable && d.status === 1),
+								classname: 'demobilize',
+								label: vocabulary['demobilize'],
+								value: d.id
 							})
 						}
 						if (d.status === 2) {
-							opts.push({ 
-								action: `/${language}/mobilize/cohort`, 
-								method: 'GET', 
-								node: 'button', 
-								type: 'submit', 
-								disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up), 
-								classname: 'followup', 
-								label: vocabulary['follow up']['verb'], 
-								name: 'source', 
-								value: d.id 
+							opts.push({
+								action: `/${language}/mobilize/cohort`,
+								method: 'GET',
+								node: 'button',
+								type: 'submit',
+								disabled: !(d.editable && d.status === 2 && d.pads !== 0 && !d.following_up),
+								classname: 'followup',
+								label: vocabulary['follow up']['verb'],
+								name: 'source',
+								value: d.id
 							})
 						}
 						if (d.status === 2) {
-							opts.push({ 
-								action: `/${language}/mobilize/cohort`, 
-								method: 'GET', 
-								node: 'button', 
-								type: 'submit', 
-								disabled: !(d.editable && d.status === 2), 
-								classname: 'copy', 
-								label: vocabulary['copy']['verb'], 
-								name: 'source', 
-								value: d.id, 
-								inputs: [{ name: 'copy', value: true }] 
+							opts.push({
+								action: `/${language}/mobilize/cohort`,
+								method: 'GET',
+								node: 'button',
+								type: 'submit',
+								disabled: !(d.editable && d.status === 2),
+								classname: 'copy',
+								label: vocabulary['copy']['verb'],
+								name: 'source',
+								value: d.id,
+								inputs: [{ name: 'copy', value: true }]
 							})
 						}
 					} else if (object === 'contributors') {
 						if (space === 'invited') {
-							opts.push({ 
-								node: 'button', 
-								type: 'button', 
-								classname: 'revoke', 
-								label: vocabulary['revoke'], 
-								name: 'contributor', 
-								value: d.id, 
-								disabled: ![null, undefined].includes(d.end_date), 
-								fn: revoke 
+							opts.push({
+								node: 'button',
+								type: 'button',
+								classname: 'revoke',
+								label: vocabulary['revoke'],
+								name: 'contributor',
+								value: d.id,
+								disabled: ![null, undefined].includes(d.end_date),
+								fn: revoke
 							})
 						}
 					}
@@ -491,20 +491,20 @@ export const Entry = function (_kwargs) {
 					const target_opts = await POST('/load/templates', { space: 'reviews' })
 					.then(results => {
 						return results.data.map(d => {
-							return { 
-								label: d.name, 
-								value: d.language, 
-								count: d.count, 
-								disabled: { 
-									value: d.disabled, 
-									label: vocabulary['missing reviewers'] 
-								}, 
-								type: 'radio', 
-								required: true 
+							return {
+								label: d.name,
+								value: d.language,
+								count: d.count,
+								disabled: {
+									value: d.disabled,
+									label: vocabulary['missing reviewers']
+								},
+								type: 'radio',
+								required: true
 							}
 						})
 					})
-					
+
 					// TO DO: FILTER THIS BASED ON USER RIGHTS >= review.rights.write
 					const reviewers = await POST(`/${language}/browse/contributors/all`, { limit: null })
 					const reviewer_opts = reviewers.data.map(d => {
@@ -515,38 +515,38 @@ export const Entry = function (_kwargs) {
 					const message = vocabulary['select review language']
 
 					const opts = []
-					opts.push({ 
-						node: 'select', 
-						name: 'language', 
-						label: vocabulary['select language']['singular'], 
-						options: target_opts, 
-						fn: updateReviewerList 
+					opts.push({
+						node: 'select',
+						name: 'language',
+						label: vocabulary['select language']['singular'],
+						options: target_opts,
+						fn: updateReviewerList
 					})
-					opts.push({ 
-						node: 'select', 
-						name: 'reviewers', 
+					opts.push({
+						node: 'select',
+						name: 'reviewers',
 						label: `${vocabulary['select']} ${modules.find(d => d.type === 'reviews')?.reviewers} ${vocabulary['reviewers']} (${vocabulary['optional']})`,
-						options: reviewer_opts, 
-						classname: 'reviewer-list hide', 
-						fn: countReviewers 
+						options: reviewer_opts,
+						classname: 'reviewer-list hide',
+						fn: countReviewers
 					})
 
 					inputs.forEach(d => {
-						opts.push({ 
-							node: 'input', 
-							type: 'hidden', 
-							name: d.name, 
-							value: d.value 
+						opts.push({
+							node: 'input',
+							type: 'hidden',
+							name: d.name,
+							value: d.value
 						})
 					})
 
-					opts.push({ 
-						node: 'button', 
-						type: 'submit', 
-						name: name, 
-						value: value, 
-						disabled: true, 
-						label: vocabulary['submit for review'] 
+					opts.push({
+						node: 'button',
+						type: 'submit',
+						name: name,
+						value: value,
+						disabled: true,
+						label: vocabulary['submit for review']
 					})
 					const new_constraint = await renderFormModal({ message, formdata, opts })
 					// THIS IS A FORM MODAL SO IT SHOULD RELOAD THE PAGE
@@ -614,11 +614,11 @@ export const Entry = function (_kwargs) {
 					const yyyy = today.getFullYear()
 
 					// opts.push({ node: 'input', type: 'date', name: 'invite', value: `${yyyy}-${mm}-${dd}` })
-					opts.push({ 
-						node: 'input', 
-						type: 'date', 
-						name: 'date', 
-						value: `${yyyy}-${mm}-${dd}` 
+					opts.push({
+						node: 'input',
+						type: 'date',
+						name: 'date',
+						value: `${yyyy}-${mm}-${dd}`
 					})
 					// opts.push({ node: 'input', type: 'email', name: 'email' })
 
@@ -626,16 +626,16 @@ export const Entry = function (_kwargs) {
 					// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'revoke', placeholder: 'Remove user rights', checked: true, default: true }) // TO DO: TRANSLATE
 					// opts.push({ node: 'input', type: 'radio', name: 'type', value: 'delete', placeholder: 'Exclude from platform and suite', checked: false, default: true }) // TO DO: TRANSLATE
 
-					opts.push({ 
-						node: 'input', 
-						type: 'hidden', 
-						name: 'id', 
-						value: value 
+					opts.push({
+						node: 'input',
+						type: 'hidden',
+						name: 'id',
+						value: value
 					})
-					opts.push({ 
-						node: 'button', 
-						type: 'submit', 
-						label: vocabulary['revoke'] 
+					opts.push({
+						node: 'button',
+						type: 'submit',
+						label: vocabulary['revoke']
 					})
 					const new_constraint = await renderFormModal({ message, formdata, opts })
 				}
@@ -690,9 +690,9 @@ export const Entry = function (_kwargs) {
 		}.bind(this),
 		stats: function (_sel) {
 			const stats = _sel.addElems('div', 'meta meta-group', d => {
-				if (['pads', 'files'].includes(object)) { 
+				if (['pads', 'files'].includes(object)) {
 					return []
-				} else { 
+				} else {
 					return !d.img?.length ? [d] : []
 				}
 			})
@@ -808,7 +808,7 @@ export const Entry = function (_kwargs) {
 						}
 						if (d.editable) return `/${language}/edit/${object.slice(0, -1)}?${queryparams.toString()}`
 						else return `/${language}/view/${object.slice(0, -1)}?${queryparams.toString()}`
-					}, 
+					},
 					'target': d => {
 						if (object === 'files') {
 							return '_blank'
@@ -823,9 +823,9 @@ export const Entry = function (_kwargs) {
 					else if (d.is_forward) return `/imgs/icons/i-forward-${object.slice(0, -1)}.svg`
 					else if (d.is_copy) return `/imgs/icons/i-copy-${object.slice(0, -1)}.svg`
 					else {
-						if (object === 'reviews') { 
+						if (object === 'reviews') {
 							return '/imgs/icons/i-pad.svg'
-						} else { 
+						} else {
 							return `/imgs/icons/i-${object.slice(0, -1)}.svg`
 						}
 					}
@@ -1284,7 +1284,7 @@ export const Entry = function (_kwargs) {
 					let { top, height } = this.getBoundingClientRect()
 					top = top + height
 					const viewheight = window.innerHeight
-					
+
 					if (mediaSize === 'xs') {
 						// const { height: padding } = d3.select('#search-and-filter').node().getBoundingClientRect()
 						// if (!padding) padding = 0
@@ -1377,17 +1377,17 @@ export const Entry = function (_kwargs) {
 
 			form.addElems('button', 'opt', d => {
 				const opts = []
-				opts.push({ 
-					type: 'button', 
+				opts.push({
+					type: 'button',
 					class: 'Confirm', // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['confirm'], 
-					fn: confirmRemoval 
+					label: vocabulary['confirm'],
+					fn: confirmRemoval
 				})
-				opts.push({ 
-					type: 'button', 
+				opts.push({
+					type: 'button',
 					class: 'Cancel', // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['cancel'], 
-					fn: unpublishArticles 
+					label: vocabulary['cancel'],
+					fn: unpublishArticles
 				})
 				return opts
 			}).attrs({
@@ -1412,17 +1412,17 @@ export const Entry = function (_kwargs) {
 
 			form.addElems('button', 'opt', d => {
 				const opts = []
-				opts.push({ 
-					type: 'button', 
+				opts.push({
+					type: 'button',
 					class: 'Confirm',  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['confirm'], 
-					fn: confirmRemoval 
+					label: vocabulary['confirm'],
+					fn: confirmRemoval
 				})
-				opts.push({ 
-					type: 'button', 
+				opts.push({
+					type: 'button',
 					class: 'Cancel',  // THIS NEEDS TO BE 'en' FOR THA CLASSNAME
-					label: vocabulary['cancel'], 
-					fn: deleteArticles 
+					label: vocabulary['cancel'],
+					fn: deleteArticles
 				})
 				return opts
 			}).attrs({
@@ -1546,7 +1546,7 @@ export async function renderSections () {
 	if (mediaSize === 'xs' && object === 'pads') { // ON sm DEVICES, FORCE DISPLAY TO COLUMNS IF NOT A SLIDESHOW
 		if (page.display !== 'slideshow') { page.display = 'columns'; }
 	}
-	
+
 	const main = d3.select('div.browse main')
 	const layout = main.select('div.inner')
 	const sections = layout.addElems('section', `container ${object}`, data)

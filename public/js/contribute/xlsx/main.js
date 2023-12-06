@@ -1,9 +1,9 @@
-import { vocabulary, language } from '/js/config/translations.js'
-import { toggleClass, getContent } from '/js/main.js'
+import { language, vocabulary } from '/js/config/translations.js'
 import { POST } from '/js/fetch.js'
+import { toggleClass } from '/js/main.js'
 import { renderPromiseModal } from '/js/modals.js'
 
-export function dropHandler(evt, node) { 
+export function dropHandler(evt, node) {
 	evt.preventDefault()
 	const sel = d3.select(node)
 	const label = sel.select('.drop-zone button label')
@@ -67,7 +67,7 @@ export function parseXLSX (file, node) {
 				const blob = new Blob([buffer], {'type': 'image/png'})
 				const urlCreator = window.URL || window.webkitURL
 				const imageUrl = urlCreator.createObjectURL(blob)
-				return { id: name?.extractDigits(), type: 'img', src: imageUrl }	
+				return { id: name?.extractDigits(), type: 'img', src: imageUrl }
 			})
 		}
 		workbook.SheetNames.forEach((s, i) => {
@@ -166,7 +166,7 @@ function parseColumns (json, keys) {
 		// INFER TYPE
 		if (obj.entries.map(c => c ? typeof c === 'object' ? c.type === 'img' ? c.type : null : null : null)
 				.filter(c => c).unique().length // c.type === 'img' IS SET IN parseXLSX AT THE VERY BEGINNING
-			// || !obj.entries.filter(c => ![null, undefined].includes(c)).length 
+			// || !obj.entries.filter(c => ![null, undefined].includes(c)).length
 			|| ref.length === 0
 			// THERE ISN'T ANY ENTRY THAT HAS A VALUE (CASE FOR ENTIRELY EMPTY COLUMN)
 		) {
@@ -197,20 +197,20 @@ function parseGroups (json, keys) {
 				let rmprefix = false
 				let mklist = true
 				const types = cols.map(c => c.types).flat().unique()
-				
+
 				if (cols.map(c => c.bool).unique().includes(true)) {
 					// IF THE VALUES ARE BOLEAN, PIVOT: PUT THE key/ HEADERS INTO THE values/ CELLS
 					// AND CHECK WHETHER THE keys HAVE PREFIXES
 					const message = `The prefix <em>${prefix}</em> was detected. Should it be removed from cell values?`
 					const opts = [
-						{ node: 'button', type: 'button', label: 'Keep it', resolve: false }, 
+						{ node: 'button', type: 'button', label: 'Keep it', resolve: false },
 						{ node: 'button', type: 'button', label: 'Drop it', resolve: true }
 					]
 					rmprefix = await renderPromiseModal({ message: message, opts: opts })
 				} else if (types.length === 1 && types[0] === 'string') {
 					const message = `Merge columns into a list, or keep a single ${types[0]} with all the values?`
 					const opts = [
-						{ node: 'button', type: 'button', label: 'Make a list', resolve: true }, 
+						{ node: 'button', type: 'button', label: 'Make a list', resolve: true },
 						{ node: 'button', type: 'button', label: `Keep as ${types[0]}`, resolve: false }
 					]
 					mklist = await renderPromiseModal({ message: message, opts: opts })
@@ -234,7 +234,7 @@ function parseGroups (json, keys) {
 					}
 				})
 				obj.entries = mklist ? zip : zip.map(c => c.join(', '))
-				
+
 				obj.values = cols.map(c => c.entries.map(b => typeof b === 'string' ? b.trim().toLowerCase() : b))
 					.flat().filter(c => ![null, undefined].includes(c)).unique().sort()
 
@@ -243,7 +243,7 @@ function parseGroups (json, keys) {
 						const listcontent = c.map(b => typeof b).unique()
 						return `list of ${listcontent}s`
 					} else return typeof c
-				}).unique() 
+				}).unique()
 				obj.bool = false
 				// obj.inferredtype = 'checklist'
 				obj.type = 'checklist'
@@ -265,14 +265,14 @@ function renderTable (cols, update = false) {
 	body.select('.btn-group').classed('hide', false)
 	const table = body.addElems('div', 'table-container')
 		.addElems('table', 'xls-preview', [cols])
-		.attrs({ 
+		.attrs({
 			'border': 0,
 			'cellpadding': 0,
 			'cellspacing': 0
 		})
 	// RENDER THE TABLE HEAD
 	const moduleHead = table.addElems('thead')
-	
+
 	const selectCols = moduleHead.addElems('tr', 'column-selection')
 	selectCols.addElems('th', 'selection', d => d)
 		.classed('selected left right top bottom disabled', false)
@@ -298,13 +298,13 @@ function renderTable (cols, update = false) {
 					const next = this.nextSibling
 					const previous = this.previousSibling
 					const sides = []
-					
+
 					if (!previous?.classList.contains('selected')) sides.push('left')
 					else {
 						if (sel.classed('selected')) previous?.classList.remove('right')
 						else previous?.classList.add('right')
 					}
-					
+
 					if (!next?.classList.contains('selected')) sides.push('right')
 					else {
 						if (sel.classed('selected')) next?.classList.remove('left')
@@ -317,7 +317,7 @@ function renderTable (cols, update = false) {
 		})
 
 		moduleHead.selectAll('.column-selection th')
-		.classed('disabled', function (c) { 
+		.classed('disabled', function (c) {
 			if (this === node) return false
 			if (c.types) {
 				if (!d.types.length) {
@@ -375,18 +375,18 @@ function renderTable (cols, update = false) {
 					if (range.includes(k)) {
 						d3.select(this).classed(`selected ${caps} ${sides.join(' ')}`, sel.classed('selected'))
 					}
-				})	
+				})
 			})
 		}
 	}).addElems('i', 'material-icons google-translate-attr')
 		.html('tab_unselected')
-	
+
 	const columnheaders = moduleHead.addElems('tr', 'column-names')
 	columnheaders.addElems('th', 'name', d => d)
 		.classed('selected left right top bottom', false)
-		.attrs({ 
-			'title': d => d.key, 
-			'contenteditable': true 
+		.attrs({
+			'title': d => d.key,
+			'contenteditable': true
 		}).html(d => d.key.length > 12 ? `${d.key.slice(0, 12)}…` : d.key)
 	.on('focus', function (d) {
 		d3.select(this).html(d.key)
@@ -415,11 +415,11 @@ function renderTable (cols, update = false) {
 	.addElems('select')
 	.on('change', function (d) {
 		const selection = this.options[this.selectedIndex].value
-		
+
 		if (columntypes.selectAll('option[value="title"]:checked').size()) {
 			columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', true)
 		} else columntypes.selectAll('option[value="title"]:not(:checked)').attr('disabled', c => c.disabled)
-		
+
 		if (metafields.some(c => c.type === 'location')) {
 			if (columntypes.selectAll('option[value="location-txt"]:checked, option[value="location-lat-lng"]:checked, option[value="location-lng-lat"]:checked').size()) {
 				columntypes.selectAll('option[value="location-txt"]:not(:checked)').attr('disabled', true)
@@ -449,21 +449,21 @@ function renderTable (cols, update = false) {
 		obj.push({ label: 'title', value: 'title', disabled: d.types.some(c => ['string', 'number'].includes(c)) ? null : true })
 		obj.push({ label: 'text', value: 'txt', disabled: d.types.some(c => ['string', 'number', 'list of strings', 'list of numbers'].includes(c)) ? null : true })
 		obj.push({ label: 'embedding', value: 'embed', disabled: d.types.some(c => ['string', 'number'].includes(c)) ? null : true })
-		
+
 		obj.push({ label: 'image', value: 'img', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
 		// obj.push({ label: 'video', value: 'video', disabled: d.types.some(c => (c === 'object' && ['img', 'video'].includes(d.type)) || (['string', 'list of strings'].includes(c) && containsURLs)) ? null : true })
-		
+
 		obj.push({ label: 'checklist', value: 'checklist', disabled: !d.types.includes('object') ? null : true })
 		obj.push({ label: 'radiolist', value: 'radiolist', disabled: !d.types.includes('object') ? null : true })
 
 		return obj
-	}).attrs({ 
+	}).attrs({
 		'value': d => d.value,
 		// 'selected': function (d) {
 		// 	const type = d3.select(this).findAncestor('type').datum().type
 		// 	if (type === d.value) return true
 		// 	else return null
-		// }, 
+		// },
 		'disabled': d => d.disabled
 	}).html(d => d.label)
 
@@ -480,7 +480,7 @@ function renderTable (cols, update = false) {
 			obj.push({ label: 'location (lat/ lng)', value: 'location-lat-lng', limit, disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
 			obj.push({ label: 'location (lng/ lat)', value: 'location-lng-lat', limit, disabled: (d.types.includes('list of numbers') && d.values.every(c => c.length === 2)) ? null : true })
 		}
-		
+
 		metafields.filter(c => c.type !== 'location')
 		.forEach(c => {
 			let disabled = true
@@ -489,7 +489,7 @@ function renderTable (cols, update = false) {
 			// CHECK FOR LIMITED INPUTS
 			let max_entries = 1
 			let constrained = false
-			
+
 			if (!['txt', 'embed'].includes(c.type)) { // THE LIMIT IS ON THE NUMBER OF ITEMS
 				if (d.entries.every(b => Array.isArray(b))) max_entries = Math.max(...d.entries.map(b => b.length))
 			} else { // THE LIMIT IS ON THE NUMBER OF CHARACTERS
@@ -499,7 +499,7 @@ function renderTable (cols, update = false) {
 
 			if (c.type === 'tag' && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b)) && !constrained) disabled = null
 			if (c.type === 'index' && d.types.some(b => ['number', 'list of numbers'].includes(b)) && !constrained) disabled = null
-			
+
 			if (c.type === 'attachment' && d.types.some(b => ['string', 'list of strings'].includes(b) && containsURLs) && !constrained) disabled = null
 
 			if (['txt', 'embed'].includes(c.type) && d.types.some(b => ['number', 'list of numbers', 'string', 'list of strings'].includes(b)) && !constrained) disabled = null
@@ -517,24 +517,24 @@ function renderTable (cols, update = false) {
 		// 	const type = d3.select(this).findAncestor('type').datum().type
 		// 	if (type === d.value) return true
 		// 	else return null
-		// }, 
+		// },
 		'disabled': d => d.disabled
 	}).html(d => {
 		if (d.limit) return `${d.label} (limited to ${d.limit})` // TO DO: TRANSLATION
 		else return d.label
 	})
 
-	columntypes.each(function (d) { 
+	columntypes.each(function (d) {
 		this.value = d.type
 	})
 
 	// IMMEDIATELY DISABLE OPTIONS ACCORDING TO INFERRED TYPES
-	if (!update) columntypes.each(function (d) { this.dispatchEvent(new Event('change')) }) 
+	if (!update) columntypes.each(function (d) { this.dispatchEvent(new Event('change')) })
 
 	// RENDER THE TABLE BODY
 	const show = 5 // THIS IS TO LIMIT THE NUMBER OF ROWS DISPLAYED
 	const moduleBody = table.addElems('tbody', null, [cols])
-	
+
 	const bodyRows = moduleBody.addElems('tr', 'column-values', d => {
 		const slices = d.map(c => { return { key: c.key, entries: c.entries.slice(0, show) } })
 		const row = []
@@ -554,7 +554,7 @@ function renderTable (cols, update = false) {
 		.classed('selected left right top bottom', false)
 		.style('word-break', d => typeof d.cell === 'string' && (d.cell.split(' ').length === 1 || d.cell.includes('http')) ? 'break-all' : null)
 		.html(d => {
-			if (d.cell && typeof d.cell === 'string' && d.cell.length > 100) return `${d.cell.slice(0, 100)}…` 
+			if (d.cell && typeof d.cell === 'string' && d.cell.length > 100) return `${d.cell.slice(0, 100)}…`
 			else if (d.cell && typeof d.cell === 'object') {
 				if (Array.isArray(d.cell)) {
 					return d.cell.join(', ').length > 100 ? `${d.cell.join(', ').slice(0, 100)}…` : d.cell.join(', ')
@@ -569,11 +569,11 @@ function renderTable (cols, update = false) {
 		const node = sel.findAncestor('column-values').node()
 		let idx = 0
 		d3.select(node.parentNode).selectAll('tr').each(function (c, j) { if (this === node) idx = j })
-		
+
 		previewPad(idx)
 	}).addElems('span')
 		.html(vocabulary['dblclick to preview']['pad'])
-	
+
 	foot.addElems('p', 'summary')
 		.html(_ => {
 			const rowcount = Math.max(...cols.map(c => c.entries.length))
@@ -667,7 +667,7 @@ function compileLocations (idx) {
 			const results = await POST('/forwardGeocoding', { locations: locations })
 			resolve(results)
 		}
-	})		
+	})
 }
 export async function compilePads (idx, structureOnly = false) {
 	const { metafields, media_value_keys } = JSON.parse(d3.select('data[name="pad"]').node().value)
@@ -687,8 +687,8 @@ export async function compilePads (idx, structureOnly = false) {
 			const items = cols.map(c => {
 				return new Promise(async resolve1 => {
 					const item = {}
-					
-					if (['txt', 'title'].includes(c.type) 
+
+					if (['txt', 'title'].includes(c.type)
 						|| ['txt', 'title'].includes(metafields.find(b => b.label === c.type)?.type)
 					) {
 						if (!structureOnly) {
@@ -720,11 +720,11 @@ export async function compilePads (idx, structureOnly = false) {
 					if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('img')) {
 						// item.type = c.type // THIS COMES FIRST HERE AS WE UPDATE IT IN THE CASE OF A mosaic
 						item.type = metafields.find(b => b.label === c.type)?.type || c.type
-						
+
 						if (!structureOnly) {
 							if (c.entries[i]?.src) item.src = c.entries[i].src
 							else {
-								if (Array.isArray(c.entries[i])) { 
+								if (Array.isArray(c.entries[i])) {
 									const containsURLs = c.entries[i].map(b => b.isURL()).unique()
 									if (containsURLs.length === 1 && containsURLs.includes(true)) { // A MOSAIC OF URLS
 										item.srcs = c.entries[i].map(b => encodeURI(b.trim()))
@@ -752,19 +752,19 @@ export async function compilePads (idx, structureOnly = false) {
 						// item.level = 'media'
 						item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
 					}
-					if (['checklist', 'radiolist'].includes(c.type) 
+					if (['checklist', 'radiolist'].includes(c.type)
 						|| ['checklist', 'radiolist'].includes(metafields.find(b => b.label === c.type)?.type)
 					) {
 						item.options = c.values //.filter(d => ![null, undefined].includes(d)).unique() // VALUES SHOUlD BE COMOPLETE (NO null OR undefined) AND SHOULD NOT BE unique
 							.sort((a, b) => {
 								if (typeof a === 'string' && typeof b === 'string') return a?.localeCompare(b)
 								else return a - b
-							}).map((d, i) => { 
+							}).map((d, i) => {
 								const obj = {}
 								obj.id = i
 								obj.name = d?.toString()
 								obj.checked = false
-								
+
 								if (!structureOnly) {
 									if (c.entries[i]) {
 										if (typeof c.entries[i] !== 'object') { // THIS COULD PROBABLY BE CHANGED TO Array.isArray()
@@ -855,7 +855,7 @@ export async function compilePads (idx, structureOnly = false) {
 
 								if (Array.isArray(c.entries[i])) {
 									item.tags = c.entries[i].filter(b => ![null, undefined].includes(b))
-										.map(b => { 
+										.map(b => {
 											const obj = {}
 											obj.id = undefined
 											if (metafields.find(b => b.label === c.type)?.type === 'index') {
@@ -865,7 +865,7 @@ export async function compilePads (idx, structureOnly = false) {
 												obj.key = null
 												obj.name = b
 											}
-											obj.type = c.type//.slice(0, -1) 
+											obj.type = c.type//.slice(0, -1)
 											return obj
 										})
 								} else {
@@ -878,7 +878,7 @@ export async function compilePads (idx, structureOnly = false) {
 										obj.key = null
 										obj.name = c.entries[i]
 									}
-									obj.type = c.type//.slice(0, -1) 
+									obj.type = c.type//.slice(0, -1)
 									item.tags = [obj]
 								}
 								item.has_content = item?.tags?.length > 0
@@ -886,8 +886,8 @@ export async function compilePads (idx, structureOnly = false) {
 							item.type = metafields.find(b => b.label === c.type)?.type
 							item.name = metafields.find(b => b.label === c.type)?.label
 							item.level = 'meta'
-						
-						} else if (metafields.find(b => b.label === c.type)?.type === 'attachment') { 
+
+						} else if (metafields.find(b => b.label === c.type)?.type === 'attachment') {
 							if (!structureOnly) {
 								if (Array.isArray(c.entries[i])) {
 									item.srcs = c.entries[i].filter(b => ![null, undefined].includes(b)).map(b => b.trim())
@@ -901,7 +901,7 @@ export async function compilePads (idx, structureOnly = false) {
 							item.level = 'meta'
 						}
 					}
-					
+
 					item.instruction = c.key
 					resolve1(item)
 				})
@@ -940,7 +940,7 @@ export async function compilePads (idx, structureOnly = false) {
 					.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
 				${results.filter(d => d.type === 'radiolist')
 					.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-				
+
 				${results.filter(d => d.type === 'group').map(d => results)
 					.filter(d => d.type === 'txt')
 					.map(d => d.txt).join('\n\n').trim()}\n\n
@@ -963,8 +963,8 @@ export async function compilePads (idx, structureOnly = false) {
 			let status = 0
 			if (completion.every(d => d === true)) status = 1
 
-			resolve0({ 
-				title, 
+			resolve0({
+				title,
 				sections: [
 					{
 						type: 'section',
@@ -981,7 +981,7 @@ export async function compilePads (idx, structureOnly = false) {
 
 				tags: results.filter(d => metafields.some(c => ['tag', 'index'].includes(c.type) && c.label === d.name)).map(d => d.tags).flat(),
 				locations: results.filter(d => d.type === 'location').map(d => d.centerpoints).flat(),
-				
+
 				metadata: results.filter(d => metafields.some(c => !['tag', 'index', 'location'].includes(c.type) && c.label === d.name))
 					.map(d => {
 						const valuekey = Object.keys(d).find(c => media_value_keys.includes(c))
@@ -990,7 +990,7 @@ export async function compilePads (idx, structureOnly = false) {
 
 						// TO DO: IF valuekey = 'options' AND type = 'checklist' OR type = 'radiolist'
 						// NEED TO MAKE SURE THE INPUT IN THE xlsx MATCHES THE options IN THE metafield
-						
+
 						if (Array.isArray(value)) {
 							return value.map(c => {
 								const obj = {}
@@ -1069,7 +1069,7 @@ export async function compileTemplate () {
 		${sections.map(d => d.structure).flat().filter(d => d.type === 'group').map(d => d.structure)
 			.filter(d => d.type === 'radiolist')
 			.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
-	
+
 	template.title = title.slice(0, 99)
 	template.description = description
 	template.sections = sections //JSON.stringify(sections)
@@ -1109,7 +1109,7 @@ async function previewPad (idx) {
 		d3.selectAll('div.media-container, div.meta-container').each(d => neworder.push(d.instruction))
 
 		neworder = neworder.map(d => cols.find(c => c.key === d))
-		
+
 		renderTable(neworder, true)
 
 		modal.remove()
@@ -1120,11 +1120,11 @@ async function previewPad (idx) {
 		.addElems('main', 'pad')
 		.attr('id', 'pad')
 	const inner = main.addElems('div', 'inner')
-	
+
 	if (datum) {
 		const head = inner.addElems('div', 'head')
 		const body = inner.addElems('div', 'body')
-		
+
 		if (datum.title) head.addElems('div', 'title').html(datum.title)
 		if (datum.sections) {
 			datum.sections.forEach(d => {

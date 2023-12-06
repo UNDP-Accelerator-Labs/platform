@@ -208,7 +208,7 @@ export class Exploration {
         .classed('notranslate', true)
         .attrs({
           value: (d) => this.normalizeExplorationPrompt(d['prompt']),
-          label: (d) => `${vocabulary['last_access']} ${d['last_access_ago']}`,
+          label: (d) => `${vocabulary['exploration']['last_access']} ${d['last_access_ago']}`,
         });
       cb && cb();
     });
@@ -319,10 +319,10 @@ export class Exploration {
   consentFeature() {
     const explorationInfoUrl = `/${language}/exploration-info/`;
     const message = `
-            <h2 class="google-translate-attr">${vocabulary['welcome']}</h2>
-            <p class="google-translate-attr">${vocabulary['explain']}</p>
-            <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['info']}</a>
-            <p class="google-translate-attr">${vocabulary['indicate']}</p>
+            <h2 class="google-translate-attr">${vocabulary['exploration']['welcome']}</h2>
+            <p class="google-translate-attr">${vocabulary['exploration']['explain']}</p>
+            <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['exploration']['info']}</a>
+            <p class="google-translate-attr">${vocabulary['exploration']['indicate']}</p>
         `;
     renderPromiseModal({
       message,
@@ -330,13 +330,13 @@ export class Exploration {
         {
           node: 'button',
           type: 'button',
-          label: vocabulary['feature-approve'],
+          label: vocabulary['exploration']['feature-approve'],
           resolve: true,
         },
         {
           node: 'button',
           type: 'button',
-          label: vocabulary['feature-reject'],
+          label: vocabulary['exploration']['feature-reject'],
           resolve: false,
         },
       ],
@@ -416,7 +416,7 @@ export class Exploration {
       .attrs({
         for: `exploration-main`,
       })
-      .text(vocabulary['intro']);
+      .text(vocabulary['exploration']['intro']);
     this.maybeAddDatalist(sel);
     const explorationInfoUrl = `/${language}/exploration-info/`;
     const infoButton = sel
@@ -463,8 +463,8 @@ export class Exploration {
       .addElems('option', 'exploration-short-list', [
         {
           id: null,
-          prompt: vocabulary['select'],
-          short: vocabulary['select'],
+          prompt: vocabulary['exploration']['select'],
+          short: vocabulary['exploration']['select'],
         },
         ...this.past,
       ])
@@ -544,7 +544,7 @@ export class Exploration {
     function addTitle(curSel) {
       curSel
         .addElem('span')
-        .text(vocabulary['doc-begin'])
+        .text(vocabulary['exploration']['doc-begin'])
         .classed('exploration-title', true)
         .classed('google-translate-attr', true);
     }
@@ -554,7 +554,7 @@ export class Exploration {
         .addElem('button')
         .classed('exploration-btn-approve', true)
         .classed('google-translate-attr', true)
-        .text(vocabulary['doc-approve'])
+        .text(vocabulary['exploration']['doc-approve'])
         .on('click', (d) => {
           that.setDocAction(d.id, true);
         });
@@ -562,7 +562,7 @@ export class Exploration {
         .addElem('button')
         .classed('exploration-btn-dislike', true)
         .classed('google-translate-attr', true)
-        .text(vocabulary['doc-dislike'])
+        .text(vocabulary['exploration']['doc-dislike'])
         .on('click', (d) => {
           that.setDocAction(d.id, false);
         });

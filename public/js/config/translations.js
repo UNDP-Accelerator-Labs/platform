@@ -3536,7 +3536,7 @@ async function getLanguage () {
 }
 
 export const vocabulary = {} // THIS IS A GLOBAL VARIABLE
-let lang = d3.select('data[name="page"]').node().value.language
+let lang = d3.select('data[name="page"]').node()?.value.language
 let langs = []
 
 if (!lang) {

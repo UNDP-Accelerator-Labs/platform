@@ -37,19 +37,19 @@ module.exports = async (req, res) => {
 
 						return t.oneOrNone(`
 							WITH su AS (
-								SELECT COALESCE(jsonb_agg(su_a3), '[]')::jsonb AS iso3, 
-									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name 
-								FROM adm0_subunits 
+								SELECT COALESCE(jsonb_agg(su_a3), '[]')::jsonb AS iso3,
+									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name
+								FROM adm0_subunits
 								WHERE (LOWER(su_a3) IN ($1:csv) OR LOWER(adm0_a3) IN ($1:csv))
 									AND su_a3 <> adm0_a3
 							),
 							adm AS (
 								SELECT COALESCE(jsonb_agg(adm0_a3), '[]')::jsonb AS iso3,
-									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name 
-								FROM adm0 
+									COALESCE(jsonb_agg($2:name), '[]')::jsonb AS name
+								FROM adm0
 								WHERE LOWER(adm0_a3) IN ($1:csv)
 							)
-							SELECT su.iso3 || adm.iso3 AS iso3, 
+							SELECT su.iso3 || adm.iso3 AS iso3,
 								CASE WHEN adm.name->>0 IS NOT NULL THEN adm.name->>0
 								ELSE su.name->>0
 								END AS name
@@ -147,32 +147,32 @@ module.exports = async (req, res) => {
 		(
 			(
 				p.id IN (
-					SELECT mc.pad 
-					FROM mobilization_contributions mc 
-					INNER JOIN mobilizations m 
-						ON m.id = mc.mobilization 
+					SELECT mc.pad
+					FROM mobilization_contributions mc
+					INNER JOIN mobilizations m
+						ON m.id = mc.mobilization
 					WHERE m.owner = $1
-				) 
+				)
 				OR $2 > 2
 			) AND (
-				p.owner <> $1 
+				p.owner <> $1
 				OR p.owner IS NULL
 			) AND p.status < 2
 		)
 		`, [ uuid, rights ])
-		
+
 		else if (space === 'shared') f_space = DB.pgp.as.format(`(p.owner IN ($1:csv) AND p.owner <> $2)`, [ collaborators_ids, uuid ])
-		
+
 		// else if (space === 'shared') f_space = DB.pgp.as.format(`p.status = 2`)
 		else if (space === 'reviewing') f_space = DB.pgp.as.format(`
-		(	
+		(
 			(
 				( -- THE CURATOR OF A MOBILIZATION HAS OVERSIGHT OVER THE REVIEWING OF COLLECTED PADS
 					p.id IN (
-						SELECT mc.pad 
-						FROM mobilization_contributions mc 
-						INNER JOIN mobilizations m 
-							ON m.id = mc.mobilization 
+						SELECT mc.pad
+						FROM mobilization_contributions mc
+						INNER JOIN mobilizations m
+							ON m.id = mc.mobilization
 						WHERE m.owner = $1
 					)
 					OR $2 > 2
@@ -181,16 +181,23 @@ module.exports = async (req, res) => {
 				)
 			)
 			AND p.id IN (
-				SELECT pad 
+				SELECT pad
 				FROM review_requests
 			)
 		)
 		`, [ uuid, rights ])
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		// else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
-		
-		else if (space === 'published') f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])
-		
+		else if (space === 'published') {
+			if (rights < 3) {
+				const isUNDP = (await DB.general.one(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ]))
+				if (isUNDP) f_space = DB.pgp.as.format('p.status >= 2')
+				else f_space = DB.pgp.as.format('p.status = 3')
+			} else {
+				f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])
+			}
+		}
+		// THIS MEANS THAT IN published, NON sudo USERS WILL ONLY SEE PREPRINTS OF THEIR TEAM-MATES
 		else if (space === 'pinned') {
 			if (public) {
 				if (pinboard) {
@@ -199,10 +206,10 @@ module.exports = async (req, res) => {
 
 					if (section) {
 						pbpads = (await DB.general.any(`
-							SELECT pad FROM pinboard_contributions 
-							WHERE pinboard = $1::INT 
-								AND db = $2 
-								AND is_included = true 
+							SELECT pad FROM pinboard_contributions
+							WHERE pinboard = $1::INT
+								AND db = $2
+								AND is_included = true
 								AND section = $3::INT
 						`, [ pinboard, ownId, section ])).map(row => row.pad);
 					} else {
@@ -227,9 +234,9 @@ module.exports = async (req, res) => {
 
 					if (section) {
 						pbpads = (await DB.general.any(`
-							SELECT pad FROM pinboard_contributions 
-							WHERE pinboard = $1::INT 
-								AND db = $2 
+							SELECT pad FROM pinboard_contributions
+							WHERE pinboard = $1::INT
+								AND db = $2
 								AND is_included = true
 								AND section = $3::INT
 						`, [ pinboard, ownId, section ])).map(row => row.pad);
@@ -246,12 +253,12 @@ module.exports = async (req, res) => {
 						(
 							(p.status = 2 AND p.owner IN ($1:csv))
 							OR p.status = 3
-							OR $2 > 2 
+							OR $2 > 2
 						) AND (
-							p.id IN ($3:csv) 
+							p.id IN ($3:csv)
 							OR p.id IN (
-								SELECT pad 
-								FROM mobilization_contributions 
+								SELECT pad
+								FROM mobilization_contributions
 								WHERE mobilization IN ($4:csv)
 							)
 						)
@@ -262,34 +269,34 @@ module.exports = async (req, res) => {
 					(
 						(p.status = 2 AND p.owner IN ($1:csv))
 						OR p.status = 3
-						OR $2 > 2 
+						OR $2 > 2
 					)`, [ collaborators_ids, rights ])
 			}
 		}
 		else if (space === 'versiontree') {
 			// TO DO: THIS NEEDS SOME THINKING
 			f_space = DB.pgp.as.format(`
-			(	
+			(
 				(
 					p.version @> (
-						SELECT version 
-						FROM pads 
-						WHERE id IN ($1:csv) 
+						SELECT version
+						FROM pads
+						WHERE id IN ($1:csv)
 							AND (
-								status >= p.status 
+								status >= p.status
 								OR (
-									owner IN ($2:csv) 
+									owner IN ($2:csv)
 									OR $3 > 2
 								)
 							)
 					) OR p.version <@ (
-						SELECT version 
-						FROM pads 
-						WHERE id IN ($1:csv) 
+						SELECT version
+						FROM pads
+						WHERE id IN ($1:csv)
 							AND (
-								status >= p.status 
+								status >= p.status
 								OR (
-									owner IN ($2:csv) 
+									owner IN ($2:csv)
 									OR $3 > 2
 								)
 							)

@@ -193,7 +193,15 @@ module.exports = async (req, res) => {
 		else if (space === 'public') f_space = DB.pgp.as.format(`p.status = 3`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		// else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		
-		else if (space === 'published') f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])
+		else if (space === 'published') {
+			if (rights < 3) {
+				const isUNDP = (await DB.general.one(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ]))
+				if (isUNDP) f_space = DB.pgp.as.format('p.status >= 2')
+				else f_space = DB.pgp.as.format('p.status = 3')
+			} else {
+				f_space = DB.pgp.as.format(`(p.status = 3 OR (p.status = 2 AND (p.owner IN ($1:csv) OR $2 > 2)))`, [ collaborators_ids, rights ])
+			}
+		}
 		// THIS MEANS THAT IN published, NON sudo USERS WILL ONLY SEE PREPRINTS OF THEIR TEAM-MATES
 
 		else if (space === 'pinned') {

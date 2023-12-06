@@ -3,15 +3,15 @@ const assets = [
   '/',
   '/imgs/branding/UNDP_accelerator_labs_logo_vertical_color_RGB.png',
   '/imgs/icons/*',
-  '/js/d3.prototype.extensions.js',
-  '/js/Date.prototype.extensions.js',
-  '/js/Array.prototype.extensions.js',
-  '/js/String.prototype.extensions.js',
-  '/js/Math.extensions.js',
+  '/js/*',
+  '/css/*'
+  // '/js/d3.prototype.extensions.js',
+  // '/js/Date.prototype.extensions.js',
+  // '/js/Array.prototype.extensions.js',
+  // '/js/String.prototype.extensions.js',
+  // '/js/Math.extensions.js',
   // '/js/upload.js',
 ];
-
-// TO DO: UPDATE assets
 
 const APP_ASSETS = 'acclab-app-assets';
 self.addEventListener('install', (evt) => {

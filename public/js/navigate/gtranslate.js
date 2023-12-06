@@ -66,3 +66,6 @@ cookieStore.addEventListener('change', async ({ changed }) => {
     rewriteUrl('en', true);
   }
 });
+
+window.googleTranslateElementInit = googleTranslateElementInit;
+window.googleTranslateElement = null;

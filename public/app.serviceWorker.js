@@ -1,9 +1,10 @@
 // THIS IS BASED ON: https://arctype.com/blog/pwa-sqlite/
 const assets = [
   '/',
+  '/favicon.ico',
   '/imgs/*',
   '/js/*',
-  '/css/*'
+  '/css/*',
   // '/js/d3.prototype.extensions.js',
   // '/js/Date.prototype.extensions.js',
   // '/js/Array.prototype.extensions.js',

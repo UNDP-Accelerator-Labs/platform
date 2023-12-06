@@ -1,4 +1,4 @@
-import { POST } from '/js/fetch.js'
+import { POST } from '/js/fetch.js';
 
 export const fullVocabulary = {
   contribute: {
@@ -3526,18 +3526,18 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
 };
 
-async function getLanguage () {
-	const { languages } = await POST('/load/metadata', { feature: 'languages' })
-	const url = new URL(window.location)
-	const language = url.pathname.substring(1).split('/')[0]
+async function getLanguage() {
+  const { languages } = await POST('/load/metadata', { feature: 'languages' });
+  const url = new URL(window.location);
+  const language = url.pathname.substring(1).split('/')[0];
 
-	if (languages.some(d => d === language)) return { language, languages }
-	else return { language: 'en', languages }
+  if (languages.some((d) => d === language)) return { language, languages };
+  else return { language: 'en', languages };
 }
 
-export const vocabulary = {} // THIS IS A GLOBAL VARIABLE
-let lang = d3.select('data[name="page"]').node()?.value.language
-let langs = []
+export const vocabulary = {}; // THIS IS A GLOBAL VARIABLE
+let lang = d3.select('data[name="page"]').node()?.value.language;
+let langs = [];
 
 if (!lang) {
   const { language, languages } = await getLanguage();

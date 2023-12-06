@@ -1,83 +1,122 @@
-import { vocabulary } from '/js/config/translations.js'
-import { getMediaSize, limitLength } from '/js/main.js'
-import { POST } from '/js/fetch.js'
+import { vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { getMediaSize, limitLength } from '/js/main.js';
 
 // SAVING BUTTON
-export function switchButtons (lang = 'en') {
-	if (!mediaSize) var mediaSize = getMediaSize()
-	window.sessionStorage.setItem('changed-content', true)
-	// PROVIDE FEEDBACK: UNSAVED CHANGES
-	if (mediaSize === 'xs') {
-		d3.select('.meta-status .btn-group .save button')
-		.each(function () { this.disabled = false })
-			.html(vocabulary['save changes'])
-	} else {
-		const menu_logo = d3.select('nav#site-title .inner')
-		window.sessionStorage.setItem('changed-content', true)
-		menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
-		menu_logo.selectAll('div.save').classed('hide saved', false)
-			.select('button')
-		.on('click', async _ => await partialSave())
-			.html(vocabulary['save changes'])
-	}
+export function switchButtons(lang = 'en') {
+  if (!mediaSize) var mediaSize = getMediaSize();
+  window.sessionStorage.setItem('changed-content', true);
+  // PROVIDE FEEDBACK: UNSAVED CHANGES
+  if (mediaSize === 'xs') {
+    d3.select('.meta-status .btn-group .save button')
+      .each(function () {
+        this.disabled = false;
+      })
+      .html(vocabulary['save changes']);
+  } else {
+    const menu_logo = d3.select('nav#site-title .inner');
+    window.sessionStorage.setItem('changed-content', true);
+    menu_logo.selectAll('div.create, h1, h2').classed('hide', true);
+    menu_logo
+      .selectAll('div.save')
+      .classed('hide saved', false)
+      .select('button')
+      .on('click', async (_) => await partialSave())
+      .html(vocabulary['save changes']);
+  }
 }
 
-function retrieveItems (sel, datum, items) {
-	const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
+function retrieveItems(sel, datum, items) {
+  const { metafields } = JSON.parse(
+    d3.select('data[name="template"]').node()?.value,
+  );
 
-	// MEDIA OR META
-	if (datum.type === 'title') {
-		datum.instruction = (sel.select('.media-title').node() || sel.select('.meta-title').node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
-	else if (datum.type === 'img') {
-		datum.instruction = (sel.select('.media-img').node() || sel.select('.meta-img').node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
-	else if (datum.type === 'drawing') {
-		datum.instruction = (sel.select('.media-drawing').node() || sel.select('.meta-drawing').node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
-	else if (datum.type === 'txt') {
-		datum.instruction = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
-	else if (datum.type === 'embed') {
-		datum.instruction = (sel.select('.media-embed').node() || sel.select('.meta-embed').node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
-	else if (datum.type === 'checklist') {
-		datum.instruction = (sel.select('.media-checklist .instruction').node() || sel.select('.meta-checklist .instruction').node())['outerText' || 'textContent' || 'innerText']
-		const clone = JSON.parse(JSON.stringify(datum))
-		clone.options = clone.options.filter(b => b.name?.length)
-		items.push(clone)
-	}
-	else if (datum.type === 'radiolist') {
-		datum.instruction = (sel.select('.media-radiolist .instruction').node() || sel.select('.meta-radiolist .instruction').node())['outerText' || 'textContent' || 'innerText']
-		const clone = JSON.parse(JSON.stringify(datum))
-		clone.options = clone.options.filter(b => b.name?.length)
-		items.push(clone)
-	}
-	// META
-	else if (datum.type === 'location') {
-		datum.instruction = sel.select('.meta-location').node()['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
-	else if (metafields.some(d => ['tag', 'index'].includes(d.type) && [datum.type, datum.name].includes(d.label))) {
-		datum.instruction = (sel.select(`.meta-${datum.type}`).node() || sel.select(`.meta-${datum.name}`).node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-		// items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
-	}
-	// skills SHOULD BE DEPRECATED
-	else if (!metafields.some(d => d.label.toLowerCase() === 'skills') && (datum.type === 'skills' || datum.name === 'skills')) { // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
-		datum.instruction = (sel.select('.meta-methods').node() || sel.select('.meta-skills').node())['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-		// items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
-	}
-	else if (datum.type === 'attachment') {
-		datum.instruction = sel.select('.meta-attachment').node()['outerText' || 'textContent' || 'innerText']
-		items.push(datum)
-	}
+  // MEDIA OR META
+  if (datum.type === 'title') {
+    datum.instruction = (sel.select('.media-title').node() ||
+      sel.select('.meta-title').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  } else if (datum.type === 'img') {
+    datum.instruction = (sel.select('.media-img').node() ||
+      sel.select('.meta-img').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  } else if (datum.type === 'drawing') {
+    datum.instruction = (sel.select('.media-drawing').node() ||
+      sel.select('.meta-drawing').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  } else if (datum.type === 'txt') {
+    datum.instruction = (sel.select('.media-txt').node() ||
+      sel.select('.meta-txt').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  } else if (datum.type === 'embed') {
+    datum.instruction = (sel.select('.media-embed').node() ||
+      sel.select('.meta-embed').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  } else if (datum.type === 'checklist') {
+    datum.instruction = (sel.select('.media-checklist .instruction').node() ||
+      sel.select('.meta-checklist .instruction').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    const clone = JSON.parse(JSON.stringify(datum));
+    clone.options = clone.options.filter((b) => b.name?.length);
+    items.push(clone);
+  } else if (datum.type === 'radiolist') {
+    datum.instruction = (sel.select('.media-radiolist .instruction').node() ||
+      sel.select('.meta-radiolist .instruction').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    const clone = JSON.parse(JSON.stringify(datum));
+    clone.options = clone.options.filter((b) => b.name?.length);
+    items.push(clone);
+  }
+  // META
+  else if (datum.type === 'location') {
+    datum.instruction = sel.select('.meta-location').node()[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  } else if (
+    metafields.some(
+      (d) =>
+        ['tag', 'index'].includes(d.type) &&
+        [datum.type, datum.name].includes(d.label),
+    )
+  ) {
+    datum.instruction = (sel.select(`.meta-${datum.type}`).node() ||
+      sel.select(`.meta-${datum.name}`).node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+    // items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
+  }
+  // skills SHOULD BE DEPRECATED
+  else if (
+    !metafields.some((d) => d.label.toLowerCase() === 'skills') &&
+    (datum.type === 'skills' || datum.name === 'skills')
+  ) {
+    // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+    datum.instruction = (sel.select('.meta-methods').node() ||
+      sel.select('.meta-skills').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+    // items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
+  } else if (datum.type === 'attachment') {
+    datum.instruction = sel.select('.meta-attachment').node()[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    items.push(datum);
+  }
 }
 
 function compileContent(attr) {
@@ -287,81 +326,93 @@ function compileContent(attr) {
   return content;
 }
 
-export async function partialSave (attr) {
-	console.log('saving')
-	const template = JSON.parse(d3.select('data[name="template"]').node()?.value)
+export async function partialSave(attr) {
+  console.log('saving');
+  const template = JSON.parse(
+    d3.select('data[name="template"]').node()?.value,
+  );
 
-	// FIRST CHECK IF THIS IS A NEW TEMPLATE
-	// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
-	const url = new URL(window.location)
-	const queryparams = new URLSearchParams(url.search)
-	let id = queryparams.get('id')
-	let source = queryparams.get('source')
-	// IF IT HAS, THEN FOR THE FIRST SAVE, COMPILE EVERYTHING IN CASE IT IS A COPY OF A TEMPLATE
-	let content
-	if (id) {
-		content = compileContent(attr)
-		content.id = +id
-	}
-	else {
-		content = compileContent()
-		if (source) content.source = +source
-	}
+  // FIRST CHECK IF THIS IS A NEW TEMPLATE
+  // CHECK IF THE PAD ALREADY HAS AN id IN THE DB
+  const url = new URL(window.location);
+  const queryparams = new URLSearchParams(url.search);
+  let id = queryparams.get('id');
+  let source = queryparams.get('source');
+  // IF IT HAS, THEN FOR THE FIRST SAVE, COMPILE EVERYTHING IN CASE IT IS A COPY OF A TEMPLATE
+  let content;
+  if (id) {
+    content = compileContent(attr);
+    content.id = +id;
+  } else {
+    content = compileContent();
+    if (source) content.source = +source;
+  }
 
-	if (template.category === 'review') {
-		content.review_template = true
-		content.review_language = template.language
-	}
+  if (template.category === 'review') {
+    content.review_template = true;
+    content.review_language = template.language;
+  }
 
-	return await POST('/save/template', content)
-	.then(res => {
-		// ADD THE NOTIFICATION
-		window.sessionStorage.removeItem('changed-content')
+  return await POST('/save/template', content)
+    .then((res) => {
+      // ADD THE NOTIFICATION
+      window.sessionStorage.removeItem('changed-content');
 
-		if (!mediaSize) var mediaSize = getMediaSize()
-		if (mediaSize === 'xs') {
-			const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
-			save_btn.select('button')
-				.html(vocabulary['changes saved'])
-			window.setTimeout(_ => {
-				save_btn.classed('saved', false)
-				.select('button').each(function () { this.disabled = true })
-					.html(vocabulary['save'])
-			}, 1000)
-		} else {
-			const menu_logo = d3.select('nav#site-title .inner')
-			menu_logo.select('.save').classed('saved', true)
-				.select('button')
-				.html(vocabulary['changes saved'])
-			window.setTimeout(_ => {
-				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
-				menu_logo.selectAll('div.save').classed('hide', true)
-			}, 1000)
-		}
+      if (!mediaSize) var mediaSize = getMediaSize();
+      if (mediaSize === 'xs') {
+        const save_btn = d3
+          .select('.meta-status .btn-group .save')
+          .classed('saved', true);
+        save_btn.select('button').html(vocabulary['changes saved']);
+        window.setTimeout((_) => {
+          save_btn
+            .classed('saved', false)
+            .select('button')
+            .each(function () {
+              this.disabled = true;
+            })
+            .html(vocabulary['save']);
+        }, 1000);
+      } else {
+        const menu_logo = d3.select('nav#site-title .inner');
+        menu_logo
+          .select('.save')
+          .classed('saved', true)
+          .select('button')
+          .html(vocabulary['changes saved']);
+        window.setTimeout((_) => {
+          menu_logo.selectAll('div.create, h1, h2').classed('hide', false);
+          menu_logo.selectAll('div.save').classed('hide', true);
+        }, 1000);
+      }
 
-		// CHANGE THE URL TO INCLUDE THE PAD ID
-		if (!id) { // INSERT
-			id = res.data.id
-			queryparams.append('id', id)
-			url.search = queryparams.toString()
-			// BASED ON:
-			// https://usefulangle.com/post/81/javascript-change-url-parameters
-			// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
-			const nextURL = url.toString().replace('contribute', 'edit')
-			const nextTitle = 'Update template'
-			const nextState = { additionalInformation: 'Updated the URL with JS' }
-			window.history.pushState(nextState, nextTitle, nextURL)
-			// REMOVE THE templates MENU
-			// d3.select('nav#filter').remove()
+      // CHANGE THE URL TO INCLUDE THE PAD ID
+      if (!id) {
+        // INSERT
+        id = res.data.id;
+        queryparams.append('id', id);
+        url.search = queryparams.toString();
+        // BASED ON:
+        // https://usefulangle.com/post/81/javascript-change-url-parameters
+        // https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
+        const nextURL = url.toString().replace('contribute', 'edit');
+        const nextTitle = 'Update template';
+        const nextState = { additionalInformation: 'Updated the URL with JS' };
+        window.history.pushState(nextState, nextTitle, nextURL);
+        // REMOVE THE templates MENU
+        // d3.select('nav#filter').remove()
 
-			// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
-			d3.selectAll('div.meta-status form input[name="id"]').attr('value', id)
-		}
+        // SET THE ID FOR THE PUBLISH AND GENERATE FORMS
+        d3.selectAll('div.meta-status form input[name="id"]').attr(
+          'value',
+          id,
+        );
+      }
 
-		updateStatus(res.data.status)
-		return id
-		
-	}).catch(err => console.log(err))
+      updateStatus(res.data.status);
+      return id;
+    })
+    .catch((err) => console.log(err));
 }
 
 function updateStatus(_status) {

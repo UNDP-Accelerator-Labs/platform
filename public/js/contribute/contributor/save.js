@@ -1,6 +1,8 @@
-export function partialSave () {
+export function partialSave() {
   // CHECK WHETHER GOOD TO SAVE
-  const metastatus = d3.select('.meta-status').classed('status-0 status-1', false)
+  const metastatus = d3
+    .select('.meta-status')
+    .classed('status-0 status-1', false);
 
   if (
     d3

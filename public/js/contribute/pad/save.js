@@ -1,79 +1,89 @@
-import { vocabulary } from '/js/config/translations.js'
-import { getMediaSize, limitLength, getContent } from '/js/main.js'
-import { POST } from '/js/fetch.js'
+import { vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { getContent, getMediaSize, limitLength } from '/js/main.js';
 
 // THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
-export function switchButtons (lang = 'en') {
-	const editing = JSON.parse(d3.select('data[name="page"]').node()?.value).activity === 'edit' // TO DO: FIX HERE
+export function switchButtons(lang = 'en') {
+  const editing =
+    JSON.parse(d3.select('data[name="page"]').node()?.value).activity ===
+    'edit'; // TO DO: FIX HERE
 
-	if (!mediaSize) var mediaSize = getMediaSize()
-	window.sessionStorage.setItem('changed-content', true)
-	// PROVIDE FEEDBACK: UNSAVED CHANGES
-	if (mediaSize === 'xs') {
-		d3.select('.meta-status .btn-group .save button')
-		.each(function () { this.disabled = false })
-			.html(vocabulary['save changes'])
-	} else {
-		const menu_logo = d3.select('nav#site-title .inner')
-		window.sessionStorage.setItem('changed-content', true)
-		menu_logo.selectAll('div.create, h1, h2').classed('hide', true)
-		menu_logo.selectAll('div.save').classed('hide saved', false)
-			.select('button')
-		.on('click', async _ => {
-			if (editing) await partialSave()
-		}).html(vocabulary['save changes'])
-	}
+  if (!mediaSize) var mediaSize = getMediaSize();
+  window.sessionStorage.setItem('changed-content', true);
+  // PROVIDE FEEDBACK: UNSAVED CHANGES
+  if (mediaSize === 'xs') {
+    d3.select('.meta-status .btn-group .save button')
+      .each(function () {
+        this.disabled = false;
+      })
+      .html(vocabulary['save changes']);
+  } else {
+    const menu_logo = d3.select('nav#site-title .inner');
+    window.sessionStorage.setItem('changed-content', true);
+    menu_logo.selectAll('div.create, h1, h2').classed('hide', true);
+    menu_logo
+      .selectAll('div.save')
+      .classed('hide saved', false)
+      .select('button')
+      .on('click', async (_) => {
+        if (editing) await partialSave();
+      })
+      .html(vocabulary['save changes']);
+  }
 }
 
-function retrieveItems (sel, datum, items) {
-	// MEDIA
-	if (datum.type === 'title') {
-		datum.txt = (sel.select('.media-title').node() || sel.select('.meta-title').node()).innerText
-		datum.has_content = datum.txt?.trim()?.length > 0
-		items.push(datum)
-	}
-	if (['img', 'mosaic', 'video'].includes(datum.type)) {
-		if (datum.type === 'mosaic') datum.has_content = datum?.srcs?.filter(b => b)?.length > 0
-		else datum.has_content = datum.src !== null && datum.src !== undefined
-		items.push(datum)
-	}
-	else if (datum.type === 'drawing') {
-		datum.has_content = datum.shapes?.length > 0
-		items.push(datum)
-	}
-	else if (datum.type === 'txt') {
-		// datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
-		datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node())['outerText' || 'textContent' || 'innerText']
-		datum.has_content = datum.txt?.trim()?.length > 0
-		items.push(datum)
-	}
-	else if (datum.type === 'embed') {
-		datum.html = (sel.select('.media-embed').node() || sel.select('.meta-embed').node()).innerHTML
-		datum.has_content = datum.html?.trim()?.length > 0
-		items.push(datum)
-	}
-	else if (['checklist', 'radiolist'].includes(datum.type)) {
-		datum.has_content = datum.options.filter(b => b.name?.length && b.checked).length > 0
-		const clone = JSON.parse(JSON.stringify(datum))
-		clone.options = clone.options.filter(b => b.name?.length)
-		items.push(clone)
+function retrieveItems(sel, datum, items) {
+  // MEDIA
+  if (datum.type === 'title') {
+    datum.txt = (
+      sel.select('.media-title').node() || sel.select('.meta-title').node()
+    ).innerText;
+    datum.has_content = datum.txt?.trim()?.length > 0;
+    items.push(datum);
+  }
+  if (['img', 'mosaic', 'video'].includes(datum.type)) {
+    if (datum.type === 'mosaic')
+      datum.has_content = datum?.srcs?.filter((b) => b)?.length > 0;
+    else datum.has_content = datum.src !== null && datum.src !== undefined;
+    items.push(datum);
+  } else if (datum.type === 'drawing') {
+    datum.has_content = datum.shapes?.length > 0;
+    items.push(datum);
+  } else if (datum.type === 'txt') {
+    // datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
+    datum.txt = (sel.select('.media-txt').node() ||
+      sel.select('.meta-txt').node())[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    datum.has_content = datum.txt?.trim()?.length > 0;
+    items.push(datum);
+  } else if (datum.type === 'embed') {
+    datum.html = (
+      sel.select('.media-embed').node() || sel.select('.meta-embed').node()
+    ).innerHTML;
+    datum.has_content = datum.html?.trim()?.length > 0;
+    items.push(datum);
+  } else if (['checklist', 'radiolist'].includes(datum.type)) {
+    datum.has_content =
+      datum.options.filter((b) => b.name?.length && b.checked).length > 0;
+    const clone = JSON.parse(JSON.stringify(datum));
+    clone.options = clone.options.filter((b) => b.name?.length);
+    items.push(clone);
 
-		// datum.options = datum.options.filter(b => b.name && b.name.length)
-		// items.push(datum)
-	}
-	// SPECIFIC META
-	else if (datum.type === 'location') {
-		datum.has_content = datum.centerpoints?.length > 0
-		items.push(datum)
-	}
-	else if (['tag', 'index'].includes(datum.type)) {
-		datum.has_content = (datum.sdgs?.length || datum.tags?.length) > 0 // THIS IS LEGACY FOR THE ACTION PLANNING PLATFORM: TO DO: DEPRECATE
-		items.push(datum)
-	}
-	else if (datum.type === 'attachment') {
-		datum.has_content = datum.srcs?.length > 0
-		items.push(datum)
-	}
+    // datum.options = datum.options.filter(b => b.name && b.name.length)
+    // items.push(datum)
+  }
+  // SPECIFIC META
+  else if (datum.type === 'location') {
+    datum.has_content = datum.centerpoints?.length > 0;
+    items.push(datum);
+  } else if (['tag', 'index'].includes(datum.type)) {
+    datum.has_content = (datum.sdgs?.length || datum.tags?.length) > 0; // THIS IS LEGACY FOR THE ACTION PLANNING PLATFORM: TO DO: DEPRECATE
+    items.push(datum);
+  } else if (datum.type === 'attachment') {
+    datum.has_content = datum.srcs?.length > 0;
+    items.push(datum);
+  }
 }
 function getStatus() {
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -415,96 +425,111 @@ function compileContent(attr) {
 
   return content;
 }
-export async function partialSave (attr) {
-	const object = d3.select('data[name="object"]').node().value
+export async function partialSave(attr) {
+  const object = d3.select('data[name="object"]').node().value;
 
-	console.log('saving')
-	// FIRST CHECK IF THIS IS A NEW PAD
-	const content = compileContent(attr)
-	// CHECK IF THE PAD ALREADY HAS AN id IN THE DB
-	const url = new URL(window.location)
-	const queryparams = new URLSearchParams(url.search)
-	let id = queryparams.get('id')
-	if (id) content.id = +id
-	const template = queryparams.get('template')
-	if (template) content.template = +template
-	const mobilization = queryparams.get('mobilization')
-	if (mobilization) content.mobilization = +mobilization
+  console.log('saving');
+  // FIRST CHECK IF THIS IS A NEW PAD
+  const content = compileContent(attr);
+  // CHECK IF THE PAD ALREADY HAS AN id IN THE DB
+  const url = new URL(window.location);
+  const queryparams = new URLSearchParams(url.search);
+  let id = queryparams.get('id');
+  if (id) content.id = +id;
+  const template = queryparams.get('template');
+  if (template) content.template = +template;
+  const mobilization = queryparams.get('mobilization');
+  if (mobilization) content.mobilization = +mobilization;
 
-	return await POST(`/save/${object}`, content)
-	.then(async res => {
-		// ADD THE NOTIFICATION
-		window.sessionStorage.removeItem('changed-content')
+  return await POST(`/save/${object}`, content)
+    .then(async (res) => {
+      // ADD THE NOTIFICATION
+      window.sessionStorage.removeItem('changed-content');
 
-		if (!mediaSize) var mediaSize = getMediaSize()
-		if (['xs', 'sm'].includes(mediaSize)) {
-			const save_btn = d3.select('.meta-status .btn-group .save').classed('saved', true)
-			save_btn.select('button')
-				.html(vocabulary['changes saved'])
-			window.setTimeout(_ => {
-				save_btn.classed('saved', false)
-				.select('button').each(function () { this.disabled = true })
-					.html(vocabulary['save'])
-			}, 1000)
-		} else {
-			const menu_logo = d3.select('nav#site-title .inner')
-			menu_logo.select('.save').classed('saved', true)
-				.select('button')
-				.html(vocabulary['changes saved'])
-			window.setTimeout(_ => {
-				menu_logo.selectAll('div.create, h1, h2').classed('hide', false)
-				menu_logo.selectAll('div.save').classed('hide', true)
-			}, 1000)
-		}
+      if (!mediaSize) var mediaSize = getMediaSize();
+      if (['xs', 'sm'].includes(mediaSize)) {
+        const save_btn = d3
+          .select('.meta-status .btn-group .save')
+          .classed('saved', true);
+        save_btn.select('button').html(vocabulary['changes saved']);
+        window.setTimeout((_) => {
+          save_btn
+            .classed('saved', false)
+            .select('button')
+            .each(function () {
+              this.disabled = true;
+            })
+            .html(vocabulary['save']);
+        }, 1000);
+      } else {
+        const menu_logo = d3.select('nav#site-title .inner');
+        menu_logo
+          .select('.save')
+          .classed('saved', true)
+          .select('button')
+          .html(vocabulary['changes saved']);
+        window.setTimeout((_) => {
+          menu_logo.selectAll('div.create, h1, h2').classed('hide', false);
+          menu_logo.selectAll('div.save').classed('hide', true);
+        }, 1000);
+      }
 
-		// REMOVE ITEMS TO DELETE
-		window.sessionStorage.removeItem('deleted')
-		// CHANGE THE URL TO INCLUDE THE PAD ID
-		if (!id) { // INSERT
-			id = res.data.id
-			queryparams.append('id', id)
-			url.search = queryparams.toString()
-			// BASED ON:
-			// https://usefulangle.com/post/81/javascript-change-url-parameters
-			// https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
-			const nextURL = url.toString().replace('contribute', 'edit')
-			const nextTitle = 'Update pad' // TO DO: RESET FOR TEMPLATE
-			const nextState = { additionalInformation: 'Updated the URL with JS' }
-			window.history.pushState(nextState, nextTitle, nextURL)
-			// REMOVE THE templates MENU
-			// d3.select('nav#filter').remove()
+      // REMOVE ITEMS TO DELETE
+      window.sessionStorage.removeItem('deleted');
+      // CHANGE THE URL TO INCLUDE THE PAD ID
+      if (!id) {
+        // INSERT
+        id = res.data.id;
+        queryparams.append('id', id);
+        url.search = queryparams.toString();
+        // BASED ON:
+        // https://usefulangle.com/post/81/javascript-change-url-parameters
+        // https://www.30secondsofcode.org/blog/s/javascript-modify-url-without-reload
+        const nextURL = url.toString().replace('contribute', 'edit');
+        const nextTitle = 'Update pad'; // TO DO: RESET FOR TEMPLATE
+        const nextState = { additionalInformation: 'Updated the URL with JS' };
+        window.history.pushState(nextState, nextTitle, nextURL);
+        // REMOVE THE templates MENU
+        // d3.select('nav#filter').remove()
 
-			// SET THE ID FOR THE PUBLISH AND GENERATE FORMS
-			d3.selectAll('div.meta-status form input[name="id"]').attr('value', id)
-			// d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
-		}
+        // SET THE ID FOR THE PUBLISH AND GENERATE FORMS
+        d3.selectAll('div.meta-status form input[name="id"]').attr(
+          'value',
+          id,
+        );
+        // d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
+      }
 
-		await updateStatus(res.data.status)
-		return id
-	}).catch(err => console.log(err))
+      await updateStatus(res.data.status);
+      return id;
+    })
+    .catch((err) => console.log(err));
 }
-export async function updateStatus (_status) {
-	if (!_status) {
-		const curr_status = await getContent({ feature: 'status' })
-		const completion = getStatus()
-		if (completion) _status = Math.max(1, curr_status)
-		else _status = 0
-	}
+export async function updateStatus(_status) {
+  if (!_status) {
+    const curr_status = await getContent({ feature: 'status' });
+    const completion = getStatus();
+    if (completion) _status = Math.max(1, curr_status);
+    else _status = 0;
+  }
 
-	// ACTIVATE THE PUBLISHING OPTIONS AT THE END
-	const metastatus = d3.select('div.meta-status')
-		.classed('status-0 status-1 status-2', false)
-		.classed(`status-${_status}`, true)
-	metastatus.select('div.btn-group form button.publish')
-		.attr('disabled', _status >= 1 ? null : true)
-	metastatus.select('div.btn-group form button.generate-pdf')
-		.attr('disabled', _status > 0 ? null : true)
+  // ACTIVATE THE PUBLISHING OPTIONS AT THE END
+  const metastatus = d3
+    .select('div.meta-status')
+    .classed('status-0 status-1 status-2', false)
+    .classed(`status-${_status}`, true);
+  metastatus
+    .select('div.btn-group form button.publish')
+    .attr('disabled', _status >= 1 ? null : true);
+  metastatus
+    .select('div.btn-group form button.generate-pdf')
+    .attr('disabled', _status > 0 ? null : true);
 }
-export async function saveAndSubmit (node) {
-	await partialSave()
-	node.form.submit()
-	// TO DO: PROVIDE FEEDBACK
-	// CREATE A THANK YOU PAGE
-	// AND MAYBE AUTO CREATE A PUBLIC PINBOARD FOR OPEN MOBILIZATIONS
-	// SO THAT AUTHORS CAN GO CHECK THEM OUT
+export async function saveAndSubmit(node) {
+  await partialSave();
+  node.form.submit();
+  // TO DO: PROVIDE FEEDBACK
+  // CREATE A THANK YOU PAGE
+  // AND MAYBE AUTO CREATE A PUBLIC PINBOARD FOR OPEN MOBILIZATIONS
+  // SO THAT AUTHORS CAN GO CHECK THEM OUT
 }

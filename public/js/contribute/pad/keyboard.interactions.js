@@ -1,6 +1,6 @@
-import { language } from '/js/config/translations.js'
-import { autofillTitle } from '/js/contribute/pad/render.js'
-import { switchButtons } from '/js/contribute/pad/save.js'
+import { language } from '/js/config/translations.js';
+import { autofillTitle } from '/js/contribute/pad/render.js';
+import { switchButtons } from '/js/contribute/pad/save.js';
 
 let keyTrack = [];
 window.addEventListener('keydown', async function (e) {

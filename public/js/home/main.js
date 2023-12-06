@@ -1,4 +1,4 @@
-import { renderPromiseModal } from '/js/modals.js'
+import { renderPromiseModal } from '/js/modals.js';
 
 // THIS IS NOT USED FOR NOW
 async function selectCountry() {

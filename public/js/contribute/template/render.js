@@ -1,8 +1,8 @@
-import { vocabulary, language } from '/js/config/translations.js'
-import { toggleClass } from '/js/main.js'
-import { POST } from '/js/fetch.js'
-import { switchButtons, partialSave } from '/js/contribute/template/save.js'
-import { renderPromiseModal } from '/js/modals.js'
+import { language, vocabulary } from '/js/config/translations.js';
+import { partialSave, switchButtons } from '/js/contribute/template/save.js';
+import { POST } from '/js/fetch.js';
+import { toggleClass } from '/js/main.js';
+import { renderPromiseModal } from '/js/modals.js';
 
 const obsvars = {
   attributes: true,
@@ -445,147 +445,217 @@ async function populateSection(data, lang = 'en', section) {
   // GROUP
   if (data.type === 'group') await addGroup({ data, lang, section });
 }
-export async function autofillTitle () {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export async function autofillTitle() {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const main = d3.select('main')
-	const head = main.select('.head')
+  const main = d3.select('main');
+  const head = main.select('.head');
 
-	if (!(head.select('.title').node().innerText || head.select('.title').node().innerText.trim().length)) {
-		let firstText = main.select('.description-layout .txt-container .media-txt').node()
-		if (!firstText.innerText || !firstText.innerText.length) firstText = main.selectAll('.media, .meta').filter(function () { return this.innerText && this.innerText.length }).node()
-		if (firstText && firstText.innerText) {
-			head.select('.title')
-			.html(_ => {
-				const cutoff = 75
-				if (firstText.innerText.split('\n').length > 1) {
-					if (firstText.innerText.split('\n')[0].length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
-					else return `${firstText.innerText.split('\n')[0]}`
-				} else {
-					if (firstText.innerText.length > cutoff) return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`
-					else return `${firstText.innerText}`
-				}
-			})
-			if (editing) { await partialSave('title'); }
-		}
-	}
+  if (
+    !(
+      head.select('.title').node().innerText ||
+      head.select('.title').node().innerText.trim().length
+    )
+  ) {
+    let firstText = main
+      .select('.description-layout .txt-container .media-txt')
+      .node();
+    if (!firstText.innerText || !firstText.innerText.length)
+      firstText = main
+        .selectAll('.media, .meta')
+        .filter(function () {
+          return this.innerText && this.innerText.length;
+        })
+        .node();
+    if (firstText && firstText.innerText) {
+      head.select('.title').html((_) => {
+        const cutoff = 75;
+        if (firstText.innerText.split('\n').length > 1) {
+          if (firstText.innerText.split('\n')[0].length > cutoff)
+            return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`;
+          else return `${firstText.innerText.split('\n')[0]}`;
+        } else {
+          if (firstText.innerText.length > cutoff)
+            return `${firstText.innerText.split('\n')[0].slice(0, cutoff)}…`;
+          else return `${firstText.innerText}`;
+        }
+      });
+      if (editing) {
+        await partialSave('title');
+      }
+    }
+  }
 }
-export async function addSection (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export async function addSection(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, sibling, focus } = kwargs || {}
-	let { title, lead, structure, repeat, group, instruction } = data || {}
+  const { data, lang, sibling, focus } = kwargs || {};
+  let { title, lead, structure, repeat, group, instruction } = data || {};
 
-	d3.selectAll('.media-layout').classed('focus', false)
+  d3.selectAll('.media-layout').classed('focus', false);
 
-	// DETERMINE THE GROUP IF REPEAT SECTION
-	if (repeat && !group) group = (d3.max(d3.selectAll('.layout.repeat').data().map(d => d ? d.group || 0 : 0)) + 1) || 0
+  // DETERMINE THE GROUP IF REPEAT SECTION
+  if (repeat && !group)
+    group =
+      d3.max(
+        d3
+          .selectAll('.layout.repeat')
+          .data()
+          .map((d) => (d ? d.group || 0 : 0)),
+      ) + 1 || 0;
 
-	const section = d3.select('main#template div.inner div.body')
-		// .insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
-		// .insertElem(function () { return sibling || d3.select('main#template div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
-		.insertElem(function () { return sibling }, 'section', `media-layout layout ${activity}`)
-		.classed('repeat', repeat || false)
-		.classed('focus', focus || false)
-		.datum({ type: 'section', title, lead, structure, repeat, group })
-	.on('click.focus', function () { d3.select(this).classed('focus', editing) })
+  const section = d3
+    .select('main#template div.inner div.body')
+    // .insertElem('.media-input-group', 'section', `media-layout layout ${activity}`)
+    // .insertElem(function () { return sibling || d3.select('main#template div.inner div.body .media-input-group').node() }, 'section', `media-layout layout ${activity}`)
+    .insertElem(
+      function () {
+        return sibling;
+      },
+      'section',
+      `media-layout layout ${activity}`,
+    )
+    .classed('repeat', repeat || false)
+    .classed('focus', focus || false)
+    .datum({ type: 'section', title, lead, structure, repeat, group })
+    .on('click.focus', function () {
+      d3.select(this).classed('focus', editing);
+    });
 
-	// DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
-	const section_id = [].indexOf.call(d3.selectAll('section.media-layout').nodes(), section.node())
+  // DETERMINE ID TO KNOW WHETHER SECTION CAN BE REMOVED
+  const section_id = [].indexOf.call(
+    d3.selectAll('section.media-layout').nodes(),
+    section.node(),
+  );
 
-	// NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
-	if ((editing || activity === 'preview') && section_id !== 0) {
-		const placement = section.addElems('div', 'placement-opts', d => [d], d => d.type)
-		placement.addElems('div', 'opt', [
-			// { label: 'north', value: 'move-up', fn: _ => this.move('move-up') }, 
-			{ label: 'close', value: 'delete', fn: _ => rmSection() }, 
-			// { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
-		]).on('click', d => {
-			d3.event.stopPropagation()
-			d.fn()
-			if (editing) switchButtons(lang)
-		}).on('mouseup', _ => d3.event.stopPropagation())
-			.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.label)
+  // NOTE THIS FOLLOWS A LOT OF THE Media OBJECT CONSTRUCTOR: MAYBE LATER HOMOGENIZE WITH A SUPER OBJECT
+  if ((editing || activity === 'preview') && section_id !== 0) {
+    const placement = section.addElems(
+      'div',
+      'placement-opts',
+      (d) => [d],
+      (d) => d.type,
+    );
+    placement
+      .addElems('div', 'opt', [
+        // { label: 'north', value: 'move-up', fn: _ => this.move('move-up') },
+        { label: 'close', value: 'delete', fn: (_) => rmSection() },
+        // { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
+      ])
+      .on('click', (d) => {
+        d3.event.stopPropagation();
+        d.fn();
+        if (editing) switchButtons(lang);
+      })
+      .on('mouseup', (_) => d3.event.stopPropagation())
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
 
-		async function rmSection () {
-			// FOR META INPUT
-			section.selectAll('.media-container, .meta-container').data()
-			.forEach(d => {
-				if (d.name) {
-					const input = d3.select(`#input-meta-${d.name}`).node()
-					if (input) input.disabled = false
-				}
-			})
+    async function rmSection() {
+      // FOR META INPUT
+      section
+        .selectAll('.media-container, .meta-container')
+        .data()
+        .forEach((d) => {
+          if (d.name) {
+            const input = d3.select(`#input-meta-${d.name}`).node();
+            if (input) input.disabled = false;
+          }
+        });
 
-			section.remove()
-			if (editing) await partialSave('media')
-		}
-	}
+      section.remove();
+      if (editing) await partialSave('media');
+    }
+  }
 
-	const header = section.addElems('div', 'section-header')
-		.addElems('h1')
-		.attrs({ 
-			'data-placeholder': d => vocabulary['section header'],
-			'contenteditable': editing ? true : null 
-		}).html(d => d.title)
-	.on('keydown', function () {
-		const evt = d3.event
-		if (evt.code === 'Enter' || evt.keyCode === 13) {
-			evt.preventDefault()
-			this.blur()
-		}
-	}).on('blur', async _ => { if (editing) { await partialSave('media') } })
+  const header = section
+    .addElems('div', 'section-header')
+    .addElems('h1')
+    .attrs({
+      'data-placeholder': (d) => vocabulary['section header'],
+      contenteditable: editing ? true : null,
+    })
+    .html((d) => d.title)
+    .on('keydown', function () {
+      const evt = d3.event;
+      if (evt.code === 'Enter' || evt.keyCode === 13) {
+        evt.preventDefault();
+        this.blur();
+      }
+    })
+    .on('blur', async (_) => {
+      if (editing) {
+        await partialSave('media');
+      }
+    });
 
-	const medialead = new Media({
-		parent: section.node(), 
-		type: 'lead', 
-		datum: { type: 'lead', level: 'media', lead, editable: editing },
-		lang
-	})
+  const medialead = new Media({
+    parent: section.node(),
+    type: 'lead',
+    datum: { type: 'lead', level: 'media', lead, editable: editing },
+    lang,
+  });
 
-	// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-	if (medialead.opts) medialead.opts.remove()
-	if (medialead.placement) medialead.placement.remove()
-	if (medialead.response) medialead.response.remove()
+  // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+  if (medialead.opts) medialead.opts.remove();
+  if (medialead.placement) medialead.placement.remove();
+  if (medialead.response) medialead.response.remove();
 
-	medialead.media.attrs({ 
-		'data-placeholder': d => vocabulary['lead paragraph'],
-		'contenteditable': editing ? true : null 
-	}).html(d => d.lead)
+  medialead.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['lead paragraph'],
+      contenteditable: editing ? true : null,
+    })
+    .html((d) => d.lead);
 
-	if (repeat) {
-		const mediarepeat = new Media({
-			parent: section.node(), 
-			type: 'repeat',
-			datum: { type: 'repeat', level: 'media', instruction, editable: editing },
-			lang
-		})
-		// REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
-		if (mediarepeat.opts) mediarepeat.opts.remove()
-		if (mediarepeat.placement) mediarepeat.placement.remove()
-		if (mediarepeat.response) mediarepeat.response.remove()
+  if (repeat) {
+    const mediarepeat = new Media({
+      parent: section.node(),
+      type: 'repeat',
+      datum: {
+        type: 'repeat',
+        level: 'media',
+        instruction,
+        editable: editing,
+      },
+      lang,
+    });
+    // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+    if (mediarepeat.opts) mediarepeat.opts.remove();
+    if (mediarepeat.placement) mediarepeat.placement.remove();
+    if (mediarepeat.response) mediarepeat.response.remove();
 
-		mediarepeat.media.addElems('button')
-		.addElems('div').attrs({ 
-			'data-placeholder': d => vocabulary['repeat section'],
-			'contenteditable': editing ? true : null 
-		}).html(d => d.instruction)
-		.on('blur', async _ => { if (editing) { await partialSave('media') } })
-	}
+    mediarepeat.media
+      .addElems('button')
+      .addElems('div')
+      .attrs({
+        'data-placeholder': (d) => vocabulary['repeat section'],
+        contenteditable: editing ? true : null,
+      })
+      .html((d) => d.instruction)
+      .on('blur', async (_) => {
+        if (editing) {
+          await partialSave('media');
+        }
+      });
+  }
 
-	if (structure) {
-		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
-		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
-		const { structure: pagestructure } = section.datum()
-		for (let s = 0; s < structure.length; s++) {
-			await populateSection(structure[s], lang, section.node())
-		}
-	}
+  if (structure) {
+    // THE PROMISES DO NOT SEEM TO WORK PROPERLY
+    // WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
+    const { structure: pagestructure } = section.datum();
+    for (let s = 0; s < structure.length; s++) {
+      await populateSection(structure[s], lang, section.node());
+    }
+  }
 
-	return section.node()
+  return section.node();
 }
 function addTitle(kwargs) {
   const { activity } = JSON.parse(
@@ -628,784 +698,1033 @@ function addTitle(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addImg (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addImg(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'img'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, required, editable } = data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'img';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	if (level === 'meta' && name) {
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
-	}
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
 
-	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(),
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, required, editable },
-		focus: focus || false,
-		lang
-	})
-	
-	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus .media-group-items').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, instruction, required, editable },
+    focus: focus || false,
+    lang,
+  });
 
-	if (focus) media.media.node().focus()
+  media.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
+
+  if (focus) media.media.node().focus();
 }
-export function addDrawing (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addDrawing(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'drawing'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, required, editable } = data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'drawing';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	if (level === 'meta' && name) {
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
-	}
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
 
-	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, required, editable },
-		focus: focus || false,
-		lang
-	})
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus .media-group-items').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, instruction, required, editable },
+    focus: focus || false,
+    lang,
+  });
 
-	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+  media.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	if (focus) media.media.node().focus()
+  if (focus) media.media.node().focus();
 }
-export function addTxt (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addTxt(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, constraint, is_excerpt, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'txt'
-	if (!instruction) instruction = ''
-	if (!name) name = null
-	if (!is_excerpt) is_excerpt = false
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let {
+    id,
+    level,
+    type,
+    name,
+    instruction,
+    constraint,
+    is_excerpt,
+    required,
+    editable,
+  } = data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'txt';
+  if (!instruction) instruction = '';
+  if (!name) name = null;
+  if (!is_excerpt) is_excerpt = false;
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	if (level === 'meta' && name) {
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
-	}
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
 
-	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, constraint, is_excerpt, required, editable },
-		focus: focus || false,
-		lang
-	})
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus .media-group-items').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: {
+      id,
+      level,
+      type,
+      name,
+      instruction,
+      constraint,
+      is_excerpt,
+      required,
+      editable,
+    },
+    focus: focus || false,
+    lang,
+  });
 
-	if (media.opts) {
-		const opts = media.opts.addElems('div', 'opt-group', [
-			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
-			[
-				{ key: 'excerpt', label: 'bookmark', value: is_excerpt },
-				{ key: 'constraint', label: 'block', value: constraint }
-			]
-		]).addElems('button', 'opt', d => d)
-		.classed('active', d => {
-			if (d.key === 'excerpt') return d.value
-			else if (d.key === 'constraint') return constraint ? true : false
-		}).attr('type', 'button')
-			.each(function (d) { 
-				d3.select(this).classed(d.key, true) 
-				d3.select(this).classed(d.value, true) 
-			})
-		.on('click', async function (d) {
-			const sel = d3.select(this)
-			const datum = media.container.datum()
-			
-			if (d.key === 'excerpt') {
-				if (!sel.classed('active')) {
-					d3.selectAll('.txt-container').each(c => { if (c) c.is_excerpt = false })
-						.selectAll('.opt.excerpt').classed('active', false)
-					datum.is_excerpt = true
-				} else {
-					datum.is_excerpt = false
-				}
-				sel.classed('active', datum.is_excerpt)
-			} else if (d.key === 'constraint') {
-				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input']['characters']} <input type='number' name='length' value=${datum.constraint || 9999} min=1> ${vocabulary['input type']['characters']}`
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
-					const new_constraint = await renderPromiseModal({ message, opts })
+  if (media.opts) {
+    const opts = media.opts
+      .addElems('div', 'opt-group', [
+        [], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+        [
+          { key: 'excerpt', label: 'bookmark', value: is_excerpt },
+          { key: 'constraint', label: 'block', value: constraint },
+        ],
+      ])
+      .addElems('button', 'opt', (d) => d)
+      .classed('active', (d) => {
+        if (d.key === 'excerpt') return d.value;
+        else if (d.key === 'constraint') return constraint ? true : false;
+      })
+      .attr('type', 'button')
+      .each(function (d) {
+        d3.select(this).classed(d.key, true);
+        d3.select(this).classed(d.value, true);
+      })
+      .on('click', async function (d) {
+        const sel = d3.select(this);
+        const datum = media.container.datum();
 
-					datum.constraint = +new_constraint
-					sel.addElems('span', 'constraint').html(new_constraint)
-				} else {
-					datum.constraint = null
-					sel.select('span', 'constraint').remove()
-				}
-				sel.classed('active', datum.constraint ? true : false)
-			}
+        if (d.key === 'excerpt') {
+          if (!sel.classed('active')) {
+            d3.selectAll('.txt-container')
+              .each((c) => {
+                if (c) c.is_excerpt = false;
+              })
+              .selectAll('.opt.excerpt')
+              .classed('active', false);
+            datum.is_excerpt = true;
+          } else {
+            datum.is_excerpt = false;
+          }
+          sel.classed('active', datum.is_excerpt);
+        } else if (d.key === 'constraint') {
+          if (!sel.classed('active')) {
+            const message = `${
+              vocabulary['limit input']['characters']
+            } <input type='number' name='length' value=${
+              datum.constraint || 9999
+            } min=1> ${vocabulary['input type']['characters']}`;
+            const opts = [
+              {
+                node: 'button',
+                type: 'button',
+                label: vocabulary['limit length'],
+                resolve: (_) =>
+                  d3.select('.modal input[name="length"]').node().value,
+              },
+            ];
+            const new_constraint = await renderPromiseModal({ message, opts });
 
-			// toggleClass(this, 'active')
-			if (editable) await partialSave('media')
-		})
-		opts.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.label)
-		opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
-			.html(d => d.value)
-	}
+            datum.constraint = +new_constraint;
+            sel.addElems('span', 'constraint').html(new_constraint);
+          } else {
+            datum.constraint = null;
+            sel.select('span', 'constraint').remove();
+          }
+          sel.classed('active', datum.constraint ? true : false);
+        }
 
-	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d.URLsToLinks())
+        // toggleClass(this, 'active')
+        if (editable) await partialSave('media');
+      });
+    opts
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
+    opts
+      .addElems('span', 'constraint', (d) =>
+        d.key === 'constraint' ? [d] : [],
+      )
+      .html((d) => d.value);
+  }
 
-	if (focus) media.media.node().focus()
+  media.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d.URLsToLinks());
+
+  if (focus) media.media.node().focus();
 }
-export function addEmbed (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addEmbed(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'embed'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
-	
-	if (level === 'meta' && name) {
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
-	}
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, required, editable } = data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'embed';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, required, editable },
-		focus: focus || false,
-		lang
-	})
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
 
-	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	}).classed('padded', true)
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus .media-group-items').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, instruction, required, editable },
+    focus: focus || false,
+    lang,
+  });
 
-	if (focus) media.media.node().focus()
+  media.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    .classed('padded', true)
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
+
+  if (focus) media.media.node().focus();
 }
-export function addChecklist (kwargs) { 
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addChecklist(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, options, instruction, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'checklist'
-	if (!name) name = null
-	if (!options) options = []
-	else {
-		// THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
-		options.sort((a, b) => {
-			if (a.name === b.name) return 0
-			else if (!a.name || !a.name.trim().length) return 1
-			else if (!b.name || !b.name.trim().length) return -1
-			else return a.id < b.id ? -1 : 1
-		})
-	}
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing && level !== 'meta'
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, options, instruction, required, editable } =
+    data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'checklist';
+  if (!name) name = null;
+  if (!options) options = [];
+  else {
+    // THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
+    options.sort((a, b) => {
+      if (a.name === b.name) return 0;
+      else if (!a.name || !a.name.trim().length) return 1;
+      else if (!b.name || !b.name.trim().length) return -1;
+      else return a.id < b.id ? -1 : 1;
+    });
+  }
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable))
+    editable = editing && level !== 'meta';
 
-	if (editable && !options.find(d => !d.name)) options.push({ checked: false })
-	if (!editable) options = options.filter(d => d.name)
+  if (editable && !options.find((d) => !d.name))
+    options.push({ checked: false });
+  if (!editable) options = options.filter((d) => d.name);
 
-	if (level === 'meta' && name) {
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
-	}
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
 
-	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, options, instruction, required, editable },
-		focus: focus || false,
-		lang
-	})
-	
-	// DETERMINE ID FOR THE INPUT NAME
-	let checklist_id = media.id
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus .media-group-items').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, options, instruction, required, editable },
+    focus: focus || false,
+    lang,
+  });
 
-	// TO DO: CHANGE THIS INSTRUCTION TO MEDIA TEXT
-	media.media.addElem('div', 'instruction')
-		.attrs({ 
-			'data-placeholder': d => vocabulary['request'][type],
-			'contenteditable': editing ? true : null 
-		}).on('keydown', _ => { if (editing) switchButtons(lang) })
-		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-		.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-		.html(d => d)
+  // DETERMINE ID FOR THE INPUT NAME
+  let checklist_id = media.id;
 
-	const list = media.media.addElem('ol')
-	list.call(addItem)	
+  // TO DO: CHANGE THIS INSTRUCTION TO MEDIA TEXT
+  media.media
+    .addElem('div', 'instruction')
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    .on('keydown', (_) => {
+      if (editing) switchButtons(lang);
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	if (editable) {
-		media.media.addElems('div', 'add-opt')
-			.on('click', function () {
-				media.container.each(d => {
-					d.options = d.options.filter(c => c.name?.length)
-					d.options.push({ checked: false })
-				})
-				list.call(addItem)
-			})	
-		.addElems('i', 'material-icons google-translate-attr')
-			.html('add_circle')
-	}
+  const list = media.media.addElem('ol');
+  list.call(addItem);
 
-	function addItem (sel, focus) {
-		const opts = sel.addElems('li', 'opt', d => d.options)
-			.classed('valid', d => d.name?.length)
-			.each((d, i) => d.id = i)
-		opts.addElems('div', 'hide')
-			.addElems('input')
-			.attrs({ 
-				'type': 'checkbox', 
-				'id': d => `check-item-${checklist_id}-${d.id}`, 
-				'value': d => d.name,
-				'name': `checklist-${checklist_id}`, 
-				'checked': d => d.checked || null,
-				'disabled': true
-			})
-		opts.addElems('div', 'checkbox')
-			.addElems('label')
-			.attr('for', d => `check-item-${checklist_id}-${d.id}`)
-		.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.checked ? 'check_box' : 'check_box_outline_blank')
-		opts.addElems('div', 'grow')
-			.addElems('label', 'list-item')
-			.attrs({ 
-				'for': d => `check-item-${checklist_id}-${d.id}`,
-				'data-placeholder': vocabulary['new checklist item'],
-				'contenteditable': editable ? true : null
-			})
-		.on('keydown', function (d) {
-			const evt = d3.event
-			if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
-				evt.preventDefault()
-				this.blur()
-				
-				media.container.each(c => {
-					c.options = c.options.filter(b => b.name?.length)
-					c.options.push({ checked: false })
-				})
-				list.call(addItem, true)
-			}
-		}).on('blur', function (d) {
-			d.name = this.innerText.trim()
-			d3.select(this).findAncestor('opt').classed('valid', d => d.name?.length)
+  if (editable) {
+    media.media
+      .addElems('div', 'add-opt')
+      .on('click', function () {
+        media.container.each((d) => {
+          d.options = d.options.filter((c) => c.name?.length);
+          d.options.push({ checked: false });
+        });
+        list.call(addItem);
+      })
+      .addElems('i', 'material-icons google-translate-attr')
+      .html('add_circle');
+  }
 
-			if (editable) switchButtons(lang)
-		}).html(d => d.name)
+  function addItem(sel, focus) {
+    const opts = sel
+      .addElems('li', 'opt', (d) => d.options)
+      .classed('valid', (d) => d.name?.length)
+      .each((d, i) => (d.id = i));
+    opts
+      .addElems('div', 'hide')
+      .addElems('input')
+      .attrs({
+        type: 'checkbox',
+        id: (d) => `check-item-${checklist_id}-${d.id}`,
+        value: (d) => d.name,
+        name: `checklist-${checklist_id}`,
+        checked: (d) => d.checked || null,
+        disabled: true,
+      });
+    opts
+      .addElems('div', 'checkbox')
+      .addElems('label')
+      .attr('for', (d) => `check-item-${checklist_id}-${d.id}`)
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => (d.checked ? 'check_box' : 'check_box_outline_blank'));
+    opts
+      .addElems('div', 'grow')
+      .addElems('label', 'list-item')
+      .attrs({
+        for: (d) => `check-item-${checklist_id}-${d.id}`,
+        'data-placeholder': vocabulary['new checklist item'],
+        contenteditable: editable ? true : null,
+      })
+      .on('keydown', function (d) {
+        const evt = d3.event;
+        if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
+          evt.preventDefault();
+          this.blur();
 
-		if (editable) {
-			opts.addElems('div', 'rm')
-				.addElems('i', 'material-icons google-translate-attr')
-				.html('clear')
-			.on('click', function (d) {
-				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
-				list.call(addItem)
-				
-				if (editable) switchButtons(lang)
-			})
-		}
+          media.container.each((c) => {
+            c.options = c.options.filter((b) => b.name?.length);
+            c.options.push({ checked: false });
+          });
+          list.call(addItem, true);
+        }
+      })
+      .on('blur', function (d) {
+        d.name = this.innerText.trim();
+        d3.select(this)
+          .findAncestor('opt')
+          .classed('valid', (d) => d.name?.length);
 
-		const emptyOpts = opts.filter(d => !d.name)
-		if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
-	}
+        if (editable) switchButtons(lang);
+      })
+      .html((d) => d.name);
 
-	if (focus) media.media.select('.instruction').node().focus()
+    if (editable) {
+      opts
+        .addElems('div', 'rm')
+        .addElems('i', 'material-icons google-translate-attr')
+        .html('clear')
+        .on('click', function (d) {
+          media.container.each(
+            (c) => (c.options = c.options.filter((b) => b.id !== d.id)),
+          );
+          list.call(addItem);
+
+          if (editable) switchButtons(lang);
+        });
+    }
+
+    const emptyOpts = opts.filter((d) => !d.name);
+    if (emptyOpts.node() && focus)
+      emptyOpts
+        .filter((d, i) => i === emptyOpts.size() - 1)
+        .select('.list-item')
+        .node()
+        .focus();
+  }
+
+  if (focus) media.media.select('.instruction').node().focus();
 }
-export function addRadiolist (kwargs) { 
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addRadiolist(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, options, instruction, required, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'radiolist'
-	if (!name) name = null
-	if (!options) options = []
-	else {
-		// THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
-		options.sort((a, b) => {
-			if (a.name === b.name) return 0
-			else if (!a.name || !a.name.trim().length) return 1
-			else if (!b.name || !b.name.trim().length) return -1
-			else return a.id < b.id ? -1 : 1
-		})
-	}
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing && level !== 'meta'
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, options, instruction, required, editable } =
+    data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'radiolist';
+  if (!name) name = null;
+  if (!options) options = [];
+  else {
+    // THIS IS SO THAT ANY NULL OPTION (THAT MIIGHT COME FROM AN EXCEL SHEET) GETS PUSHED TO THE END
+    options.sort((a, b) => {
+      if (a.name === b.name) return 0;
+      else if (!a.name || !a.name.trim().length) return 1;
+      else if (!b.name || !b.name.trim().length) return -1;
+      else return a.id < b.id ? -1 : 1;
+    });
+  }
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable))
+    editable = editing && level !== 'meta';
 
-	if (editable && !options.find(d => !d.name)) options.push({ checked: false })
-	if (!editable) options = options.filter(d => d.name)
+  if (editable && !options.find((d) => !d.name))
+    options.push({ checked: false });
+  if (!editable) options = options.filter((d) => d.name);
 
-	if (level === 'meta' && name) {
-		const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-		if (input) input.disabled = true
-	}
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
 
-	const media = new Media({
-		parent: section || d3.select('.group-container.focus .media-group-items').node() || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, options, instruction, required, editable },
-		focus: focus || false,
-		lang
-	})
-	
-	// DETERMINE ID FOR THE INPUT NAME
-	let radiolist_id = media.id//uuidv4()
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus .media-group-items').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, options, instruction, required, editable },
+    focus: focus || false,
+    lang,
+  });
 
-	media.media.addElem('div', 'instruction')
-		.attrs({ 
-			'data-placeholder': d => vocabulary['request'][type],
-			'contenteditable': editing ? true : null // NOTE HERE THE editing (INSTEAD OF editable) IS IMPORTANT: WE CAN SET A PREDEFINED INSTRUCTION, BUT THE INTENTION IS TO ALWAYS ALLOW THE EDITOR TO TAILOR WORDING TO THEIR LIKING
-		}).on('keydown', _ => { if (editing) switchButtons(lang) })
-		// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-		.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-		.html(d => d)
+  // DETERMINE ID FOR THE INPUT NAME
+  let radiolist_id = media.id; //uuidv4()
 
-	const list = media.media.addElem('ol')
-	list.call(addItem)	
+  media.media
+    .addElem('div', 'instruction')
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null, // NOTE HERE THE editing (INSTEAD OF editable) IS IMPORTANT: WE CAN SET A PREDEFINED INSTRUCTION, BUT THE INTENTION IS TO ALWAYS ALLOW THE EDITOR TO TAILOR WORDING TO THEIR LIKING
+    })
+    .on('keydown', (_) => {
+      if (editing) switchButtons(lang);
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	if (editable) {
-		media.media.addElems('div', 'add-opt')
-			.on('click', function () {
-				media.container.each(d => {
-					d.options = d.options.filter(c => c.name?.length)
-					d.options.push({ checked: false })
-				})
-				list.call(addItem)
-			})
-		.addElems('i', 'material-icons google-translate-attr')
-			.html('add_circle')
-	}
+  const list = media.media.addElem('ol');
+  list.call(addItem);
 
-	function addItem (sel) {
-		const opts = sel.addElems('li', 'opt', d => d.options)
-			.classed('valid', d => d.name?.length)
-			.each((d, i) => d.id = i)
-		opts.addElems('div', 'hide')
-			.addElems('input')
-			.attrs({ 
-				'type': 'checkbox', 
-				'id': d => `radio-item-${radiolist_id}-${d.id}`, 
-				'value': d => d.name,
-				'name': `radiolist-${radiolist_id}`, 
-				'checked': d => d.checked || null,
-				'disabled': true
-			})
-		opts.addElems('div', 'checkbox')
-			.addElems('label')
-			.attr('for', d => `radio-item-${radiolist_id}-${d.id}`)
-		.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.checked ? 'radio_button_checked' : 'radio_button_unchecked')
-		opts.addElems('div', 'grow')
-			.addElems('label', 'list-item')
-			.attrs({ 
-				'for': d => `radio-item-${radiolist_id}-${d.id}`,
-				'data-placeholder': vocabulary['new checklist item'],
-				'contenteditable': editable ? true : null
-			})
-		.on('keydown', function (d) {
-			const evt = d3.event
-			d.name = this.innerText.trim()
-			if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
-				evt.preventDefault()
-				this.blur()
-				
-				media.container.each(d => {
-					d.options = d.options.filter(c => c.name?.length)
-					d.options.push({ checked: false })
-				})
-				list.call(addItem)
-			}
-		}).on('blur', function (d) {
-			d.name = this.innerText.trim()
-			d3.select(this).findAncestor('opt').classed('valid', d => d.name?.length)
+  if (editable) {
+    media.media
+      .addElems('div', 'add-opt')
+      .on('click', function () {
+        media.container.each((d) => {
+          d.options = d.options.filter((c) => c.name?.length);
+          d.options.push({ checked: false });
+        });
+        list.call(addItem);
+      })
+      .addElems('i', 'material-icons google-translate-attr')
+      .html('add_circle');
+  }
 
-			if (editable) switchButtons(lang)
-		}).html(d => d.name)
+  function addItem(sel) {
+    const opts = sel
+      .addElems('li', 'opt', (d) => d.options)
+      .classed('valid', (d) => d.name?.length)
+      .each((d, i) => (d.id = i));
+    opts
+      .addElems('div', 'hide')
+      .addElems('input')
+      .attrs({
+        type: 'checkbox',
+        id: (d) => `radio-item-${radiolist_id}-${d.id}`,
+        value: (d) => d.name,
+        name: `radiolist-${radiolist_id}`,
+        checked: (d) => d.checked || null,
+        disabled: true,
+      });
+    opts
+      .addElems('div', 'checkbox')
+      .addElems('label')
+      .attr('for', (d) => `radio-item-${radiolist_id}-${d.id}`)
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) =>
+        d.checked ? 'radio_button_checked' : 'radio_button_unchecked',
+      );
+    opts
+      .addElems('div', 'grow')
+      .addElems('label', 'list-item')
+      .attrs({
+        for: (d) => `radio-item-${radiolist_id}-${d.id}`,
+        'data-placeholder': vocabulary['new checklist item'],
+        contenteditable: editable ? true : null,
+      })
+      .on('keydown', function (d) {
+        const evt = d3.event;
+        d.name = this.innerText.trim();
+        if ((evt.code === 'Enter' || evt.keyCode === 13) && !evt.shiftKey) {
+          evt.preventDefault();
+          this.blur();
 
-		if (editable) {
-			opts.addElems('div', 'rm')
-				.addElems('i', 'material-icons google-translate-attr')
-				.html('clear')
-			.on('click', function (d) {
-				media.container.each(c => c.options = c.options.filter(b => b.id !== d.id))
-				list.call(addItem)
-				
-				if (editable) switchButtons(lang)
-			})
-		}
+          media.container.each((d) => {
+            d.options = d.options.filter((c) => c.name?.length);
+            d.options.push({ checked: false });
+          });
+          list.call(addItem);
+        }
+      })
+      .on('blur', function (d) {
+        d.name = this.innerText.trim();
+        d3.select(this)
+          .findAncestor('opt')
+          .classed('valid', (d) => d.name?.length);
 
-		// const emptyOpts = opts.filter(d => !d.name)
-		// if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
-	}
+        if (editable) switchButtons(lang);
+      })
+      .html((d) => d.name);
 
-	// if (!editable) media.placement?.remove()
-	if (focus) media.media.select('.instruction').node().focus()
+    if (editable) {
+      opts
+        .addElems('div', 'rm')
+        .addElems('i', 'material-icons google-translate-attr')
+        .html('clear')
+        .on('click', function (d) {
+          media.container.each(
+            (c) => (c.options = c.options.filter((b) => b.id !== d.id)),
+          );
+          list.call(addItem);
+
+          if (editable) switchButtons(lang);
+        });
+    }
+
+    // const emptyOpts = opts.filter(d => !d.name)
+    // if (emptyOpts.node() && focus) emptyOpts.filter((d, i) => i === emptyOpts.size() - 1).select('.list-item').node().focus()
+  }
+
+  // if (!editable) media.placement?.remove()
+  if (focus) media.media.select('.instruction').node().focus();
 }
 // META ELEMENTS
-export function addLocations (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addLocations(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
-	if (!level) level = 'meta'
-	if (!type) type = 'location'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, constraint, required, editable } =
+    data || {};
+  if (!level) level = 'meta';
+  if (!type) type = 'location';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-	if (input) input.disabled = true
+  const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+  if (input) input.disabled = true;
 
-	const meta = new Meta({ 
-		// parent: d3.select('.meta-layout'), 
-		parent: d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, constraint, required, editable },
-		focus: focus,
-		lang
-	})
+  const meta = new Meta({
+    // parent: d3.select('.meta-layout'),
+    parent:
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: {
+      id,
+      level,
+      type,
+      name,
+      instruction,
+      constraint,
+      required,
+      editable,
+    },
+    focus: focus,
+    lang,
+  });
 
-	if (meta.opts) {
-		const opts = meta.opts.addElems('div', 'opt-group', [
-			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
-			[{ key: 'constraint', label: 'block', value: constraint }]
-		]).addElems('button', 'opt', d => d)
-		.classed('active', d => {
-			if (d.key === 'constraint') return constraint ? true : false
-		}).attr('type', 'button')
-			.each(function (d) { d3.select(this).classed(d.value, true) })
-		.on('click', async function (d) {
-			const sel = d3.select(this)
-			const datum = meta.container.datum()
-			
-			if (d.key === 'constraint') {
-				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input']['locations']} <input type='number' name='length' value=${datum.constraint || 10} min=1> ${vocabulary['input type']['locations']}`
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['limit length'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
-					const new_constraint = await renderPromiseModal({ message, opts })
+  if (meta.opts) {
+    const opts = meta.opts
+      .addElems('div', 'opt-group', [
+        [], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+        [{ key: 'constraint', label: 'block', value: constraint }],
+      ])
+      .addElems('button', 'opt', (d) => d)
+      .classed('active', (d) => {
+        if (d.key === 'constraint') return constraint ? true : false;
+      })
+      .attr('type', 'button')
+      .each(function (d) {
+        d3.select(this).classed(d.value, true);
+      })
+      .on('click', async function (d) {
+        const sel = d3.select(this);
+        const datum = meta.container.datum();
 
-					datum.constraint = +new_constraint
-					sel.addElems('span', 'constraint').html(new_constraint)
-				} else {
-					datum.constraint = null
-					sel.select('span', 'constraint').remove()
-				}
-				toggleClass(this, 'active')
-			}
+        if (d.key === 'constraint') {
+          if (!sel.classed('active')) {
+            const message = `${
+              vocabulary['limit input']['locations']
+            } <input type='number' name='length' value=${
+              datum.constraint || 10
+            } min=1> ${vocabulary['input type']['locations']}`;
+            const opts = [
+              {
+                node: 'button',
+                type: 'button',
+                label: vocabulary['limit length'],
+                resolve: (_) =>
+                  d3.select('.modal input[name="length"]').node().value,
+              },
+            ];
+            const new_constraint = await renderPromiseModal({ message, opts });
 
-			if (editable) await partialSave('media')
-		})
-		opts.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.label)
-		opts.addElems('span', 'constraint', d => d.key === 'constraint' ? [d] : [])
-			.html(d => d.value)
-	}
+            datum.constraint = +new_constraint;
+            sel.addElems('span', 'constraint').html(new_constraint);
+          } else {
+            datum.constraint = null;
+            sel.select('span', 'constraint').remove();
+          }
+          toggleClass(this, 'active');
+        }
 
-	meta.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+        if (editable) await partialSave('media');
+      });
+    opts
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
+    opts
+      .addElems('span', 'constraint', (d) =>
+        d.key === 'constraint' ? [d] : [],
+      )
+      .html((d) => d.value);
+  }
 
-	if (meta.inset) {
-		meta.inset.addElems('div', `inset-${type}`)
-			.addElems('ul', 'panel')
-			.addElems('li', 'instruction', [{ value: vocabulary['location instruction'] }])
-			.html(d => `* ${d.value}`) // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END FOR SMS DEPLOYMENT
-	}
+  meta.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	if (focus) meta.media.node().focus()
+  if (meta.inset) {
+    meta.inset
+      .addElems('div', `inset-${type}`)
+      .addElems('ul', 'panel')
+      .addElems('li', 'instruction', [
+        { value: vocabulary['location instruction'] },
+      ])
+      .html((d) => `* ${d.value}`); // TO DO: CHECK { value : } DATA STRUCTURE IS NECESSARY IN BACK END FOR SMS DEPLOYMENT
+  }
+
+  if (focus) meta.media.node().focus();
 }
-export async function addIndexes (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export async function addIndexes(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
-	if (!level) level = 'meta'
-	if (!type) type = 'index'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, constraint, required, editable } =
+    data || {};
+  if (!level) level = 'meta';
+  if (!type) type = 'index';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-	if (input) input.disabled = true
+  const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+  if (input) input.disabled = true;
 
-	const options = await POST('/apis/fetch/tags', { type: name, language })
-	options.sort((a, b) => a.key - b.key)
+  const options = await POST('/apis/fetch/tags', { type: name, language });
+  options.sort((a, b) => a.key - b.key);
 
-	const taglist = new Taglist({ 
-		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, constraint, required, editable },
-		focus: focus || false,
-		lang,
-		list: options
-	})
+  const taglist = new Taglist({
+    parent:
+      section ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: {
+      id,
+      level,
+      type,
+      name,
+      instruction,
+      constraint,
+      required,
+      editable,
+    },
+    focus: focus || false,
+    lang,
+    list: options,
+  });
 
-	if (focus) taglist.media.node().focus()
+  if (focus) taglist.media.node().focus();
 }
-export async function addTags (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export async function addTags(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
-	if (!level) level = 'meta'
-	if (!type) type = 'tag'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, constraint, required, editable } =
+    data || {};
+  if (!level) level = 'meta';
+  if (!type) type = 'tag';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-	if (input) input.disabled = true
+  const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+  if (input) input.disabled = true;
 
-	const options = await POST('/apis/fetch/tags', { type: name })
-	options.sort((a, b) => a.name?.localeCompare(b.name))
+  const options = await POST('/apis/fetch/tags', { type: name });
+  options.sort((a, b) => a.name?.localeCompare(b.name));
 
-	const taglist = new Taglist({ 
-		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, constraint, required, editable },
-		focus: focus || false,
-		lang,
-		list: options
-	})
+  const taglist = new Taglist({
+    parent:
+      section ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: {
+      id,
+      level,
+      type,
+      name,
+      instruction,
+      constraint,
+      required,
+      editable,
+    },
+    focus: focus || false,
+    lang,
+    list: options,
+  });
 
-	if (focus) taglist.media.node().focus()
+  if (focus) taglist.media.node().focus();
 }
-export function addAttachment (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export function addAttachment(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, instruction, constraint, required, editable } = data || {}
-	if (!level) level = 'meta'
-	if (!type) type = 'attachment'
-	if (!name) name = null
-	if (!instruction) instruction = ''
-	required = required ?? true
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, instruction, constraint, required, editable } =
+    data || {};
+  if (!level) level = 'meta';
+  if (!type) type = 'attachment';
+  if (!name) name = null;
+  if (!instruction) instruction = '';
+  required = required ?? true;
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const input = d3.select(`.media-input-group #input-meta-${name}`).node()
-	if (input) input.disabled = true
+  const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+  if (input) input.disabled = true;
 
-	const meta = new Meta({
-		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, instruction, constraint, required, editable },
-		focus: focus || false,
-		lang
-	})
+  const meta = new Meta({
+    parent:
+      section ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: {
+      id,
+      level,
+      type,
+      name,
+      instruction,
+      constraint,
+      required,
+      editable,
+    },
+    focus: focus || false,
+    lang,
+  });
 
-	meta.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	}).classed('padded', true)
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+  meta.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    .classed('padded', true)
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	if (focus) meta.media.node().focus()
+  if (focus) meta.media.node().focus();
 }
 // GROUPS
-export async function addGroup (kwargs) {
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export async function addGroup(kwargs) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	const { data, lang, section, sibling, focus } = kwargs || {}
-	let { id, level, type, name, structure, instruction, repeat, editable } = data || {}
-	if (!level) level = 'media'
-	if (!type) type = 'group'
-	if (!name) name = null
-	if (!structure) structure = []
-	if (!instruction) instruction = ''
-	if ([null, undefined].includes(editable)) editable = editing
+  const { data, lang, section, sibling, focus } = kwargs || {};
+  let { id, level, type, name, structure, instruction, repeat, editable } =
+    data || {};
+  if (!level) level = 'media';
+  if (!type) type = 'group';
+  if (!name) name = null;
+  if (!structure) structure = [];
+  if (!instruction) instruction = '';
+  if ([null, undefined].includes(editable)) editable = editing;
 
-	const media = new Media({
-		parent: section || d3.select('.media-layout.focus').node() || d3.selectAll('.media-layout').last().node(), 
-		sibling,
-		type, 
-		datum: { id, level, type, name, structure, instruction, repeat, editable },
-		focus: focus || false,
-		lang
-	})
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    type,
+    datum: { id, level, type, name, structure, instruction, repeat, editable },
+    focus: focus || false,
+    lang,
+  });
 
-	if (media.opts) {
-		const opts = media.opts.addElems('div', 'opt-group', [
-			[], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
-			[{ key: 'repeat', label: 'loop', value: repeat }]
-		]).addElems('button', 'opt', d => d)
-		.classed('active', d => {
-			if (d.key === 'repeat') return repeat ? true : false
-		}).attr('type', 'button')
-			.each(function (d) { d3.select(this).classed(d.value, true) })
-		.on('click', async function (d) {
-			const sel = d3.select(this)
-			const datum = media.container.datum()
-			
-			if (d.key === 'repeat') {
-				if (!sel.classed('active')) {
-					const message = `${vocabulary['limit input']['groups']} <input type='number' name='length' value=${datum.constraint || 5} min=1> ${vocabulary['input type']['groups']}`
-					const opts = [{ node: 'button', type: 'button', label: vocabulary['repeat group'], resolve: _ => d3.select('.modal input[name="length"]').node().value }]
-					const new_repeat = await renderPromiseModal({ message, opts })
+  if (media.opts) {
+    const opts = media.opts
+      .addElems('div', 'opt-group', [
+        [], // THIS IS EMPTY, AND FOR THE PROPER DISPLAY OF THE paragraph-opts
+        [{ key: 'repeat', label: 'loop', value: repeat }],
+      ])
+      .addElems('button', 'opt', (d) => d)
+      .classed('active', (d) => {
+        if (d.key === 'repeat') return repeat ? true : false;
+      })
+      .attr('type', 'button')
+      .each(function (d) {
+        d3.select(this).classed(d.value, true);
+      })
+      .on('click', async function (d) {
+        const sel = d3.select(this);
+        const datum = media.container.datum();
 
-					datum.repeat = +new_repeat
-					sel.addElems('span', 'repeat').html(new_repeat)
-				} else {
-					datum.repeat = null
-					sel.select('span', 'repeat').remove()
-				}
-				toggleClass(this, 'active')
-			}
+        if (d.key === 'repeat') {
+          if (!sel.classed('active')) {
+            const message = `${
+              vocabulary['limit input']['groups']
+            } <input type='number' name='length' value=${
+              datum.constraint || 5
+            } min=1> ${vocabulary['input type']['groups']}`;
+            const opts = [
+              {
+                node: 'button',
+                type: 'button',
+                label: vocabulary['repeat group'],
+                resolve: (_) =>
+                  d3.select('.modal input[name="length"]').node().value,
+              },
+            ];
+            const new_repeat = await renderPromiseModal({ message, opts });
 
-			if (editable) await partialSave('media')
-		})
-		opts.addElems('i', 'material-icons google-translate-attr')
-			.html(d => d.label)
-		opts.addElems('span', 'repeat', d => d.key === 'repeat' ? [d] : [])
-			.html(d => d.value)
-	}
+            datum.repeat = +new_repeat;
+            sel.addElems('span', 'repeat').html(new_repeat);
+          } else {
+            datum.repeat = null;
+            sel.select('span', 'repeat').remove();
+          }
+          toggleClass(this, 'active');
+        }
 
-	if (media.input) media.input.remove()
-	if (media.response) media.response.remove()
+        if (editable) await partialSave('media');
+      });
+    opts
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
+    opts
+      .addElems('span', 'repeat', (d) => (d.key === 'repeat' ? [d] : []))
+      .html((d) => d.value);
+  }
 
-	media.media.attrs({ 
-		'data-placeholder': d => vocabulary['request'][type],
-		'contenteditable': editing ? true : null 
-	})
-	// .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
-	.addElems('p', null, d => d.instruction.split('\n').filter(c => c))
-	.html(d => d)
+  if (media.input) media.input.remove();
+  if (media.response) media.response.remove();
 
-	if (focus) media.media.node().focus()
+  media.media
+    .attrs({
+      'data-placeholder': (d) => vocabulary['request'][type],
+      contenteditable: editing ? true : null,
+    })
+    // .html(d => d.instruction.replace(/\r?\n/g, '<br/>'))
+    .addElems('p', null, (d) => d.instruction.split('\n').filter((c) => c))
+    .html((d) => d);
 
-	await addItems(media.container)
+  if (focus) media.media.node().focus();
 
-	async function addItems (sel) {
-		// THE PROMISES DO NOT SEEM TO WORK PROPERLY
-		// WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
-		const { structure } = sel.datum()
-		const group = sel.addElems('div', 'media media-group-items')
-			.datum(structure)
+  await addItems(media.container);
 
-		for (let s = 0; s < structure.length; s++) {
-			await populateSection(structure[s], lang, group.node())
-		}
-	}
+  async function addItems(sel) {
+    // THE PROMISES DO NOT SEEM TO WORK PROPERLY
+    // WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
+    const { structure } = sel.datum();
+    const group = sel
+      .addElems('div', 'media media-group-items')
+      .datum(structure);
+
+    for (let s = 0; s < structure.length; s++) {
+      await populateSection(structure[s], lang, group.node());
+    }
+  }
 }
 
-export async function renderTemplate () {
-	// POPULATE THE PAGE
-	const object = d3.select('data[name="object"]').node()?.value
-	const template = JSON.parse(d3.select('data[name="template"]').node()?.value)
-	const { activity } = JSON.parse(d3.select('data[name="page"]').node()?.value)
-	const editing = activity === 'edit'
+export async function renderTemplate() {
+  // POPULATE THE PAGE
+  const object = d3.select('data[name="object"]').node()?.value;
+  const template = JSON.parse(
+    d3.select('data[name="template"]').node()?.value,
+  );
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
 
-	if (template.id) {
-		const { sections } = await POST('/load/template', { id: template.id })
+  if (template.id) {
+    const { sections } = await POST('/load/template', { id: template.id });
 
-		if (sections) {
-			for (let s = 0; s < sections.length; s++) {
-				const data = sections[s]
-				await addSection({ data, lang: language })
-			}
-		}
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	} else if (template.source) {
-		const { sections } = await POST('/load/template', { id: template.source })
+    if (sections) {
+      for (let s = 0; s < sections.length; s++) {
+        const data = sections[s];
+        await addSection({ data, lang: language });
+      }
+    }
+    // CLEAR CHANGES
+    window.sessionStorage.removeItem('changed-content');
+  } else if (template.source) {
+    const { sections } = await POST('/load/template', { id: template.source });
 
-		if (sections) {
-			for (let s = 0; s < sections.length; s++) {
-				const data = sections[s]
-				await addSection({ data, lang: language })
-			}
-		}
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	} else {
-		await addSection({ lang: language })
-		
-		if (template.category === 'review') {
-			const radiodata = {
-				level: 'meta',
-				type: 'radiolist',
-				name: 'review_score',
-				options: [{ name: vocabulary['accept'], value: 1 }, { name: vocabulary['reject'], value: 0 }],
-				instruction: vocabulary['accept or reject pad'],
-				required: true,
-				editable: false
-			}
-			addRadiolist({ data: radiodata, lang: language, focus: false })
-		} else {
-			addTitle({ lang: language })
-		}
-		// CLEAR CHANGES
-		window.sessionStorage.removeItem('changed-content')
-	}
+    if (sections) {
+      for (let s = 0; s < sections.length; s++) {
+        const data = sections[s];
+        await addSection({ data, lang: language });
+      }
+    }
+    // CLEAR CHANGES
+    window.sessionStorage.removeItem('changed-content');
+  } else {
+    await addSection({ lang: language });
+
+    if (template.category === 'review') {
+      const radiodata = {
+        level: 'meta',
+        type: 'radiolist',
+        name: 'review_score',
+        options: [
+          { name: vocabulary['accept'], value: 1 },
+          { name: vocabulary['reject'], value: 0 },
+        ],
+        instruction: vocabulary['accept or reject pad'],
+        required: true,
+        editable: false,
+      };
+      addRadiolist({ data: radiodata, lang: language, focus: false });
+    } else {
+      addTitle({ lang: language });
+    }
+    // CLEAR CHANGES
+    window.sessionStorage.removeItem('changed-content');
+  }
 }

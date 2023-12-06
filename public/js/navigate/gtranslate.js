@@ -67,13 +67,5 @@ cookieStore.addEventListener('change', async ({ changed }) => {
   }
 });
 
-function DOMLoad() {
-  window.googleTranslateElementInit = googleTranslateElementInit;
-  window.googleTranslateElement = null;
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.googleTranslateElementInit = googleTranslateElementInit;
+window.googleTranslateElement = null;

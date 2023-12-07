@@ -66,7 +66,8 @@ async function DOMLoad() {
 	        });
 	    };
       }
-    } else if (['templates', 'pads'].includes(key) && writables[key]) {
+    };
+    if (['templates', 'pads'].includes(key) && writables[key]) {
       if (opts.length && opts[opts.length - 1]?.class !== 'divider') {
 	      opts.push({
 	        node: 'div',

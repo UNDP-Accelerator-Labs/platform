@@ -3688,15 +3688,31 @@ export async function addAttachment(kwargs) {
           resolve: (_) => {
             return new Promise(async (resolve) => {
               const pad_id = await partialSave('meta');
+              const params = new URLSearchParams();
+              params.set('uri', d.uri);
+              params.set('pad_id', pad_id);
+              params.set('element_id', meta.id);
+              params.set('name', name);
+              params.set('type', type);
+              if (d.resources?.length) {
+              	d.resources.forEach((c) => {
+              		params.append('resources', c);
+              	});
+              };
               resolve(
-                window.location.replace(
-                  `/request/resource?uri=${encodeURI(
-                    d.uri,
-                  )}&pad_id=${pad_id}&element_id=${
-                    meta.id
-                  }&name=${name}&type=${type}`,
-                ),
+              	window.location.replace(
+              		`/request/resource?${params.toString()}`
+              	),
               );
+              // resolve(
+              //   window.location.replace(
+              //     `/request/resource?uri=${encodeURI(
+              //       d.uri,
+              //     )}&pad_id=${pad_id}&element_id=${
+              //       meta.id
+              //     }&name=${name}&type=${type}`,
+              //   ),
+              // );
             });
           },
         });

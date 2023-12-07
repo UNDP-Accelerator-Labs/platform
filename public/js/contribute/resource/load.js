@@ -4,9 +4,9 @@ import { renderPromiseModal } from '/js/modals.js';
 
 async function DOMLoad() {
   const rights = JSON.parse(d3.select('data[name="rights"]').node().value);
-
+  const resources = JSON.parse(d3.select('data[name="req_resources"]').node().value);
   // LOAD DATA
-  const [data, templates] = await getContent();
+  const [readables, writables] = await getContent({ resources });
   // const { modules } = await POST('/load/metadata', { feature: [ 'modules' ] })
 
   // CREATE MODAL
@@ -20,9 +20,9 @@ async function DOMLoad() {
   const module_opts = {};
   const template_opts = {};
 
-  for (const key in data) {
-    if (data[key].length) {
-      module_opts[key] = data[key].map((d) => {
+  resources.forEach((key) => {
+    if (readables[key].length) {
+      module_opts[key] = readables[key].map((d) => {
         return {
           label: `${d.title || d.name}${
             d.ownername ? `<div class="sub">${d.ownername}</div>` : ''
@@ -57,14 +57,14 @@ async function DOMLoad() {
           });
         },
       });
-      if (['templates', 'pads'].includes(key)) {
+      if (['templates', 'pads'].includes(key) && writables[key]) {
         opts.push({
           node: 'div',
           class: 'divider',
-          label: vocabulary['or'],
+          label: vocabulary['or'].toUpperCase(),
         });
-        if (templates[key]?.length) {
-          template_opts[key] = templates[key].map((d) => {
+        if (writables[key]?.length) {
+          template_opts[key] = writables[key].map((d) => {
             return {
               label: `${d.title || d.name}${
                 d.ownername ? `<div class="sub">${d.ownername}</div>` : ''
@@ -129,11 +129,11 @@ async function DOMLoad() {
             },
           });
         }
-      } else if (key === 'files') {
+      } else if (key === 'files' && writables[key]) {
         opts.push({
           node: 'div',
           class: 'divider',
-          label: 'OR', // TO DO: TRANSLATE
+          label: vocabulary['or'].toUpperCase(),
         });
         opts.push({
           node: 'input',
@@ -179,15 +179,15 @@ async function DOMLoad() {
           },
         });
       }
-      if (key !== Object.keys(data)[Object.keys(data).length - 1]) {
+      if (key !== Object.keys(readables)[Object.keys(readables).length - 1]) {
         opts.push({
           node: 'div',
           class: 'divider',
-          label: vocabulary['or'],
+          label: vocabulary['or'].toUpperCase(),
         });
       }
     }
-  }
+  });
 
   const close = function () {
     window.location.replace(

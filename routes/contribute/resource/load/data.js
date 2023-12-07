@@ -7,17 +7,17 @@ module.exports = kwargs => {
 
 	const { uuid, rights, collaborators } = req.session || {}
 
-	let { modules: req_modules } = req.body || {}
-	if (!req_modules) req_modules = [ 'pads', 'templates', 'files', 'reviews' ]
-	else if (req_modules && !Array.isArray(req_modules)) req_modules = [req_modules]
+	let { resources: req_resources } = req.body || {}
+	if (!req_resources) req_resources = [ 'pads', 'templates', 'files', 'reviews' ].filter(d => modules.some(c => c.type === d))
 	
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	return conn.task(t => {
 		const batch = []
+		// SELECTABLE RESOURCES
 		batch.push(t.task(t1 => {
-			return t1.batch(req_modules.map(d => {
+			return t1.batch(req_resources.map(d => {
 				if (modules.some(c => c.type === d && c.rights.read <= rights)) {
 					if (d === 'pads') {
 						return t1.any(`
@@ -37,7 +37,7 @@ module.exports = kwargs => {
 					} else if (d === 'templates') {
 						return t1.any(`
 							SELECT id, title, owner FROM templates
-							WHERE status > 2
+							WHERE status > 1
 								AND owner IN ($1:csv)
 							ORDER BY date DESC
 						;`, [ collaborators_ids ])
@@ -85,9 +85,9 @@ module.exports = kwargs => {
 			})).then(results => flatObj.call(results.filter(d => d)))
 			.catch(err => console.log(err))
 		}))
-
+		// WRITABLE RESOURCES
 		batch.push(t.task(t1 => {
-			return t1.batch(req_modules.map(d => {
+			return t1.batch(req_resources.map(d => {
 				if (modules.some(c => {
 					let { write } = c.rights
 					if (typeof write === 'object') write = write.templated
@@ -108,7 +108,11 @@ module.exports = kwargs => {
 							}
 							return { pads } 
 						}).catch(err => console.log(err))
-					} else return null
+					} else {
+						const obj = {}
+						obj[d] = true
+						return obj
+					}
 					/* else if (d === 'reviews') {
 						return t1.any(`
 							SELECT t.id, t.title, t.owner 
@@ -123,6 +127,8 @@ module.exports = kwargs => {
 			})).then(results => flatObj.call(results))
 			.catch(err => console.log(err))
 		}))
+
+		batch.push(req_resources)
 
 		return t.batch(batch)
 		.catch(err => console.log(err))

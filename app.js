@@ -41,7 +41,9 @@ app.use(
       directives: {
         'img-src': csp_links.concat(['blob:']),
         'script-src': csp_links.concat([
-          (req, res) => `'nonce-${res.locals.nonce}'`
+          (req, res) => `'nonce-${res.locals.nonce}'`,
+          'sha256-NNiElek2Ktxo4OLn2zGTHHeUR6b91/P618EXWJXzl3s=',
+          'strict-dynamic',
         ]),
         'script-src-attr': [
           "'self'",
@@ -49,6 +51,9 @@ app.use(
           'sdg-innovation-commons.org',
         ],
         'style-src': csp_links,
+        // .concat([
+        //   "'unsafe-inline'"
+        // ]),
         'connect-src': csp_links.concat([
           // 'blob:http:://localhost:2000/'
           'blob:',

@@ -25,7 +25,7 @@ let {
 } = require('./edit/');
 const fs = require('fs');
 
-const { lodashNonce } = require('./nonces/');
+const lodashNonce  = require('./nonces/');
 
 exports.translations = translations;
 
@@ -180,7 +180,6 @@ exports.csp_links = [
   "'self'",
   '*.sdg-innovation-commons.org',
   'sdg-innovation-commons.org',
-  `'nonce-${lodashNonce}'`,
   'https://translate.google.com',
   'https://translate.googleapis.com',
   'https://translate-pa.googleapis.com',

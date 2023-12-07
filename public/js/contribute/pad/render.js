@@ -4225,7 +4225,7 @@ export async function renderPad(kwargs) {
   if (editing && !id && type === 'templated') {
     // GET TEMPLATE DATA
     const { sections } = await POST('/load/template', { id: pad.template.id });
-
+    
     // APPEND locked_excerpt TO THE pad data DOM ELEMENT
     const locked_excerpt =
       object === 'pad' &&
@@ -4253,9 +4253,9 @@ export async function renderPad(kwargs) {
         const data = sections[s];
 
         if (display === 'slideshow') {
-          await addSlides({ data: d, lang: language, objectdata });
+          await addSlides({ data, lang: language, objectdata });
         } else {
-          await addSection({ data: d, lang: language, objectdata });
+          await addSection({ data, lang: language, objectdata });
         }
       }
     }

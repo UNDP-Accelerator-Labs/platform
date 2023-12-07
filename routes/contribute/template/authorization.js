@@ -8,7 +8,7 @@ module.exports = _kwargs => {
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 
 	if (rights < write) {
-		if (id) return conn.one(`SELECT status FROM templates WHERE id = $1::INT;`, [ id ], d => d.status > 2)
+		if (id) return conn.one(`SELECT status FROM templates WHERE id = $1::INT;`, [ id ], d => d.status >= 2)
 			.then(result => {
 				if (result === true) return { authorized: rights >= read, redirect: 'view' }
 				else return { authorized: false }

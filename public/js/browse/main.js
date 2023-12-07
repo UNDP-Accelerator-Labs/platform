@@ -1,10 +1,10 @@
-import { POST } from '/js/fetch.js'
-import { renderPromiseModal, renderLonglistFormModal } from '/js/modals.js'
+import { POST } from '/js/fetch.js';
+import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
 
-export function openPreview () {
-	const url = new URL(window.location)
-	const href = url.href.replace('/browse/', '/preview/')
-	window.open(href, '_blank')
+export function openPreview() {
+  const url = new URL(window.location);
+  const href = url.href.replace('/browse/', '/preview/');
+  window.open(href, '_blank');
 }
 
 export async function setShareOptions(node) {
@@ -220,37 +220,41 @@ export async function pinAll(node) {
   await POST('/pin', reqbody);
   location.reload();
 }
-export function redirect (_kwargs) {
-	let { location, params, rm } = _kwargs
-	if (!Array.isArray(rm)) rm = [rm]
-	
-	const url = new URL(window.location)
-	const queryparams = new URLSearchParams(url.search)
-	
-	// const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
+export function redirect(_kwargs) {
+  let { location, params, rm } = _kwargs;
+  if (!Array.isArray(rm)) rm = [rm];
 
-	// filter_keys.push('search')
-	// for (const key of queryparams.keys()) {
-	// 	if (!filter_keys.includes(key)) queryparams.delete(key)
-	// }
-	// return window.location = `${location}?${queryparams.toString()}`
+  const url = new URL(window.location);
+  const queryparams = new URLSearchParams(url.search);
 
-	if (rm?.length) {
-		rm.forEach(d => {
-			queryparams.delete(d);
-		})
-	}
+  // const filter_keys = <%- JSON.stringify(Object.keys(query)?.filter(key => !['status'].includes(key))) %>
 
-	// if (!keep_status) { queryparams.delete('status'); }
-	
-	if (params && !Array.isArray(params)) params = [params]
-	if (params?.length) {
-		params.forEach(d => {
-			if (d.key && d.value) { queryparams.set(d.key, d.value); }
-		})
-	};
+  // filter_keys.push('search')
+  // for (const key of queryparams.keys()) {
+  // 	if (!filter_keys.includes(key)) queryparams.delete(key)
+  // }
+  // return window.location = `${location}?${queryparams.toString()}`
 
-	if (!location) { location = `${url.origin}${url.pathname}` }
-	
-	return window.location = `${location}?${queryparams.toString()}`;
-};
+  if (rm?.length) {
+    rm.forEach((d) => {
+      queryparams.delete(d);
+    });
+  }
+
+  // if (!keep_status) { queryparams.delete('status'); }
+
+  if (params && !Array.isArray(params)) params = [params];
+  if (params?.length) {
+    params.forEach((d) => {
+      if (d.key && d.value) {
+        queryparams.set(d.key, d.value);
+      }
+    });
+  }
+
+  if (!location) {
+    location = `${url.origin}${url.pathname}`;
+  }
+
+  return (window.location = `${location}?${queryparams.toString()}`);
+}

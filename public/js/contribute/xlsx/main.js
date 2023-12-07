@@ -1,112 +1,122 @@
-import { vocabulary, language } from '/js/config/translations.js'
-import { toggleClass, getContent } from '/js/main.js'
-import { POST } from '/js/fetch.js'
-import { renderPromiseModal } from '/js/modals.js'
+import { language, vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { toggleClass } from '/js/main.js';
+import { renderPromiseModal } from '/js/modals.js';
 
-export function dropHandler(evt, node) { 
-	evt.preventDefault()
-	const sel = d3.select(node)
-	const label = sel.select('.drop-zone button label')
+export function dropHandler(evt, node) {
+  evt.preventDefault();
+  const sel = d3.select(node);
+  const label = sel.select('.drop-zone button label');
 
-	if (evt.dataTransfer.items) {
-		// DataTransferItemList INTERFACE TO ACCES THE FILE
-		const items = evt.dataTransfer.items
-		if (items.length > 1) {
-			sel.classed('accept', false).classed('reject', true)
-			label.html(vocabulary['chose only one file']['xlsx'])
-		} else {
-			const item = items[0]
-			if (item.kind === 'file') {
-				const file = item.getAsFile();
-				if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
-					parseXLSX(file, d3.select(node).select('input[type=file]').node())
-				} else {
-					sel.classed('accept', false).classed('reject', true)
-					label.html(vocabulary['chose file']['xlsx'])
-				}
-			} else {
-				sel.classed('accept', false).classed('reject', true)
-				label.html(vocabulary['chose file']['xlsx'])
-			}
-		}
-	} else {
-		// DataTransfer INTERFAE TO ACCESS THE FILE
-		const items = evt.dataTransfer.files
-		if (items.length > 1) {
-			sel.classed('accept', false).classed('reject', true)
-			label.html(vocabulary['chose only one file']['xlsx'])
-		} else {
-			const file = evt.dataTransfer.files[0]
-			if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
-				parseXLSX(file, d3.select(node).select('input[type=file]').node())
-			} else {
-				sel.classed('accept', false).classed('reject', true)
-				label.html(vocabulary['chose file']['xlsx'])
-			}
-		}
-
-	}
+  if (evt.dataTransfer.items) {
+    // DataTransferItemList INTERFACE TO ACCES THE FILE
+    const items = evt.dataTransfer.items;
+    if (items.length > 1) {
+      sel.classed('accept', false).classed('reject', true);
+      label.html(vocabulary['chose only one file']['xlsx']);
+    } else {
+      const item = items[0];
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (
+          file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) {
+          parseXLSX(file, d3.select(node).select('input[type=file]').node());
+        } else {
+          sel.classed('accept', false).classed('reject', true);
+          label.html(vocabulary['chose file']['xlsx']);
+        }
+      } else {
+        sel.classed('accept', false).classed('reject', true);
+        label.html(vocabulary['chose file']['xlsx']);
+      }
+    }
+  } else {
+    // DataTransfer INTERFAE TO ACCESS THE FILE
+    const items = evt.dataTransfer.files;
+    if (items.length > 1) {
+      sel.classed('accept', false).classed('reject', true);
+      label.html(vocabulary['chose only one file']['xlsx']);
+    } else {
+      const file = evt.dataTransfer.files[0];
+      if (
+        file.type ===
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ) {
+        parseXLSX(file, d3.select(node).select('input[type=file]').node());
+      } else {
+        sel.classed('accept', false).classed('reject', true);
+        label.html(vocabulary['chose file']['xlsx']);
+      }
+    }
+  }
 }
-export function parseXLSX (file, node) {
-	const reader = new FileReader()
+export function parseXLSX(file, node) {
+  const reader = new FileReader();
 
-	d3.select(node).attr('data-fname', file.name)
+  d3.select(node).attr('data-fname', file.name);
 
-	reader.onload = function (e) {
-		var data = new Uint8Array(e.target.result)
-		var workbook = XLSX.read(data, { type: 'array', bookFiles: true })
+  reader.onload = function (e) {
+    var data = new Uint8Array(e.target.result);
+    var workbook = XLSX.read(data, { type: 'array', bookFiles: true });
 
-		let images = []
-		if (workbook.keys) {
-			const media = workbook.keys.filter(k => k.includes('media/image'))
+    let images = [];
+    if (workbook.keys) {
+      const media = workbook.keys.filter((k) => k.includes('media/image'));
 
-			images = media.map((m, i) => {
-				const name = workbook.files[m].name // .split('media/')[1]
-				const buffer = workbook.files[m].content.buffer // workbook.files[m]._data?.getContent()
+      images = media.map((m, i) => {
+        const name = workbook.files[m].name; // .split('media/')[1]
+        const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
 
-				const blob = new Blob([buffer], {'type': 'image/png'})
-				const urlCreator = window.URL || window.webkitURL
-				const imageUrl = urlCreator.createObjectURL(blob)
-				return { id: name?.extractDigits(), type: 'img', src: imageUrl }	
-			})
-		}
-		workbook.SheetNames.forEach((s, i) => {
-			const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], { defval: null })
+        const blob = new Blob([buffer], { type: 'image/png' });
+        const urlCreator = window.URL || window.webkitURL;
+        const imageUrl = urlCreator.createObjectURL(blob);
+        return { id: name?.extractDigits(), type: 'img', src: imageUrl };
+      });
+    }
+    workbook.SheetNames.forEach((s, i) => {
+      const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
+        defval: null,
+      });
 
-			let keys = Object.keys(json[0])
-			if (images.length) {
-				// WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
-				// THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
-				const cols = keys.map(d => {
-					const obj = {}
-					obj.key = d
-					obj.values = json.map(c => c[d]).filter(c => c) // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
-					return obj
-				})
-				const imageCol = cols.find(d => !d.values.length)?.key || null
-				if (imageCol) {
-					json.forEach((d, i) => { // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
-						d[imageCol] = images.find(c => c.id === i + 1)
-					})
-				}
-			}
-			if (i === 0) {  // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
-				const cols = parseColumns(json, keys)
-				renderTable(cols)
-			}
-		})
-		// HIDE THE LOADING BUTTON
-		const main = d3.select('div.table main')
-		const layout = main.select('div.inner')
-		const head = layout.select('div.head')
+      let keys = Object.keys(json[0]);
+      if (images.length) {
+        // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
+        // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
+        const cols = keys.map((d) => {
+          const obj = {};
+          obj.key = d;
+          obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
+          return obj;
+        });
+        const imageCol = cols.find((d) => !d.values.length)?.key || null;
+        if (imageCol) {
+          json.forEach((d, i) => {
+            // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
+            d[imageCol] = images.find((c) => c.id === i + 1);
+          });
+        }
+      }
+      if (i === 0) {
+        // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+        const cols = parseColumns(json, keys);
+        renderTable(cols);
+      }
+    });
+    // HIDE THE LOADING BUTTON
+    const main = d3.select('div.table main');
+    const layout = main.select('div.inner');
+    const head = layout.select('div.head');
 
-		main.select('.input-group').classed('hide', true)
-		head.classed('status-0', false)
-			.classed('status-1', true)
-			.select('button[type=submit]')
-			.attr('disabled', null)
-	}
-	reader.readAsArrayBuffer(file)
+    main.select('.input-group').classed('hide', true);
+    head
+      .classed('status-0', false)
+      .classed('status-1', true)
+      .select('button[type=submit]')
+      .attr('disabled', null);
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function parseXLSX(file, node) {
@@ -968,63 +978,82 @@ function renderTable(cols, update = false) {
   const nextState = { additionalInformation: 'Updated the URL with JS' };
   window.history.pushState(nextState, nextTitle, nextURL);
 }
-function seekPrefix (arr) {
-	// INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
-	const A = arr.filter(d => d).concat().sort()
-	const a1 = A[0]
-	const a2 = A[A.length-1]
-	const L = a1.length
-	let i = 0
-	while (i < L && a1.charAt(i) === a2.charAt(i)) i++
-	return a1.substring(0, i)
+function seekPrefix(arr) {
+  // INSPIRED BY https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings
+  const A = arr
+    .filter((d) => d)
+    .concat()
+    .sort();
+  const a1 = A[0];
+  const a2 = A[A.length - 1];
+  const L = a1.length;
+  let i = 0;
+  while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
+  return a1.substring(0, i);
 }
-function splitValues (col, separator) {
-	if (!separator) return null
-	const cols = d3.select('table.xls-preview').datum()
-	cols.forEach(d => {
-		if (d.key === col) {
-			// CHECK IF THE SPARATOR WAS INPUT TWICE (OR MORE)
-			const regex = new RegExp(`${RegExp.escape(separator)}${RegExp.escape(separator)}+`, 'gi')
-			d.entries = d.entries.map(c => {
-				if (c) {
-					c = c.replace(/\n/g, ' ')
-					let e = c.replace(regex, separator).split(separator)
-					if (Array.isArray(e)) { // NOTE THIS SHOULD ALWAYS BE THE CASE
-						e = e.map(b => {
-							if (!isNaN(b)) return +b
-							else return b
-						})
-					}
-					return e
-				} else return undefined
-			})
-			d.values = d.values.map(c => c.replace(regex, separator).split(separator)).flat().unique()
-			d.types = d.entries.filter(c => c !== undefined).map(c => {
-				if (Array.isArray(c)) {
-					const listcontent = c.map(b => typeof b).unique()
-					return `list of ${listcontent}s`
-				} else return typeof c
-			}).unique()
-			d.type = 'checklist'
-		}
-	})
-	renderTable(cols)
+function splitValues(col, separator) {
+  if (!separator) return null;
+  const cols = d3.select('table.xls-preview').datum();
+  cols.forEach((d) => {
+    if (d.key === col) {
+      // CHECK IF THE SPARATOR WAS INPUT TWICE (OR MORE)
+      const regex = new RegExp(
+        `${RegExp.escape(separator)}${RegExp.escape(separator)}+`,
+        'gi',
+      );
+      d.entries = d.entries.map((c) => {
+        if (c) {
+          c = c.replace(/\n/g, ' ');
+          let e = c.replace(regex, separator).split(separator);
+          if (Array.isArray(e)) {
+            // NOTE THIS SHOULD ALWAYS BE THE CASE
+            e = e.map((b) => {
+              if (!isNaN(b)) return +b;
+              else return b;
+            });
+          }
+          return e;
+        } else return undefined;
+      });
+      d.values = d.values
+        .map((c) => c.replace(regex, separator).split(separator))
+        .flat()
+        .unique();
+      d.types = d.entries
+        .filter((c) => c !== undefined)
+        .map((c) => {
+          if (Array.isArray(c)) {
+            const listcontent = c.map((b) => typeof b).unique();
+            return `list of ${listcontent}s`;
+          } else return typeof c;
+        })
+        .unique();
+      d.type = 'checklist';
+    }
+  });
+  renderTable(cols);
 }
-export function groupColumns () {
-	const cols = d3.select('table.xls-preview').datum()
-	const selected = d3.selectAll('table.xls-preview thead .column-selection .selected')
+export function groupColumns() {
+  const cols = d3.select('table.xls-preview').datum();
+  const selected = d3.selectAll(
+    'table.xls-preview thead .column-selection .selected',
+  );
 
-	if (selected.size() > 1) {
-		const groupedkeys = selected.data().map(d => d.key)
-		const keys = cols.map(d => d.key).diff(groupedkeys) // NOT SURE WHAT THIS DOES
-		keys.push(groupedkeys)
-		parseGroups(cols, keys)
-	}
+  if (selected.size() > 1) {
+    const groupedkeys = selected.data().map((d) => d.key);
+    const keys = cols.map((d) => d.key).diff(groupedkeys); // NOT SURE WHAT THIS DOES
+    keys.push(groupedkeys);
+    parseGroups(cols, keys);
+  }
 }
-export function dropColumns () {
-	let cols = d3.select('table.xls-preview').datum()
-	const dropkeys = d3.select('table.xls-preview thead').selectAll('.selected').data().map(d => d.key)
-	renderTable(cols.filter(d => !dropkeys.includes(d.key)))
+export function dropColumns() {
+  let cols = d3.select('table.xls-preview').datum();
+  const dropkeys = d3
+    .select('table.xls-preview thead')
+    .selectAll('.selected')
+    .data()
+    .map((d) => d.key);
+  renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
 }
 function compileLocations(idx) {
   return new Promise(async (resolve) => {
@@ -1045,370 +1074,565 @@ function compileLocations(idx) {
     }
   });
 }
-export async function compilePads (idx, structureOnly = false) {
-	const { metafields, media_value_keys } = JSON.parse(d3.select('data[name="pad"]').node().value)
-	const { name: userlocation } = JSON.parse(d3.select('data[name="location"]').node().value)
+export async function compilePads(idx, structureOnly = false) {
+  const { metafields, media_value_keys } = JSON.parse(
+    d3.select('data[name="pad"]').node().value,
+  );
+  const { name: userlocation } = JSON.parse(
+    d3.select('data[name="location"]').node().value,
+  );
 
-	const cols = d3.select('table.xls-preview').datum()
-	// FORWARD GEOCODE THE TEXT LOCATIONS
-	const compiledLocations = await compileLocations(idx)
+  const cols = d3.select('table.xls-preview').datum();
+  // FORWARD GEOCODE THE TEXT LOCATIONS
+  const compiledLocations = await compileLocations(idx);
 
-	const entriesLength = Math.max(...cols.map(d => d.entries.length))
-	const pads = new Array(entriesLength).fill(0).map((d, i) => i)
-	.filter(i => {
-		if (![null, undefined].includes(idx)) return i === idx
-		else return true // COMPILE ALL PADS
-	}).map(i => {
-		return new Promise(async resolve0 => {
-			const items = cols.map(c => {
-				return new Promise(async resolve1 => {
-					const item = {}
-					
-					if (['txt', 'title'].includes(c.type) 
-						|| ['txt', 'title'].includes(metafields.find(b => b.label === c.type)?.type)
-					) {
-						if (!structureOnly) {
-							if (Array.isArray(c.entries[i])) {
-								item.txt = c.entries[i].sort((a, b) => {
-									if (typeof a === 'string' && typeof b === 'string') return a?.localeCompare(b)
-									else return a - b
-								}).join(', ')
-							} else item.txt = c.entries[i] ?? ''
-							item.has_content = item.txt?.toString().trim()?.length > 0
-						}
-						// item.type = c.type
-						item.type = metafields.find(b => b.label === c.type)?.type || c.type
-						item.name = metafields.find(b => b.label === c.type)?.label || null
-						// item.level = 'media'
-						item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
-					}
-					if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('embed')) {
-						if (!structureOnly) {
-							item.html = c.entries[i] ?? ''
-							item.has_content = item.html?.trim()?.length > 0
-						}
-						// item.type = c.type
-						item.type = metafields.find(b => b.label === c.type)?.type || c.type
-						item.name = metafields.find(b => b.label === c.type)?.label || null
-						// item.level = 'media'
-						item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
-					}
-					if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('img')) {
-						// item.type = c.type // THIS COMES FIRST HERE AS WE UPDATE IT IN THE CASE OF A mosaic
-						item.type = metafields.find(b => b.label === c.type)?.type || c.type
-						
-						if (!structureOnly) {
-							if (c.entries[i]?.src) item.src = c.entries[i].src
-							else {
-								if (Array.isArray(c.entries[i])) { 
-									const containsURLs = c.entries[i].map(b => b.isURL()).unique()
-									if (containsURLs.length === 1 && containsURLs.includes(true)) { // A MOSAIC OF URLS
-										item.srcs = c.entries[i].map(b => encodeURI(b.trim()))
-										item.type = 'mosaic'
-										// item.type = 'mosaic'
-									} else item.src = null
-								} else if (c.entries[i]?.isURL()) item.src = encodeURI(c.entries[i].trim())
-								else item.src = null
-							}
-							if (item.type === 'mosaic') item.has_content = item?.srcs?.filter(b => b)?.length > 0
-							else item.has_content = ![null, undefined].includes(item.src)
-						}
-						// item.level = 'media'
-						item.name = metafields.find(b => b.label === c.type)?.label || null
-						item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
-					}
-					if ([c.type, metafields.find(b => b.label === c.type)?.type].includes('video')) { // THERE CAN BE NO VIDEO UPLOAD FROM EXCEL: THIS IS ONLY A PLACEHOLDER IN THE TABLE/ PAD
-						if (!structureOnly) {
-							item.src = null
-							item.has_content = ![null, undefined].includes(item.src)
-						}
-						// item.type = c.type
-						item.type = metafields.find(b => b.label === c.type)?.type || c.type
-						item.name = metafields.find(b => b.label === c.type)?.label || null
-						// item.level = 'media'
-						item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
-					}
-					if (['checklist', 'radiolist'].includes(c.type) 
-						|| ['checklist', 'radiolist'].includes(metafields.find(b => b.label === c.type)?.type)
-					) {
-						item.options = c.values //.filter(d => ![null, undefined].includes(d)).unique() // VALUES SHOUlD BE COMOPLETE (NO null OR undefined) AND SHOULD NOT BE unique
-							.sort((a, b) => {
-								if (typeof a === 'string' && typeof b === 'string') return a?.localeCompare(b)
-								else return a - b
-							}).map((d, i) => { 
-								const obj = {}
-								obj.id = i
-								obj.name = d?.toString()
-								obj.checked = false
-								
-								if (!structureOnly) {
-									if (c.entries[i]) {
-										if (typeof c.entries[i] !== 'object') { // THIS COULD PROBABLY BE CHANGED TO Array.isArray()
-											if (typeof c.entries[i] === 'string' && c.entries[i].toLowerCase().trim() === d) {
-												obj.checked = true
-											} else if (c.entries[i] === d) obj.checked = true
-										} else {
-											if (c.entries[i].map(b => typeof b === 'string' ? b.toLowerCase().trim() : b).includes(d)) obj.checked = true
-										}
-									}
-								}
-								return obj
-							})
+  const entriesLength = Math.max(...cols.map((d) => d.entries.length));
+  const pads = new Array(entriesLength)
+    .fill(0)
+    .map((d, i) => i)
+    .filter((i) => {
+      if (![null, undefined].includes(idx)) return i === idx;
+      else return true; // COMPILE ALL PADS
+    })
+    .map((i) => {
+      return new Promise(async (resolve0) => {
+        const items = cols.map((c) => {
+          return new Promise(async (resolve1) => {
+            const item = {};
 
-						if (!structureOnly) item.has_content = item.options?.filter(b => b.name?.length && b.checked)?.length > 0
-						// item.type = c.type
-						item.type = metafields.find(b => b.label === c.type)?.type || c.type
-						item.name = metafields.find(b => b.label === c.type)?.label || null
-						item.level = metafields.some(b => b.label === c.type) ? 'meta' : 'media'
-					}
+            if (
+              ['txt', 'title'].includes(c.type) ||
+              ['txt', 'title'].includes(
+                metafields.find((b) => b.label === c.type)?.type,
+              )
+            ) {
+              if (!structureOnly) {
+                if (Array.isArray(c.entries[i])) {
+                  item.txt = c.entries[i]
+                    .sort((a, b) => {
+                      if (typeof a === 'string' && typeof b === 'string')
+                        return a?.localeCompare(b);
+                      else return a - b;
+                    })
+                    .join(', ');
+                } else item.txt = c.entries[i] ?? '';
+                item.has_content = item.txt?.toString().trim()?.length > 0;
+              }
+              // item.type = c.type
+              item.type =
+                metafields.find((b) => b.label === c.type)?.type || c.type;
+              item.name =
+                metafields.find((b) => b.label === c.type)?.label || null;
+              // item.level = 'media'
+              item.level = metafields.some((b) => b.label === c.type)
+                ? 'meta'
+                : 'media';
+            }
+            if (
+              [
+                c.type,
+                metafields.find((b) => b.label === c.type)?.type,
+              ].includes('embed')
+            ) {
+              if (!structureOnly) {
+                item.html = c.entries[i] ?? '';
+                item.has_content = item.html?.trim()?.length > 0;
+              }
+              // item.type = c.type
+              item.type =
+                metafields.find((b) => b.label === c.type)?.type || c.type;
+              item.name =
+                metafields.find((b) => b.label === c.type)?.label || null;
+              // item.level = 'media'
+              item.level = metafields.some((b) => b.label === c.type)
+                ? 'meta'
+                : 'media';
+            }
+            if (
+              [
+                c.type,
+                metafields.find((b) => b.label === c.type)?.type,
+              ].includes('img')
+            ) {
+              // item.type = c.type // THIS COMES FIRST HERE AS WE UPDATE IT IN THE CASE OF A mosaic
+              item.type =
+                metafields.find((b) => b.label === c.type)?.type || c.type;
 
-					// META FIELDS
-					// NOTE: THIS IMPLIES THERE CAN ONLY BE ONE LOCATION IN THE METADATA
-					if (metafields.some(b => b.type === 'location')) {
-						if (c.type === 'location-txt') {
-							if (!structureOnly) {
-								let locations = []
-								if (Array.isArray(c.entries[i])) locations = c.entries[i]
-								else locations = [c.entries[i]]
-								locations = locations.filter(b => b)
+              if (!structureOnly) {
+                if (c.entries[i]?.src) item.src = c.entries[i].src;
+                else {
+                  if (Array.isArray(c.entries[i])) {
+                    const containsURLs = c.entries[i]
+                      .map((b) => b.isURL())
+                      .unique();
+                    if (
+                      containsURLs.length === 1 &&
+                      containsURLs.includes(true)
+                    ) {
+                      // A MOSAIC OF URLS
+                      item.srcs = c.entries[i].map((b) => encodeURI(b.trim()));
+                      item.type = 'mosaic';
+                      // item.type = 'mosaic'
+                    } else item.src = null;
+                  } else if (c.entries[i]?.isURL())
+                    item.src = encodeURI(c.entries[i].trim());
+                  else item.src = null;
+                }
+                if (item.type === 'mosaic')
+                  item.has_content = item?.srcs?.filter((b) => b)?.length > 0;
+                else item.has_content = ![null, undefined].includes(item.src);
+              }
+              // item.level = 'media'
+              item.name =
+                metafields.find((b) => b.label === c.type)?.label || null;
+              item.level = metafields.some((b) => b.label === c.type)
+                ? 'meta'
+                : 'media';
+            }
+            if (
+              [
+                c.type,
+                metafields.find((b) => b.label === c.type)?.type,
+              ].includes('video')
+            ) {
+              // THERE CAN BE NO VIDEO UPLOAD FROM EXCEL: THIS IS ONLY A PLACEHOLDER IN THE TABLE/ PAD
+              if (!structureOnly) {
+                item.src = null;
+                item.has_content = ![null, undefined].includes(item.src);
+              }
+              // item.type = c.type
+              item.type =
+                metafields.find((b) => b.label === c.type)?.type || c.type;
+              item.name =
+                metafields.find((b) => b.label === c.type)?.label || null;
+              // item.level = 'media'
+              item.level = metafields.some((b) => b.label === c.type)
+                ? 'meta'
+                : 'media';
+            }
+            if (
+              ['checklist', 'radiolist'].includes(c.type) ||
+              ['checklist', 'radiolist'].includes(
+                metafields.find((b) => b.label === c.type)?.type,
+              )
+            ) {
+              item.options = c.values //.filter(d => ![null, undefined].includes(d)).unique() // VALUES SHOUlD BE COMOPLETE (NO null OR undefined) AND SHOULD NOT BE unique
+                .sort((a, b) => {
+                  if (typeof a === 'string' && typeof b === 'string')
+                    return a?.localeCompare(b);
+                  else return a - b;
+                })
+                .map((d, i) => {
+                  const obj = {};
+                  obj.id = i;
+                  obj.name = d?.toString();
+                  obj.checked = false;
 
-								if (locations?.length) {
-									// const results = await POST('/forwardGeocoding', { locations: locations })
-									const geocoded = compiledLocations.filter(b => locations.includes(b.input))
-									item.centerpoints = geocoded.map(c => c.centerpoint)
-									item.caption = `Originally input location${locations.length > 1 ? 's' : ''}: <strong>${locations.map(l => l.trim().capitalize()).join('</strong>, <strong>')}</strong>.<br/>`
-									if (geocoded.filter(c => c.found).length > 1) item.caption += `Multiple locations found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`
-									else if (geocoded.filter(c => c.found).length === 1) {
-										item.caption += geocoded.find(c => c.found).caption
-									}
-									if (geocoded.filter(c => !c.found).length) {
-										item.caption += geocoded.filter(c => !c.found).map(c => c.caption).join(' ')
-										item.caption += `<br/>Defaulted to UNDP ${userlocation ? `${userlocation} ` : ''}Country Office location.`
-									}
-								}
-								// } else item.locations = locations // THIS IS FOR FINDING ALL LOCATIONS AT ONCE WHEN UPLOADING
-								item.has_content = item?.centerpoints?.length > 0
-							}
-					 		item.type = 'location'
-					 		item.name = metafields.find(b => b.type === 'location')?.label
-					 		item.level = 'meta'
-						} else if (c.type === 'location-lat-lng') {
-							if (!structureOnly) {
-								let locations = []
-								if (Array.isArray(c.entries[i])) locations = c.entries[i]
-								else locations = [c.entries[i]]
-								locations = locations.filter(b => b)
+                  if (!structureOnly) {
+                    if (c.entries[i]) {
+                      if (typeof c.entries[i] !== 'object') {
+                        // THIS COULD PROBABLY BE CHANGED TO Array.isArray()
+                        if (
+                          typeof c.entries[i] === 'string' &&
+                          c.entries[i].toLowerCase().trim() === d
+                        ) {
+                          obj.checked = true;
+                        } else if (c.entries[i] === d) obj.checked = true;
+                      } else {
+                        if (
+                          c.entries[i]
+                            .map((b) =>
+                              typeof b === 'string'
+                                ? b.toLowerCase().trim()
+                                : b,
+                            )
+                            .includes(d)
+                        )
+                          obj.checked = true;
+                      }
+                    }
+                  }
+                  return obj;
+                });
 
-								if (locations.length) item.centerpoints = [{ lat: locations[0], lng: locations[1] }]
+              if (!structureOnly)
+                item.has_content =
+                  item.options?.filter((b) => b.name?.length && b.checked)
+                    ?.length > 0;
+              // item.type = c.type
+              item.type =
+                metafields.find((b) => b.label === c.type)?.type || c.type;
+              item.name =
+                metafields.find((b) => b.label === c.type)?.label || null;
+              item.level = metafields.some((b) => b.label === c.type)
+                ? 'meta'
+                : 'media';
+            }
 
-								item.has_content = item?.centerpoints?.length > 0
-							}
-							item.type = 'location'
-							item.name = metafields.find(b => b.type === 'location')?.label
-							item.level = 'meta'
-						} else if (c.type === 'location-lng-lat') {
-							if (!structureOnly) {
-								let locations = []
-								if (Array.isArray(c.entries[i])) locations = c.entries[i]
-								else locations = [c.entries[i]]
-								locations = locations.filter(b => b)
+            // META FIELDS
+            // NOTE: THIS IMPLIES THERE CAN ONLY BE ONE LOCATION IN THE METADATA
+            if (metafields.some((b) => b.type === 'location')) {
+              if (c.type === 'location-txt') {
+                if (!structureOnly) {
+                  let locations = [];
+                  if (Array.isArray(c.entries[i])) locations = c.entries[i];
+                  else locations = [c.entries[i]];
+                  locations = locations.filter((b) => b);
 
-								if (locations.length) item.centerpoints = [{ lat: locations[1], lng: locations[0] }]
+                  if (locations?.length) {
+                    // const results = await POST('/forwardGeocoding', { locations: locations })
+                    const geocoded = compiledLocations.filter((b) =>
+                      locations.includes(b.input),
+                    );
+                    item.centerpoints = geocoded.map((c) => c.centerpoint);
+                    item.caption = `Originally input location${
+                      locations.length > 1 ? 's' : ''
+                    }: <strong>${locations
+                      .map((l) => l.trim().capitalize())
+                      .join('</strong>, <strong>')}</strong>.<br/>`;
+                    if (geocoded.filter((c) => c.found).length > 1)
+                      item.caption += `Multiple locations found using <a href='https://opencagedata.com/credits' target='_blank'>OpenCage Geocoder</a> | &copy; <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap contributors</a>`;
+                    else if (geocoded.filter((c) => c.found).length === 1) {
+                      item.caption += geocoded.find((c) => c.found).caption;
+                    }
+                    if (geocoded.filter((c) => !c.found).length) {
+                      item.caption += geocoded
+                        .filter((c) => !c.found)
+                        .map((c) => c.caption)
+                        .join(' ');
+                      item.caption += `<br/>Defaulted to UNDP ${
+                        userlocation ? `${userlocation} ` : ''
+                      }Country Office location.`;
+                    }
+                  }
+                  // } else item.locations = locations // THIS IS FOR FINDING ALL LOCATIONS AT ONCE WHEN UPLOADING
+                  item.has_content = item?.centerpoints?.length > 0;
+                }
+                item.type = 'location';
+                item.name = metafields.find(
+                  (b) => b.type === 'location',
+                )?.label;
+                item.level = 'meta';
+              } else if (c.type === 'location-lat-lng') {
+                if (!structureOnly) {
+                  let locations = [];
+                  if (Array.isArray(c.entries[i])) locations = c.entries[i];
+                  else locations = [c.entries[i]];
+                  locations = locations.filter((b) => b);
 
-								item.has_content = item?.centerpoints?.length > 0
-							}
-							item.type = 'location'
-							item.name = metafields.find(b => b.type === 'location')?.label
-							item.level = 'meta'
-						}
-					}
+                  if (locations.length)
+                    item.centerpoints = [
+                      { lat: locations[0], lng: locations[1] },
+                    ];
 
-					// ALL TAGs AND ATTACHMENTS ARE LOOPED BELOW BASED ON AVAILABLE metafields
-					if (metafields.some(b => b.type !== 'location' && b.label === c.type)) {
-						if (['tag', 'index'].includes(metafields.find(b => b.label === c.type)?.type)) {
-							if (!structureOnly) {
-								const tag_or_index_info = await POST('/apis/fetch/tags', { type: c.type, language })
+                  item.has_content = item?.centerpoints?.length > 0;
+                }
+                item.type = 'location';
+                item.name = metafields.find(
+                  (b) => b.type === 'location',
+                )?.label;
+                item.level = 'meta';
+              } else if (c.type === 'location-lng-lat') {
+                if (!structureOnly) {
+                  let locations = [];
+                  if (Array.isArray(c.entries[i])) locations = c.entries[i];
+                  else locations = [c.entries[i]];
+                  locations = locations.filter((b) => b);
 
-								if (Array.isArray(c.entries[i])) {
-									item.tags = c.entries[i].filter(b => ![null, undefined].includes(b))
-										.map(b => { 
-											const obj = {}
-											obj.id = undefined
-											if (metafields.find(b => b.label === c.type)?.type === 'index') {
-												obj.key = +b
-												obj.name = tag_or_index_info.find(a => a.key === +b)?.name
-											} else {
-												obj.key = null
-												obj.name = b
-											}
-											obj.type = c.type//.slice(0, -1) 
-											return obj
-										})
-								} else {
-									const obj = {}
-									obj.id = undefined
-									if (metafields.find(b => b.label === c.type)?.type === 'index') {
-										obj.key = +c.entries[i]
-										obj.name = tag_or_index_info.find(b => b.key === +c.entries[i])?.name
-									} else {
-										obj.key = null
-										obj.name = c.entries[i]
-									}
-									obj.type = c.type//.slice(0, -1) 
-									item.tags = [obj]
-								}
-								item.has_content = item?.tags?.length > 0
-							}
-							item.type = metafields.find(b => b.label === c.type)?.type
-							item.name = metafields.find(b => b.label === c.type)?.label
-							item.level = 'meta'
-						
-						} else if (metafields.find(b => b.label === c.type)?.type === 'attachment') { 
-							if (!structureOnly) {
-								if (Array.isArray(c.entries[i])) {
-									item.srcs = c.entries[i].filter(b => ![null, undefined].includes(b)).map(b => b.trim())
-								} else if (c.entries[i]) {
-									item.srcs = [c.entries[i].trim()]
-								} else item.srcs = []
-								item.has_content = item?.srcs?.length > 0
-							}
-							item.type = metafields.find(b => b.label === c.type)?.type
-							item.name = metafields.find(b => b.label === c.type)?.label
-							item.level = 'meta'
-						}
-					}
-					
-					item.instruction = c.key
-					resolve1(item)
-				})
-			})
-			const results = await Promise.all(items)
+                  if (locations.length)
+                    item.centerpoints = [
+                      { lat: locations[1], lng: locations[0] },
+                    ];
 
-			const title = results.find(d => d.type === 'title')?.txt?.slice(0, 99) || null
+                  item.has_content = item?.centerpoints?.length > 0;
+                }
+                item.type = 'location';
+                item.name = metafields.find(
+                  (b) => b.type === 'location',
+                )?.label;
+                item.level = 'meta';
+              }
+            }
 
-			let structure = results
-			if (!structureOnly) {
-				structure = results.map(d => {
-					const { txt, html, srcs, src, centerpoints, tags, ...structure } = d
-					if (structure.options) {
-						structure.options = structure.options.map(c => {
-							const { checked, ...opts } = c
-							opts.checked = false
-							return opts
-						})
-					}
-					return structure
-				})
-			}
-			structure.forEach(d => {
-				d.required = false
-				// THE FOLLOWING LIKELY REDUNDANT
-				if (metafields.some(c => c.label === d.name)) d.level = 'meta'
-				else d.level = 'media'
-			})
+            // ALL TAGs AND ATTACHMENTS ARE LOOPED BELOW BASED ON AVAILABLE metafields
+            if (
+              metafields.some(
+                (b) => b.type !== 'location' && b.label === c.type,
+              )
+            ) {
+              if (
+                ['tag', 'index'].includes(
+                  metafields.find((b) => b.label === c.type)?.type,
+                )
+              ) {
+                if (!structureOnly) {
+                  const tag_or_index_info = await POST('/apis/fetch/tags', {
+                    type: c.type,
+                    language,
+                  });
 
-			const full_text = `${title}\n\n
-				${results.filter(d => d.type === 'txt')
-					.map(d => d.txt).join('\n\n').trim()}\n\n
-				${results.filter(d => d.type === 'embed')
-					.map(d => d.html).join('\n\n').trim()}\n\n
-				${results.filter(d => d.type === 'checklist')
-					.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-				${results.filter(d => d.type === 'radiolist')
-					.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-				
-				${results.filter(d => d.type === 'group').map(d => results)
-					.filter(d => d.type === 'txt')
-					.map(d => d.txt).join('\n\n').trim()}\n\n
-				${results.filter(d => d.type === 'group').map(d => results)
-					.filter(d => d.type === 'embed')
-					.map(d => d.html).join('\n\n').trim()}\n\n
-				${results.filter(d => d.type === 'group').map(d => results)
-					.filter(d => d.type === 'checklist')
-					.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}
-				${results.filter(d => d.type === 'group').map(d => results)
-					.filter(d => d.type === 'radiolist')
-					.map(d => d.options.filter(c => c.checked).map(c => c.name)).flat().join('\n\n').trim()}`
+                  if (Array.isArray(c.entries[i])) {
+                    item.tags = c.entries[i]
+                      .filter((b) => ![null, undefined].includes(b))
+                      .map((b) => {
+                        const obj = {};
+                        obj.id = undefined;
+                        if (
+                          metafields.find((b) => b.label === c.type)?.type ===
+                          'index'
+                        ) {
+                          obj.key = +b;
+                          obj.name = tag_or_index_info.find(
+                            (a) => a.key === +b,
+                          )?.name;
+                        } else {
+                          obj.key = null;
+                          obj.name = b;
+                        }
+                        obj.type = c.type; //.slice(0, -1)
+                        return obj;
+                      });
+                  } else {
+                    const obj = {};
+                    obj.id = undefined;
+                    if (
+                      metafields.find((b) => b.label === c.type)?.type ===
+                      'index'
+                    ) {
+                      obj.key = +c.entries[i];
+                      obj.name = tag_or_index_info.find(
+                        (b) => b.key === +c.entries[i],
+                      )?.name;
+                    } else {
+                      obj.key = null;
+                      obj.name = c.entries[i];
+                    }
+                    obj.type = c.type; //.slice(0, -1)
+                    item.tags = [obj];
+                  }
+                  item.has_content = item?.tags?.length > 0;
+                }
+                item.type = metafields.find((b) => b.label === c.type)?.type;
+                item.name = metafields.find((b) => b.label === c.type)?.label;
+                item.level = 'meta';
+              } else if (
+                metafields.find((b) => b.label === c.type)?.type ===
+                'attachment'
+              ) {
+                if (!structureOnly) {
+                  if (Array.isArray(c.entries[i])) {
+                    item.srcs = c.entries[i]
+                      .filter((b) => ![null, undefined].includes(b))
+                      .map((b) => b.trim());
+                  } else if (c.entries[i]) {
+                    item.srcs = [c.entries[i].trim()];
+                  } else item.srcs = [];
+                  item.has_content = item?.srcs?.length > 0;
+                }
+                item.type = metafields.find((b) => b.label === c.type)?.type;
+                item.name = metafields.find((b) => b.label === c.type)?.label;
+                item.level = 'meta';
+              }
+            }
 
-			// NEED TO CHECK THERE ARE ALL THE metafields AND THAT THEY HAVE CONTENT
-			const completion = []
-			completion.push(results.find(d => d.type === 'title')?.has_content || false)
-			metafields.filter(d => d.required).forEach(d => {
-				completion.push(results.find(c => c.name === d.label)?.has_content || false)
-			})
-			let status = 0
-			if (completion.every(d => d === true)) status = 1
+            item.instruction = c.key;
+            resolve1(item);
+          });
+        });
+        const results = await Promise.all(items);
 
-			resolve0({ 
-				title, 
-				sections: [
-					{
-						type: 'section',
-						title: null,
-						lead: null,
-						structure,
-						items: !structureOnly ? results	: null
-					}
-				],
-				full_text,
-				status,
-				compileddata: results,
-				imgs: results.filter(d => ['img', 'mosaic'].includes(d.type)).map(d => d.src || d.srcs).flat(),
+        const title =
+          results.find((d) => d.type === 'title')?.txt?.slice(0, 99) || null;
 
-				tags: results.filter(d => metafields.some(c => ['tag', 'index'].includes(c.type) && c.label === d.name)).map(d => d.tags).flat(),
-				locations: results.filter(d => d.type === 'location').map(d => d.centerpoints).flat(),
-				
-				metadata: results.filter(d => metafields.some(c => !['tag', 'index', 'location'].includes(c.type) && c.label === d.name))
-					.map(d => {
-						const valuekey = Object.keys(d).find(c => media_value_keys.includes(c))
-						const value = d[valuekey]
-						console.log(valuekey, value)
+        let structure = results;
+        if (!structureOnly) {
+          structure = results.map((d) => {
+            const { txt, html, srcs, src, centerpoints, tags, ...structure } =
+              d;
+            if (structure.options) {
+              structure.options = structure.options.map((c) => {
+                const { checked, ...opts } = c;
+                opts.checked = false;
+                return opts;
+              });
+            }
+            return structure;
+          });
+        }
+        structure.forEach((d) => {
+          d.required = false;
+          // THE FOLLOWING LIKELY REDUNDANT
+          if (metafields.some((c) => c.label === d.name)) d.level = 'meta';
+          else d.level = 'media';
+        });
 
-						// TO DO: IF valuekey = 'options' AND type = 'checklist' OR type = 'radiolist'
-						// NEED TO MAKE SURE THE INPUT IN THE xlsx MATCHES THE options IN THE metafield
-						
-						if (Array.isArray(value)) {
-							return value.map(c => {
-								const obj = {}
-								obj.type = d.type
-								obj.name = d.name
-								obj.value = c
-								return obj
-							})
-						} else {
-							const obj = {}
-							obj.type = d.type
-							obj.name = d.name
-							obj.value = value
-							return obj
-						}
-					}).flat()
-			})
-		})
-	})
-	return Promise.all(pads)
+        const full_text = `${title}\n\n
+				${results
+          .filter((d) => d.type === 'txt')
+          .map((d) => d.txt)
+          .join('\n\n')
+          .trim()}\n\n
+				${results
+          .filter((d) => d.type === 'embed')
+          .map((d) => d.html)
+          .join('\n\n')
+          .trim()}\n\n
+				${results
+          .filter((d) => d.type === 'checklist')
+          .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+          .flat()
+          .join('\n\n')
+          .trim()}
+				${results
+          .filter((d) => d.type === 'radiolist')
+          .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+          .flat()
+          .join('\n\n')
+          .trim()}
+
+				${results
+          .filter((d) => d.type === 'group')
+          .map((d) => results)
+          .filter((d) => d.type === 'txt')
+          .map((d) => d.txt)
+          .join('\n\n')
+          .trim()}\n\n
+				${results
+          .filter((d) => d.type === 'group')
+          .map((d) => results)
+          .filter((d) => d.type === 'embed')
+          .map((d) => d.html)
+          .join('\n\n')
+          .trim()}\n\n
+				${results
+          .filter((d) => d.type === 'group')
+          .map((d) => results)
+          .filter((d) => d.type === 'checklist')
+          .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+          .flat()
+          .join('\n\n')
+          .trim()}
+				${results
+          .filter((d) => d.type === 'group')
+          .map((d) => results)
+          .filter((d) => d.type === 'radiolist')
+          .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+          .flat()
+          .join('\n\n')
+          .trim()}`;
+
+        // NEED TO CHECK THERE ARE ALL THE metafields AND THAT THEY HAVE CONTENT
+        const completion = [];
+        completion.push(
+          results.find((d) => d.type === 'title')?.has_content || false,
+        );
+        metafields
+          .filter((d) => d.required)
+          .forEach((d) => {
+            completion.push(
+              results.find((c) => c.name === d.label)?.has_content || false,
+            );
+          });
+        let status = 0;
+        if (completion.every((d) => d === true)) status = 1;
+
+        resolve0({
+          title,
+          sections: [
+            {
+              type: 'section',
+              title: null,
+              lead: null,
+              structure,
+              items: !structureOnly ? results : null,
+            },
+          ],
+          full_text,
+          status,
+          compileddata: results,
+          imgs: results
+            .filter((d) => ['img', 'mosaic'].includes(d.type))
+            .map((d) => d.src || d.srcs)
+            .flat(),
+
+          tags: results
+            .filter((d) =>
+              metafields.some(
+                (c) => ['tag', 'index'].includes(c.type) && c.label === d.name,
+              ),
+            )
+            .map((d) => d.tags)
+            .flat(),
+          locations: results
+            .filter((d) => d.type === 'location')
+            .map((d) => d.centerpoints)
+            .flat(),
+
+          metadata: results
+            .filter((d) =>
+              metafields.some(
+                (c) =>
+                  !['tag', 'index', 'location'].includes(c.type) &&
+                  c.label === d.name,
+              ),
+            )
+            .map((d) => {
+              const valuekey = Object.keys(d).find((c) =>
+                media_value_keys.includes(c),
+              );
+              const value = d[valuekey];
+              console.log(valuekey, value);
+
+              // TO DO: IF valuekey = 'options' AND type = 'checklist' OR type = 'radiolist'
+              // NEED TO MAKE SURE THE INPUT IN THE xlsx MATCHES THE options IN THE metafield
+
+              if (Array.isArray(value)) {
+                return value.map((c) => {
+                  const obj = {};
+                  obj.type = d.type;
+                  obj.name = d.name;
+                  obj.value = c;
+                  return obj;
+                });
+              } else {
+                const obj = {};
+                obj.type = d.type;
+                obj.name = d.name;
+                obj.value = value;
+                return obj;
+              }
+            })
+            .flat(),
+        });
+      });
+    });
+  return Promise.all(pads);
 }
-export async function compileTemplate () {
-	const { metafields } = JSON.parse(d3.select('data[name="pad"]').node().value)
-	const cols = d3.select('table.xls-preview').datum()
+export async function compileTemplate() {
+  const { metafields } = JSON.parse(
+    d3.select('data[name="pad"]').node().value,
+  );
+  const cols = d3.select('table.xls-preview').datum();
 
-	const template = {}
+  const template = {};
 
-	// THIS IS COPIED FROM template.ejs
-	const title = d3.select('input#upload').attr('data-fname').slice(0, 99) // THIS IS NECESSARY BECAUSE THE DB IS ONLY SET TO STORE 99 VARCHAR
-	const description = vocabulary['generated template']
-		.replace(/\$1/g, title.trim())
+  // THIS IS COPIED FROM template.ejs
+  const title = d3.select('input#upload').attr('data-fname').slice(0, 99); // THIS IS NECESSARY BECAUSE THE DB IS ONLY SET TO STORE 99 VARCHAR
+  const description = vocabulary['generated template'].replace(
+    /\$1/g,
+    title.trim(),
+  );
 
-	const data = await compilePads(0, true)
-	const sections = data[0].sections.map(d => {
-		const { items, ...section } = d
-		return section
-	})
+  const data = await compilePads(0, true);
+  const sections = data[0].sections.map((d) => {
+    const { items, ...section } = d;
+    return section;
+  });
 
-	// COMPILE FULL TXT FOR SEARCH
-	// TECHNICALLY THE group PART IS NOT NEEDED HERE AS THERE CAN BE NO GROUPS ON IMPORT
-	// BUT WE KEEP IT FOR CONSISTENCY WITH template.ejs
-	const full_text = `${title}\n\n
+  // COMPILE FULL TXT FOR SEARCH
+  // TECHNICALLY THE group PART IS NOT NEEDED HERE AS THERE CAN BE NO GROUPS ON IMPORT
+  // BUT WE KEEP IT FOR CONSISTENCY WITH template.ejs
+  const full_text = `${title}\n\n
 		${description}\n\n
 		${sections
       .map((d) => d.title)

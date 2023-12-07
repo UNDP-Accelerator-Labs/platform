@@ -8,9 +8,6 @@ module.exports = async kwargs => {
 
 	const { limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
-	console.log('limit')
-	console.log(limit)
-
 	// GET FILTERS
 	if (!filters?.length) filters = await filter(req, res)
 	const [ f_space, order, page, full_filters ] = filters

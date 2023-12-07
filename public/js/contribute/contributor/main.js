@@ -1,83 +1,96 @@
-import { vocabulary } from '/js/config/translations.js'
-import { getMediaSize, fixLabel } from '/js/main.js'
-import { POST } from '/js/fetch.js'
-import { partialSave } from '/js/contribute/contributor/save.js'
+import { vocabulary } from '/js/config/translations.js';
+import { partialSave } from '/js/contribute/contributor/save.js';
+import { POST } from '/js/fetch.js';
+import { fixLabel, getMediaSize } from '/js/main.js';
 
-export async function requestToken (node) {
-	const token = await POST('/request/token')
-	if (token) {
-		const inputgroup = d3.select(node)
-		inputgroup.selectAll('.hide')
-			.classed('hide', false)
-		const input = inputgroup.select('input[type=text]')
-			.attr('value', token)
-		input.node().select()
-	}
+export async function requestToken(node) {
+  const token = await POST('/request/token');
+  if (token) {
+    const inputgroup = d3.select(node);
+    inputgroup.selectAll('.hide').classed('hide', false);
+    const input = inputgroup.select('input[type=text]').attr('value', token);
+    input.node().select();
+  }
 }
-export function copyToken (node) {
-	const inputgroup = d3.select(node)
-	const token = inputgroup.select('input[type=text]').node().value
-	navigator.clipboard.writeText(token)
+export function copyToken(node) {
+  const inputgroup = d3.select(node);
+  const token = inputgroup.select('input[type=text]').node().value;
+  navigator.clipboard.writeText(token);
 }
-export async function addLanguage (node) {
-	const { languages } = JSON.parse(d3.select('data[name="site"]').node().value)
-	const sel = d3.select(node)
-	const parent = sel.findAncestor('ul')
-	const li = parent.insertElem(function () { return node }, 'li')
-	li.addElem('label', 'instruction')
-		.html(vocabulary['other languages'])
-	const input = li.addElem('div', 'select')
-	input.addElem('input')
-		.attrs({
-			'type': 'text',
-			'id': 'secondary-languages',
-			'autocomplete': 'secondary-languages'
-		}).on('blur.fixlabel', function () { fixLabel(this) })
-	input.addElem('label')
-		.attr('for', 'secondary-languages')
-		.html(vocabulary['select language']['plural'])
-	const dropdown = input.addElem('div', 'dropdown')
-		.addElem('menu')
-		.addElems('li', null, languages)
-		.each(function () {
-			const sel = d3.select(this)
-			sel.addElems('input')
-				.attrs({
-					'type': 'checkbox',
-					'id': d => `secondary-language-${d.language}`,
-					'name': 'secondary_languages', // TO DO: PROBABLY CHANGE THIS SO NO CONFLICT WITH OTHER language INPUTS
-					'value': d => d.language,
-					'data-label': d => d.name.capitalize(),
-					'disabled': d => d.language === d3.select('input[name="language"]:checked').node()?.value ? true : null
-				}).on('change.select', function () {
-					partialSave()
-				})
-			sel.addElems('label')
-				.attr('for', d => `secondary-language-${d.language}`)
-				.html(d => d.name.capitalize())
-		})
+export async function addLanguage(node) {
+  const { languages } = JSON.parse(
+    d3.select('data[name="site"]').node().value,
+  );
+  const sel = d3.select(node);
+  const parent = sel.findAncestor('ul');
+  const li = parent.insertElem(function () {
+    return node;
+  }, 'li');
+  li.addElem('label', 'instruction').html(vocabulary['other languages']);
+  const input = li.addElem('div', 'select');
+  input
+    .addElem('input')
+    .attrs({
+      type: 'text',
+      id: 'secondary-languages',
+      autocomplete: 'secondary-languages',
+    })
+    .on('blur.fixlabel', function () {
+      fixLabel(this);
+    });
+  input
+    .addElem('label')
+    .attr('for', 'secondary-languages')
+    .html(vocabulary['select language']['plural']);
+  const dropdown = input
+    .addElem('div', 'dropdown')
+    .addElem('menu')
+    .addElems('li', null, languages)
+    .each(function () {
+      const sel = d3.select(this);
+      sel
+        .addElems('input')
+        .attrs({
+          type: 'checkbox',
+          id: (d) => `secondary-language-${d.language}`,
+          name: 'secondary_languages', // TO DO: PROBABLY CHANGE THIS SO NO CONFLICT WITH OTHER language INPUTS
+          value: (d) => d.language,
+          'data-label': (d) => d.name.capitalize(),
+          disabled: (d) =>
+            d.language ===
+            d3.select('input[name="language"]:checked').node()?.value
+              ? true
+              : null,
+        })
+        .on('change.select', function () {
+          partialSave();
+        });
+      sel
+        .addElems('label')
+        .attr('for', (d) => `secondary-language-${d.language}`)
+        .html((d) => d.name.capitalize());
+    });
 
-	await initDropdowns()
-	sel.remove()
+  await initDropdowns();
+  sel.remove();
 }
-function addPinOption (value) {
-	const dropdown = d3.select(this)
-	const li = dropdown.select('menu')
-	.addElem('li')
-	const pinItem = li.addElems('input')
-		.attrs({
-			'type': 'checkbox',
-			'id': value.simplify(),
-			'name': 'new_teams',
-			'value': value,
-			'data-label': value
-		}).each(function () { 
-			this.checked = true 
-		})
-	li.addElems('label', 'title')
-		.attr('for', value.simplify())
-		.html(value)
-	renderPin.call(pinItem.node())
+function addPinOption(value) {
+  const dropdown = d3.select(this);
+  const li = dropdown.select('menu').addElem('li');
+  const pinItem = li
+    .addElems('input')
+    .attrs({
+      type: 'checkbox',
+      id: value.simplify(),
+      name: 'new_teams',
+      value: value,
+      'data-label': value,
+    })
+    .each(function () {
+      this.checked = true;
+    });
+  li.addElems('label', 'title').attr('for', value.simplify()).html(value);
+  renderPin.call(pinItem.node());
 }
 function renderPin() {
   const sel = d3.select(this);
@@ -103,22 +116,24 @@ function renderPin() {
   }
 }
 
-export function rmPin (node) {
-  const sel = d3.select(node)
-  const id = node.dataset.id
-  const name = node.dataset.name
-  const input = d3.select(`input[name='${name}'][value='${id}']`)
-  input.attr('checked', null)
-  input.node().checked = false
-  sel.findAncestor('pin').remove()
+export function rmPin(node) {
+  const sel = d3.select(node);
+  const id = node.dataset.id;
+  const name = node.dataset.name;
+  const input = d3.select(`input[name='${name}'][value='${id}']`);
+  input.attr('checked', null);
+  input.node().checked = false;
+  sel.findAncestor('pin').remove();
   const pinboard = d3.select('.pinboard-group');
   if (!pinboard.selectAll('.pin').size()) pinboard.classed('hide', true);
 
   partialSave();
 }
-export async function initDropdowns () {
-  if (!mediaSize) var mediaSize = getMediaSize()
-  const { rights } = await POST('/check/module_rights', { module_type: 'teams' })
+export async function initDropdowns() {
+  if (!mediaSize) var mediaSize = getMediaSize();
+  const { rights } = await POST('/check/module_rights', {
+    module_type: 'teams',
+  });
 
   const selects = d3.selectAll('.select');
   selects

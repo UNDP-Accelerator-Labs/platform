@@ -1,4 +1,4 @@
-import { renderPromiseModal } from '/js/modals.js'
+import { renderPromiseModal } from '/js/modals.js';
 
 // THIS IS NOT USED FOR NOW
 async function selectCountry() {
@@ -26,10 +26,4 @@ async function selectCountry() {
     },
   ];
   const mobilization = await renderPromiseModal({ message, opts });
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
 }

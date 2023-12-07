@@ -1,6 +1,6 @@
-import { vocabulary, language } from '/js/config/translations.js'
-import { GET, POST, PUT } from '/js/fetch.js'
-import { renderPromiseModal } from '/js/modals.js'
+import { language, vocabulary } from '/js/config/translations.js';
+import { GET, POST, PUT } from '/js/fetch.js';
+import { renderPromiseModal } from '/js/modals.js';
 
 export class Exploration {
   constructor() {
@@ -208,7 +208,8 @@ export class Exploration {
         .classed('notranslate', true)
         .attrs({
           value: (d) => this.normalizeExplorationPrompt(d['prompt']),
-          label: (d) => `${vocabulary['exploration']['last_access']} ${d['last_access_ago']}`,
+          label: (d) =>
+            `${vocabulary['exploration']['last_access']} ${d['last_access_ago']}`,
         });
       cb && cb();
     });

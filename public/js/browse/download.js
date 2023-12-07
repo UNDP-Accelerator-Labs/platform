@@ -1,7 +1,7 @@
-import { language, vocabulary } from '/js/config/translations.js'
-import { getContent } from '/js/main.js'
-import { POST } from '/js/fetch.js'
-import { renderFormModal } from '/js/modals.js'
+import { vocabulary } from '/js/config/translations.js';
+import { POST } from '/js/fetch.js';
+import { getContent } from '/js/main.js';
+import { renderFormModal } from '/js/modals.js';
 
 export async function setDownloadOptions() {
   const object = d3.select('data[name="object"]').node().value;
@@ -69,134 +69,136 @@ export async function setDownloadOptions() {
     formdata = { action: '/apis/download/pads', method: 'POST' };
     message = vocabulary['select download options'];
 
-		opts.push({ 
-			node: 'select', 
-			name: 'output', 
-			label: vocabulary['select format'], 
-			options: target_opts, 
-			classname: 'csv xlsx json geojson docx pdf', 
-			fn: resetFeatures 
-		})
-		opts.push({ 
-			node: 'input', 
-			type: 'checkbox', 
-			name: 'use_templates', 
-			value: true, 
-			placeholder: vocabulary['use templates'], 
-			checked: true, 
-			default: true, 
-			classname: 'hide csv xlsx json geojson' 
-		})
-		opts.push({ 
-			node: 'input', 
-			type: 'checkbox', 
-			name: 'include_data', 
-			value: true, 
-			placeholder: vocabulary['include data'], 
-			checked: true, 
-			default: true, 
-			classname: 'hide csv xlsx json geojson docx' 
-		})
-		opts.push({ 
-			node: 'input', 
-			type: 'checkbox', 
-			name: 'include_toc', 
-			value: true, 
-			placeholder: 'Include table of contents',  // TO DO: TRANSLATE
-			checked: true, 
-			default: true, 
-			classname: 'hide docx' 
-		})
-		if (notemplates) {
-			opts.push({ 
-				node: 'input', 
-				type: 'checkbox', 
-				name: 'standardize_structure', 
-				value: true, 
-				placeholder: 'Standardize structure', // TO DO: TRANSLATE
-				checked: false, 
-				default: true, 
-				classname: 'hide docx' 
-			})
-		}
-		opts.push({ 
-			node: 'input', 
-			type: 'checkbox', 
-			name: 'include_imgs', 
-			value: true, 
-			placeholder: vocabulary['include media'], 
-			default: true, 
-			classname: 'hide csv xlsx json geojson' 
-		})
-		
-		if (metafields.some(d => ['index', 'tag'].includes(d.type))) {
-			opts.push({ 
-				node: 'input', 
-				type: 'checkbox', 
-				name: 'include_tags', 
-				value: true, 
-				placeholder: vocabulary['include tags'], 
-				default: true, 
-				classname: 'hide csv xlsx json geojson' 
-			})
-		}
-		if (metafields.some(d => d.type === 'location')) {
-			opts.push({ 
-				node: 'input', 
-				type: 'checkbox', 
-				name: 'include_locations', 
-				value: true, 
-				placeholder: vocabulary['include locations'], 
-				default: true, 
-				classname: 'hide csv xlsx json geojson' 
-			})
-		}
-		if (metafields.some(d => !['tag', 'index', 'location'].includes(d.type))) {
-			opts.push({ 
-				node: 'input', 
-				type: 'checkbox', 
-				name: 'include_metafields', 
-				value: true, 
-				placeholder: vocabulary['include metafields'], 
-				default: true, 
-				classname: 'hide csv xlsx json geojson' 
-			})
-		}
-		opts.push({ 
-			node: 'input', 
-			type: 'checkbox', 
-			name: 'include_engagement', 
-			value: true, 
-			placeholder: vocabulary['include engagement'], 
-			default: true, 
-			classname: 'hide csv xlsx json geojson'
-		})
-		opts.push({ 
-			node: 'input', 
-			type: 'checkbox', 
-			name: 'include_comments', 
-			value: true, 
-			placeholder: vocabulary['include comments'], 
-			default: true, 
-			classname: 'hide csv xlsx json geojson' 
-		})
-		// IN CASE THIS IS A SINGLE DOWNLOAD
-		if (this?.name && this?.value) {
-			opts.push({ 
-				node: 'input', 
-				type: 'hidden', 
-				name: this?.name, 
-				value: this?.value 
-			})
-		}
-		else { // ADD THE PAGE QUERY VARIABLES
-			const url = new URL(window.location)
-			const queryparams = new URLSearchParams(url.search)
-			queryparams.forEach((value, key) => {
-				if (key !== 'page' && value) {
-					opts.push({ node: 'input', type: 'hidden', name: key, value })
-				}
-			});
+    opts.push({
+      node: 'select',
+      name: 'output',
+      label: vocabulary['select format'],
+      options: target_opts,
+      classname: 'csv xlsx json geojson docx pdf',
+      fn: resetFeatures,
+    });
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
+      name: 'use_templates',
+      value: true,
+      placeholder: vocabulary['use templates'],
+      checked: true,
+      default: true,
+      classname: 'hide csv xlsx json geojson',
+    });
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
+      name: 'include_data',
+      value: true,
+      placeholder: vocabulary['include data'],
+      checked: true,
+      default: true,
+      classname: 'hide csv xlsx json geojson docx',
+    });
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
+      name: 'include_toc',
+      value: true,
+      placeholder: 'Include table of contents', // TO DO: TRANSLATE
+      checked: true,
+      default: true,
+      classname: 'hide docx',
+    });
+    if (notemplates) {
+      opts.push({
+        node: 'input',
+        type: 'checkbox',
+        name: 'standardize_structure',
+        value: true,
+        placeholder: 'Standardize structure', // TO DO: TRANSLATE
+        checked: false,
+        default: true,
+        classname: 'hide docx',
+      });
+    }
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
+      name: 'include_imgs',
+      value: true,
+      placeholder: vocabulary['include media'],
+      default: true,
+      classname: 'hide csv xlsx json geojson',
+    });
+
+    if (metafields.some((d) => ['index', 'tag'].includes(d.type))) {
+      opts.push({
+        node: 'input',
+        type: 'checkbox',
+        name: 'include_tags',
+        value: true,
+        placeholder: vocabulary['include tags'],
+        default: true,
+        classname: 'hide csv xlsx json geojson',
+      });
+    }
+    if (metafields.some((d) => d.type === 'location')) {
+      opts.push({
+        node: 'input',
+        type: 'checkbox',
+        name: 'include_locations',
+        value: true,
+        placeholder: vocabulary['include locations'],
+        default: true,
+        classname: 'hide csv xlsx json geojson',
+      });
+    }
+    if (
+      metafields.some((d) => !['tag', 'index', 'location'].includes(d.type))
+    ) {
+      opts.push({
+        node: 'input',
+        type: 'checkbox',
+        name: 'include_metafields',
+        value: true,
+        placeholder: vocabulary['include metafields'],
+        default: true,
+        classname: 'hide csv xlsx json geojson',
+      });
+    }
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
+      name: 'include_engagement',
+      value: true,
+      placeholder: vocabulary['include engagement'],
+      default: true,
+      classname: 'hide csv xlsx json geojson',
+    });
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
+      name: 'include_comments',
+      value: true,
+      placeholder: vocabulary['include comments'],
+      default: true,
+      classname: 'hide csv xlsx json geojson',
+    });
+    // IN CASE THIS IS A SINGLE DOWNLOAD
+    if (this?.name && this?.value) {
+      opts.push({
+        node: 'input',
+        type: 'hidden',
+        name: this?.name,
+        value: this?.value,
+      });
+    } else {
+      // ADD THE PAGE QUERY VARIABLES
+      const url = new URL(window.location);
+      const queryparams = new URLSearchParams(url.search);
+      queryparams.forEach((value, key) => {
+        if (key !== 'page' && value) {
+          opts.push({ node: 'input', type: 'hidden', name: key, value });
+        }
+      });
 
       // <% Object.keys(query)?.forEach(d => {
       // 	if (Array.isArray(query[d])) {
@@ -378,7 +380,7 @@ export async function setDownloadOptions() {
     const queryparams = new URLSearchParams(url.search);
     queryparams.forEach((value, key) => {
       if (key !== 'page' && value) {
-        opts.push({ node: 'input', type: 'hidden', name: key, value: value });
+        opts.push({ node: 'input', type: 'hidden', name: key, value });
       }
     });
 

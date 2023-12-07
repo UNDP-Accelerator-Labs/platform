@@ -150,7 +150,7 @@ CREATE TABLE mobilizations (
     collection INT,
     version ltree
 );
-ALTER TABLE mobilizations ALTER pad_limit SET DEFAULT 0; 
+ALTER TABLE mobilizations ALTER pad_limit SET DEFAULT 0;
 CREATE INDEX version_idx ON mobilizations USING GIST (version);
 
 CREATE TABLE mobilization_contributors (
@@ -320,7 +320,6 @@ CREATE TABLE IF NOT EXISTS public.exploration
     CONSTRAINT id_key UNIQUE (id),
     CONSTRAINT uuid_prompt_key UNIQUE (uuid, prompt)
 );
-CREATE INDEX idx_linked_pinboard ON exploration (linked_pinboard);
 ALTER TABLE IF EXISTS public.users
     ADD COLUMN confirmed_feature_exploration timestamp with time zone;
 ALTER TABLE IF EXISTS public.pinboard_contributions

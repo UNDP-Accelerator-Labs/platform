@@ -19,8 +19,8 @@ String.prototype.replacePunctuation = function (replacement) {
   ); // THIS KEEPS COMMAS
 };
 String.prototype.replaceURLWithHTMLLinks = function (language) {
-  let b = '\\b'; // WORD BOUNDARIES
-  let B = '\\B';
+  const b = '\\b'; // WORD BOUNDARIES
+  const B = '\\B';
   // if (language === 'AR') { // THIS DOES NOT WORK FOR SOME REASON
   // 	b = '(^|[^\u0621-\u064A])'
   // 	B = '($|[^\u0621-\u064A])'
@@ -48,8 +48,8 @@ String.prototype.extractDigits = function () {
   return +this.match(/\d+/)[0];
 };
 String.prototype.isURL = function () {
-  let b = '\\b'; // WORD BOUNDARIES
-  let B = '\\B';
+  const b = '\\b'; // WORD BOUNDARIES
+  const B = '\\B';
   // const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
   // 	'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
   // 	'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
@@ -87,7 +87,7 @@ String.prototype.isBlob = function () {
 };
 String.prototype.URLsToLinks = function () {
   // INSPIRED BY https://stackoverflow.com/questions/49634850/convert-plain-text-links-to-clickable-links
-  //URLs starting with http://, https://, or ftp://
+  // URLs starting with http://, https://, or ftp://
   const replacePattern1 =
     /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
   let str = this.valueOf().replace(
@@ -95,14 +95,14 @@ String.prototype.URLsToLinks = function () {
     '<a href="$1" target="_blank">$1</a>',
   );
 
-  //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+  // URLs starting with "www." (without // before it, or it'd re-link the ones done above).
   const replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
   str = str.replace(
     replacePattern2,
     '$1<a href="http://$2" target="_blank">$2</a>',
   );
 
-  //Change email addresses to mailto:: links.
+  // Change email addresses to mailto:: links.
   const replacePattern3 =
     /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
   str = str.replace(replacePattern3, '<a href="mailto:$1">$1</a>');

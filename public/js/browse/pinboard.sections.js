@@ -1,7 +1,12 @@
-import { language, vocabulary } from '/js/config/translations.js'
-import { getMediaSize, fixLabel, selectElementContents, checkForEnter } from '/js/main.js'
-import { renderFormModal } from '/js/modals.js'
-import { partialSave } from '/js/browse/save.js'
+import { partialSave } from '/js/browse/save.js';
+import { vocabulary } from '/js/config/translations.js';
+import {
+  checkForEnter,
+  fixLabel,
+  getMediaSize,
+  selectElementContents,
+} from '/js/main.js';
+import { renderFormModal } from '/js/modals.js';
 
 // TO DO: DEPRECATE THIS IN FAVOR OF A COLLECTION OF COLLECTIONS APPROACH
 d3.selectAll('.make-editable:not(.section-title)').on('click', function () {
@@ -128,7 +133,7 @@ async function addSection(node) {
     label: vocabulary['save'],
     disabled: !singlesection,
   });
-  //d3.select('.modal input[name=sections]:checked').node().value
+  // d3.select('.modal input[name=sections]:checked').node().value
   const sections = await renderFormModal({ message, formdata, opts });
 
   function setSections(data) {

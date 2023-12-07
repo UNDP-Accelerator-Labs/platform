@@ -194,12 +194,12 @@ Array.prototype.chunk = function (size) {
 };
 Array.prototype.median = function () {
   this.sort((a, b) => a - b);
-  var half = Math.floor(this.length / 2);
+  const half = Math.floor(this.length / 2);
   return this[half];
 };
 Array.prototype.move = function (oldId, newId) {
   if (newId >= this.length) {
-    var k = newId - this.length + 1;
+    let k = newId - this.length + 1;
     while (k--) {
       arr.push(undefined);
     }
@@ -208,9 +208,9 @@ Array.prototype.move = function (oldId, newId) {
   return this;
 };
 Array.prototype.shuffle = function () {
-  let currentIndex = this.length,
-    temporaryValue,
-    randomIndex;
+  let currentIndex = this.length;
+  let temporaryValue;
+  let randomIndex;
 
   while (0 !== currentIndex) {
     randomIndex = Math.floor(Math.random() * currentIndex);

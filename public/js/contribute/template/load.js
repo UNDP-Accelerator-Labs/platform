@@ -1,11 +1,13 @@
-import { getMediaSize } from '/js/main.js'
-import { renderTemplate } from '/js/contribute/template/render.js'
-import { initToolbarInteractions } from '/js/contribute/template/toolbar.interactions.js'
-import { partialSave } from '/js/contribute/template/save.js'
+import { renderTemplate } from '/js/contribute/template/render.js';
+import { partialSave } from '/js/contribute/template/save.js';
+import { initToolbarInteractions } from '/js/contribute/template/toolbar.interactions.js';
+import { getMediaSize } from '/js/main.js';
 
-async function DOMLoad () {
-  if (!mediaSize) var mediaSize = getMediaSize()
-  const { metafields } = JSON.parse(d3.select('data[name="template"]').node()?.value)
+async function DOMLoad() {
+  if (!mediaSize) var mediaSize = getMediaSize();
+  const { metafields } = JSON.parse(
+    d3.select('data[name="template"]').node()?.value,
+  );
 
   await renderTemplate();
   initToolbarInteractions(metafields);
@@ -40,13 +42,14 @@ async function DOMLoad () {
   );
 
   // ADD THE INTERACTION BEHAVRIOR FOR THE SLIDESHOW TOGGLE
-  d3.select('input#slideshow-status')
-  .on('change', async _ => await partialSave())
-
+  d3.select('input#slideshow-status').on(
+    'change',
+    async (_) => await partialSave(),
+  );
 }
 
 if (document.readyState === 'loading') {
-	window.addEventListener('DOMContentLoaded', DOMLoad)
+  window.addEventListener('DOMContentLoaded', DOMLoad);
 } else {
-	DOMLoad()
+  DOMLoad();
 }

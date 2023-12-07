@@ -1,6 +1,8 @@
-import { POST } from '/js/fetch.js'
+import { POST } from '/js/fetch.js';
 
-const pagestats = JSON.parse(d3.select('data[name="pagestats"]').node().value);
+const pagestats = JSON.parse(
+  d3.select('data[name="pagestats"]')?.node()?.value ?? '{}',
+);
 // FIXME: set pagestats object from dynamic loads instead of data
 
 const totalTime = pagestats.readtime;

@@ -12,9 +12,9 @@ module.exports = async (req, res) => {
 		const { referer } = req.headers || {}
 		const { object } = req.params || {}
 		const { id, source } = req.query || {}
-		
+
 		const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
-		
+
 		const path = req.path.substring(1).split('/')
 		const activity = path[1]
 
@@ -31,8 +31,8 @@ module.exports = async (req, res) => {
 					else return res.redirect('/login')
 				} else if (authorized && redirect && redirect !== activity) {
 					const query = []
-					for (let key in req.query) {
-						query.push(`${key}=${req.query[key]}`)
+					for (const [key, value] of req.query) {
+						query.push(`${key}=${value}`)
 					}
 					return res.redirect(`/${language}/${redirect}/template${query.length > 0 ? `?${query.join('&')}` : ''}`)
 				} else {

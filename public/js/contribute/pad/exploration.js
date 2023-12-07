@@ -1,8 +1,8 @@
-import { Exploration } from '/js/exploration.js'
+import { Exploration } from '/js/exploration.js';
 // INIT EXPLORATION
 
-export function initExploration () {
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value)
+export function initExploration() {
+  const pad = JSON.parse(d3.select('data[name="pad"]')?.node()?.value);
   const exploration = new Exploration();
   exploration.setUseFullPromptForSelect(true);
   exploration.updateExplorationList(() => {

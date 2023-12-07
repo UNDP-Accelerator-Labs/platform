@@ -8,7 +8,7 @@ export function initExploration() {
   let hasUsedExploration = false;
 
   let isExplorationInit = false;
-  const fixedEid = d3.select('data[name="fixedEid"]').node()?.value;
+  const fixedEid = d3.select('data[name="fixedEid"]')?.node()?.value;
   const formExplorationId = d3.select('#form-exploration-id');
 
   d3.selectAll('#search-field').on('focus', () => {

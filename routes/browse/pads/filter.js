@@ -190,7 +190,7 @@ module.exports = async (req, res) => {
 		// else if (space === 'all') f_space = DB.pgp.as.format(`p.status >= 2`) // THE !uuid IS FOR PUBLIC DISPLAYS
 		else if (space === 'published') {
 			if (rights < 3) {
-				const isUNDP = (await DB.general.one(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ]))
+				const isUNDP = (await DB.general.oneOrNone(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ]))
 				if (isUNDP) f_space = DB.pgp.as.format('p.status >= 2')
 				else f_space = DB.pgp.as.format('p.status = 3')
 			} else {

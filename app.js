@@ -11,6 +11,7 @@ const {
   csp_links,
   app_base_host,
   getVersionObject,
+  lodashNonce
 } = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
@@ -29,12 +30,19 @@ const cookieParser = require('cookie-parser');
 const app = express();
 app.disable('x-powered-by');
 
+app.use((req, res, next) => {
+  res.locals.nonce = lodashNonce()
+  next();
+});
+
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         'img-src': csp_links.concat(['blob:']),
-        'script-src': csp_links,
+        'script-src': csp_links.concat([
+          (req, res) => `'nonce-${res.locals.nonce}'`
+        ]),
         'script-src-attr': [
           "'self'",
           '*.sdg-innovation-commons.org',

@@ -27,13 +27,15 @@ const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
 
-const swPrecache = require('sw-precache');
-swPrecache.write('./public/app.serviceWorker.js', {
-  root: './public/',
-  staticFileGlobs: ['./public/**/*'],
-  stripPrefix: './public/',
-  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-});
+if (process.env.NODE_ENV === 'production') {
+  const swPrecache = require('sw-precache');
+  swPrecache.write('./public/app.serviceWorker.js', {
+    root: './public/',
+    staticFileGlobs: ['./public/**/*'],
+    stripPrefix: './public/',
+    maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+  });
+}
 
 const app = express();
 app.disable('x-powered-by');
@@ -47,7 +49,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        'img-src': csp_links.concat(['blob:']),
+        'img-src': csp_links, //.concat(['blob:']),
         'script-src': csp_links.concat([
           (req, res) => `'nonce-${res.locals.nonce}'`,
           'sha256-NNiElek2Ktxo4OLn2zGTHHeUR6b91/P618EXWJXzl3s=',
@@ -64,7 +66,7 @@ app.use(
         // ]),
         'connect-src': csp_links.concat([
           // 'blob:http:://localhost:2000/'
-          'blob:',
+          //'blob:',
         ]),
         'frame-src': [
           "'self'",

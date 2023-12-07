@@ -57,7 +57,7 @@ export function parseXLSX(file, node) {
 
   d3.select(node).attr('data-fname', file.name);
 
-  reader.onload = function (e) {
+  reader.onload = async function (e) {
     var data = new Uint8Array(e.target.result);
     var workbook = XLSX.read(data, { type: 'array', bookFiles: true });
 
@@ -69,72 +69,10 @@ export function parseXLSX(file, node) {
         const name = workbook.files[m].name; // .split('media/')[1]
         const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
 
-        const blob = new Blob([buffer], { type: 'image/png' });
-        const urlCreator = window.URL || window.webkitURL;
-        const imageUrl = urlCreator.createObjectURL(blob);
-        return { id: name?.extractDigits(), type: 'img', src: imageUrl };
-      });
-    }
-    workbook.SheetNames.forEach((s, i) => {
-      const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
-        defval: null,
-      });
+        console.log(buffer)
 
-      let keys = Object.keys(json[0]);
-      if (images.length) {
-        // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
-        // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
-        const cols = keys.map((d) => {
-          const obj = {};
-          obj.key = d;
-          obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
-          return obj;
-        });
-        const imageCol = cols.find((d) => !d.values.length)?.key || null;
-        if (imageCol) {
-          json.forEach((d, i) => {
-            // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
-            d[imageCol] = images.find((c) => c.id === i + 1);
-          });
-        }
-      }
-      if (i === 0) {
-        // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
-        const cols = parseColumns(json, keys);
-        renderTable(cols);
-      }
-    });
-    // HIDE THE LOADING BUTTON
-    const main = d3.select('div.table main');
-    const layout = main.select('div.inner');
-    const head = layout.select('div.head');
-
-    main.select('.input-group').classed('hide', true);
-    head
-      .classed('status-0', false)
-      .classed('status-1', true)
-      .select('button[type=submit]')
-      .attr('disabled', null);
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-function parseXLSX(file, node) {
-  const reader = new FileReader();
-
-  d3.select(node).attr('data-fname', file.name);
-
-  reader.onload = function (e) {
-    var data = new Uint8Array(e.target.result);
-    var workbook = XLSX.read(data, { type: 'array', bookFiles: true });
-
-    let images = [];
-    if (workbook.keys) {
-      const media = workbook.keys.filter((k) => k.includes('media/image'));
-
-      images = media.map((m, i) => {
-        const name = workbook.files[m].name; // .split('media/')[1]
-        const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
+        const img = await POST('/request/blob/', { src: buffer, type: 'buffer' })
+        console.log(img)
 
         const blob = new Blob([buffer], { type: 'image/png' });
         const urlCreator = window.URL || window.webkitURL;

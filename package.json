@@ -12,7 +12,7 @@
     "lint": "./node_modules/.bin/eslint .",
     "lint-fix": "./node_modules/.bin/eslint . --fix",
     "pretty": "prettier . --write",
-    "service-worker": "node routes/scripts/shared/create_service_worker.js"
+    "service-worker": "node create_service_worker.js"
   },
   "author": "",
   "license": "ISC",

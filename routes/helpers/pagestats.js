@@ -37,8 +37,8 @@ const ownIdFor = async (doc_type) => {
 
 const recordView = async (doc_id, doc_type, page_url, user_country, user_rights, is_view) => {
     const ownId = await ownIdFor(doc_type);
-    const allowRecord = true;  // DEBUG PAGESTATS
-    // const allowRecord = !(user_country === 'LCL' || (user_rights > 2 && user_country === 'NUL'));
+    // const allowRecord = true;  // DEBUG PAGESTATS
+    const allowRecord = !(user_country === 'LCL' || (user_rights > 2 && user_country === 'NUL'));
     await DB.general.tx(async gt => {
         const page_stats = [];
 
@@ -109,8 +109,8 @@ exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
 };
 
 function amendStats(base, doc_id, doc_type) {
-    // return base;
-    return base + ` (${doc_type} ${doc_id})`;  // DEBUG PAGESTATS
+    return base;
+    // return base + ` (${doc_type} ${doc_id})`;  // DEBUG PAGESTATS
 }
 
 exports.getReadCount = async (doc_id, doc_type) => {

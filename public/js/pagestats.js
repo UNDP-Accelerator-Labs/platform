@@ -6,7 +6,6 @@ let active = true;
 let done = false;
 
 const recordRead = () => {
-  console.log('hi record read', window.pagestats);
   const pagestatsbase = JSON.parse(
     d3.select('data[name="pagestats"]')?.node()?.value ?? '{}',
   );
@@ -15,14 +14,12 @@ const recordRead = () => {
   const pageURL = pagestatsbase.url;
   const pagestats = window.pagestats;
   if (pagestats) {
-    console.log('got stats', pagestats);
     const docId = pagestats.id;
     const docType = pagestats.type;
     if (active) {
       currentProgress += performance.now() - startTime;
       startTime = performance.now();
       if (currentProgress >= totalTime) {
-        console.log('record', pagestats);
         POST('/pagestats', {
           doc_id: docId,
           doc_type: docType,
@@ -30,7 +27,7 @@ const recordRead = () => {
         })
           .then((resp) => {
             // done
-            console.log('pagestat', resp); // DEBUG PAGESTATS
+            // console.log('pagestat', resp); // DEBUG PAGESTATS
           })
           .catch((e) => {
             console.log(e);

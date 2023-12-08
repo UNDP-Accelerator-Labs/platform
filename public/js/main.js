@@ -305,7 +305,6 @@ export function getContent(params = {}) {
     }
   });
 
-  console.log('load', object, reqbody);
   const docTypes = ['pads', 'contributors'];
   if (docTypes.includes(object)) {
     const pstats = {};
@@ -326,12 +325,12 @@ export function getContent(params = {}) {
     if (pstats.id && pstats.type) {
       window.pagestats = pstats;
     }
-    console.log(
-      'pagestats',
-      window.pagestats,
-      pstats,
-      pstats.id && pstats.type,
-    );
+    // console.log(
+    //   'pagestats',
+    //   window.pagestats,
+    //   pstats,
+    //   pstats.id && pstats.type,
+    // );
   }
   // TO DO: ADD VAR keep_page
   return POST(`/load/${object}`, reqbody);

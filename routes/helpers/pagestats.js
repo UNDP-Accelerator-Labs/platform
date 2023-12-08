@@ -120,7 +120,7 @@ exports.getReadCount = async (doc_id, doc_type) => {
         FROM page_stats
         WHERE doc_id = $1::INT AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
     `, [doc_id, doc_type, ownId]);
-    return amendStats(convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0)));
+    return amendStats(convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0)), doc_id, doc_type);
 };
 
 const getReadCountBulk = async (doc_query, doc_type) => {

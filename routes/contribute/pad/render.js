@@ -148,8 +148,9 @@ module.exports = async (req, res) => {
 					// 	return data
 					// }).catch(err => console.log(err)))
 					batch.push(load.data({ connection: t, req, authorized: true })
-					.then(result => {
+					.then(async result => {
 						delete result.sections
+						result.readCount = await pagestats.getReadCount(id, 'pad');
 						return result
 					}).catch(err => console.log(err)))
 				}

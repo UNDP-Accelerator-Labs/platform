@@ -146,13 +146,7 @@ module.exports = async (req, res) => {
 				;`, [ uuid, rights, pinboard ])
 				.then(async result => {
 					const data = await join.users(result, [ language, 'owner' ])
-					// NOTE: avoid double counting in the unlikely event that
-					// the pinboard is referenced both through an instance
-					// as well as a direct arg
-					if (!res.locals?.instance_vars?.instanceId && !res.locals?.instance_vars?.docType) {
-						data.readCount = await pagestats.getReadCount(pinboard, 'pinboard');
-						// await pagestats.recordRender(req, pinboard, 'pinboard');
-					}
+					data.readCount = await pagestats.getReadCount(pinboard, 'pinboard');
 					return data
 				}).catch(err => console.log(err)))
 			} else batch.push(null)

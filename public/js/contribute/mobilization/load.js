@@ -75,9 +75,9 @@ function DOMLoad() {
     });
   mobilization
     .selectAll(
-      '.modal.m-2 .body input[type=radio], .modal.m-5 .body input[type=radio], .modal.m-6 .body input[type=radio]',
+      '.modal.m-2 .body input[type=radio], .modal.m-5 .body input[type=radio], .modal.m-6 .body input[type=checkbox]',
     )
-    .on('change', function () {
+    .on('change.toggle', function () {
       toggleChecked(this);
       enableNext(this);
     });
@@ -114,7 +114,7 @@ function DOMLoad() {
     });
   mobilization
     .select('.modal.m-7 .body input#limit-pads')
-    .on('change', function () {
+    .on('change.toggle', function () {
       togglePadLimit(this);
     });
 }

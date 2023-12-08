@@ -13,9 +13,6 @@ module.exports = (req, res) => {
 	const { uuid, email } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
-	// TO DO: SET VERSION OF MOBILIZATION
-
-
 	DB.conn.tx(t => { // INSERT THE NEW MOBILIZATION
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
@@ -87,14 +84,6 @@ module.exports = (req, res) => {
 						VALUES ($1, $2::INT)
 					;`, [ uuid, id ]))
 				}
-				// SAVE VERSION TREE
-				batch.push(t.none(`
-					UPDATE mobilizations
-					SET version = source.version || $1::TEXT
-					FROM (SELECT id, version FROM mobilizations) AS source
-					WHERE mobilizations.id = $1
-						AND source.id = mobilizations.source
-				;`, [ id ]))
 			} else {
 				// AUTOMATICALLY CREATE A PUBLIC PINBOARD FOR THIS MOBILIZATION
 				batch.push(ownDB().then(async ownId => {
@@ -111,6 +100,24 @@ module.exports = (req, res) => {
 					;`, [ result, uuid ])
 				}).catch(err => console.log(err)))
 			}
+
+			// SAVE VERSION TREE
+			if (source) {
+				batch.push(t.none(`
+					UPDATE mobilizations
+					SET version = source.version || $1::TEXT
+					FROM (SELECT id, version FROM mobilizations) AS source
+					WHERE mobilizations.id = $1::INT
+						AND source.id = mobilizations.source
+				;`, [ id ]))
+			} else {
+				batch.push(t.none(`
+					UPDATE mobilizations
+					SET version = '$1'::ltree
+					WHERE id = $1::INT
+				;`, [ id ]))
+			}
+
 
 			return t.batch(batch)
 			.then(_ => {

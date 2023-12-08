@@ -68,11 +68,16 @@ module.exports = async _kwargs => {
 				// OTHREWISE REDIRECT
 				batch.push(t.oneOrNone(`
 					SELECT CASE WHEN
-						(SELECT DISTINCT (participant) FROM mobilization_contributors WHERE mobilization = $1::INT AND participant = $2) IS NOT NULL
+						(SELECT DISTINCT (participant) 
+							FROM mobilization_contributors 
+							WHERE mobilization = $1::INT 
+								AND participant = $2
+						) IS NOT NULL
+							OR $3 > 2
 						THEN TRUE
 						ELSE (SELECT public FROM mobilizations WHERE id = $1::INT)
 					END AS bool
-				;`, [ mobilization, uuid ], d => d.bool))
+				;`, [ mobilization, uuid, rights ], d => d.bool))
 
 				if (source) {
 					// INTERCEPT IF THERE ARE ALREADY FOLLOW UPS IN THIS MOBILIZATION
@@ -84,7 +89,7 @@ module.exports = async _kwargs => {
 							ON p.id = mc.pad
 						WHERE mc.mobilization = $1::INT
 						AND p.source = $2::INT
-					`, [ mobilization, source ], d => d.count))
+					;`, [ mobilization, source ], d => d.count))
 				} else batch.push(0)
 			} else {
 				batch.push(true)

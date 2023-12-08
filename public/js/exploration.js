@@ -183,7 +183,7 @@ export class Exploration {
       return;
     }
     this.listUpdateActive = true;
-    GET(`/exploration/list?lang=${language}`, true, true)
+    GET(`/exploration/list?lang=${language}&browser=1`, true, true)
       .then(checkResponse)
       .then((result) => {
         this.consent = true;
@@ -242,7 +242,11 @@ export class Exploration {
       return;
     }
     this.collectionId = curId;
-    GET(`/exploration/collection?exploration_id=${curId}`, true, true)
+    GET(
+      `/exploration/collection?exploration_id=${curId}&browser=1`,
+      true,
+      true,
+    )
       .then(checkResponse)
       .then((result) => {
         if (this.collectionId !== null && this.collectionId !== curId) {
@@ -296,7 +300,7 @@ export class Exploration {
         this.updateCurrentExploration(curId, curPrompt);
       } else if (curPrompt) {
         PUT(
-          `/exploration/create`,
+          `/exploration/create?browser=1`,
           {
             prompt: curPrompt,
           },
@@ -360,7 +364,7 @@ export class Exploration {
           return;
         }
         PUT(
-          '/exploration/consent',
+          '/exploration/consent?browser=1',
           {
             consent: 'approve',
           },
@@ -534,7 +538,7 @@ export class Exploration {
         ? 'neutral'
         : 'dislike';
     PUT(
-      '/exploration/doc',
+      '/exploration/doc?browser=1',
       {
         pad: docId,
         action: action,

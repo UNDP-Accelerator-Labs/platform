@@ -79,6 +79,8 @@
 							<% } %>
 						<% } else if (locals.data?.title) { %>
 							<input id='title' type='text' name='title' value='<%= locals.data.title %>'>
+						<% } else { %>
+							<input id='title' type='text' name='title'>
 						<% } %>
 						<label aria-colspan="google-translate-attr" class='placeholder' for='title' data-vocab='add mobilization title'></label>
 					</div>
@@ -305,26 +307,28 @@
 							<menu>
 								<% locals.cohort.forEach(c => { %>
 									<% if (
-										(locals.sourceinfo
+										(
+											locals.sourceinfo
 											&& locals.metadata.page.query?.copy?.some(d => d !== 'true')
-										) || locals.data?.cohort.includes(c.id)
+										) 
+										|| locals.data?.cohort.includes(c.id)
 										|| locals.metadata.page.query.pinboard?.length > 0
 									) { %>
 										<li class='checked'>
 											<div class='hide'>
-												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>' checked>
+												<input type='checkbox' id='c-<%= c.id %>' name='cohort' value='<%= c.id %>' checked>
 												<!-- TO DO: CHECK IF THIS WORKS: IT SHOULD SELECT CONTRIBUTORS BASED ON WHETHER IT IS A FOLLOW UP OR A DEPTH CAMPAIGN -->
 									<% } else { %>
 										<li>
 											<div class='hide'>
-												<input type='checkbox' id='c-<%- c.id %>' name='cohort' value='<%- c.id %>'>
+												<input type='checkbox' id='c-<%= c.id %>' name='cohort' value='<%= c.id %>'>
 									<% } %>
 										</div>
 										<div class='main'>
-											<label for='c-<%- c.id %>'><%- c.ownername %></label>
+											<label for='c-<%= c.id %>'><%= c.ownername %></label>
 										</div>
-										<div class='grow position'><label for='c-<%- c.id %>'><%- c.position %></label></div>
-										<div class='country'><label for='c-<%- c.id %>'><%- c.country %></label></div>
+										<div class='grow position'><label for='c-<%= c.id %>'><%= c.position %></label></div>
+										<div class='country'><label for='c-<%= c.id %>'><%= c.country %></label></div>
 									</li>
 								<% }) %>
 							</menu>

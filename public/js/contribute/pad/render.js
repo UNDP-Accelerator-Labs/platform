@@ -4237,9 +4237,9 @@ export async function renderPad(kwargs) {
         const data = sections[s];
 
         if (display === 'slideshow') {
-          await addSlides({ data: d, lang: language, objectdata });
+          await addSlides({ data, lang: language, objectdata });
         } else {
-          await addSection({ data: d, lang: language, objectdata });
+          await addSection({ data, lang: language, objectdata });
         }
       }
     }

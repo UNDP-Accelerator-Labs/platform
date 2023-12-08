@@ -1,3 +1,4 @@
+import { language, vocabulary } from '/js/config/translations.js';
 import { fixLabel } from '/js/main.js';
 
 export function adjustarea(node) {

@@ -1,4 +1,5 @@
 import { POST } from '/js/fetch.js';
+import { language, vocabulary } from '/js/config/translations.js';
 import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
 
 export function openPreview() {

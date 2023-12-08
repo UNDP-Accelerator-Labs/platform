@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
 		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 
 		if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
-		else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
-		else res.redirect(`/${language}/browse/pads/public`)
+		else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/published`)
+		else res.redirect(`/${language}/browse/pads/published`)
 	} else next()
 }

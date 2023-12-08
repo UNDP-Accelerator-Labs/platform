@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
 	const redirectPath = req.query.path;
 	const { referer, host } = req.headers || {}
 	const mainHost = removeSubdomain(host);
-	console.log('TOKEN VERIFY', host, mainHost);
+	// console.log('TOKEN VERIFY', host, mainHost);
 	const { path, ip: ownIp } = req || {}
 
 	const { __ucd_app, __puid, __cduid } = req.cookies
@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
 				return;
 			}
 		}
-		console.log('TOKEN VERIFY TOBJ', tobj);
+		// console.log('TOKEN VERIFY TOBJ', tobj);
 		const { uuid, rights, ip, acceptedorigins } = tobj;
 
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
@@ -83,8 +83,8 @@ module.exports = (req, res, next) => {
 						if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 
 						if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
-						else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
-						else res.redirect(`/${language}/browse/pads/public`)
+						else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/published`)
+						else res.redirect(`/${language}/browse/pads/published`)
 					}
 				})
 			}).catch(err => console.log(err))
@@ -149,8 +149,8 @@ module.exports = (req, res, next) => {
 					} else if (!originalUrl || originalUrl === path) {
 						const { read, write } = modules.find(d => d.type === 'pads')?.rights;
 						if (rights >= (write ?? Infinity)) redirecturl = `/${language}/browse/pads/private`;
-						else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/shared`;
-						else redirecturl = `/${language}/browse/pads/public`;
+						else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/published`;
+						else redirecturl = `/${language}/browse/pads/published`;
 					} else {
 						redirecturl = originalUrl || referer;
 					}

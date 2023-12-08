@@ -153,14 +153,22 @@ module.exports = (req, res) => {
 				;`, [ newID, mobilization ]))
 			}
 			// SAVE VERSION TREE
-			if (source && newID) {
-				batch.push(t.none(`
-					UPDATE pads
-					SET version = source.version || $1::TEXT
-					FROM (SELECT id, version FROM pads) AS source
-					WHERE pads.id = $1
-						AND source.id = pads.source
-				;`, [ newID ]))
+			if (newID) {
+				if (source) {
+					batch.push(t.none(`
+						UPDATE pads
+						SET version = source.version || $1::TEXT
+						FROM (SELECT id, version FROM pads) AS source
+						WHERE pads.id = $1::INT
+							AND source.id = pads.source
+					;`, [ newID ]))
+				} else {
+					batch.push(t.none(`
+						UPDATE pads
+						SET version = '$1'::ltree
+						WHERE id = $1::INT
+					;`, [ newID ]))
+				}
 			}
 
 			// UPDATE THE TIMESTAMP

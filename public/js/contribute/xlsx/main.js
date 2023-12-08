@@ -58,8 +58,8 @@ export function parseXLSX(file, node) {
   d3.select(node).attr('data-fname', file.name);
 
   reader.onload = async function (e) {
-    var data = new Uint8Array(e.target.result);
-    var workbook = XLSX.read(data, { type: 'array', bookFiles: true });
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array', bookFiles: true });
 
     let images = [];
     if (workbook.keys) {
@@ -69,7 +69,7 @@ export function parseXLSX(file, node) {
         const name = workbook.files[m].name; // .split('media/')[1]
         const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
 
-        console.log(buffer)
+        console.log(buffer);
 
         // const img = await POST('/request/blob/', { src: buffer, type: 'buffer' })
         // console.log(img)
@@ -85,7 +85,7 @@ export function parseXLSX(file, node) {
         defval: null,
       });
 
-      let keys = Object.keys(json[0]);
+      const keys = Object.keys(json[0]);
       if (images.length) {
         // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
         // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
@@ -150,7 +150,7 @@ function parseColumns(json, keys) {
       // IF THERE ARE MULTIPLE TYPES AND AT LEAST ONE OF THEM IS STRING, CONVERT ALL NOT NULL ENTRIES TO STRINGS
       obj.entries = obj.entries.map((c) => {
         if ([null, undefined].includes(c)) return c;
-        else return String(c).trim(); //.toLowerCase()
+        else return String(c).trim(); // .toLowerCase()
       });
       ref = obj.entries
         .filter((c) => ![null, undefined].includes(c))
@@ -464,7 +464,7 @@ function renderTable(cols, update = false) {
             .selectAll('th, td')
             .classed('top bottom left right', false)
             .each(function (b, k) {
-              let sides = [];
+              const sides = [];
               if (!range.includes(k - 1)) sides.push('left');
               if (!range.includes(k + 1)) sides.push('right');
               if (range.includes(k)) {
@@ -985,7 +985,7 @@ export function groupColumns() {
   }
 }
 export function dropColumns() {
-  let cols = d3.select('table.xls-preview').datum();
+  const cols = d3.select('table.xls-preview').datum();
   const dropkeys = d3
     .select('table.xls-preview thead')
     .selectAll('.selected')
@@ -1154,7 +1154,7 @@ export async function compilePads(idx, structureOnly = false) {
                 metafields.find((b) => b.label === c.type)?.type,
               )
             ) {
-              item.options = c.values //.filter(d => ![null, undefined].includes(d)).unique() // VALUES SHOUlD BE COMOPLETE (NO null OR undefined) AND SHOULD NOT BE unique
+              item.options = c.values // .filter(d => ![null, undefined].includes(d)).unique() // VALUES SHOUlD BE COMOPLETE (NO null OR undefined) AND SHOULD NOT BE unique
                 .sort((a, b) => {
                   if (typeof a === 'string' && typeof b === 'string')
                     return a?.localeCompare(b);
@@ -1327,7 +1327,7 @@ export async function compilePads(idx, structureOnly = false) {
                           obj.key = null;
                           obj.name = b;
                         }
-                        obj.type = c.type; //.slice(0, -1)
+                        obj.type = c.type; // .slice(0, -1)
                         return obj;
                       });
                   } else {
@@ -1345,7 +1345,7 @@ export async function compilePads(idx, structureOnly = false) {
                       obj.key = null;
                       obj.name = c.entries[i];
                     }
-                    obj.type = c.type; //.slice(0, -1)
+                    obj.type = c.type; // .slice(0, -1)
                     item.tags = [obj];
                   }
                   item.has_content = item?.tags?.length > 0;
@@ -1691,7 +1691,7 @@ export async function compileTemplate() {
 
   template.title = title.slice(0, 99);
   template.description = description;
-  template.sections = sections; //JSON.stringify(sections)
+  template.sections = sections; // JSON.stringify(sections)
   template.full_text = full_text;
   template.medium = 'xlsx';
   template.imported = true;

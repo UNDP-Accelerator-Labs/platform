@@ -30,7 +30,7 @@ const recordRead = () => {
         })
           .then((resp) => {
             // done
-            console.log('pagestat', resp);
+            console.log('pagestat', resp); // DEBUG PAGESTATS
           })
           .catch((e) => {
             console.log(e);

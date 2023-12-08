@@ -37,7 +37,8 @@ const ownIdFor = async (doc_type) => {
 
 const recordView = async (doc_id, doc_type, page_url, user_country, user_rights, is_view) => {
     const ownId = await ownIdFor(doc_type);
-    const allowRecord = !(user_country === 'LCL' || (user_rights > 2 && user_country === 'NUL'));
+    const allowRecord = true;  // DEBUG PAGESTATS
+    // const allowRecord = !(user_country === 'LCL' || (user_rights > 2 && user_country === 'NUL'));
     await DB.general.tx(async gt => {
         const page_stats = [];
 
@@ -66,7 +67,7 @@ const recordView = async (doc_id, doc_type, page_url, user_country, user_rights,
     });
 };
 exports.recordRender = async (req, doc_id, doc_type) => {
-    //
+    // not active anymore
 }
 
 const storeReadpage = async (req, doc_id, doc_type, page_url) => {
@@ -78,10 +79,10 @@ const storeReadpage = async (req, doc_id, doc_type, page_url) => {
 };
 
 exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
-    const { originalUrl } = req;
+    // const { originalUrl } = req;
     const { uuid, rights } = req.session || {};
     const user_country = await ipCountry(req);
-    const page_url = originalUrl;
+    // const page_url = originalUrl;
     const user_rights = uuid ? rights : -1;
     await recordView(doc_id, doc_type, page_url, user_country, user_rights, true);
 
@@ -107,6 +108,11 @@ exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
     }
 };
 
+function amendStats(base, doc_id, doc_type) {
+    // return base;
+    return base + ` (${doc_type} ${doc_id})`;  // DEBUG PAGESTATS
+}
+
 exports.getReadCount = async (doc_id, doc_type) => {
     const ownId = await ownIdFor(doc_type);
     const readCount = await DB.general.any(`
@@ -114,7 +120,7 @@ exports.getReadCount = async (doc_id, doc_type) => {
         FROM page_stats
         WHERE doc_id = $1::INT AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
     `, [doc_id, doc_type, ownId]);
-    return convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0));
+    return amendStats(convertNum(fuzzNumber(readCount.length ? readCount[0].rc : 0)));
 };
 
 const getReadCountBulk = async (doc_query, doc_type) => {
@@ -123,7 +129,7 @@ const getReadCountBulk = async (doc_query, doc_type) => {
         SELECT doc_id, read_count AS rc
         FROM page_stats
         WHERE doc_id IN $1:raw AND doc_type = $2 AND db = $3 AND page_url = '' AND viewer_country = '' AND viewer_rights < 0
-    `, [doc_query, doc_type, ownId])).map(row => [row.doc_id, convertNum(fuzzNumber(row.rc))]));
+    `, [doc_query, doc_type, ownId])).map(row => [row.doc_id, amendStats(convertNum(fuzzNumber(row.rc)), row.doc_id, doc_type)]));
     return readMap;
 };
 

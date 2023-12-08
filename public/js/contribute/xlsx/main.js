@@ -71,8 +71,8 @@ export function parseXLSX(file, node) {
 
         console.log(buffer)
 
-        const img = await POST('/request/blob/', { src: buffer, type: 'buffer' })
-        console.log(img)
+        // const img = await POST('/request/blob/', { src: buffer, type: 'buffer' })
+        // console.log(img)
 
         const blob = new Blob([buffer], { type: 'image/png' });
         const urlCreator = window.URL || window.webkitURL;

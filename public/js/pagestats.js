@@ -7,7 +7,7 @@ let done = false;
 
 const recordRead = () => {
   const pagestatsbase = JSON.parse(
-    d3.select('data[name="pagestats"]')?.node()?.value ?? '{}',
+    d3.select('data[name="pagestats"]').node().value,
   );
 
   const totalTime = pagestatsbase.readtime;

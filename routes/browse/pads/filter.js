@@ -122,7 +122,6 @@ module.exports = async (req, res) => {
 			}
 			if (vars.instanceId && vars.docType) {
 				vars.readCount = await pagestats.getReadCount(vars.instanceId, vars.docType);
-				await pagestats.recordRender(req, vars.instanceId, vars.docType);
 			}
 			space = vars.space
 			pinboard = vars.pinboard

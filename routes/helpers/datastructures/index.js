@@ -16,7 +16,6 @@ const {
 	map,
 	DB,
 	ownDB,
-	lodashNonce,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -274,7 +273,7 @@ exports.pagemetadata = (_kwargs) => {
 				d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
 			})
 		} else review_templates = []
-
+		
 		const obj = {}
 		obj.metadata = {
 			site: {
@@ -327,8 +326,6 @@ exports.pagemetadata = (_kwargs) => {
 				mscale: mscale || 'contain',
 				display: display || browse_display,
 				page_content_limit,
-
-				nonce: lodashNonce,
 
 				errormessage
 			},

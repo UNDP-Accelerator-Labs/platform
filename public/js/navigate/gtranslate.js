@@ -11,19 +11,18 @@ function setCookie(key, value, expiry) {
   expires.setTime(expires.getTime() + expiry * 24 * 60 * 60 * 1000);
   document.cookie = `${key}=${value};expires=${expires.toUTCString()};domain=${mainHost}`;
 }
-async function googleTranslateElementInit() {
-  setCookie('GoogleAccountsLocale_session', `${language}`);
-  setCookie('googtrans', `/en/${language}`, 1);
 
-  d3.select('#gtranslate-dummy-lang').style('display', 'none');
-  new google.translate.TranslateElement(
-    {
-      pageLanguage: 'en',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    },
-    'google_translate_element',
-  );
-}
+d3.select('#gtranslate-dummy-lang').style('display', 'none');
+new google.translate.TranslateElement(
+{
+	pageLanguage: 'en',
+	layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+},
+'google_translate_element',
+);
+
+setCookie('GoogleAccountsLocale_session', `${language}`);
+setCookie('googtrans', `/en/${language}`, 1);
 
 function rewriteUrl(lang, reload = false) {
   if (!lang) {
@@ -46,7 +45,6 @@ async function updateDomTree(lang) {
     lang = 'en';
   }
   const isMainLanguage = lang !== 'en' && languages.some((d) => d === lang);
-
   // d3.selectAll('.google-translate-attr')
   d3.selectAll('[data-vocab]').classed('notranslate', function () {
     return d3.select(this).classed('notranslate') || isMainLanguage;
@@ -66,6 +64,3 @@ cookieStore.addEventListener('change', async ({ changed }) => {
     rewriteUrl('en', true);
   }
 });
-
-window.googleTranslateElementInit = googleTranslateElementInit;
-window.googleTranslateElement = null;

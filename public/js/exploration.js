@@ -2,6 +2,15 @@ import { language, vocabulary } from '/js/config/translations.js';
 import { GET, POST, PUT } from '/js/fetch.js';
 import { renderPromiseModal } from '/js/modals.js';
 
+async function checkResponse(result) {
+  if (+result['status'] >= 400 && +result['status'] < 500) {
+    const err = new Error();
+    err.status = +result['status'];
+    throw err;
+  }
+  return result;
+}
+
 export class Exploration {
   constructor() {
     this.past = [];
@@ -174,7 +183,8 @@ export class Exploration {
       return;
     }
     this.listUpdateActive = true;
-    GET(`/exploration/list?lang=${language}`, true, true)
+    GET(`/exploration/list?lang=${language}&browser=1`, true, true)
+      .then(checkResponse)
       .then((result) => {
         this.consent = true;
         this.listUpdateActive = false;
@@ -232,7 +242,12 @@ export class Exploration {
       return;
     }
     this.collectionId = curId;
-    GET(`/exploration/collection?exploration_id=${curId}`, true, true)
+    GET(
+      `/exploration/collection?exploration_id=${curId}&browser=1`,
+      true,
+      true,
+    )
+      .then(checkResponse)
       .then((result) => {
         if (this.collectionId !== null && this.collectionId !== curId) {
           return;
@@ -285,13 +300,14 @@ export class Exploration {
         this.updateCurrentExploration(curId, curPrompt);
       } else if (curPrompt) {
         PUT(
-          `/exploration/create`,
+          `/exploration/create?browser=1`,
           {
             prompt: curPrompt,
           },
           true,
           true,
         )
+          .then(checkResponse)
           .then((result) => {
             this.updateCurrentExploration(
               result['exploration'],
@@ -348,13 +364,14 @@ export class Exploration {
           return;
         }
         PUT(
-          '/exploration/consent',
+          '/exploration/consent?browser=1',
           {
             consent: 'approve',
           },
           true,
           true,
         )
+          .then(checkResponse)
           .then((result) => {
             this.consent = true;
             this.updateExplorationDatalist();
@@ -521,7 +538,7 @@ export class Exploration {
         ? 'neutral'
         : 'dislike';
     PUT(
-      '/exploration/doc',
+      '/exploration/doc?browser=1',
       {
         pad: docId,
         action: action,
@@ -530,6 +547,7 @@ export class Exploration {
       true,
       true,
     )
+      .then(checkResponse)
       .then((result) => {
         this.updateExplorationDocs();
       })

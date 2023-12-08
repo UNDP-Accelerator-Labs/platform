@@ -18,26 +18,9 @@ exports.modules = [
     rights: { read: 0, write: { blank: 4, templated: 1 } },
     publish: 'def',
   }, // respond IS FOR TEMPLATED PADS
-  // { type: 'pinboards', rights: { read: 0, write: 1 } },
-  { type: 'templates', rights: { read: 2, write: 3 } },
-  { type: 'files', rights: { read: 0, write: 1 } },
-  // {
-  //   type: 'reviews',
-  //   rights: { read: 1, write: 1, coordinate: 3 },
-  //   reviewers: 1,
-  // },
-  // { type: 'mobilizations', rights: { read: 2, write: 2 } },
-  // { type: 'contributors', rights: { read: 2, write: 2 } },
-  // { type: 'teams', rights: { read: 2, write: 2 } },
-
-  // { type: 'analyses', rights: { read: 1, write: 2 } }
+  { type: 'templates', rights: { read: 1, write: 3 } },
+  { type: 'files', rights: { read: 1, write: 1 } },
 ];
-
-// NOTE: reviews IS DEPENDENT ON tags RIGHT NOW (FOR ASSIGNMENT OF REVIEWERS)
-
-// DESIRED METADATA
-// TO DO: metafields SHOULD BE ANY KIND OF MEDIA, E.G. CHECKBOX WITH VALUES, TEXT, ETC
-// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
 
 exports.metafields = [
   {
@@ -47,6 +30,27 @@ exports.metafields = [
     instruction: 'Signature',
   },
 ];
+
+if (process.env.NODE_ENV !== 'production') {
+  this.metafields.push(
+    {
+      type: 'attachment',
+      name: 'consent',
+      required: false,
+      uris: [
+        {
+          uri:
+            process.env.NODE_ENV === 'production'
+              ? 'https://consent.sdg-innovation-commons.org/en/contribute/resource'
+              : 'http://localhost:2000/en/contribute/resource',
+          resources: ['pads', 'files'] // IF THIS IS A CALL TO ANOTHER INSTANCE OF THE PLATFORM (LIKE THE CONSENT MODULE), DECLARE WHICH modules CAN BE SHARED AS RESOURCES
+        },
+        { uri: undefined },
+      ],
+      limit: 1,
+    }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
+  );
+}
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']
 exports.engagementtypes = [];

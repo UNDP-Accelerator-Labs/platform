@@ -325,6 +325,7 @@ export function getContent(params = {}) {
     if (pstats.id && pstats.type) {
       window.pagestats = pstats;
     }
+    // DEBUG PAGESTATS
     // console.log(
     //   'pagestats',
     //   window.pagestats,

@@ -287,9 +287,11 @@ export function getContent(params = {}) {
     }
     if (object === 'pads' && reqbody.space === 'published') {
       pstats.type = 'country';
-      pstats.id = `${decodeURI(reqbody.instance)}`
-        .toLowerCase()
-        .shortStringAsNum();
+      if (reqbody.instance) {
+        pstats.id = `${decodeURI(reqbody.instance)}`
+          .toLowerCase()
+          .shortStringAsNum();
+      }
     }
     if (object === 'contributors' && reqbody.space === 'pinned') {
       pstats.type = 'team';

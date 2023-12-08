@@ -66,9 +66,6 @@ const recordView = async (doc_id, doc_type, page_url, user_country, user_rights,
         await gt.batch(page_stats);
     });
 };
-exports.recordRender = async (req, doc_id, doc_type) => {
-    // not active anymore
-}
 
 const storeReadpage = async (req, doc_id, doc_type, page_url) => {
     const ownId = await ownIdFor(doc_type);

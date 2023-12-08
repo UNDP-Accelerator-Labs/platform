@@ -139,9 +139,7 @@ module.exports = async (req, res) => {
 					// 		result.reviews.sort((a, b) => a.id - b.id)
 					// 	}
 					// 	result.readCount = await pagestats.getReadCount(id, 'pad');
-					// 	if (result.status >= 2) {
-					// 		await pagestats.recordRender(req, id, 'pad');
-					// 	} else {
+					// 	if (result.status < 2) {
 					// 		result.readCount = '-';  // we're not recording so we don't imply we do
 					// 	}
 					// 	const data = await join.users(result, [ language, 'owner' ])

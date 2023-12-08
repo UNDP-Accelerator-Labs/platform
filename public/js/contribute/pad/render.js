@@ -3688,15 +3688,31 @@ export async function addAttachment(kwargs) {
           resolve: (_) => {
             return new Promise(async (resolve) => {
               const pad_id = await partialSave('meta');
+              const params = new URLSearchParams();
+              params.set('uri', d.uri);
+              params.set('pad_id', pad_id);
+              params.set('element_id', meta.id);
+              params.set('name', name);
+              params.set('type', type);
+              if (d.resources?.length) {
+              	d.resources.forEach((c) => {
+              		params.append('resources', c);
+              	});
+              };
               resolve(
-                window.location.replace(
-                  `/request/resource?uri=${encodeURI(
-                    d.uri,
-                  )}&pad_id=${pad_id}&element_id=${
-                    meta.id
-                  }&name=${name}&type=${type}`,
-                ),
+              	window.location.replace(
+              		`/request/resource?${params.toString()}`
+              	),
               );
+              // resolve(
+              //   window.location.replace(
+              //     `/request/resource?uri=${encodeURI(
+              //       d.uri,
+              //     )}&pad_id=${pad_id}&element_id=${
+              //       meta.id
+              //     }&name=${name}&type=${type}`,
+              //   ),
+              // );
             });
           },
         });
@@ -4209,7 +4225,7 @@ export async function renderPad(kwargs) {
   if (editing && !id && type === 'templated') {
     // GET TEMPLATE DATA
     const { sections } = await POST('/load/template', { id: pad.template.id });
-
+    
     // APPEND locked_excerpt TO THE pad data DOM ELEMENT
     const locked_excerpt =
       object === 'pad' &&
@@ -4237,9 +4253,9 @@ export async function renderPad(kwargs) {
         const data = sections[s];
 
         if (display === 'slideshow') {
-          await addSlides({ data: d, lang: language, objectdata });
+          await addSlides({ data, lang: language, objectdata });
         } else {
-          await addSection({ data: d, lang: language, objectdata });
+          await addSection({ data, lang: language, objectdata });
         }
       }
     }

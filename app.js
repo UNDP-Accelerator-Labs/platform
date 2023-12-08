@@ -27,18 +27,20 @@ const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
 
-const swPrecache = require('sw-precache');
-swPrecache.write('./public/app.serviceWorker.js', {
-  root: './public/',
-  staticFileGlobs: [
-    './public/css/**/*',
-    './public/imgs/**/*',
-    './public/js/**/*',
-    './public/favicon.ico',
-  ],
-  stripPrefix: './public/',
-  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-});
+if (process.env.NODE_ENV === 'production') {
+  const swPrecache = require('sw-precache');
+  swPrecache.write('./public/app.serviceWorker.js', {
+    root: './public/',
+    staticFileGlobs: [
+      './public/css/**/*',
+      './public/imgs/**/*',
+      './public/js/**/*',
+      './public/favicon.ico',
+    ],
+    stripPrefix: './public/',
+    maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+  });
+};
 
 const app = express();
 app.disable('x-powered-by');

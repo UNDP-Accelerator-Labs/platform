@@ -1,32 +1,28 @@
 const { modules, DB } = include('config/')
 const { checklanguage, flatObj, join, datastructures, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
+	const token = req.body.token || req.query.token || req.headers['x-access-token']
+
+	let req_resources
+	if (token) { // THE CONSENT IS A pdf COMING FROM THE CONSENT PLATFORM (OTHER APP IN THE SUITE) AND THE REQUEST IS COMMING FROM THAT APP
+		const auth = jwt.verify(token, process.env.APP_SUITE_SECRET)
+		if (!auth) res.json({ status: 403, message: 'You are not allowed to request resources on this platform.' })
+		else {
+			const { resources } = auth;
+			if (resources) {
+				if (!Array.isArray(resources)) resources = [resources];
+				req_resources = resources.filter(d => modules.some(c => c.type === d));
+			}
+		}
+	}
+
 	const { referer } = req.headers || {}
 	req.session.reqReferer = referer // STORE THIS IN CASE THE TOKEN EXPIRES
 
-	// const { uuid, rights, collaborators } = req.session || {}
-
-	// const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
-	// const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
-
-	// return DB.conn.tx(t => {
-	// 	const batch = []
-
-	// 	return t.batch(batch)
-	// 	.then(async results => {
-	// 		// GET THE INFO FOR CREATING NEW ENTRIES
-	// 		// FOR EXAMPLE, GET TEMPLATES FOR NEW PADS OR NEW REVIEWS
-	// 		const [ data, templates ] = results
-	// 		const metadata = await datastructures.pagemetadata({ connection: t, req })
-	// 		return Object.assign(metadata, { data: flatObj.call(data), templates: flatObj.call(templates) })
-	// 	}).catch(err => console.log(err))
-	// }).then(results => {
-	// 	res.render('contribute/resource', results)
-	// }).catch(err => console.log(err))
-
 	const metadata = await datastructures.pagemetadata({ req })
-	res.render('contribute/resource', metadata)
+	res.render('contribute/resource', Object.assign(metadata, { req_resources }))
 }
 
 // TO DO: IN files TABLE, ALTER COLUMN NAME name TO title FOR CONSISTENCY WITH OTHER MODULES

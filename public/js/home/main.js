@@ -1,3 +1,4 @@
+import { vocabulary } from '/js/config/translations.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 // THIS IS NOT USED FOR NOW

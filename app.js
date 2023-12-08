@@ -11,7 +11,7 @@ const {
   csp_links,
   app_base_host,
   getVersionObject,
-  lodashNonce
+  lodashNonce,
 } = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
@@ -41,7 +41,7 @@ const app = express();
 app.disable('x-powered-by');
 
 app.use((req, res, next) => {
-  res.locals.nonce = lodashNonce()
+  res.locals.nonce = lodashNonce();
   next();
 });
 

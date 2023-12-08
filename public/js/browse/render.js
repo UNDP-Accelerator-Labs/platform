@@ -1306,13 +1306,16 @@ export const Entry = function (_kwargs) {
             .addElems('a')
             .attrs({
               href: (d) => {
-                const queryparams = new URLSearchParams()
-                queryparams.set('source', d.source)
-                queryparams.set('template', d.template)
-                queryparams.set('mobilization', d.id)
-                queryparams.set('display', 'adjacent-source')
+                const queryparams = new URLSearchParams();
+                queryparams.set('source', d.source);
+                queryparams.set('template', d.template);
+                queryparams.set('mobilization', d.id);
+                queryparams.set('display', 'adjacent-source');
 
-                return `/${language}/contribute/${object.slice(0, -1)}?${queryparams.toString()}`
+                return `/${language}/contribute/${object.slice(
+                  0,
+                  -1,
+                )}?${queryparams.toString()}`;
                 // `/${language}/contribute/${object.slice(0, -1)}?source=${
                 //   d.source
                 // }&template=${d.template}&mobilization=${

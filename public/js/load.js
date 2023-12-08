@@ -103,7 +103,7 @@ async function DOMLoad() {
   });
 
   // TOGGLE OPTIONS
-  d3.selectAll('input.toggle').on('change', async function () {
+  d3.selectAll('input.toggle').on('change.generaltoggle', async function () {
     await toggleOptions(this);
   });
 

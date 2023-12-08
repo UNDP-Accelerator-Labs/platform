@@ -17,6 +17,12 @@ async function DOMLoad() {
     d3.select('data[name="page"]').node()?.value || false,
   );
 
+  // toggles
+  //  else if (object === 'contributor') {
+  //   partialSave();
+  // }
+
+
   d3.selectAll('input[type=password]') // IT IS IMPORTANT THAT THIS COMES BEFORE THE NEXT GENERIC BLUR FUNCTION
     .on('blur.confirm', function () {
       const node = this;

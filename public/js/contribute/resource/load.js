@@ -4,7 +4,9 @@ import { renderPromiseModal } from '/js/modals.js';
 
 async function DOMLoad() {
   const rights = JSON.parse(d3.select('data[name="rights"]').node().value);
-  const resources = JSON.parse(d3.select('data[name="req_resources"]').node().value);
+  const resources = JSON.parse(
+    d3.select('data[name="req_resources"]').node().value,
+  );
   // LOAD DATA
   const [readables, writables] = await getContent({ resources });
   // const { modules } = await POST('/load/metadata', { feature: [ 'modules' ] })
@@ -59,22 +61,22 @@ async function DOMLoad() {
       });
       if (key !== Object.keys(readables)[Object.keys(readables).length - 1]) {
         if (opts.length && opts[opts.length - 1]?.class !== 'divider') {
-	        opts.push({
-	          node: 'div',
-	          class: 'divider',
-	          label: vocabulary['or'].toUpperCase(),
-	        });
-	    };
+          opts.push({
+            node: 'div',
+            class: 'divider',
+            label: vocabulary['or'].toUpperCase(),
+          });
+        }
       }
-    };
+    }
     if (['templates', 'pads'].includes(key) && writables[key]) {
       if (opts.length && opts[opts.length - 1]?.class !== 'divider') {
-	      opts.push({
-	        node: 'div',
-	        class: 'divider',
-	        label: vocabulary['or'].toUpperCase(),
-	      });
-	  };
+        opts.push({
+          node: 'div',
+          class: 'divider',
+          label: vocabulary['or'].toUpperCase(),
+        });
+      }
       if (writables[key]?.length) {
         template_opts[key] = writables[key].map((d) => {
           return {
@@ -111,9 +113,7 @@ async function DOMLoad() {
               window.location.replace(
                 `/${language}/contribute/${key.slice(0, -1)}?template=${
                   node.value
-                }&token=${encodeURIComponent(
-                  token,
-                )}&action=publish_and_share`,
+                }&token=${encodeURIComponent(token)}&action=publish_and_share`,
               );
             else
               window.location.replace(
@@ -143,12 +143,12 @@ async function DOMLoad() {
       }
     } else if (key === 'files' && writables[key]) {
       if (opts.length && opts[opts.length - 1]?.class !== 'divider') {
-	      opts.push({
-	        node: 'div',
-	        class: 'divider',
-	        label: vocabulary['or'].toUpperCase(),
-	      });
-	  };
+        opts.push({
+          node: 'div',
+          class: 'divider',
+          label: vocabulary['or'].toUpperCase(),
+        });
+      }
       opts.push({
         node: 'input',
         type: 'file',

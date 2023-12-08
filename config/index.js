@@ -25,7 +25,7 @@ let {
 } = require('./edit/');
 const fs = require('fs');
 
-const lodashNonce  = require('./nonces/');
+const lodashNonce = require('./nonces/');
 
 exports.translations = translations;
 

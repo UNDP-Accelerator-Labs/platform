@@ -69,7 +69,7 @@ export function parseXLSX(file, node) {
         const name = workbook.files[m].name; // .split('media/')[1]
         const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
 
-        console.log(buffer)
+        console.log(buffer);
 
         // const img = await POST('/request/blob/', { src: buffer, type: 'buffer' })
         // console.log(img)

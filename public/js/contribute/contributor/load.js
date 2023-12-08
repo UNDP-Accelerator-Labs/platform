@@ -17,7 +17,6 @@ async function DOMLoad() {
     d3.select('data[name="page"]').node()?.value || false,
   );
 
-
   d3.selectAll('input.toggle').on('change.save', function () {
     partialSave();
   });

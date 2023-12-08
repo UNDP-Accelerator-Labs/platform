@@ -116,6 +116,30 @@ String.prototype.convertHTMLtoTXT = function () {
   div.innerHTML = html;
   return div.textContent || div.innerText || '';
 };
+String.prototype.shortStringAsNum = function () {
+  // converts a short string (up to 4 characters) into a number based on
+  // the ASCII values.
+  // For example the string 'mwi' will become 0x69776D or 6911853 in base 10.
+  // 'm' will become 0x6D or 109.
+  // This function will throw errors on invalid inputs (too long or non-ASCII).
+  const text = this.valueOf();
+  if (text.length > 4) {
+    throw new Error(
+      `only short strings can be safely converted to numbers. got '${text}'`,
+    );
+  }
+  let res = 0;
+  let mul = 1;
+  for (let ix = 0; ix < text.length; ix += 1) {
+    const cur = text.charCodeAt(ix);
+    if (cur < 0 || cur > 0xff) {
+      throw new Error(`cannot decode non-ASCII characters: ${text}`);
+    }
+    res += cur * mul;
+    mul *= 0x100;
+  }
+  return res;
+};
 RegExp.escape = function (string) {
   // FROM https://makandracards.com/makandra/15879-javascript-how-to-generate-a-regular-expression-from-a-string
   return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');

@@ -1,7 +1,13 @@
+<%
+	// CREATE ALIASES
+	const rights = locals.metadata.user.rights;
+	const object = locals.metadata.page.object;
+	const modules = locals.metadata.site.modules;
+	const { req_resources } = locals;
+%>
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <% 
-	const modules = locals.metadata.site.modules
 	const rightsobj = {};
 	
 	modules.forEach(d => {
@@ -15,6 +21,7 @@
 	});
 %>
 <data name='rights' value='<%= JSON.stringify(rightsobj) %>'></data>
+<data name='req_resources' value='<%= JSON.stringify(req_resources) %>' %></data>
 <% if (locals.metadata.site.app_storage) { %>
 	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
 <% } %>

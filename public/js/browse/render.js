@@ -878,9 +878,8 @@ export const Entry = function (_kwargs) {
                   c.count !== 1 ? 'plural' : 'singular'
                 ];
               obj.count = c.count;
-              let space = 'private';
-              if (c.status === 2) space = 'shared';
-              else if (c.status > 2) space = 'public';
+              let space = 'curated';
+              if (c.status >= 2) space = 'published';
               obj.href = `/${language}/browse/pads/${space}?${object}=${d.id}`;
               data.push(obj);
             });
@@ -941,10 +940,12 @@ export const Entry = function (_kwargs) {
             const queryparams = new URLSearchParams();
             if (d.id) queryparams.set('id', d.id);
             if (d.source) queryparams.set('source', d.source);
-            if (d.is_followup || d.is_review)
+            if (d.is_followup || d.is_review) {
               queryparams.set('display', 'adjacent-source');
-            if (d.is_review && d.review_template)
+            }
+            if (d.is_review && d.review_template) {
               queryparams.set('template', d.review_template);
+            }
 
             if (object === 'reviews') {
               if (!d.is_review && d.reviews?.length > 0) {

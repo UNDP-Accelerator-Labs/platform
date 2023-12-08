@@ -26,8 +26,8 @@ module.exports = async (req, res) => {
 				else res.redirect('/login')
 			} else if (authorized && redirect && redirect !== activity) {
 				const query = []
-				for (const [key, value] of req.query) {
-					query.push(`${key}=${value}`)
+				for (const key in req.query) {
+					query.push(`${key}=${req.query[key]}`)
 				}
 				return res.redirect(`/${language}/${redirect}/pad${query.length > 0 ? `?${query.join('&')}` : ''}`)
 			} else {
@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
 				else if (id) template_clause = DB.pgp.as.format(`id IN (SELECT template FROM pads WHERE id = $1::INT)`, [ id ])
 				else template_clause = DB.pgp.as.format('FALSE')
 				batch.push(t.oneOrNone(`
-					SELECT id, title, medium FROM templates
+					SELECT id, title, description, medium FROM templates
 					WHERE $1:raw
 				;`, [ template_clause ]))
 
@@ -139,17 +139,16 @@ module.exports = async (req, res) => {
 					// 		result.reviews.sort((a, b) => a.id - b.id)
 					// 	}
 					// 	result.readCount = await pagestats.getReadCount(id, 'pad');
-					// 	if (result.status >= 2) {
-					// 		await pagestats.recordRender(req, id, 'pad');
-					// 	} else {
+					// 	if (result.status < 2) {
 					// 		result.readCount = '-';  // we're not recording so we don't imply we do
 					// 	}
 					// 	const data = await join.users(result, [ language, 'owner' ])
 					// 	return data
 					// }).catch(err => console.log(err)))
 					batch.push(load.data({ connection: t, req, authorized: true })
-					.then(result => {
+					.then(async result => {
 						delete result.sections
+						result.readCount = await pagestats.getReadCount(id, 'pad');
 						return result
 					}).catch(err => console.log(err)))
 				}

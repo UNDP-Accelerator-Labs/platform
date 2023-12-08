@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 module.exports = (req, res) => {
 	// THIS IS TO REQUEST INFORMATION
 	const { uuid, rights } = req.session || {}
-	const { uri, pad_id, element_id, name, type } = req.query || {}
+	const { uri, resources, pad_id, element_id, name, type } = req.query || {}
 	const { host, referer } = req.headers || {}
 
 	// GET THE USER INFO TO SEND TO THE CONSENT MANAGEMENT PLATFORM
@@ -19,6 +19,7 @@ module.exports = (req, res) => {
 		const token = jwt.sign(
 			{ 
 				uuid, 
+				resources,
 				callback: { 
 					pad_id, 
 					element_id,

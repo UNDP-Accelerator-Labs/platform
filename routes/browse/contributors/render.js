@@ -1,6 +1,6 @@
 const { page_content_limit, modules, metafields, lazyload, map, DB } = include('config/')
 const load = require('./load/')
-const { array, checklanguage, datastructures } = include('routes/helpers/')
+const { array, checklanguage, datastructures, pagestats } = include('routes/helpers/')
 
 const filter = require('./filter.js')
 
@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
 		const { object, space } = req.params || {}
 		const { pinboard, display } = req.query || {}
 		const language = checklanguage(req.params?.language || req.session.language)
-		
+
 		// GET FILTERS
 		const filter_result = await filter(req);
 		const [ f_space, page, full_filters ] = filter_result;
@@ -33,9 +33,9 @@ module.exports = async (req, res) => {
 				// PINBOARDS LIST
 				if (modules.some(d => d.type === 'teams' && d.rights.read <= rights)) {
 					batch.push(t.any(`
-						SELECT t.id, t.name AS title, 
-							COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count, 
-							FALSE AS is_exploration 
+						SELECT t.id, t.name AS title,
+							COALESCE(COUNT (DISTINCT (tm.member)), 0)::INT AS count,
+							FALSE AS is_exploration
 						FROM teams t
 						INNER JOIN team_members tm
 							ON tm.team = t.id
@@ -74,6 +74,10 @@ module.exports = async (req, res) => {
 						pinboards_list, // LIST OF AVAILABLE TEAMS
 						pinboard // CURRENTLY DISLAYED TEAM (IF APPLICABLE)
 					] = results
+
+					if (pinboard) {
+						pinboard.readCount = await pagestats.getReadCount(pinboard.id, 'team');
+					}
 
 					const { sections } = data || {} // THIS SHOULD BE DEPRECATED
 					const stats = {

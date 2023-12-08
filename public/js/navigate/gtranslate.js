@@ -14,11 +14,11 @@ function setCookie(key, value, expiry) {
 
 d3.select('#gtranslate-dummy-lang').style('display', 'none');
 new google.translate.TranslateElement(
-{
-	pageLanguage: 'en',
-	layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-},
-'google_translate_element',
+  {
+    pageLanguage: 'en',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+  },
+  'google_translate_element',
 );
 
 setCookie('GoogleAccountsLocale_session', `${language}`);

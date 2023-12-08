@@ -3695,14 +3695,14 @@ export async function addAttachment(kwargs) {
               params.set('name', name);
               params.set('type', type);
               if (d.resources?.length) {
-              	d.resources.forEach((c) => {
-              		params.append('resources', c);
-              	});
-              };
+                d.resources.forEach((c) => {
+                  params.append('resources', c);
+                });
+              }
               resolve(
-              	window.location.replace(
-              		`/request/resource?${params.toString()}`
-              	),
+                window.location.replace(
+                  `/request/resource?${params.toString()}`,
+                ),
               );
               // resolve(
               //   window.location.replace(
@@ -4225,7 +4225,7 @@ export async function renderPad(kwargs) {
   if (editing && !id && type === 'templated') {
     // GET TEMPLATE DATA
     const { sections } = await POST('/load/template', { id: pad.template.id });
-    
+
     // APPEND locked_excerpt TO THE pad data DOM ELEMENT
     const locked_excerpt =
       object === 'pad' &&

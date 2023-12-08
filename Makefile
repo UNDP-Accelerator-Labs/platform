@@ -53,7 +53,7 @@ run-sass:
 	CMD=sass ./sh/run.sh
 
 run-service-worker:
-	CMD=create_service_worker.js ./sh/script.sh
+	npm run service-worker
 
 run-no-service-worker:
 	rm ./public/app.serviceWorker.js || true

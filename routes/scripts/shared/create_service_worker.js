@@ -1,6 +1,6 @@
 const swPrecache = require('sw-precache');
 
-process.chdir('../../../');
+// process.chdir('../../../');
 swPrecache.write('./public/app.serviceWorker.js', {
   root: './public/',
   staticFileGlobs: [

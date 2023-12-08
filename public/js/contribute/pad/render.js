@@ -896,7 +896,9 @@ export function uploadImg(kwargs) {
       }
       return json;
     })
-    .then((data) => addImgs({ data, lang, sibling, container, focus }))
+    .then((data) =>
+      addImgs({ data, lang, sibling, container, focus, objectdata }),
+    )
     .catch((err) => {
       if (err) throw err;
     });
@@ -945,7 +947,7 @@ function deleteImg(kwargs) {
   }
 }
 function addImgs(kwargs) {
-  const { data, lang, sibling, container, focus } = kwargs;
+  const { data, lang, sibling, container, focus, objectdata } = kwargs;
   const fls = data.filter((d) => d.status === 200);
   // THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
   if (fls.length === 1) {
@@ -954,14 +956,14 @@ function addImgs(kwargs) {
       if (container) datum = container.datum();
       if (datum.type !== 'img') datum = { instruction: datum.instruction };
       datum['src'] = f.src;
-      addImg({ data: datum, lang, sibling, container, focus });
+      addImg({ data: datum, lang, sibling, container, focus, objectdata });
     }); // ONLY ONE IMAGE SO NO MOSAIC
   } else {
     let datum = {};
     if (container) datum = container.datum();
     if (datum.type !== 'mosaic') datum = { instruction: datum.instruction };
     datum['srcs'] = fls.map((f) => f.src);
-    addMosaic({ data: datum, lang, sibling, container, focus });
+    addMosaic({ data: datum, lang, sibling, container, focus, objectdata });
   }
 }
 export function uploadVideo(kwargs) {
@@ -1023,7 +1025,7 @@ export function uploadVideo(kwargs) {
           if (container) data = container.datum();
           data['src'] = f.src;
           fls.forEach((f) =>
-            addVideo({ data, lang, sibling, container, focus }),
+            addVideo({ data, lang, sibling, container, focus, objectdata }),
           );
         });
       }
@@ -3688,15 +3690,31 @@ export async function addAttachment(kwargs) {
           resolve: (_) => {
             return new Promise(async (resolve) => {
               const pad_id = await partialSave('meta');
+              const params = new URLSearchParams();
+              params.set('uri', d.uri);
+              params.set('pad_id', pad_id);
+              params.set('element_id', meta.id);
+              params.set('name', name);
+              params.set('type', type);
+              if (d.resources?.length) {
+                d.resources.forEach((c) => {
+                  params.append('resources', c);
+                });
+              }
               resolve(
                 window.location.replace(
-                  `/request/resource?uri=${encodeURI(
-                    d.uri,
-                  )}&pad_id=${pad_id}&element_id=${
-                    meta.id
-                  }&name=${name}&type=${type}`,
+                  `/request/resource?${params.toString()}`,
                 ),
               );
+              // resolve(
+              //   window.location.replace(
+              //     `/request/resource?uri=${encodeURI(
+              //       d.uri,
+              //     )}&pad_id=${pad_id}&element_id=${
+              //       meta.id
+              //     }&name=${name}&type=${type}`,
+              //   ),
+              // );
             });
           },
         });
@@ -4250,6 +4268,7 @@ export async function renderPad(kwargs) {
     window.sessionStorage.removeItem('changed-content');
   } else if (id && ['edit', 'view'].includes(activity)) {
     // GET THE DATA
+    window.pagestats = { type: 'pad', id };
     const { title, sections, is_review, template } = await POST('/load/pad', {
       id,
     });

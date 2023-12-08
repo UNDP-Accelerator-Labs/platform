@@ -17,7 +17,6 @@ import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
 async function DOMLoad() {
   if (!mediaSize) var mediaSize = getMediaSize();
-  console.log('triggered');
 
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;

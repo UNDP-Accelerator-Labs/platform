@@ -122,7 +122,6 @@ module.exports = async (req, res) => {
 			}
 			if (vars.instanceId && vars.docType) {
 				vars.readCount = await pagestats.getReadCount(vars.instanceId, vars.docType);
-				await pagestats.recordRender(req, vars.instanceId, vars.docType);
 			}
 			space = vars.space
 			pinboard = vars.pinboard
@@ -195,7 +194,7 @@ module.exports = async (req, res) => {
 
 		else if (space === 'published') {
 			if (rights < 3) {
-				const isUNDP = (await DB.general.oneOrNone(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ]))
+				const isUNDP = await DB.general.oneOrNone(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ], d => d?.bool)
 				if (isUNDP) f_space = DB.pgp.as.format('p.status >= 2')
 				else f_space = DB.pgp.as.format('p.status = 3')
 			} else {

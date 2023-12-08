@@ -17,9 +17,6 @@ module.exports = (req, res) => {
 		var { referer } = req.headers || {}
 	}
 
-
-	console.log(callback)
-
 	// STORE THE CONSENT INFORMATION
 	if (uuid && src && pad_id) {
 		return DB.conn.tx(t => {

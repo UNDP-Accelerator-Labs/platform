@@ -110,17 +110,11 @@ module.exports = async (req, res) => {
 						// 	return data
 						// }))
 						batch.push(load.data({ connection: t, req, authorized: true })
-						.then(result => {
+						.then(async result => {
 							delete result.sections
+							result.readCount = await pagestats.getReadCount(id, 'template');
 							return result
 						}).catch(err => console.log(err)))
-					}
-
-					if (id) {
-						// TO NOTE: for now we record views/reads even for unpublished templates
-						// can be changed by moving this block up where readCount is set
-						// and checking the status instead of id
-						await pagestats.recordRender(req, id, 'template');
 					}
 
 					if (id && engagementtypes?.length > 0) { // GET THE ENGAGEMENT METRICS

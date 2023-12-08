@@ -19,8 +19,6 @@ module.exports = async kwargs => {
 		authorized = authorization.authorized
 	}
 
-	console.log('authorized')
-	console.log(authorized)
 
 	if (authorized === false) return null
 	else {

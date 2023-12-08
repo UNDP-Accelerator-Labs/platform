@@ -28,8 +28,9 @@ const recordRead = () => {
           doc_type: docType,
           page_url: pageURL,
         })
-          .then(() => {
+          .then((resp) => {
             // done
+            console.log('pagestat', resp);
           })
           .catch((e) => {
             console.log(e);

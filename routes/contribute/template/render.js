@@ -120,7 +120,7 @@ module.exports = async (req, res) => {
 						// TO NOTE: for now we record views/reads even for unpublished templates
 						// can be changed by moving this block up where readCount is set
 						// and checking the status instead of id
-						await pagestats.recordRender(req, id, 'template');
+						// await pagestats.recordRender(req, id, 'template');
 					}
 
 					if (id && engagementtypes?.length > 0) { // GET THE ENGAGEMENT METRICS

@@ -66,13 +66,7 @@ const recordView = async (doc_id, doc_type, page_url, user_country, user_rights,
     });
 };
 exports.recordRender = async (req, doc_id, doc_type) => {
-    const { originalUrl } = req;
-    const { uuid, rights } = req.session || {};
-    const user_country = await ipCountry(req);
-    const page_url = originalUrl;
-    const user_rights = uuid ? rights : -1;
-    await recordView(doc_id, doc_type, page_url, user_country, user_rights, true);
-    await storeReadpage(req, doc_id, doc_type, page_url);
+    //
 }
 
 const storeReadpage = async (req, doc_id, doc_type, page_url) => {
@@ -84,22 +78,32 @@ const storeReadpage = async (req, doc_id, doc_type, page_url) => {
 };
 
 exports.recordReadpage = async (req, doc_id, doc_type, page_url) => {
+    const { originalUrl } = req;
     const { uuid, rights } = req.session || {};
-    const user_rights = uuid ? rights : -1;
-    const ownId = await ownIdFor(doc_type);
     const user_country = await ipCountry(req);
+    const page_url = originalUrl;
+    const user_rights = uuid ? rights : -1;
+    await recordView(doc_id, doc_type, page_url, user_country, user_rights, true);
+
+    const ownId = await ownIdFor(doc_type);
     const {read_doc_id, read_doc_type, read_db, read_url} = req.session;
-    if (+read_doc_id === +doc_id && read_doc_type === doc_type && +read_db === +ownId && read_url === page_url) {
+    if (
+            +read_doc_id !== +doc_id
+            || read_doc_type !== doc_type
+            || +read_db !== +ownId
+            // || read_url !== page_url
+            ) {
         await recordView(doc_id, doc_type, read_url, user_country, user_rights, false);
-        req.session.read_doc_id = undefined;
-        req.session.read_doc_type = undefined;
-        req.session.read_db = undefined;
-        req.session.read_url = undefined;
+        // req.session.read_doc_id = undefined;
+        // req.session.read_doc_type = undefined;
+        // req.session.read_db = undefined;
+        // req.session.read_url = undefined;
+        await storeReadpage(req, doc_id, doc_type, page_url);
     } else {
         throw new Error(
-            `mismatching base: ${read_doc_id}===${doc_id} `
-            + `${read_doc_type}===${doc_type} ${read_db}===${ownId} `
-            + `${read_url}===${page_url}`)
+            `repeat base: ${read_doc_id}<=>${doc_id} `
+            + `${read_doc_type}<=>${doc_type} ${read_db}<=>${ownId} `
+            + `(${read_url}<=>${page_url})`)
     }
 };
 

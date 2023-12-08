@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary, language } from '/js/config/translations.js';
 import { compilePads, compileTemplate } from '/js/contribute/xlsx/main.js';
 import { POST } from '/js/fetch.js';
 import { addGlobalLoader, rmGlobalLoader } from '/js/main.js';
@@ -79,10 +79,10 @@ export async function catchSubmit(evt) {
     });
     const blobs = await Promise.all(promises);
     blobs.forEach((b) => {
-      console.log(b)
+      console.log(b);
       fd.append('img', b.blob, b.originalname);
     });
-    return false
+    return false;
 
     // THIS IS SIMILAR TO THE uploadImg FUNCTION IN pad.js
     // WE NEED TO USE THE fetch API, AND NOT THE POST HELPER FUNCTION FOR SOME REASON

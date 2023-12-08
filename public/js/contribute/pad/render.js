@@ -896,7 +896,9 @@ export function uploadImg(kwargs) {
       }
       return json;
     })
-    .then((data) => addImgs({ data, lang, sibling, container, focus, objectdata }))
+    .then((data) =>
+      addImgs({ data, lang, sibling, container, focus, objectdata }),
+    )
     .catch((err) => {
       if (err) throw err;
     });

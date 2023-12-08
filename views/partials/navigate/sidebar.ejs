@@ -106,7 +106,16 @@
 													</li>
 												<% } // locals.metadata.menu.templates 0 %>
 											<% } // rights %>
-											<% if (locals.metadata.menu.participations?.filter(p => !(p.source && !p.copy) || p.child).length > 0) { %>
+											<% if (
+												locals.metadata.menu.participations?.filter(p => {
+													if (p.source) {
+														if (p.copy || p.child) return p.status === 1
+														else return false
+													} else if (p.collection) {
+														return false
+													} else return p.status === 1
+												}).length > 0
+											) { %>
 												<li class="google-translate-attr">
 													<button>
 														<label data-vocab='campaign pad'></label>

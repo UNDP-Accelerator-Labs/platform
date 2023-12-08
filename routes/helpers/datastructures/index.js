@@ -150,10 +150,15 @@ exports.pagemetadata = (_kwargs) => {
 		// MOBILIZATION LIST (PARTICIPANT)
 		if (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.read)) {
 			batch.push(t.any(`
-				SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child,
+				SELECT m.id, m.owner, m.title, m.template, m.source, m.copy, m.status, m.child, m.collection,
 					to_char(m.start_date, 'DD Mon YYYY') AS start_date
 				FROM mobilizations m
-				WHERE (m.id IN (SELECT mobilization FROM mobilization_contributors WHERE participant = $1)
+				WHERE (
+					m.id IN (
+						SELECT mobilization 
+						FROM mobilization_contributors 
+						WHERE participant = $1
+					)
 					OR m.owner = $1
 				)
 					OR m.public = TRUE

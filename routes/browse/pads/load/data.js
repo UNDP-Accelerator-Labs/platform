@@ -301,6 +301,7 @@ module.exports = async kwargs => {
 					
 					// FIRST WE CONSTRUCT THE followups OBJECT
 					// THEN WE ATTACH TO RELEVANT PADS
+					// THIS IS FOR DEEP DIVE CAMPAIGNS THAT USE collection
 					batch1.push(t1.any(`
 						SELECT m.collection, json_build_object(
 							'id', m.id,
@@ -316,17 +317,34 @@ module.exports = async kwargs => {
 							AND m.collection IS NOT NULL
 					;`, [ followup_count ])
 					.then(results => {
+						// WE NEED THE COUNT OF PADS SUBMITTED TO THE FOLLOWUP,
+						// JOINED TO THE PADS RENDERED ACCORDING TO THEIR SOURCE
 						return DB.general.any(`
 							SELECT pad AS id, pinboard AS collection FROM pinboard_contributions
 							WHERE pinboard IN ($1:csv)
 							AND db = $2
-						;`, [ safeArr(results.map(d => d.collection), -1), ownId ])
-						.then(pinnedpads => {
+							AND pad IN $3:raw
+						;`, [ safeArr(results.map(d => d.collection), -1), ownId, padlist ])
+						.then(async pinnedpads => {
 							pinnedpads.forEach(d => {
 								d.followups = results.find(c => c.collection === d.collection)?.followups
 								d.followups.source = d.id
 								delete d.collection
 							})
+							// GET THE count OF FOLLOWUPS
+							for (let p = 0; p < pinnedpads.length; p ++) {
+								const pad = pinnedpads[p]
+								if (pad.followups) {
+									pad.followups.count = await t1.one(`
+										SELECT COUNT(p.id)::INT
+										FROM pads p
+										INNER JOIN mobilization_contributions mc
+											ON mc.pad = p.id
+										WHERE mc.mobilization = $1::INT
+											AND '$2'::ltree @> p.version
+									;`, [ pad.followups.id, pad.id ], d => d.count)
+								}
+							}
 							return pinnedpads
 						}).catch(err => console.log(err))
 					}).catch(err => console.log(err)))

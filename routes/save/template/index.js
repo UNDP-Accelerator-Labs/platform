@@ -43,15 +43,23 @@ module.exports = (req, res) => {
 				;`, [ newID || id, review_language ]))
 			}
 			// SAVE VERSION TREE
-			if (source && newID) {
-				batch.push(t.none(`
-					UPDATE templates
-					SET version = source.version || $1::TEXT
-					FROM (SELECT id, version FROM templates) AS source
-					WHERE templates.id = $1
-						AND source.id = templates.source
-				;`, [ newID ]))
-			} // TO DO: APPEND THE newID IF THERE IS NO SOURCE AND APPEND source OTHERWISE
+			if (newID) {
+				if (source) {
+					batch.push(t.none(`
+						UPDATE templates
+						SET version = source.version || $1::TEXT
+						FROM (SELECT id, version FROM templates) AS source
+						WHERE templates.id = $1::INT
+							AND source.id = templates.source
+					;`, [ newID ]))
+				} else {
+					batch.push(t.none(`
+						UPDATE templates
+						SET version = '$1'::ltree
+						WHERE id = $1::INT
+					;`, [ newID ]))
+				}
+			}
 			// UPDATE THE TIMESTAMP
 			batch.push(t.none(`
 				UPDATE templates SET update_at = NOW() WHERE id = $1::INT

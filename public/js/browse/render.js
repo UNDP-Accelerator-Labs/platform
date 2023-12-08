@@ -1306,12 +1306,23 @@ export const Entry = function (_kwargs) {
             .addElems('li', 'follow-up-option', (d) => d.followups)
             .addElems('a')
             .attrs({
-              href: (d) =>
-                `/${language}/contribute/${object.slice(0, -1)}?source=${
-                  d.source
-                }&template=${d.template}&mobilization=${
-                  d.id
-                }&display=adjacent-source`,
+              href: (d) => {
+                const queryparams = new URLSearchParams();
+                queryparams.set('source', d.source);
+                queryparams.set('template', d.template);
+                queryparams.set('mobilization', d.id);
+                queryparams.set('display', 'adjacent-source');
+
+                return `/${language}/contribute/${object.slice(
+                  0,
+                  -1,
+                )}?${queryparams.toString()}`;
+                // `/${language}/contribute/${object.slice(0, -1)}?source=${
+                //   d.source
+                // }&template=${d.template}&mobilization=${
+                //   d.id
+                // }&display=adjacent-source`
+              },
             })
             .addElems('button')
             .html((d) =>

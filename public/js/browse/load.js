@@ -37,6 +37,54 @@ async function DOMLoad() {
     setShareOptions(this);
   });
 
+  d3.selectAll('form#pinboard-display-opts input.toggle').on(
+    'change.save',
+    async function () {
+      // IF slideshow THEN PREVENT OTHERS
+      const node = this;
+      const sel = d3.select(node);
+      const menu = sel.findAncestor('menu');
+      const parent = sel.findAncestor('li');
+      if (node.name === 'slideshow') {
+        menu.selectAll('li').each(function () {
+          const sel = d3.select(this);
+          sel.select('p').classed('disabled', function () {
+            return this.parentNode !== parent.node() && node.checked;
+          });
+          sel.selectAll('input[type=checkbox]').each(function () {
+            this.disabled = this.parentNode !== parent.node() && node.checked;
+          });
+        });
+      }
+      // IF map THEN ENABLE fullscreen OPTION
+      if (node.name === 'display_map') {
+        menu.selectAll('li').each(function () {
+          const sel = d3.select(this);
+          sel.select('p').classed('disabled', function () {
+            return (
+              this.parentNode !== parent.node() &&
+              this.nextElementSibling.name !== 'display_filters' &&
+              node.checked
+            );
+          });
+          sel.selectAll('input[type=checkbox]').each(function () {
+            this.disabled =
+              this.parentNode !== parent.node() &&
+              this.name !== 'display_filters' &&
+              node.checked;
+          });
+        });
+        const subnode = d3.select('input#display-fullscreen').node();
+        subnode.disabled = !node.checked;
+        d3.select(subnode)
+          .findAncestor('li')
+          .select('p')
+          .classed('disabled', !node.checked);
+      }
+      await partialSave('pinboard', node.dataset.id);
+    },
+  );
+
   d3.select('div#pinboard-title')
     .on('keydowwn', function () {
       checkForEnter(d3.event, this);

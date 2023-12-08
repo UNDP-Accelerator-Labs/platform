@@ -111,14 +111,14 @@ module.exports = async (req, res) => {
 			if (modules.some(d => d.type === 'pinboards') && pinboard) {
 				batch.push(DB.general.one(`
 					SELECT p.*, array_agg(pc.participant) AS contributors,
-						
+
 						COALESCE(jsonb_agg(
 							jsonb_build_object(
-								'id', ps.id, 
-								'title', ps.title, 
-								'description', ps.description, 
+								'id', ps.id,
+								'title', ps.title,
+								'description', ps.description,
 								'count', (SELECT COUNT(1)::INT FROM pinboard_contributions WHERE section = ps.id)
-							) ORDER BY ps.id) FILTER (WHERE ps.id IS NOT NULL), 
+							) ORDER BY ps.id) FILTER (WHERE ps.id IS NOT NULL),
 							'[]'::jsonb
 						) AS sections,
 
@@ -128,11 +128,11 @@ module.exports = async (req, res) => {
 							THEN TRUE
 							ELSE FALSE
 						END AS editable,
-						
+
 						CASE WHEN EXISTS (
 							SELECT 1 FROM exploration WHERE linked_pinboard = p.id
 						) THEN TRUE ELSE FALSE END AS is_exploration
-					
+
 					FROM pinboards p
 
 					INNER JOIN pinboard_contributors pc
@@ -146,13 +146,7 @@ module.exports = async (req, res) => {
 				;`, [ uuid, rights, pinboard ])
 				.then(async result => {
 					const data = await join.users(result, [ language, 'owner' ])
-					// NOTE: avoid double counting in the unlikely event that
-					// the pinboard is referenced both through an instance
-					// as well as a direct arg
-					if (!res.locals?.instance_vars?.instanceId && !res.locals?.instance_vars?.docType) {
-						data.readCount = await pagestats.getReadCount(pinboard, 'pinboard');
-						await pagestats.recordRender(req, pinboard, 'pinboard');
-					}
+					data.readCount = await pagestats.getReadCount(pinboard, 'pinboard');
 					return data
 				}).catch(err => console.log(err)))
 			} else batch.push(null)

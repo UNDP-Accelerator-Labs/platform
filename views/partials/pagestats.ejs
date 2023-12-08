@@ -1,18 +1,10 @@
 <%
     const originalUrl = locals.metadata.page.originalUrl;
-    const { id, docType } = locals.metadata?.user?.pagestats ?? {};
     const readTime = 6000;  // time it takes to register a read in milliseconds
-    const docTypes = ['pad', 'template', 'pinboard', 'team', 'country'];
+    const pagestatsbase = {
+        url: originalUrl,
+        readtime: readTime
+    }
 %>
-<% if (docTypes.includes(docType) && id) { %>
-    <%
-        const pagestatsdata = {
-            id: +id,
-            type: docType,
-            url: originalUrl,
-            readtime: readTime
-        }
-    %>
-    <data name='pagestats' value='<%= JSON.stringify(pagestatsdata) %>'></data>
-    <script type='module' src='/js/pagestats.js'></script>
-<% } // is allowed type and has id %>
+<data name='pagestats' value='<%= JSON.stringify(pagestatsbase) %>'></data>
+<script type='module' src='/js/pagestats.js'></script>

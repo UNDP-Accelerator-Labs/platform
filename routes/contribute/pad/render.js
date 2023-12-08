@@ -26,8 +26,8 @@ module.exports = async (req, res) => {
 				else res.redirect('/login')
 			} else if (authorized && redirect && redirect !== activity) {
 				const query = []
-				for (const [key, value] of req.query) {
-					query.push(`${key}=${value}`)
+				for (const key in req.query) {
+					query.push(`${key}=${req.query[key]}`)
 				}
 				return res.redirect(`/${language}/${redirect}/pad${query.length > 0 ? `?${query.join('&')}` : ''}`)
 			} else {
@@ -139,17 +139,16 @@ module.exports = async (req, res) => {
 					// 		result.reviews.sort((a, b) => a.id - b.id)
 					// 	}
 					// 	result.readCount = await pagestats.getReadCount(id, 'pad');
-					// 	if (result.status >= 2) {
-					// 		await pagestats.recordRender(req, id, 'pad');
-					// 	} else {
+					// 	if (result.status < 2) {
 					// 		result.readCount = '-';  // we're not recording so we don't imply we do
 					// 	}
 					// 	const data = await join.users(result, [ language, 'owner' ])
 					// 	return data
 					// }).catch(err => console.log(err)))
 					batch.push(load.data({ connection: t, req, authorized: true })
-					.then(result => {
+					.then(async result => {
 						delete result.sections
+						result.readCount = await pagestats.getReadCount(id, 'pad');
 						return result
 					}).catch(err => console.log(err)))
 				}

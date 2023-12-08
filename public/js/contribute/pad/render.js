@@ -4250,6 +4250,7 @@ export async function renderPad(kwargs) {
     window.sessionStorage.removeItem('changed-content');
   } else if (id && ['edit', 'view'].includes(activity)) {
     // GET THE DATA
+    window.pagestats = { type: 'pad', id };
     const { title, sections, is_review, template } = await POST('/load/pad', {
       id,
     });

@@ -23,7 +23,7 @@ COPY package-lock.json .
 RUN npm install
 COPY . .
 RUN npm run sass-deploy
-RUN make run-service-worker
+RUN npm run service-worker
 RUN npm run build --if-present
 
 ENV HOST=0.0.0.0

@@ -121,11 +121,8 @@ String.prototype.shortStringAsNum = function () {
   // the ASCII values.
   // For example the string 'mwi' will become 0x69776D or 6911853 in base 10.
   // 'm' will become 0x6D or 109.
-  // This function will throw errors on invalid inputs (too long or non-ASCII)
-  // but it handles nullish values by returning null.
-  const textThis = this;
-  if (!textThis) return null;
-  const text = `${textThis}`;
+  // This function will throw errors on invalid inputs (too long or non-ASCII).
+  const text = this.valueOf();
   if (text.length > 4) {
     throw new Error(
       `only short strings can be safely converted to numbers. got '${text}'`,

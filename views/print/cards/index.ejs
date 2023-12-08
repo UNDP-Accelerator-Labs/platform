@@ -170,6 +170,7 @@
 
 				article.addElems('div', 'meta meta-contributor')
 				.html(d => {
+					// TO DO: DEPRECATED: ignore vocabulary here
 					if (iso3 === 'NUL') return vocabulary['global']
 					return country || vocabulary['anonymous contributor']
 				})

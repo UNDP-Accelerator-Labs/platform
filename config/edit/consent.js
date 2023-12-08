@@ -43,7 +43,7 @@ if (process.env.NODE_ENV !== 'production') {
             process.env.NODE_ENV === 'production'
               ? 'https://consent.sdg-innovation-commons.org/en/contribute/resource'
               : 'http://localhost:2000/en/contribute/resource',
-          resources: ['pads', 'files'] // IF THIS IS A CALL TO ANOTHER INSTANCE OF THE PLATFORM (LIKE THE CONSENT MODULE), DECLARE WHICH modules CAN BE SHARED AS RESOURCES
+          resources: ['pads', 'files'], // IF THIS IS A CALL TO ANOTHER INSTANCE OF THE PLATFORM (LIKE THE CONSENT MODULE), DECLARE WHICH modules CAN BE SHARED AS RESOURCES
         },
         { uri: undefined },
       ],

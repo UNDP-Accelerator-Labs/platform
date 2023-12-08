@@ -278,6 +278,36 @@ export function getContent(params = {}) {
     }
   });
 
+  const docTypes = ['pads', 'contributors'];
+  if (docTypes.includes(object)) {
+    const pstats = {};
+    if (object === 'pads' && reqbody.space === 'pinned') {
+      pstats.type = 'pinboard';
+      pstats.id = +reqbody.pinboard;
+    }
+    if (object === 'pads' && reqbody.space === 'published') {
+      pstats.type = 'country';
+      if (reqbody.instance) {
+        pstats.id = `${decodeURI(reqbody.instance)}`
+          .toLowerCase()
+          .shortStringAsNum();
+      }
+    }
+    if (object === 'contributors' && reqbody.space === 'pinned') {
+      pstats.type = 'team';
+      pstats.id = +reqbody.pinboard;
+    }
+    if (pstats.id && pstats.type) {
+      window.pagestats = pstats;
+    }
+    // DEBUG PAGESTATS
+    // console.log(
+    //   'pagestats',
+    //   window.pagestats,
+    //   pstats,
+    //   pstats.id && pstats.type,
+    // );
+  }
   // TO DO: ADD VAR keep_page
   return POST(`/load/${object}`, reqbody);
 }

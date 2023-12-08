@@ -11,6 +11,7 @@ const {
   csp_links,
   app_base_host,
   getVersionObject,
+  lodashNonce
 } = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
@@ -30,7 +31,12 @@ if (process.env.NODE_ENV === 'production') {
   const swPrecache = require('sw-precache');
   swPrecache.write('./public/app.serviceWorker.js', {
     root: './public/',
-    staticFileGlobs: ['./public/**/*'],
+    staticFileGlobs: [
+      './public/css/**/*',
+      './public/imgs/**/*',
+      './public/js/**/*',
+      './public/favicon.ico',
+    ],
     stripPrefix: './public/',
     maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
   });
@@ -39,18 +45,30 @@ if (process.env.NODE_ENV === 'production') {
 const app = express();
 app.disable('x-powered-by');
 
+app.use((req, res, next) => {
+  res.locals.nonce = lodashNonce()
+  next();
+});
+
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         'img-src': csp_links.concat(['blob:']),
-        'script-src': csp_links,
+        'script-src': csp_links.concat([
+          (req, res) => `'nonce-${res.locals.nonce}'`,
+          'sha256-NNiElek2Ktxo4OLn2zGTHHeUR6b91/P618EXWJXzl3s=',
+          'strict-dynamic',
+        ]),
         'script-src-attr': [
           "'self'",
           '*.sdg-innovation-commons.org',
           'sdg-innovation-commons.org',
         ],
         'style-src': csp_links,
+        // .concat([
+        //   "'unsafe-inline'"
+        // ]),
         'connect-src': csp_links.concat([
           // 'blob:http:://localhost:2000/'
           'blob:',

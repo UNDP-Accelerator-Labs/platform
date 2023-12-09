@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/main.js';
+import { vocabulary, languages } from '/js/config/main.js';
 import { partialSave } from '/js/contribute/contributor/save.js';
 import { POST } from '/js/fetch.js';
 import { fixLabel, getMediaSize } from '/js/main.js';
@@ -18,9 +18,6 @@ export function copyToken(node) {
   navigator.clipboard.writeText(token);
 }
 export async function addLanguage(node) {
-  const { languages } = JSON.parse(
-    d3.select('data[name="site"]').node().value,
-  );
   const sel = d3.select(node);
   const parent = sel.findAncestor('ul');
   const li = parent.insertElem(function () {
@@ -179,7 +176,7 @@ export async function initDropdowns() {
 
       if (mediaSize === 'xs') select.classed('expand', true);
     })
-    .on('blur', function () {
+    .on('blur.dropdown', function () {
       const select = d3.select(this).findAncestor('select');
       const dropdown = select.select('.dropdown');
       dropdown.node().style.maxHeight = null;

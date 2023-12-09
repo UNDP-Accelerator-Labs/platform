@@ -1,6 +1,6 @@
 import { Exploration } from '/js/exploration.js';
 // INIT EXPLORATION
-export function initExploration() {
+function initExploration() {
   const exploration = new Exploration();
 
   // EXPLORATION MODULE
@@ -98,3 +98,4 @@ export function initExploration() {
 
   return exploration;
 }
+export const exploration = initExploration();

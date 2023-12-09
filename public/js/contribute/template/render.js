@@ -1,4 +1,4 @@
-import { language, vocabulary } from '/js/config/translations.js';
+import { language, vocabulary } from '/js/config/main.js';
 import { partialSave, switchButtons } from '/js/contribute/template/save.js';
 import { POST } from '/js/fetch.js';
 import { toggleClass } from '/js/main.js';

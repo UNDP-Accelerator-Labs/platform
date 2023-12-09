@@ -1,5 +1,5 @@
+import { language, vocabulary } from '/js/config/main.js';
 import { Entry } from '/js/browse/render.js';
-import { language, vocabulary } from '/js/config/translations.js';
 import { POST } from '/js/fetch.js';
 import { getContent, multiSelection } from '/js/main.js';
 

@@ -1,5 +1,5 @@
+import { vocabulary } from '/js/config/main.js';
 import { partialSave } from '/js/browse/save.js';
-import { vocabulary } from '/js/config/translations.js';
 import {
   checkForEnter,
   fixLabel,

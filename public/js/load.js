@@ -1,3 +1,4 @@
+import { languages } from '/js/config/main.js'
 import { POST } from '/js/fetch.js';
 import {
   ensureIcon,
@@ -71,9 +72,13 @@ async function DOMLoad() {
   if (pathname.split('/').length > 1) {
     pathname = `${pathname.split('/').slice(1).join('/')}${url.search}`;
   }
-  const { languages } = await POST('/load/metadata', { feature: 'languages' });
+  // const { languages } = await POST('/load/metadata', { feature: 'languages' });
   languages.forEach((d) => {
-    d3.select(`#lang-${d} a`).attr('href', `/${d}/${pathname}`);
+    if (typeof d === 'object') {
+      d3.select(`#lang-${d.language} a`).attr('href', `/${d.language}/${pathname}`);
+    } else {
+      d3.select(`#lang-${d} a`).attr('href', `/${d}/${pathname}`);
+    }
   });
 
   // SET NAVIGATION LINKS FOR TABS

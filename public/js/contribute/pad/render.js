@@ -1,5 +1,5 @@
-import { language, vocabulary } from '/js/config/translations.js';
-import { initExploration } from '/js/contribute/pad/exploration.js';
+import { language, vocabulary } from '/js/config/main.js';
+import { exploration } from '/js/contribute/pad/exploration.js';
 import {
   partialSave,
   switchButtons,
@@ -8,8 +8,6 @@ import {
 import { POST } from '/js/fetch.js';
 import { fixLabel, toggleClass } from '/js/main.js';
 import { renderImgZoom, renderPromiseModal } from '/js/modals.js';
-
-const exploration = initExploration();
 
 const obsvars = {
   attributes: true,

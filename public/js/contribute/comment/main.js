@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary } from '/js/config/main.js';
 
 // INSPIRED BY https://stackoverflow.com/questions/995168/textarea-to-resize-based-on-content-length
 export function changeLabel(node, focus) {

@@ -1,15 +1,17 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 
 const debugging = false;
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker
-      .register('/app.serviceWorker.js')
-      .then((res) => console.log('service worker registered'))
-      .catch((err) => console.log('service worker not registered', err));
-  });
+if (false) {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker
+        .register('/app.serviceWorker.js')
+        .then((res) => console.log('service worker registered'))
+        .catch((err) => console.log('service worker not registered', err));
+    });
+  }
 }
 
 export function getMediaSize() {

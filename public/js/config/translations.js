@@ -3525,32 +3525,3 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     pt: '',
   },
 };
-
-async function getLanguage() {
-  const { languages } = await POST('/load/metadata', { feature: 'languages' });
-  const url = new URL(window.location);
-  const language = url.pathname.substring(1).split('/')[0];
-
-  if (languages.some((d) => d === language)) return { language, languages };
-  else return { language: 'en', languages };
-}
-
-export const vocabulary = {};
-let lang = d3.select('data[name="page"]')?.node()?.value?.language;
-let langs = [];
-
-if (!lang) {
-  const { language, languages } = await getLanguage();
-  lang = language || 'en';
-  langs = languages || [];
-} else {
-  const { languages } = await getLanguage();
-  langs = languages || [];
-}
-
-Object.keys(fullVocabulary).forEach((d) => {
-  vocabulary[d] = fullVocabulary[d][lang];
-});
-
-export const language = lang;
-export const languages = langs;

@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary } from '/js/config/main.js';
 import { partialSave } from '/js/contribute/contributor/save.js';
 import { POST } from '/js/fetch.js';
 import { fixLabel, getMediaSize } from '/js/main.js';

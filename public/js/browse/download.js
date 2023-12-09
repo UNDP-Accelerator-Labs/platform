@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { getContent } from '/js/main.js';
 import { renderFormModal } from '/js/modals.js';

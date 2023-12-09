@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary } from '/js/config/main.js';
 import { filterDropdown, fixLabel } from '/js/main.js';
 
 export function renderModal(data, close = true) {

@@ -1,4 +1,4 @@
-import { language } from '/js/config/translations.js';
+import { language } from '/js/config/main.js';
 import { filterDropdown, getMediaSize, uploadFile } from '/js/main.js';
 
 function DOMLoad() {

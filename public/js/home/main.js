@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/translations.js';
+import { vocabulary } from '/js/config/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 // THIS IS NOT USED FOR NOW

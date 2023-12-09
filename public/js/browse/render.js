@@ -1,18 +1,17 @@
+import { language, vocabulary } from '/js/config/main.js';
 import { setDownloadOptions } from '/js/browse/download.js';
-import { initExploration } from '/js/browse/exploration.js';
+import { exploration } from '/js/browse/exploration.js';
 import {
   confirmRemoval,
   deleteArticles,
   unpublishArticles,
 } from '/js/browse/main.js';
-import { language, vocabulary } from '/js/config/translations.js';
 import { POST } from '/js/fetch.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
 import { renderFormModal, renderImgZoom } from '/js/modals.js';
 
 // TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
-const exploration = initExploration();
 
 export const Entry = function (_kwargs) {
   if (!mediaSize) var mediaSize = getMediaSize();

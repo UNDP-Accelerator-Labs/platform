@@ -1,4 +1,4 @@
-import { language } from '/js/config/translations.js';
+import { language } from '/js/config/main.js';
 import { autofillTitle } from '/js/contribute/pad/render.js';
 import { switchButtons } from '/js/contribute/pad/save.js';
 

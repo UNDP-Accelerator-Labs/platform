@@ -1,4 +1,4 @@
-import { language, vocabulary } from '/js/config/translations.js';
+import { language, vocabulary } from '/js/config/main.js';
 import { compilePads, compileTemplate } from '/js/contribute/xlsx/main.js';
 import { POST } from '/js/fetch.js';
 import { addGlobalLoader, rmGlobalLoader } from '/js/main.js';

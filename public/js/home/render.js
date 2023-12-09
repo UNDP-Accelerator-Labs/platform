@@ -1,4 +1,4 @@
-import { language } from '/js/config/translations.js';
+import { language } from '/js/config/main.js';
 import { getContent, getMediaSize } from '/js/main.js';
 
 export async function renderCarousel() {

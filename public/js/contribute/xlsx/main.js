@@ -1,4 +1,4 @@
-import { language, vocabulary } from '/js/config/translations.js';
+import { language, vocabulary } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';

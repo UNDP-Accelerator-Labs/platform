@@ -1,4 +1,4 @@
-import { language, vocabulary } from '/js/config/translations.js';
+import { language, vocabulary } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
 

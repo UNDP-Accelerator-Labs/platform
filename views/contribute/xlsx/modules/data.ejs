@@ -1,0 +1,18 @@
+<%
+	// CREATE ALIASES
+	const modules = locals.metadata.site.modules
+	const metafields = locals.metadata.site.metafields
+%>
+<!-- SET DATA ATTRIBUTES -->
+<%
+	const sitedata = {
+		modules: modules || {},
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || [],
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
+<% if (locals.metadata.site.app_storage) { %>
+	<data name='app_storage' value='<%= locals.metadata.site.app_storage %>'></data>
+<% } %>

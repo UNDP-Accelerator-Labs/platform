@@ -48,6 +48,9 @@ module.exports = async (kwargs) => {
 						.catch(err => console.log(err))
 					}
 
+					// REMOVE source FILE IN tmp
+					fs.unlinkSync(source)
+
 					console.log('should have written main file')
 				}).catch(err => console.log(err))
 

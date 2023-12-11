@@ -3615,7 +3615,7 @@ export async function addAttachment(kwargs) {
 
   const { data, lang, section, sibling, container, focus, objectdata } =
     kwargs || {};
-  const { object } = objectdata || {};
+  const { object, type: objecttype } = objectdata || {};
   let { id, level, type, name, srcs, instruction, constraint, required } =
     data || {};
   if (!level) level = 'meta';
@@ -3704,15 +3704,6 @@ export async function addAttachment(kwargs) {
                   `/request/resource?${params.toString()}`,
                 ),
               );
-              // resolve(
-              //   window.location.replace(
-              //     `/request/resource?uri=${encodeURI(
-              //       d.uri,
-              //     )}&pad_id=${pad_id}&element_id=${
-              //       meta.id
-              //     }&name=${name}&type=${type}`,
-              //   ),
-              // );
             });
           },
         });
@@ -3748,7 +3739,7 @@ export async function addAttachment(kwargs) {
     });
     const result = await renderPromiseModal(item);
     if (result === null) {
-      if (!srcs.length) await meta.rmMedia();
+      if (!srcs.length && objecttype !== 'templated') await meta.rmMedia();
     } else {
       d3.selectAll('div.screen').classed('hide', true);
       const screen = d3

@@ -19,7 +19,7 @@ async function getCurrentLanguage () {
 }
 async function getRegisteredLanguages () {
   let { languages } = JSON.parse(
-    d3.select('data[name="site"]').node()?.value,
+    d3.select('data[name="site"]').node()?.value || '{}',
   );
   if (!languages?.length) {
     languages = (await POST('/load/metadata', { feature: 'languages' })).languages;

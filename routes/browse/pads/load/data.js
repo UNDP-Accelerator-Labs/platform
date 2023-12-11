@@ -326,10 +326,13 @@ module.exports = async kwargs => {
 							AND pad IN $3:raw
 						;`, [ safeArr(results.map(d => d.collection), -1), ownId, padlist ])
 						.then(async pinnedpads => {
-							pinnedpads.forEach(d => {
-								d.followups = results.find(c => c.collection === d.collection)?.followups
-								d.followups.source = d.id
-								delete d.collection
+							pinnedpads = pinnedpads.map(d => {
+								const { collection, ...datum } = d
+								datum.followups = Object.assign({}, results.find(c => c.collection === d.collection)?.followups)
+								if (datum.followups) {
+									datum.followups.source = d.id
+								}
+								return datum
 							})
 							// GET THE count OF FOLLOWUPS
 							for (let p = 0; p < pinnedpads.length; p ++) {

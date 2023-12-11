@@ -1622,10 +1622,10 @@ div.browse {
                   padding: 0 5px;
                   border: 1px solid $c-light-blue;
                   outline: none;
-                  background-color: transparent;
-                  font-size: $t-small;
+                  background-color: $c-light-blue;
+                  font-size: $t-mid-small;
                   line-height: 1.5em;
-                  color: $c-light-blue;
+                  color: #FFF;
                   cursor: pointer;
                 }
                 .dropdown {

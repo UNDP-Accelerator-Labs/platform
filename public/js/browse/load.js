@@ -1,4 +1,3 @@
-import { initGTranslate } from '/js/config/gtranslate.js'
 import { setDownloadOptions } from '/js/browse/download.js';
 import { initSlideshowNavigation } from '/js/browse/keyboard.interactions.js';
 import {
@@ -18,8 +17,6 @@ import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
 async function DOMLoad() {
   if (!mediaSize) var mediaSize = getMediaSize();
-
-  await initGTranslate();
 
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;

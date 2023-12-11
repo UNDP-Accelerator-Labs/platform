@@ -1,5 +1,5 @@
 import { languages } from '/js/config/main.js'
-import { POST } from '/js/fetch.js';
+import { initGTranslate } from '/js/config/gtranslate.js'
 import {
   ensureIcon,
   expandstats,
@@ -13,6 +13,8 @@ import {
 if (!mediaSize) var mediaSize = getMediaSize();
 
 async function DOMLoad() {
+  await initGTranslate()
+
   d3.selectAll('[data-vocab]').html(function () {
     const vocab =
       this.dataset.vocab ||

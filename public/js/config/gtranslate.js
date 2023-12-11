@@ -1,6 +1,6 @@
-import { language } from '/js/config/main.js';
+import { language, languages } from '/js/config/main.js';
 
-export async function initGTranslate () {
+export async function initGTranslate() {
   const currentpage_url = new URL(window.location);
   const fullHost = `${currentpage_url.origin}`;
   const mainHost = fullHost.endsWith('azurewebsites.net')
@@ -21,9 +21,6 @@ export async function initGTranslate () {
     },
     'google_translate_element',
   );
-
-  setCookie('GoogleAccountsLocale_session', `${language}`);
-  setCookie('googtrans', `/en/${language}`, 1);
 
   function rewriteUrl(lang, reload = false) {
     if (!lang) {
@@ -52,18 +49,32 @@ export async function initGTranslate () {
     });
   }
 
-  // LISTEN TO CHANGES IN LANGUAGE COOKIES
-  // TO DO: cookieStore IS NOT AVAILABLE ON SAFARI OR FIREFOX
-  cookieStore.addEventListener('change', async ({ changed }) => {
-    for (const { name, value } of changed) {
-      if (name === 'googtrans') {
-        const lang = value?.split('/')[2];
-        await updateDomTree(lang);
-        rewriteUrl(lang);
+  // LISTEN TO CHANGES IN G_LANGUAGE COOKIES
+  function listenCookieChange(callback, interval = 1000) {
+    let lastCookie = document.cookie;
+    setInterval(() => {
+      let cookie = document.cookie;
+      if (cookie !== lastCookie) {
+        try {
+          callback({ oldValue: lastCookie, newValue: cookie });
+        } finally {
+          lastCookie = cookie;
+        }
       }
-    }
-    if (!changed.length) {
-      rewriteUrl('en', true);
-    }
-  });
+    }, interval);
+  }
+
+  listenCookieChange(({ oldValue, newValue }) => {
+    newValue.split('; ').forEach((cookie) => {
+      const [name, value] = cookie.split('=');
+      if (name === 'googtrans') {
+        const lang = value.split('/')[2];
+        updateDomTree(lang);
+        rewriteUrl(lang);
+      } else rewriteUrl('en', true);
+    });
+  }, 1000);
+
+  setCookie('googtrans', `/en/${language}`, 1);
+
 }

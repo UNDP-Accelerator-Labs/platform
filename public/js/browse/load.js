@@ -432,7 +432,7 @@ async function onLoad() {
         !lazyloading
       ) {
         console.log('hit the bottom');
-        main.select('.lds-ellipsis').classed('hide', false);
+        d3.selectAll('.lds-ellipsis').classed('hide', false);
 
         if (!isNaN(page)) page++;
         lazyloading = true;

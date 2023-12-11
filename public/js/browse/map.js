@@ -1,5 +1,5 @@
 import { Entry } from '/js/browse/render.js';
-import { getCurrentLanguage } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { getContent, multiSelection } from '/js/main.js';
 

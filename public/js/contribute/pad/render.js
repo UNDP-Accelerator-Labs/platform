@@ -4215,7 +4215,7 @@ export async function renderPad(kwargs) {
 
   if (editing && !id && type === 'templated') {
     // GET TEMPLATE DATA
-    const { sections } = await POST('/load/template', { id: pad.template.id });
+    const { sections } = await POST('/load/template', { id: pad.template.id, mainobject });
 
     // APPEND locked_excerpt TO THE pad data DOM ELEMENT
     const locked_excerpt =
@@ -4307,6 +4307,7 @@ export async function renderPad(kwargs) {
         // GET TEMPLATE DATA
         const { sections } = await POST('/load/template', {
           id: pad.template.id,
+          mainobject,
         });
 
         // APPEND locked_excerpt TO THE pad data DOM ELEMENT

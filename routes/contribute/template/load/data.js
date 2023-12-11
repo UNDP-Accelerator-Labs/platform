@@ -7,7 +7,7 @@ module.exports = async kwargs => {
 	const conn = kwargs.connection ? kwargs.connection : DB.conn
 	let { req, authorized } = kwargs || {}
 
-	let { id, source } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { id, source, mainobject } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	let workingID = id ?? source
 	if (!workingID) return { message: 'No id found.' }
 
@@ -15,7 +15,7 @@ module.exports = async kwargs => {
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 
 	if (authorized === undefined) {
-		const authorization = await check_authorization({ connection: conn, uuid, id, rights, collaborators })
+		const authorization = await check_authorization({ connection: conn, uuid, id, rights, collaborators, mainobject })
 		authorized = authorization.authorized
 	}
 

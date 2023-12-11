@@ -81,8 +81,10 @@ async function DOMLoad() {
   }
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
+if (document.readyState !== 'complete') {
+  window.addEventListener('load', DOMLoad);
 } else {
-  DOMLoad();
+  DOMLoad()
+    .then(() => {})
+    .catch((err) => console.error(err));
 }

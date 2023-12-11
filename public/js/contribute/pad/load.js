@@ -1,4 +1,4 @@
-import { initGTranslate } from '/js/config/gtranslate.js'
+import { initGTranslate } from '/js/config/gtranslate.js';
 import { selectReviewLanguage } from '/js/contribute/pad/main.js';
 import { renderPad } from '/js/contribute/pad/render.js';
 import { partialSave, saveAndSubmit } from '/js/contribute/pad/save.js';
@@ -7,7 +7,7 @@ import { getMediaSize } from '/js/main.js';
 
 async function DOMLoad() {
   if (!mediaSize) var mediaSize = getMediaSize();
-  
+
   await initGTranslate();
 
   const { id, type, source } = JSON.parse(
@@ -155,8 +155,10 @@ async function DOMLoad() {
     });
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
+if (document.readyState !== 'complete') {
+  window.addEventListener('load', DOMLoad);
 } else {
-  DOMLoad();
+  DOMLoad()
+    .then(() => {})
+    .catch((err) => console.error(err));
 }

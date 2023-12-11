@@ -1,7 +1,8 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { filterDropdown, fixLabel } from '/js/main.js';
 
-export function renderModal(data, close = true) {
+export async function renderModal(data, close = true) {
+  const vocabulary = await getTranslations();
   const { headline, opts, theme, node } = data;
 
   d3.selectAll('.temp-active').classed('temp-active', false);
@@ -59,7 +60,8 @@ export function renderModal(data, close = true) {
 export function renderPromiseModal(data, close = true) {
   const { headline, message, opts } = data;
 
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
+    const vocabulary = await getTranslations();
     d3.select('nav.filter').classed('open', false);
     d3.selectAll('div.screen').classed('hide', true);
     const screen = d3.select('div.screen').classed('hide', false);
@@ -104,7 +106,8 @@ export function renderPromiseModal(data, close = true) {
       });
   });
 }
-export function renderFormModal(data, close = true) {
+export async function renderFormModal(data, close = true) {
+  const vocabulary = await getTranslations();
   const { headline, message, formdata, opts, foot } = data;
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
@@ -176,7 +179,8 @@ export function renderFormModal(data, close = true) {
       .html((d) => d.label);
   });
 }
-export function renderLonglistFormModal(data, close = true) {
+export async function renderLonglistFormModal(data, close = true) {
+  const vocabulary = await getTranslations();
   const { headline, message, formdata, opts, foot } = data;
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
@@ -267,7 +271,8 @@ export function renderLonglistFormModal(data, close = true) {
   });
 }
 
-function addInputNode(_sel, _data) {
+async function addInputNode(_sel, _data) {
+  const vocabulary = await getTranslations();
   const { d, resolve } = _data;
   const screen = _sel.findAncestor('screen');
   const modal = screen.select('.modal');
@@ -514,7 +519,8 @@ function addInputNode(_sel, _data) {
   }
 }
 
-export function renderImgZoom(data) {
+export async function renderImgZoom(data) {
+  const vocabulary = await getTranslations();
   const { src } = data;
 
   d3.select('nav.filter').classed('open', false);

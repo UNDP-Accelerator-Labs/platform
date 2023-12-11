@@ -1,4 +1,4 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { GET, POST, PUT } from '/js/fetch.js';
 import { renderPromiseModal } from '/js/modals.js';
 
@@ -175,7 +175,8 @@ export class Exploration {
     console.error(err);
   }
 
-  updateExplorationList(cb = null) {
+  async updateExplorationList(cb = null) {
+    const language = await getCurrentLanguage();
     if (cb) {
       this.listUpdateCbs.push(cb);
     }
@@ -207,12 +208,13 @@ export class Exploration {
       });
   }
 
-  updateExplorationDatalist(cb = null) {
+  async updateExplorationDatalist(cb = null) {
+    const vocabulary = await getTranslations();
     const datalist = this.datalist;
     if (!datalist) {
       return;
     }
-    this.updateExplorationList(() => {
+    await this.updateExplorationList(() => {
       datalist
         .addElems('option', 'exploration-past-elem', this.past)
         .classed('notranslate', true)
@@ -288,9 +290,9 @@ export class Exploration {
     return this.docLookup[`${docId}`] === false;
   }
 
-  updatePrompt(userPrompt, allowReport) {
+  async updatePrompt(userPrompt, allowReport) {
     const currentId = this.currentId;
-    this.updateExplorationDatalist(() => {
+    await this.updateExplorationDatalist(() => {
       const [curId, curPrompt] = this.getExplorationByPrompt(userPrompt);
       if (curId !== null && curId === currentId) {
         if (allowReport) {
@@ -308,12 +310,12 @@ export class Exploration {
           true,
         )
           .then(checkResponse)
-          .then((result) => {
+          .then(async (result) => {
             this.updateCurrentExploration(
               result['exploration'],
               result['prompt'],
             );
-            this.updateExplorationDatalist();
+            await this.updateExplorationDatalist();
           })
           .catch((err) => {
             this.checkError(err);
@@ -324,16 +326,18 @@ export class Exploration {
     });
   }
 
-  confirmExplorationPrompt(allowReport) {
+  async confirmExplorationPrompt(allowReport) {
     const mainInput = this.mainInput;
     if (mainInput === null) {
       return;
     }
     const userPrompt = this.getInputValue();
-    this.updatePrompt(userPrompt, allowReport);
+    await this.updatePrompt(userPrompt, allowReport);
   }
 
-  consentFeature() {
+  async consentFeature() {
+    const language = await getCurrentLanguage();
+    const vocabulary = await getTranslations(language);
     const explorationInfoUrl = `/${language}/exploration-info/`;
     const message = `
             <h2 class="google-translate-attr">${vocabulary['exploration']['welcome']}</h2>
@@ -372,9 +376,9 @@ export class Exploration {
           true,
         )
           .then(checkResponse)
-          .then((result) => {
+          .then(async (result) => {
             this.consent = true;
-            this.updateExplorationDatalist();
+            await this.updateExplorationDatalist();
           })
           .catch((err) => {
             this.checkError(err);
@@ -393,7 +397,9 @@ export class Exploration {
     this.datalist = datalist;
   }
 
-  addExplorationMain(sel, cb) {
+  async addExplorationMain(sel, cb) {
+    const language = await getCurrentLanguage();
+    const vocabulary = await getTranslations(language);
     const mainInput = sel
       .addElem('input')
       .attrs({
@@ -401,10 +407,10 @@ export class Exploration {
         id: `exploration-main`,
         list: 'exploration-past',
       })
-      .on('keydown', () => {
+      .on('keydown', async () => {
         const evt = d3.event;
         if (evt.code === 'Enter' || evt.keyCode === 13) {
-          this.confirmExplorationPrompt(false);
+          await this.confirmExplorationPrompt(false);
           evt.preventDefault();
           evt.srcElement.blur();
         }
@@ -417,12 +423,12 @@ export class Exploration {
           this.currentId,
         );
       })
-      .on('blur', () => this.confirmExplorationPrompt(false))
-      .on('click', () => {
+      .on('blur', async () => await this.confirmExplorationPrompt(false))
+      .on('click', async () => {
         const evt = d3.event;
         if (!this.consent) {
           evt.preventDefault();
-          this.consentFeature();
+          await this.consentFeature();
         }
       });
     this.mainInput = mainInput;
@@ -446,7 +452,7 @@ export class Exploration {
       .text('ⓘ');
     this.infoButton = infoButton;
 
-    this.updateExplorationDatalist(cb);
+    await this.updateExplorationDatalist(cb);
   }
 
   hasExploration() {

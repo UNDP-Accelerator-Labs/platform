@@ -1,9 +1,10 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { getContent } from '/js/main.js';
 import { renderFormModal } from '/js/modals.js';
 
 export async function setDownloadOptions() {
+  const vocabulary = await getTranslations();
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
 

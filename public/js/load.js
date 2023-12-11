@@ -1,16 +1,12 @@
-import { languages } from '/js/config/main.js'
-import { POST } from '/js/fetch.js';
+import { getRegisteredLanguages } from '/js/config/main.js';
 import {
   ensureIcon,
   expandstats,
   fixLabel,
-  getMediaSize,
   printTranslation,
   scrollToPad,
   toggleOptions,
 } from '/js/main.js';
-
-if (!mediaSize) var mediaSize = getMediaSize();
 
 async function DOMLoad() {
   d3.selectAll('[data-vocab]').html(function () {
@@ -19,9 +15,9 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = printTranslation(this, vocab);
+    let translation = await printTranslation(this, vocab);
     if (!translation)
-      translation = printTranslation(this, this.dataset.altvocab);
+      translation = await printTranslation(this, this.dataset.altvocab);
     return translation;
   });
   d3.selectAll('[data-vocabprefix]').each(function () {
@@ -30,8 +26,8 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let prefix = printTranslation(this, vocab);
-    if (!prefix) prefix = printTranslation(this, this.dataset.altvocab);
+    let prefix = await printTranslation(this, vocab);
+    if (!prefix) prefix = await printTranslation(this, this.dataset.altvocab);
     if (this.value) {
       this.value = `[${prefix}] ${this.value}`;
     } else {
@@ -48,9 +44,9 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = printTranslation(this, vocab);
+    let translation = await printTranslation(this, vocab);
     if (!translation)
-      translation = printTranslation(this, this.dataset.altvocab);
+      translation = await printTranslation(this, this.dataset.altvocab);
     return translation;
   });
   d3.selectAll('[data-content]').attr('data-content', function () {
@@ -59,9 +55,9 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = printTranslation(this, vocab);
+    let translation = await printTranslation(this, vocab);
     if (!translation)
-      translation = printTranslation(this, this.dataset.altvocab);
+      translation = await printTranslation(this, this.dataset.altvocab);
     return translation;
   });
 
@@ -72,10 +68,14 @@ async function DOMLoad() {
   if (pathname.split('/').length > 1) {
     pathname = `${pathname.split('/').slice(1).join('/')}${url.search}`;
   }
+  const languages = await getRegisteredLanguages();
   // const { languages } = await POST('/load/metadata', { feature: 'languages' });
   languages.forEach((d) => {
     if (typeof d === 'object') {
-      d3.select(`#lang-${d.language} a`).attr('href', `/${d.language}/${pathname}`);
+      d3.select(`#lang-${d.language} a`).attr(
+        'href',
+        `/${d.language}/${pathname}`,
+      );
     } else {
       d3.select(`#lang-${d} a`).attr('href', `/${d}/${pathname}`);
     }
@@ -122,9 +122,9 @@ async function DOMLoad() {
     });
 
   // ENABLE EXPANSION OF STATISTICS IN sm VIEWS
-  if (mediaSize === 'xs') {
-    d3.select('button#expand-statistics').on('click', function () {
-      expandstats(this);
+  if (getMediaSize() === 'xs') {
+    d3.select('button#expand-statistics').on('click', async function () {
+      await expandstats(this);
     });
   }
   // INITIALIZE FILTER TAGS
@@ -176,7 +176,7 @@ async function DOMLoad() {
 
   // ANIMATE THE EYE ICON
   let eye_icon = '/imgs/icons/i-eye';
-  if (mediaSize === 'xs') {
+  if (getMediaSize() === 'xs') {
     eye_icon = '/imgs/icons/i-eye-sm';
   }
   ensureIcon(
@@ -186,17 +186,18 @@ async function DOMLoad() {
     200,
     2000,
   );
+  window.addEventListener('scroll', function () {
+    d3.select('button.scroll-nav').classed(
+      'hide',
+      document.documentElement.scrollTop > 60,
+    );
+  });
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
+if (document.readyState !== 'complete') {
+  window.addEventListener('load', DOMLoad);
 } else {
-  DOMLoad();
+  DOMLoad()
+    .then(() => {})
+    .catch((err) => console.error(err));
 }
-
-window.addEventListener('scroll', function () {
-  d3.select('button.scroll-nav').classed(
-    'hide',
-    document.documentElement.scrollTop > 60,
-  );
-});

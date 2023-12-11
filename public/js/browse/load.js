@@ -1,4 +1,3 @@
-import { initGTranslate } from '/js/config/gtranslate.js'
 import { setDownloadOptions } from '/js/browse/download.js';
 import { initSlideshowNavigation } from '/js/browse/keyboard.interactions.js';
 import {
@@ -13,12 +12,11 @@ import {
 } from '/js/browse/main.js';
 import { renderSections, renderVignette } from '/js/browse/render.js';
 import { partialSave } from '/js/browse/save.js';
+import { initGTranslate } from '/js/config/gtranslate.js';
 import { GET, POST } from '/js/fetch.js';
 import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
 async function DOMLoad() {
-  if (!mediaSize) var mediaSize = getMediaSize();
-
   await initGTranslate();
 
   const object = d3.select('data[name="object"]').node().value;
@@ -124,6 +122,7 @@ async function DOMLoad() {
   });
   // ADD INTERACTION FOR MAIN SEARCH AND FILTER MODULE
   // REPRINT STATUS TOGGLES IN FILTERS MENU IF sm DISPLY
+  const mediaSize = getMediaSize();
   const filter_module = d3.select('#search-and-filter');
   if (mediaSize === 'xs') {
     const status_toggles = filter_module.select('form .status').node();
@@ -460,8 +459,4 @@ async function DOMLoad() {
   }
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', DOMLoad);

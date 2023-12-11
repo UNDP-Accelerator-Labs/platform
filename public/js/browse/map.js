@@ -1,5 +1,5 @@
-import { language, vocabulary } from '/js/config/main.js';
 import { Entry } from '/js/browse/render.js';
+import { getCurrentLanguage } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { getContent, multiSelection } from '/js/main.js';
 
@@ -69,6 +69,8 @@ async function DOMLoad() {
       });
 
       async function loadPopup(popup, pads, page = 1) {
+        const language = await getCurrentLanguage();
+        const vocabulary = await getTranslations();
         const { data, count } = await POST(
           `/${language}/browse/pads/${space}`,
           {
@@ -286,8 +288,4 @@ async function DOMLoad() {
   }
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', DOMLoad);

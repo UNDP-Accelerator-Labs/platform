@@ -1,6 +1,6 @@
 import { Exploration } from '/js/exploration.js';
 // INIT EXPLORATION
-function initExploration() {
+async function initExploration() {
   const exploration = new Exploration();
 
   // EXPLORATION MODULE
@@ -15,7 +15,7 @@ function initExploration() {
     updateExplorationHint();
   });
 
-  exploration.addExplorationMain(d3.select('div.exploration'), () => {
+  await exploration.addExplorationMain(d3.select('div.exploration'), () => {
     hasUsedExploration = exploration.hasExploration();
     if (fixedEid) {
       exploration.updateById(fixedEid);
@@ -98,4 +98,11 @@ function initExploration() {
 
   return exploration;
 }
-export const exploration = initExploration();
+
+let exploration = null;
+export async function getExploration() {
+  if (!exploration) {
+    exploration = await initExploration();
+  }
+  return exploration;
+}

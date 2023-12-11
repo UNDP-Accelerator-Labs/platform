@@ -1,4 +1,4 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
 
@@ -9,6 +9,7 @@ export function openPreview() {
 }
 
 export async function setShareOptions(node) {
+  const language = await getCurrentLanguage();
   const { id, contributors: curr_contributors } = node.dataset || {};
   const contributors = await POST(`/${language}/browse/contributors/invited`, {
     limit: null,
@@ -46,6 +47,7 @@ export async function setShareOptions(node) {
   });
 }
 export async function confirmRemoval(action) {
+  const vocabulary = await getTranslations();
   const sel = d3.select(this);
   const datum = d3.select(this.parentNode).datum();
   const form = this.form;
@@ -122,7 +124,8 @@ export function addequivalents(node) {
     .selectAll('input[type=hidden]')
     .attr('disabled', node.checked ? null : true);
 }
-export function toggletag(node, d) {
+export async function toggletag(node, d) {
+  const vocabulary = await getTranslations();
   const sel = d3.select(node);
   const filter = sel.findAncestor('filter');
   let taggroup = d3.select(filter.node().nextElementSibling);
@@ -163,7 +166,7 @@ export function toggletag(node, d) {
     if (taggroup.selectAll('.tag').size() === 0) taggroup.remove();
   }
 }
-export function rmtag(node, d) {
+export async function rmtag(node, d) {
   const sel = d3.select(node);
   const tag = sel.findAncestor('tag');
   const taggroup = tag.findAncestor('active-filters');
@@ -175,7 +178,7 @@ export function rmtag(node, d) {
     })
     .node();
   input.checked = false;
-  toggletag(input, d);
+  await toggletag(input, d);
 }
 export async function pinAll(node) {
   const object = d3.select('data[name="object"]').node().value;

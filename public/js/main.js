@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 
 const debugging = false;
@@ -14,7 +14,8 @@ if (false) {
   }
 }
 
-export function getMediaSize() {
+let mediaSize = null;
+function doGetMediaSize() {
   // https://www.w3schools.com/howto/howto_js_media_queries.asp
   // console.log(window.navigator)
   // console.log(window.navigator.Agent)
@@ -32,6 +33,12 @@ export function getMediaSize() {
         return window.matchMedia(`(max-width: ${d.size}px)`).matches;
       else return window.matchMedia(`(min-width: ${d.size}px)`).matches;
     })?.label;
+}
+export function getMediaSize() {
+  if (!mediaSize) {
+    mediaSize = doGetMediaSize();
+  }
+  return mediaSize;
 }
 
 export function toggleClass(node, classname) {
@@ -344,7 +351,8 @@ export function uploadFile(form) {
     });
 }
 
-export function printTranslation(node, vocab) {
+export async function printTranslation(node, vocab) {
+  const vocabulary = await getTranslations();
   // FIRST, CHECK IF THE vocab IS A JSON OBJECT (ARRAY)
   const regex = /\[(["'][\w\d\s-]+["'](,\s*["'][\w\d\s-]+["'])*)\]/;
   if (regex.test(vocab)) {
@@ -402,6 +410,7 @@ export function checkForEnter(evt, node) {
   }
 }
 export async function toggleOptions(node) {
+  const vocabulary = await getTranslations();
   const { object } = node.dataset || {};
 
   for (const label of node.labels) {
@@ -422,7 +431,8 @@ export function updateTab(value) {
     // fixLabel(input)
   }
 }
-export function expandstats(node) {
+export async function expandstats(node) {
+  const vocabulary = await getTranslations();
   const sel = d3.select(node);
   const statistics = d3.select(
     sel.findAncestor('stat-group').node().parentNode,

@@ -120,7 +120,7 @@ async function getStatus() {
       page.type === 'public'
     ) {
       if (d.required === null || d.required === undefined)
-        throw 'there is no requirement: this should not happen';
+        throw new Error('there is no requirement: this should not happen');
       if (d.required === false) return true;
       else return d.has_content === true;
     } else {

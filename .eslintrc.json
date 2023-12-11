@@ -14,7 +14,9 @@
   "rules": {
     "camelcase": "off",
     "max-len": "off",
-    "require-jsdoc": "off"
+    "require-jsdoc": "off",
+    "no-implicit-globals": "error",
+    "no-invalid-this": "off"
   },
   "plugins": ["ejs-js"],
   "ignorePatterns": []

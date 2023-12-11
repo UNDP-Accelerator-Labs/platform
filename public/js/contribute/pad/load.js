@@ -67,22 +67,24 @@ async function onLoad() {
       });
 
       const url = new URL(window.location);
-      if (!queryparams) var queryparams = new URLSearchParams(url.search);
-      queryparams.delete('display');
+      if (!window.queryparams)
+        window.queryparams = new URLSearchParams(url.search);
+      window.queryparams.delete('display');
 
       d3.select('div.display-source a').attr(
         'href',
-        `?${queryparams.toString()}`,
+        `?${window.queryparams.toString()}`,
       );
     }
   } else if (d3.select('div.display-option.display-source').node()) {
     const url = new URL(window.location);
-    if (!queryparams) var queryparams = new URLSearchParams(url.search);
-    queryparams.set('display', 'adjacent-source');
+    if (!window.queryparams)
+      window.queryparams = new URLSearchParams(url.search);
+    window.queryparams.set('display', 'adjacent-source');
 
     d3.select('div.display-source a').attr(
       'href',
-      `?${queryparams.toString()}`,
+      `?${window.queryparams.toString()}`,
     );
   }
   // OR FOR REVIEW
@@ -107,22 +109,24 @@ async function onLoad() {
       }
 
       const url = new URL(window.location);
-      if (!queryparams) var queryparams = new URLSearchParams(url.search);
-      queryparams.delete('display');
+      if (!window.queryparams)
+        window.queryparams = new URLSearchParams(url.search);
+      window.queryparams.delete('display');
 
       d3.select('div.display-reviews a').attr(
         'href',
-        `?${queryparams.toString()}`,
+        `?${window.queryparams.toString()}`,
       );
     }
   } else if (d3.select('div.display-option.display-reviews').node()) {
     const url = new URL(window.location); // url IS ALREADY DEFINED SOMEWHERE ELSE
-    if (!queryparams) var queryparams = new URLSearchParams(url.search);
-    queryparams.set('display', 'adjacent-reviews');
+    if (!window.queryparams)
+      window.queryparams = new URLSearchParams(url.search);
+    window.queryparams.set('display', 'adjacent-reviews');
 
     d3.select('div.display-reviews a').attr(
       'href',
-      `?${queryparams.toString()}`,
+      `?${window.queryparams.toString()}`,
     );
   }
 

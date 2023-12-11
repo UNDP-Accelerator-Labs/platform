@@ -9,7 +9,7 @@ import {
 } from '/js/main.js';
 
 async function onLoad() {
-  d3.selectAll('[data-vocab]').html(function () {
+  d3.selectAll('[data-vocab]').html(async function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||
@@ -20,7 +20,7 @@ async function onLoad() {
       translation = await printTranslation(this, this.dataset.altvocab);
     return translation;
   });
-  d3.selectAll('[data-vocabprefix]').each(function () {
+  d3.selectAll('[data-vocabprefix]').each(async function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||
@@ -38,18 +38,21 @@ async function onLoad() {
       }
     }
   });
-  d3.selectAll('[data-placeholder]').attr('data-placeholder', function () {
-    const vocab =
-      this.dataset.vocab ||
-      this.dataset.vocabprefix ||
-      this.dataset.placeholder ||
-      this.dataset.content;
-    let translation = await printTranslation(this, vocab);
-    if (!translation)
-      translation = await printTranslation(this, this.dataset.altvocab);
-    return translation;
-  });
-  d3.selectAll('[data-content]').attr('data-content', function () {
+  d3.selectAll('[data-placeholder]').attr(
+    'data-placeholder',
+    async function () {
+      const vocab =
+        this.dataset.vocab ||
+        this.dataset.vocabprefix ||
+        this.dataset.placeholder ||
+        this.dataset.content;
+      let translation = await printTranslation(this, vocab);
+      if (!translation)
+        translation = await printTranslation(this, this.dataset.altvocab);
+      return translation;
+    },
+  );
+  d3.selectAll('[data-content]').attr('data-content', async function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||

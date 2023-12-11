@@ -12,8 +12,7 @@ export async function renderModal(data, close = true) {
 
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
-  let screen;
-  screen = d3.select('div.screen').classed('hide', false);
+  const screen = d3.select('div.screen').classed('hide', false);
 
   const modal = screen.addElems('div', `modal ${theme}`);
 
@@ -381,7 +380,7 @@ async function addInputNode(_sel, _data) {
                 if (b.label.length > 30) return `${b.label.slice(0, 30)}…`;
                 else return b.label;
               });
-              tag.addElems('label', 'close').on('click', (_) => {
+              tag.addElems('label', 'close').on('click', async (_) => {
                 await rmtag(b.value);
                 if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
               });

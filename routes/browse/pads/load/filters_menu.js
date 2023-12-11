@@ -102,11 +102,13 @@ module.exports = async kwargs => {
 								obj.name = d.name
 
 								if (d.count > 1) {
-									obj.count = array.unique.call(d.values.map(c => c.pads).flat()).length
+									// obj.count = array.unique.call(d.values.map(c => c.pads).flat()).length
+									obj.count = d.values.length
 									obj.id = d.values.splice(0, 1)[0].iso3
 									obj.equivalents = d.values.map(c => c.iso3)
 								} else {
-									obj.count = d.values[0].count
+									// obj.count = d.values[0].count
+									obj.count = d.values.length
 									obj.id = d.values[0].iso3
 								}
 

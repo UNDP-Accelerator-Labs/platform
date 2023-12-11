@@ -160,7 +160,7 @@ module.exports = async kwargs => {
 					INNER JOIN pads p
 						ON p.id = mc.pad
 					WHERE m.id IN $1:raw
-						AND p.status >= 2
+						-- AND p.status >= 2
 						AND m.public = FALSE
 					GROUP BY m.id
 				;`, [ mobilizationlist ])

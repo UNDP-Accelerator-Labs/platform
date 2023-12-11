@@ -453,7 +453,7 @@ async function onLoad() {
         });
 
         if (page < pages) lazyloading = false;
-        else main.select('.lds-ellipsis').classed('hide', true);
+        else d3.selectAll('.lds-ellipsis').classed('hide', true);
       }
     };
   }

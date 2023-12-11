@@ -195,7 +195,7 @@ Date.prototype.render = function () {
   }-${this.getFullYear()}`;
 };
 
-function ExcelDateToJSDate(serial) {
+window.ExcelDateToJSDate = function (serial) {
   // CREDIT TO https://stackoverflow.com/questions/16229494/converting-excel-date-serial-number-to-date-using-javascript
   const utc_days = Math.floor(serial - 25569);
   const utc_value = utc_days * 86400;
@@ -214,8 +214,8 @@ function ExcelDateToJSDate(serial) {
     minutes,
     seconds,
   );
-}
-function isValidDate(d) {
+};
+window.isValidDate = function (d) {
   // CREDIT TO https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
   return d instanceof Date && !isNaN(d);
-}
+};

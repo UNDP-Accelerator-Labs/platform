@@ -106,7 +106,7 @@ export class Exploration {
       this.getExplorationByPrompt(normPrompt)[0],
       curId,
     );
-    this.updateExplorationDocs();
+    await this.updateExplorationDocs();
     this.triggerIdChange();
   }
 
@@ -227,7 +227,7 @@ export class Exploration {
     });
   }
 
-  updateExplorationDocs(cb = null) {
+  async updateExplorationDocs(cb = null) {
     if (cb) {
       this.collectionUpdateCbs.push(cb);
     }
@@ -237,7 +237,7 @@ export class Exploration {
       this.docLookup = {};
       const cbs = this.collectionUpdateCbs;
       this.collectionUpdateCbs = [];
-      this.updateDocs(cbs);
+      await this.updateDocs(cbs);
       return;
     }
     if (this.collectionId === curId) {
@@ -268,7 +268,7 @@ export class Exploration {
         this.docLookup = newLookup;
         const cbs = this.collectionUpdateCbs;
         this.collectionUpdateCbs = [];
-        this.updateDocs(cbs);
+        await this.updateDocs(cbs);
       })
       .catch((err) => {
         this.collectionId = null;
@@ -277,7 +277,7 @@ export class Exploration {
           this.docLookup = {};
           const cbs = this.collectionUpdateCbs;
           this.collectionUpdateCbs = [];
-          this.updateDocs(cbs);
+          await this.updateDocs(cbs);
         });
       });
   }
@@ -296,7 +296,7 @@ export class Exploration {
       const [curId, curPrompt] = this.getExplorationByPrompt(userPrompt);
       if (curId !== null && curId === currentId) {
         if (allowReport) {
-          this.updateExplorationDocs();
+          await this.updateExplorationDocs();
         }
       } else if (curId !== null) {
         this.updateCurrentExploration(curId, curPrompt);
@@ -463,15 +463,16 @@ export class Exploration {
     return this.visible;
   }
 
-  setVisible(visible) {
+  async setVisible(visible) {
     const oldVisible = this.visible;
     this.visible = visible;
     if (oldVisible !== visible) {
-      this.updateDocs([]);
+      await this.updateDocs([]);
     }
   }
 
-  updateDocs(cbs) {
+  async updateDocs(cbs) {
+    const vocabulary = await getTranslations();
     d3.selectAll('div.exploration').styles({
       display: this.isVisible() ? null : 'none',
     });
@@ -554,15 +555,15 @@ export class Exploration {
       true,
     )
       .then(checkResponse)
-      .then((result) => {
-        this.updateExplorationDocs();
+      .then(async (result) => {
+        await this.updateExplorationDocs();
       })
       .catch((err) => {
         this.checkError(err);
       });
   }
 
-  addDocButtons(sel, hasLimitedSpace) {
+  async addDocButtons(sel, hasLimitedSpace) {
     const doc = sel.addElems('div', 'exploration-doc');
     const that = this;
 
@@ -617,6 +618,6 @@ export class Exploration {
       doc.classed('exploration-big', true);
     }
     this.limitedSpace = hasLimitedSpace;
-    this.updateExplorationDocs();
+    await this.updateExplorationDocs();
   }
 } // Exploration

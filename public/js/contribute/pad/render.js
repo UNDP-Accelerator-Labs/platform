@@ -828,26 +828,27 @@ async function populateSection(data, lang = 'en', section, objectdata) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   // MEDIA
   if (data.type === 'title' && page.type === 'public')
-    addTitle({ data, lang, section, objectdata });
-  if (data.type === 'img') addImg({ data, lang, section, objectdata });
+    await addTitle({ data, lang, section, objectdata });
+  if (data.type === 'img') await addImg({ data, lang, section, objectdata });
   if (data.type === 'mosaic') addMosaic({ data, lang, section, objectdata });
   if (data.type === 'video') addVideo({ data, lang, section, objectdata });
   if (data.type === 'drawing') addDrawing({ data, lang, section, objectdata });
-  if (data.type === 'txt') addTxt({ data, lang, section, objectdata });
-  if (data.type === 'embed') addEmbed({ data, lang, section, objectdata });
+  if (data.type === 'txt') await addTxt({ data, lang, section, objectdata });
+  if (data.type === 'embed')
+    await addEmbed({ data, lang, section, objectdata });
   if (data.type === 'checklist')
-    addChecklist({ data, lang, section, objectdata });
+    await addChecklist({ data, lang, section, objectdata });
   if (data.type === 'radiolist')
-    addRadiolist({ data, lang, section, objectdata });
+    await addRadiolist({ data, lang, section, objectdata });
   // META
   if (data.type === 'location')
-    addLocations({ data, lang, section, objectdata });
+    await addLocations({ data, lang, section, objectdata });
   if (data.type === 'index')
     await addIndexes({ data, lang, section, objectdata });
   if (data.type === 'tag') await addTags({ data, lang, section, objectdata });
   if (data.type === 'attachment')
     await addAttachment({ data, lang, section, objectdata });
-  // if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section, objectdata }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+  // if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') await addTags({ data, lang, section, objectdata }) // THE skills IS LEGACY FOR THE ACTION PLANS PLATFORM
   // GROUP
   if (data.type === 'group') addGroup({ data, lang, section, objectdata });
 }
@@ -866,6 +867,7 @@ export function uploadImg(kwargs) {
   })
     .then((res) => res.json())
     .then(async (json) => {
+      const vocabulary = await getTranslations();
       let notification = null;
       const uploaderr = json?.filter(
         (msg) => msg.status != 200 && msg.message,
@@ -894,8 +896,9 @@ export function uploadImg(kwargs) {
       }
       return json;
     })
-    .then((data) =>
-      addImgs({ data, lang, sibling, container, focus, objectdata }),
+    .then(
+      async (data) =>
+        await addImgs({ data, lang, sibling, container, focus, objectdata }),
     )
     .catch((err) => {
       if (err) throw err;
@@ -930,7 +933,7 @@ async function deleteImg(kwargs) {
     if (items.size() === 0) container.remove();
     else if (items.size() === 1) {
       // REPLACE THE MOSAIC WITH A SINGLE IMAGE
-      addImg({
+      await addImg({
         data: { src: items.select('img').datum() },
         lang,
         container,
@@ -949,12 +952,19 @@ function addImgs(kwargs) {
   const fls = data.filter((d) => d.status === 200);
   // THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
   if (fls.length === 1) {
-    fls.forEach((f) => {
+    fls.forEach(async (f) => {
       let datum = {};
       if (container) datum = container.datum();
       if (datum.type !== 'img') datum = { instruction: datum.instruction };
       datum['src'] = f.src;
-      addImg({ data: datum, lang, sibling, container, focus, objectdata });
+      await addImg({
+        data: datum,
+        lang,
+        sibling,
+        container,
+        focus,
+        objectdata,
+      });
     }); // ONLY ONE IMAGE SO NO MOSAIC
   } else {
     let datum = {};
@@ -984,6 +994,7 @@ export function uploadVideo(kwargs) {
   })
     .then((res) => res.json())
     .then(async (json) => {
+      const vocabulary = await getTranslations();
       ellipsis.remove();
       let notification = null;
       const uploaderr = json?.filter(
@@ -1067,6 +1078,7 @@ export async function autofillTitle() {
 }
 
 export async function addSection(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -1282,7 +1294,8 @@ export async function addSection(kwargs) {
 
   return section.node();
 }
-function addTitle(kwargs) {
+async function addTitle(kwargs) {
+  const vocabulary = await getTranslations();
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
@@ -1346,7 +1359,8 @@ function addTitle(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-function addImg(kwargs) {
+async function addImg(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -2159,7 +2173,8 @@ export function addDrawing(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addTxt(kwargs) {
+export async function addTxt(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -2391,7 +2406,8 @@ export function addTxt(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addEmbed(kwargs) {
+export async function addEmbed(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -2607,7 +2623,8 @@ export function addEmbed(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addChecklist(kwargs) {
+export async function addChecklist(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -2875,7 +2892,8 @@ export function addChecklist(kwargs) {
         .focus();
   }
 }
-export function addRadiolist(kwargs) {
+export async function addRadiolist(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -3148,7 +3166,8 @@ export function addRadiolist(kwargs) {
   }
 }
 // META ELEMENTS
-export function addLocations(kwargs) {
+export async function addLocations(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3554,6 +3573,7 @@ export async function addIndexes(kwargs) {
   }
 }
 export async function addTags(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3616,6 +3636,7 @@ export async function addTags(kwargs) {
   }
 }
 export async function addAttachment(kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 

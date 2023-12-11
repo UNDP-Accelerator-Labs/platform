@@ -131,8 +131,8 @@ function parseColumns(json, keys) {
     obj.entries = json.map((c) => {
       // ENTRIES, UNLIKE VALUES, IS EXHAUSTIVE (IT ALSO INCLUDES NULL/ MISSING VALUES)
       // CHECK IF DATE
-      const testdate = ExcelDateToJSDate(c[d]);
-      if (isValidDate(testdate) && testdate.getFullYear() >= 2019) {
+      const testdate = window.ExcelDateToJSDate(c[d]);
+      if (window.isValidDate(testdate) && testdate.getFullYear() >= 2019) {
         return testdate.toISOString();
       } else {
         const e = c[d];
@@ -324,9 +324,10 @@ function parseGroups(json, keys) {
       } else resolve(json.find((c) => c.key === d));
     });
   });
-  Promise.all(cols).then((data) => renderTable(data));
+  Promise.all(cols).then(async (data) => await renderTable(data));
 }
-function renderTable(cols, update = false) {
+function async renderTable(cols, update = false) {
+  const vocabulary = getTranslations();
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );

@@ -14,12 +14,12 @@ function initExploration() {
       exploration.addDocButtons(docBtn, false);
     }
   });
-  return exp;
+  return exploration;
 }
 
 let cachedExploration = null;
 
-export function getExploration() {
+export async function getExploration() {
   if (!cachedExploration) {
     cachedExploration = initExploration();
   }

@@ -140,7 +140,8 @@ export function selectAllOpts(node) {
     .select('.global-opt')
     .toggleClass('active')
     .select('button')
-    .html((_) => {
+    .html(async (_) => {
+      const vocabulary = await getTranslations();
       return parent.select('.global-opt').classed('active')
         ? vocabulary['deselect all']
         : vocabulary['select all'];

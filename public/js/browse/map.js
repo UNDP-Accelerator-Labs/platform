@@ -99,6 +99,8 @@ async function onLoad() {
               idx = Math.round(this.scrollLeft / slidewidth);
               d3.selectAll('.dot').classed('highlight', (d, i) => i === idx);
               d3.selectAll('button.slide-nav').classed('hide', (d) => {
+                const deck = d3.select('.layout.columns');
+                const slides = deck.selectAll('article.pad');
                 return (
                   (d.class === 'prev' && idx === 0) ||
                   (d.class === 'next' && idx === slides.size() - 1)

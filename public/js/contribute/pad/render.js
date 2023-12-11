@@ -1,5 +1,4 @@
-import { language, vocabulary } from '/js/config/main.js';
-import { exploration } from '/js/contribute/pad/exploration.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import {
   partialSave,
   switchButtons,
@@ -173,12 +172,12 @@ const Media = function (kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', (d) => {
+      .on('click', async (d) => {
         d3.event.stopPropagation();
         d.fn();
 
         if (media.editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -436,7 +435,8 @@ Meta.prototype.expand = function (kwargs) {
     }, timeout);
   }
 };
-const Taglist = function (kwargs) {
+const Taglist = async function (kwargs) {
+  const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
   const { type, list, imglink, altimglink, datum, lang } = kwargs || {};
@@ -502,7 +502,7 @@ const Taglist = function (kwargs) {
             : null;
         },
       })
-      .on('change', function (d) {
+      .on('change', async function (d) {
         const checked = meta.inset
           .selectAll(`.inset-${type} .tag input:checked`)
           .data();
@@ -559,7 +559,7 @@ const Taglist = function (kwargs) {
             });
           }
           if (meta.editing) {
-            if (page.type === 'private') switchButtons(lang);
+            if (page.type === 'private') await switchButtons(lang);
             else window.sessionStorage.setItem('changed-content', true);
           }
         }
@@ -752,7 +752,7 @@ Taglist.prototype.recode = async function (opencode = true) {
 
             if (meta.editing) {
               if (page.type === 'private') {
-                switchButtons(meta.lang);
+                await switchButtons(meta.lang);
                 await partialSave('media');
               } else {
                 window.sessionStorage.setItem('changed-content', true);
@@ -810,7 +810,7 @@ Taglist.prototype.recode = async function (opencode = true) {
     });
   }
   if (meta.editing) {
-    if (page.type === 'private') switchButtons(meta.lang);
+    if (page.type === 'private') await switchButtons(meta.lang);
     else window.sessionStorage.setItem('changed-content', true);
   }
 };
@@ -865,7 +865,7 @@ export function uploadImg(kwargs) {
     body: new FormData(form),
   })
     .then((res) => res.json())
-    .then((json) => {
+    .then(async (json) => {
       let notification = null;
       const uploaderr = json?.filter(
         (msg) => msg.status != 200 && msg.message,
@@ -889,7 +889,7 @@ export function uploadImg(kwargs) {
       setTimeout((_) => notification.remove(), 4000);
 
       if (editing) {
-        if (page.type === 'private') switchButtons(lang);
+        if (page.type === 'private') await switchButtons(lang);
         else window.sessionStorage.setItem('changed-content', true);
       }
       return json;
@@ -901,7 +901,7 @@ export function uploadImg(kwargs) {
       if (err) throw err;
     });
 }
-function deleteImg(kwargs) {
+async function deleteImg(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
   const { sel, lang, objectdata } = kwargs || {};
@@ -939,7 +939,7 @@ function deleteImg(kwargs) {
     } else mosaic.classed('x2', items.size() < 3);
 
     if (editing) {
-      if (page.type === 'private') switchButtons(lang);
+      if (page.type === 'private') await switchButtons(lang);
       else window.sessionStorage.setItem('changed-content', true);
     }
   }
@@ -983,7 +983,7 @@ export function uploadVideo(kwargs) {
     body: new FormData(form),
   })
     .then((res) => res.json())
-    .then((json) => {
+    .then(async (json) => {
       ellipsis.remove();
       let notification = null;
       const uploaderr = json?.filter(
@@ -1009,7 +1009,7 @@ export function uploadVideo(kwargs) {
       }
       setTimeout((_) => notification.remove(), 4000);
       if (editing) {
-        if (page.type === 'private') switchButtons(lang);
+        if (page.type === 'private') await switchButtons(lang);
         else window.sessionStorage.setItem('changed-content', true);
       }
       return json;
@@ -1143,12 +1143,12 @@ export async function addSection(kwargs) {
         { label: 'close', value: 'delete', fn: (_) => rmSection() },
         // { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
       ])
-      .on('click', (d) => {
+      .on('click', async (d) => {
         d3.event.stopPropagation();
         d.fn();
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -1426,7 +1426,7 @@ function addImg(kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         sel
           .findAncestor('opt-group')
@@ -1442,7 +1442,7 @@ function addImg(kwargs) {
           media.media.style('text-align', (c) => (c.textalign = d.value));
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -1461,7 +1461,7 @@ function addImg(kwargs) {
           class: (d) => d.scale,
           src: (d) => this.src,
         })
-        .on('click', (d) => renderImgZoom({ src: this.src }));
+        .on('click', async (d) => await renderImgZoom({ src: this.src }));
     };
     img.onerror = function (err) {
       if (err) console.log(err);
@@ -1601,7 +1601,7 @@ function addMosaic(kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         if (d.key === 'v-align') {
           sel
@@ -1614,7 +1614,7 @@ function addMosaic(kwargs) {
         }
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -1644,13 +1644,13 @@ function addMosaic(kwargs) {
             .each(function (d) {
               d3.select(this).classed(d.value, true);
             })
-            .on('click', function (d) {
+            .on('click', async function (d) {
               const sel = d3.select(this);
               const source = sel.findAncestor('mosaic-item').node();
               const parent = media.media.node();
 
               if (d.value === 'delete')
-                deleteImg({
+                await deleteImg({
                   sel: sel.findAncestor('mosaic-item').select('img'),
                   lang,
                   objectdata,
@@ -1677,7 +1677,7 @@ function addMosaic(kwargs) {
               }
 
               if (editing) {
-                if (page.type === 'private') switchButtons(lang);
+                if (page.type === 'private') await switchButtons(lang);
                 else window.sessionStorage.setItem('changed-content', true);
               }
             })
@@ -1818,7 +1818,7 @@ function addVideo(kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         if (d.key === 'h-align') {
           sel
@@ -1831,7 +1831,7 @@ function addVideo(kwargs) {
         }
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -2008,7 +2008,7 @@ export function addDrawing(kwargs) {
             .each(function (b) {
               d3.select(this).classed(b.key, true);
             })
-            .on('click', function (b) {
+            .on('click', async function (b) {
               const sel = d3.select(this);
               if (b.element === 'button') {
                 if (b.key === 'clear') {
@@ -2028,7 +2028,7 @@ export function addDrawing(kwargs) {
               } else return false;
 
               if (editing) {
-                if (page.type === 'private') switchButtons(lang);
+                if (page.type === 'private') await switchButtons(lang);
                 else window.sessionStorage.setItem('changed-content', true);
               }
             })
@@ -2142,7 +2142,7 @@ export function addDrawing(kwargs) {
 
           if (editing) {
             if (page.type === 'private') {
-              switchButtons(lang);
+              await switchButtons(lang);
               await partialSave('media');
             } else {
               window.sessionStorage.setItem('changed-content', true);
@@ -2278,7 +2278,7 @@ export function addTxt(kwargs) {
         d3.select(this).classed(d.key, true);
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         if (d.key === 'font-properties') {
           sel.classed(
@@ -2334,7 +2334,7 @@ export function addTxt(kwargs) {
         }
 
         if (editing && d.key !== 'constraint') {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       });
@@ -2464,7 +2464,7 @@ export function addEmbed(kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         if (d.key === 'h-align') {
           sel
@@ -2476,7 +2476,7 @@ export function addEmbed(kwargs) {
           media.media.style('text-align', (c) => (c.textalign = d.value));
         }
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -2523,7 +2523,7 @@ export function addEmbed(kwargs) {
       sel.classed('padded', !this.children.length);
 
       if (editing) {
-        if (page.type === 'private') switchButtons(lang);
+        if (page.type === 'private') await switchButtons(lang);
         else window.sessionStorage.setItem('changed-content', true);
       }
     });
@@ -2709,7 +2709,7 @@ export function addChecklist(kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         sel.classed(
           'active',
@@ -2738,7 +2738,7 @@ export function addChecklist(kwargs) {
           .focus();
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -2799,7 +2799,7 @@ export function addChecklist(kwargs) {
 
         if (editing) {
           if (page.type === 'private') {
-            switchButtons(lang);
+            await switchButtons(lang);
             await partialSave('media');
           } else {
             window.sessionStorage.setItem('changed-content', true);
@@ -2835,14 +2835,14 @@ export function addChecklist(kwargs) {
           list.call(addItem);
         }
       })
-      .on('blur', function (d) {
+      .on('blur', async function (d) {
         d.name = this.innerText.trim();
         d3.select(this)
           .findAncestor('opt')
           .classed('valid', (d) => d.name?.length);
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -2853,14 +2853,14 @@ export function addChecklist(kwargs) {
         .addElems('div', 'rm')
         .addElems('i', 'material-icons google-translate-attr')
         .html('clear')
-        .on('click', function (d) {
+        .on('click', async function (d) {
           media.container.each(
             (c) => (c.options = c.options.filter((b) => b.id !== d.id)),
           );
           list.call(addItem);
 
           if (editing) {
-            if (page.type === 'private') switchButtons(lang);
+            if (page.type === 'private') await switchButtons(lang);
             else window.sessionStorage.setItem('changed-content', true);
           }
         });
@@ -2977,7 +2977,7 @@ export function addRadiolist(kwargs) {
       .each(function (d) {
         d3.select(this).classed(d.value, true);
       })
-      .on('click', function (d) {
+      .on('click', async function (d) {
         const sel = d3.select(this);
         sel.classed(
           'active',
@@ -3006,7 +3006,7 @@ export function addRadiolist(kwargs) {
           .focus();
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -3069,7 +3069,7 @@ export function addRadiolist(kwargs) {
 
         if (editing) {
           if (page.type === 'private') {
-            switchButtons(lang);
+            await switchButtons(lang);
             await partialSave('media');
           } else {
             window.sessionStorage.setItem('changed-content', true);
@@ -3107,14 +3107,14 @@ export function addRadiolist(kwargs) {
           list.call(addItem);
         }
       })
-      .on('blur', function (d) {
+      .on('blur', async function (d) {
         d.name = this.innerText.trim();
         d3.select(this)
           .findAncestor('opt')
           .classed('valid', (d) => d.name?.length);
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
@@ -3125,14 +3125,14 @@ export function addRadiolist(kwargs) {
         .addElems('div', 'rm')
         .addElems('i', 'material-icons google-translate-attr')
         .html('clear')
-        .on('click', function (d) {
+        .on('click', async function (d) {
           media.container.each(
             (c) => (c.options = c.options.filter((b) => b.id !== d.id)),
           );
           list.call(addItem);
 
           if (editing) {
-            if (page.type === 'private') switchButtons(lang);
+            if (page.type === 'private') await switchButtons(lang);
             else window.sessionStorage.setItem('changed-content', true);
           }
         });
@@ -3226,10 +3226,11 @@ export function addLocations(kwargs) {
     html: '<i class="material-icons google-translate-attr">place</i>',
   });
 
-  function rmPin(marker, container) {
+  async function rmPin(marker, container) {
+    const vocabulary = await getTranslations();
     const btn = document.createElement('BUTTON');
     btn.innerHTML = vocabulary['remove pin'];
-    btn.addEventListener('click', (_) => {
+    btn.addEventListener('click', async (_) => {
       group.removeLayer(marker);
       markers = markers.filter((m) => m !== marker);
       const centerpoints = [];
@@ -3243,7 +3244,7 @@ export function addLocations(kwargs) {
         meta.container.select('figcaption').html((c) => (c.caption = null));
 
       if (editing) {
-        if (page.type === 'private') switchButtons(lang);
+        if (page.type === 'private') await switchButtons(lang);
         else window.sessionStorage.setItem('changed-content', true);
       }
     });
@@ -3268,7 +3269,7 @@ export function addLocations(kwargs) {
               marker.openPopup();
               dragging = false;
             })
-            .on('dragend', function (evt) {
+            .on('dragend', async function (evt) {
               dragging = false;
               const latlng = evt.target.getLatLng();
               meta.container.each(
@@ -3277,7 +3278,7 @@ export function addLocations(kwargs) {
               );
 
               if (editing) {
-                if (page.type === 'private') switchButtons(lang);
+                if (page.type === 'private') await switchButtons(lang);
                 else window.sessionStorage.setItem('changed-content', true);
               }
             });
@@ -3359,7 +3360,7 @@ export function addLocations(kwargs) {
         .addElems('ul', 'panel')
         .addElems('li', 'opt location', results.locations)
         .html((d) => d.formatted)
-        .on('click', function (d) {
+        .on('click', async function (d) {
           d3.select(this.parentNode)
             .selectAll('.opt')
             .classed('selected', false);
@@ -3383,7 +3384,7 @@ export function addLocations(kwargs) {
               );
 
             if (editing) {
-              if (page.type === 'private') switchButtons(lang);
+              if (page.type === 'private') await switchButtons(lang);
               else window.sessionStorage.setItem('changed-content', true);
             }
           }
@@ -3407,14 +3408,17 @@ export function addLocations(kwargs) {
       .on('mousedown', (e) => {
         offset[0] = [e.containerPoint.x, e.containerPoint.x];
         if (!dragging)
-          timer = window.setTimeout((_) => addLocation(e.latlng), 1000);
+          timer = window.setTimeout(
+            async (_) => await addLocation(e.latlng),
+            1000,
+          );
       })
       .on(
         'mousemove',
         (e) => (offset[1] = [e.containerPoint.x, e.containerPoint.x]),
       );
 
-    function addLocation(latlng) {
+    async function addLocation(latlng) {
       const duplicate = markers.find((d) => {
         const existing = d.getLatLng();
         return existing.lat === latlng.lat && existing.lng === latlng.lng;
@@ -3445,7 +3449,7 @@ export function addLocations(kwargs) {
                   marker.openPopup();
                   dragging = false;
                 })
-                .on('dragend', function (evt) {
+                .on('dragend', async function (evt) {
                   dragging = false;
                   const latlng = evt.target.getLatLng();
                   meta.container.each(
@@ -3457,7 +3461,7 @@ export function addLocations(kwargs) {
                   );
 
                   if (editing) {
-                    if (page.type === 'private') switchButtons(lang);
+                    if (page.type === 'private') await switchButtons(lang);
                     else
                       window.sessionStorage.setItem('changed-content', true);
                   }
@@ -3473,7 +3477,7 @@ export function addLocations(kwargs) {
           );
 
           if (editing) {
-            if (page.type === 'private') switchButtons(lang);
+            if (page.type === 'private') await switchButtons(lang);
             else window.sessionStorage.setItem('changed-content', true);
           }
         }
@@ -3482,6 +3486,8 @@ export function addLocations(kwargs) {
   }
 }
 export async function addIndexes(kwargs) {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -4201,6 +4207,7 @@ function switchslide(main, i) {
   return (idx = i);
 }
 export async function renderPad(kwargs) {
+  const language = await getCurrentLanguage();
   let { object, type, id, main } = kwargs;
   // TYPE CAN BE templated, OR blank
   // OBJECT CAN BE pad, source OR review

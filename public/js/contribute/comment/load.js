@@ -1,10 +1,10 @@
 import { adjustarea, changeLabel } from '/js/contribute/comment/main.js';
 import { fixLabel } from '/js/main.js';
 
-function DOMLoad() {
+function onLoad() {
   d3.selectAll('textarea[name="message"]')
-    .on('focus', function () {
-      changeLabel(this, true);
+    .on('focus', async function () {
+      await changeLabel(this, true);
     })
     .on('keyup', function () {
       adjustarea(this);
@@ -12,8 +12,8 @@ function DOMLoad() {
     .on('change', function () {
       fixLabel(this);
     })
-    .on('blur', function () {
-      changeLabel(this, false);
+    .on('blur', async function () {
+      await changeLabel(this, false);
     });
 
   d3.selectAll('footer textarea').each(function () {
@@ -28,10 +28,4 @@ function DOMLoad() {
   });
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

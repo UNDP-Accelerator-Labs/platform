@@ -1,10 +1,12 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { compilePads, compileTemplate } from '/js/contribute/xlsx/main.js';
 import { POST } from '/js/fetch.js';
 import { addGlobalLoader, rmGlobalLoader } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 export async function catchSubmit(evt) {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   const { participations } = JSON.parse(
     d3.select('data[name="page"]').node().value,
   );

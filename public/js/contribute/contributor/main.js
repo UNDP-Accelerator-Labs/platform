@@ -1,4 +1,4 @@
-import { vocabulary, languages } from '/js/config/main.js';
+import { getRegisteredLanguages, getTranslations } from '/js/config/main';
 import { partialSave } from '/js/contribute/contributor/save.js';
 import { POST } from '/js/fetch.js';
 import { fixLabel, getMediaSize } from '/js/main.js';
@@ -18,6 +18,8 @@ export function copyToken(node) {
   navigator.clipboard.writeText(token);
 }
 export async function addLanguage(node) {
+  const vocabulary = await getTranslations();
+  const languages = await getRegisteredLanguages();
   const sel = d3.select(node);
   const parent = sel.findAncestor('ul');
   const li = parent.insertElem(function () {
@@ -127,7 +129,7 @@ export function rmPin(node) {
   partialSave();
 }
 export async function initDropdowns() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   const { rights } = await POST('/check/module_rights', {
     module_type: 'teams',
   });

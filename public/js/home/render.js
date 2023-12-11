@@ -1,7 +1,8 @@
-import { language } from '/js/config/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
 import { getContent, getMediaSize } from '/js/main.js';
 
 export async function renderCarousel() {
+  const language = await getCurrentLanguage();
   const page = JSON.parse(d3.select('data[name="page"]').node().value);
 
   const container = d3.select('.slides');
@@ -78,6 +79,7 @@ function animateCarousel(idx) {
   let animation = setTimeout((_) => animateCarousel(idx + 1), delay);
 }
 export async function renderMosaic() {
+  const language = await getCurrentLanguage();
   const page = JSON.parse(d3.select('data[name="page"]').node().value);
 
   const container = d3.select('.slides');
@@ -87,7 +89,7 @@ export async function renderMosaic() {
   if (!slides.length) return panel.remove();
 
   // TO DO: LOAD MOSAIC DATA DYNAMICALLY HERE
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   if (mediaSize === 'xs') slides = slides.slice(0, 11);
   else if (mediaSize === 'sm') slides = slides.slice(0, 21);
   else if (mediaSize === 'm') slides = slides.slice(0, 26);

@@ -1,7 +1,8 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 
 // INSPIRED BY https://stackoverflow.com/questions/995168/textarea-to-resize-based-on-content-length
-export function changeLabel(node, focus) {
+export async function changeLabel(node, focus) {
+  const vocabulary = await getTranslations();
   for (const label of node.labels) {
     const sel = d3.select(label);
     const username = d3.select('data[name="username"]').node()?.value;

@@ -1,4 +1,4 @@
-import { language } from '/js/config/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
 import {
   addAttachment,
   addChecklist,
@@ -15,9 +15,10 @@ import {
 } from '/js/contribute/pad/render.js';
 import { getMediaSize } from '/js/main.js';
 
-export function initToolbarInteractions(kwargs) {
+export async function initToolbarInteractions(kwargs) {
+  const language = await getCurrentLanguage();
   let { metafields, type: objecttype, main } = kwargs;
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
 
   const object = d3.select('data[name="object"]').node()?.value;
 

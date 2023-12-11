@@ -1,4 +1,4 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { renderFormModal } from '/js/modals.js';
 
@@ -49,6 +49,7 @@ function loadHTML(url, source, target) {
 */
 
 export async function selectReviewLanguage(node) {
+  const vocabulary = await getTranslations();
   // THIS IS ALMOST THE SAME AS IN /browse/index.js
   // TO DO: THIS STILL NEEDS SOME WORK
   const { name, value } = node;

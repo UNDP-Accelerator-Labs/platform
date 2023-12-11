@@ -1,8 +1,10 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { getContent, uploadFile } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
-async function DOMLoad() {
+async function onLoad() {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   const rights = JSON.parse(d3.select('data[name="rights"]').node().value);
   const resources = JSON.parse(
     d3.select('data[name="req_resources"]').node().value,
@@ -204,10 +206,4 @@ async function DOMLoad() {
   const mobilization = await renderPromiseModal({ headline, opts }, close);
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

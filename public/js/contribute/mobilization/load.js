@@ -13,7 +13,7 @@ import {
 } from '/js/contribute/mobilization/main.js';
 import { fixLabel } from '/js/main.js';
 
-function DOMLoad() {
+function onLoad() {
   // CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
   const url = new URL(window.location);
   const queryparams = new URLSearchParams(url.search);
@@ -119,10 +119,4 @@ function DOMLoad() {
     });
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

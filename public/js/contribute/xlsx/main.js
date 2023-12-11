@@ -1,9 +1,10 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
-export function dropHandler(evt, node) {
+export async function dropHandler(evt, node) {
+  const vocabulary = await getTranslations();
   evt.preventDefault();
   const sel = d3.select(node);
   const label = sel.select('.drop-zone button label');
@@ -1714,6 +1715,7 @@ export async function compileTemplate() {
 }
 
 async function previewPad(idx) {
+  const language = await getCurrentLanguage();
   const cols = d3.select('table.xls-preview').datum();
   const data = await compilePads(idx);
   const datum = data[0];

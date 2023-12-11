@@ -382,12 +382,12 @@ async function addInputNode(_sel, _data) {
                 else return b.label;
               });
               tag.addElems('label', 'close').on('click', (_) => {
-                rmtag(b.value);
+                await rmtag(b.value);
                 if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
               });
             }
             sel.findAncestor('li').classed('active', this.checked);
-            if (!this.checked) rmtag(b.value);
+            if (!this.checked) await rmtag(b.value);
 
             // IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
             if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
@@ -424,7 +424,7 @@ async function addInputNode(_sel, _data) {
     // 	.attr('value', d => d.value)
     // 	.html(d => d.label)
 
-    function rmtag(id) {
+    async function rmtag(id) {
       const input = dropdown.selectAll('input').filter((d) => d.value === id);
       const taggroup = _sel.select('.active-filters');
       const tag = taggroup.selectAll('.tag').filter((d) => d.id === id);

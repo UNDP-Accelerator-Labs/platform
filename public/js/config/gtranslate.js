@@ -1,6 +1,10 @@
-import { language } from '/js/config/main.js';
+import {
+  getCurrentLanguage,
+  getRegisteredLanguages,
+} from '/js/config/main.js';
 
-export async function initGTranslate () {
+export async function initGTranslate() {
+  const language = await getCurrentLanguage();
   const currentpage_url = new URL(window.location);
   const fullHost = `${currentpage_url.origin}`;
   const mainHost = fullHost.endsWith('azurewebsites.net')
@@ -42,6 +46,7 @@ export async function initGTranslate () {
   // IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
   // THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
   async function updateDomTree(lang) {
+    const languages = await getRegisteredLanguages();
     if (!lang) {
       lang = 'en';
     }

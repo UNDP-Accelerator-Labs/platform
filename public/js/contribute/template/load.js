@@ -3,14 +3,14 @@ import { partialSave } from '/js/contribute/template/save.js';
 import { initToolbarInteractions } from '/js/contribute/template/toolbar.interactions.js';
 import { getMediaSize } from '/js/main.js';
 
-async function DOMLoad() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+async function onLoad() {
+  const mediaSize = getMediaSize();
   const { metafields } = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
   );
 
   await renderTemplate();
-  initToolbarInteractions(metafields);
+  await initToolbarInteractions(metafields);
 
   const main = d3.select('main');
   const head = main.select('.head');
@@ -48,10 +48,4 @@ async function DOMLoad() {
   );
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

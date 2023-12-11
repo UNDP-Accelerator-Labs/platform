@@ -8,7 +8,7 @@ import {
   toggleOptions,
 } from '/js/main.js';
 
-async function DOMLoad() {
+async function onLoad() {
   d3.selectAll('[data-vocab]').html(function () {
     const vocab =
       this.dataset.vocab ||
@@ -194,10 +194,4 @@ async function DOMLoad() {
   });
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

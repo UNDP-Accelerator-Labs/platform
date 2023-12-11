@@ -1,14 +1,15 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { getContent, getMediaSize, limitLength } from '/js/main.js';
 
 // THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
-export function switchButtons(lang = 'en') {
+export async function switchButtons(lang = 'en') {
+  const vocabulary = await getTranslations();
   const editing =
     JSON.parse(d3.select('data[name="page"]').node()?.value).activity ===
     'edit'; // TO DO: FIX HERE
 
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   window.sessionStorage.setItem('changed-content', true);
   // PROVIDE FEEDBACK: UNSAVED CHANGES
   if (mediaSize === 'xs') {
@@ -85,7 +86,8 @@ function retrieveItems(sel, datum, items) {
     items.push(datum);
   }
 }
-function getStatus() {
+async function getStatus() {
+  const vocabulary = await getTranslations();
   const mainobject = d3.select('data[name="object"]').node()?.value;
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
@@ -177,7 +179,8 @@ function getStatus() {
   // else return !completion.unique().includes(false)
   // else return completion.every(d => d === true)
 }
-function compileContent(attr) {
+async function compileContent(attr) {
+  const vocabulary = await getTranslations();
   const mainobject = d3.select('data[name="object"]').node()?.value;
   const { media_value_keys, metafields } = JSON.parse(
     d3.select('data[name="site"]').node()?.value,
@@ -418,7 +421,7 @@ function compileContent(attr) {
   // if (!attr || ['title', 'lead', 'txt', 'embed', 'checklist', 'radiolist', 'tags', 'group'].includes(attr))
 
   // ALWAYS SEND status
-  const completion = getStatus();
+  const completion = await getStatus();
   content.completion = completion;
   // ALWAYS SEND deletion IF THERE IS SOMETHING TO DELET
   if (deletion.length) content.deletion = deletion;
@@ -430,7 +433,7 @@ export async function partialSave(attr) {
 
   console.log('saving');
   // FIRST CHECK IF THIS IS A NEW PAD
-  const content = compileContent(attr);
+  const content = await compileContent(attr);
   // CHECK IF THE PAD ALREADY HAS AN id IN THE DB
   const url = new URL(window.location);
   const queryparams = new URLSearchParams(url.search);
@@ -443,10 +446,11 @@ export async function partialSave(attr) {
 
   return await POST(`/save/${object}`, content)
     .then(async (res) => {
+      const vocabulary = await getTranslations();
       // ADD THE NOTIFICATION
       window.sessionStorage.removeItem('changed-content');
 
-      if (!mediaSize) var mediaSize = getMediaSize();
+      const mediaSize = getMediaSize();
       if (['xs', 'sm'].includes(mediaSize)) {
         const save_btn = d3
           .select('.meta-status .btn-group .save')
@@ -508,7 +512,7 @@ export async function partialSave(attr) {
 export async function updateStatus(_status) {
   if (!_status) {
     const curr_status = await getContent({ feature: 'status' });
-    const completion = getStatus();
+    const completion = await getStatus();
     if (completion) _status = Math.max(1, curr_status);
     else _status = 0;
   }

@@ -9,7 +9,7 @@ import { partialSave } from '/js/contribute/contributor/save.js';
 import { initUpdatePassword } from '/js/contribute/contributor/update.password.js';
 import { checkPassword } from '/js/main.js';
 
-async function DOMLoad() {
+async function onLoad() {
   await initDropdowns();
 
   const uuid = d3.select('data[name="id"]').node()?.value || undefined;
@@ -81,10 +81,4 @@ async function DOMLoad() {
   }
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

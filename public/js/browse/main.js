@@ -158,8 +158,8 @@ export async function toggletag(node, d) {
           else return d.name.capitalize();
         } else return vocabulary['unknown'];
       });
-    tag.addElems('label', 'close').on('click', function () {
-      rmtag(this, d);
+    tag.addElems('label', 'close').on('click', async function () {
+      await rmtag(this, d);
     });
   } else {
     taggroup.selectAll(`.tag[data-id="${d.id}"]`).remove();

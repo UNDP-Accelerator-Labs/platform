@@ -3,7 +3,7 @@ import { getCurrentLanguage } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { getContent, multiSelection } from '/js/main.js';
 
-async function DOMLoad() {
+async function onLoad() {
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
   const page = JSON.parse(d3.select('data[name="page"]').node().value);
@@ -70,7 +70,7 @@ async function DOMLoad() {
 
       async function loadPopup(popup, pads, page = 1) {
         const language = await getCurrentLanguage();
-        const vocabulary = await getTranslations();
+        const vocabulary = await getTranslations(language);
         const { data, count } = await POST(
           `/${language}/browse/pads/${space}`,
           {
@@ -146,7 +146,7 @@ async function DOMLoad() {
                 render.followup(entry.body);
               }
               render.tags(entry.body);
-              // if (mediaSize !== 'xs') render.stats(entry.foot)
+              // if (getMediaSize() !== 'xs') render.stats(entry.foot)
               render.engagement(entry.foot);
               render.pin(entry.foot);
               render.delete(entry.outer);
@@ -288,4 +288,4 @@ async function DOMLoad() {
   }
 }
 
-window.addEventListener('load', DOMLoad);
+window.addEventListener('load', onLoad);

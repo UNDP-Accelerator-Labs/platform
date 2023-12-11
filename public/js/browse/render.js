@@ -1,6 +1,5 @@
-import { language, vocabulary } from '/js/config/main.js';
 import { setDownloadOptions } from '/js/browse/download.js';
-import { exploration } from '/js/browse/exploration.js';
+import { getExploration } from '/js/browse/exploration.js';
 import {
   confirmRemoval,
   deleteArticles,
@@ -14,7 +13,7 @@ import { renderFormModal, renderImgZoom } from '/js/modals.js';
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
 
 export const Entry = function (_kwargs) {
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
 
   let {
     parent,
@@ -792,10 +791,10 @@ export const Entry = function (_kwargs) {
         // 		else return `/${language}/view/${object.slice(0, -1)}?${queryparams.toString()}`
         // 	}
         // })
-        .on('click', function (d) {
+        .on('click', async function (d) {
           // THIS ENLARGES THE IMAGE INSTED OF OPENING THE PAD
           const img = d3.select(this).select('img').node().src;
-          renderImgZoom({ src: img.replace('/sm/', '/') });
+          await renderImgZoom({ src: img.replace('/sm/', '/') });
         })
         .addElems('img', 'vignette')
         .attrs({ loading: 'lazy', alt: (_) => vocabulary['missing image'] })
@@ -1103,10 +1102,10 @@ export const Entry = function (_kwargs) {
       } = _sel.datum();
 
       if (source) {
-        var treeinfo = _sel.addElems('div', 'meta meta-tree');
+        window.treeinfo = _sel.addElems('div', 'meta meta-tree');
 
         if (version_depth > 1) {
-          const versiontree = treeinfo
+          const versiontree = window.treeinfo
             .addElems('div', 'meta meta-versiontree')
             .addElems('a')
             .attr(
@@ -1120,7 +1119,7 @@ export const Entry = function (_kwargs) {
         }
       }
       if (source && is_followup) {
-        const followup = treeinfo
+        const followup = window.treeinfo
           .addElems('div', 'meta meta-followup')
           .attr('title', (d) => d.source_title);
         followup
@@ -1143,7 +1142,7 @@ export const Entry = function (_kwargs) {
           .html((d) => d.source_title);
       }
       if (source && is_forward) {
-        const forward = treeinfo
+        const forward = window.treeinfo
           .addElems('div', 'meta meta-forward')
           .attr('title', (d) => d.source_title);
         forward.addElems('i').html(`${vocabulary['forwarded from']}:&nbsp;`);
@@ -1164,7 +1163,7 @@ export const Entry = function (_kwargs) {
           .html((d) => d.source_title);
       }
       if (source && is_copy) {
-        const copy = treeinfo
+        const copy = window.treeinfo
           .addElems('div', 'meta meta-copy', (d) =>
             d.source && d.is_copy ? [d] : [],
           )
@@ -1187,7 +1186,7 @@ export const Entry = function (_kwargs) {
           .html((d) => d.source_title);
       }
       if (source && is_child) {
-        const child = treeinfo
+        const child = window.treeinfo
           .addElems('div', 'meta meta-child', (d) =>
             d.source && d.is_child ? [d] : [],
           )
@@ -1910,13 +1909,13 @@ export const Entry = function (_kwargs) {
 
       _sel.addElems('div', 'meta meta-country').html((d) => d.countryname);
     },
-    exploration: (_sel) => {
-      exploration.addDocButtons(_sel, true);
+    exploration: async (_sel) => {
+      (await getExploration()).addDocButtons(_sel, true);
     },
   };
 };
 export function renderVignette(_section, _kwargs) {
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   const { data, object, space, page } = _kwargs;
 
   const entry = new Entry({
@@ -1990,7 +1989,7 @@ export function renderVignette(_section, _kwargs) {
   }
 }
 export async function renderSections() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   const { sections: data } = await getContent();
 
   const object = d3.select('data[name="object"]').node().value;

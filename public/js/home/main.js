@@ -1,8 +1,9 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main';
 import { renderPromiseModal } from '/js/modals.js';
 
 // THIS IS NOT USED FOR NOW
 async function selectCountry() {
+  const vocabulary = await getTranslations();
   // GET COUNTRIES
   // const target_opts = <%- JSON.stringify(locals.countries) %>.map(d => {
   // return { label: d.name, value: d.iso3, type: 'radio' }

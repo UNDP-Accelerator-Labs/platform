@@ -5,8 +5,8 @@ import { partialSave, saveAndSubmit } from '/js/contribute/pad/save.js';
 import { initToolbarInteractions } from '/js/contribute/pad/toolbar.interactions.js';
 import { getMediaSize } from '/js/main.js';
 
-async function DOMLoad() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+async function onLoad() {
+  const mediaSize = getMediaSize();
 
   await initGTranslate();
 
@@ -18,11 +18,9 @@ async function DOMLoad() {
   );
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
-  // if (typeof initExploration !== undefined) { initExploration(); }
-
   const main = d3.select(`#${mainobject}`);
   await renderPad({ object: mainobject, type, id, main });
-  initToolbarInteractions({ metafields, type, main });
+  await initToolbarInteractions({ metafields, type, main });
 
   const head = main.select('.head');
 
@@ -155,10 +153,4 @@ async function DOMLoad() {
     });
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', onLoad);

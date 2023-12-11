@@ -16,7 +16,7 @@ import { initGTranslate } from '/js/config/gtranslate.js';
 import { GET, POST } from '/js/fetch.js';
 import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
-async function DOMLoad() {
+async function onLoad() {
   await initGTranslate();
 
   const object = d3.select('data[name="object"]').node().value;
@@ -131,16 +131,16 @@ async function DOMLoad() {
   }
   filter_module
     .selectAll('.filters .filter .dropdown input[type=checkbox]')
-    .on('change', function () {
+    .on('change', async function () {
       const { id, name } = this.dataset;
       addequivalents(this);
-      toggletag(this, { id, name });
+      await toggletag(this, { id, name });
     });
   filter_module
     .selectAll('.filters .active-filters .tag .close')
-    .on('click', function () {
+    .on('click', async function () {
       const { id, name } = this.dataset;
-      rmtag(this, { id, name });
+      await rmtag(this, { id, name });
     });
   filter_module.selectAll('.status input.toggle').on('change', function () {
     this.form.requestSubmit[this.form.querySelector('button#search')] ||
@@ -459,4 +459,4 @@ async function DOMLoad() {
   }
 }
 
-window.addEventListener('load', DOMLoad);
+window.addEventListener('load', onLoad);

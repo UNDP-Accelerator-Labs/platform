@@ -64,7 +64,7 @@ export function parseXLSX(file, node) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: 'array', bookFiles: true });
 
-    let images = [];
+    const images = [];
     if (workbook.keys) {
       const media = workbook.keys.filter((k) => k.includes('media/image'));
 

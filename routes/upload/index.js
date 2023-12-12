@@ -4,7 +4,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 const fs = require('fs')
 const { join } = require('path')
 
-const { createContainer } = require('./container_functions.js')
+// const { createContainer } = require('./container_functions.js')
 
 const img = require('./img/')
 const video = require('./video/')
@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
 			return { status: 403, ftype: file.mimetype, message: 'wrong file format' }
 		}
 	});
-	
+
 	Promise.all(promises)
 	.then(results => res.json(results))
 	.catch(err => {

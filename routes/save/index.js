@@ -8,6 +8,7 @@ const review = require('./review/')
 const file = require('./file/')
 const resource = require('./resource/')
 const mobilization = require('./mobilization/')
+const img = require('./img/')
 
 module.exports = (req, res) => {
 	const { object } = req.params || {}
@@ -23,5 +24,6 @@ module.exports = (req, res) => {
 	else if (object === 'file') file(req, res)
 	else if (object === 'resource') resource(req, res)
 	else if (object === 'mobilization') mobilization(req, res)
+	else if (object === 'img') img(req, res)
 	else res.redirect('/module-error')
 }

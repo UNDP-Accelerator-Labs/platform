@@ -883,7 +883,7 @@ export const Entry = function (_kwargs) {
               obj.count = c.count;
               let space = 'curated';
               if (c.status >= 2) space = 'published';
-              obj.href = `/${language}/browse/pads/${space}?${object}=${d.id}`;
+              obj.href = `/${language}/browse/pads/${space}?${object}=${d.id}&status=${c.status}`;
               data.push(obj);
             });
           }
@@ -1116,7 +1116,7 @@ export const Entry = function (_kwargs) {
             .addElems('a')
             .attr(
               'href',
-              (d) => `/${language}/browse/pads/versiontree?nodes=${d.id}`,
+              (d) => `/${language}/browse/${object}/versiontree?nodes=${d.id}`,
             );
           versiontree
             .addElems('img')

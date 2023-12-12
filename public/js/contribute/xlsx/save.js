@@ -59,38 +59,38 @@ export async function catchSubmit(evt) {
   const pads = await compilePads();
   const template = await compileTemplate();
 
+  // TO DO: ADD LOADER FEEDBACK
+
   // 2) SAVE IMAGES
-  const fd = new FormData();
-  const promises = [];
+  const sources = [];
   const imgs = pads
     .map((d) => d.imgs)
     .flat()
     .unique()
-    .filter((d) => !d?.isURL()) // WE DO NOT DOWNLOAD IMAGES THAT ARE LINKED
     .filter((d) => d);
 
-  if (imgs.length) {
-    imgs.forEach((d) => {
-      promises.push(
-        new Promise(async (resolve) => {
-          const blob = await fetch(d).then((res) => res.blob());
-          // const ts = new Date().getTime();
-          const originalname = d;
-          resolve({ blob: blob, originalname: originalname });
-        }),
-      );
-    });
-    const blobs = await Promise.all(promises);
-    blobs.forEach((b) => {
-      console.log(b);
-      fd.append('img', b.blob, b.originalname);
-    });
-    return false;
+  for (let i = 0; i < imgs.length; i++) {
+    const app_storage = d3.select('data[name="app_storage"]').node()?.value;
+    const img = imgs[i];
+    if (img?.isURL()) {
+      const { src } = await POST('/request/img/', { data: img, from: 'url' });
 
-    // THIS IS SIMILAR TO THE uploadImg FUNCTION IN pad.js
-    // WE NEED TO USE THE fetch API, AND NOT THE POST HELPER FUNCTION FOR SOME REASON
-    const files = await fetch('/upload/img', { method: 'POST', body: fd })
-      .then((response) => response.json())
+      if (app_storage) {
+        sources.push(src);
+      } else {
+        sources.push(`/public/${src}`.replace(/\/+/g, '/'));
+      }
+    } else {
+      if (app_storage) {
+        sources.push(img);
+      } else {
+        sources.push(`/public/${img}`.replace(/\/+/g, '/'));
+      }
+    }
+  }
+
+  if (sources.length) {
+    const files = await POST('/save/img', { sources })
       .then((results) => {
         const notification = d3
           .select('body')
@@ -104,12 +104,14 @@ export async function catchSubmit(evt) {
         if (err) throw err;
       });
 
+    // ADD THE FILENAMES TO THE PAD SECTIONS
     if (files?.length) {
       pads.forEach((d) => {
         d.sections.forEach((c) => {
           c.items.forEach((b) => {
-            if (b.type === 'img')
+            if (b.type === 'img') {
               b.src = files.find((a) => b?.src?.includes(a.originalname))?.src;
+            }
             if (b.type === 'mosaic') {
               b.srcs = b.srcs.map((a) => {
                 return files.find((z) => a.includes(z.originalname))?.src;
@@ -122,8 +124,6 @@ export async function catchSubmit(evt) {
   } else console.log('no images to upload');
 
   // 3) SAVE PADS
-  // pads.forEach(d => d.sections = JSON.stringify(d.sections))
-  // const results = await POST('/storeImport', { pads, template, mobilization })
   addGlobalLoader();
   // const results =
   await POST('/save/xlsx', { pads, template, mobilization });

@@ -67,12 +67,22 @@ export async function catchSubmit(evt) {
     .filter((d) => d);
 
   for (let i = 0; i < imgs.length; i++) {
+    const app_storage = d3.select('data[name="app_storage"]').node()?.value
     const img = imgs[i]
     if (img?.isURL()) {
       const { src } = await POST('/request/img/', { data: img, from: 'url' })
-      sources.push(`/public/${src}`.replace(/\/+/g, '/'))
+      
+      if (app_storage) {
+        sources.push(src)
+      } else {
+        sources.push(`/public/${src}`.replace(/\/+/g, '/'))
+      }
     } else {
-      sources.push(`/public/${img}`.replace(/\/+/g, '/'))
+      if (app_storage) {
+        sources.push(img)
+      } else {
+        sources.push(`/public/${img}`.replace(/\/+/g, '/'))
+      }
     }
   }
 

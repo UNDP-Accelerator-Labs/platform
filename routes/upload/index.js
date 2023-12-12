@@ -4,7 +4,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 const fs = require('fs')
 const { join } = require('path')
 
-const createContainer = require('./container.js')
+const { createContainer } = require('./container_functions.js')
 
 const img = require('./img/')
 const video = require('./video/')

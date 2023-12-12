@@ -891,7 +891,12 @@ function renderTable(cols, update = false) {
             : d.cell.join(', ');
         } else if (Object.keys(d.cell).includes('src')) {
           // LIKELY AN IMAGE
-          return `<img src='${d.cell.src}'>`;
+          let cellsrc = d.cell.src
+          if (d3.select('data[name="app_storage"]').node()) {
+            const app_storage = d3.select('data[name="app_storage"]').node().value;
+            cellsrc = new URL(`${app_storage}/${cellsrc}`).href;
+          }
+          return `<img src='${cellsrc}'>`;
         }
       } else return d.cell;
     });

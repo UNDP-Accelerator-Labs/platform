@@ -99,8 +99,8 @@ export async function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addImg({
+    .on('click', async function () {
+      await addImg({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -115,8 +115,8 @@ export async function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addDrawing({
+    .on('click', async function () {
+      await addDrawing({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -131,8 +131,8 @@ export async function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addTxt({
+    .on('click', async function () {
+      await addTxt({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -147,8 +147,8 @@ export async function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addEmbed({
+    .on('click', async function () {
+      await addEmbed({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -163,8 +163,8 @@ export async function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addChecklist({
+    .on('click', async function () {
+      await addChecklist({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -179,8 +179,8 @@ export async function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addRadiolist({
+    .on('click', async function () {
+      await addRadiolist({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -207,7 +207,7 @@ export async function initToolbarInteractions(metafields) {
             .nodes()
             ?.last()?.nextSibling || null;
       })
-      .on('click', function () {
+      .on('click', async function () {
         const data = {
           level: 'meta',
           name: d.label,
@@ -216,35 +216,35 @@ export async function initToolbarInteractions(metafields) {
           options: d.options || null,
         };
         if (d.type === 'txt')
-          addTxt({
+          await addTxt({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'embed')
-          addEmbed({
+          await addEmbed({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'drawing')
-          addDrawing({
+          await addDrawing({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'checklist')
-          addChecklist({
+          await addChecklist({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'radiolist')
-          addRadiolist({
+          await addRadiolist({
             data,
             lang: language,
             sibling: this['__active_node__'],
@@ -252,28 +252,28 @@ export async function initToolbarInteractions(metafields) {
           });
         // THE FOLLOWING ARE ALWAYS META
         if (d.type === 'tag')
-          addTags({
+          await addTags({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         else if (d.type === 'index')
-          addIndexes({
+          await addIndexes({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         else if (d.type === 'location')
-          addLocations({
+          await addLocations({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         else if (d.type === 'attachment')
-          addAttachment({
+          await addAttachment({
             data,
             lang: language,
             sibling: this['__active_node__'],

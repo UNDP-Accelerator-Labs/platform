@@ -1,4 +1,5 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
+import { addSection } from '/js/contribute/template/render.js';
 import { POST } from '/js/fetch.js';
 import { XLSX, d3 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
@@ -82,7 +83,7 @@ export function parseXLSX(file, node) {
         return { id: name?.extractDigits(), type: 'img', src: imageUrl };
       });
     }
-    workbook.SheetNames.forEach((s, i) => {
+    workbook.SheetNames.forEach(async (s, i) => {
       const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
         defval: null,
       });
@@ -108,7 +109,7 @@ export function parseXLSX(file, node) {
       if (i === 0) {
         // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
         const cols = parseColumns(json, keys);
-        renderTable(cols);
+        await renderTable(cols);
       }
     });
     // HIDE THE LOADING BUTTON
@@ -328,7 +329,7 @@ function parseGroups(json, keys) {
   Promise.all(cols).then(async (data) => await renderTable(data));
 }
 async function renderTable(cols, update = false) {
-  const vocabulary = getTranslations();
+  const vocabulary = await getTranslations();
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -528,7 +529,7 @@ async function renderTable(cols, update = false) {
         message: message,
         opts: opts,
       });
-      splitValues(d.key, separator);
+      await splitValues(d.key, separator);
     });
 
   const columntypes = moduleHead
@@ -934,7 +935,7 @@ function seekPrefix(arr) {
   while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
   return a1.substring(0, i);
 }
-function splitValues(col, separator) {
+async function splitValues(col, separator) {
   if (!separator) return null;
   const cols = d3.select('table.xls-preview').datum();
   cols.forEach((d) => {
@@ -974,7 +975,7 @@ function splitValues(col, separator) {
       d.type = 'checklist';
     }
   });
-  renderTable(cols);
+  await renderTable(cols);
 }
 export function groupColumns() {
   const cols = d3.select('table.xls-preview').datum();
@@ -989,14 +990,14 @@ export function groupColumns() {
     parseGroups(cols, keys);
   }
 }
-export function dropColumns() {
+export async function dropColumns() {
   const cols = d3.select('table.xls-preview').datum();
   const dropkeys = d3
     .select('table.xls-preview thead')
     .selectAll('.selected')
     .data()
     .map((d) => d.key);
-  renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
+  await renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
 }
 function compileLocations(idx) {
   return new Promise(async (resolve) => {
@@ -1018,7 +1019,7 @@ function compileLocations(idx) {
   });
 }
 export async function compilePads(idx, structureOnly = false) {
-  const language = getCurrentLanguage();
+  const language = await getCurrentLanguage();
   const { metafields, media_value_keys } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -1734,9 +1735,9 @@ async function previewPad(idx) {
     .on('click', (_) => window.history.back())
     .html('Close');
 
-  window.onpopstate = (_) => closeModal();
+  window.onpopstate = async (_) => await closeModal();
 
-  function closeModal() {
+  async function closeModal() {
     // REORDER THE TABLE WHEN CLOSING PREVIEW
     let neworder = [];
 
@@ -1752,7 +1753,7 @@ async function previewPad(idx) {
 
     neworder = neworder.map((d) => cols.find((c) => c.key === d));
 
-    renderTable(neworder, true);
+    await renderTable(neworder, true);
 
     modal.remove();
     screen.classed('hide', true);
@@ -1771,7 +1772,7 @@ async function previewPad(idx) {
     if (datum.title) head.addElems('div', 'title').html(datum.title);
     if (datum.sections) {
       datum.sections.forEach((d) => {
-        addSection({ data: d, lang: language }); // TO DO: what function is this supposed to be?
+        addSection({ data: d, lang: language });
       });
     }
 

@@ -1,35 +1,37 @@
-import { getRegisteredLanguages } from '/js/config/main.js';
+import { getRegisteredLanguages, getTranslations } from '/js/config/main.js';
 import { d3 } from '/js/globals.js';
-import { getMediaSize } from '/js/main';
 import {
   ensureIcon,
   expandstats,
   fixLabel,
+  getMediaSize,
   printTranslation,
   scrollToPad,
   toggleOptions,
 } from '/js/main.js';
 
 async function onLoad() {
-  d3.selectAll('[data-vocab]').html(async function () {
+  const vocabulary = await getTranslations();
+  d3.selectAll('[data-vocab]').html(function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = await printTranslation(this, vocab);
+    let translation = printTranslation(this, vocab, vocabulary);
     if (!translation)
-      translation = await printTranslation(this, this.dataset.altvocab);
+      translation = printTranslation(this, this.dataset.altvocab, vocabulary);
     return translation;
   });
-  d3.selectAll('[data-vocabprefix]').each(async function () {
+  d3.selectAll('[data-vocabprefix]').each(function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let prefix = await printTranslation(this, vocab);
-    if (!prefix) prefix = await printTranslation(this, this.dataset.altvocab);
+    let prefix = printTranslation(this, vocab, vocabulary);
+    if (!prefix)
+      prefix = printTranslation(this, this.dataset.altvocab, vocabulary);
     if (this.value) {
       this.value = `[${prefix}] ${this.value}`;
     } else {
@@ -40,29 +42,26 @@ async function onLoad() {
       }
     }
   });
-  d3.selectAll('[data-placeholder]').attr(
-    'data-placeholder',
-    async function () {
-      const vocab =
-        this.dataset.vocab ||
-        this.dataset.vocabprefix ||
-        this.dataset.placeholder ||
-        this.dataset.content;
-      let translation = await printTranslation(this, vocab);
-      if (!translation)
-        translation = await printTranslation(this, this.dataset.altvocab);
-      return translation;
-    },
-  );
-  d3.selectAll('[data-content]').attr('data-content', async function () {
+  d3.selectAll('[data-placeholder]').attr('data-placeholder', function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = await printTranslation(this, vocab);
+    let translation = printTranslation(this, vocab, vocabulary);
     if (!translation)
-      translation = await printTranslation(this, this.dataset.altvocab);
+      translation = printTranslation(this, this.dataset.altvocab, vocabulary);
+    return translation;
+  });
+  d3.selectAll('[data-content]').attr('data-content', function () {
+    const vocab =
+      this.dataset.vocab ||
+      this.dataset.vocabprefix ||
+      this.dataset.placeholder ||
+      this.dataset.content;
+    let translation = printTranslation(this, vocab, vocabulary);
+    if (!translation)
+      translation = printTranslation(this, this.dataset.altvocab, vocabulary);
     return translation;
   });
 

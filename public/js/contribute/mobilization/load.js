@@ -78,8 +78,8 @@ function onLoad() {
     .selectAll(
       '.modal.m-2 .body input[type=radio], .modal.m-5 .body input[type=radio], .modal.m-6 .body input[type=checkbox]',
     )
-    .on('change.toggle', function () {
-      toggleChecked(this);
+    .on('change.toggle', async function () {
+      await toggleChecked(this);
       enableNext(this);
     });
   mobilization

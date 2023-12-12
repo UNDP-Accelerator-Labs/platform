@@ -158,16 +158,16 @@ export class Exploration {
     }
   }
 
-  async checkError(err, cb) {
+  async checkError(err, acb) {
     if (err) {
       if (err.status === 401) {
         // not logged in
-        cb && (await cb());
+        acb && (await acb());
         await this.updateCurrentExploration(null, '');
         return;
       } else if (err.status === 403) {
         // did not consent
-        cb && (await cb());
+        acb && (await acb());
         await this.updateCurrentExploration(null, '');
         this.consent = false;
         return;
@@ -176,10 +176,10 @@ export class Exploration {
     console.error(err);
   }
 
-  async updateExplorationList(cb = null) {
+  async updateExplorationList(acb = null) {
     const language = await getCurrentLanguage();
-    if (cb) {
-      this.listUpdateCbs.push(cb);
+    if (acb) {
+      this.listUpdateCbs.push(acb);
     }
     if (this.listUpdateActive) {
       return;
@@ -187,35 +187,35 @@ export class Exploration {
     this.listUpdateActive = true;
     GET(`/exploration/list?lang=${language}&browser=1`, true, true)
       .then(checkResponse)
-      .then((result) => {
+      .then(async (result) => {
         this.consent = true;
         this.listUpdateActive = false;
         const explorations = result['explorations'];
         this.past = explorations;
         const [curId, curPrompt] = this.getExplorationById(this.currentId);
-        this.updateCurrentExploration(curId, curPrompt);
-        const cbs = this.listUpdateCbs;
+        await this.updateCurrentExploration(curId, curPrompt);
+        const acbs = this.listUpdateCbs;
         this.listUpdateCbs = [];
-        cbs.forEach((curCb) => curCb());
+        Promise.all(acbs.map(async (curCb) => await curCb()));
       })
-      .catch((err) => {
+      .catch(async (err) => {
         this.listUpdateActive = false;
-        this.checkError(err, () => {
+        await this.checkError(err, async () => {
           this.past = [];
-          const cbs = this.listUpdateCbs;
+          const acbs = this.listUpdateCbs;
           this.listUpdateCbs = [];
-          cbs.forEach((curCb) => curCb());
+          Promise.all(acbs.map(async (curCb) => await curCb()));
         });
       });
   }
 
-  async updateExplorationDatalist(cb = null) {
+  async updateExplorationDatalist(acb = null) {
     const vocabulary = await getTranslations();
     const datalist = this.datalist;
     if (!datalist) {
       return;
     }
-    await this.updateExplorationList(() => {
+    await this.updateExplorationList(async () => {
       datalist
         .addElems('option', 'exploration-past-elem', this.past)
         .classed('notranslate', true)
@@ -224,7 +224,7 @@ export class Exploration {
           label: (d) =>
             `${vocabulary['exploration']['last_access']} ${d['last_access_ago']}`,
         });
-      cb && cb();
+      acb && (await acb());
     });
   }
 
@@ -398,7 +398,7 @@ export class Exploration {
     this.datalist = datalist;
   }
 
-  async addExplorationMain(sel, cb) {
+  async addExplorationMain(sel, acb) {
     const language = await getCurrentLanguage();
     const vocabulary = await getTranslations(language);
     const mainInput = sel
@@ -453,7 +453,7 @@ export class Exploration {
       .text('ⓘ');
     this.infoButton = infoButton;
 
-    await this.updateExplorationDatalist(cb);
+    await this.updateExplorationDatalist(acb);
   }
 
   hasExploration() {
@@ -559,8 +559,8 @@ export class Exploration {
       .then(async (result) => {
         await this.updateExplorationDocs();
       })
-      .catch((err) => {
-        this.checkError(err);
+      .catch(async (err) => {
+        await this.checkError(err);
       });
   }
 
@@ -600,10 +600,10 @@ export class Exploration {
       curSel
         .addElem('select')
         .classed('exploration-short', true)
-        .on('change', function () {
+        .on('change', async function () {
           const curId = d3.select(this)?.node()?.value;
           if (curId !== null) {
-            that.updateById(+curId);
+            await that.updateById(+curId);
           }
         });
     }

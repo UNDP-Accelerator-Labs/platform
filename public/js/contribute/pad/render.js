@@ -440,11 +440,11 @@ Meta.prototype.expand = function (kwargs) {
     }, timeout);
   }
 };
-const Taglist = async function (kwargs) {
-  const vocabulary = await getTranslations();
+const Taglist = function (kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
-  const { type, list, imglink, altimglink, datum, lang } = kwargs || {};
+  const { type, list, imglink, altimglink, datum, lang, vocabulary } =
+    kwargs || {};
   const { tags, constraint } = datum || {};
   // Taglist IS AN INSTANCE OF Meta
   Meta.call(this, kwargs);
@@ -837,7 +837,8 @@ async function populateSection(data, lang = 'en', section, objectdata) {
   if (data.type === 'img') await addImg({ data, lang, section, objectdata });
   if (data.type === 'mosaic') addMosaic({ data, lang, section, objectdata });
   if (data.type === 'video') addVideo({ data, lang, section, objectdata });
-  if (data.type === 'drawing') addDrawing({ data, lang, section, objectdata });
+  if (data.type === 'drawing')
+    await addDrawing({ data, lang, section, objectdata });
   if (data.type === 'txt') await addTxt({ data, lang, section, objectdata });
   if (data.type === 'embed')
     await addEmbed({ data, lang, section, objectdata });
@@ -952,7 +953,7 @@ async function deleteImg(kwargs) {
     }
   }
 }
-function addImgs(kwargs) {
+async function addImgs(kwargs) {
   const { data, lang, sibling, container, focus, objectdata } = kwargs;
   const fls = data.filter((d) => d.status === 200);
   // THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
@@ -1915,7 +1916,7 @@ function addVideo(kwargs) {
     }
   }
 }
-export function addDrawing(kwargs) {
+export async function addDrawing(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
@@ -3393,7 +3394,7 @@ export async function addLocations(kwargs) {
           d3.select(this).classed('selected', true);
 
           // ADD THE LOCATION TO THE MAP
-          addLocation(d.geometry);
+          await addLocation(d.geometry);
 
           sel.node().value = d.formatted;
           // meta.container.each(c => c.centerpoint = { lat: d.geometry.lat, lng: d.geometry.lng })
@@ -3554,6 +3555,7 @@ export async function addIndexes(kwargs) {
     list: options,
     imglink: (d) => `/imgs/sdgs/${lang}/G${d.key || d}-c.svg`, // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
     altimglink: (d) => `/imgs/sdgs/${lang}/G${d.key || d}.svg`, // THE || d IS LEGACY FOR THE ACTION PLANNING PLATFORM
+    vocabulary,
   });
 
   if (list.opts) {
@@ -3617,6 +3619,7 @@ export async function addTags(kwargs) {
     lang,
     objectdata,
     list: options,
+    vocabulary,
   });
 
   if (list.opts) {
@@ -3930,12 +3933,12 @@ function addGroup(kwargs) {
       .addElems('div', 'opt', [
         { label: 'close', value: 'delete', fn: (sel) => rmGroup(sel) },
       ])
-      .on('click', function (d) {
+      .on('click', async function (d) {
         d3.event.stopPropagation();
         d.fn(d3.select(this).findAncestor('media-group-items'));
 
         if (editing) {
-          if (page.type === 'private') switchButtons(lang);
+          if (page.type === 'private') await switchButtons(lang);
           else window.sessionStorage.setItem('changed-content', true);
         }
       })

@@ -1920,8 +1920,8 @@ export const Entry = function (_kwargs) {
   };
 };
 export async function renderVignette(_section, _kwargs) {
-  const language = getCurrentLanguage();
-  const vocabulary = getTranslations(language);
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   const mediaSize = getMediaSize();
   const { data, object, space, page } = _kwargs;
 

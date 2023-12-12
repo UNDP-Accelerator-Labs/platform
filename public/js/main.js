@@ -354,8 +354,7 @@ export function uploadFile(form) {
     });
 }
 
-export async function printTranslation(node, vocab) {
-  const vocabulary = await getTranslations();
+export function printTranslation(node, vocab, vocabulary) {
   // FIRST, CHECK IF THE vocab IS A JSON OBJECT (ARRAY)
   const regex = /\[(["'][\w\d\s-]+["'](,\s*["'][\w\d\s-]+["'])*)\]/;
   if (regex.test(vocab)) {

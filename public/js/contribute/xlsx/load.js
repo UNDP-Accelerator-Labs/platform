@@ -7,11 +7,11 @@ import {
 import { catchSubmit } from '/js/contribute/xlsx/save.js';
 import { d3 } from '/js/globals.js';
 
-function DOMLoad() {
+function doLoad() {
   d3.select('div#import-file')
-    .on('drop', function () {
+    .on('drop', async function () {
       const evt = d3.event;
-      dropHandler(evt, this);
+      await dropHandler(evt, this);
     })
     .on('dragover', function () {
       const evt = d3.event;
@@ -30,8 +30,9 @@ function DOMLoad() {
   d3.select('.sidebar button.column-action.group').on('click', (_) =>
     groupColumns(),
   );
-  d3.select('.sidebar button.column-action.delete').on('click', (_) =>
-    dropColumns(),
+  d3.select('.sidebar button.column-action.delete').on(
+    'click',
+    async (_) => await dropColumns(),
   );
 
   const searchForm = d3.select('body form#contribute');
@@ -40,10 +41,4 @@ function DOMLoad() {
   else searchForm.node().addEventListener('submit', catchSubmit);
 }
 
-if (document.readyState !== 'complete') {
-  window.addEventListener('load', DOMLoad);
-} else {
-  DOMLoad()
-    .then(() => {})
-    .catch((err) => console.error(err));
-}
+window.addEventListener('load', doLoad);

@@ -1071,7 +1071,12 @@ export async function addSection(kwargs) {
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, sibling, repeated, focus, objectdata } = kwargs || {};
-  const { object, type: objecttype, main } = objectdata || {};
+  let { object, type: objecttype, main } = objectdata || {};
+  if (!main) {
+    if (object) main = d3.select(`#${object}`);
+    else main = d3.select('#pad');
+  }
+
   let { id, title, lead, structure, items, repeat, group, instruction } =
     data || {};
   if (!title) title = '';
@@ -1465,9 +1470,11 @@ function addImg(kwargs) {
     };
     img.onerror = function (err) {
       if (err) console.log(err);
+      img.onerror = null;
+      img.src = `/${src}`.replace(/\/+/g, '/');
     };
 
-    if (src.isURL() || src.isBlob()) img.src = src;
+    if (src.isURL() || src.isBlob()) img.src = src; // THIS IS DEPRECATED BECAUSE OF CSP
     else {
       if (d3.select('data[name="app_storage"]').node()) {
         const app_storage = d3.select('data[name="app_storage"]').node().value;
@@ -1686,9 +1693,9 @@ function addMosaic(kwargs) {
         }
       };
       img.onerror = function (err) {
-        // if (img.src !== d) img.src = d
-        // else console.log(err)
         if (err) console.log(err);
+        img.onerror = null;
+        img.src = `/${d}`.replace(/\/+/g, '/');
       };
 
       if (d.isURL() || d.isBlob()) {
@@ -1712,7 +1719,7 @@ function addMosaic(kwargs) {
   // THERE IS NO IMAGE YET
   if (
     objecttype === 'templated' &&
-    (page.activity === 'edit' || (page.activity === 'preview' && !src))
+    (page.activity === 'edit' || (page.activity === 'preview' && !srcs?.length))
   ) {
     const form_id = media.id; // uuidv4()
 

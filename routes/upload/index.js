@@ -1,8 +1,10 @@
-const { app_storage, app_title_short } = include('config/')
+const { app_storage } = include('config/')
 
 const { BlobServiceClient } = require('@azure/storage-blob')
 const fs = require('fs')
 const { join } = require('path')
+
+const { createContainer } = require('./container_functions.js')
 
 const img = require('./img/')
 const video = require('./video/')
@@ -53,11 +55,4 @@ module.exports = async (req, res) => {
 		console.log(err)
 		res.json({ status: 500, message: 'Oops! Something went wrong.' });
 	});
-}
-
-async function createContainer (blobServiceClient) {
-	// CREATE CONTAINER
-	const containerClient = blobServiceClient.getContainerClient(app_title_short)
-	const createContainerResponse = await containerClient.createIfNotExists({ access: 'blob' })
-	return containerClient
 }

@@ -2,6 +2,7 @@ import { language, vocabulary } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
+import { addSection } from '/js/contribute/pad/render.js';
 
 export function dropHandler(evt, node) {
   evt.preventDefault();
@@ -65,20 +66,37 @@ export function parseXLSX(file, node) {
     if (workbook.keys) {
       const media = workbook.keys.filter((k) => k.includes('media/image'));
 
-      images = media.map((m, i) => {
-        const name = workbook.files[m].name; // .split('media/')[1]
-        const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
+      for (let i = 0; i < media.length; i++) {
+        const m = media[i]
+        const name = workbook.files[m].name;
+        const buffer = workbook.files[m].content.buffer;
 
-        console.log(buffer);
+        const bytes = new Uint8Array(buffer)
+        const data = btoa(bytes.reduce((d, b) => d + String.fromCharCode(b), ''))
+        const { src } = await POST('/request/img/', { data, name, from: 'buffer' })
 
-        // const img = await POST('/request/blob/', { src: buffer, type: 'buffer' })
-        // console.log(img)
+        images.push({ id: name?.extractDigits(), type: 'img', src });
+      }
+      // images = media.map(async(m, i) => {
+      //   const name = workbook.files[m].name; // .split('media/')[1]
+      //   const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
+        
+      //   // const blob = new Blob([buffer], { type: 'image/png' });
+      //   // const urlCreator = window.URL || window.webkitURL;
+      //   // const imageUrl = urlCreator.createObjectURL(blob);
 
-        const blob = new Blob([buffer], { type: 'image/png' });
-        const urlCreator = window.URL || window.webkitURL;
-        const imageUrl = urlCreator.createObjectURL(blob);
-        return { id: name?.extractDigits(), type: 'img', src: imageUrl };
-      });
+      //   // const str = btoa(String.fromCharCode.apply(null, buffer))
+      //   // console.log(`data:image/png;base64,${btoa}`)
+
+      //   const bytes = new Uint8Array(buffer)
+      //   const data = btoa(bytes.reduce((d, b) => d + String.fromCharCode(b), ''))
+
+      //   if (i === 0) {
+      //     const { src } = await POST('/request/blob/', { data, name, type: 'blob' })
+      //     console.log(src)
+      //     return { id: name?.extractDigits(), type: 'img', src };
+      //   }
+      // });
     }
     workbook.SheetNames.forEach((s, i) => {
       const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
@@ -873,7 +891,12 @@ function renderTable(cols, update = false) {
             : d.cell.join(', ');
         } else if (Object.keys(d.cell).includes('src')) {
           // LIKELY AN IMAGE
-          return `<img src='${d.cell.src}'>`;
+          let cellsrc = d.cell.src
+          if (d3.select('data[name="app_storage"]').node()) {
+            const app_storage = d3.select('data[name="app_storage"]').node().value;
+            cellsrc = new URL(`${app_storage}/${cellsrc}`).href;
+          }
+          return `<img src='${cellsrc}'>`;
         }
       } else return d.cell;
     });
@@ -1759,11 +1782,41 @@ async function previewPad(idx) {
     const head = inner.addElems('div', 'head');
     const body = inner.addElems('div', 'body');
 
-    if (datum.title) head.addElems('div', 'title').html(datum.title);
-    if (datum.sections) {
-      datum.sections.forEach((d) => {
-        addSection({ data: d, lang: language });
-      });
+    const { title, sections } = datum
+
+    if (title) head.addElems('div', 'title').html(title);
+    if (sections) {
+      const objectdata = { object: 'pad', type: 'templated', main };
+
+      for (let s = 0; s < sections.length; s++) {
+        const data = sections[s]
+
+        // CHECK FOR URL IMAGES AND LOAD THEM IF NECESSARY
+        data.items = await Promise.all(data.items.map(async (d) => {
+          if (d.type === 'img') {
+            if (d.src?.isURL()) {
+              const { src } = await POST('/request/img/', { data: d.src, from: 'url' })
+              d.src = src
+            }
+          }
+          if (d.type === 'mosaic') {
+            if (d.srcs?.length) {
+              const newsrcs = []
+              for (let i = 0; i < d.srcs?.length; i++) {
+                const img = d.srcs[i]
+                if (img?.isURL()) {
+                  const { src } = await POST('/request/img/', { data: img, from: 'url' })
+                  newsrcs.push(src)
+                }
+              }
+              d.srcs = newsrcs
+            }
+          }
+          return d
+        }));
+
+        await addSection({ data, lang: language, objectdata });
+      }
     }
 
     // REMOVE THE SECTION HEADER (WHICH IS ALWAYS EMPTY HERE)

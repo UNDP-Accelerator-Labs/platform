@@ -441,6 +441,7 @@ async function onLoad() {
 
         const response = await GET(`?${queryparams.toString()}`); // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
 
+        // TO DO: THIS NEEDS UPDATING AS renderVignette IS AN ASYNC FUNCTION NOWW
         d3.selectAll('section.container div.layout').each(function (d) {
           const section = d3.select(this);
           response.sections

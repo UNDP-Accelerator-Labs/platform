@@ -2015,13 +2015,23 @@ export async function renderSections() {
   const sections = layout.addElems('section', `container ${object}`, data);
 
   if (!page.mapscale || page.mapscale === 'contain') {
-    sections.addElems('div', 'layout').each(function (d) {
-      const section = d3.select(this);
+    for (let s = 0; s < sections.size(); s++) {
+      const section = d3.select(sections.nodes()[s]).addElems('div', 'layout')
       section.classed(page.display, true);
-      d.data.forEach((c) =>
-        section.call(renderVignette, { data: c, object, space, page }),
-      );
-    });
+      
+      const { data } = section.datum();
+      for (let i = 0; i < data.length; i++) {
+        await renderVignette(section, { data: data[i], object, space, page });
+      }
+    }
+
+    // sections.addElems('div', 'layout').each(async function (d) {
+    //   const section = d3.select(this);
+    //   section.classed(page.display, true);
+    //   d.data.forEach((c) =>
+    //     section.call(renderVignette, { data: c, object, space, page }),
+    //   );
+    // });
 
     if (page.display === 'slideshow') {
       initSlideshow();

@@ -197,17 +197,6 @@ Array.prototype.median = function () {
   const half = Math.floor(this.length / 2);
   return this[half];
 };
-Array.prototype.move = function (oldId, newId) {
-  const arr = [];
-  if (newId >= this.length) {
-    let k = newId - this.length + 1;
-    while (k--) {
-      arr.push(undefined); // TO DO: not sure what the point of this is?
-    }
-  }
-  this.splice(newId, 0, this.splice(oldId, 1)[0]);
-  return this;
-};
 Array.prototype.shuffle = function () {
   let currentIndex = this.length;
   let temporaryValue;

@@ -1733,7 +1733,7 @@ function addMosaic(kwargs) {
   // THERE IS NO IMAGE YET
   if (
     objecttype === 'templated' &&
-    (page.activity === 'edit' || (page.activity === 'preview' && !src)) // TO DO: what is src?
+    (page.activity === 'edit' || (page.activity === 'preview' && !srcs.length))
   ) {
     const form_id = media.id; // uuidv4()
 

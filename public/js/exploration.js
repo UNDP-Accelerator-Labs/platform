@@ -1,5 +1,6 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { GET, POST, PUT } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 async function checkResponse(result) {
@@ -81,7 +82,7 @@ export class Exploration {
     return prompt.replace(/[\s\n\r]+/g, ' ').trim();
   }
 
-  updateCurrentExploration(curId, curPrompt) {
+  async updateCurrentExploration(curId, curPrompt) {
     const normPrompt = this.normalizeExplorationPrompt(curPrompt);
     this.currentPrompt = normPrompt;
     if (normPrompt !== sessionStorage.explorationPrompt) {
@@ -106,7 +107,7 @@ export class Exploration {
       this.getExplorationByPrompt(normPrompt)[0],
       curId,
     );
-    this.updateExplorationDocs();
+    await this.updateExplorationDocs();
     this.triggerIdChange();
   }
 
@@ -122,9 +123,9 @@ export class Exploration {
     );
   }
 
-  updateById(newId) {
+  async updateById(newId) {
     const [nextId, nextPrompt] = this.getExplorationById(+newId);
-    this.updateCurrentExploration(nextId, nextPrompt);
+    await this.updateCurrentExploration(nextId, nextPrompt);
   }
 
   getExplorationByPrompt(explorationPrompt) {
@@ -157,17 +158,17 @@ export class Exploration {
     }
   }
 
-  checkError(err, cb) {
+  async checkError(err, acb) {
     if (err) {
       if (err.status === 401) {
         // not logged in
-        cb && cb();
-        this.updateCurrentExploration(null, '');
+        acb && (await acb());
+        await this.updateCurrentExploration(null, '');
         return;
       } else if (err.status === 403) {
         // did not consent
-        cb && cb();
-        this.updateCurrentExploration(null, '');
+        acb && (await acb());
+        await this.updateCurrentExploration(null, '');
         this.consent = false;
         return;
       }
@@ -175,9 +176,10 @@ export class Exploration {
     console.error(err);
   }
 
-  updateExplorationList(cb = null) {
-    if (cb) {
-      this.listUpdateCbs.push(cb);
+  async updateExplorationList(acb = null) {
+    const language = await getCurrentLanguage();
+    if (acb) {
+      this.listUpdateCbs.push(acb);
     }
     if (this.listUpdateActive) {
       return;
@@ -185,34 +187,35 @@ export class Exploration {
     this.listUpdateActive = true;
     GET(`/exploration/list?lang=${language}&browser=1`, true, true)
       .then(checkResponse)
-      .then((result) => {
+      .then(async (result) => {
         this.consent = true;
         this.listUpdateActive = false;
         const explorations = result['explorations'];
         this.past = explorations;
         const [curId, curPrompt] = this.getExplorationById(this.currentId);
-        this.updateCurrentExploration(curId, curPrompt);
-        const cbs = this.listUpdateCbs;
+        await this.updateCurrentExploration(curId, curPrompt);
+        const acbs = this.listUpdateCbs;
         this.listUpdateCbs = [];
-        cbs.forEach((curCb) => curCb());
+        Promise.all(acbs.map(async (curCb) => await curCb()));
       })
-      .catch((err) => {
+      .catch(async (err) => {
         this.listUpdateActive = false;
-        this.checkError(err, () => {
+        await this.checkError(err, async () => {
           this.past = [];
-          const cbs = this.listUpdateCbs;
+          const acbs = this.listUpdateCbs;
           this.listUpdateCbs = [];
-          cbs.forEach((curCb) => curCb());
+          Promise.all(acbs.map(async (curCb) => await curCb()));
         });
       });
   }
 
-  updateExplorationDatalist(cb = null) {
+  async updateExplorationDatalist(acb = null) {
+    const vocabulary = await getTranslations();
     const datalist = this.datalist;
     if (!datalist) {
       return;
     }
-    this.updateExplorationList(() => {
+    await this.updateExplorationList(async () => {
       datalist
         .addElems('option', 'exploration-past-elem', this.past)
         .classed('notranslate', true)
@@ -221,11 +224,11 @@ export class Exploration {
           label: (d) =>
             `${vocabulary['exploration']['last_access']} ${d['last_access_ago']}`,
         });
-      cb && cb();
+      acb && (await acb());
     });
   }
 
-  updateExplorationDocs(cb = null) {
+  async updateExplorationDocs(cb = null) {
     if (cb) {
       this.collectionUpdateCbs.push(cb);
     }
@@ -235,7 +238,7 @@ export class Exploration {
       this.docLookup = {};
       const cbs = this.collectionUpdateCbs;
       this.collectionUpdateCbs = [];
-      this.updateDocs(cbs);
+      await this.updateDocs(cbs);
       return;
     }
     if (this.collectionId === curId) {
@@ -248,7 +251,7 @@ export class Exploration {
       true,
     )
       .then(checkResponse)
-      .then((result) => {
+      .then(async (result) => {
         if (this.collectionId !== null && this.collectionId !== curId) {
           return;
         }
@@ -266,16 +269,16 @@ export class Exploration {
         this.docLookup = newLookup;
         const cbs = this.collectionUpdateCbs;
         this.collectionUpdateCbs = [];
-        this.updateDocs(cbs);
+        await this.updateDocs(cbs);
       })
-      .catch((err) => {
+      .catch(async (err) => {
         this.collectionId = null;
-        this.checkError(err, () => {
+        await this.checkError(err, async () => {
           this.docs = [];
           this.docLookup = {};
           const cbs = this.collectionUpdateCbs;
           this.collectionUpdateCbs = [];
-          this.updateDocs(cbs);
+          await this.updateDocs(cbs);
         });
       });
   }
@@ -288,16 +291,16 @@ export class Exploration {
     return this.docLookup[`${docId}`] === false;
   }
 
-  updatePrompt(userPrompt, allowReport) {
+  async updatePrompt(userPrompt, allowReport) {
     const currentId = this.currentId;
-    this.updateExplorationDatalist(() => {
+    await this.updateExplorationDatalist(async () => {
       const [curId, curPrompt] = this.getExplorationByPrompt(userPrompt);
       if (curId !== null && curId === currentId) {
         if (allowReport) {
-          this.updateExplorationDocs();
+          await this.updateExplorationDocs();
         }
       } else if (curId !== null) {
-        this.updateCurrentExploration(curId, curPrompt);
+        await this.updateCurrentExploration(curId, curPrompt);
       } else if (curPrompt) {
         PUT(
           `/exploration/create?browser=1`,
@@ -308,32 +311,34 @@ export class Exploration {
           true,
         )
           .then(checkResponse)
-          .then((result) => {
-            this.updateCurrentExploration(
+          .then(async (result) => {
+            await this.updateCurrentExploration(
               result['exploration'],
               result['prompt'],
             );
-            this.updateExplorationDatalist();
+            await this.updateExplorationDatalist();
           })
-          .catch((err) => {
-            this.checkError(err);
+          .catch(async (err) => {
+            await this.checkError(err);
           });
       } else {
-        this.updateCurrentExploration(null, '');
+        await this.updateCurrentExploration(null, '');
       }
     });
   }
 
-  confirmExplorationPrompt(allowReport) {
+  async confirmExplorationPrompt(allowReport) {
     const mainInput = this.mainInput;
     if (mainInput === null) {
       return;
     }
     const userPrompt = this.getInputValue();
-    this.updatePrompt(userPrompt, allowReport);
+    await this.updatePrompt(userPrompt, allowReport);
   }
 
-  consentFeature() {
+  async consentFeature() {
+    const language = await getCurrentLanguage();
+    const vocabulary = await getTranslations(language);
     const explorationInfoUrl = `/${language}/exploration-info/`;
     const message = `
             <h2 class="google-translate-attr">${vocabulary['exploration']['welcome']}</h2>
@@ -372,12 +377,12 @@ export class Exploration {
           true,
         )
           .then(checkResponse)
-          .then((result) => {
+          .then(async (result) => {
             this.consent = true;
-            this.updateExplorationDatalist();
+            await this.updateExplorationDatalist();
           })
-          .catch((err) => {
-            this.checkError(err);
+          .catch(async (err) => {
+            await this.checkError(err);
           });
       })
       .catch((err) => console.error(err));
@@ -393,7 +398,9 @@ export class Exploration {
     this.datalist = datalist;
   }
 
-  addExplorationMain(sel, cb) {
+  async addExplorationMain(sel, acb) {
+    const language = await getCurrentLanguage();
+    const vocabulary = await getTranslations(language);
     const mainInput = sel
       .addElem('input')
       .attrs({
@@ -401,10 +408,10 @@ export class Exploration {
         id: `exploration-main`,
         list: 'exploration-past',
       })
-      .on('keydown', () => {
+      .on('keydown', async () => {
         const evt = d3.event;
         if (evt.code === 'Enter' || evt.keyCode === 13) {
-          this.confirmExplorationPrompt(false);
+          await this.confirmExplorationPrompt(false);
           evt.preventDefault();
           evt.srcElement.blur();
         }
@@ -417,16 +424,16 @@ export class Exploration {
           this.currentId,
         );
       })
-      .on('blur', () => this.confirmExplorationPrompt(false))
-      .on('click', () => {
+      .on('blur', async () => await this.confirmExplorationPrompt(false))
+      .on('click', async () => {
         const evt = d3.event;
         if (!this.consent) {
           evt.preventDefault();
-          this.consentFeature();
+          await this.consentFeature();
         }
       });
     this.mainInput = mainInput;
-    this.updateCurrentExploration(this.currentId, this.currentPrompt);
+    await this.updateCurrentExploration(this.currentId, this.currentPrompt);
 
     sel
       .addElem('label')
@@ -446,7 +453,7 @@ export class Exploration {
       .text('ⓘ');
     this.infoButton = infoButton;
 
-    this.updateExplorationDatalist(cb);
+    await this.updateExplorationDatalist(acb);
   }
 
   hasExploration() {
@@ -457,15 +464,16 @@ export class Exploration {
     return this.visible;
   }
 
-  setVisible(visible) {
+  async setVisible(visible) {
     const oldVisible = this.visible;
     this.visible = visible;
     if (oldVisible !== visible) {
-      this.updateDocs([]);
+      await this.updateDocs([]);
     }
   }
 
-  updateDocs(cbs) {
+  async updateDocs(cbs) {
+    const vocabulary = await getTranslations();
     d3.selectAll('div.exploration').styles({
       display: this.isVisible() ? null : 'none',
     });
@@ -548,15 +556,16 @@ export class Exploration {
       true,
     )
       .then(checkResponse)
-      .then((result) => {
-        this.updateExplorationDocs();
+      .then(async (result) => {
+        await this.updateExplorationDocs();
       })
-      .catch((err) => {
-        this.checkError(err);
+      .catch(async (err) => {
+        await this.checkError(err);
       });
   }
 
-  addDocButtons(sel, hasLimitedSpace) {
+  async addDocButtons(sel, hasLimitedSpace) {
+    const vocabulary = await getTranslations();
     const doc = sel.addElems('div', 'exploration-doc');
     const that = this;
 
@@ -591,10 +600,10 @@ export class Exploration {
       curSel
         .addElem('select')
         .classed('exploration-short', true)
-        .on('change', function () {
+        .on('change', async function () {
           const curId = d3.select(this)?.node()?.value;
           if (curId !== null) {
-            that.updateById(+curId);
+            await that.updateById(+curId);
           }
         });
     }
@@ -611,6 +620,6 @@ export class Exploration {
       doc.classed('exploration-big', true);
     }
     this.limitedSpace = hasLimitedSpace;
-    this.updateExplorationDocs();
+    await this.updateExplorationDocs();
   }
 } // Exploration

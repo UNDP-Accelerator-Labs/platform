@@ -11,20 +11,20 @@ Date.prototype.createUTCDate = function () {
   );
 };
 Date.prototype.displayDMY = function () {
-  const M = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  // const M = [
+  //   'January',
+  //   'February',
+  //   'March',
+  //   'April',
+  //   'May',
+  //   'June',
+  //   'July',
+  //   'August',
+  //   'September',
+  //   'October',
+  //   'November',
+  //   'December',
+  // ];
   const Ms = [
     'Jan',
     'Feb',
@@ -39,35 +39,35 @@ Date.prototype.displayDMY = function () {
     'Nov',
     'Dec',
   ];
-  const d = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
-  const h = this.getHours() < 10 ? `0${this.getHours()}` : this.getHours();
-  const m =
-    this.getMinutes() < 10 ? `0${this.getMinutes()}` : this.getMinutes();
+  // const d = [
+  //   'Monday',
+  //   'Tuesday',
+  //   'Wednesday',
+  //   'Thursday',
+  //   'Friday',
+  //   'Saturday',
+  //   'Sunday',
+  // ];
+  // const h = this.getHours() < 10 ? `0${this.getHours()}` : this.getHours();
+  // const m =
+  //   this.getMinutes() < 10 ? `0${this.getMinutes()}` : this.getMinutes();
   return `${this.getDate()} ${Ms[this.getMonth()]}, ${this.getFullYear()}`;
 };
 Date.prototype.displayMY = function () {
-  const M = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  // const M = [
+  //   'January',
+  //   'February',
+  //   'March',
+  //   'April',
+  //   'May',
+  //   'June',
+  //   'July',
+  //   'August',
+  //   'September',
+  //   'October',
+  //   'November',
+  //   'December',
+  // ];
   const Ms = [
     'Jan',
     'Feb',
@@ -82,18 +82,18 @@ Date.prototype.displayMY = function () {
     'Nov',
     'Dec',
   ];
-  const d = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
-  const h = this.getHours() < 10 ? `0${this.getHours()}` : this.getHours();
-  const m =
-    this.getMinutes() < 10 ? `0${this.getMinutes()}` : this.getMinutes();
+  // const d = [
+  //   'Monday',
+  //   'Tuesday',
+  //   'Wednesday',
+  //   'Thursday',
+  //   'Friday',
+  //   'Saturday',
+  //   'Sunday',
+  // ];
+  // const h = this.getHours() < 10 ? `0${this.getHours()}` : this.getHours();
+  // const m =
+  //   this.getMinutes() < 10 ? `0${this.getMinutes()}` : this.getMinutes();
   return `${Ms[this.getMonth()]}, ${this.getFullYear()}`;
 };
 Date.prototype.displayYear = function () {
@@ -114,37 +114,37 @@ Date.prototype.displayMonth = function () {
     'November',
     'December',
   ];
-  const Ms = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  // const Ms = [
+  //   'Jan',
+  //   'Feb',
+  //   'Mar',
+  //   'Apr',
+  //   'May',
+  //   'Jun',
+  //   'Jul',
+  //   'Aug',
+  //   'Sep',
+  //   'Oct',
+  //   'Nov',
+  //   'Dec',
+  // ];
   return `${M[this.getMonth()]}`;
 };
 Date.prototype.displayDay = function () {
-  const M = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  // const M = [
+  //   'January',
+  //   'February',
+  //   'March',
+  //   'April',
+  //   'May',
+  //   'June',
+  //   'July',
+  //   'August',
+  //   'September',
+  //   'October',
+  //   'November',
+  //   'December',
+  // ];
   const Ms = [
     'Jan',
     'Feb',
@@ -195,7 +195,7 @@ Date.prototype.render = function () {
   }-${this.getFullYear()}`;
 };
 
-function ExcelDateToJSDate(serial) {
+window.ExcelDateToJSDate = function (serial) {
   // CREDIT TO https://stackoverflow.com/questions/16229494/converting-excel-date-serial-number-to-date-using-javascript
   const utc_days = Math.floor(serial - 25569);
   const utc_value = utc_days * 86400;
@@ -214,8 +214,8 @@ function ExcelDateToJSDate(serial) {
     minutes,
     seconds,
   );
-}
-function isValidDate(d) {
+};
+window.isValidDate = function (d) {
   // CREDIT TO https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
   return d instanceof Date && !isNaN(d);
-}
+};

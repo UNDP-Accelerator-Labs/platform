@@ -1,12 +1,11 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { fixLabel } from '/js/main.js';
 
 export function adjustarea(node) {
   node.style.height = `${node.scrollHeight - 30}px`; // WE HAVE A 2x10px PADDING IN THE CSS
-  const submit = d3
-    .select(node.parentNode)
-    .select('button[type=submit]')
-    .node();
+  // const submit =
+  d3.select(node.parentNode).select('button[type=submit]').node();
   d3
     .select(node)
     .findAncestor('modal')
@@ -114,7 +113,8 @@ export function offsetMinEndDate(node) {
   const now = new Date();
   parent.select('input[name="status"]').node().value = start >= now ? 0 : 1;
 }
-export function toggleChecked(node) {
+export async function toggleChecked(node) {
+  const vocabulary = await getTranslations();
   const parent = d3.select(node).findAncestor('modal');
   parent.selectAll('li').classed('checked', function () {
     return d3.select(this).select('input').node().checked;
@@ -133,7 +133,8 @@ export function toggleChecked(node) {
     parent.selectAll('menu li').classed('hide', false);
   }
 }
-export function selectAllOpts(node) {
+export async function selectAllOpts(node) {
+  const vocabulary = await getTranslations();
   const parent = d3.select(node).findAncestor('modal');
   parent
     .select('.global-opt')
@@ -144,8 +145,10 @@ export function selectAllOpts(node) {
         ? vocabulary['deselect all']
         : vocabulary['select all'];
     });
-  parent.selectAll('li:not(.hide) input[type=checkbox]').each(function () {
-    this.checked = parent.select('.global-opt').classed('active');
-    toggleChecked(this);
-  });
+  parent
+    .selectAll('li:not(.hide) input[type=checkbox]')
+    .each(async function () {
+      this.checked = parent.select('.global-opt').classed('active');
+      await toggleChecked(this);
+    });
 }

@@ -1,5 +1,5 @@
-const { followup_count, modules, engagementtypes, metafields, map, DB, ownDB } = include('config/')
-const { checklanguage, engagementsummary, join, flatObj, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
+const { engagementtypes, map, DB } = include('config/')
+const { checklanguage, engagementsummary, join, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
 
 const check_authorization = require('./authorization.js')
 const load = require('./load/')

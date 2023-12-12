@@ -1,6 +1,11 @@
-import { language, languages } from '/js/config/main.js';
+import {
+  getCurrentLanguage,
+  getRegisteredLanguages,
+} from '/js/config/main.js';
+import { d3, google } from '/js/globals.js';
 
 export async function initGTranslate() {
+  const language = await getCurrentLanguage();
   const currentpage_url = new URL(window.location);
   const fullHost = `${currentpage_url.origin}`;
   const mainHost = fullHost.endsWith('azurewebsites.net')
@@ -13,8 +18,6 @@ export async function initGTranslate() {
     // document.cookie = `${key}=${value};expires=${expires.toUTCString()};domain=${mainHost}`;
     document.cookie = `${key}=${value};domain=${mainHost}`;
   }
-
-  d3.select('#gtranslate-dummy-lang').style('display', 'none');
 
   function rewriteUrl(lang, reload = false) {
     if (!lang) {
@@ -35,6 +38,7 @@ export async function initGTranslate() {
   // IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
   // THIS MEANS THE SOURCE OF TRUTH FOR TRANSLATION ON MODULE LANGUAGES IS THE VOCABULARY OBJECT.
   async function updateDomTree(lang) {
+    const languages = await getRegisteredLanguages();
     if (!lang) {
       lang = 'en';
     }
@@ -49,12 +53,13 @@ export async function initGTranslate() {
   function listenCookieChange(callback, interval = 1000) {
     let lastCookie = null;
     setInterval(() => {
-      let cookie = document.cookie;
+      const cookie = document.cookie;
       if (cookie !== lastCookie) {
         try {
           callback({ oldValue: lastCookie, newValue: cookie });
         } finally {
           if (!lastCookie) {
+            d3.select('#gtranslate-dummy-lang').style('display', 'none');
             new google.translate.TranslateElement(
               {
                 pageLanguage: 'en',

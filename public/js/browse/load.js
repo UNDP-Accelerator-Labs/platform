@@ -13,11 +13,10 @@ import {
 import { renderSections, renderVignette } from '/js/browse/render.js';
 import { partialSave } from '/js/browse/save.js';
 import { GET, POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
-async function DOMLoad() {
-  if (!mediaSize) var mediaSize = getMediaSize();
-
+async function onLoad() {
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
   const {
@@ -121,6 +120,7 @@ async function DOMLoad() {
   });
   // ADD INTERACTION FOR MAIN SEARCH AND FILTER MODULE
   // REPRINT STATUS TOGGLES IN FILTERS MENU IF sm DISPLY
+  const mediaSize = getMediaSize();
   const filter_module = d3.select('#search-and-filter');
   if (mediaSize === 'xs') {
     const status_toggles = filter_module.select('form .status').node();
@@ -129,16 +129,16 @@ async function DOMLoad() {
   }
   filter_module
     .selectAll('.filters .filter .dropdown input[type=checkbox]')
-    .on('change', function () {
+    .on('change', async function () {
       const { id, name } = this.dataset;
       addequivalents(this);
-      toggletag(this, { id, name });
+      await toggletag(this, { id, name });
     });
   filter_module
     .selectAll('.filters .active-filters .tag .close')
-    .on('click', function () {
+    .on('click', async function () {
       const { id, name } = this.dataset;
-      rmtag(this, { id, name });
+      await rmtag(this, { id, name });
     });
   filter_module.selectAll('.status input.toggle').on('change', function () {
     this.form.requestSubmit[this.form.querySelector('button#search')] ||
@@ -430,7 +430,7 @@ async function DOMLoad() {
         !lazyloading
       ) {
         console.log('hit the bottom');
-        main.select('.lds-ellipsis').classed('hide', false);
+        d3.selectAll('.lds-ellipsis').classed('hide', false);
 
         if (!isNaN(page)) page++;
         lazyloading = true;
@@ -441,6 +441,7 @@ async function DOMLoad() {
 
         const response = await GET(`?${queryparams.toString()}`); // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
 
+        // TO DO: THIS NEEDS UPDATING AS renderVignette IS AN ASYNC FUNCTION NOWW
         d3.selectAll('section.container div.layout').each(function (d) {
           const section = d3.select(this);
           response.sections
@@ -451,14 +452,10 @@ async function DOMLoad() {
         });
 
         if (page < pages) lazyloading = false;
-        else main.select('.lds-ellipsis').classed('hide', true);
+        else d3.selectAll('.lds-ellipsis').classed('hide', true);
       }
     };
   }
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', onLoad);

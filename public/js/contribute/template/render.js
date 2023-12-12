@@ -1,6 +1,7 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { partialSave, switchButtons } from '/js/contribute/template/save.js';
 import { POST } from '/js/fetch.js';
+import { d3, uuidv4 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
@@ -51,7 +52,8 @@ const Media = function (kwargs) {
     d3.select('data[name="page"]').node()?.value,
   );
 
-  let { parent, container, sibling, type, datum, focus, lang } = kwargs || {};
+  let { parent, container, sibling, type, datum, focus, lang, vocabulary } =
+    kwargs || {};
   let { id, level, name, editable } = datum;
   if (!id) id = datum.id = uuidv4();
   if (!level) level = 'media';
@@ -133,10 +135,10 @@ const Media = function (kwargs) {
           fn: (_) => this.move('move-down'),
         },
       ])
-      .on('click', (d) => {
+      .on('click', async (d) => {
         d3.event.stopPropagation();
         d.fn();
-        if (_self.editable) switchButtons(lang);
+        if (_self.editable) await switchButtons(lang);
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
       .addElems('i', 'material-icons google-translate-attr')
@@ -331,7 +333,7 @@ Meta.prototype.expand = function (kwargs) {
   }, timeout);
 };
 const Taglist = function (kwargs) {
-  const { type, list, url, datum, lang } = kwargs || {};
+  const { type, list, url, datum, lang, vocabulary } = kwargs || {};
   const { constraint, name } = datum || {};
   // Taglist IS AN INSTANCE OF Meta
   Meta.call(this, kwargs);
@@ -429,19 +431,19 @@ Taglist.prototype.constructor = Taglist;
 
 async function populateSection(data, lang = 'en', section) {
   // MEDIA
-  if (data.type === 'title') addTitle({ data, lang, section });
-  if (data.type === 'img') addImg({ data, lang, section });
-  if (data.type === 'drawing') addDrawing({ data, lang, section });
-  if (data.type === 'txt') addTxt({ data, lang, section });
-  if (data.type === 'embed') addEmbed({ data, lang, section });
-  if (data.type === 'checklist') addChecklist({ data, lang, section });
-  if (data.type === 'radiolist') addRadiolist({ data, lang, section });
+  if (data.type === 'title') await addTitle({ data, lang, section });
+  if (data.type === 'img') await addImg({ data, lang, section });
+  if (data.type === 'drawing') await addDrawing({ data, lang, section });
+  if (data.type === 'txt') await addTxt({ data, lang, section });
+  if (data.type === 'embed') await addEmbed({ data, lang, section });
+  if (data.type === 'checklist') await addChecklist({ data, lang, section });
+  if (data.type === 'radiolist') await addRadiolist({ data, lang, section });
   // META
-  if (data.type === 'location') addLocations({ data, lang, section });
+  if (data.type === 'location') await addLocations({ data, lang, section });
   if (data.type === 'index') await addIndexes({ data, lang, section });
   if (data.type === 'tag') await addTags({ data, lang, section });
-  if (data.type === 'attachment') addAttachment({ data, lang, section });
-  // if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') addTags({ data, lang, section }) // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
+  if (data.type === 'attachment') await addAttachment({ data, lang, section });
+  // if (!metafields.find(d => d.label === 'skills') && data.type === 'skills') await addTags({ data, lang, section }) // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
   // GROUP
   if (data.type === 'group') await addGroup({ data, lang, section });
 }
@@ -490,6 +492,7 @@ export async function autofillTitle() {
   }
 }
 export async function addSection(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -548,10 +551,10 @@ export async function addSection(kwargs) {
         { label: 'close', value: 'delete', fn: (_) => rmSection() },
         // { label: 'south', value: 'move-down', fn: _ => this.move('move-down') }
       ])
-      .on('click', (d) => {
+      .on('click', async (d) => {
         d3.event.stopPropagation();
         d.fn();
-        if (editing) switchButtons(lang);
+        if (editing) await switchButtons(lang);
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
       .addElems('i', 'material-icons google-translate-attr')
@@ -574,7 +577,8 @@ export async function addSection(kwargs) {
     }
   }
 
-  const header = section
+  // const header =
+  section
     .addElems('div', 'section-header')
     .addElems('h1')
     .attrs({
@@ -600,6 +604,7 @@ export async function addSection(kwargs) {
     type: 'lead',
     datum: { type: 'lead', level: 'media', lead, editable: editing },
     lang,
+    vocabulary,
   });
 
   // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
@@ -625,6 +630,7 @@ export async function addSection(kwargs) {
         editable: editing,
       },
       lang,
+      vocabulary,
     });
     // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
     if (mediarepeat.opts) mediarepeat.opts.remove();
@@ -649,7 +655,7 @@ export async function addSection(kwargs) {
   if (structure) {
     // THE PROMISES DO NOT SEEM TO WORK PROPERLY
     // WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
-    const { structure: pagestructure } = section.datum();
+    // const { structure: pagestructure } = section.datum();
     for (let s = 0; s < structure.length; s++) {
       await populateSection(structure[s], lang, section.node());
     }
@@ -657,7 +663,8 @@ export async function addSection(kwargs) {
 
   return section.node();
 }
-function addTitle(kwargs) {
+async function addTitle(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -682,6 +689,7 @@ function addTitle(kwargs) {
     datum: { id, level, type, name, instruction, required, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
   // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
   if (media.placement) media.placement.remove();
@@ -698,7 +706,8 @@ function addTitle(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addImg(kwargs) {
+export async function addImg(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -729,6 +738,7 @@ export function addImg(kwargs) {
     datum: { id, level, type, name, instruction, required, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   media.media
@@ -742,7 +752,8 @@ export function addImg(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addDrawing(kwargs) {
+export async function addDrawing(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -773,6 +784,7 @@ export function addDrawing(kwargs) {
     datum: { id, level, type, name, instruction, required, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   media.media
@@ -786,7 +798,8 @@ export function addDrawing(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addTxt(kwargs) {
+export async function addTxt(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -838,6 +851,7 @@ export function addTxt(kwargs) {
     },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   if (media.opts) {
@@ -927,7 +941,8 @@ export function addTxt(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addEmbed(kwargs) {
+export async function addEmbed(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -958,6 +973,7 @@ export function addEmbed(kwargs) {
     datum: { id, level, type, name, instruction, required, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   media.media
@@ -972,7 +988,8 @@ export function addEmbed(kwargs) {
 
   if (focus) media.media.node().focus();
 }
-export function addChecklist(kwargs) {
+export async function addChecklist(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1019,6 +1036,7 @@ export function addChecklist(kwargs) {
     datum: { id, level, type, name, options, instruction, required, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   // DETERMINE ID FOR THE INPUT NAME
@@ -1134,7 +1152,8 @@ export function addChecklist(kwargs) {
 
   if (focus) media.media.select('.instruction').node().focus();
 }
-export function addRadiolist(kwargs) {
+export async function addRadiolist(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1181,6 +1200,7 @@ export function addRadiolist(kwargs) {
     datum: { id, level, type, name, options, instruction, required, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   // DETERMINE ID FOR THE INPUT NAME
@@ -1295,7 +1315,8 @@ export function addRadiolist(kwargs) {
   if (focus) media.media.select('.instruction').node().focus();
 }
 // META ELEMENTS
-export function addLocations(kwargs) {
+export async function addLocations(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1414,6 +1435,8 @@ export function addLocations(kwargs) {
   if (focus) meta.media.node().focus();
 }
 export async function addIndexes(kwargs) {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1455,11 +1478,13 @@ export async function addIndexes(kwargs) {
     focus: focus || false,
     lang,
     list: options,
+    vocabulary,
   });
 
   if (focus) taglist.media.node().focus();
 }
 export async function addTags(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1501,11 +1526,13 @@ export async function addTags(kwargs) {
     focus: focus || false,
     lang,
     list: options,
+    vocabulary,
   });
 
   if (focus) taglist.media.node().focus();
 }
-export function addAttachment(kwargs) {
+export async function addAttachment(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1559,6 +1586,7 @@ export function addAttachment(kwargs) {
 }
 // GROUPS
 export async function addGroup(kwargs) {
+  const vocabulary = await getTranslations();
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
@@ -1584,6 +1612,7 @@ export async function addGroup(kwargs) {
     datum: { id, level, type, name, structure, instruction, repeat, editable },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   if (media.opts) {
@@ -1672,15 +1701,18 @@ export async function addGroup(kwargs) {
 }
 
 export async function renderTemplate() {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   // POPULATE THE PAGE
-  const object = d3.select('data[name="object"]').node()?.value;
+  // const object =
+  d3.select('data[name="object"]').node()?.value;
   const template = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
   );
-  const { activity } = JSON.parse(
-    d3.select('data[name="page"]').node()?.value,
-  );
-  const editing = activity === 'edit';
+  // const { activity } = JSON.parse(
+  //   d3.select('data[name="page"]').node()?.value,
+  // );
+  // const editing = activity === 'edit';
 
   if (template.id) {
     window.pagestats = { type: 'template', id: template.id };
@@ -1722,9 +1754,9 @@ export async function renderTemplate() {
         required: true,
         editable: false,
       };
-      addRadiolist({ data: radiodata, lang: language, focus: false });
+      await addRadiolist({ data: radiodata, lang: language, focus: false });
     } else {
-      addTitle({ lang: language });
+      await addTitle({ lang: language });
     }
     // CLEAR CHANGES
     window.sessionStorage.removeItem('changed-content');

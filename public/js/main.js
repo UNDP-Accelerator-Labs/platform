@@ -1,20 +1,20 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 
 const debugging = false;
 
-if (false) {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker
-        .register('/app.serviceWorker.js')
-        .then((res) => console.log('service worker registered'))
-        .catch((err) => console.log('service worker not registered', err));
-    });
-  }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker
+      .register('/app.serviceWorker.js')
+      .then((res) => console.log('service worker registered'))
+      .catch((err) => console.log('service worker not registered', err));
+  });
 }
 
-export function getMediaSize() {
+let mediaSize = null;
+function doGetMediaSize() {
   // https://www.w3schools.com/howto/howto_js_media_queries.asp
   // console.log(window.navigator)
   // console.log(window.navigator.Agent)
@@ -32,6 +32,13 @@ export function getMediaSize() {
         return window.matchMedia(`(max-width: ${d.size}px)`).matches;
       else return window.matchMedia(`(min-width: ${d.size}px)`).matches;
     })?.label;
+}
+
+export function getMediaSize() {
+  if (!mediaSize) {
+    mediaSize = doGetMediaSize();
+  }
+  return mediaSize;
 }
 
 export function toggleClass(node, classname) {
@@ -266,7 +273,9 @@ export function getContent(params = {}) {
   if (instance) reqbody['instance'] = instance;
 
   for (const key in params) {
-    reqbody[key] = params[key];
+    if (params.hasOwnProperty(key)) {
+      reqbody[key] = params[key];
+    }
   }
 
   queryparams.forEach((value, key) => {
@@ -333,7 +342,7 @@ export function uploadFile(form) {
     })
     .then((files) => {
       console.log(files);
-      const { message } = files;
+      // const { message } = files;
       const errs = files.filter((d) => d.status !== 200);
       if (errs.length) console.log(errs);
       return files;
@@ -344,7 +353,7 @@ export function uploadFile(form) {
     });
 }
 
-export function printTranslation(node, vocab) {
+export function printTranslation(node, vocab, vocabulary) {
   // FIRST, CHECK IF THE vocab IS A JSON OBJECT (ARRAY)
   const regex = /\[(["'][\w\d\s-]+["'](,\s*["'][\w\d\s-]+["'])*)\]/;
   if (regex.test(vocab)) {
@@ -402,7 +411,8 @@ export function checkForEnter(evt, node) {
   }
 }
 export async function toggleOptions(node) {
-  const { object } = node.dataset || {};
+  const vocabulary = await getTranslations();
+  // const { object } = node.dataset || {};
 
   for (const label of node.labels) {
     d3.select(label).attr(
@@ -422,7 +432,8 @@ export function updateTab(value) {
     // fixLabel(input)
   }
 }
-export function expandstats(node) {
+export async function expandstats(node) {
+  const vocabulary = await getTranslations();
   const sel = d3.select(node);
   const statistics = d3.select(
     sel.findAncestor('stat-group').node().parentNode,

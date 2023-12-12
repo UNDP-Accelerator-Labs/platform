@@ -1,7 +1,9 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
+import { d3, uuidv4 } from '/js/globals.js';
 import { filterDropdown, fixLabel } from '/js/main.js';
 
-export function renderModal(data, close = true) {
+export async function renderModal(data, close = true) {
+  const vocabulary = await getTranslations();
   const { headline, opts, theme, node } = data;
 
   d3.selectAll('.temp-active').classed('temp-active', false);
@@ -11,8 +13,7 @@ export function renderModal(data, close = true) {
 
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
-  let screen;
-  screen = d3.select('div.screen').classed('hide', false);
+  const screen = d3.select('div.screen').classed('hide', false);
 
   const modal = screen.addElems('div', `modal ${theme}`);
 
@@ -21,7 +22,7 @@ export function renderModal(data, close = true) {
       .addElems('button', 'close')
       .on('click', function () {
         if (typeof close === 'function') {
-          resolve(close());
+          close();
         } else {
           modal.remove();
           d3.selectAll('.temp-active').classed('temp-active', false);
@@ -59,7 +60,8 @@ export function renderModal(data, close = true) {
 export function renderPromiseModal(data, close = true) {
   const { headline, message, opts } = data;
 
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
+    const vocabulary = await getTranslations();
     d3.select('nav.filter').classed('open', false);
     d3.selectAll('div.screen').classed('hide', true);
     const screen = d3.select('div.screen').classed('hide', false);
@@ -104,7 +106,8 @@ export function renderPromiseModal(data, close = true) {
       });
   });
 }
-export function renderFormModal(data, close = true) {
+export async function renderFormModal(data, close = true) {
+  const vocabulary = await getTranslations();
   const { headline, message, formdata, opts, foot } = data;
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
@@ -117,7 +120,7 @@ export function renderFormModal(data, close = true) {
       .addElems('button', 'close')
       .on('click', function () {
         if (typeof close === 'function') {
-          resolve(close());
+          close();
         } else {
           modal.remove();
           screen.classed('hide', true);
@@ -176,7 +179,8 @@ export function renderFormModal(data, close = true) {
       .html((d) => d.label);
   });
 }
-export function renderLonglistFormModal(data, close = true) {
+export async function renderLonglistFormModal(data, close = true) {
+  const vocabulary = await getTranslations();
   const { headline, message, formdata, opts, foot } = data;
   d3.select('nav.filter').classed('open', false);
   d3.selectAll('div.screen').classed('hide', true);
@@ -189,7 +193,7 @@ export function renderLonglistFormModal(data, close = true) {
       .addElems('button', 'close')
       .on('click', function () {
         if (typeof close === 'function') {
-          resolve(close());
+          close();
         } else {
           modal.remove();
           screen.classed('hide', true);
@@ -267,7 +271,8 @@ export function renderLonglistFormModal(data, close = true) {
   });
 }
 
-function addInputNode(_sel, _data) {
+async function addInputNode(_sel, _data) {
+  const vocabulary = await getTranslations();
   const { d, resolve } = _data;
   const screen = _sel.findAncestor('screen');
   const modal = screen.select('.modal');
@@ -284,7 +289,7 @@ function addInputNode(_sel, _data) {
         type: 'text',
       })
       .on('keyup', async function (d) {
-        const evt = d3.event;
+        // const evt = d3.event;
         const node = this;
         const dropdown = d3
           .select(node)
@@ -346,7 +351,7 @@ function addInputNode(_sel, _data) {
           })
           .on('change', async function (b) {
             // TO DO: MAKE THIS ONLY POSSIBLE IF THIS input TYPE IS CHECKBOX
-            const node = this;
+            // const node = this;
             const sel = d3.select(this);
             const input = sel
               .findAncestor('filter')
@@ -376,13 +381,13 @@ function addInputNode(_sel, _data) {
                 if (b.label.length > 30) return `${b.label.slice(0, 30)}…`;
                 else return b.label;
               });
-              tag.addElems('label', 'close').on('click', (_) => {
-                rmtag(b.value);
+              tag.addElems('label', 'close').on('click', async (_) => {
+                await rmtag(b.value);
                 if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
               });
             }
             sel.findAncestor('li').classed('active', this.checked);
-            if (!this.checked) rmtag(b.value);
+            if (!this.checked) await rmtag(b.value);
 
             // IF THERE IS A FUNCTION ATTACHED TO THE DROPDOWN, EXECUTE IT
             if (d.fn && typeof d.fn === 'function') d.fn.call(this, b);
@@ -419,7 +424,7 @@ function addInputNode(_sel, _data) {
     // 	.attr('value', d => d.value)
     // 	.html(d => d.label)
 
-    function rmtag(id) {
+    async function rmtag(id) {
       const input = dropdown.selectAll('input').filter((d) => d.value === id);
       const taggroup = _sel.select('.active-filters');
       const tag = taggroup.selectAll('.tag').filter((d) => d.id === id);
@@ -514,7 +519,8 @@ function addInputNode(_sel, _data) {
   }
 }
 
-export function renderImgZoom(data) {
+export async function renderImgZoom(data) {
+  const vocabulary = await getTranslations();
   const { src } = data;
 
   d3.select('nav.filter').classed('open', false);

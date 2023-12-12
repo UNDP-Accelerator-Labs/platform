@@ -1,12 +1,13 @@
-import { language, vocabulary } from '/js/config/main.js';
 import { setDownloadOptions } from '/js/browse/download.js';
-import { exploration } from '/js/browse/exploration.js';
+import { getExploration } from '/js/browse/exploration.js';
 import {
   confirmRemoval,
   deleteArticles,
   unpublishArticles,
 } from '/js/browse/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3, uuidv4 } from '/js/globals.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
 import { renderFormModal, renderImgZoom } from '/js/modals.js';
 
@@ -14,7 +15,7 @@ import { renderFormModal, renderImgZoom } from '/js/modals.js';
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
 
 export const Entry = function (_kwargs) {
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
 
   let {
     parent,
@@ -568,7 +569,8 @@ export const Entry = function (_kwargs) {
               });
 
             if (d.dropdown?.length) {
-              const dropdown = sel
+              // const dropdown =
+              sel
                 .addElems('div', 'dropdown')
                 .addElems('menu', 'opts')
                 .addElems('li', 'opt', d.dropdown)
@@ -662,7 +664,8 @@ export const Entry = function (_kwargs) {
             disabled: true,
             label: vocabulary['submit for review'],
           });
-          const new_constraint = await renderFormModal({
+          // const new_constraint =
+          await renderFormModal({
             message,
             formdata,
             opts,
@@ -762,7 +765,8 @@ export const Entry = function (_kwargs) {
             type: 'submit',
             label: vocabulary['revoke'],
           });
-          const new_constraint = await renderFormModal({
+          // const new_constraint =
+          await renderFormModal({
             message,
             formdata,
             opts,
@@ -792,10 +796,10 @@ export const Entry = function (_kwargs) {
         // 		else return `/${language}/view/${object.slice(0, -1)}?${queryparams.toString()}`
         // 	}
         // })
-        .on('click', function (d) {
+        .on('click', async function (d) {
           // THIS ENLARGES THE IMAGE INSTED OF OPENING THE PAD
           const img = d3.select(this).select('img').node().src;
-          renderImgZoom({ src: img.replace('/sm/', '/') });
+          await renderImgZoom({ src: img.replace('/sm/', '/') });
         })
         .addElems('img', 'vignette')
         .attrs({ loading: 'lazy', alt: (_) => vocabulary['missing image'] })
@@ -1102,8 +1106,9 @@ export const Entry = function (_kwargs) {
         version_depth,
       } = _sel.datum();
 
+      let treeinfo;
       if (source) {
-        var treeinfo = _sel.addElems('div', 'meta meta-tree');
+        treeinfo = _sel.addElems('div', 'meta meta-tree');
 
         if (version_depth > 1) {
           const versiontree = treeinfo
@@ -1910,13 +1915,15 @@ export const Entry = function (_kwargs) {
 
       _sel.addElems('div', 'meta meta-country').html((d) => d.countryname);
     },
-    exploration: (_sel) => {
-      exploration.addDocButtons(_sel, true);
+    exploration: async (_sel) => {
+      (await getExploration()).addDocButtons(_sel, true);
     },
   };
 };
-export function renderVignette(_section, _kwargs) {
-  if (!mediaSize) var mediaSize = getMediaSize();
+export async function renderVignette(_section, _kwargs) {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
+  const mediaSize = getMediaSize();
   const { data, object, space, page } = _kwargs;
 
   const entry = new Entry({
@@ -1962,7 +1969,7 @@ export function renderVignette(_section, _kwargs) {
     render.pin(entry.foot);
     render.delete(entry.outer);
     render.unpublish(entry.outer);
-    render.exploration(entry.foot);
+    await render.exploration(entry.foot);
   } else if (page.display === 'slideshow') {
     render.img(entry.head);
     render.owner(entry.metagroup);
@@ -1986,11 +1993,11 @@ export function renderVignette(_section, _kwargs) {
     render.pin(entry.inner);
     render.delete(entry.outer);
     render.unpublish(entry.outer);
-    render.exploration(entry.foot);
+    await render.exploration(entry.foot);
   }
 }
 export async function renderSections() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   const { sections: data } = await getContent();
 
   const object = d3.select('data[name="object"]').node().value;
@@ -2008,13 +2015,23 @@ export async function renderSections() {
   const sections = layout.addElems('section', `container ${object}`, data);
 
   if (!page.mapscale || page.mapscale === 'contain') {
-    sections.addElems('div', 'layout').each(function (d) {
-      const section = d3.select(this);
+    for (let s = 0; s < sections.size(); s++) {
+      const section = d3.select(sections.nodes()[s]).addElems('div', 'layout')
       section.classed(page.display, true);
-      d.data.forEach((c) =>
-        section.call(renderVignette, { data: c, object, space, page }),
-      );
-    });
+      
+      const { data } = section.datum();
+      for (let i = 0; i < data.length; i++) {
+        await renderVignette(section, { data: data[i], object, space, page });
+      }
+    }
+
+    // sections.addElems('div', 'layout').each(async function (d) {
+    //   const section = d3.select(this);
+    //   section.classed(page.display, true);
+    //   d.data.forEach((c) =>
+    //     section.call(renderVignette, { data: c, object, space, page }),
+    //   );
+    // });
 
     if (page.display === 'slideshow') {
       initSlideshow();
@@ -2037,7 +2054,8 @@ function initSlideshow() {
       d3.select(this).classed(d.class, true);
     })
     .classed('hide', (d) => {
-      const sel = d3.select(this);
+      // const sel =
+      d3.select(this);
       let focus_id = 0;
       d3.selectAll('.slide').each(function (c, i) {
         if (d3.select(this).classed('slide-in-view')) focus_id = i;

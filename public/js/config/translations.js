@@ -1,5 +1,3 @@
-import { POST } from '/js/fetch.js';
-
 export const fullVocabulary = {
   contribute: {
     en: 'Contribute',

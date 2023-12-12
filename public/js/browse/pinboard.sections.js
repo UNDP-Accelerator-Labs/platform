@@ -1,5 +1,6 @@
-import { vocabulary } from '/js/config/main.js';
 import { partialSave } from '/js/browse/save.js';
+import { getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import {
   checkForEnter,
   fixLabel,
@@ -8,37 +9,54 @@ import {
 } from '/js/main.js';
 import { renderFormModal } from '/js/modals.js';
 
-// TO DO: DEPRECATE THIS IN FAVOR OF A COLLECTION OF COLLECTIONS APPROACH
-d3.selectAll('.make-editable:not(.section-title)').on('click', function () {
-  console.log('click');
-  makeEditable(this, this.nextElementSibling);
-});
-
-d3.selectAll('.section-title').on('keydown', function () {
-  checkForEnter(event, this);
-});
-
-d3.selectAll('.section-title.editable')
-  .on('focus', function () {
-    this.classList.add('focus');
-    this.parentNode.parentNode.classList.add('editing');
-  })
-  .on('blur', function () {
-    const { id } = this.dataset;
-    partialSave('section-title', id);
-  });
-
-d3.selectAll('.new-section .section-title')
-  .on('focus', function () {
+function onLoad() {
+  // TO DO: DEPRECATE THIS IN FAVOR OF A COLLECTION OF COLLECTIONS APPROACH
+  d3.selectAll('.make-editable:not(.section-title)').on('click', function () {
+    console.log('click');
     makeEditable(this, this.nextElementSibling);
-  })
-  .on('blur', function () {
-    addSection(this);
   });
 
-d3.selectAll('.add-section').on('click', function () {
-  addSection(this.previousElementSibling);
-});
+  d3.selectAll('.section-title').on('keydown', function () {
+    checkForEnter(event, this);
+  });
+
+  d3.selectAll('.section-title.editable')
+    .on('focus', function () {
+      this.classList.add('focus');
+      this.parentNode.parentNode.classList.add('editing');
+    })
+    .on('blur', function () {
+      const { id } = this.dataset;
+      partialSave('section-title', id);
+    });
+
+  d3.selectAll('.new-section .section-title')
+    .on('focus', function () {
+      makeEditable(this, this.nextElementSibling);
+    })
+    .on('blur', function () {
+      addSection(this);
+    });
+
+  d3.selectAll('.add-section').on('click', function () {
+    addSection(this.previousElementSibling);
+  });
+
+  (function scrollToActiveSection(node) {
+    const mediaSize = getMediaSize();
+    if (!['xs', 'sm'].includes(mediaSize)) {
+      const menu = d3.select('.pinboard-sections menu');
+      const section = menu.select('li.active').node();
+      if (section) {
+        menu.node().scrollTo({
+          top: 0,
+          left: section.offsetLeft,
+          behavior: 'smooth',
+        });
+      }
+    }
+  })();
+}
 
 function makeEditable(node, a_node) {
   const sel = d3.select(node);
@@ -61,6 +79,7 @@ function makeEditable(node, a_node) {
   }
 }
 async function addSection(node) {
+  const vocabulary = await getTranslations();
   const { id, section, singlesection, options } = JSON.parse(
     d3.select('data[name="pinboard"]').node().value,
   );
@@ -134,7 +153,8 @@ async function addSection(node) {
     disabled: !singlesection,
   });
   // d3.select('.modal input[name=sections]:checked').node().value
-  const sections = await renderFormModal({ message, formdata, opts });
+  // const sections =
+  await renderFormModal({ message, formdata, opts });
 
   function setSections(data) {
     const { value } = data || {};
@@ -193,17 +213,5 @@ async function addSection(node) {
       !form.selectAll('input.multiple-section-id').size();
   }
 }
-(function scrollToActiveSection(node) {
-  if (!mediaSize) var mediaSize = getMediaSize();
-  if (!['xs', 'sm'].includes(mediaSize)) {
-    const menu = d3.select('.pinboard-sections menu');
-    const section = menu.select('li.active').node();
-    if (section) {
-      menu.node().scrollTo({
-        top: 0,
-        left: section.offsetLeft,
-        behavior: 'smooth',
-      });
-    }
-  }
-})();
+
+window.addEventListener('load', onLoad);

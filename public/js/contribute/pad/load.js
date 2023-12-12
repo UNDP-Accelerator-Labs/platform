@@ -2,10 +2,11 @@ import { selectReviewLanguage } from '/js/contribute/pad/main.js';
 import { renderPad } from '/js/contribute/pad/render.js';
 import { partialSave, saveAndSubmit } from '/js/contribute/pad/save.js';
 import { initToolbarInteractions } from '/js/contribute/pad/toolbar.interactions.js';
+import { d3 } from '/js/globals.js';
 import { getMediaSize } from '/js/main.js';
 
-async function DOMLoad() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+async function onLoad() {
+  const mediaSize = getMediaSize();
 
   const { id, type, source } = JSON.parse(
     d3.select('data[name="pad"]').node()?.value,
@@ -15,11 +16,9 @@ async function DOMLoad() {
   );
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
-  // if (typeof initExploration !== undefined) { initExploration(); }
-
   const main = d3.select(`#${mainobject}`);
   await renderPad({ object: mainobject, type, id, main });
-  initToolbarInteractions({ metafields, type, main });
+  await initToolbarInteractions({ metafields, type, main });
 
   const head = main.select('.head');
 
@@ -66,7 +65,7 @@ async function DOMLoad() {
       });
 
       const url = new URL(window.location);
-      if (!queryparams) var queryparams = new URLSearchParams(url.search);
+      const queryparams = new URLSearchParams(url.search);
       queryparams.delete('display');
 
       d3.select('div.display-source a').attr(
@@ -76,7 +75,7 @@ async function DOMLoad() {
     }
   } else if (d3.select('div.display-option.display-source').node()) {
     const url = new URL(window.location);
-    if (!queryparams) var queryparams = new URLSearchParams(url.search);
+    const queryparams = new URLSearchParams(url.search);
     queryparams.set('display', 'adjacent-source');
 
     d3.select('div.display-source a').attr(
@@ -106,7 +105,7 @@ async function DOMLoad() {
       }
 
       const url = new URL(window.location);
-      if (!queryparams) var queryparams = new URLSearchParams(url.search);
+      const queryparams = new URLSearchParams(url.search);
       queryparams.delete('display');
 
       d3.select('div.display-reviews a').attr(
@@ -116,7 +115,7 @@ async function DOMLoad() {
     }
   } else if (d3.select('div.display-option.display-reviews').node()) {
     const url = new URL(window.location); // url IS ALREADY DEFINED SOMEWHERE ELSE
-    if (!queryparams) var queryparams = new URLSearchParams(url.search);
+    const queryparams = new URLSearchParams(url.search);
     queryparams.set('display', 'adjacent-reviews');
 
     d3.select('div.display-reviews a').attr(
@@ -152,8 +151,4 @@ async function DOMLoad() {
     });
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', onLoad);

@@ -1,6 +1,7 @@
-import { language } from '/js/config/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
 import { autofillTitle } from '/js/contribute/template/render.js';
 import { switchButtons } from '/js/contribute/template/save.js';
+import { d3 } from '/js/globals.js';
 
 let keyTrack = [];
 window.addEventListener('keydown', async function (e) {
@@ -91,7 +92,8 @@ window.addEventListener('keydown', async function (e) {
     }
   }
 });
-window.addEventListener('keyup', function (e) {
+window.addEventListener('keyup', async function (e) {
+  const language = await getCurrentLanguage();
   e = e || event;
 
   const { activity } = JSON.parse(
@@ -170,7 +172,7 @@ window.addEventListener('keyup', function (e) {
             d3.select(e.srcElement).findAncestor('filter-or-add')?.node())
         )
       ) {
-        switchButtons(language);
+        await switchButtons(language);
         // THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS
       }
     }

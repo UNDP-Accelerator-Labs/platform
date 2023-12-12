@@ -1,4 +1,5 @@
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { limitLength, updateTab } from '/js/main.js';
 // THIS IS TO SAVE PPINBOARDS
 export async function partialSave(object, id) {

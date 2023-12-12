@@ -1,10 +1,13 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { compilePads, compileTemplate } from '/js/contribute/xlsx/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { addGlobalLoader, rmGlobalLoader } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 export async function catchSubmit(evt) {
+  const language = await getCurrentLanguage();
+  const vocabulary = await getTranslations(language);
   const { participations } = JSON.parse(
     d3.select('data[name="page"]').node().value,
   );
@@ -59,7 +62,7 @@ export async function catchSubmit(evt) {
   // TO DO: ADD LOADER FEEDBACK
 
   // 2) SAVE IMAGES
-  const sources = []
+  const sources = [];
   const imgs = pads
     .map((d) => d.imgs)
     .flat()
@@ -67,21 +70,21 @@ export async function catchSubmit(evt) {
     .filter((d) => d);
 
   for (let i = 0; i < imgs.length; i++) {
-    const app_storage = d3.select('data[name="app_storage"]').node()?.value
-    const img = imgs[i]
+    const app_storage = d3.select('data[name="app_storage"]').node()?.value;
+    const img = imgs[i];
     if (img?.isURL()) {
-      const { src } = await POST('/request/img/', { data: img, from: 'url' })
-      
+      const { src } = await POST('/request/img/', { data: img, from: 'url' });
+
       if (app_storage) {
-        sources.push(src)
+        sources.push(src);
       } else {
-        sources.push(`/public/${src}`.replace(/\/+/g, '/'))
+        sources.push(`/public/${src}`.replace(/\/+/g, '/'));
       }
     } else {
       if (app_storage) {
-        sources.push(img)
+        sources.push(img);
       } else {
-        sources.push(`/public/${img}`.replace(/\/+/g, '/'))
+        sources.push(`/public/${img}`.replace(/\/+/g, '/'));
       }
     }
   }
@@ -122,7 +125,8 @@ export async function catchSubmit(evt) {
 
   // 3) SAVE PADS
   addGlobalLoader();
-  const results = await POST('/save/xlsx', { pads, template, mobilization });
+  // const results =
+  await POST('/save/xlsx', { pads, template, mobilization });
   rmGlobalLoader();
   window.location.href = `/${language}/browse/pads/private`;
 

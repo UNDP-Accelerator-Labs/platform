@@ -1,9 +1,10 @@
-import { language, vocabulary } from '/js/config/main.js';
 import { Entry } from '/js/browse/render.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { L, d3 } from '/js/globals.js';
 import { getContent, multiSelection } from '/js/main.js';
 
-async function DOMLoad() {
+async function onLoad() {
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
   const page = JSON.parse(d3.select('data[name="page"]').node().value);
@@ -36,7 +37,8 @@ async function DOMLoad() {
     } else {
       d3.select('.map-container').classed('hide', false);
 
-      const singlepin = L.divIcon({
+      // const singlepin =
+      L.divIcon({
         className: 'single-pin',
         iconAnchor: [0, 24],
         labelAnchor: [-6, 0],
@@ -69,6 +71,8 @@ async function DOMLoad() {
       });
 
       async function loadPopup(popup, pads, page = 1) {
+        const language = await getCurrentLanguage();
+        const vocabulary = await getTranslations(language);
         const { data, count } = await POST(
           `/${language}/browse/pads/${space}`,
           {
@@ -83,8 +87,8 @@ async function DOMLoad() {
         const section = document.createElement('section');
         section.classList.add('container');
         section.classList.add(object);
-        const body = d3
-          .select(section)
+        // const body =
+        d3.select(section)
           .addElems('div', 'layout columns', [data])
           .on('scroll', function () {
             const slide = d3.select(this).select('article');
@@ -97,6 +101,8 @@ async function DOMLoad() {
               idx = Math.round(this.scrollLeft / slidewidth);
               d3.selectAll('.dot').classed('highlight', (d, i) => i === idx);
               d3.selectAll('button.slide-nav').classed('hide', (d) => {
+                const deck = d3.select('.layout.columns');
+                const slides = deck.selectAll('article.pad');
                 return (
                   (d.class === 'prev' && idx === 0) ||
                   (d.class === 'next' && idx === slides.size() - 1)
@@ -144,7 +150,7 @@ async function DOMLoad() {
                 render.followup(entry.body);
               }
               render.tags(entry.body);
-              // if (mediaSize !== 'xs') render.stats(entry.foot)
+              // if (getMediaSize() !== 'xs') render.stats(entry.foot)
               render.engagement(entry.foot);
               render.pin(entry.foot);
               render.delete(entry.outer);
@@ -181,7 +187,7 @@ async function DOMLoad() {
         function animateCarousel(idx) {
           const deck = d3.select('.layout.columns');
           const slides = deck.selectAll('article.pad');
-          const delay = 3000;
+          // const delay = 3000;
 
           if (idx === slides.size()) idx = 0;
           deck.node().scrollTo({
@@ -286,8 +292,4 @@ async function DOMLoad() {
   }
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', onLoad);

@@ -1,10 +1,12 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
+import { addSection } from '/js/contribute/template/render.js';
 import { POST } from '/js/fetch.js';
+import { XLSX, d3 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
-import { addSection } from '/js/contribute/pad/render.js';
 
-export function dropHandler(evt, node) {
+export async function dropHandler(evt, node) {
+  const vocabulary = await getTranslations();
   evt.preventDefault();
   const sel = d3.select(node);
   const label = sel.select('.drop-zone button label');
@@ -62,25 +64,31 @@ export function parseXLSX(file, node) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: 'array', bookFiles: true });
 
-    let images = [];
+    const images = [];
     if (workbook.keys) {
       const media = workbook.keys.filter((k) => k.includes('media/image'));
 
       for (let i = 0; i < media.length; i++) {
-        const m = media[i]
+        const m = media[i];
         const name = workbook.files[m].name;
         const buffer = workbook.files[m].content.buffer;
 
-        const bytes = new Uint8Array(buffer)
-        const data = btoa(bytes.reduce((d, b) => d + String.fromCharCode(b), ''))
-        const { src } = await POST('/request/img/', { data, name, from: 'buffer' })
+        const bytes = new Uint8Array(buffer);
+        const data = btoa(
+          bytes.reduce((d, b) => d + String.fromCharCode(b), ''),
+        );
+        const { src } = await POST('/request/img/', {
+          data,
+          name,
+          from: 'buffer',
+        });
 
         images.push({ id: name?.extractDigits(), type: 'img', src });
       }
       // images = media.map(async(m, i) => {
       //   const name = workbook.files[m].name; // .split('media/')[1]
       //   const buffer = workbook.files[m].content.buffer; // workbook.files[m]._data?.getContent()
-        
+
       //   // const blob = new Blob([buffer], { type: 'image/png' });
       //   // const urlCreator = window.URL || window.webkitURL;
       //   // const imageUrl = urlCreator.createObjectURL(blob);
@@ -98,35 +106,40 @@ export function parseXLSX(file, node) {
       //   }
       // });
     }
-    workbook.SheetNames.forEach((s, i) => {
-      const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
-        defval: null,
-      });
-
-      const keys = Object.keys(json[0]);
-      if (images.length) {
-        // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
-        // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
-        const cols = keys.map((d) => {
-          const obj = {};
-          obj.key = d;
-          obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
-          return obj;
+    const sheets = workbook.SheetNames.map(() => {
+      return async (s, i) => {
+        const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
+          defval: null,
         });
-        const imageCol = cols.find((d) => !d.values.length)?.key || null;
-        if (imageCol) {
-          json.forEach((d, i) => {
-            // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
-            d[imageCol] = images.find((c) => c.id === i + 1);
+
+        const keys = Object.keys(json[0]);
+        if (images.length) {
+          // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
+          // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
+          const cols = keys.map((d) => {
+            const obj = {};
+            obj.key = d;
+            obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
+            return obj;
           });
+          const imageCol = cols.find((d) => !d.values.length)?.key || null;
+          if (imageCol) {
+            json.forEach((d, i) => {
+              // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
+              d[imageCol] = images.find((c) => c.id === i + 1);
+            });
+          }
         }
-      }
-      if (i === 0) {
-        // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
-        const cols = parseColumns(json, keys);
-        renderTable(cols);
-      }
+        if (i === 0) {
+          // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+          const cols = parseColumns(json, keys);
+          await renderTable(cols);
+        }
+      };
     });
+    for (const sheet of sheets) {
+      await sheet();
+    }
     // HIDE THE LOADING BUTTON
     const main = d3.select('div.table main');
     const layout = main.select('div.inner');
@@ -148,8 +161,8 @@ function parseColumns(json, keys) {
     obj.entries = json.map((c) => {
       // ENTRIES, UNLIKE VALUES, IS EXHAUSTIVE (IT ALSO INCLUDES NULL/ MISSING VALUES)
       // CHECK IF DATE
-      const testdate = ExcelDateToJSDate(c[d]);
-      if (isValidDate(testdate) && testdate.getFullYear() >= 2019) {
+      const testdate = window.ExcelDateToJSDate(c[d]);
+      if (window.isValidDate(testdate) && testdate.getFullYear() >= 2019) {
         return testdate.toISOString();
       } else {
         const e = c[d];
@@ -341,9 +354,10 @@ function parseGroups(json, keys) {
       } else resolve(json.find((c) => c.key === d));
     });
   });
-  Promise.all(cols).then((data) => renderTable(data));
+  Promise.all(cols).then(async (data) => await renderTable(data));
 }
-function renderTable(cols, update = false) {
+async function renderTable(cols, update = false) {
+  const vocabulary = await getTranslations();
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -543,7 +557,7 @@ function renderTable(cols, update = false) {
         message: message,
         opts: opts,
       });
-      splitValues(d.key, separator);
+      await splitValues(d.key, separator);
     });
 
   const columntypes = moduleHead
@@ -683,11 +697,13 @@ function renderTable(cols, update = false) {
     })
     .html((d) => d.label);
 
-  const metaOpts = columntypes
+  // const metaOpts =
+  columntypes
     .addElems('optgroup', 'group-meta')
     .attr('label', 'meta')
     .addElems('option', 'opt', (d) => {
-      const containsURLs = d.entries
+      // const containsURLs =
+      d.entries
         .flat()
         .filter((c) => ![null, undefined].includes(c))
         .every((c) => typeof c === 'string' && c.isURL());
@@ -891,9 +907,11 @@ function renderTable(cols, update = false) {
             : d.cell.join(', ');
         } else if (Object.keys(d.cell).includes('src')) {
           // LIKELY AN IMAGE
-          let cellsrc = d.cell.src
+          let cellsrc = d.cell.src;
           if (d3.select('data[name="app_storage"]').node()) {
-            const app_storage = d3.select('data[name="app_storage"]').node().value;
+            const app_storage = d3
+              .select('data[name="app_storage"]')
+              .node().value;
             cellsrc = new URL(`${app_storage}/${cellsrc}`).href;
           }
           return `<img src='${cellsrc}'>`;
@@ -952,7 +970,7 @@ function seekPrefix(arr) {
   while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
   return a1.substring(0, i);
 }
-function splitValues(col, separator) {
+async function splitValues(col, separator) {
   if (!separator) return null;
   const cols = d3.select('table.xls-preview').datum();
   cols.forEach((d) => {
@@ -992,7 +1010,7 @@ function splitValues(col, separator) {
       d.type = 'checklist';
     }
   });
-  renderTable(cols);
+  await renderTable(cols);
 }
 export function groupColumns() {
   const cols = d3.select('table.xls-preview').datum();
@@ -1007,14 +1025,14 @@ export function groupColumns() {
     parseGroups(cols, keys);
   }
 }
-export function dropColumns() {
+export async function dropColumns() {
   const cols = d3.select('table.xls-preview').datum();
   const dropkeys = d3
     .select('table.xls-preview thead')
     .selectAll('.selected')
     .data()
     .map((d) => d.key);
-  renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
+  await renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
 }
 function compileLocations(idx) {
   return new Promise(async (resolve) => {
@@ -1036,6 +1054,7 @@ function compileLocations(idx) {
   });
 }
 export async function compilePads(idx, structureOnly = false) {
+  const language = await getCurrentLanguage();
   const { metafields, media_value_keys } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -1570,10 +1589,12 @@ export async function compilePads(idx, structureOnly = false) {
   return Promise.all(pads);
 }
 export async function compileTemplate() {
+  const vocabulary = await getTranslations();
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
-  const cols = d3.select('table.xls-preview').datum();
+  // const cols =
+  d3.select('table.xls-preview').datum();
 
   const template = {};
 
@@ -1737,6 +1758,7 @@ export async function compileTemplate() {
 }
 
 async function previewPad(idx) {
+  const language = await getCurrentLanguage();
   const cols = d3.select('table.xls-preview').datum();
   const data = await compilePads(idx);
   const datum = data[0];
@@ -1748,9 +1770,9 @@ async function previewPad(idx) {
     .on('click', (_) => window.history.back())
     .html('Close');
 
-  window.onpopstate = (_) => closeModal();
+  window.onpopstate = async (_) => await closeModal();
 
-  function closeModal() {
+  async function closeModal() {
     // REORDER THE TABLE WHEN CLOSING PREVIEW
     let neworder = [];
 
@@ -1766,7 +1788,7 @@ async function previewPad(idx) {
 
     neworder = neworder.map((d) => cols.find((c) => c.key === d));
 
-    renderTable(neworder, true);
+    await renderTable(neworder, true);
 
     modal.remove();
     screen.classed('hide', true);
@@ -1782,38 +1804,46 @@ async function previewPad(idx) {
     const head = inner.addElems('div', 'head');
     const body = inner.addElems('div', 'body');
 
-    const { title, sections } = datum
+    const { title, sections } = datum;
 
     if (title) head.addElems('div', 'title').html(title);
     if (sections) {
       const objectdata = { object: 'pad', type: 'templated', main };
 
       for (let s = 0; s < sections.length; s++) {
-        const data = sections[s]
+        const data = sections[s];
 
         // CHECK FOR URL IMAGES AND LOAD THEM IF NECESSARY
-        data.items = await Promise.all(data.items.map(async (d) => {
-          if (d.type === 'img') {
-            if (d.src?.isURL()) {
-              const { src } = await POST('/request/img/', { data: d.src, from: 'url' })
-              d.src = src
-            }
-          }
-          if (d.type === 'mosaic') {
-            if (d.srcs?.length) {
-              const newsrcs = []
-              for (let i = 0; i < d.srcs?.length; i++) {
-                const img = d.srcs[i]
-                if (img?.isURL()) {
-                  const { src } = await POST('/request/img/', { data: img, from: 'url' })
-                  newsrcs.push(src)
-                }
+        data.items = await Promise.all(
+          data.items.map(async (d) => {
+            if (d.type === 'img') {
+              if (d.src?.isURL()) {
+                const { src } = await POST('/request/img/', {
+                  data: d.src,
+                  from: 'url',
+                });
+                d.src = src;
               }
-              d.srcs = newsrcs
             }
-          }
-          return d
-        }));
+            if (d.type === 'mosaic') {
+              if (d.srcs?.length) {
+                const newsrcs = [];
+                for (let i = 0; i < d.srcs?.length; i++) {
+                  const img = d.srcs[i];
+                  if (img?.isURL()) {
+                    const { src } = await POST('/request/img/', {
+                      data: img,
+                      from: 'url',
+                    });
+                    newsrcs.push(src);
+                  }
+                }
+                d.srcs = newsrcs;
+              }
+            }
+            return d;
+          }),
+        );
 
         await addSection({ data, lang: language, objectdata });
       }

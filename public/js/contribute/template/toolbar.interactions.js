@@ -1,4 +1,3 @@
-import { language } from '/js/config/main.js';
 import {
   addAttachment,
   addChecklist,
@@ -13,10 +12,12 @@ import {
   addTags,
   addTxt,
 } from '/js/contribute/template/render.js';
-import { getMediaSize } from '/js/main.js';
+import { d3 } from '/js/globals.js';
+import { getCurrentLanguage, getMediaSize } from '/js/main.js';
 
-export function initToolbarInteractions(metafields) {
-  if (!mediaSize) var mediaSize = getMediaSize();
+export async function initToolbarInteractions(metafields) {
+  const language = await getCurrentLanguage();
+  const mediaSize = getMediaSize();
   if (!metafields) {
     const { metafields: tmeta } = JSON.parse(
       d3.select('data[name="template"]').node()?.value,
@@ -98,8 +99,8 @@ export function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addImg({
+    .on('click', async function () {
+      await addImg({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -114,8 +115,8 @@ export function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addDrawing({
+    .on('click', async function () {
+      await addDrawing({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -130,8 +131,8 @@ export function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addTxt({
+    .on('click', async function () {
+      await addTxt({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -146,8 +147,8 @@ export function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addEmbed({
+    .on('click', async function () {
+      await addEmbed({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -162,8 +163,8 @@ export function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addChecklist({
+    .on('click', async function () {
+      await addChecklist({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -178,8 +179,8 @@ export function initToolbarInteractions(metafields) {
         .nodes()
         ?.last()?.nextSibling;
     })
-    .on('click', function () {
-      addRadiolist({
+    .on('click', async function () {
+      await addRadiolist({
         lang: language,
         sibling: this['__active_node__'],
         focus: true,
@@ -206,7 +207,7 @@ export function initToolbarInteractions(metafields) {
             .nodes()
             ?.last()?.nextSibling || null;
       })
-      .on('click', function () {
+      .on('click', async function () {
         const data = {
           level: 'meta',
           name: d.label,
@@ -215,35 +216,35 @@ export function initToolbarInteractions(metafields) {
           options: d.options || null,
         };
         if (d.type === 'txt')
-          addTxt({
+          await addTxt({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'embed')
-          addEmbed({
+          await addEmbed({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'drawing')
-          addDrawing({
+          await addDrawing({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'checklist')
-          addChecklist({
+          await addChecklist({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         if (d.type === 'radiolist')
-          addRadiolist({
+          await addRadiolist({
             data,
             lang: language,
             sibling: this['__active_node__'],
@@ -251,28 +252,28 @@ export function initToolbarInteractions(metafields) {
           });
         // THE FOLLOWING ARE ALWAYS META
         if (d.type === 'tag')
-          addTags({
+          await addTags({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         else if (d.type === 'index')
-          addIndexes({
+          await addIndexes({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         else if (d.type === 'location')
-          addLocations({
+          await addLocations({
             data,
             lang: language,
             sibling: this['__active_node__'],
             focus: true,
           });
         else if (d.type === 'attachment')
-          addAttachment({
+          await addAttachment({
             data,
             lang: language,
             sibling: this['__active_node__'],
@@ -286,7 +287,7 @@ export function initToolbarInteractions(metafields) {
 
   // DETERMINE WHETHER THE INPUT BAR NEEDS TO BE NAVIGATED (i.e., SCROLLED)
   d3.select('.media-input-group').each(function () {
-    const node = this;
+    // const node = this;
     const sel = d3.select(this);
     const inner = sel.select('.inner');
     const height = inner.node().clientHeight || inner.node().offsetHeight;

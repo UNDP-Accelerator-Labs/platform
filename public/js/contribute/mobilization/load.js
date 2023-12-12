@@ -11,9 +11,10 @@ import {
   togglePadLimit,
   togglePublic,
 } from '/js/contribute/mobilization/main.js';
+import { d3 } from '/js/globals.js';
 import { fixLabel } from '/js/main.js';
 
-function DOMLoad() {
+function onLoad() {
   // CHECK IF THE MOBILIZATION HAS A SOURCE (WHETHER IT IS A FOLLOW UP)
   const url = new URL(window.location);
   const queryparams = new URLSearchParams(url.search);
@@ -77,8 +78,8 @@ function DOMLoad() {
     .selectAll(
       '.modal.m-2 .body input[type=radio], .modal.m-5 .body input[type=radio], .modal.m-6 .body input[type=checkbox]',
     )
-    .on('change.toggle', function () {
-      toggleChecked(this);
+    .on('change.toggle', async function () {
+      await toggleChecked(this);
       enableNext(this);
     });
   mobilization
@@ -108,8 +109,8 @@ function DOMLoad() {
     });
   mobilization
     .select('.modal.m-6 .foot .global-opt button')
-    .on('click', function () {
-      selectAllOpts(this);
+    .on('click', async function () {
+      await selectAllOpts(this);
       enableNext(this);
     });
   mobilization
@@ -119,8 +120,4 @@ function DOMLoad() {
     });
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', onLoad);

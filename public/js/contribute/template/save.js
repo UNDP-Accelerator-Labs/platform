@@ -1,10 +1,12 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { getMediaSize, limitLength } from '/js/main.js';
 
 // SAVING BUTTON
-export function switchButtons(lang = 'en') {
-  if (!mediaSize) var mediaSize = getMediaSize();
+export async function switchButtons(lang = 'en') {
+  const vocabulary = await getTranslations();
+  const mediaSize = getMediaSize();
   window.sessionStorage.setItem('changed-content', true);
   // PROVIDE FEEDBACK: UNSAVED CHANGES
   if (mediaSize === 'xs') {
@@ -327,6 +329,7 @@ function compileContent(attr) {
 }
 
 export async function partialSave(attr) {
+  const vocabulary = await getTranslations();
   console.log('saving');
   const template = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
@@ -358,7 +361,7 @@ export async function partialSave(attr) {
       // ADD THE NOTIFICATION
       window.sessionStorage.removeItem('changed-content');
 
-      if (!mediaSize) var mediaSize = getMediaSize();
+      const mediaSize = getMediaSize();
       if (mediaSize === 'xs') {
         const save_btn = d3
           .select('.meta-status .btn-group .save')

@@ -13,11 +13,20 @@ trap 'rm -- version.txt' EXIT
 
 echo "building ${IMAGE_NAME}"
 
-docker buildx build \
-    --platform linux/amd64 \
-    --build-arg "PORT=${PORT}" \
-    -t "${IMAGE_NAME}" \
-    -f deploy/Dockerfile \
-    .
+if [ -z "${IMAGE_LOCAL}" ]; then
+    docker buildx build \
+        --platform linux/amd64 \
+        --build-arg "PORT=${PORT}" \
+        -t "${IMAGE_NAME}" \
+        -f deploy/Dockerfile \
+        .
+else
+    docker buildx build \
+        --build-arg "PORT=${PORT}" \
+        -t "${IMAGE_NAME}" \
+        -f deploy/Dockerfile \
+        .
+    IMAGE_LOCAL="local image "
+fi
 
-echo "built ${IMAGE_NAME}"
+echo "built ${IMAGE_LOCAL}${IMAGE_NAME}"

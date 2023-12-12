@@ -10,6 +10,7 @@ export async function initGTranslate() {
   function setCookie(key, value, expiry) {
     const expires = new Date();
     expires.setTime(expires.getTime() + expiry * 24 * 60 * 60 * 1000);
+    // document.cookie = `${key}=${value};expires=${expires.toUTCString()};domain=${mainHost}`;
     document.cookie = `${key}=${value};domain=${mainHost}`;
   }
 

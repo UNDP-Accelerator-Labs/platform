@@ -1,3 +1,4 @@
+import { d3 } from '/js/globals.js';
 import { clearExploration } from '/js/home/exploration.js';
 import { renderCarousel, renderMosaic } from '/js/home/render.js';
 

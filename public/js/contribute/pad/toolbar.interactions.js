@@ -13,6 +13,7 @@ import {
   uploadImg,
   uploadVideo,
 } from '/js/contribute/pad/render.js';
+import { d3 } from '/js/globals.js';
 import { getMediaSize } from '/js/main.js';
 
 export async function initToolbarInteractions(kwargs) {
@@ -308,7 +309,7 @@ export async function initToolbarInteractions(kwargs) {
   // DETERMINE WHETHER THE INPUT BAR NEEDS TO BE NAVIGATED (i.e., SCROLLED)
   if (objecttype === 'blank') {
     d3.select('.media-input-group').each(function () {
-      const node = this;
+      // const node = this;
       const sel = d3.select(this);
       const inner = sel.select('.inner');
       const height = inner.node().clientHeight || inner.node().offsetHeight;

@@ -1,4 +1,5 @@
 import { getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 
 // INSPIRED BY https://stackoverflow.com/questions/995168/textarea-to-resize-based-on-content-length
 export async function changeLabel(node, focus) {

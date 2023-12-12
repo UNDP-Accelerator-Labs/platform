@@ -1,5 +1,6 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { GET, POST, PUT } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 async function checkResponse(result) {
@@ -81,7 +82,7 @@ export class Exploration {
     return prompt.replace(/[\s\n\r]+/g, ' ').trim();
   }
 
-  updateCurrentExploration(curId, curPrompt) {
+  async updateCurrentExploration(curId, curPrompt) {
     const normPrompt = this.normalizeExplorationPrompt(curPrompt);
     this.currentPrompt = normPrompt;
     if (normPrompt !== sessionStorage.explorationPrompt) {
@@ -122,9 +123,9 @@ export class Exploration {
     );
   }
 
-  updateById(newId) {
+  async updateById(newId) {
     const [nextId, nextPrompt] = this.getExplorationById(+newId);
-    this.updateCurrentExploration(nextId, nextPrompt);
+    await this.updateCurrentExploration(nextId, nextPrompt);
   }
 
   getExplorationByPrompt(explorationPrompt) {
@@ -157,17 +158,17 @@ export class Exploration {
     }
   }
 
-  checkError(err, cb) {
+  async checkError(err, cb) {
     if (err) {
       if (err.status === 401) {
         // not logged in
-        cb && cb();
-        this.updateCurrentExploration(null, '');
+        cb && (await cb());
+        await this.updateCurrentExploration(null, '');
         return;
       } else if (err.status === 403) {
         // did not consent
-        cb && cb();
-        this.updateCurrentExploration(null, '');
+        cb && (await cb());
+        await this.updateCurrentExploration(null, '');
         this.consent = false;
         return;
       }
@@ -250,7 +251,7 @@ export class Exploration {
       true,
     )
       .then(checkResponse)
-      .then((result) => {
+      .then(async (result) => {
         if (this.collectionId !== null && this.collectionId !== curId) {
           return;
         }
@@ -270,9 +271,9 @@ export class Exploration {
         this.collectionUpdateCbs = [];
         await this.updateDocs(cbs);
       })
-      .catch((err) => {
+      .catch(async (err) => {
         this.collectionId = null;
-        this.checkError(err, () => {
+        await this.checkError(err, async () => {
           this.docs = [];
           this.docLookup = {};
           const cbs = this.collectionUpdateCbs;
@@ -292,14 +293,14 @@ export class Exploration {
 
   async updatePrompt(userPrompt, allowReport) {
     const currentId = this.currentId;
-    await this.updateExplorationDatalist(() => {
+    await this.updateExplorationDatalist(async () => {
       const [curId, curPrompt] = this.getExplorationByPrompt(userPrompt);
       if (curId !== null && curId === currentId) {
         if (allowReport) {
           await this.updateExplorationDocs();
         }
       } else if (curId !== null) {
-        this.updateCurrentExploration(curId, curPrompt);
+        await this.updateCurrentExploration(curId, curPrompt);
       } else if (curPrompt) {
         PUT(
           `/exploration/create?browser=1`,
@@ -311,17 +312,17 @@ export class Exploration {
         )
           .then(checkResponse)
           .then(async (result) => {
-            this.updateCurrentExploration(
+            await this.updateCurrentExploration(
               result['exploration'],
               result['prompt'],
             );
             await this.updateExplorationDatalist();
           })
-          .catch((err) => {
-            this.checkError(err);
+          .catch(async (err) => {
+            await this.checkError(err);
           });
       } else {
-        this.updateCurrentExploration(null, '');
+        await this.updateCurrentExploration(null, '');
       }
     });
   }
@@ -380,8 +381,8 @@ export class Exploration {
             this.consent = true;
             await this.updateExplorationDatalist();
           })
-          .catch((err) => {
-            this.checkError(err);
+          .catch(async (err) => {
+            await this.checkError(err);
           });
       })
       .catch((err) => console.error(err));
@@ -432,7 +433,7 @@ export class Exploration {
         }
       });
     this.mainInput = mainInput;
-    this.updateCurrentExploration(this.currentId, this.currentPrompt);
+    await this.updateCurrentExploration(this.currentId, this.currentPrompt);
 
     sel
       .addElem('label')
@@ -564,6 +565,7 @@ export class Exploration {
   }
 
   async addDocButtons(sel, hasLimitedSpace) {
+    const vocabulary = await getTranslations();
     const doc = sel.addElems('div', 'exploration-doc');
     const that = this;
 

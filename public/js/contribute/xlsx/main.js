@@ -1,5 +1,6 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { XLSX, d3 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
@@ -326,7 +327,7 @@ function parseGroups(json, keys) {
   });
   Promise.all(cols).then(async (data) => await renderTable(data));
 }
-function async renderTable(cols, update = false) {
+async function renderTable(cols, update = false) {
   const vocabulary = getTranslations();
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
@@ -667,11 +668,13 @@ function async renderTable(cols, update = false) {
     })
     .html((d) => d.label);
 
-  const metaOpts = columntypes
+  // const metaOpts =
+  columntypes
     .addElems('optgroup', 'group-meta')
     .attr('label', 'meta')
     .addElems('option', 'opt', (d) => {
-      const containsURLs = d.entries
+      // const containsURLs =
+      d.entries
         .flat()
         .filter((c) => ![null, undefined].includes(c))
         .every((c) => typeof c === 'string' && c.isURL());
@@ -1015,6 +1018,7 @@ function compileLocations(idx) {
   });
 }
 export async function compilePads(idx, structureOnly = false) {
+  const language = getCurrentLanguage();
   const { metafields, media_value_keys } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
@@ -1549,10 +1553,12 @@ export async function compilePads(idx, structureOnly = false) {
   return Promise.all(pads);
 }
 export async function compileTemplate() {
+  const vocabulary = await getTranslations();
   const { metafields } = JSON.parse(
     d3.select('data[name="pad"]').node().value,
   );
-  const cols = d3.select('table.xls-preview').datum();
+  // const cols =
+  d3.select('table.xls-preview').datum();
 
   const template = {};
 
@@ -1765,7 +1771,7 @@ async function previewPad(idx) {
     if (datum.title) head.addElems('div', 'title').html(datum.title);
     if (datum.sections) {
       datum.sections.forEach((d) => {
-        addSection({ data: d, lang: language });
+        addSection({ data: d, lang: language }); // TO DO: what function is this supposed to be?
       });
     }
 

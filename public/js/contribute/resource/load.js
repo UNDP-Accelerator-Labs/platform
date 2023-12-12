@@ -1,4 +1,5 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { getContent, uploadFile } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 

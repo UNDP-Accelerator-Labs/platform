@@ -1,4 +1,3 @@
-import { language } from '/js/config/main.js';
 import {
   addAttachment,
   addChecklist,
@@ -13,10 +12,12 @@ import {
   addTags,
   addTxt,
 } from '/js/contribute/template/render.js';
-import { getMediaSize } from '/js/main.js';
+import { d3 } from '/js/globals.js';
+import { getCurrentLanguage, getMediaSize } from '/js/main.js';
 
-export function initToolbarInteractions(metafields) {
-  if (!mediaSize) var mediaSize = getMediaSize();
+export async function initToolbarInteractions(metafields) {
+  const language = await getCurrentLanguage();
+  const mediaSize = getMediaSize();
   if (!metafields) {
     const { metafields: tmeta } = JSON.parse(
       d3.select('data[name="template"]').node()?.value,
@@ -286,7 +287,7 @@ export function initToolbarInteractions(metafields) {
 
   // DETERMINE WHETHER THE INPUT BAR NEEDS TO BE NAVIGATED (i.e., SCROLLED)
   d3.select('.media-input-group').each(function () {
-    const node = this;
+    // const node = this;
     const sel = d3.select(this);
     const inner = sel.select('.inner');
     const height = inner.node().clientHeight || inner.node().offsetHeight;

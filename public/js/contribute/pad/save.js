@@ -1,5 +1,6 @@
 import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { getContent, getMediaSize, limitLength } from '/js/main.js';
 
 // THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM

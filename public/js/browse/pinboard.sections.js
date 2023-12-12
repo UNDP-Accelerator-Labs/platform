@@ -1,5 +1,6 @@
 import { partialSave } from '/js/browse/save.js';
 import { getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import {
   checkForEnter,
   fixLabel,
@@ -152,7 +153,8 @@ async function addSection(node) {
     disabled: !singlesection,
   });
   // d3.select('.modal input[name=sections]:checked').node().value
-  const sections = await renderFormModal({ message, formdata, opts });
+  // const sections =
+  await renderFormModal({ message, formdata, opts });
 
   function setSections(data) {
     const { value } = data || {};

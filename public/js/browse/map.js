@@ -1,6 +1,7 @@
 import { Entry } from '/js/browse/render.js';
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { L, d3 } from '/js/globals.js';
 import { getContent, multiSelection } from '/js/main.js';
 
 async function onLoad() {
@@ -36,7 +37,8 @@ async function onLoad() {
     } else {
       d3.select('.map-container').classed('hide', false);
 
-      const singlepin = L.divIcon({
+      // const singlepin =
+      L.divIcon({
         className: 'single-pin',
         iconAnchor: [0, 24],
         labelAnchor: [-6, 0],
@@ -85,8 +87,8 @@ async function onLoad() {
         const section = document.createElement('section');
         section.classList.add('container');
         section.classList.add(object);
-        const body = d3
-          .select(section)
+        // const body =
+        d3.select(section)
           .addElems('div', 'layout columns', [data])
           .on('scroll', function () {
             const slide = d3.select(this).select('article');
@@ -185,7 +187,7 @@ async function onLoad() {
         function animateCarousel(idx) {
           const deck = d3.select('.layout.columns');
           const slides = deck.selectAll('article.pad');
-          const delay = 3000;
+          // const delay = 3000;
 
           if (idx === slides.size()) idx = 0;
           deck.node().scrollTo({

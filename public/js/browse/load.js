@@ -14,6 +14,7 @@ import { renderSections, renderVignette } from '/js/browse/render.js';
 import { partialSave } from '/js/browse/save.js';
 import { initGTranslate } from '/js/config/gtranslate.js';
 import { GET, POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
 async function onLoad() {

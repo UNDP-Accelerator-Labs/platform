@@ -1,12 +1,11 @@
 import { getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { fixLabel } from '/js/main.js';
 
 export function adjustarea(node) {
   node.style.height = `${node.scrollHeight - 30}px`; // WE HAVE A 2x10px PADDING IN THE CSS
-  const submit = d3
-    .select(node.parentNode)
-    .select('button[type=submit]')
-    .node();
+  // const submit =
+  d3.select(node.parentNode).select('button[type=submit]').node();
   d3
     .select(node)
     .findAncestor('modal')

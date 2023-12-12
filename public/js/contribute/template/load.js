@@ -1,6 +1,7 @@
 import { renderTemplate } from '/js/contribute/template/render.js';
 import { partialSave } from '/js/contribute/template/save.js';
 import { initToolbarInteractions } from '/js/contribute/template/toolbar.interactions.js';
+import { d3 } from '/js/globals.js';
 import { getMediaSize } from '/js/main.js';
 
 async function onLoad() {

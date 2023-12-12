@@ -1,6 +1,7 @@
 import { language } from '/js/config/main.js';
 import { autofillTitle } from '/js/contribute/template/render.js';
 import { switchButtons } from '/js/contribute/template/save.js';
+import { d3 } from '/js/globals.js';
 
 let keyTrack = [];
 window.addEventListener('keydown', async function (e) {

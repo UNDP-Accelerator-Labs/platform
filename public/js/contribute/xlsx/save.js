@@ -1,6 +1,7 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { compilePads, compileTemplate } from '/js/contribute/xlsx/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { addGlobalLoader, rmGlobalLoader } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
@@ -73,7 +74,7 @@ export async function catchSubmit(evt) {
       promises.push(
         new Promise(async (resolve) => {
           const blob = await fetch(d).then((res) => res.blob());
-          const ts = new Date().getTime();
+          // const ts = new Date().getTime();
           const originalname = d;
           resolve({ blob: blob, originalname: originalname });
         }),
@@ -124,7 +125,8 @@ export async function catchSubmit(evt) {
   // pads.forEach(d => d.sections = JSON.stringify(d.sections))
   // const results = await POST('/storeImport', { pads, template, mobilization })
   addGlobalLoader();
-  const results = await POST('/save/xlsx', { pads, template, mobilization });
+  // const results =
+  await POST('/save/xlsx', { pads, template, mobilization });
   rmGlobalLoader();
   window.location.href = `/${language}/browse/pads/private`;
 

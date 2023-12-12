@@ -1,4 +1,5 @@
 import { adjustarea, changeLabel } from '/js/contribute/comment/main.js';
+import { d3 } from '/js/globals.js';
 import { fixLabel } from '/js/main.js';
 
 function onLoad() {

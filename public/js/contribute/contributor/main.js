@@ -1,6 +1,7 @@
 import { getRegisteredLanguages, getTranslations } from '/js/config/main';
 import { partialSave } from '/js/contribute/contributor/save.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { fixLabel, getMediaSize } from '/js/main.js';
 
 export async function requestToken(node) {
@@ -41,7 +42,8 @@ export async function addLanguage(node) {
     .addElem('label')
     .attr('for', 'secondary-languages')
     .html(vocabulary['select language']['plural']);
-  const dropdown = input
+  // const dropdown =
+  input
     .addElem('div', 'dropdown')
     .addElem('menu')
     .addElems('li', null, languages)
@@ -92,7 +94,7 @@ function addPinOption(value) {
   renderPin.call(pinItem.node());
 }
 function renderPin() {
-  const sel = d3.select(this);
+  // const sel = d3.select(this);
   const pinboard = d3.select('.pinboard-group').classed('hide', false);
 
   if (this.checked) {
@@ -230,7 +232,7 @@ export async function initDropdowns() {
       })
       .on('keyup.checkEnter', function (d) {
         const evt = d3.event;
-        const node = this;
+        // const node = this;
         const newpin = d3.select(this).findAncestor('add');
 
         if (evt.code === 'Enter' || evt.keyCode === 13) {

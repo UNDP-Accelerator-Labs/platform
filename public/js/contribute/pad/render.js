@@ -5,6 +5,7 @@ import {
   updateStatus,
 } from '/js/contribute/pad/save.js';
 import { POST } from '/js/fetch.js';
+import { L, d3, uuidv4 } from '/js/globals.js';
 import { fixLabel, toggleClass } from '/js/main.js';
 import { renderImgZoom, renderPromiseModal } from '/js/modals.js';
 
@@ -37,8 +38,9 @@ const observer = new MutationObserver((evt) => {
 
       if (changedContent) {
         // SAVE
-        let item = evt.find((d) => d.oldValue.includes('focus'));
-        item = item.oldValue
+        const item = evt.find((d) => d.oldValue.includes('focus'));
+        // item =
+        item.oldValue
           .split(' ')
           .find(
             (d) =>
@@ -225,7 +227,8 @@ const Media = function (kwargs) {
 };
 Media.prototype.rmMedia = async function () {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const mainobject = d3.select('data[name="object"]').node()?.value;
+  // const mainobject =
+  d3.select('data[name="object"]').node()?.value;
 
   const datum = this.container.datum();
   const { level, type, name } = datum;
@@ -385,7 +388,8 @@ Media.prototype.move = function (dir) {
 };
 // META PROTOTYPE
 const Meta = function (kwargs) {
-  const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
+  // const page =
+  JSON.parse(d3.select('data[name="page"]').node()?.value);
 
   const { type, maxheight, focus } = kwargs;
   // Meta IS AN INSTANCE OF Media WITH AN INSET
@@ -429,7 +433,8 @@ Meta.prototype.expand = function (kwargs) {
             ? Math.min(this.inset.node().scrollHeight, maxheight)
             : this.inset.node().scrollHeight
         }px`;
-        const input = this.inset.select('input[type=text]').node();
+        // const input =
+        this.inset.select('input[type=text]').node();
         // if (input) input.focus()
       }
     }, timeout);
@@ -590,7 +595,7 @@ const Taglist = async function (kwargs) {
       })
       .on('keyup', function () {
         const evt = d3.event;
-        const sel = d3.select(this);
+        // const sel = d3.select(this);
         const val = this.value.trim().toLowerCase();
         const parent = meta.inset.select(`.inset-${type}`);
 
@@ -606,7 +611,7 @@ const Taglist = async function (kwargs) {
       })
       .on('input', function () {
         const evt = d3.event;
-        const sel = d3.select(this);
+        // const sel = d3.select(this);
         const val = this.value.trim().toLowerCase();
         const parent = meta.inset.select(`.inset-${type}`);
 
@@ -725,7 +730,7 @@ Taglist.prototype.recode = async function (opencode = true) {
           }
           if (!meta.constraint || checked.length <= meta.constraint) {
             toggleClass(this.parentNode, 'selected');
-            const sel = d3.select(this);
+            // const sel = d3.select(this);
 
             meta.container
               .each((c) => (c.tags = checked))
@@ -1197,7 +1202,8 @@ export async function addSection(kwargs) {
     }
   }
 
-  const header = section
+  // const header =
+  section
     .addElems('div', 'section-header', (d) => {
       if (objecttype === 'templated' && d.title?.length === 0) return [];
       else if (!editing && d.title?.length === 0) return [];
@@ -1262,7 +1268,7 @@ export async function addSection(kwargs) {
     mediarepeat.media
       .addElems('button')
       .on('click', async function () {
-        const sel = d3.select(this);
+        // const sel = d3.select(this);
 
         kwargs.sibling = section.node().nextSibling;
         kwargs.repeated = true;
@@ -1362,7 +1368,7 @@ async function addTitle(kwargs) {
 async function addImg(kwargs) {
   const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  // const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, container, focus, objectdata } =
@@ -1546,7 +1552,7 @@ async function addImg(kwargs) {
 }
 function addMosaic(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  // const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, container, focus, objectdata } =
@@ -1726,7 +1732,7 @@ function addMosaic(kwargs) {
   // THERE IS NO IMAGE YET
   if (
     objecttype === 'templated' &&
-    (page.activity === 'edit' || (page.activity === 'preview' && !src))
+    (page.activity === 'edit' || (page.activity === 'preview' && !src)) // TO DO: what is src?
   ) {
     const form_id = media.id; // uuidv4()
 
@@ -1774,7 +1780,7 @@ function addMosaic(kwargs) {
 }
 function addVideo(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  // const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, container, focus, objectdata } =
@@ -1949,7 +1955,8 @@ export function addDrawing(kwargs) {
   });
 
   if (media.opts) {
-    const opt_groups = media.opts
+    // const opt_groups =
+    media.opts
       .addElems('div', 'opt-group', (_) => {
         const brush_size = [
           {
@@ -2626,7 +2633,7 @@ export async function addEmbed(kwargs) {
 export async function addChecklist(kwargs) {
   const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  // const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
@@ -2895,7 +2902,7 @@ export async function addChecklist(kwargs) {
 export async function addRadiolist(kwargs) {
   const vocabulary = await getTranslations();
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  // const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
@@ -3769,10 +3776,8 @@ export async function addAttachment(kwargs) {
       if (!srcs.length && objecttype !== 'templated') await meta.rmMedia();
     } else {
       d3.selectAll('div.screen').classed('hide', true);
-      const screen = d3
-        .select('div.screen')
-        .classed('hide', false)
-        .classed('dark', true);
+      // const screen =
+      d3.select('div.screen').classed('hide', false).classed('dark', true);
     }
   }
 
@@ -3823,7 +3828,7 @@ export async function addAttachment(kwargs) {
 // GROUPS
 function addGroup(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
-  const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
+  // const pad = JSON.parse(d3.select('data[name="pad"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
@@ -3872,7 +3877,7 @@ function addGroup(kwargs) {
       media.media
         .addElems('div', 'add-opt')
         .on('click', function (d) {
-          const sel = d3.select(this);
+          // const sel = d3.select(this);
           media.container.each((d) => {
             const new_structure = structure.map((c) => {
               const { id, ...data } = c;
@@ -3967,6 +3972,7 @@ function addGroup(kwargs) {
 let idx = 0;
 // FOR SLIDESHOW VIEW
 async function addSlides(kwargs) {
+  const vocabulary = await getTranslations();
   // NOTE: SLIDES ARE NECESSARILY TEMPLATED OR IN VIEW MODE ONLY
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const mainobject = d3.select('data[name="object"]').node()?.value;
@@ -4052,7 +4058,7 @@ async function addSlides(kwargs) {
     mediarepeat.media
       .addElems('button')
       .on('click.repeat', function () {
-        const sel = d3.select(this);
+        // const sel = d3.select(this);
 
         const promises = [];
         section
@@ -4065,7 +4071,8 @@ async function addSlides(kwargs) {
                   kwargs.sibling = `section:nth-child(${i + 2})`;
                   kwargs.focus = true;
 
-                  const new_section = await addSlides(kwargs); // THIS TOO IS DIFFERENT TO addSection
+                  // const new_section =
+                  await addSlides(kwargs); // THIS TOO IS DIFFERENT TO addSection
                   initSlideshow(main);
                 }
                 resolve();
@@ -4142,7 +4149,7 @@ function initSlideshow(main) {
       d3.select(this).classed(d.class, true);
     })
     .classed('hide', (d) => {
-      const sel = d3.select(this);
+      // const sel = d3.select(this);
       let focus_id = 0;
       d3.selectAll('.slide').each(function (c, i) {
         if (d3.select(this).classed('slide-in-view')) focus_id = i;

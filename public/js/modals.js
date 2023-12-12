@@ -1,4 +1,5 @@
 import { getTranslations } from '/js/config/main.js';
+import { d3, uuidv4 } from '/js/globals.js';
 import { filterDropdown, fixLabel } from '/js/main.js';
 
 export async function renderModal(data, close = true) {
@@ -21,7 +22,7 @@ export async function renderModal(data, close = true) {
       .addElems('button', 'close')
       .on('click', function () {
         if (typeof close === 'function') {
-          resolve(close());
+          close();
         } else {
           modal.remove();
           d3.selectAll('.temp-active').classed('temp-active', false);
@@ -119,7 +120,7 @@ export async function renderFormModal(data, close = true) {
       .addElems('button', 'close')
       .on('click', function () {
         if (typeof close === 'function') {
-          resolve(close());
+          close();
         } else {
           modal.remove();
           screen.classed('hide', true);
@@ -192,7 +193,7 @@ export async function renderLonglistFormModal(data, close = true) {
       .addElems('button', 'close')
       .on('click', function () {
         if (typeof close === 'function') {
-          resolve(close());
+          close();
         } else {
           modal.remove();
           screen.classed('hide', true);
@@ -288,7 +289,7 @@ async function addInputNode(_sel, _data) {
         type: 'text',
       })
       .on('keyup', async function (d) {
-        const evt = d3.event;
+        // const evt = d3.event;
         const node = this;
         const dropdown = d3
           .select(node)
@@ -350,7 +351,7 @@ async function addInputNode(_sel, _data) {
           })
           .on('change', async function (b) {
             // TO DO: MAKE THIS ONLY POSSIBLE IF THIS input TYPE IS CHECKBOX
-            const node = this;
+            // const node = this;
             const sel = d3.select(this);
             const input = sel
               .findAncestor('filter')

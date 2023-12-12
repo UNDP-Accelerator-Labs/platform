@@ -7,6 +7,7 @@ import {
 } from '/js/contribute/contributor/main.js';
 import { partialSave } from '/js/contribute/contributor/save.js';
 import { initUpdatePassword } from '/js/contribute/contributor/update.password.js';
+import { d3 } from '/js/globals.js';
 import { checkPassword } from '/js/main.js';
 
 async function onLoad() {

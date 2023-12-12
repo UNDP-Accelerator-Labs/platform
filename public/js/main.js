@@ -1,5 +1,6 @@
 import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 
 const debugging = false;
 
@@ -273,7 +274,9 @@ export function getContent(params = {}) {
   if (instance) reqbody['instance'] = instance;
 
   for (const key in params) {
-    reqbody[key] = params[key];
+    if (params.hasOwnProperty(key)) {
+      reqbody[key] = params[key];
+    }
   }
 
   queryparams.forEach((value, key) => {
@@ -340,7 +343,7 @@ export function uploadFile(form) {
     })
     .then((files) => {
       console.log(files);
-      const { message } = files;
+      // const { message } = files;
       const errs = files.filter((d) => d.status !== 200);
       if (errs.length) console.log(errs);
       return files;
@@ -411,7 +414,7 @@ export function checkForEnter(evt, node) {
 }
 export async function toggleOptions(node) {
   const vocabulary = await getTranslations();
-  const { object } = node.dataset || {};
+  // const { object } = node.dataset || {};
 
   for (const label of node.labels) {
     d3.select(label).attr(

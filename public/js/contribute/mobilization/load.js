@@ -11,6 +11,7 @@ import {
   togglePadLimit,
   togglePublic,
 } from '/js/contribute/mobilization/main.js';
+import { d3 } from '/js/globals.js';
 import { fixLabel } from '/js/main.js';
 
 function onLoad() {

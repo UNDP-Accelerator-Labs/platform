@@ -5,6 +5,7 @@ import {
   parseXLSX,
 } from '/js/contribute/xlsx/main.js';
 import { catchSubmit } from '/js/contribute/xlsx/save.js';
+import { d3 } from '/js/globals.js';
 
 function DOMLoad() {
   d3.select('div#import-file')

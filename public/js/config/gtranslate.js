@@ -2,6 +2,7 @@ import {
   getCurrentLanguage,
   getRegisteredLanguages,
 } from '/js/config/main.js';
+import { cookieStore, d3, google } from '/js/globals.js';
 
 export async function initGTranslate() {
   const language = await getCurrentLanguage();

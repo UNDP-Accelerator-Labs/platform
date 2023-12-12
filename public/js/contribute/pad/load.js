@@ -3,6 +3,7 @@ import { selectReviewLanguage } from '/js/contribute/pad/main.js';
 import { renderPad } from '/js/contribute/pad/render.js';
 import { partialSave, saveAndSubmit } from '/js/contribute/pad/save.js';
 import { initToolbarInteractions } from '/js/contribute/pad/toolbar.interactions.js';
+import { d3 } from '/js/globals.js';
 import { getMediaSize } from '/js/main.js';
 
 async function onLoad() {

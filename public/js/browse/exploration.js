@@ -1,4 +1,5 @@
 import { Exploration } from '/js/exploration.js';
+import { d3 } from '/js/globals.js';
 // INIT EXPLORATION
 async function initExploration() {
   const exploration = new Exploration();

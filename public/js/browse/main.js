@@ -1,5 +1,6 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
 
 export function openPreview() {
@@ -39,7 +40,8 @@ export async function setShareOptions(node) {
     label: 'Share',
   }; // TO DO: TRANSLATE
 
-  const new_constraint = await renderLonglistFormModal({
+  // const new_constraint =
+  await renderLonglistFormModal({
     message,
     formdata,
     opts,
@@ -48,7 +50,7 @@ export async function setShareOptions(node) {
 }
 export async function confirmRemoval(action) {
   const vocabulary = await getTranslations();
-  const sel = d3.select(this);
+  // const sel = d3.select(this);
   const datum = d3.select(this.parentNode).datum();
   const form = this.form;
   const flagged = d3.selectAll('article .outer.expand');

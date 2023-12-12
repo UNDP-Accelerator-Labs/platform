@@ -1,5 +1,6 @@
 import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { renderFormModal } from '/js/modals.js';
 
 // INIT THE SOCKET
@@ -95,5 +96,6 @@ export async function selectReviewLanguage(node) {
     value: value,
     label: vocabulary['submit for review'],
   });
-  const new_constraint = await renderFormModal({ message, formdata, opts });
+  // const new_constraint =
+  await renderFormModal({ message, formdata, opts });
 }

@@ -18,7 +18,8 @@
     "no-implicit-globals": "error",
     "no-invalid-this": "off",
     "no-undef": "error",
-    "no-extend-native": "off"
+    "no-extend-native": "off",
+    "new-cap": "off" // for GET, POST, PUT, etc.
   },
   "plugins": ["ejs-js"],
   "ignorePatterns": []

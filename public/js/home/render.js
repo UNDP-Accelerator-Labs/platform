@@ -1,9 +1,10 @@
 import { getCurrentLanguage } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { getContent, getMediaSize } from '/js/main.js';
 
 export async function renderCarousel() {
   const language = await getCurrentLanguage();
-  const page = JSON.parse(d3.select('data[name="page"]').node().value);
+  // const page = JSON.parse(d3.select('data[name="page"]').node().value);
 
   const container = d3.select('.slides');
   const panel = container.findAncestor('panel');

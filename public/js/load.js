@@ -1,4 +1,6 @@
 import { getRegisteredLanguages } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
+import { getMediaSize } from '/js/main';
 import {
   ensureIcon,
   expandstats,
@@ -134,9 +136,9 @@ async function onLoad() {
   d3.selectAll('div#filters div.search-filters div.tag label.close').on(
     'click',
     function () {
-      const sel = d3.select(this);
-      const tag = sel.findAncestor('tag');
-      const data_value = tag.attr('data-value');
+      // const sel = d3.select(this);
+      // const tag = sel.findAncestor('tag');
+      // const data_value = tag.attr('data-value');
 
       const filter_form = d3.select('nav#search-and-filter');
       filter_form.select('input#search-field').node().value = null;

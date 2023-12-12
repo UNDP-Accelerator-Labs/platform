@@ -1,3 +1,5 @@
+import { d3 } from '/js/globals.js';
+
 export function initSlideshowNavigation() {
   window.addEventListener('keydown', function (e) {
     // SET THE LEFT/RIGHT KEYBOARD NAVIGATION IF IN SLIDESHOW DISPLAY

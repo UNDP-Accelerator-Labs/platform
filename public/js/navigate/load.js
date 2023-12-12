@@ -1,4 +1,5 @@
 import { getCurrentLanguage } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { filterDropdown, getMediaSize, uploadFile } from '/js/main.js';
 
 async function onLoad() {

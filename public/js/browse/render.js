@@ -5,7 +5,9 @@ import {
   deleteArticles,
   unpublishArticles,
 } from '/js/browse/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3, uuidv4 } from '/js/globals.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
 import { renderFormModal, renderImgZoom } from '/js/modals.js';
 
@@ -567,7 +569,8 @@ export const Entry = function (_kwargs) {
               });
 
             if (d.dropdown?.length) {
-              const dropdown = sel
+              // const dropdown =
+              sel
                 .addElems('div', 'dropdown')
                 .addElems('menu', 'opts')
                 .addElems('li', 'opt', d.dropdown)
@@ -661,7 +664,8 @@ export const Entry = function (_kwargs) {
             disabled: true,
             label: vocabulary['submit for review'],
           });
-          const new_constraint = await renderFormModal({
+          // const new_constraint =
+          await renderFormModal({
             message,
             formdata,
             opts,
@@ -761,7 +765,8 @@ export const Entry = function (_kwargs) {
             type: 'submit',
             label: vocabulary['revoke'],
           });
-          const new_constraint = await renderFormModal({
+          // const new_constraint =
+          await renderFormModal({
             message,
             formdata,
             opts,
@@ -1914,7 +1919,9 @@ export const Entry = function (_kwargs) {
     },
   };
 };
-export function renderVignette(_section, _kwargs) {
+export async function renderVignette(_section, _kwargs) {
+  const language = getCurrentLanguage();
+  const vocabulary = getTranslations(language);
   const mediaSize = getMediaSize();
   const { data, object, space, page } = _kwargs;
 
@@ -1961,7 +1968,7 @@ export function renderVignette(_section, _kwargs) {
     render.pin(entry.foot);
     render.delete(entry.outer);
     render.unpublish(entry.outer);
-    render.exploration(entry.foot);
+    await render.exploration(entry.foot);
   } else if (page.display === 'slideshow') {
     render.img(entry.head);
     render.owner(entry.metagroup);
@@ -1985,7 +1992,7 @@ export function renderVignette(_section, _kwargs) {
     render.pin(entry.inner);
     render.delete(entry.outer);
     render.unpublish(entry.outer);
-    render.exploration(entry.foot);
+    await render.exploration(entry.foot);
   }
 }
 export async function renderSections() {
@@ -2036,7 +2043,8 @@ function initSlideshow() {
       d3.select(this).classed(d.class, true);
     })
     .classed('hide', (d) => {
-      const sel = d3.select(this);
+      // const sel =
+      d3.select(this);
       let focus_id = 0;
       d3.selectAll('.slide').each(function (c, i) {
         if (d3.select(this).classed('slide-in-view')) focus_id = i;

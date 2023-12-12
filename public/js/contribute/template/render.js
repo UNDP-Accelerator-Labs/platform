@@ -1,6 +1,7 @@
 import { language, vocabulary } from '/js/config/main.js';
 import { partialSave, switchButtons } from '/js/contribute/template/save.js';
 import { POST } from '/js/fetch.js';
+import { d3, uuidv4 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
@@ -574,7 +575,8 @@ export async function addSection(kwargs) {
     }
   }
 
-  const header = section
+  // const header =
+  section
     .addElems('div', 'section-header')
     .addElems('h1')
     .attrs({
@@ -649,7 +651,7 @@ export async function addSection(kwargs) {
   if (structure) {
     // THE PROMISES DO NOT SEEM TO WORK PROPERLY
     // WITH ASYNC CONTENT GETTING RENDERED OUT OF ORDER
-    const { structure: pagestructure } = section.datum();
+    // const { structure: pagestructure } = section.datum();
     for (let s = 0; s < structure.length; s++) {
       await populateSection(structure[s], lang, section.node());
     }
@@ -1673,14 +1675,15 @@ export async function addGroup(kwargs) {
 
 export async function renderTemplate() {
   // POPULATE THE PAGE
-  const object = d3.select('data[name="object"]').node()?.value;
+  // const object =
+  d3.select('data[name="object"]').node()?.value;
   const template = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
   );
-  const { activity } = JSON.parse(
-    d3.select('data[name="page"]').node()?.value,
-  );
-  const editing = activity === 'edit';
+  // const { activity } = JSON.parse(
+  //   d3.select('data[name="page"]').node()?.value,
+  // );
+  // const editing = activity === 'edit';
 
   if (template.id) {
     window.pagestats = { type: 'template', id: template.id };

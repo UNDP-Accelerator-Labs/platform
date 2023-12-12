@@ -12,8 +12,8 @@ const {
   app_base_host,
   getVersionObject,
   lodashNonce,
-} = include('config/');
-const { loginRateLimiterMiddleware } = include('routes/helpers/');
+} = require('config/');
+const { loginRateLimiterMiddleware } = require('routes/helpers/');
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');

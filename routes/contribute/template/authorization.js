@@ -3,8 +3,13 @@ const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 module.exports = _kwargs => {
 	const conn = _kwargs.connection || DB.conn
-	const { uuid, rights, id, collaborators } = _kwargs
-	const { read, write } = modules.find(d => d.type === 'templates')?.rights
+	const { uuid, rights, id, collaborators, mainobject } = _kwargs
+	let { read, write } = modules.find(d => d.type === 'templates')?.rights
+	if (['pad', 'review'].includes(mainobject)) {
+		// IF THE REQUEST IS COMING FROM A PAD OR A REVIEW PAGE
+		const { write: padwrite } = modules.find(d => d.type === 'pads')?.rights
+		if (typeof padwrite === 'object') read = padwrite.templated
+	}
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID) //.filter(d => d.rights >= (write ?? Infinity)).map(d => d.uuid)
 
 	if (rights < write) {

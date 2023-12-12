@@ -13,7 +13,7 @@ exports.own_app_url = 'https://solutions.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
-  { type: 'pads', rights: { read: 0, write: { blank: 2, templated: 1 } } },
+  { type: 'pads', rights: { read: 0, write: { blank: 2, templated: 0 } } }, // templated: 0 IS FOR PUBLIC MOBILIZATIONS
   { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 2 } },
   // { type: 'files', rights: { read: 0, write: 1 } },

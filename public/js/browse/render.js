@@ -1947,11 +1947,13 @@ export function renderVignette(_section, _kwargs) {
     // render.tags(entry.body)
     render.title(entry.body);
     render.owner(entry.body);
+    if (page.type === 'private') {
+      render.followup(entry.body);
+    }
     // if (data.img?.length === 0) render.txt(entry.body)
     render.txt(entry.body);
     if (page.type === 'private') {
       render.metainfo(entry.body);
-      render.followup(entry.body);
     }
     render.tags(entry.body);
     // if (mediaSize === 'xs') render.stats(entry.foot)

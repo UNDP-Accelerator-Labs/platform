@@ -21,12 +21,13 @@ if [ -z "${IMAGE_LOCAL}" ]; then
         -f deploy/Dockerfile \
         .
 else
+    IMAGE_NAME="${IMAGE_NAME}-local"
+    IMAGE_LOCAL="local image "
     docker buildx build \
         --build-arg "PORT=${PORT}" \
         -t "${IMAGE_NAME}" \
         -f deploy/Dockerfile \
         .
-    IMAGE_LOCAL="local image "
 fi
 
 echo "built ${IMAGE_LOCAL}${IMAGE_NAME}"

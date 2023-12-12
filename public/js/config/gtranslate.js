@@ -32,8 +32,10 @@ export async function initGTranslate() {
     currentUrl.pathname = newPath;
     const newUrl = `${currentUrl}`;
 
-    if (reload) window.location.href = newUrl;
-    else window.history.replaceState({}, '', newUrl);
+    if(newUrl !== window.location.href ){
+      if (reload) window.location.href = newUrl;
+      else window.history.replaceState({}, '', newUrl);
+    }
   }
 
   // IF THE SELECTED LANGUAGE IS ONE OF THE MODULE LANGUAGES, IGNORE GOOGLE TRANSLATE FOR VOCABULARY OBJ
@@ -51,7 +53,7 @@ export async function initGTranslate() {
 
   // LISTEN TO CHANGES IN G_LANGUAGE COOKIES
   function listenCookieChange(callback, interval = 1000) {
-    let lastCookie = document.cookie;
+    let lastCookie = null;
     setInterval(() => {
       let cookie = document.cookie;
       if (cookie !== lastCookie) {
@@ -65,14 +67,17 @@ export async function initGTranslate() {
   }
 
   listenCookieChange(({ oldValue, newValue }) => {
+    let seengtranslate = false
     newValue.split('; ').forEach((cookie) => {
       const [name, value] = cookie.split('=');
       if (name === 'googtrans') {
+        seengtranslet = true;
         const lang = value.split('/')[2];
         updateDomTree(lang);
         rewriteUrl(lang);
-      } else rewriteUrl('en', true);
+      } 
     });
+    if(!seengtranslate) rewriteUrl('en', true);
   }, 1000);
 
   setCookie('googtrans', `/en/${language}`, 1);

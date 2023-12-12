@@ -2016,9 +2016,9 @@ export async function renderSections() {
 
   if (!page.mapscale || page.mapscale === 'contain') {
     for (let s = 0; s < sections.size(); s++) {
-      const section = d3.select(sections.nodes()[s]).addElems('div', 'layout')
+      const section = d3.select(sections.nodes()[s]).addElems('div', 'layout');
       section.classed(page.display, true);
-      
+
       const { data } = section.datum();
       for (let i = 0; i < data.length; i++) {
         await renderVignette(section, { data: data[i], object, space, page });

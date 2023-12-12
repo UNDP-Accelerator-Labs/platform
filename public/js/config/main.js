@@ -3,7 +3,7 @@ import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 
 let cachedLanguage = null;
-async function getCurrentLanguage() {
+export async function getCurrentLanguage() {
   if (cachedLanguage) {
     return cachedLanguage;
   }

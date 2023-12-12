@@ -2029,6 +2029,7 @@ export async function renderSections() {
     //   const section = d3.select(this);
     //   section.classed(page.display, true);
     //   d.data.forEach((c) =>
+    //     // TO DO: following function is async -- replace call and the loop
     //     section.call(renderVignette, { data: c, object, space, page }),
     //   );
     // });

@@ -102,6 +102,7 @@ export function renderPromiseModal(data, close = true) {
       .each(function (d) {
         const sel = d3.select(this);
         if (d.classname) d3.select(this).classed(d.classname, true);
+        // TO DO: following function is async -- replace call and the loop
         sel.call(addInputNode, { d, resolve });
       });
   });
@@ -160,6 +161,7 @@ export async function renderFormModal(data, close = true) {
     .each(function (d) {
       const sel = d3.select(this);
       if (d.classname) d3.select(this).classed(d.classname, true);
+      // TO DO: following function is async -- replace call and the loop
       sel.call(addInputNode, { d });
     });
 
@@ -251,6 +253,7 @@ export async function renderLonglistFormModal(data, close = true) {
   ul.addElems('li', 'opt link', (d) => d)
     .classed('default', (d) => d.default || false)
     .each(function (d) {
+      // TO DO: following function is async -- replace call and the loop
       d3.select(this).call(addInputNode, { d });
     });
 

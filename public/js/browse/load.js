@@ -447,6 +447,7 @@ async function onLoad() {
           response.sections
             .find((s) => s.status === d.status)
             .data.forEach((c) =>
+              // TO DO: following function is async -- replace call and the loop
               section.call(renderVignette, { data: c, display }),
             );
         });

@@ -31,34 +31,12 @@ module.exports = async (req, res) => {
 			}
 
 			if (app_storage) {
-				source = containerClient.getBlockBlobClient(source)
-				const targetdir = join('uploads/', uuid)
-				target = containerClient.getBlockBlobClient(join(targetdir, `${file.filename}.${path.extname(source)}`))
-				
-				await moveBlob({ containerClient, source, target })
-				
-				// ISSUE HERE IS THAT WE DO NOT CREATE THE SMALL INSTANCE OF THE IMAGE
-
-				// SAVE A REF OF THE FILE IF RELEVANT
-				if (modules.some(d => d.type === 'files')){
-					const { filename } = file
-					const pathurl = `${app_storage}/${targetdir}/${filename}.${path.extname(source)}`
-					return DB.conn.one(`
-						INSERT INTO files (name, path, owner)
-						VALUES ($1, $2, $3)
-						RETURNING id
-					;`, [file.originalname, pathurl, uuid])
-					.then(result => {
-						if (result) {
-							return { status: 200, src: join(targetdir, filename), originalname: file.originalname, message: 'success' }
-						} else {
-							return { status: 403, message: 'file was not properly stored' }
-						}
-					}).catch(err => console.log(err))
-				}
+				let { origin, pathname } = new URL(app_storage)
+				pathname = path.join(pathname, source)
+				source = new URL(pathname, origin).href
+				return await upload({ uuid, file, source, containerClient });
 			} else {
 				source = path.join(rootpath, `./${source}`)
-
 				// SIMULATE file OBJECT NEEDED TO UPLOAD IMAGES
 				return await upload({ uuid, file, source, containerClient });
 			}

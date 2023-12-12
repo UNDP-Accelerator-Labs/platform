@@ -1,6 +1,6 @@
 const { app_storage, modules, DB } = include('config/')
 const fs = require('fs')
-const { join, extname } = require ('path')
+const { join, extname, relative } = require ('path')
 const Jimp = require('jimp')
 
 module.exports = async (kwargs) => {
@@ -48,8 +48,13 @@ module.exports = async (kwargs) => {
 						.catch(err => console.log(err))
 					}
 
-					// REMOVE source FILE IN tmp
-					fs.unlinkSync(source)
+					// REMOVE source FILE IN tmp IF IT EXISTS (MEANING IF IT IS ON THE SERVER AND NOT IN THE BLOB STORAGE)
+					if (fs.existsSync(source)) {
+						fs.unlinkSync(source)
+					} else {
+						const sourceBlobClient = containerClient.getBlockBlobClient(relative(app_storage, source));
+						await sourceBlobClient.delete();
+					}
 
 					console.log('should have written main file')
 				}).catch(err => console.log(err))

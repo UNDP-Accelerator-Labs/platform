@@ -133,14 +133,14 @@ export async function toggleChecked(node) {
     parent.selectAll('menu li').classed('hide', false);
   }
 }
-export function selectAllOpts(node) {
+export async function selectAllOpts(node) {
+  const vocabulary = await getTranslations();
   const parent = d3.select(node).findAncestor('modal');
   parent
     .select('.global-opt')
     .toggleClass('active')
     .select('button')
-    .html(async (_) => {
-      const vocabulary = await getTranslations();
+    .html((_) => {
       return parent.select('.global-opt').classed('active')
         ? vocabulary['deselect all']
         : vocabulary['select all'];

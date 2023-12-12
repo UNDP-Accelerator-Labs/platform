@@ -109,8 +109,8 @@ function onLoad() {
     });
   mobilization
     .select('.modal.m-6 .foot .global-opt button')
-    .on('click', function () {
-      selectAllOpts(this);
+    .on('click', async function () {
+      await selectAllOpts(this);
       enableNext(this);
     });
   mobilization

@@ -1106,11 +1106,12 @@ export const Entry = function (_kwargs) {
         version_depth,
       } = _sel.datum();
 
+      let treeinfo;
       if (source) {
-        window.treeinfo = _sel.addElems('div', 'meta meta-tree');
+        treeinfo = _sel.addElems('div', 'meta meta-tree');
 
         if (version_depth > 1) {
-          const versiontree = window.treeinfo
+          const versiontree = treeinfo
             .addElems('div', 'meta meta-versiontree')
             .addElems('a')
             .attr(
@@ -1124,7 +1125,7 @@ export const Entry = function (_kwargs) {
         }
       }
       if (source && is_followup) {
-        const followup = window.treeinfo
+        const followup = treeinfo
           .addElems('div', 'meta meta-followup')
           .attr('title', (d) => d.source_title);
         followup
@@ -1147,7 +1148,7 @@ export const Entry = function (_kwargs) {
           .html((d) => d.source_title);
       }
       if (source && is_forward) {
-        const forward = window.treeinfo
+        const forward = treeinfo
           .addElems('div', 'meta meta-forward')
           .attr('title', (d) => d.source_title);
         forward.addElems('i').html(`${vocabulary['forwarded from']}:&nbsp;`);
@@ -1168,7 +1169,7 @@ export const Entry = function (_kwargs) {
           .html((d) => d.source_title);
       }
       if (source && is_copy) {
-        const copy = window.treeinfo
+        const copy = treeinfo
           .addElems('div', 'meta meta-copy', (d) =>
             d.source && d.is_copy ? [d] : [],
           )
@@ -1191,7 +1192,7 @@ export const Entry = function (_kwargs) {
           .html((d) => d.source_title);
       }
       if (source && is_child) {
-        const child = window.treeinfo
+        const child = treeinfo
           .addElems('div', 'meta meta-child', (d) =>
             d.source && d.is_child ? [d] : [],
           )

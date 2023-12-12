@@ -68,24 +68,22 @@ async function onLoad() {
       });
 
       const url = new URL(window.location);
-      if (!window.queryparams)
-        window.queryparams = new URLSearchParams(url.search);
-      window.queryparams.delete('display');
+      const queryparams = new URLSearchParams(url.search);
+      queryparams.delete('display');
 
       d3.select('div.display-source a').attr(
         'href',
-        `?${window.queryparams.toString()}`,
+        `?${queryparams.toString()}`,
       );
     }
   } else if (d3.select('div.display-option.display-source').node()) {
     const url = new URL(window.location);
-    if (!window.queryparams)
-      window.queryparams = new URLSearchParams(url.search);
-    window.queryparams.set('display', 'adjacent-source');
+    const queryparams = new URLSearchParams(url.search);
+    queryparams.set('display', 'adjacent-source');
 
     d3.select('div.display-source a').attr(
       'href',
-      `?${window.queryparams.toString()}`,
+      `?${queryparams.toString()}`,
     );
   }
   // OR FOR REVIEW
@@ -110,24 +108,22 @@ async function onLoad() {
       }
 
       const url = new URL(window.location);
-      if (!window.queryparams)
-        window.queryparams = new URLSearchParams(url.search);
-      window.queryparams.delete('display');
+      const queryparams = new URLSearchParams(url.search);
+      queryparams.delete('display');
 
       d3.select('div.display-reviews a').attr(
         'href',
-        `?${window.queryparams.toString()}`,
+        `?${queryparams.toString()}`,
       );
     }
   } else if (d3.select('div.display-option.display-reviews').node()) {
     const url = new URL(window.location); // url IS ALREADY DEFINED SOMEWHERE ELSE
-    if (!window.queryparams)
-      window.queryparams = new URLSearchParams(url.search);
-    window.queryparams.set('display', 'adjacent-reviews');
+    const queryparams = new URLSearchParams(url.search);
+    queryparams.set('display', 'adjacent-reviews');
 
     d3.select('div.display-reviews a').attr(
       'href',
-      `?${window.queryparams.toString()}`,
+      `?${queryparams.toString()}`,
     );
   }
 

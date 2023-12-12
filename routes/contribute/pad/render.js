@@ -25,11 +25,12 @@ module.exports = async (req, res) => {
 				if (referer) return res.redirect(referer)
 				else res.redirect('/login')
 			} else if (authorized && redirect && redirect !== activity) {
-				const query = []
-				for (const key in req.query) {
-					query.push(`${key}=${req.query[key]}`)
-				}
-				return res.redirect(`/${language}/${redirect}/pad${query.length > 0 ? `?${query.join('&')}` : ''}`)
+				// const query = []
+				// for (const key in req.query) {
+				// 	query.push(`${key}=${req.query[key]}`)
+				// }
+				const query = new URLSearchParams(req.query || {});
+				return res.redirect(`/${language}/${redirect}/pad?${query.toString()}`)
 			} else {
 				const batch = []
 

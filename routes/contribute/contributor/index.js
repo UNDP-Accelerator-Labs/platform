@@ -21,12 +21,12 @@ module.exports = async (req, res) => {
 					if (referer) return res.redirect(referer)
 					else res.redirect('/login')
 				} else if (authorized && redirect && redirect !== activity) {
-					const query = []
-					for (const [key, value] of req.query) {
-						query.push(`${key}=${value}`);
-					}
-					return res.redirect(`/${language}/${redirect}/contributor${query.length > 0 ? `?${query.join('&')}` : ''}`)
-					// return res.redirect(`/${language}/${redirect}/contributor?id=${id}`)
+					// const query = []
+					// for (const [key, value] of req.query) {
+					// 	query.push(`${key}=${value}`);
+					// }
+					const query = new URLSearchParams(req.query || {});
+					return res.redirect(`/${language}/${redirect}/contributor?${query.toString()}`)
 				} else {
 					const country_name_column = await geo.adm0.name_column({ connection: t, language })
 					const batch = []

@@ -308,7 +308,7 @@
 									<div class='dropdown'>
 										<ul>
 											<li>
-												<a href='/<%- language %>/mobilize/cohort'>
+												<a href='/<%- language %>/contribute/mobilization'>
 													<button>
 														<label data-vocab='call for contributions'></label>
 													</button>
@@ -334,7 +334,7 @@
 															<% locals.metadata.menu.pinboards.forEach(d => { %>
 																<li class='status-<%- d.status %>'>
 																	<!-- TO DO: REROUTE THIS -->
-																	<a href='/<%- language %>/mobilize/cohort?pinboard=<%- d.id %>'>
+																	<a href='/<%- language %>/contribute/mobilization?pinboard=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -368,7 +368,7 @@
 															<% locals.metadata.menu.mobilizations.filter(d => !d.target_id)
 															.forEach(d => { %>
 																<li class='status-<%- d.status %>'>
-																	<a href='/<%- language %>/mobilize/cohort?source=<%- d.id %>'>
+																	<a href='/<%- language %>/contribute/mobilization?source=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -401,7 +401,7 @@
 															<% } %>
 															<% locals.metadata.menu.mobilizations.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/mobilize/cohort?copy=true&source=<%- d.id %>'>
+																	<a href='/<%- language %>/contribute/mobilization?copy=true&source=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>
@@ -438,7 +438,7 @@
 															.filter(d => !(d.source && !d.copy) && d.status === 1 && !d.child)
 															.forEach(d => { %>
 																<li>
-																	<a href='/<%- language %>/mobilize/cohort?child=true&source=<%- d.id %>'>
+																	<a href='/<%- language %>/contribute/mobilization?child=true&source=<%- d.id %>'>
 																		<button class='wrapable'>
 																			<label><%- d.title %></label>
 																			<div class='sub'>

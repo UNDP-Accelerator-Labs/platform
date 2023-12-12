@@ -473,7 +473,7 @@ export const Entry = function (_kwargs) {
               }
               if (d.status === 2) {
                 opts.push({
-                  action: `/${language}/mobilize/cohort`,
+                  action: `/${language}/contribute/mobilization`,
                   method: 'GET',
                   node: 'button',
                   type: 'submit',
@@ -491,7 +491,7 @@ export const Entry = function (_kwargs) {
               }
               if (d.status === 2) {
                 opts.push({
-                  action: `/${language}/mobilize/cohort`,
+                  action: `/${language}/contribute/mobilization`,
                   method: 'GET',
                   node: 'button',
                   type: 'submit',
@@ -865,6 +865,7 @@ export const Entry = function (_kwargs) {
             obj.label =
               vocabulary['contributor'][total !== 1 ? 'plural' : 'singular'];
             obj.count = contributors;
+            obj.href = `/${language}/view/${object.slice(0, -1)}?id=${d.id}&display=stats`
             obj.text = `${contributors} <small class='total'>/ ${total}</small>`;
             data.push(obj);
           }

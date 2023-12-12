@@ -2015,24 +2015,21 @@ export async function renderSections() {
   const sections = layout.addElems('section', `container ${object}`, data);
 
   if (!page.mapscale || page.mapscale === 'contain') {
-    for (let s = 0; s < sections.size(); s++) {
-      const section = d3.select(sections.nodes()[s]).addElems('div', 'layout');
-      section.classed(page.display, true);
-
-      const { data } = section.datum();
-      for (let i = 0; i < data.length; i++) {
-        await renderVignette(section, { data: data[i], object, space, page });
-      }
+    const arenders = [];
+    sections.addElems('div', 'layout').each(function (d) {
+      const section = d3.select(this);
+      arenders.push(async () => {
+        section.classed(page.display, true);
+      });
+      d.data.forEach((c) => {
+        arenders.push(async () => {
+          await renderVignette(section, { data: c, object, space, page });
+        });
+      });
+    });
+    for (const arender of arenders) {
+      await arender();
     }
-
-    // sections.addElems('div', 'layout').each(async function (d) {
-    //   const section = d3.select(this);
-    //   section.classed(page.display, true);
-    //   d.data.forEach((c) =>
-    //     // TO DO: following function is async -- replace call and the loop
-    //     section.call(renderVignette, { data: c, object, space, page }),
-    //   );
-    // });
 
     if (page.display === 'slideshow') {
       initSlideshow();

@@ -441,16 +441,21 @@ async function onLoad() {
 
         const response = await GET(`?${queryparams.toString()}`); // NO TARGET NEEDED SINCE SAME AS CURRENT PAGE
 
-        // TO DO: THIS NEEDS UPDATING AS renderVignette IS AN ASYNC FUNCTION NOWW
+        const asections = [];
         d3.selectAll('section.container div.layout').each(function (d) {
           const section = d3.select(this);
           response.sections
             .find((s) => s.status === d.status)
             .data.forEach((c) =>
-              // TO DO: following function is async -- replace call and the loop
-              section.call(renderVignette, { data: c, display }),
+              asections.push(
+                async () =>
+                  await renderVignette(section, { data: c, display }),
+              ),
             );
         });
+        for (const asection of asections) {
+          await asection();
+        }
 
         if (page < pages) lazyloading = false;
         else d3.selectAll('.lds-ellipsis').classed('hide', true);

@@ -14,8 +14,6 @@ help:
 	@echo "git-check	ensures no git visible files have been altered"
 	@echo "run-web	runs the webserver"
 	@echo "run-sass	runs the sass compiler"
-	@echo "run-service-worker	runs the service worker create script"
-	@echo "run-no-service-worker	remove the service worker"
 	@echo "pretty	runs eslint-fix and prettier"
 	@echo "script	run a script from the scripts folder"
 
@@ -51,12 +49,6 @@ run-web:
 
 run-sass:
 	CMD=sass ./sh/run.sh
-
-run-service-worker:
-	npm run service-worker
-
-run-no-service-worker:
-	rm ./public/app.serviceWorker.js || true
 
 pretty:
 	CMD=lint-fix ./sh/run.sh

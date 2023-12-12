@@ -23,9 +23,7 @@ COPY package-lock.json .
 RUN npm install
 COPY . .
 RUN npm run sass-deploy
-RUN npm run service-worker
 RUN npm run build --if-present
-RUN make run-no-service-worker
 
 ENV HOST=0.0.0.0
 ENV PORT=${PORT}

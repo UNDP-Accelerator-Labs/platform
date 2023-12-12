@@ -23,4 +23,3 @@ feedback/
 *.diff
 version.txt
 public/css/
-public/app.serviceWorker.js

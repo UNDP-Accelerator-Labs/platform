@@ -4,15 +4,13 @@ import { d3 } from '/js/globals.js';
 
 const debugging = false;
 
-if (false) {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker
-        .register('/app.serviceWorker.js')
-        .then((res) => console.log('service worker registered'))
-        .catch((err) => console.log('service worker not registered', err));
-    });
-  }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker
+      .register('/app.serviceWorker.js')
+      .then((res) => console.log('service worker registered'))
+      .catch((err) => console.log('service worker not registered', err));
+  });
 }
 
 let mediaSize = null;
@@ -35,6 +33,7 @@ function doGetMediaSize() {
       else return window.matchMedia(`(min-width: ${d.size}px)`).matches;
     })?.label;
 }
+
 export function getMediaSize() {
   if (!mediaSize) {
     mediaSize = doGetMediaSize();

@@ -11,8 +11,7 @@
     "dev": "nodemon app.js",
     "lint": "./node_modules/.bin/eslint .",
     "lint-fix": "./node_modules/.bin/eslint . --fix",
-    "pretty": "prettier . --write",
-    "service-worker": "node create_service_worker.js"
+    "pretty": "prettier . --write"
   },
   "author": "",
   "license": "ISC",
@@ -49,7 +48,6 @@
     "rate-limiter-flexible": "^3.0.0",
     "request": "^2.88.2",
     "smoothscroll-polyfill": "^0.4.4",
-    "sw-precache": "^5.2.1",
     "useragent": "^2.3.0",
     "uuid": "^8.3.2",
     "xlsx": "^0.18.5"

@@ -19,8 +19,6 @@ export async function initGTranslate() {
     document.cookie = `${key}=${value};domain=${mainHost}`;
   }
 
-  d3.select('#gtranslate-dummy-lang').style('display', 'none');
-
   function rewriteUrl(lang, reload = false) {
     if (!lang) {
       lang = 'en';
@@ -61,6 +59,7 @@ export async function initGTranslate() {
           callback({ oldValue: lastCookie, newValue: cookie });
         } finally {
           if (!lastCookie) {
+            d3.select('#gtranslate-dummy-lang').style('display', 'none');
             new google.translate.TranslateElement(
               {
                 pageLanguage: 'en',

@@ -83,35 +83,40 @@ export function parseXLSX(file, node) {
         return { id: name?.extractDigits(), type: 'img', src: imageUrl };
       });
     }
-    workbook.SheetNames.forEach(async (s, i) => {
-      const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
-        defval: null,
-      });
-
-      const keys = Object.keys(json[0]);
-      if (images.length) {
-        // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
-        // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
-        const cols = keys.map((d) => {
-          const obj = {};
-          obj.key = d;
-          obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
-          return obj;
+    const sheets = workbook.SheetNames.map(() => {
+      return async (s, i) => {
+        const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
+          defval: null,
         });
-        const imageCol = cols.find((d) => !d.values.length)?.key || null;
-        if (imageCol) {
-          json.forEach((d, i) => {
-            // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
-            d[imageCol] = images.find((c) => c.id === i + 1);
+
+        const keys = Object.keys(json[0]);
+        if (images.length) {
+          // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
+          // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval
+          const cols = keys.map((d) => {
+            const obj = {};
+            obj.key = d;
+            obj.values = json.map((c) => c[d]).filter((c) => c); // VALUES IS SPARSE: IT ONLY KEEPS EXISTING (NOT null, AS PER THE defval) VALUES
+            return obj;
           });
+          const imageCol = cols.find((d) => !d.values.length)?.key || null;
+          if (imageCol) {
+            json.forEach((d, i) => {
+              // THIS IS WHERE WE ASSOCIATE IMAGES BY INDEX (WHICH IS WHY IMAGES HAVE TO BE ADDED OR LAYERED IN THE CORRECT ORDER IN EXCEL)
+              d[imageCol] = images.find((c) => c.id === i + 1);
+            });
+          }
         }
-      }
-      if (i === 0) {
-        // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
-        const cols = parseColumns(json, keys);
-        await renderTable(cols);
-      }
+        if (i === 0) {
+          // TO DO: THIS IS TEMP WHILE WE DO NOT ASK FOR SHEET OF INTEREST
+          const cols = parseColumns(json, keys);
+          await renderTable(cols);
+        }
+      };
     });
+    for (const sheet of sheets) {
+      await sheet();
+    }
     // HIDE THE LOADING BUTTON
     const main = d3.select('div.table main');
     const layout = main.select('div.inner');

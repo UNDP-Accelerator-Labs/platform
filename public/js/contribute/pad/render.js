@@ -958,20 +958,25 @@ async function addImgs(kwargs) {
   const fls = data.filter((d) => d.status === 200);
   // THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
   if (fls.length === 1) {
-    fls.forEach(async (f) => {
-      let datum = {};
-      if (container) datum = container.datum();
-      if (datum.type !== 'img') datum = { instruction: datum.instruction };
-      datum['src'] = f.src;
-      await addImg({
-        data: datum,
-        lang,
-        sibling,
-        container,
-        focus,
-        objectdata,
-      });
+    const afls = fls.map(() => {
+      return async (f) => {
+        let datum = {};
+        if (container) datum = container.datum();
+        if (datum.type !== 'img') datum = { instruction: datum.instruction };
+        datum['src'] = f.src;
+        await addImg({
+          data: datum,
+          lang,
+          sibling,
+          container,
+          focus,
+          objectdata,
+        });
+      };
     }); // ONLY ONE IMAGE SO NO MOSAIC
+    for (const afl of afls) {
+      await afl();
+    }
   } else {
     let datum = {};
     if (container) datum = container.datum();

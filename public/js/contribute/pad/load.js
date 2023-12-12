@@ -1,4 +1,3 @@
-import { initGTranslate } from '/js/config/gtranslate.js';
 import { selectReviewLanguage } from '/js/contribute/pad/main.js';
 import { renderPad } from '/js/contribute/pad/render.js';
 import { partialSave, saveAndSubmit } from '/js/contribute/pad/save.js';
@@ -8,8 +7,6 @@ import { getMediaSize } from '/js/main.js';
 
 async function onLoad() {
   const mediaSize = getMediaSize();
-
-  await initGTranslate();
 
   const { id, type, source } = JSON.parse(
     d3.select('data[name="pad"]').node()?.value,

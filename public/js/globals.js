@@ -1,5 +1,3 @@
-// TO DO: cookieStore IS NOT AVAILABLE ON SAFARI OR FIREFOX
-export const cookieStore = window.cookieStore;
 export const d3 = window.d3;
 export const google = window.google;
 export const L = window.L;

@@ -12,14 +12,11 @@ import {
 } from '/js/browse/main.js';
 import { renderSections, renderVignette } from '/js/browse/render.js';
 import { partialSave } from '/js/browse/save.js';
-import { initGTranslate } from '/js/config/gtranslate.js';
 import { GET, POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 import { checkForEnter, fixLabel, getMediaSize } from '/js/main.js';
 
 async function onLoad() {
-  await initGTranslate();
-
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
   const {

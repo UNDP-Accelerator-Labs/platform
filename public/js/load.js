@@ -1,3 +1,4 @@
+import { initGTranslate } from '/js/config/gtranslate.js';
 import { getRegisteredLanguages, getTranslations } from '/js/config/main.js';
 import { d3 } from '/js/globals.js';
 import {
@@ -12,6 +13,9 @@ import {
 
 async function onLoad() {
   const vocabulary = await getTranslations();
+
+  await initGTranslate();
+
   d3.selectAll('[data-vocab]').html(function () {
     const vocab =
       this.dataset.vocab ||

@@ -1,12 +1,11 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
-import { addSection } from '/js/contribute/template/render.js';
+import { addSection } from '/js/contribute/pad/render.js';
 import { POST } from '/js/fetch.js';
 import { XLSX, d3 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 export async function dropHandler(evt, node) {
-  const vocabulary = await getTranslations();
   evt.preventDefault();
   const sel = d3.select(node);
   const label = sel.select('.drop-zone button label');
@@ -14,7 +13,9 @@ export async function dropHandler(evt, node) {
   if (evt.dataTransfer.items) {
     // DataTransferItemList INTERFACE TO ACCES THE FILE
     const items = evt.dataTransfer.items;
+
     if (items.length > 1) {
+      const vocabulary = await getTranslations();
       sel.classed('accept', false).classed('reject', true);
       label.html(vocabulary['chose only one file']['xlsx']);
     } else {
@@ -27,10 +28,12 @@ export async function dropHandler(evt, node) {
         ) {
           parseXLSX(file, d3.select(node).select('input[type=file]').node());
         } else {
+          const vocabulary = await getTranslations();
           sel.classed('accept', false).classed('reject', true);
           label.html(vocabulary['chose file']['xlsx']);
         }
       } else {
+        const vocabulary = await getTranslations();
         sel.classed('accept', false).classed('reject', true);
         label.html(vocabulary['chose file']['xlsx']);
       }
@@ -39,6 +42,7 @@ export async function dropHandler(evt, node) {
     // DataTransfer INTERFAE TO ACCESS THE FILE
     const items = evt.dataTransfer.files;
     if (items.length > 1) {
+      const vocabulary = await getTranslations();
       sel.classed('accept', false).classed('reject', true);
       label.html(vocabulary['chose only one file']['xlsx']);
     } else {
@@ -49,6 +53,7 @@ export async function dropHandler(evt, node) {
       ) {
         parseXLSX(file, d3.select(node).select('input[type=file]').node());
       } else {
+        const vocabulary = await getTranslations();
         sel.classed('accept', false).classed('reject', true);
         label.html(vocabulary['chose file']['xlsx']);
       }
@@ -106,8 +111,8 @@ export function parseXLSX(file, node) {
       //   }
       // });
     }
-    const sheets = workbook.SheetNames.map(() => {
-      return async (s, i) => {
+    const sheets = workbook.SheetNames.map((s, i) => {
+      return async () => {
         const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
           defval: null,
         });
@@ -1844,7 +1849,6 @@ async function previewPad(idx) {
             return d;
           }),
         );
-
         await addSection({ data, lang: language, objectdata });
       }
     }

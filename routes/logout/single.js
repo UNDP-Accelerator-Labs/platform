@@ -1,5 +1,5 @@
 const { DB } = include("config/");
-const { sessionupdate } = include('routes/helpers')
+const { sessionupdate } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
   const { sessionID: sid } = req || {};

@@ -4,7 +4,7 @@ const path = require('path');
 const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 
-const { createContainer } = include('routes/upload/container_functions.js');
+const { blobContainer } = include('routes/helpers/');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 module.exports = (req, res) => {
@@ -26,7 +26,7 @@ module.exports = (req, res) => {
 			// ESTABLISH THE CONNECTION TO AZURE
 			const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 			// FIND OR CREATE THE CONTAINER
-			containerClient = await createContainer(blobServiceClient)
+			containerClient = await blobContainer.createContainer(blobServiceClient)
 
 			const blobClient = containerClient.getBlockBlobClient(path.join(targetdir, name))
 			await blobClient.uploadData(buffer)

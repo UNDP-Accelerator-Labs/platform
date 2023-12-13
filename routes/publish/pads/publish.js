@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers')
+const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {

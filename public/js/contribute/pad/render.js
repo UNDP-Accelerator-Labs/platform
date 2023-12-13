@@ -1345,7 +1345,7 @@ async function addTitle(kwargs) {
     lang,
     objectdata,
   });
-  // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+  // REMOVE THE PLACEMENT OPTIONS: gS CANNOT BE MOVED
   // (PRESUMABLY THIS IS NOT NEEDED BECAUSE addTitle IS ONLY USED IN THE SPECIFIC CASE OF A TEMPLATED PAD THAT IS DEPLOYED IN A PUBLIC MOBILIZATION)
   if (media.placement) media.placement.remove();
   if (media.input) media.input.remove();
@@ -4320,7 +4320,7 @@ export async function renderPad(kwargs) {
 
     if (object !== 'review' && !is_review) {
       if (title) {
-        main.select('.head .title').html(title);
+        main.select('.head .title').html(title.trim());
       }
     }
     if (['source', 'review'].includes(object) && !type) {

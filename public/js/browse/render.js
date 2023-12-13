@@ -805,10 +805,8 @@ export const Entry = function (_kwargs) {
         .attrs({ loading: 'lazy', alt: (_) => vocabulary['missing image'] })
         .each(function (d) {
           const node = this;
-
           const img = new Image();
           img.onload = function () {
-            console.log('onload');
             node.src = this.src;
           };
 

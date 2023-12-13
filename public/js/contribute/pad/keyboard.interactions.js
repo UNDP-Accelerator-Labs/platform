@@ -100,7 +100,6 @@ window.addEventListener('keydown', async function (e) {
   }
 });
 window.addEventListener('keyup', async function (e) {
-  const language = await getCurrentLanguage();
   e = e || event;
   const mainobject = d3.select('data[name="object"]').node()?.value;
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
@@ -194,6 +193,7 @@ window.addEventListener('keyup', async function (e) {
         )
       ) {
         if (editing) {
+          const language = await getCurrentLanguage();
           if (page.type === 'private') await switchButtons(language);
           else window.sessionStorage.setItem('changed-content', true);
         }

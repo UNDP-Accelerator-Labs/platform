@@ -204,7 +204,8 @@ async function onLoad() {
     ); // DO NOT PASS A RESOURCE, SO ESSENTIALLY CANCEL THE REQUEST
   };
 
-  const mobilization = await renderPromiseModal({ headline, opts }, close);
+  // const mobilization =
+  await renderPromiseModal({ headline, opts }, close);
 }
 
 window.addEventListener('load', onLoad);

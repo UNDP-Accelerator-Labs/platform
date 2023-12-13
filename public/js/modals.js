@@ -95,15 +95,21 @@ export function renderPromiseModal(data, close = true) {
         if (input.node()) input.node().focus();
       });
 
+    const asels = [];
     inner
       .addElems('ul', 'opts', opts ? [opts] : [])
       .addElems('li', 'opt link', (d) => d)
       .classed('default', (d) => d.default || false)
       .each(function (d) {
-        const sel = d3.select(this);
-        if (d.classname) d3.select(this).classed(d.classname, true);
-        sel.call(addInputNode, { d, resolve });
+        asels.push(async () => {
+          const sel = d3.select(this);
+          if (d.classname) d3.select(this).classed(d.classname, true);
+          await addInputNode(sel, { d, resolve });
+        });
       });
+    for (const asel of asels) {
+      await asel();
+    }
   });
 }
 export async function renderFormModal(data, close = true) {
@@ -153,15 +159,21 @@ export async function renderFormModal(data, close = true) {
       method: (d) => d.method || 'GET',
     });
 
+  const asels = [];
   form
     .addElems('ul', 'opts', opts ? [opts] : [])
     .addElems('li', 'opt link', (d) => d)
     .classed('default', (d) => d.default || false)
     .each(function (d) {
-      const sel = d3.select(this);
-      if (d.classname) d3.select(this).classed(d.classname, true);
-      sel.call(addInputNode, { d });
+      asels.push(async () => {
+        const sel = d3.select(this);
+        if (d.classname) d3.select(this).classed(d.classname, true);
+        await addInputNode(sel, { d });
+      });
     });
+  for (const asel of asels) {
+    await asel();
+  }
 
   form.addElems('div', 'foot', foot ? [foot] : []).each(function (d) {
     const sel = d3.select(this);
@@ -248,11 +260,17 @@ export async function renderLonglistFormModal(data, close = true) {
 
   ul.addElems('li', 'padding');
 
+  const asels = [];
   ul.addElems('li', 'opt link', (d) => d)
     .classed('default', (d) => d.default || false)
     .each(function (d) {
-      d3.select(this).call(addInputNode, { d });
+      asels.push(async () => {
+        await addInputNode(d3.select(this), { d });
+      });
     });
+  for (const asel of asels) {
+    await asel();
+  }
 
   form.addElems('div', 'foot', foot ? [foot] : []).each(function (d) {
     const sel = d3.select(this);

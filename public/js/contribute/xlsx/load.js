@@ -37,8 +37,15 @@ function doLoad() {
 
   const searchForm = d3.select('body form#contribute');
   if (searchForm.node().attachEvent)
-    searchForm.node().attachEvent('submit', async evt => await catchSubmit(evt));
-  else searchForm.node().addEventListener('submit', async evt => await catchSubmit(evt));
+    searchForm.node().attachEvent('submit', async (evt) => {
+      evt.preventDefault();
+      await catchSubmit(evt);
+    });
+  else
+    searchForm.node().addEventListener('submit', async (evt) => {
+      evt.preventDefault();
+      await catchSubmit(evt);
+    });
 }
 
 window.addEventListener('load', doLoad);

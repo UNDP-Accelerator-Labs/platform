@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
 			return { status: 403, ftype: file.mimetype, message: 'wrong file format' }
 		}
 	});
-	
+
 	Promise.all(promises)
 	.then(results => res.json(results))
 	.catch(err => {

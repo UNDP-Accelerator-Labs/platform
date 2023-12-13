@@ -2,6 +2,7 @@ help:
 	@echo "The following make targets are available:"
 	@echo "create-user	interactively inserts a new user into the login db"
 	@echo "build	build the docker image"
+	@echo "local-build	build a local docker image that can run on the current machine"
 	@echo "publish	deploys the next version with the current commit"
 	@echo "azlogin	log in to azure container storage"
 	@echo "dockerpush	push the current docker image to azure"
@@ -56,6 +57,9 @@ pretty:
 
 build:
 	./sh/build.sh
+
+local-build:
+	IMAGE_LOCAL=local ./sh/build.sh
 
 publish:
 	./sh/deploy.sh

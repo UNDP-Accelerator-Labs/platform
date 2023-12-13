@@ -116,14 +116,26 @@ export async function renderMosaic() {
     if (d.title?.length > 50) return d.title?.slice(0, 50).trim();
     else return d.title;
   });
-  vignette.addElems('img').attr('src', (d) => {
-    if (d3.select('data[name="app_storage"]').node()) {
-      const app_storage = d3.select('data[name="app_storage"]').node().value;
-      return new URL(`${app_storage}${d.img[0]}`).href;
-    } else {
-      return d.img[0];
-    }
-  });
+  vignette
+    .addElems('img')
+    .attr('src', (d) => {
+      if (d3.select('data[name="app_storage"]').node()) {
+        const app_storage = d3.select('data[name="app_storage"]').node().value;
+        return new URL(`${app_storage}${d.img[0]}`).href;
+      } else {
+        return d.img[0];
+      }
+    })
+    .each(function () {
+      const imgNode = this;
+      const setReady = () => {
+        d3.select(imgNode).classed('img-ready', true);
+      };
+      imgNode.addEventListener('load', setReady);
+      if (imgNode.complete) {
+        setReady();
+      }
+    });
 
   window.onresize = (evt) => {
     renderMosaic();

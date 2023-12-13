@@ -805,9 +805,11 @@ export const Entry = function (_kwargs) {
         .attrs({ loading: 'lazy', alt: (_) => vocabulary['missing image'] })
         .each(function (d) {
           const node = this;
+          console.log('hi');
 
           const img = new Image();
           img.onload = function () {
+            console.log('onload');
             node.src = this.src;
           };
 
@@ -827,6 +829,7 @@ export const Entry = function (_kwargs) {
           let retries = 50;
           // NOTE: using setTimeout since the img load event is not reliably triggered
           const maybeReady = () => {
+            console.log(retries);
             if (retries <= 0 || node.complete) {
               d3.select(node).classed('img-ready', true);
             } else {

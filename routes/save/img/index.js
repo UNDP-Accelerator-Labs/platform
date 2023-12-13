@@ -1,5 +1,5 @@
 const { modules, app_storage } = include('config/');
-const { createContainer, moveBlob } = include('routes/upload/container_functions.js');
+const { blobContainer, moveBlob } = include('routes/helpers/');
 const upload = include('routes/upload/img/');
 const { v4: uuidv4 } = require('uuid');
 
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 			// ESTABLISH THE CONNECTION TO AZURE
 			const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 			// FIND OR CREATE THE CONTAINER
-			containerClient = await createContainer(blobServiceClient)
+			containerClient = await blobContainer.createContainer(blobServiceClient)
 		}
 
 		const promises = sources.map(async source => {

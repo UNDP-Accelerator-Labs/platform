@@ -4,7 +4,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 const fs = require('fs')
 const { join } = require('path')
 
-const { createContainer } = require('./container_functions.js')
+const { blobContainer } = include('routes/helpers/')
 
 const img = require('./img/')
 const video = require('./video/')
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 		// ESTABLISH THE CONNECTION TO AZURE
 		const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 		// FIND OR CREATE THE CONTAINER
-		containerClient = await createContainer(blobServiceClient)
+		containerClient = await blobContainer.createContainer(blobServiceClient)
 	}
 
 	const promises = fls.map(async file => {

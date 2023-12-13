@@ -6,13 +6,12 @@ import { addGlobalLoader, rmGlobalLoader } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
 
 export async function catchSubmit(evt) {
+  if (evt.preventDefault) evt.preventDefault();
   const language = await getCurrentLanguage();
   const vocabulary = await getTranslations(language);
   const { participations } = JSON.parse(
     d3.select('data[name="page"]').node().value,
   );
-
-  if (evt.preventDefault) evt.preventDefault();
 
   // 1) SELECT MOBILIZATION TO CONTRIBUTE TO
   const target_opts = participations

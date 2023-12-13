@@ -411,8 +411,8 @@ export class Exploration {
       .on('keydown', async () => {
         const evt = d3.event;
         if (evt.code === 'Enter' || evt.keyCode === 13) {
-          await this.confirmExplorationPrompt(false);
           evt.preventDefault();
+          await this.confirmExplorationPrompt(false);
           evt.srcElement.blur();
         }
       })

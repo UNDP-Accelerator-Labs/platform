@@ -1,5 +1,5 @@
 const { DB, app_base_host } = include("config/");
-const { sessionupdate } = include('routes/helpers')
+const { sessionupdate } = include('routes/helpers/')
 const { deviceInfo, sendDeviceCode } = require("./device-info");
 const { v4: uuidv4 } = require("uuid");
 

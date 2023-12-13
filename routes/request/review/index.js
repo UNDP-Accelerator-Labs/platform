@@ -19,8 +19,8 @@ module.exports = (req, res) => {
 	// THE FOLLOWING IS TECHNICALLY NOT NEEDED
 	c_process.on('message', message => {
 		console.log('passing info from child process')
-		Promise.all(message.map(() => {
-			return async d => {
+		Promise.all(message.map((d) => {
+			return async _ => {
 				// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
 				if (d.notifications) {
 					return await sendemail({

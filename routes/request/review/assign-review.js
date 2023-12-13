@@ -1,7 +1,7 @@
 global.include = (path) => require(`../../../${path}`);
 
 const path = require('path')
-const { safeArr, DEFAULT_UUID } = include('routes/helpers')
+const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 process.on('message', message => {
 	const { rootpath, id, language, reviewers, tagfocus, uuid } = message || {} 

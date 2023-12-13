@@ -805,10 +805,10 @@ export const Entry = function (_kwargs) {
         .attrs({ loading: 'lazy', alt: (_) => vocabulary['missing image'] })
         .each(function (d) {
           const node = this;
+
           const img = new Image();
           img.onload = function () {
             node.src = this.src;
-            d3.select(node).classed('img-ready', true);
           };
 
           if (!Array.isArray(d.img)) d.img = [d.img];
@@ -823,6 +823,16 @@ export const Entry = function (_kwargs) {
           if (page.display === 'slideshow' || mediaSize === 'xs') {
             img.src = source.replace('uploads/sm/', 'uploads/');
           } else img.src = source;
+
+          const setReady = () => {
+            d3.select(node).classed('img-ready', true);
+          };
+
+          if (node.complete) {
+            setReady();
+          } else {
+            node.addEventListener('load', setReady);
+          }
         });
     },
     stats: function (_sel) {

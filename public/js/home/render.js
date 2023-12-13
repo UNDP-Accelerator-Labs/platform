@@ -131,10 +131,10 @@ export async function renderMosaic() {
       const setReady = () => {
         d3.select(imgNode).classed('img-ready', true);
       };
+      imgNode.addEventListener('load', setReady);
       if (imgNode.complete) {
         setReady();
       }
-      imgNode.addEventListener('load', setReady);
     });
 
   window.onresize = (evt) => {

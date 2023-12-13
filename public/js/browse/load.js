@@ -425,6 +425,7 @@ async function onLoad() {
   if (load === 'lazy') {
     let lazyloading = false;
     window.onscroll = async function (ev) {
+      ev.preventDefault();
       if (
         window.innerHeight + window.scrollY >= document.body.offsetHeight &&
         !lazyloading

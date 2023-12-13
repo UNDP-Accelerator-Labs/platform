@@ -2173,6 +2173,7 @@ export async function addDrawing(kwargs) {
     });
     ['mouseup', 'ontouchend'].forEach((evt_handler) => {
       window.addEventListener(evt_handler, async (evt) => {
+        evt.preventDefault();
         if (canvas.node()['__drawing__']) {
           canvas.node()['__drawing__'] = false;
 

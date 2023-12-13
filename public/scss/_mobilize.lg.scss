@@ -892,12 +892,12 @@ main#mobilize-existing {
 // }
 
 table.stats {
-	width: 100%;
-	table-layout: fixed;
-	margin-bottom: 60px;
-	border-spacing: 0;
+  width: 100%;
+  table-layout: fixed;
+  margin-bottom: 60px;
+  border-spacing: 0;
 
-	thead {
+  thead {
     tr {
       font-size: $t-mid;
 
@@ -905,11 +905,11 @@ table.stats {
         padding: 15px 30px;
       }
     }
-	}
-	tbody {
-		color: $c-mid-grey;
+  }
+  tbody {
+    color: $c-mid-grey;
 
-		tr {
+    tr {
       &.top-level {
         td {
           cursor: pointer;
@@ -917,8 +917,8 @@ table.stats {
       }
 
       &:hover {
-  			background-color: $c-light-3;
-  		}
+        background-color: $c-light-3;
+      }
       &.open {
         color: $c-dark-grey;
 
@@ -952,10 +952,9 @@ table.stats {
           );
         }
       }
-  		&.error {
-
+      &.error {
         &:nth-child(even) {
-    			background: repeating-linear-gradient(
+          background: repeating-linear-gradient(
             45deg,
             #fff,
             #fff 3px,
@@ -972,7 +971,7 @@ table.stats {
             rgba(165, 30, 65, 0.1) 6px
           );
         }
-  		}
+      }
 
       td {
         padding: 5px 15px;
@@ -981,5 +980,5 @@ table.stats {
         }
       }
     }
-	}
+  }
 }

@@ -33,7 +33,7 @@ module.exports = async (kwargs) => {
 				if (source && copy !== 'true' && child !== 'true') { // THIS IS A FOLLOW UP OF A PERVIOUS MOBILIZATION
 					// SO WE WANT TO KEEP AT MOST THE SAME participants
 					batch.push(t.task(t1 => {
-						return t1.one(`SELECT public FROM mobilizations WHERE id = $1::INT;`, [ source ], d => d.public)
+						return t1.oneOrNone(`SELECT public FROM mobilizations WHERE id = $1::INT;`, [ source ], d => d?.public)
 						.then(result => {
 							if (result === true) { // THE SOURCE IS A PUBLIC MOBILIZATION
 								// SO THERE IS NO NEED FOR A COHORT

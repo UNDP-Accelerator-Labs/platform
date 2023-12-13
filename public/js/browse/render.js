@@ -824,14 +824,17 @@ export const Entry = function (_kwargs) {
             img.src = source.replace('uploads/sm/', 'uploads/');
           } else img.src = source;
 
-          const setReady = () => {
-            d3.select(node).classed('img-ready', true);
+          let retries = 50;
+          // NOTE: using setTimeout since the img load event is not reliably triggered
+          const maybeReady = () => {
+            if (retries <= 0 || node.complete) {
+              d3.select(node).classed('img-ready', true);
+            } else {
+              retries -= 1;
+              setTimeout(maybeReady, 100);
+            }
           };
-
-          node.addEventListener('load', setReady);
-          if (node.complete) {
-            setReady();
-          }
+          maybeReady();
         });
     },
     stats: function (_sel) {

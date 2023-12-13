@@ -7,7 +7,7 @@ module.exports = async _kwargs => {
 
 	const { rights: modulerights, publish } = modules.find(d => d.type === 'pads') || {}
 	let { read, write } = modulerights || {}
-	
+
 	if (typeof write === 'object') {
 		if (!id && template) write = write.templated
 		else if (id) {
@@ -21,7 +21,7 @@ module.exports = async _kwargs => {
 	if (public || rights < write) {
 		// if public and status < 3 then not authorized
 		if (mobilization) {
-			return conn.one(`SELECT public FROM mobilizations WHERE id = $1::INT;`, [ mobilization ], d => d.public)
+			return conn.oneOrNone(`SELECT public FROM mobilizations WHERE id = $1::INT;`, [ mobilization ], d => d?.public)
 			// TO DO: EDIT HERE FOR mobilization LANGUAGE
 			.then(result => {
 				if (result === true) return { authorized: true }
@@ -29,7 +29,7 @@ module.exports = async _kwargs => {
 			}).catch(err => console.log(err))
 		}
 		else {
-			if (id) return conn.one(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => public ? d.status > 2 : d.status >= read)
+			if (id) return conn.oneOrNone(`SELECT status FROM pads WHERE id = $1::INT;`, [ id ], d => public ? d?.status > 2 : d?.status >= read)
 				.then(result => {
 					if (result === true) return { authorized: (public || rights >= read), redirect: 'view' }
 					else return { authorized: false }
@@ -68,9 +68,9 @@ module.exports = async _kwargs => {
 				// OTHREWISE REDIRECT
 				batch.push(t.oneOrNone(`
 					SELECT CASE WHEN
-						(SELECT DISTINCT (participant) 
-							FROM mobilization_contributors 
-							WHERE mobilization = $1::INT 
+						(SELECT DISTINCT (participant)
+							FROM mobilization_contributors
+							WHERE mobilization = $1::INT
 								AND participant = $2
 						) IS NOT NULL
 							OR $3 > 2

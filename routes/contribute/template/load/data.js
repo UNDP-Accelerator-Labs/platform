@@ -19,7 +19,6 @@ module.exports = async kwargs => {
 		authorized = authorization.authorized
 	}
 
-
 	if (authorized === false) return null
 	else {
 		const engagement = engagementsummary({ doctype: 'template', engagementtypes, docid: +id, uuid })

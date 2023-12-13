@@ -1,8 +1,10 @@
-import { language } from '/js/config/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { filterDropdown, getMediaSize, uploadFile } from '/js/main.js';
 
-function DOMLoad() {
-  if (!mediaSize) var mediaSize = getMediaSize();
+async function onLoad() {
+  const language = await getCurrentLanguage();
+  const mediaSize = getMediaSize();
 
   // EXPAND NAVIGATION ON SMALL DISPLAYS
   d3.select('button#expand-nav').on('click', function () {
@@ -30,7 +32,7 @@ function DOMLoad() {
         let { top, height } = this.getBoundingClientRect();
         top = top + height;
         const viewheight = window.innerHeight;
-        if (!mediaSize) var mediaSize = getMediaSize();
+        const mediaSize = getMediaSize();
         if (mediaSize === 'xs' && top + 300 >= viewheight)
           dropdown.classed('dropup', true);
 
@@ -103,8 +105,4 @@ function DOMLoad() {
   }
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', onLoad);

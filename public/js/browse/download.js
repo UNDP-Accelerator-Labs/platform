@@ -1,9 +1,11 @@
-import { vocabulary } from '/js/config/main.js';
+import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { getContent } from '/js/main.js';
 import { renderFormModal } from '/js/modals.js';
 
 export async function setDownloadOptions() {
+  const vocabulary = await getTranslations();
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
 
@@ -61,10 +63,10 @@ export async function setDownloadOptions() {
     const notemplates = templates.every((d) => [null, undefined].includes(d));
 
     // const countries = (data.map(d => d.data.map(c => c.country)).flat()).unique()
-    const years = data
-      .map((d) => d.data)
-      .flat()
-      .unique();
+    // const years = data
+    //   .map((d) => d.data)
+    //   .flat()
+    //   .unique();
 
     formdata = { action: '/apis/download/pads', method: 'POST' };
     message = vocabulary['select download options'];
@@ -307,19 +309,19 @@ export async function setDownloadOptions() {
         sel.selectAll('button').attr('disabled', deactivate ? true : null);
       });
     }
-    function limitSelection(data) {
-      const { name, type, form: formnode } = this;
-      const node = this;
+    // function limitSelection(data) {
+    //   const { name, type, form: formnode } = this;
+    //   const node = this;
 
-      // .dropdown menu li
-      const form = d3.select(formnode);
-      form.selectAll(`input[name=${name}]`).each(function () {
-        if (this !== node) {
-          this.checked = false;
-          d3.select(this.parentNode).classed('active', false);
-        }
-      });
-    }
+    //   // .dropdown menu li
+    //   const form = d3.select(formnode);
+    //   form.selectAll(`input[name=${name}]`).each(function () {
+    //     if (this !== node) {
+    //       this.checked = false;
+    //       d3.select(this.parentNode).classed('active', false);
+    //     }
+    //   });
+    // }
     function downloadPDF(data) {
       const elements = Array.from(this.form.elements).filter((elem) => {
         const sel = d3.select(elem);
@@ -410,5 +412,6 @@ export async function setDownloadOptions() {
     });
   }
 
-  const new_constraint = await renderFormModal({ message, formdata, opts });
+  // const new_constraint =
+  await renderFormModal({ message, formdata, opts });
 }

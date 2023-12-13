@@ -19,16 +19,18 @@ module.exports = (req, res) => {
 	// THE FOLLOWING IS TECHNICALLY NOT NEEDED
 	c_process.on('message', message => {
 		console.log('passing info from child process')
-		message.forEach(async d => {
-			// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
-			if (d.notifications) {
-				return await sendemail({
-					to: d.email,
-					subject: `[${platformName}] Request for review`,
-					html: `You are invited to review the submission entitled "${title}" on the <a href="${own_app_url}">${platformName}</a>. Please navigate <a href="${own_app_url}en/browse/reviews/pending">here</a> to accept or decline the review.`
-				})
+		Promise.all(message.map((d) => {
+			return async _ => {
+				// SEND EMAIL NOTIFICATION TO USERS WHO ACCEPT EMAIL NOTIFICATIONS
+				if (d.notifications) {
+					return await sendemail({
+						to: d.email,
+						subject: `[${platformName}] Request for review`,
+						html: `You are invited to review the submission entitled "${title}" on the <a href="${own_app_url}">${platformName}</a>. Please navigate <a href="${own_app_url}en/browse/reviews/pending">here</a> to accept or decline the review.`
+					})
+				}
 			}
-		})
+		}))
 	})
 	c_process.on('exit', code => {
 		console.log('child process done')

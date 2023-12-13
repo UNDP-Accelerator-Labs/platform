@@ -1,8 +1,10 @@
-import { language } from '/js/config/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import { getContent, getMediaSize } from '/js/main.js';
 
 export async function renderCarousel() {
-  const page = JSON.parse(d3.select('data[name="page"]').node().value);
+  const language = await getCurrentLanguage();
+  // const page = JSON.parse(d3.select('data[name="page"]').node().value);
 
   const container = d3.select('.slides');
   const panel = container.findAncestor('panel');
@@ -78,6 +80,7 @@ function animateCarousel(idx) {
   let animation = setTimeout((_) => animateCarousel(idx + 1), delay);
 }
 export async function renderMosaic() {
+  const language = await getCurrentLanguage();
   const page = JSON.parse(d3.select('data[name="page"]').node().value);
 
   const container = d3.select('.slides');
@@ -87,7 +90,7 @@ export async function renderMosaic() {
   if (!slides.length) return panel.remove();
 
   // TO DO: LOAD MOSAIC DATA DYNAMICALLY HERE
-  if (!mediaSize) var mediaSize = getMediaSize();
+  const mediaSize = getMediaSize();
   if (mediaSize === 'xs') slides = slides.slice(0, 11);
   else if (mediaSize === 'sm') slides = slides.slice(0, 21);
   else if (mediaSize === 'm') slides = slides.slice(0, 26);
@@ -113,14 +116,26 @@ export async function renderMosaic() {
     if (d.title?.length > 50) return d.title?.slice(0, 50).trim();
     else return d.title;
   });
-  vignette.addElems('img').attr('src', (d) => {
-    if (d3.select('data[name="app_storage"]').node()) {
-      const app_storage = d3.select('data[name="app_storage"]').node().value;
-      return new URL(`${app_storage}${d.img[0]}`).href;
-    } else {
-      return d.img[0];
-    }
-  });
+  vignette
+    .addElems('img')
+    .attr('src', (d) => {
+      if (d3.select('data[name="app_storage"]').node()) {
+        const app_storage = d3.select('data[name="app_storage"]').node().value;
+        return new URL(`${app_storage}${d.img[0]}`).href;
+      } else {
+        return d.img[0];
+      }
+    })
+    .each(function () {
+      const imgNode = this;
+      const setReady = () => {
+        d3.select(imgNode).classed('img-ready', true);
+      };
+      imgNode.addEventListener('load', setReady);
+      if (imgNode.complete) {
+        setReady();
+      }
+    });
 
   window.onresize = (evt) => {
     renderMosaic();

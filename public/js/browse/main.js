@@ -1,5 +1,6 @@
-import { language, vocabulary } from '/js/config/main.js';
+import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
 
 export function openPreview() {
@@ -9,6 +10,7 @@ export function openPreview() {
 }
 
 export async function setShareOptions(node) {
+  const language = await getCurrentLanguage();
   const { id, contributors: curr_contributors } = node.dataset || {};
   const contributors = await POST(`/${language}/browse/contributors/invited`, {
     limit: null,
@@ -38,7 +40,8 @@ export async function setShareOptions(node) {
     label: 'Share',
   }; // TO DO: TRANSLATE
 
-  const new_constraint = await renderLonglistFormModal({
+  // const new_constraint =
+  await renderLonglistFormModal({
     message,
     formdata,
     opts,
@@ -46,7 +49,8 @@ export async function setShareOptions(node) {
   });
 }
 export async function confirmRemoval(action) {
-  const sel = d3.select(this);
+  const vocabulary = await getTranslations();
+  // const sel = d3.select(this);
   const datum = d3.select(this.parentNode).datum();
   const form = this.form;
   const flagged = d3.selectAll('article .outer.expand');
@@ -122,7 +126,8 @@ export function addequivalents(node) {
     .selectAll('input[type=hidden]')
     .attr('disabled', node.checked ? null : true);
 }
-export function toggletag(node, d) {
+export async function toggletag(node, d) {
+  const vocabulary = await getTranslations();
   const sel = d3.select(node);
   const filter = sel.findAncestor('filter');
   let taggroup = d3.select(filter.node().nextElementSibling);
@@ -155,15 +160,15 @@ export function toggletag(node, d) {
           else return d.name.capitalize();
         } else return vocabulary['unknown'];
       });
-    tag.addElems('label', 'close').on('click', function () {
-      rmtag(this, d);
+    tag.addElems('label', 'close').on('click', async function () {
+      await rmtag(this, d);
     });
   } else {
     taggroup.selectAll(`.tag[data-id="${d.id}"]`).remove();
     if (taggroup.selectAll('.tag').size() === 0) taggroup.remove();
   }
 }
-export function rmtag(node, d) {
+export async function rmtag(node, d) {
   const sel = d3.select(node);
   const tag = sel.findAncestor('tag');
   const taggroup = tag.findAncestor('active-filters');
@@ -175,7 +180,7 @@ export function rmtag(node, d) {
     })
     .node();
   input.checked = false;
-  toggletag(input, d);
+  await toggletag(input, d);
 }
 export async function pinAll(node) {
   const object = d3.select('data[name="object"]').node().value;

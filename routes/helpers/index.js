@@ -1,6 +1,7 @@
 const { DB } = include('config/')
 
 exports.array = require('./array/')
+exports.blobContainer = require('./blobcontainer/')
 exports.join = require('./joins/')
 exports.parsers = require('./parsers/')
 exports.datastructures = require('./datastructures/')

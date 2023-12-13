@@ -1,4 +1,5 @@
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 
 let startTime = performance.now();
 let currentProgress = 0;

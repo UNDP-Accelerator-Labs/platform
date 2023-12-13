@@ -1,4 +1,5 @@
 import { POST } from '/js/fetch.js';
+import { d3 } from '/js/globals.js';
 
 // TO DO: DEPRECATE THIS IN FAVOR OF reset-password (WITH OTP)
 export function initUpdatePassword() {

@@ -1,3 +1,5 @@
+import { d3 } from '/js/globals.js';
+
 export function partialSave() {
   // CHECK WHETHER GOOD TO SAVE
   const metastatus = d3

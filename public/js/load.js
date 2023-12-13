@@ -1,5 +1,6 @@
-import { languages } from '/js/config/main.js'
-import { POST } from '/js/fetch.js';
+import { initGTranslate } from '/js/config/gtranslate.js';
+import { getRegisteredLanguages, getTranslations } from '/js/config/main.js';
+import { d3 } from '/js/globals.js';
 import {
   ensureIcon,
   expandstats,
@@ -10,18 +11,20 @@ import {
   toggleOptions,
 } from '/js/main.js';
 
-if (!mediaSize) var mediaSize = getMediaSize();
+async function onLoad() {
+  const vocabulary = await getTranslations();
 
-async function DOMLoad() {
+  await initGTranslate();
+
   d3.selectAll('[data-vocab]').html(function () {
     const vocab =
       this.dataset.vocab ||
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = printTranslation(this, vocab);
+    let translation = printTranslation(this, vocab, vocabulary);
     if (!translation)
-      translation = printTranslation(this, this.dataset.altvocab);
+      translation = printTranslation(this, this.dataset.altvocab, vocabulary);
     return translation;
   });
   d3.selectAll('[data-vocabprefix]').each(function () {
@@ -30,8 +33,9 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let prefix = printTranslation(this, vocab);
-    if (!prefix) prefix = printTranslation(this, this.dataset.altvocab);
+    let prefix = printTranslation(this, vocab, vocabulary);
+    if (!prefix)
+      prefix = printTranslation(this, this.dataset.altvocab, vocabulary);
     if (this.value) {
       this.value = `[${prefix}] ${this.value}`;
     } else {
@@ -48,9 +52,9 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = printTranslation(this, vocab);
+    let translation = printTranslation(this, vocab, vocabulary);
     if (!translation)
-      translation = printTranslation(this, this.dataset.altvocab);
+      translation = printTranslation(this, this.dataset.altvocab, vocabulary);
     return translation;
   });
   d3.selectAll('[data-content]').attr('data-content', function () {
@@ -59,9 +63,9 @@ async function DOMLoad() {
       this.dataset.vocabprefix ||
       this.dataset.placeholder ||
       this.dataset.content;
-    let translation = printTranslation(this, vocab);
+    let translation = printTranslation(this, vocab, vocabulary);
     if (!translation)
-      translation = printTranslation(this, this.dataset.altvocab);
+      translation = printTranslation(this, this.dataset.altvocab, vocabulary);
     return translation;
   });
 
@@ -72,10 +76,14 @@ async function DOMLoad() {
   if (pathname.split('/').length > 1) {
     pathname = `${pathname.split('/').slice(1).join('/')}${url.search}`;
   }
+  const languages = await getRegisteredLanguages();
   // const { languages } = await POST('/load/metadata', { feature: 'languages' });
   languages.forEach((d) => {
     if (typeof d === 'object') {
-      d3.select(`#lang-${d.language} a`).attr('href', `/${d.language}/${pathname}`);
+      d3.select(`#lang-${d.language} a`).attr(
+        'href',
+        `/${d.language}/${pathname}`,
+      );
     } else {
       d3.select(`#lang-${d} a`).attr('href', `/${d}/${pathname}`);
     }
@@ -122,18 +130,18 @@ async function DOMLoad() {
     });
 
   // ENABLE EXPANSION OF STATISTICS IN sm VIEWS
-  if (mediaSize === 'xs') {
-    d3.select('button#expand-statistics').on('click', function () {
-      expandstats(this);
+  if (getMediaSize() === 'xs') {
+    d3.select('button#expand-statistics').on('click', async function () {
+      await expandstats(this);
     });
   }
   // INITIALIZE FILTER TAGS
   d3.selectAll('div#filters div.search-filters div.tag label.close').on(
     'click',
     function () {
-      const sel = d3.select(this);
-      const tag = sel.findAncestor('tag');
-      const data_value = tag.attr('data-value');
+      // const sel = d3.select(this);
+      // const tag = sel.findAncestor('tag');
+      // const data_value = tag.attr('data-value');
 
       const filter_form = d3.select('nav#search-and-filter');
       filter_form.select('input#search-field').node().value = null;
@@ -176,7 +184,7 @@ async function DOMLoad() {
 
   // ANIMATE THE EYE ICON
   let eye_icon = '/imgs/icons/i-eye';
-  if (mediaSize === 'xs') {
+  if (getMediaSize() === 'xs') {
     eye_icon = '/imgs/icons/i-eye-sm';
   }
   ensureIcon(
@@ -186,17 +194,12 @@ async function DOMLoad() {
     200,
     2000,
   );
+  window.addEventListener('scroll', function () {
+    d3.select('button.scroll-nav').classed(
+      'hide',
+      document.documentElement.scrollTop > 60,
+    );
+  });
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
-
-window.addEventListener('scroll', function () {
-  d3.select('button.scroll-nav').classed(
-    'hide',
-    document.documentElement.scrollTop > 60,
-  );
-});
+window.addEventListener('load', onLoad);

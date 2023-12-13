@@ -39,7 +39,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        'img-src': csp_links, // .concat(['blob:']),
+        'img-src': csp_links,
         'script-src': csp_links.concat([
           (req, res) => `'nonce-${res.locals.nonce}'`,
           'sha256-NNiElek2Ktxo4OLn2zGTHHeUR6b91/P618EXWJXzl3s=',
@@ -51,13 +51,7 @@ app.use(
           'sdg-innovation-commons.org',
         ],
         'style-src': csp_links,
-        // .concat([
-        //   "'unsafe-inline'"
-        // ]),
-        'connect-src': csp_links.concat([
-          // 'blob:http:://localhost:2000/'
-          // 'blob:',
-        ]),
+        'connect-src': csp_links,
         'frame-src': [
           "'self'",
           '*.sdg-innovation-commons.org',

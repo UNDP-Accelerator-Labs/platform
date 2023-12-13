@@ -5,12 +5,13 @@ import {
   parseXLSX,
 } from '/js/contribute/xlsx/main.js';
 import { catchSubmit } from '/js/contribute/xlsx/save.js';
+import { d3 } from '/js/globals.js';
 
-function DOMLoad() {
+function doLoad() {
   d3.select('div#import-file')
-    .on('drop', function () {
+    .on('drop', async function () {
       const evt = d3.event;
-      dropHandler(evt, this);
+      await dropHandler(evt, this);
     })
     .on('dragover', function () {
       const evt = d3.event;
@@ -29,18 +30,22 @@ function DOMLoad() {
   d3.select('.sidebar button.column-action.group').on('click', (_) =>
     groupColumns(),
   );
-  d3.select('.sidebar button.column-action.delete').on('click', (_) =>
-    dropColumns(),
+  d3.select('.sidebar button.column-action.delete').on(
+    'click',
+    async (_) => await dropColumns(),
   );
 
   const searchForm = d3.select('body form#contribute');
   if (searchForm.node().attachEvent)
-    searchForm.node().attachEvent('submit', catchSubmit);
-  else searchForm.node().addEventListener('submit', catchSubmit);
+    searchForm.node().attachEvent('submit', async (evt) => {
+      evt.preventDefault();
+      await catchSubmit(evt);
+    });
+  else
+    searchForm.node().addEventListener('submit', async (evt) => {
+      evt.preventDefault();
+      await catchSubmit(evt);
+    });
 }
 
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', DOMLoad);
-} else {
-  DOMLoad();
-}
+window.addEventListener('load', doLoad);

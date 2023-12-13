@@ -52,7 +52,7 @@ DB.conn.tx(async t => {
 						.forEach(b => {
 							const unregistered_tags = b.tags.filter(a => notype_tags.includes(a.id))
 							if (unregistered_tags.length > 0) {
-								unregistered_tags.forEach(async a => {
+								unregistered_tags.forEach(a => {
 									a.type = b.name // SET THE type IN THE pad > sections > tags
 
 									// CHECK IF THE COMPLETE TAG (WITH type) ALREADY EXISTS IN THE DB

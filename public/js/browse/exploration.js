@@ -1,6 +1,7 @@
 import { Exploration } from '/js/exploration.js';
+import { d3 } from '/js/globals.js';
 // INIT EXPLORATION
-function initExploration() {
+async function initExploration() {
   const exploration = new Exploration();
 
   // EXPLORATION MODULE
@@ -15,19 +16,22 @@ function initExploration() {
     updateExplorationHint();
   });
 
-  exploration.addExplorationMain(d3.select('div.exploration'), () => {
-    hasUsedExploration = exploration.hasExploration();
-    if (fixedEid) {
-      exploration.updateById(fixedEid);
-    }
-    if (fixedEid || exploration.isVisible()) {
-      doSelectSTM('stm-exploration');
-    }
-    if (!isExplorationInit) {
-      isExplorationInit = true;
-      exploration.triggerIdChange();
-    }
-  });
+  await exploration.addExplorationMain(
+    d3.select('div.exploration'),
+    async () => {
+      hasUsedExploration = exploration.hasExploration();
+      if (fixedEid) {
+        await exploration.updateById(fixedEid);
+      }
+      if (fixedEid || exploration.isVisible()) {
+        await doSelectSTM('stm-exploration');
+      }
+      if (!isExplorationInit) {
+        isExplorationInit = true;
+        exploration.triggerIdChange();
+      }
+    },
+  );
 
   exploration.addIdChangeListener((eid, isVisible) => {
     formExplorationId.attrs({
@@ -48,7 +52,7 @@ function initExploration() {
     }
   });
 
-  function doSelectSTM(stm) {
+  async function doSelectSTM(stm) {
     curSelectSTM = stm;
     d3.selectAll('.stm').classed('stm-select', function () {
       return d3.select(this).attr('id') === curSelectSTM;
@@ -58,7 +62,7 @@ function initExploration() {
     if (isExploration) {
       updateExplorationHint();
     } else {
-      exploration.updateById(null);
+      await exploration.updateById(null);
     }
     exploration.triggerIdChange();
   }
@@ -77,12 +81,12 @@ function initExploration() {
 
   let onlyHide = false;
 
-  d3.selectAll('.stm').on('click', function () {
+  d3.selectAll('.stm').on('click', async function () {
     if (onlyHide) {
       onlyHide = false;
       return;
     }
-    doSelectSTM(d3.select(this).attr('id'));
+    await doSelectSTM(d3.select(this).attr('id'));
   });
 
   d3.selectAll('.stm-hint').on('click', function (e) {
@@ -98,4 +102,11 @@ function initExploration() {
 
   return exploration;
 }
-export const exploration = initExploration();
+
+let exploration = null;
+export async function getExploration() {
+  if (!exploration) {
+    exploration = await initExploration();
+  }
+  return exploration;
+}

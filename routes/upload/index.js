@@ -1,8 +1,10 @@
-const { app_storage, app_title_short } = include('config/')
+const { app_storage } = include('config/')
 
 const { BlobServiceClient } = require('@azure/storage-blob')
 const fs = require('fs')
 const { join } = require('path')
+
+const { blobContainer } = include('routes/helpers/')
 
 const img = require('./img/')
 const video = require('./video/')
@@ -19,7 +21,7 @@ module.exports = async (req, res) => {
 		// ESTABLISH THE CONNECTION TO AZURE
 		const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 		// FIND OR CREATE THE CONTAINER
-		containerClient = await createContainer(blobServiceClient)
+		containerClient = await blobContainer.createContainer(blobServiceClient)
 	}
 
 	const promises = fls.map(async file => {
@@ -46,18 +48,11 @@ module.exports = async (req, res) => {
 			return { status: 403, ftype: file.mimetype, message: 'wrong file format' }
 		}
 	});
-	
+
 	Promise.all(promises)
 	.then(results => res.json(results))
 	.catch(err => {
 		console.log(err)
 		res.json({ status: 500, message: 'Oops! Something went wrong.' });
 	});
-}
-
-async function createContainer (blobServiceClient) {
-	// CREATE CONTAINER
-	const containerClient = blobServiceClient.getContainerClient(app_title_short)
-	const createContainerResponse = await containerClient.createIfNotExists({ access: 'blob' })
-	return containerClient
 }

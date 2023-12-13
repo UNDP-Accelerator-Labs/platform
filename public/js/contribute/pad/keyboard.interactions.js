@@ -1,6 +1,7 @@
-import { language } from '/js/config/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
 import { autofillTitle } from '/js/contribute/pad/render.js';
 import { switchButtons } from '/js/contribute/pad/save.js';
+import { d3 } from '/js/globals.js';
 
 let keyTrack = [];
 window.addEventListener('keydown', async function (e) {
@@ -98,7 +99,7 @@ window.addEventListener('keydown', async function (e) {
     }
   }
 });
-window.addEventListener('keyup', function (e) {
+window.addEventListener('keyup', async function (e) {
   e = e || event;
   const mainobject = d3.select('data[name="object"]').node()?.value;
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
@@ -192,7 +193,8 @@ window.addEventListener('keyup', function (e) {
         )
       ) {
         if (editing) {
-          if (page.type === 'private') switchButtons(language);
+          const language = await getCurrentLanguage();
+          if (page.type === 'private') await switchButtons(language);
           else window.sessionStorage.setItem('changed-content', true);
         }
         // THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS

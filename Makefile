@@ -2,6 +2,7 @@ help:
 	@echo "The following make targets are available:"
 	@echo "create-user	interactively inserts a new user into the login db"
 	@echo "build	build the docker image"
+	@echo "local-build	build a local docker image that can run on the current machine"
 	@echo "publish	deploys the next version with the current commit"
 	@echo "azlogin	log in to azure container storage"
 	@echo "dockerpush	push the current docker image to azure"
@@ -14,8 +15,6 @@ help:
 	@echo "git-check	ensures no git visible files have been altered"
 	@echo "run-web	runs the webserver"
 	@echo "run-sass	runs the sass compiler"
-	@echo "run-service-worker	runs the service worker create script"
-	@echo "run-no-service-worker	remove the service worker"
 	@echo "pretty	runs eslint-fix and prettier"
 	@echo "script	run a script from the scripts folder"
 
@@ -52,18 +51,15 @@ run-web:
 run-sass:
 	CMD=sass ./sh/run.sh
 
-run-service-worker:
-	npm run service-worker
-
-run-no-service-worker:
-	rm ./public/app.serviceWorker.js || true
-
 pretty:
 	CMD=lint-fix ./sh/run.sh
 	CMD=pretty ./sh/run.sh
 
 build:
 	./sh/build.sh
+
+local-build:
+	IMAGE_LOCAL=local ./sh/build.sh
 
 publish:
 	./sh/deploy.sh

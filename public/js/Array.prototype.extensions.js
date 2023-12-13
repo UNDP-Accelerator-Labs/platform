@@ -53,13 +53,13 @@ Array.prototype.mean = function (key) {
   return this.sum(key) / this.length;
 };
 Array.prototype.variance = function (key) {
-  if (this.length === 0) throw 'no values';
+  if (this.length === 0) throw new Error('no values');
   const mean = this.mean(key);
   if (!key) return this.map((d) => Math.pow(d - mean, 2)).sum() / this.length;
   else return this.map((d) => Math.pow(d[key] - mean, 2)).sum() / this.length;
 };
 Array.prototype.sd = function (key) {
-  if (this.length === 0) throw 'no values';
+  if (this.length === 0) throw new Error('no values');
   return Math.sqrt(this.variance(key));
 };
 Array.prototype.nest = function (key, keep) {
@@ -196,16 +196,6 @@ Array.prototype.median = function () {
   this.sort((a, b) => a - b);
   const half = Math.floor(this.length / 2);
   return this[half];
-};
-Array.prototype.move = function (oldId, newId) {
-  if (newId >= this.length) {
-    let k = newId - this.length + 1;
-    while (k--) {
-      arr.push(undefined);
-    }
-  }
-  this.splice(newId, 0, this.splice(oldId, 1)[0]);
-  return this;
 };
 Array.prototype.shuffle = function () {
   let currentIndex = this.length;

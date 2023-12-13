@@ -169,6 +169,8 @@ div.public-page-header {
           height: 100%;
           object-fit: cover;
           transform: scale(0);
+        }
+        img.img-ready {
           transition:
             filter 1s,
             transform 1s;
@@ -1583,7 +1585,7 @@ div.browse {
                   background-color: $c-light-blue;
                   font-size: $t-mid-small;
                   line-height: 1.5em;
-                  color: #FFF;
+                  color: #fff;
                   cursor: pointer;
                 }
                 .dropdown {

@@ -4,8 +4,7 @@ const path = require('path');
 const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 
-// TO DO: add the file to the repo and uncomment the line below
-// const { createContainer } = include('routes/upload/container_functions.js');
+const { createContainer } = include('routes/upload/container_functions.js');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 module.exports = (req, res) => {

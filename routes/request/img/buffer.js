@@ -2,8 +2,7 @@ const { app_storage } = include('config/')
 const fs = require('fs')
 const path = require('path')
 
-// TO DO: add the file to the repo and uncomment the line below
-// const { createContainer } = include('routes/upload/container_functions.js');
+const { createContainer } = include('routes/upload/container_functions.js');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 module.exports = async (req, res) => {

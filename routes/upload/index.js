@@ -4,8 +4,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 const fs = require('fs')
 const { join } = require('path')
 
-// TO DO: add the file to the repo and uncomment the line below
-// const { createContainer } = require('./container_functions.js')
+const { createContainer } = require('./container_functions.js')
 
 const img = require('./img/')
 const video = require('./video/')

@@ -1,6 +1,5 @@
 const { modules, app_storage } = include('config/');
-// TO DO: add the file to the repo and uncomment the line below
-// const { createContainer, moveBlob } = include('routes/upload/container_functions.js');
+const { createContainer, moveBlob } = include('routes/upload/container_functions.js');
 const upload = include('routes/upload/img/');
 const { v4: uuidv4 } = require('uuid');
 

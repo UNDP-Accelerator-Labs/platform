@@ -13,7 +13,8 @@ import {
   addTxt,
 } from '/js/contribute/template/render.js';
 import { d3 } from '/js/globals.js';
-import { getCurrentLanguage, getMediaSize } from '/js/main.js';
+import { getMediaSize } from '/js/main.js';
+import { getCurrentLanguage } from '/js/config/main.js';
 
 export async function initToolbarInteractions(metafields) {
   const language = await getCurrentLanguage();

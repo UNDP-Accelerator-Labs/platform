@@ -1,5 +1,5 @@
 const { modules, DB, ownDB } = include('config/')
-const { safeArr, DEFAULT_UUID } = include('routes/helpers')
+const { safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
 const { ids: padsids } = include('routes/browse/pads/load')
 

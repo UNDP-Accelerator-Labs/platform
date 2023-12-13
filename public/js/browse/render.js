@@ -808,7 +808,7 @@ export const Entry = function (_kwargs) {
           const img = new Image();
           img.onload = function () {
             node.src = this.src;
-            node.classed('img-ready', true);
+            d3.select(node).classed('img-ready', true);
           };
 
           if (!Array.isArray(d.img)) d.img = [d.img];

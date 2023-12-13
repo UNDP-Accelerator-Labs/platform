@@ -828,10 +828,9 @@ export const Entry = function (_kwargs) {
             d3.select(node).classed('img-ready', true);
           };
 
+          node.addEventListener('load', setReady);
           if (node.complete) {
             setReady();
-          } else {
-            node.addEventListener('load', setReady);
           }
         });
     },

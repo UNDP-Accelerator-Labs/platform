@@ -1,5 +1,8 @@
 <%
   const own_app_url = locals.metadata.own_app_url;
+  const is_staging = locals.metadata.is_staging;
+
+  if (!is_staging) {
 %>User-agent: *
 Allow: /
 
@@ -32,3 +35,6 @@ Disallow: /resend-otp-code
 Disallow: /reset-password
 
 Sitemap: <%- own_app_url %>sitemap.xml
+<% } else { %>User-agent: *
+Disallow: /
+<% } %>

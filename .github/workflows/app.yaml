@@ -58,7 +58,7 @@ jobs:
 
   deploy_tag_pipeline:
     name: Deploy Tag
-    needs: build_pipeline
+    needs: deploy_staging_pipeline
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 

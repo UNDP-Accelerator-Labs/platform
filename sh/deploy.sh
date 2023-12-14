@@ -17,7 +17,7 @@ fi
 git fetch --tags
 TAG=$(make -s next-version)
 
-if [ -n $(git tag --points-at HEAD) ]; then
+if [ $(git tag --points-at HEAD) ]; then
     echo "commit is already deployed!"
     exit 3
 fi

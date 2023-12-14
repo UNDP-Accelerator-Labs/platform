@@ -13,7 +13,6 @@ module.exports = async kwargs => {
 	const [ f_space, order, page, full_filters ] = filters
 
 	// TO DO: INTEGRATE engagement METRICS
-	// AND ADAPT CODE TO RESEMBLE pads/load/data.js
 	return conn.task(t => {
 		return t.any(`
 			SELECT f.id, f.name AS title, f.path AS url, f.owner,

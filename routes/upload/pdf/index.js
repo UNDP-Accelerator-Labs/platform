@@ -30,7 +30,7 @@ module.exports = async (kwargs) => {
 			.then(result => {
 				fs.unlinkSync(source)
 				if (result) {
-					return { status: 200, src: join(targetdir, filename), originalname: file.originalname, message: 'success' }
+					return { status: 200, src: join(targetdir, filename), originalname: file.originalname, type: 'pdf', message: 'success' }
 				} else {
 					return { status: 403, message: 'file was not properly stored' }
 				}

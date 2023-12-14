@@ -5,7 +5,7 @@ module.exports = req => {
 	const { uuid, country, rights, collaborators } = req.session || {}
 	let { space } = req.params || {}
 	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
-	let { files, search, status, contributors, countries, regions, page, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { files, paths, search, status, contributors, countries, regions, page, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
@@ -24,12 +24,13 @@ module.exports = req => {
 		if (space === 'private') f_space = DB.pgp.as.format(`f.owner IN ($1:csv)`, [ collaborators_ids ])
 		else if (space === 'shared') f_space = DB.pgp.as.format(`f.status = 2`, [ collaborators_ids ])
 		else if (space === 'public') f_space = DB.pgp.as.format(`f.status = 3`, [ collaborators_ids ])
-		else if (space === 'all') f_space = DB.pgp.as.format(`(f.status > 0 AND $1 > 2)`, [ rights])
+		else if (space === 'all') f_space = DB.pgp.as.format(`(f.status > 0 AND $1 > 2)`, [ rights]) // TO DO: BASE THIS ON MODULE RIGHTS
 		base_filters.push(f_space)
 
 		// PLATFORM FILTERS
 		const platform_filters = []
 		if (files) platform_filters.push(DB.pgp.as.format(`f.id IN ($1:csv)`, [ files ]))
+		if (paths) platform_filters.push(DB.pgp.as.format(`f.path IN ($1:csv)`, [ paths ]))
 		if (contributors) platform_filters.push(DB.pgp.as.format(`f.owner IN ($1:csv)`, [ contributors ]))		
 
 		if (countries?.length) {

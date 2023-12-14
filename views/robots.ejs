@@ -34,7 +34,6 @@ Disallow: /module-error
 Disallow: /resend-otp-code
 Disallow: /reset-password
 
-Sitemap: <%- own_app_url %>sitemap.xml
-<% } else { %>User-agent: *
+Sitemap: <%- own_app_url %>sitemap.xml<% } else { %>User-agent: *
 Disallow: /
 <% } %>

@@ -722,7 +722,7 @@ exports.robots = async (req, res) => {
 		metadata: {
 			own_app_url,
 			is_staging,
-		}
+		},
 	};
 	res.setHeader('content-type', 'text/plain');
 	res.render('robots', obj);

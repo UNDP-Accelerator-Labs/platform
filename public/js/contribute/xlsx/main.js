@@ -1207,9 +1207,9 @@ export async function compilePads(idx, structureOnly = false) {
                     return a?.localeCompare(b);
                   else return a - b;
                 })
-                .map((d, i) => {
+                .map((d, j) => {
                   const obj = {};
-                  obj.id = i;
+                  obj.id = j;
                   obj.name = d?.toString();
                   obj.checked = false;
 
@@ -1218,20 +1218,19 @@ export async function compilePads(idx, structureOnly = false) {
                       if (typeof c.entries[i] !== 'object') {
                         // THIS COULD PROBABLY BE CHANGED TO Array.isArray()
                         if (
-                          typeof c.entries[i] === 'string' &&
-                          c.entries[i].toLowerCase().trim() === d
+                          typeof c.entries[i] === 'string' && typeof d === 'string' &&
+                          c.entries[i].toLowerCase().trim() === d.toLowerCase().trim()
                         ) {
                           obj.checked = true;
                         } else if (c.entries[i] === d) obj.checked = true;
                       } else {
                         if (
                           c.entries[i]
-                            .map((b) =>
-                              typeof b === 'string'
-                                ? b.toLowerCase().trim()
-                                : b,
+                            .some((b) =>
+                              typeof b === 'string' && typeof d === 'string'
+                                ? b.toLowerCase().trim() === b.toLowerCase().trim()
+                                : b === d,
                             )
-                            .includes(d)
                         )
                           obj.checked = true;
                       }

@@ -82,7 +82,11 @@ const Media = function (kwargs) {
   this.editing = page.activity === 'edit' && object === mainobject;
 
   if (this.editing) {
-    this.id = id;
+    if (parent.datum()?.repeat) {
+      this.id = `${parent.datum().id}-${id}` // THIS IS TO HANDLE CHECKLISTS INSIDE REPEAT SECTIONS
+    } else {
+      this.id = id;
+    }
   } else {
     this.id = `${object}-${id}`;
   }
@@ -1154,6 +1158,7 @@ export async function addSection(kwargs) {
 
   let { id, title, lead, structure, items, repeat, group, instruction } =
     data || {};
+  if (!id) id = uuidv4();
   if (!title) title = '';
   if (!lead) lead = '';
   if (!structure) structure = [];

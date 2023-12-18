@@ -16,7 +16,7 @@
 %>
 
 <%
-	const platform_filters = locals.filters_menu?.[0]
+	const platform_filters = locals.filters_menu?.[0] || {}
 	// MAKE SURE THERE IS MORE THAN ONE location, template, OR mobilization (platform_filters) TO TURN INTO SECTIONS
 	const sectionoptions = Object.keys(platform_filters)
 	.filter(d => {

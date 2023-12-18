@@ -5,9 +5,7 @@ const xlsx = require('./xlsx/')
 const template = require('./template/')
 const contributor = require('./contributor/')
 const resource = require('./resource/')
-
-// TO DO: CHANGE THE LOGIC OF MOBILIZATIONS
-const mobilization = require('../mobilize/cohort/')
+const mobilization = require('./mobilization/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -25,7 +23,7 @@ module.exports = (req, res) => {
 		else if (object === 'review') return pad.render(req, res)
 		else if (object === 'contributor') return contributor(req, res)
 		else if (object === 'resource') return resource.render(req, res)
-		else if (object === 'mobilization') return mobilization(req, res)
+		else if (object === 'mobilization') return mobilization.render(req, res)
 
 		else {
 			if (referer) res.redirect(referer)

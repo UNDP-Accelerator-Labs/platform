@@ -10,11 +10,11 @@ import {
   addSection,
   addTags,
   addTxt,
-  uploadImg,
+  dispatchFiles,
   uploadVideo,
 } from '/js/contribute/pad/render.js';
 import { d3 } from '/js/globals.js';
-import { getMediaSize } from '/js/main.js';
+import { getMediaSize, uploadFile } from '/js/main.js';
 
 export async function initToolbarInteractions(kwargs) {
   const language = await getCurrentLanguage();
@@ -78,14 +78,19 @@ export async function initToolbarInteractions(kwargs) {
         ?.last()?.nextSibling;
     },
   );
-  d3.select('.media-input-group #input-media-img').on('change', function () {
-    uploadImg({
-      form: this.form,
-      lang: language,
-      sibling: this['__active_node__'],
-      focus: true,
-      objectdata,
-    });
+  d3.select('.media-input-group #input-media-img').on('change', async function () {
+    const files = await uploadFile(this.form);
+    const filetypes = files.unique('type', true);
+    for (let type of filetypes) {
+      if (type === 'img') await dispatchFiles({ data: files, lang: language, sibling: this['__active_node__'], focus: true, objectdata });
+    }
+    // uploadImg({
+    //   form: this.form,
+    //   lang: language,
+    //   sibling: this['__active_node__'],
+    //   focus: true,
+    //   objectdata,
+    // });
     this['__active_node__'] = null;
   });
 

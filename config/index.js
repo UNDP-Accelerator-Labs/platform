@@ -35,6 +35,8 @@ exports.app_title_short = app_title_short;
 exports.app_suite = app_suite;
 exports.own_app_url = own_app_url;
 
+exports.is_staging = is_staging;
+
 const base_host = is_staging
   ? 'acclabs-staging.azurewebsites.net'
   : 'sdg-innovation-commons.org';

@@ -30,11 +30,12 @@ module.exports = async (req, res) => {
 					if (referer) return res.redirect(referer)
 					else return res.redirect('/login')
 				} else if (authorized && redirect && redirect !== activity) {
-					const query = []
-					for (const [key, value] of req.query) {
-						query.push(`${key}=${value}`)
-					}
-					return res.redirect(`/${language}/${redirect}/template${query.length > 0 ? `?${query.join('&')}` : ''}`)
+					// const query = []
+					// for (const [key, value] of req.query) {
+					// 	query.push(`${key}=${value}`)
+					// }
+					const query = new URLSearchParams(req.query || {});
+					return res.redirect(`/${language}/${redirect}/template?${query.toString()}`)
 				} else {
 					const batch = []
 					// GET ALL TAG LISTS

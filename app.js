@@ -217,9 +217,9 @@ app
 // app
 //   .route('/:language/import/:object')
 //   .get(routes.check.login, routes.render.import);
-app
-  .route('/:language/mobilize/:object')
-  .get(routes.check.login, routes.dispatch.mobilize);
+// app
+// .route('/:language/mobilize/:object')
+// .get(routes.check.login, routes.dispatch.mobilize);
 
 app
   .route('/:language/browse/:object/:space')

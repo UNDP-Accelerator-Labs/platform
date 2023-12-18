@@ -55,12 +55,12 @@ module.exports = (kwargs) => {
 				.then(result => {
 					fs.unlinkSync(source)
 					if (result) {
-						resolve({ status: 200, src: join(targetdir, `${file.filename}${extname(file.originalname).toLowerCase()}`), originalname: file.originalname, message: 'success' })
+						resolve({ status: 200, src: join(targetdir, `${file.filename}${extname(file.originalname).toLowerCase()}`), originalname: file.originalname, type: 'audio', message: 'success' })
 					} else resolve({ status: 403, message: 'file was not properly stored' })
 				}).catch(err => console.log(err))
 			} else {
 				fs.unlinkSync(source)
-				resolve({ status: 200, src: fftarget.split('public/')[1], originalname: file.originalname, message: 'success' })
+				resolve({ status: 200, src: fftarget.split('public/')[1], originalname: file.originalname, type: 'audio', message: 'success' })
 			}
 		})
 	})

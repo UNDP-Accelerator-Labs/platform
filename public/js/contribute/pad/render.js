@@ -83,7 +83,7 @@ const Media = function (kwargs) {
 
   if (this.editing) {
     if (parent.datum()?.repeat) {
-      this.id = `${parent.datum().id}-${id}` // THIS IS TO HANDLE CHECKLISTS INSIDE REPEAT SECTIONS
+      this.id = `${parent.datum().id}-${id}`; // THIS IS TO HANDLE CHECKLISTS INSIDE REPEAT SECTIONS
     } else {
       this.id = id;
     }
@@ -935,8 +935,7 @@ async function deleteFile(kwargs) {
     const src = sel.datum();
     const mosaicItem = sel.findAncestor('mosaic-item');
     const mosaic = sel.findAncestor('media-mosaic');
-    sel.findAncestor('mosaic-container')
-      .classed('focus', true);
+    sel.findAncestor('mosaic-container').classed('focus', true);
     container.each((d) => (d.srcs = d.srcs.filter((c) => c !== src)));
     // DELETE AND STORE
     deleted.push(sel.datum());
@@ -963,8 +962,11 @@ async function deleteFile(kwargs) {
     const src = sel.datum();
     const filesItem = sel.findAncestor('files-item');
     const files = sel.findAncestor('media-files');
-    (sel.findAncestor('files-container') || sel.findAncestor('mosaic-container') || sel.findAncestor('img-container'))
-      .classed('focus', true);
+    (
+      sel.findAncestor('files-container') ||
+      sel.findAncestor('mosaic-container') ||
+      sel.findAncestor('img-container')
+    ).classed('focus', true);
     container.each((d) => (d.srcs = d.srcs.filter((c) => c !== src)));
     // DELETE AND STORE
     deleted.push(sel.datum());
@@ -994,9 +996,10 @@ export async function dispatchFiles(kwargs) {
   const fls = data.filter((d) => d.status === 200);
   // THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
   if (fls.length === 1) {
-    const afls = fls.map((f) => { // THIS IS A BIT OVERKILL SINCE WE KNOW THAT IN THIS CASE, THERE IS ONLY ONE FILE TO PROCESS
+    const afls = fls.map((f) => {
+      // THIS IS A BIT OVERKILL SINCE WE KNOW THAT IN THIS CASE, THERE IS ONLY ONE FILE TO PROCESS
       return async () => {
-        const { type } = f
+        const { type } = f;
         let datum = {};
         if (container) datum = container.datum();
         if (type === 'img') {
@@ -1011,9 +1014,17 @@ export async function dispatchFiles(kwargs) {
             objectdata,
           });
         } else if (type === 'pdf') {
-          if (datum.type !== 'files') datum = { instruction: datum.instruction };
+          if (datum.type !== 'files')
+            datum = { instruction: datum.instruction };
           datum['srcs'] = [f.src];
-          addFiles({ data: datum, lang, sibling, container, focus, objectdata });
+          addFiles({
+            data: datum,
+            lang,
+            sibling,
+            container,
+            focus,
+            objectdata,
+          });
         }
         // ENABLE SAVING
         if (page.type === 'private') await switchButtons(lang);
@@ -1026,7 +1037,7 @@ export async function dispatchFiles(kwargs) {
   } else {
     let datum = {};
     if (container) datum = container.datum();
-    const type = fls[0].type
+    const type = fls[0].type;
     if (type === 'img') {
       if (datum.type !== 'mosaic') datum = { instruction: datum.instruction };
       datum['srcs'] = fls.map((f) => f.src);
@@ -1598,11 +1609,17 @@ async function addImg(kwargs) {
         .on('change', async function () {
           // REMOVE IMAGES HERE
           if (editing) {
-            const files = await uploadFile(this.form)
-            const filetypes = files.unique('type', true)
+            const files = await uploadFile(this.form);
+            const filetypes = files.unique('type', true);
             for (let type of filetypes) {
-              const fls = files.filter(d => d.type === type)
-              await dispatchFiles({ data: fls, lang, container: media.container, focus: true, objectdata });
+              const fls = files.filter((d) => d.type === type);
+              await dispatchFiles({
+                data: fls,
+                lang,
+                container: media.container,
+                focus: true,
+                objectdata,
+              });
             }
             // uploadImg({
             //   form: this.form,
@@ -1839,11 +1856,17 @@ function addMosaic(kwargs) {
         .on('change', async function () {
           // REMOVE IMAGES HERE
           if (editing) {
-            const files = await uploadFile(this.form)
-            const filetypes = files.unique('type', true)
+            const files = await uploadFile(this.form);
+            const filetypes = files.unique('type', true);
             for (let type of filetypes) {
-              const fls = files.filter(d => d.type === type)
-              await dispatchFiles({ data: fls, lang, container: media.container, focus: true, objectdata });
+              const fls = files.filter((d) => d.type === type);
+              await dispatchFiles({
+                data: fls,
+                lang,
+                container: media.container,
+                focus: true,
+                objectdata,
+              });
             }
             // uploadImg({
             //   form: this.form,
@@ -2018,8 +2041,17 @@ function addFiles(kwargs) {
   const { data, lang, section, sibling, container, focus, objectdata } =
     kwargs || {};
   const { object, type: objecttype } = objectdata || {};
-  let { id, level, type, name, srcs, textalign, verticalalign, instruction, required } =
-    data || {};
+  let {
+    id,
+    level,
+    type,
+    name,
+    srcs,
+    textalign,
+    verticalalign,
+    instruction,
+    required,
+  } = data || {};
   if (!level) level = 'media';
   if (!type || container) type = 'files'; // WE ADD THE || container IN CASE THE FILE IS INITIALLY UPLOADED AS AN IMAGE, BUT THEN CHANGED TO ANOTHER FILE FORMAT
   if (!name) name = null;
@@ -2064,24 +2096,32 @@ function addFiles(kwargs) {
 
   if (media.opts) {
     media.opts
-      .addElems('div', 'opt-group', _ => {
+      .addElems('div', 'opt-group', (_) => {
         if (srcs?.length === 1) {
           return [
             [
               { key: 'h-align', label: 'format_align_left', value: 'left' },
-              { key: 'h-align', label: 'format_align_center', value: 'center' },
+              {
+                key: 'h-align',
+                label: 'format_align_center',
+                value: 'center',
+              },
               { key: 'h-align', label: 'format_align_right', value: 'right' },
             ],
-          ]
+          ];
         } else {
           return [
             [],
             [
               { key: 'v-align', label: 'format_align_left', value: 'start' },
-              { key: 'v-align', label: 'format_align_center', value: 'center' },
+              {
+                key: 'v-align',
+                label: 'format_align_center',
+                value: 'center',
+              },
               { key: 'v-align', label: 'format_align_right', value: 'end' },
             ],
-          ]
+          ];
         }
       })
       .classed('align-opts', srcs?.length !== 1)
@@ -2107,7 +2147,10 @@ function addFiles(kwargs) {
             return this == sel.node();
           });
         if (d.key === 'h-align')
-          media.media.style('text-align', (c) => (c.textalign = d.value)); // TO DO: THIS IS LIKELY BLOCKED BY csp
+          media.media.style(
+            'text-align',
+            (c) => (c.textalign = d.value),
+          ); // TO DO: THIS IS LIKELY BLOCKED BY csp
         else if (d.key === 'v-align') {
           media.media.style('align-items', (c) => (c.verticalalign = d.value)); // TO DO: THIS IS LIKELY BLOCKED BY csp
         }
@@ -2129,14 +2172,15 @@ function addFiles(kwargs) {
     .style('align-items', (d) => d.verticalalign)
     .addElems('div', 'files-item', (d) => d.srcs)
     .each(function (d) {
-      const sel = d3.select(this)
+      const sel = d3.select(this);
       const img = new Image();
-      let link
+      let link;
       img.onload = async function () {
         sel
-        .addElems('a')
-        .attr('href', link)
-        .addElems('img').attr('src', this.src);
+          .addElems('a')
+          .attr('href', link)
+          .addElems('img')
+          .attr('src', this.src);
 
         if (editing) {
           sel
@@ -2150,7 +2194,7 @@ function addFiles(kwargs) {
               d3.select(this).classed(d.value, true);
             })
             .on('click', async function (d) {
-              d3.event.stopPropagation()
+              d3.event.stopPropagation();
               const sel = d3.select(this);
               const source = sel.findAncestor('files-item').node();
               const parent = media.media.node();
@@ -2195,10 +2239,9 @@ function addFiles(kwargs) {
           paths: link,
           // TO DO: ADD SPACE FOR CONTROLING USER RIGHTS
         }).then((results) => {
-          const { title } = results.data?.[0]
-          sel.addElems('label', 'file-name')
-          .html(title)
-        })
+          const { title } = results.data?.[0];
+          sel.addElems('label', 'file-name').html(title);
+        });
       };
       img.onerror = function (err) {
         if (err) console.log(err);
@@ -2208,9 +2251,7 @@ function addFiles(kwargs) {
       };
 
       if (d3.select('data[name="app_storage"]').node()) {
-        const app_storage = d3
-          .select('data[name="app_storage"]')
-          .node().value;
+        const app_storage = d3.select('data[name="app_storage"]').node().value;
         link = new URL(`${app_storage}/${d}`).href;
         img.src = link;
       } else {
@@ -2249,11 +2290,17 @@ function addFiles(kwargs) {
         .on('change', async function () {
           // REMOVE IMAGES HERE
           if (editing) {
-            const files = await uploadFile(this.form)
-            const filetypes = files.unique('type', true)
+            const files = await uploadFile(this.form);
+            const filetypes = files.unique('type', true);
             for (let type of filetypes) {
-              const fls = files.filter(d => d.type === type);
-              await dispatchFiles({ data: files, lang, container: media.container, focus: true, objectdata });
+              const fls = files.filter((d) => d.type === type);
+              await dispatchFiles({
+                data: files,
+                lang,
+                container: media.container,
+                focus: true,
+                objectdata,
+              });
             }
             if (page.type === 'private') await switchButtons(lang);
             else window.sessionStorage.setItem('changed-content', true);
@@ -4286,18 +4333,23 @@ function addGroup(kwargs) {
     }
     // for (let )
 
-    groups.classed('animate-in', (d, i) => i === groups.size() - 1)
+    groups
+      .classed('animate-in', (d, i) => i === groups.size() - 1)
       .each(function (d, i) {
         const sel = d3.select(this);
         sel.classed(`g-${i + 1}`, true);
       });
     // THIS IS THE SAME AS IN MEDIA, BUT IN MEDIA WE PREVENT THESE OPTIONS WHEN TEMPLATED
     // HERE THEY ARE MADE AVAILABLE FOR REMOVING GROUP REPETITIONS
-    groups.addElems('div', 'placement-opts')
-    .each(function () {
-      const sel = d3.select(this)
-      const groupitems = sel.findAncestor('media-group-items')
-      if (!((level === 'meta' || objecttype === 'templated') && groupitems.classed('g-1'))) {
+    groups.addElems('div', 'placement-opts').each(function () {
+      const sel = d3.select(this);
+      const groupitems = sel.findAncestor('media-group-items');
+      if (
+        !(
+          (level === 'meta' || objecttype === 'templated') &&
+          groupitems.classed('g-1')
+        )
+      ) {
         sel
           .addElems('div', 'opt', [
             { label: 'close', value: 'delete', fn: (sel) => rmGroup(sel) },
@@ -4315,7 +4367,7 @@ function addGroup(kwargs) {
           .addElems('i', 'material-icons google-translate-attr')
           .html((d) => d.label);
       }
-    })
+    });
 
     async function rmGroup(sel) {
       sel

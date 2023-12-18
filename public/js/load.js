@@ -203,4 +203,8 @@ async function onLoad() {
   d3.select('#loader').style('display', 'none');
 }
 
-window.addEventListener('load', onLoad);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onLoad);
+} else {
+  await onLoad();
+}

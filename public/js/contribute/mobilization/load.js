@@ -118,6 +118,13 @@ function onLoad() {
     .on('change.toggle', function () {
       togglePadLimit(this);
     });
+
+  // FOR STATS VIEW
+  d3.selectAll('tr.top-level').on('click', function () {
+    const { iso3 } = this.dataset;
+    d3.select(this).toggleClass('open');
+    d3.selectAll(`tr.small.${iso3}`).toggleClass('hide');
+  });
 }
 
 window.addEventListener('load', onLoad);

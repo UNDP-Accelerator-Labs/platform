@@ -22,7 +22,7 @@ exports.modules = [
   { type: 'files', rights: { read: 1, write: 1 } },
 ];
 
-exports.metafields = [
+const metafields = [
   {
     type: 'drawing',
     name: 'signature',
@@ -32,7 +32,7 @@ exports.metafields = [
 ];
 
 if (process.env.NODE_ENV !== 'production') {
-  this.metafields.push(
+  metafields.push(
     {
       type: 'attachment',
       name: 'consent',
@@ -51,6 +51,8 @@ if (process.env.NODE_ENV !== 'production') {
     }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
   );
 }
+exports.metafields = metafields;
+
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']
 exports.engagementtypes = [];

@@ -1,4 +1,4 @@
-const { own_app_url, getVersionObject, app_title_short, app_storage, modules, DB } = include('config/')
+const { own_app_url, getVersionObject, is_staging, DB } = include('config/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 // const format = require('./formatting.js')
@@ -246,7 +246,7 @@ exports.dispatch.contribute = require('./contribute/')
 
 // exports.render.import = require('./import/').render
 
-exports.dispatch.mobilize = require('./mobilize/')
+// exports.dispatch.mobilize = require('./mobilize/')
 
 /* =============================================================== */
 /* =========================== BROWSE ============================ */
@@ -721,7 +721,8 @@ exports.robots = async (req, res) => {
 	const obj = {
 		metadata: {
 			own_app_url,
-		}
+			is_staging,
+		},
 	};
 	res.setHeader('content-type', 'text/plain');
 	res.render('robots', obj);

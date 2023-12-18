@@ -2,13 +2,14 @@ const { DB } = require('../../../config')
 const { app_storage } = require('../../../config/edit/index')
 const validate = require('uuid').validate;
 const { BlobServiceClient } = require("@azure/storage-blob");
+const fs = require('fs');
 
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
   });
 
-const containerName = 'consent'
+const containerName = 'action-plans'
 
 async function getBlobList(containername) {
     const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);	
@@ -18,6 +19,7 @@ async function getBlobList(containername) {
 	
 	let list = []
     let unknown = []
+    let distintuuid = []
 
     console.log('Please wait, processing blob list...')
 	for await (const blob of blobs) {
@@ -33,6 +35,9 @@ async function getBlobList(containername) {
                         path: `${app_storage}${containername}/${blob?.name}`,
                     })
                 } else {
+                    if(!distintuuid.includes(u_uuid) && !u_uuid.includes('/sm/')){
+                        distintuuid.push(u_uuid)
+                    }
                     unknown.push({
                         name: blob?.name,
                         date: blob?.properties?.createdOn,
@@ -48,6 +53,13 @@ async function getBlobList(containername) {
     console.log('Blob list processed...')
     console.log('There are ' + list.length + ' records with known users.')
     console.log('There are ' + unknown.length + ' records with unknown users.')
+    console.log('There are ' + distintuuid.length + ' records with disticnt unknown users.')
+    
+    fs.writeFile('distinctunknownuser.txt', distintuuid.join('  '), (err) => {
+        if (err) throw err;
+        console.log('Data written to file');
+    });
+
 	return [list, unknown]
 }
 

@@ -177,8 +177,6 @@ async function onLoad() {
               const filepath = res[0].src;
 
 
-              // THIS THROWS AN ERROR
-              // TO DO: INVESTIGATE ASAP
               const storage_url = new URL(
                 d3.select('data[name="app_storage"]').node().value,
               );

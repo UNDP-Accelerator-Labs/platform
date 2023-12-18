@@ -78,21 +78,31 @@ export async function initToolbarInteractions(kwargs) {
         ?.last()?.nextSibling;
     },
   );
-  d3.select('.media-input-group #input-media-img').on('change', async function () {
-    const files = await uploadFile(this.form);
-    const filetypes = files.unique('type', true);
-    for (let type of filetypes) {
-      if (type === 'img') await dispatchFiles({ data: files, lang: language, sibling: this['__active_node__'], focus: true, objectdata });
-    }
-    // uploadImg({
-    //   form: this.form,
-    //   lang: language,
-    //   sibling: this['__active_node__'],
-    //   focus: true,
-    //   objectdata,
-    // });
-    this['__active_node__'] = null;
-  });
+  d3.select('.media-input-group #input-media-img').on(
+    'change',
+    async function () {
+      const files = await uploadFile(this.form);
+      const filetypes = files.unique('type', true);
+      for (let type of filetypes) {
+        if (type === 'img')
+          await dispatchFiles({
+            data: files,
+            lang: language,
+            sibling: this['__active_node__'],
+            focus: true,
+            objectdata,
+          });
+      }
+      // uploadImg({
+      //   form: this.form,
+      //   lang: language,
+      //   sibling: this['__active_node__'],
+      //   focus: true,
+      //   objectdata,
+      // });
+      this['__active_node__'] = null;
+    },
+  );
 
   d3.select('.media-input-group #input-media-video + label').on(
     'mousedown',

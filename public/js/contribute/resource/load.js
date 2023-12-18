@@ -176,12 +176,13 @@ async function onLoad() {
             if (res.every((d) => d.status === 200)) {
               const filepath = res[0].src;
 
-
               const storage_url = new URL(
                 d3.select('data[name="app_storage"]').node().value,
               );
-              storage_url.pathname = `${storage_url.pathname}/${filepath}`.replace(/\/\//g, '/');
-              const src = new URL(storage_url.pathname, storage_url.origin).href;
+              storage_url.pathname =
+                `${storage_url.pathname}/${filepath}`.replace(/\/\//g, '/');
+              const src = new URL(storage_url.pathname, storage_url.origin)
+                .href;
 
               resolve(
                 window.location.replace(

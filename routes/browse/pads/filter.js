@@ -236,6 +236,7 @@ module.exports = async (req, res) => {
 				if (pinboard) {
 					const ownId = await ownDB();
 					let pbpads = ''
+					const isUNDP = await DB.general.oneOrNone(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ], d => d?.bool)
 
 					if (section) {
 						pbpads = (await DB.general.any(`
@@ -253,10 +254,11 @@ module.exports = async (req, res) => {
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);
+				
 					f_space = DB.pgp.as.format(`
 					(
 						(
-							(p.status = 2 AND p.owner IN ($1:csv))
+							(p.status = 2 AND $1 )
 							OR p.status = 3
 							OR $2 > 2
 						) AND (
@@ -268,14 +270,14 @@ module.exports = async (req, res) => {
 							)
 						)
 					)
-					`, [ collaborators_ids, rights, safeArr(pbpads, -1), safeArr(mobs, -1) ])
+					`, [ isUNDP, rights, safeArr(pbpads, -1), safeArr(mobs, -1) ])
 				}
 				else f_space = DB.pgp.as.format(`
 					(
-						(p.status = 2 AND p.owner IN ($1:csv))
+						(p.status = 2 AND $1 )
 						OR p.status = 3
 						OR $2 > 2
-					)`, [ collaborators_ids, rights ])
+					)`, [ isUNDP, rights ])
 			}
 		}
 		else if (space === 'versiontree') {

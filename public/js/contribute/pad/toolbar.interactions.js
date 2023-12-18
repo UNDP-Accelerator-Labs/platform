@@ -83,7 +83,7 @@ export async function initToolbarInteractions(kwargs) {
     async function () {
       const files = await uploadFile(this.form);
       const filetypes = files.unique('type', true);
-      for (let type of filetypes) {
+      for (const type of filetypes) {
         if (type === 'img')
           await dispatchFiles({
             data: files,

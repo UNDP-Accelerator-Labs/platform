@@ -1611,7 +1611,7 @@ async function addImg(kwargs) {
           if (editing) {
             const files = await uploadFile(this.form);
             const filetypes = files.unique('type', true);
-            for (let type of filetypes) {
+            for (const type of filetypes) {
               const fls = files.filter((d) => d.type === type);
               await dispatchFiles({
                 data: fls,
@@ -1858,7 +1858,7 @@ function addMosaic(kwargs) {
           if (editing) {
             const files = await uploadFile(this.form);
             const filetypes = files.unique('type', true);
-            for (let type of filetypes) {
+            for (const type of filetypes) {
               const fls = files.filter((d) => d.type === type);
               await dispatchFiles({
                 data: fls,
@@ -2147,10 +2147,8 @@ function addFiles(kwargs) {
             return this == sel.node();
           });
         if (d.key === 'h-align')
-          media.media.style(
-            'text-align',
-            (c) => (c.textalign = d.value),
-          ); // TO DO: THIS IS LIKELY BLOCKED BY csp
+          media.media.style('text-align', (c) => (c.textalign = d.value));
+        // TO DO: THIS IS LIKELY BLOCKED BY csp
         else if (d.key === 'v-align') {
           media.media.style('align-items', (c) => (c.verticalalign = d.value)); // TO DO: THIS IS LIKELY BLOCKED BY csp
         }
@@ -2292,7 +2290,7 @@ function addFiles(kwargs) {
           if (editing) {
             const files = await uploadFile(this.form);
             const filetypes = files.unique('type', true);
-            for (let type of filetypes) {
+            for (const type of filetypes) {
               const fls = files.filter((d) => d.type === type);
               await dispatchFiles({
                 data: files,

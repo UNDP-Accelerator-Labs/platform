@@ -1,5 +1,5 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
-import { GET, POST, PUT } from '/js/fetch.js';
+import { GET, PUT } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 import { renderPromiseModal } from '/js/modals.js';
 
@@ -13,7 +13,7 @@ async function checkResponse(result) {
 }
 
 export class Exploration {
-  constructor() {
+  constructor(ownDB) {
     this.past = [];
     this.docs = [];
     this.docLookup = {};
@@ -30,7 +30,7 @@ export class Exploration {
     this.collectionId = null;
     this.collectionUpdateCbs = [];
 
-    // this.ownDb = ownDB;
+    this.ownDb = ownDB;
     if (sessionStorage.explorationId) {
       this.currentId = +sessionStorage.explorationId || null;
     }
@@ -41,12 +41,8 @@ export class Exploration {
     }
     this.visible = !!this.currentId;
     this.limitedSpace = true;
-    this.consent = true; // we assume consent was given until an API call says otherwise
-  }
-
-  async addDb() {
-    const db = await POST('/load/metadata', { feature: 'ownDB' });
-    this.ownDb = db.ownDB;
+    // we assume consent was given until an API call says otherwise
+    this.consent = true;
   }
 
   addIdChangeListener(cb) {
@@ -196,7 +192,9 @@ export class Exploration {
         await this.updateCurrentExploration(curId, curPrompt);
         const acbs = this.listUpdateCbs;
         this.listUpdateCbs = [];
-        Promise.all(acbs.map(async (curCb) => await curCb()));
+        for (const aCurCb of acbs) {
+          await aCurCb();
+        }
       })
       .catch(async (err) => {
         this.listUpdateActive = false;
@@ -204,7 +202,9 @@ export class Exploration {
           this.past = [];
           const acbs = this.listUpdateCbs;
           this.listUpdateCbs = [];
-          Promise.all(acbs.map(async (curCb) => await curCb()));
+          for (const aCurCb of acbs) {
+            await aCurCb();
+          }
         });
       });
   }
@@ -341,11 +341,11 @@ export class Exploration {
     const vocabulary = await getTranslations(language);
     const explorationInfoUrl = `/${language}/exploration-info/`;
     const message = `
-            <h2 class="google-translate-attr">${vocabulary['exploration']['welcome']}</h2>
-            <p class="google-translate-attr">${vocabulary['exploration']['explain']}</p>
-            <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['exploration']['info']}</a>
-            <p class="google-translate-attr">${vocabulary['exploration']['indicate']}</p>
-        `;
+      <h2 class="google-translate-attr">${vocabulary['exploration']['welcome']}</h2>
+      <p class="google-translate-attr">${vocabulary['exploration']['explain']}</p>
+      <a href="${explorationInfoUrl}" target="_blank" class="google-translate-attr">${vocabulary['exploration']['info']}</a>
+      <p class="google-translate-attr">${vocabulary['exploration']['indicate']}</p>
+    `;
     renderPromiseModal({
       message,
       opts: [

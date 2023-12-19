@@ -40,12 +40,10 @@ export async function renderModal(data, close = true) {
   // }).html(vocabulary['close'])
 
   const inner = modal.addElems('div', 'inner');
-  inner
-    .addElems('h1', 'headline', data.headline ? [data.headline] : [])
-    .html((d) => d);
+  inner.addElems('h1', 'headline', headline ? [headline] : []).html((d) => d);
 
   inner
-    .addElems('ul', 'opts', data.opts ? [data.opts] : [])
+    .addElems('ul', 'opts', opts ? [opts] : [])
     .addElems('li', 'opt link', (d) => d)
     .addElems('a')
     .attr('href', (d) => d.href)

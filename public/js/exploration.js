@@ -547,7 +547,6 @@ export class Exploration {
       : this.isDocDislike(docId)
         ? 'neutral'
         : 'dislike';
-    console.log(docId, action);
     PUT(
       '/exploration/doc?browser=1',
       {
@@ -560,14 +559,9 @@ export class Exploration {
     )
       .then(checkResponse)
       .then(async (result) => {
-        console.log('b', result);
-        await this.updateExplorationDocs(() => {
-          console.log(docId, this.isDocApprove(docId));
-          console.log(docId, this.isDocDislike(docId));
-        });
+        await this.updateExplorationDocs();
       })
       .catch(async (err) => {
-        console.log('a');
         await this.checkError(err);
       });
   }
@@ -592,7 +586,6 @@ export class Exploration {
         .classed('google-translate-attr', true)
         .text(vocabulary['exploration']['doc-approve'])
         .on('click', (d) => {
-          console.log(d.id, that.isDocApprove(d.id), that.isDocDislike(d.id));
           that.setDocAction(d.id, true);
         });
       curSel
@@ -601,7 +594,6 @@ export class Exploration {
         .classed('google-translate-attr', true)
         .text(vocabulary['exploration']['doc-dislike'])
         .on('click', (d) => {
-          console.log(d.id, that.isDocApprove(d.id), that.isDocDislike(d.id));
           that.setDocAction(d.id, false);
         });
     }

@@ -472,7 +472,7 @@ export class Exploration {
     }
   }
 
-  async updateDocs(acbs) {
+  async updateDocs(cbs) {
     const vocabulary = await getTranslations();
     d3.selectAll('div.exploration').styles({
       display: this.isVisible() ? null : 'none',
@@ -530,9 +530,7 @@ export class Exploration {
         return this.isDocDislike(d.id);
       },
     );
-    for (const aCurCb of acbs) {
-      await aCurCb();
-    }
+    cbs.forEach((curCb) => curCb());
   }
 
   setDocAction(docId, isApprove) {

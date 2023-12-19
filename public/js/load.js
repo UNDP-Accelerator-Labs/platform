@@ -200,6 +200,7 @@ async function onLoad() {
       document.documentElement.scrollTop > 60,
     );
   });
+  d3.select('#loader').style('display', 'none');
 }
 
 window.addEventListener('load', onLoad);

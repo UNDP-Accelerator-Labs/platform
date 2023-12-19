@@ -1,10 +1,12 @@
 import { Exploration } from '/js/exploration.js';
+import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 // INIT EXPLORATION
 
 async function initExploration() {
   const pad = JSON.parse(d3.select('data[name="pad"]')?.node()?.value);
-  const exploration = new Exploration();
+  const db = await POST('/load/metadata', { feature: 'ownDB' });
+  const exploration = new Exploration(db.ownDB);
   exploration.setUseFullPromptForSelect(true);
   await exploration.updateExplorationList(async () => {
     const docBtn = d3.select('div.exploration-local');

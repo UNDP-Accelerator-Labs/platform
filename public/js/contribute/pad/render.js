@@ -1,4 +1,5 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
+import { getExploration } from '/js/contribute/pad/exploration.js';
 import {
   partialSave,
   switchButtons,
@@ -4812,5 +4813,8 @@ export async function renderPad(kwargs) {
   } else {
     const objectdata = { object, type, main };
     await addSection({ lang: language, objectdata });
+  }
+  if (display !== 'slideshow' && id && ['edit', 'view'].includes(activity)) {
+    await getExploration();
   }
 }

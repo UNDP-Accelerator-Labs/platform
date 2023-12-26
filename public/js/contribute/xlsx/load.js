@@ -48,4 +48,8 @@ function doLoad() {
     });
 }
 
-window.addEventListener('load', doLoad);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onLoad);
+} else {
+  onLoad();
+}

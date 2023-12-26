@@ -208,4 +208,8 @@ async function onLoad() {
   await renderPromiseModal({ headline, opts }, close);
 }
 
-window.addEventListener('load', onLoad);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onLoad);
+} else {
+  onLoad();
+}

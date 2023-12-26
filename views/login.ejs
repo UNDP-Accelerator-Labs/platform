@@ -9,6 +9,13 @@
 
 <%- include ('partials/head.ejs') %>
 
+<% 
+	const pagedata = {
+		language
+	}
+%>
+<data name='page' value='<%= JSON.stringify(pagedata) %>'></data>
+
 </head>
 
 

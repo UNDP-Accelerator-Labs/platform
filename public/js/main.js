@@ -415,10 +415,13 @@ export async function toggleOptions(node) {
   // const { object } = node.dataset || {};
 
   for (const label of node.labels) {
-    d3.select(label).attr(
-      'data-content',
-      node.checked ? vocabulary['yes'] : vocabulary['no'],
-    );
+    const { content } = label.dataset
+    if (isNaN(content)) { // THIS PREVENTS TOGGLE SWITCHES WITH NUMERICAL LABELS TO CHANGE BETWEEN yes AND no
+      d3.select(label).attr(
+        'data-content',
+        node.checked ? vocabulary['yes'] : vocabulary['no'],
+      );
+    }
   }
 }
 export function updateTab(value) {

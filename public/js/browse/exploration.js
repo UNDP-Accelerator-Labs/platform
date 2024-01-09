@@ -1,8 +1,10 @@
 import { Exploration } from '/js/exploration.js';
+import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 // INIT EXPLORATION
 async function initExploration() {
-  const exploration = new Exploration();
+  const db = await POST('/load/metadata', { feature: 'ownDB' });
+  const exploration = new Exploration(db.ownDB);
 
   // EXPLORATION MODULE
   let curSelectSTM = 'stm-browse';

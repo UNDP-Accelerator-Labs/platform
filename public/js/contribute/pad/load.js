@@ -95,7 +95,7 @@ async function onLoad() {
     } else {
       for (let i = 0; i < mainreviews.size(); i++) {
         const node = mainreviews.nodes()[i];
-        const { id, idx } = node.dataset;
+        const { id } = node.dataset;
         await renderPad({
           object: 'review',
           type: undefined,
@@ -154,5 +154,5 @@ async function onLoad() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', onLoad);
 } else {
-  onLoad();
+  await onLoad();
 }

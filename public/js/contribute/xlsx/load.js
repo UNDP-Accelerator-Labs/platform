@@ -7,7 +7,7 @@ import {
 import { catchSubmit } from '/js/contribute/xlsx/save.js';
 import { d3 } from '/js/globals.js';
 
-function doLoad() {
+function onLoad() {
   d3.select('div#import-file')
     .on('drop', async function () {
       const evt = d3.event;

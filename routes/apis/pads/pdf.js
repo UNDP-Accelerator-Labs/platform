@@ -426,6 +426,12 @@ exports.addTags = (data, doc, inset = false) => {
 		const width = doc.widthOfString(name)
 		const height = doc.currentLineHeight()
 
+		if (x + width > maxwidth) {
+			x = margins.left + 8
+			doc.moveDown()
+			y = doc.y
+		}
+
 		doc.roundedRect(x - 8, y - 4, width + 16, height + 8, height)
 			.fillColor(colors['light-2'])
 			.fill()

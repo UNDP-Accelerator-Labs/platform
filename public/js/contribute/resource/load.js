@@ -177,7 +177,7 @@ async function onLoad() {
               const filepath = res[0].src;
 
               const storage_url = new URL(
-                d3.select('data[name="app_storage"]').node(),
+                d3.select('data[name="app_storage"]').node().value,
               );
               storage_url.pathname =
                 `${storage_url.pathname}/${filepath}`.replace(/\/\//g, '/');
@@ -211,5 +211,5 @@ async function onLoad() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', onLoad);
 } else {
-  onLoad();
+  await onLoad();
 }

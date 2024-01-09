@@ -80,7 +80,7 @@ module.exports = async (kwargs) => {
 					console.log('should have written small file')
 				}).catch(err => console.log(err))
 
-				resolve({ status: 200, src: join(targetdir, `${file.filename}.png`), originalname: file.originalname, message: 'success' })
+				resolve({ status: 200, src: join(targetdir, `${file.filename}.png`), originalname: file.originalname, type: 'img', message: 'success' })
 				console.log('failed resolve')
 			})
 		} else { // THIS IS SERVER FILE SYSTEM BASED
@@ -117,11 +117,11 @@ module.exports = async (kwargs) => {
 				image.writeAsync(smtarget)
 				.then(_ => {
 					fs.renameSync(source, target)
-					resolve({ status: 200, src: target.split('public/')[1], originalname: file.originalname, message: 'success' })
+					resolve({ status: 200, src: target.split('public/')[1], originalname: file.originalname, type: 'img', message: 'success' })
 				}).catch(err => {
 					fs.copyFileSync(source, smtarget)
 					fs.renameSync(source, target)
-					resolve({ status: 200, src: target.split('public/')[1], originalname: file.originalname, message: 'success' })
+					resolve({ status: 200, src: target.split('public/')[1], originalname: file.originalname, type: 'img', message: 'success' })
 				})
 			})
 		}

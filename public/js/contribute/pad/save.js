@@ -43,8 +43,8 @@ function retrieveItems(sel, datum, items) {
     datum.has_content = datum.txt?.trim()?.length > 0;
     items.push(datum);
   }
-  if (['img', 'mosaic', 'video'].includes(datum.type)) {
-    if (datum.type === 'mosaic')
+  if (['img', 'mosaic', 'video', 'files'].includes(datum.type)) {
+    if (['mosaic', 'files'].includes(datum.type))
       datum.has_content = datum?.srcs?.filter((b) => b)?.length > 0;
     else datum.has_content = datum.src !== null && datum.src !== undefined;
     items.push(datum);

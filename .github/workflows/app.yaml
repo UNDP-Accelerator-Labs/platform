@@ -58,7 +58,7 @@ jobs:
 
   deploy_tag_pipeline:
     name: Deploy Tag
-    needs: build_pipeline
+    needs: deploy_staging_pipeline
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
@@ -71,11 +71,17 @@ jobs:
       - name: Set env
         run: echo "IMAGE_TAG=$(make -s name)" >> $GITHUB_ENV
 
+      - name: Wait for staging
+        run: sleep 60
+
       - uses: azure/webapps-deploy@v2
         with:
           app-name: 'acclabs-solutionsmapping'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_SM }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'
+
+      - name: Wait for solutionsmapping
+        run: sleep 60
 
       - uses: azure/webapps-deploy@v2
         with:
@@ -83,11 +89,17 @@ jobs:
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_AP }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'
 
+      - name: Wait for actionlearningplans
+        run: sleep 60
+
       - uses: azure/webapps-deploy@v2
         with:
           app-name: 'acclabs-experiments'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_EXP }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'
+
+      - name: Wait for experiments
+        run: sleep 60
 
       - uses: azure/webapps-deploy@v2
         with:

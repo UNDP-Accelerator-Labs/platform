@@ -1,4 +1,5 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
+import { getExploration } from '/js/contribute/pad/exploration.js';
 import {
   partialSave,
   switchButtons,
@@ -6,7 +7,7 @@ import {
 } from '/js/contribute/pad/save.js';
 import { POST } from '/js/fetch.js';
 import { L, d3, uuidv4 } from '/js/globals.js';
-import { fixLabel, toggleClass } from '/js/main.js';
+import { fixLabel, toggleClass, uploadFile } from '/js/main.js';
 import { renderImgZoom, renderPromiseModal } from '/js/modals.js';
 
 const obsvars = {
@@ -82,7 +83,11 @@ const Media = function (kwargs) {
   this.editing = page.activity === 'edit' && object === mainobject;
 
   if (this.editing) {
-    this.id = id;
+    if (parent.datum()?.repeat) {
+      this.id = `${parent.datum().id}-${id}`; // THIS IS TO HANDLE CHECKLISTS INSIDE REPEAT SECTIONS
+    } else {
+      this.id = id;
+    }
   } else {
     this.id = `${object}-${id}`;
   }
@@ -239,7 +244,7 @@ Media.prototype.rmMedia = async function () {
         JSON.parse(window.sessionStorage.getItem('deleted')) || [];
       deleted.push(datum.src);
       window.sessionStorage.setItem('deleted', JSON.stringify(deleted));
-    } else if (type === 'mosaic') {
+    } else if (['mosaic', 'files'].includes(type)) {
       const deleted =
         JSON.parse(window.sessionStorage.getItem('deleted')) || [];
       datum.srcs.forEach((d) => deleted.push(d));
@@ -837,6 +842,7 @@ async function populateSection(data, lang = 'en', section, objectdata) {
   if (data.type === 'img') await addImg({ data, lang, section, objectdata });
   if (data.type === 'mosaic') addMosaic({ data, lang, section, objectdata });
   if (data.type === 'video') addVideo({ data, lang, section, objectdata });
+  if (data.type === 'files') addFiles({ data, lang, section, objectdata });
   if (data.type === 'drawing')
     await addDrawing({ data, lang, section, objectdata });
   if (data.type === 'txt') await addTxt({ data, lang, section, objectdata });
@@ -859,6 +865,7 @@ async function populateSection(data, lang = 'en', section, objectdata) {
   if (data.type === 'group') addGroup({ data, lang, section, objectdata });
 }
 // THIS CAN PROBABLY BE MOVED TO upload.js
+/*
 export function uploadImg(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
@@ -902,19 +909,19 @@ export function uploadImg(kwargs) {
       }
       return json;
     })
-    .then(
-      async (data) =>
-        await addImgs({ data, lang, sibling, container, focus, objectdata }),
-    )
+    .then(async (data) => {
+        await dispatchFiles({ data, lang, sibling, container, focus, objectdata })
+    })
     .catch((err) => {
       if (err) throw err;
     });
 }
-async function deleteImg(kwargs) {
+*/
+async function deleteFile(kwargs) {
   const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
 
   const { sel, lang, objectdata } = kwargs || {};
-  const { object } = objectdata || {};
+  const { object, type: objecttype } = objectdata || {};
 
   const editing = page.activity === 'edit' && object !== 'source';
 
@@ -929,6 +936,7 @@ async function deleteImg(kwargs) {
     const src = sel.datum();
     const mosaicItem = sel.findAncestor('mosaic-item');
     const mosaic = sel.findAncestor('media-mosaic');
+    sel.findAncestor('mosaic-container').classed('focus', true);
     container.each((d) => (d.srcs = d.srcs.filter((c) => c !== src)));
     // DELETE AND STORE
     deleted.push(sel.datum());
@@ -936,7 +944,7 @@ async function deleteImg(kwargs) {
     mosaicItem.remove();
     // UPDATE DISPLAY
     const items = mosaic.selectAll('.mosaic-item');
-    if (items.size() === 0) container.remove();
+    if (items.size() === 0 && objecttype !== 'templated') container.remove();
     else if (items.size() === 1) {
       // REPLACE THE MOSAIC WITH A SINGLE IMAGE
       await addImg({
@@ -951,38 +959,98 @@ async function deleteImg(kwargs) {
       if (page.type === 'private') await switchButtons(lang);
       else window.sessionStorage.setItem('changed-content', true);
     }
+  } else if (datum.type === 'files') {
+    const src = sel.datum();
+    const filesItem = sel.findAncestor('files-item');
+    const files = sel.findAncestor('media-files');
+    (
+      sel.findAncestor('files-container') ||
+      sel.findAncestor('mosaic-container') ||
+      sel.findAncestor('img-container')
+    ).classed('focus', true);
+    container.each((d) => (d.srcs = d.srcs.filter((c) => c !== src)));
+    // DELETE AND STORE
+    deleted.push(sel.datum());
+    window.sessionStorage.setItem('deleted', JSON.stringify(deleted));
+    filesItem.remove();
+    // UPDATE DISPLAY
+    const items = files.selectAll('.files-item');
+    if (items.size() === 0 && objecttype !== 'templated') container.remove();
+    else {
+      files.classed('x2', items.size() === 2);
+      files.classed('x3', items.size() > 2);
+    }
+
+    if (editing) {
+      if (page.type === 'private') await switchButtons(lang);
+      else window.sessionStorage.setItem('changed-content', true);
+    }
   }
 }
-async function addImgs(kwargs) {
+export async function dispatchFiles(kwargs) {
+  const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
   const { data, lang, sibling, container, focus, objectdata } = kwargs;
+  const { object } = objectdata || {};
+
+  const editing = page.activity === 'edit' && object !== 'source';
+
   const fls = data.filter((d) => d.status === 200);
   // THE CONFIG WITH DATA HERE IS A BIT ANNOYING, BUT IT IS FOR CASES WITH A TEMPLATE, TO MAKE SURE THE VARS SET (e.g. THE INSTRUCTION) ARE MAINTAINED
   if (fls.length === 1) {
     const afls = fls.map((f) => {
+      // THIS IS A BIT OVERKILL SINCE WE KNOW THAT IN THIS CASE, THERE IS ONLY ONE FILE TO PROCESS
       return async () => {
+        const { type } = f;
         let datum = {};
         if (container) datum = container.datum();
-        if (datum.type !== 'img') datum = { instruction: datum.instruction };
-        datum['src'] = f.src;
-        await addImg({
-          data: datum,
-          lang,
-          sibling,
-          container,
-          focus,
-          objectdata,
-        });
+        if (type === 'img') {
+          if (datum.type !== 'img') datum = { instruction: datum.instruction };
+          datum['src'] = f.src;
+          await addImg({
+            data: datum,
+            lang,
+            sibling,
+            container,
+            focus,
+            objectdata,
+          });
+        } else if (type === 'pdf') {
+          if (datum.type !== 'files')
+            datum = { instruction: datum.instruction };
+          datum['srcs'] = [f.src];
+          addFiles({
+            data: datum,
+            lang,
+            sibling,
+            container,
+            focus,
+            objectdata,
+          });
+        }
+        // ENABLE SAVING
+        if (page.type === 'private') await switchButtons(lang);
+        else window.sessionStorage.setItem('changed-content', true);
       };
-    }); // ONLY ONE IMAGE SO NO MOSAIC
+    }); // ONLY ONE FILE, SO IF IMAGE, NO MOSAIC
     for (const afl of afls) {
       await afl();
     }
   } else {
     let datum = {};
     if (container) datum = container.datum();
-    if (datum.type !== 'mosaic') datum = { instruction: datum.instruction };
-    datum['srcs'] = fls.map((f) => f.src);
-    addMosaic({ data: datum, lang, sibling, container, focus, objectdata });
+    const type = fls[0].type;
+    if (type === 'img') {
+      if (datum.type !== 'mosaic') datum = { instruction: datum.instruction };
+      datum['srcs'] = fls.map((f) => f.src);
+      addMosaic({ data: datum, lang, sibling, container, focus, objectdata });
+    } else if (type === 'pdf') {
+      if (datum.type !== 'files') datum = { instruction: datum.instruction };
+      datum['srcs'] = fls.map((f) => f.src);
+      addFiles({ data: datum, lang, sibling, container, focus, objectdata });
+    }
+    // ENABLE SAVING
+    if (page.type === 'private') await switchButtons(lang);
+    else window.sessionStorage.setItem('changed-content', true);
   }
 }
 export function uploadVideo(kwargs) {
@@ -1102,6 +1170,7 @@ export async function addSection(kwargs) {
 
   let { id, title, lead, structure, items, repeat, group, instruction } =
     data || {};
+  if (!id) id = uuidv4();
   if (!title) title = '';
   if (!lead) lead = '';
   if (!structure) structure = [];
@@ -1345,7 +1414,7 @@ async function addTitle(kwargs) {
     lang,
     objectdata,
   });
-  // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
+  // REMOVE THE PLACEMENT OPTIONS: gS CANNOT BE MOVED
   // (PRESUMABLY THIS IS NOT NEEDED BECAUSE addTitle IS ONLY USED IN THE SPECIFIC CASE OF A TEMPLATED PAD THAT IS DEPLOYED IN A PUBLIC MOBILIZATION)
   if (media.placement) media.placement.remove();
   if (media.input) media.input.remove();
@@ -1391,7 +1460,7 @@ async function addImg(kwargs) {
   if (!type) type = 'img';
   if (!name) name = null;
   if (!src) src = null;
-  if (!textalign) textalign = 'left';
+  if (!textalign) textalign = 'center';
   if (!scale) scale = 'original';
   required = required ?? false;
 
@@ -1538,16 +1607,34 @@ async function addImg(kwargs) {
           multiple: true,
           disabled: page.activity === 'preview' ? true : null,
         })
-        .on('change', function () {
+        .on('change', async function () {
           // REMOVE IMAGES HERE
-          uploadImg({
-            form: this.form,
-            lang,
-            container: media.container,
-            focus: true,
-            objectdata,
-          });
-          form.select('label').classed('highlight', this.value?.length);
+          if (editing) {
+            const files = await uploadFile(this.form);
+            const filetypes = files.unique('type', true);
+            for (const type of filetypes) {
+              const fls = files.filter((d) => d.type === type);
+              await dispatchFiles({
+                data: fls,
+                lang,
+                container: media.container,
+                focus: true,
+                objectdata,
+              });
+            }
+            // uploadImg({
+            //   form: this.form,
+            //   lang,
+            //   container: media.container,
+            //   focus: true,
+            //   objectdata,
+            // });
+
+            if (page.type === 'private') await switchButtons(lang);
+            else window.sessionStorage.setItem('changed-content', true);
+
+            form.select('label').classed('highlight', this.value?.length);
+          }
         });
       form
         .addElems('label')
@@ -1684,7 +1771,7 @@ function addMosaic(kwargs) {
               const parent = media.media.node();
 
               if (d.value === 'delete')
-                await deleteImg({
+                await deleteFile({
                   sel: sel.findAncestor('mosaic-item').select('img'),
                   lang,
                   objectdata,
@@ -1767,16 +1854,34 @@ function addMosaic(kwargs) {
           multiple: true,
           disabled: page.activity === 'preview' ? true : null,
         })
-        .on('change', function () {
+        .on('change', async function () {
           // REMOVE IMAGES HERE
-          uploadImg({
-            form: this.form,
-            lang,
-            container: media.container,
-            focus: true,
-            objectdata,
-          });
-          form.select('label').classed('highlight', this.value?.length);
+          if (editing) {
+            const files = await uploadFile(this.form);
+            const filetypes = files.unique('type', true);
+            for (const type of filetypes) {
+              const fls = files.filter((d) => d.type === type);
+              await dispatchFiles({
+                data: fls,
+                lang,
+                container: media.container,
+                focus: true,
+                objectdata,
+              });
+            }
+            // uploadImg({
+            //   form: this.form,
+            //   lang,
+            //   container: media.container,
+            //   focus: true,
+            //   objectdata,
+            // });
+
+            if (page.type === 'private') await switchButtons(lang);
+            else window.sessionStorage.setItem('changed-content', true);
+
+            form.select('label').classed('highlight', this.value?.length);
+          }
         });
       form
         .addElems('label')
@@ -1927,6 +2032,293 @@ function addVideo(kwargs) {
         })
         .addElems('i', 'material-icons google-translate-attr')
         .html('ondemand_video');
+    }
+  }
+}
+function addFiles(kwargs) {
+  const page = JSON.parse(d3.select('data[name="page"]').node()?.value);
+  const mainobject = d3.select('data[name="object"]').node()?.value;
+
+  const { data, lang, section, sibling, container, focus, objectdata } =
+    kwargs || {};
+  const { object, type: objecttype } = objectdata || {};
+  let {
+    id,
+    level,
+    type,
+    name,
+    srcs,
+    textalign,
+    verticalalign,
+    instruction,
+    required,
+  } = data || {};
+  if (!level) level = 'media';
+  if (!type || container) type = 'files'; // WE ADD THE || container IN CASE THE FILE IS INITIALLY UPLOADED AS AN IMAGE, BUT THEN CHANGED TO ANOTHER FILE FORMAT
+  if (!name) name = null;
+  if (!srcs) srcs = [];
+  if (!textalign) textalign = 'center';
+  if (!verticalalign) verticalalign = 'center';
+  required = required ?? false;
+
+  const editing = page.activity === 'edit' && object === mainobject;
+
+  if (!editing && srcs?.length === 0) return null;
+
+  if (level === 'meta' && name) {
+    const input = d3.select(`.media-input-group #input-meta-${name}`).node();
+    if (input) input.disabled = true;
+  }
+
+  const media = new Media({
+    parent:
+      section ||
+      d3.select('.group-container.focus').node() ||
+      d3.select('.media-layout.focus').node() ||
+      d3.selectAll('.media-layout').last().node(),
+    sibling,
+    container,
+    type,
+    datum: {
+      id,
+      level,
+      type,
+      name,
+      textalign,
+      verticalalign,
+      srcs,
+      instruction,
+      required,
+    },
+    focus: focus || false,
+    lang,
+    objectdata,
+  });
+
+  if (media.opts) {
+    media.opts
+      .addElems('div', 'opt-group', (_) => {
+        if (srcs?.length === 1) {
+          return [
+            [
+              { key: 'h-align', label: 'format_align_left', value: 'left' },
+              {
+                key: 'h-align',
+                label: 'format_align_center',
+                value: 'center',
+              },
+              { key: 'h-align', label: 'format_align_right', value: 'right' },
+            ],
+          ];
+        } else {
+          return [
+            [],
+            [
+              { key: 'v-align', label: 'format_align_left', value: 'start' },
+              {
+                key: 'v-align',
+                label: 'format_align_center',
+                value: 'center',
+              },
+              { key: 'v-align', label: 'format_align_right', value: 'end' },
+            ],
+          ];
+        }
+      })
+      .classed('align-opts', srcs?.length !== 1)
+      .addElems('button', 'opt', (d) => d)
+      .classed('active', (d) => {
+        if (d.key === 'h-align')
+          return textalign ? d.value === textalign : d.value === 'left';
+        else if (d.key === 'v-align')
+          return verticalalign
+            ? d.value === verticalalign
+            : d.value === 'center';
+      })
+      .attr('type', 'button')
+      .each(function (d) {
+        d3.select(this).classed(d.value, true);
+      })
+      .on('click', async function (d) {
+        const sel = d3.select(this);
+        sel
+          .findAncestor('opt-group')
+          .selectAll('.opt')
+          .classed('active', function () {
+            return this == sel.node();
+          });
+        if (d.key === 'h-align')
+          media.media.style('text-align', (c) => (c.textalign = d.value));
+        // TO DO: THIS IS LIKELY BLOCKED BY csp
+        else if (d.key === 'v-align') {
+          media.media.style('align-items', (c) => (c.verticalalign = d.value)); // TO DO: THIS IS LIKELY BLOCKED BY csp
+        }
+
+        if (editing) {
+          if (page.type === 'private') await switchButtons(lang);
+          else window.sessionStorage.setItem('changed-content', true);
+        }
+      })
+      .addElems('i', 'material-icons google-translate-attr')
+      .html((d) => d.label);
+  }
+
+  media.media
+    .attr('data-placeholder', (d) => d.instruction)
+    .classed('x2', (d) => d.srcs.length === 2)
+    .classed('x3', (d) => d.srcs.length > 2)
+    .style('text-align', (d) => d.textalign)
+    .style('align-items', (d) => d.verticalalign)
+    .addElems('div', 'files-item', (d) => d.srcs)
+    .each(function (d) {
+      const sel = d3.select(this);
+      const img = new Image();
+      let link;
+      img.onload = async function () {
+        sel
+          .addElems('a')
+          .attr('href', link)
+          .addElems('img')
+          .attr('src', this.src);
+
+        if (editing) {
+          sel
+            .addElems('div', 'opts index-opts')
+            .addElems('div', 'opt', [
+              { label: 'west', value: 'move-up' },
+              { label: 'close', value: 'delete' },
+              { label: 'east', value: 'move-down' },
+            ])
+            .each(function (d) {
+              d3.select(this).classed(d.value, true);
+            })
+            .on('click', async function (d) {
+              d3.event.stopPropagation();
+              const sel = d3.select(this);
+              const source = sel.findAncestor('files-item').node();
+              const parent = media.media.node();
+
+              if (d.value === 'delete')
+                await deleteFile({
+                  sel: sel.findAncestor('files-item').select('img'),
+                  lang,
+                  objectdata,
+                });
+              if (d.value === 'move-up') {
+                const prev = source.previousSibling;
+                parent.insertBefore(source, prev);
+                // RESET THE DATA SO THAT IT IS SAVED PROPERLY
+                media.media.each(function (d) {
+                  d.srcs = d3.select(this).selectAll('.files-item').data();
+                });
+              } else if (d.value === 'move-down') {
+                let next;
+                if (source.nextSibling) {
+                  if (source.nextSibling.nextSibling)
+                    next = source.nextSibling.nextSibling;
+                  else next = null;
+                } else next = parent.children[0];
+                parent.insertBefore(source, next);
+                // RESET THE DATA SO THAT IT IS SAVED PROPERLY
+                media.media.each(function (d) {
+                  d.srcs = d3.select(this).selectAll('.files-item').data();
+                });
+              }
+
+              if (editing) {
+                if (page.type === 'private') await switchButtons(lang);
+                else window.sessionStorage.setItem('changed-content', true);
+              }
+            })
+            .addElems('i', 'material-icons google-translate-attr')
+            .html((d) => d.label);
+        }
+
+        const target_opts = await POST('/load/files', {
+          paths: link,
+          // TO DO: ADD SPACE FOR CONTROLING USER RIGHTS
+        }).then((results) => {
+          const { title } = results.data?.[0];
+          sel.addElems('label', 'file-name').html(title);
+        });
+      };
+      img.onerror = function (err) {
+        if (err) console.log(err);
+        img.onerror = null;
+        img.src = '/imgs/icons/i-pdf-xl.svg';
+        sel.classed('default-icon', true);
+      };
+
+      if (d3.select('data[name="app_storage"]').node()) {
+        const app_storage = d3.select('data[name="app_storage"]').node().value;
+        link = new URL(`${app_storage}/${d}`).href;
+        img.src = link;
+      } else {
+        link = `/${d}`;
+        img.src = link;
+      }
+    });
+
+  // WE NEED THE ICON IF
+  // THE PAD IS BASED ON A TEMPLATE: templated
+  // THE PAD IS IN create, preview MODE
+  // THERE IS NO IMAGE YET
+  if (
+    objecttype === 'templated' &&
+    (page.activity === 'edit' ||
+      (page.activity === 'preview' && !srcs?.length))
+  ) {
+    const form_id = media.id; // uuidv4()
+
+    if (media.input) {
+      const form = media.input.addElems('form').attrs({
+        action: '/upload/img',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+      });
+      form
+        .addElems('input')
+        .attrs({
+          type: 'file',
+          id: `input-media-img-${form_id}`,
+          name: 'img',
+          accept: 'image/*, .pdf',
+          multiple: true,
+          disabled: page.activity === 'preview' ? true : null,
+        })
+        .on('change', async function () {
+          // REMOVE IMAGES HERE
+          if (editing) {
+            const files = await uploadFile(this.form);
+            const filetypes = files.unique('type', true);
+            for (const type of filetypes) {
+              const fls = files.filter((d) => d.type === type);
+              await dispatchFiles({
+                data: files,
+                lang,
+                container: media.container,
+                focus: true,
+                objectdata,
+              });
+            }
+            if (page.type === 'private') await switchButtons(lang);
+            else window.sessionStorage.setItem('changed-content', true);
+
+            form.select('label').classed('highlight', this.value?.length);
+          }
+        });
+      form
+        .addElems('label')
+        .classed('highlight', srcs?.length ? true : false)
+        .attr('for', `input-media-img-${form_id}`)
+        .on('mousedown', function () {
+          d3.select(this).classed('highlight', page.activity !== 'preview');
+        })
+        .on('mouseup', function () {
+          d3.select(this).classed('highlight', false);
+        })
+        .addElems('i', 'material-icons google-translate-attr')
+        .html('add_photo_alternate');
     }
   }
 }
@@ -3940,30 +4332,43 @@ function addGroup(kwargs) {
     }
     // for (let )
 
-    groups.classed('animate-in', (d, i) => i === groups.size() - 1);
+    groups
+      .classed('animate-in', (d, i) => i === groups.size() - 1)
+      .each(function (d, i) {
+        const sel = d3.select(this);
+        sel.classed(`g-${i + 1}`, true);
+      });
     // THIS IS THE SAME AS IN MEDIA, BUT IN MEDIA WE PREVENT THESE OPTIONS WHEN TEMPLATED
     // HERE THEY ARE MADE AVAILABLE FOR REMOVING GROUP REPETITIONS
-    const placement = groups.addElems('div', 'placement-opts');
-    placement
-      .addElems('div', 'opt', [
-        { label: 'close', value: 'delete', fn: (sel) => rmGroup(sel) },
-      ])
-      .on('click', async function (d) {
-        d3.event.stopPropagation();
-        d.fn(d3.select(this).findAncestor('media-group-items'));
+    groups.addElems('div', 'placement-opts').each(function () {
+      const sel = d3.select(this);
+      const groupitems = sel.findAncestor('media-group-items');
+      if (
+        !(
+          (level === 'meta' || objecttype === 'templated') &&
+          groupitems.classed('g-1')
+        )
+      ) {
+        sel
+          .addElems('div', 'opt', [
+            { label: 'close', value: 'delete', fn: (sel) => rmGroup(sel) },
+          ])
+          .on('click', async function (d) {
+            d3.event.stopPropagation();
+            d.fn(d3.select(this).findAncestor('media-group-items'));
 
-        if (editing) {
-          if (page.type === 'private') await switchButtons(lang);
-          else window.sessionStorage.setItem('changed-content', true);
-        }
-      })
-      .on('mouseup', (_) => d3.event.stopPropagation())
-      .addElems('i', 'material-icons google-translate-attr')
-      .html((d) => d.label);
+            if (editing) {
+              if (page.type === 'private') await switchButtons(lang);
+              else window.sessionStorage.setItem('changed-content', true);
+            }
+          })
+          .on('mouseup', (_) => d3.event.stopPropagation())
+          .addElems('i', 'material-icons google-translate-attr')
+          .html((d) => d.label);
+      }
+    });
 
     async function rmGroup(sel) {
-      // TO DO: ONLY POSSIBLE WHEN THERE ARE MULTIPLE REPEATS
-      // FOR META INPUT
       sel
         .selectAll('.media-container, .meta-container')
         .data()
@@ -4408,5 +4813,8 @@ export async function renderPad(kwargs) {
   } else {
     const objectdata = { object, type, main };
     await addSection({ lang: language, objectdata });
+  }
+  if (display !== 'slideshow' && id && ['edit', 'view'].includes(activity)) {
+    await getExploration();
   }
 }

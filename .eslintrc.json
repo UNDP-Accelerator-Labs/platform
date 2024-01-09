@@ -5,7 +5,7 @@
     "commonjs": true,
     "es2021": true
   },
-  "extends": ["google", "prettier"],
+  "extends": ["google", "prettier", "plugin:import/recommended"],
   "overrides": [],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -19,8 +19,17 @@
     "no-invalid-this": "off",
     "no-undef": "error",
     "no-extend-native": "off",
+    "import/no-unresolved": "off", // reactivate later and fix resolver
     "new-cap": "off" // for GET, POST, PUT, etc.
   },
-  "plugins": ["ejs-js"],
-  "ignorePatterns": []
+  "plugins": ["ejs-js", "import"],
+  "ignorePatterns": [],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": ["./", "public/"],
+        "moduleDirectory": ["node_modules"]
+      }
+    }
+  }
 }

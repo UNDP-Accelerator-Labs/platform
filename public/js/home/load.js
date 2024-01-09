@@ -16,5 +16,5 @@ async function onLoad() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', onLoad);
 } else {
-  onLoad();
+  await onLoad();
 }

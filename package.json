@@ -59,6 +59,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-ejs-js": "^0.1.0",
+    "eslint-plugin-import": "^2.29.0",
     "file-type": "^18.3.0",
     "html-pdf-node": "^1.0.8",
     "html2pdf.js": "^0.10.1",

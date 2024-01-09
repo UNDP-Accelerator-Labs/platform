@@ -194,7 +194,7 @@ window.addEventListener('keyup', async function (e) {
       ) {
         if (editing) {
           const language = await getCurrentLanguage();
-          if (page.type === 'private') await switchButtons(language);
+          if (page.type === 'private') await switchButtons(language); // TECHNICALLY switchButtons NO LONGER NEEDS THE language VAIRABLE
           else window.sessionStorage.setItem('changed-content', true);
         }
         // THIS PICKS UP ON KEYSTROKES IN media OR meta OUTSIDE OF INPUT FIELDS

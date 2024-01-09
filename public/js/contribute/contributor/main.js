@@ -1,4 +1,4 @@
-import { getRegisteredLanguages, getTranslations } from '/js/config/main';
+import { getRegisteredLanguages, getTranslations } from '/js/config/main.js';
 import { partialSave } from '/js/contribute/contributor/save.js';
 import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';

@@ -7,11 +7,8 @@ export async function getCurrentLanguage() {
   if (cachedLanguage) {
     return cachedLanguage;
   }
-  const language = d3.select('data[name="page"]')?.node()?.value?.language;
-  if (language) {
-    cachedLanguage = language;
-    return language;
-  } else {
+  let language = JSON.parse(d3.select('data[name="page"]')?.node()?.value ?? '{}')?.language;
+  if (!language) {
     const { languages } = await POST('/load/metadata', {
       feature: 'languages',
     });
@@ -19,11 +16,13 @@ export async function getCurrentLanguage() {
     const pathlang = url.pathname.substring(1).split('/')[0];
 
     if (languages.some((d) => d === pathlang)) {
-      return pathlang;
+      language = pathlang;
     } else {
-      return 'en';
+      language = 'en';
     }
   }
+  cachedLanguage = language;
+  return language;
 }
 
 let cachedLanguages = null;
@@ -37,9 +36,8 @@ export async function getRegisteredLanguages() {
   if (!languages?.length) {
     languages = (await POST('/load/metadata', { feature: 'languages' }))
       .languages;
-  } else {
-    cachedLanguages = languages;
   }
+  cachedLanguages = languages;
   return languages;
 }
 

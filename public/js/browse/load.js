@@ -140,6 +140,7 @@ async function onLoad() {
       const { id, name } = this.dataset;
       await rmtag(this, { id, name });
     });
+  //  TO DO: CHECK HERE FOR TOGGLE ISSUE
   filter_module.selectAll('.status input.toggle').on('change', function () {
     this.form.requestSubmit[this.form.querySelector('button#search')] ||
       this.form.submit();

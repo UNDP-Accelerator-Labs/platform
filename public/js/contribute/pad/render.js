@@ -1345,7 +1345,7 @@ async function addTitle(kwargs) {
     lang,
     objectdata,
   });
-  // REMOVE THE PLACEMENT OPTIONS: gS CANNOT BE MOVED
+  // REMOVE THE PLACEMENT OPTIONS: TITLES CANNOT BE MOVED
   // (PRESUMABLY THIS IS NOT NEEDED BECAUSE addTitle IS ONLY USED IN THE SPECIFIC CASE OF A TEMPLATED PAD THAT IS DEPLOYED IN A PUBLIC MOBILIZATION)
   if (media.placement) media.placement.remove();
   if (media.input) media.input.remove();

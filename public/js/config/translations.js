@@ -585,6 +585,63 @@ export const fullVocabulary = {
       singular: 'Fonte de dados',
     },
   },
+  gender: {
+    // USED
+    en: {
+      plural: 'Genders',
+      singular: 'Gender',
+    },
+    fr: {
+      plural: 'Genres',
+      singular: 'Genre',
+    },
+    es: {
+      plural: 'Géneros',
+      singular: 'Género',
+    },
+    pt: {
+      plural: 'Gêneros',
+      singular: 'Gênero',
+    },
+  },
+  position: {
+    // USED
+    en: {
+      plural: 'Positions',
+      singular: 'Position',
+    },
+    fr: {
+      plural: 'Positions',
+      singular: 'Position',
+    },
+    es: {
+      plural: 'Posiciones',
+      singular: 'Posición',
+    },
+    pt: {
+      plural: 'Posições',
+      singular: 'Posição',
+    },
+  },
+  rights: {
+    // USED
+    en: {
+      plural: 'Rights',
+      singular: 'Right',
+    },
+    fr: {
+      plural: 'Droits',
+      singular: 'Droit',
+    },
+    es: {
+      plural: 'Derechos',
+      singular: 'Derecho',
+    },
+    pt: {
+      plural: 'Direitos',
+      singular: 'Direito',
+    },
+  },
   'experiment status': {
     // USED
     en: 'Experiment status',
@@ -2289,6 +2346,13 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     fr: 'Inclure les emplacements',
     es: 'Incluir las ubicaciones',
     pt: 'Incluir os locais',
+  },
+  'transpose locations': {
+    // USED
+    en: 'Transpose locations',
+    fr: 'Transposer les emplacements',
+    es: 'Transponer las ubicaciones',
+    pt: 'Transpor os locais',
   },
   'include metafields': {
     // USED

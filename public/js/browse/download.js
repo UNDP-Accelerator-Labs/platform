@@ -152,6 +152,15 @@ export async function setDownloadOptions() {
         default: true,
         classname: 'hide csv xlsx json geojson',
       });
+      opts.push({
+        node: 'input',
+        type: 'checkbox',
+        name: 'transpose_locations',
+        value: true,
+        placeholder: vocabulary['transpose locations'],
+        default: true,
+        classname: 'hide csv',
+      });
     }
     if (
       metafields.some((d) => !['tag', 'index', 'location'].includes(d.type))

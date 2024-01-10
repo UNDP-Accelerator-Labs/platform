@@ -14,7 +14,7 @@ const filter = include('routes/browse/pads/filter')
 
 module.exports = async (req, res) => {
 	const { action } = req.params || {}
-	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_engagement, include_comments, transpose_locations } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
 	if (typeof include_data === 'string') include_data = JSON.parse(include_data)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
@@ -313,7 +313,7 @@ module.exports = async (req, res) => {
 												obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}`
 
 												if (d.type === 'title') obj.content = d.txt
-												if (include_imgs && d.type === 'img') {
+												else if (include_imgs && d.type === 'img') {
 													if (d.src) {
 														const idx = imgs.findIndex(c => c.image === d.src.replace('uploads', '/uploads/sm'))
 														if (include_imgs && fs.existsSync(path.join(rootpath, `/public/${d.src}`))) {
@@ -321,7 +321,7 @@ module.exports = async (req, res) => {
 														} else obj.content = d.src
 													}
 												}
-												if (include_imgs && d.type === 'mosaic') {
+												else if (include_imgs && d.type === 'mosaic') {
 													if (d.srcs?.length) {
 														obj.content = d.srcs.map(c => {
 															const idx = imgs.findIndex(b => b.image === c.replace('uploads', '/uploads/sm'))
@@ -331,12 +331,14 @@ module.exports = async (req, res) => {
 														}).join(', ')
 													}
 												}
-												if (include_imgs && d.type === 'video') obj.content = d.src
-												if (d.type === 'drawing') obj.content = d.shapes?.join(', ')
-												if (d.type === 'txt') obj.content = d.txt
-												if (d.type === 'embed') obj.content = d.html?.replace(/<[^>]*>/g, '') || d.src // THE replace IS IMPORTANT HERE TO AVOID xml INJECTION IN THE xlsx OUTPUT
+												else if (include_imgs && d.type === 'video') obj.content = d.src
+												else if (d.type === 'drawing') obj.content = d.shapes?.join(', ')
+												else if (d.type === 'txt') obj.content = d.txt
+												else if (d.type === 'embed') obj.content = d.html?.replace(/<[^>]*>/g, '') || d.src // THE replace IS IMPORTANT HERE TO AVOID xml INJECTION IN THE xlsx OUTPUT
+												else return false
 
 												if (!obj.content) obj.content = null
+
 
 												structure.push(obj)
 											}
@@ -363,6 +365,78 @@ module.exports = async (req, res) => {
 								headers = Object.keys(headers).filter(c => c !== 'pad_id')
 							}
 
+							 
+							const data = pad_group.values.map(d => {
+								let { ...obj } = d
+
+								// ANONYMIZE CONTRIBUTORS
+								// NOTE THIS id IS COMMON TO ALL WORKBOOKS (IF SEVERAL ARE GENERATED)
+								obj.contributor_id = `c-${contributor_list.indexOf(obj.contributor_id) + 1}`
+
+								obj.snippet = parsers.getTxt(d)?.[0]
+								if (app_storage) {
+									const vignette_path = parsers.getImg(d, true)?.[0]
+									if (vignette_path) obj.vignette = new URL(path.join(new URL(app_storage).pathname, vignette_path), app_storage).href
+									else obj.vignette = null
+								}
+								// FIGURE OUT WHICH CONTENT STRUCTURE TO KEEP
+								if (!use_templates) {
+									obj.content = obj.full_text?.replace(/<[^>]*>/g, '')
+								} else {
+									const structure = flat_content.find(c => c.pad_id === obj.pad_id)
+									headers.forEach(c => {
+										obj[c] = structure[c] ?? null
+									})
+								}
+								delete obj.full_text
+								delete obj.sections
+
+								// EXTRACT IMAGES
+								if (single_sheet && include_imgs && !use_templates) {
+									if (Array.isArray(obj.img)) {
+										for (let i = 0; i < max_imgs; i ++) {
+											if (obj.img[i]) {
+												const idx = imgs.findIndex(c => c.image === obj.img[i])
+												if (fs.existsSync(path.join(rootpath, `/public${obj.img[i].replace('uploads/sm', 'uploads')}`))) obj[`media-${i + 1}`] = `images/pad-${obj.pad_id}/image-${idx + 1}${path.extname(obj.img[i])}`
+												else obj[`media-${i + 1}`] = obj.img[i]
+											}
+										}
+									}
+								}
+								delete obj.img
+								
+								if (single_sheet && include_locations) {
+									const pad_locations = locations.filter(c => c.pad_id === obj.pad_id)
+									if (transpose_locations) {
+										if (pad_locations.length === 1) {
+											const { lat, lng } = pad_locations[0]
+											obj[`location-1-lat`] = lat
+											obj[`location-1-lng`] = lng
+										} else if (pad_locations.length > 1) {
+											const subobjs = pad_locations.map(c => {
+												let subobj = Object.assign({}, obj)
+												const { lat, lng } = c
+												subobj[`location-1-lat`] = lat
+												subobj[`location-1-lng`] = lng
+												return subobj
+											})
+											obj = subobjs
+										}
+									} else {
+										for (let i = 0; i < max_locations; i ++) {
+											if (pad_locations[i]) {
+												const { lat, lng } = pad_locations[i]
+												obj[`location-${i + 1}-lat`] = lat
+												obj[`location-${i + 1}-lng`] = lng
+											}
+										}
+									}
+								}
+
+								return obj
+							}).flat()
+							
+							/*
 							pad_group.values.forEach(d => {
 								// ANONYMIZE CONTRIBUTORS
 								// NOTE THIS id IS COMMON TO ALL WORKBOOKS (IF SEVERAL ARE GENERATED)
@@ -403,7 +477,11 @@ module.exports = async (req, res) => {
 								if (single_sheet && include_locations) {
 									const pad_locations = locations.filter(c => c.pad_id === d.pad_id)
 									for (let i = 0; i < max_locations; i ++) {
-										if (pad_locations[i]) {
+										// if (transpose_locations) {
+
+										// }
+
+										else if (pad_locations[i]) {
 											const { lat, lng } = pad_locations[i]
 											d[`location-${i + 1}-lat`] = lat
 											d[`location-${i + 1}-lng`] = lng
@@ -411,8 +489,10 @@ module.exports = async (req, res) => {
 									}
 								}
 							})
+							*/
 
-							const data_sheet = XLSX.utils.json_to_sheet(pad_group.values)
+							// const data_sheet = XLSX.utils.json_to_sheet(pad_group.values)
+							const data_sheet = XLSX.utils.json_to_sheet(data)
 							XLSX.utils.book_append_sheet(wb, data_sheet, 'data-main')
 
 							// ADD IMAGES TO WORKBOOK

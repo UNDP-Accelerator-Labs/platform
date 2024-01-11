@@ -80,6 +80,7 @@ export async function confirmRemoval(action) {
         resolve: [datum.id],
       },
     ];
+
     const removal = await renderPromiseModal({ message, opts });
 
     d3.select(form)
@@ -91,6 +92,8 @@ export async function confirmRemoval(action) {
       });
     form.submit();
   }
+
+  d3.select('#loader').style('display', 'block');
 }
 export function deleteArticles() {
   const sel = d3.select(this);

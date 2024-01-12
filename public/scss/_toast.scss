@@ -48,11 +48,11 @@
 }
 
 .toast.toast-success {
-  background: #95eab8;
+  background: #b4dc28;
 }
 
 .toast.toast-success .toast-progress {
-  background-color: #2ecc71;
+  background-color: #fff;
 }
 
 .toast.toast-danger {
@@ -60,7 +60,7 @@
 }
 
 .toast.toast-danger .toast-progress {
-  background-color: #e74c3c;
+  background-color: #fff;
 }
 
 .toast.toast-info {
@@ -68,7 +68,7 @@
 }
 
 .toast.toast-info .toast-progress {
-  background-color: #3498db;
+  background-color: #fff;
 }
 
 .toast.toast-warning {
@@ -76,7 +76,7 @@
 }
 
 .toast.toast-warning .toast-progress {
-  background-color: #f1c40f;
+  background-color: #fff;
 }
 
 @keyframes slideInRight {

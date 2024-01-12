@@ -1,27 +1,28 @@
-let icon = { 
-    success: 
-    `<span>
-        <i class='fa fa-check-circle'> </i>
-    </span>`, 
-    danger: 
-    `<span>
-        <i class='fa fa-times'> </i>
-    </span>`, 
-    warning: 
-    `<span>
-        <i class='fa fa-exclamation-triangle'> </i>
-    </span>`, 
-    info: 
-    `<span>
-        <i class='fa  fa-info-circle'> </i>
-    </span>`, 
-}; 
-  
 export function showToast  ( 
         message = "", 
         toastType = "info", 
         duration = 5000
     ){ 
+
+    let icon = { 
+        success: 
+        `<span>
+            <i class='fa fa-check-circle'> </i>
+        </span>`, 
+        danger: 
+        `<span>
+            <i class='fa fa-times'> </i>
+        </span>`, 
+        warning: 
+        `<span>
+            <i class='fa fa-exclamation-triangle'> </i>
+        </span>`, 
+        info: 
+        `<span>
+            <i class='fa  fa-info-circle'> </i>
+        </span>`, 
+    }; 
+
     if (!Object.keys(icon).includes(toastType)) 
         toastType = "info"; 
   

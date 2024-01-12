@@ -10,6 +10,7 @@ import { POST } from '/js/fetch.js';
 import { d3, uuidv4 } from '/js/globals.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
 import { renderFormModal, renderImgZoom } from '/js/modals.js';
+import { showToast } from '/js/notification/toast.js';
 
 // TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
@@ -1445,6 +1446,8 @@ export const Entry = function (_kwargs) {
               if (['like', 'dislike'].includes(e)) {
                 const sel = d3.select(this);
 
+                d3.select('#loader').style('display', 'block');
+
                 const res = await POST('/engage', {
                   object: object.slice(0, -1),
                   id: d.id,
@@ -1478,7 +1481,9 @@ export const Entry = function (_kwargs) {
                       .select('button.engagement-like')
                       .attr('disabled', res.active);
                   }
+                  d3.select('#loader').style('display', 'none');
                 }
+                else d3.select('#loader').style('display', 'none');
               }
             });
         });
@@ -1536,6 +1541,9 @@ export const Entry = function (_kwargs) {
           pin
             .addElems('label', 'close', (d) => (d.editable ? [d] : []))
             .on('click', async function (d) {
+              //SHOW LOADER
+              d3.select('#loader').style('display', 'block');
+
               const res = await POST('/pin', {
                 board_id: d.id,
                 object_id: d.object_id,
@@ -1543,6 +1551,8 @@ export const Entry = function (_kwargs) {
                 object: object.slice(0, -1),
               });
               if (res.status === 200) {
+                showToast('Successfully deleted pad from pinboard.', 'success');
+
                 if (space === 'pinned') {
                   location.reload();
                 } else {
@@ -1556,6 +1566,10 @@ export const Entry = function (_kwargs) {
                   renderDropdown(d.object_id);
                   renderPinNavigation(res.pinboards_list);
                 }
+              }
+              else{
+                d3.select('#loader').style('display', 'none');
+                showToast('Error occurred! Please try again.', 'danger')
               }
             });
         }
@@ -1574,6 +1588,7 @@ export const Entry = function (_kwargs) {
               const pins = sel.findAncestor('pinboard-group').select('.pins');
 
               if (this.checked) {
+                d3.select('#loader').style('display', 'block');
                 const res = await POST('/pin', {
                   board_id: d.id,
                   object_id: d.object_id,
@@ -1587,8 +1602,16 @@ export const Entry = function (_kwargs) {
                   );
                   renderDropdown(d.object_id);
                   renderPinNavigation(res.pinboards_list);
+
+                  showToast('Successfully added pad from pinboard.', 'success');
+                  d3.select('#loader').style('display', 'none');
+                }
+                else {
+                  showToast('Error occurred! Please try again.', 'danger')
+                  d3.select('#loader').style('display', 'none');
                 }
               } else {
+                d3.select('#loader').style('display', 'block');
                 const res = await POST('/pin', {
                   board_id: d.id,
                   object_id: d.object_id,
@@ -1605,6 +1628,13 @@ export const Entry = function (_kwargs) {
                   );
                   renderDropdown(d.object_id);
                   renderPinNavigation(res.pinboards_list);
+
+                  showToast('Successfully deleted pad from pinboard.', 'success');
+                  d3.select('#loader').style('display', 'none');
+                }
+                else {
+                  showToast('Error occurred! Please try again.', 'danger')
+                  d3.select('#loader').style('display', 'none');
                 }
               }
             });
@@ -1765,6 +1795,8 @@ export const Entry = function (_kwargs) {
                 });
 
               if (existingBoard.node()) {
+                d3.select('#loader').style('display', 'block');
+
                 // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
                 const res = await POST('/pin', {
                   board_id: existingBoard.datum().id,
@@ -1779,8 +1811,14 @@ export const Entry = function (_kwargs) {
                   );
                   renderDropdown(d.id);
                   renderPinNavigation(res.pinboards_list);
+
+                  d3.select('#loader').style('display', 'none');
                 }
+                else d3.select('#loader').style('display', 'none');
               } else {
+                //SHOW LOADER
+                d3.select('#loader').style('display', 'block');
+
                 // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
                 const res = await POST('/pin', {
                   board_title: node.value.trim(),
@@ -1788,9 +1826,15 @@ export const Entry = function (_kwargs) {
                   action: 'insert',
                   object: object.slice(0, -1),
                 });
+
                 if (res.status === 200) {
+                  showToast('Successfully created pinboard and added pad.', 'success')  
                   // RELOAD THE PAGE
                   location.reload();
+                }
+                else{
+                  d3.select('#loader').style('display', 'none');
+                  showToast('Error occurred while trying to create pinboard. Please try again!', 'danger')
                 }
               }
               // RESET DROPDOWN
@@ -1841,6 +1885,7 @@ export const Entry = function (_kwargs) {
         .html((d) => d.label)
         .on('click', function (d) {
           d.fn ? d.fn.call(this, 'unpublish') : null;
+          d3.select('#loader').style('display', 'block');
         });
     },
     delete: function (_sel) {

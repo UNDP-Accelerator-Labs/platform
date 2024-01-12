@@ -200,6 +200,12 @@ async function onLoad() {
       document.documentElement.scrollTop > 60,
     );
   });
+
+  //SHOW LOADING ICON WHEN A SUBMIT BUTTON IS CLICKED
+  d3.select('button[type="submit"]').on('click', function () {
+      d3.select('#loader').style('display', 'block');
+  });
+
   d3.select('#loader').style('display', 'none');
 }
 

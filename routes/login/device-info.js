@@ -87,3 +87,38 @@ exports.checkDevice = async (_kwarg) => {
     (d) => (d?.id ? true : false)
   );
 };
+
+
+exports.query = () =>`
+SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
+COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
+
+CASE WHEN u.language IN ($1:csv)
+  THEN u.language
+  ELSE 'en'
+END AS language,
+
+COALESCE(
+  (SELECT json_agg(DISTINCT(jsonb_build_object(
+    'uuid', u2.uuid,
+    'name', u2.name,
+    'rights', u2.rights
+  ))) FROM team_members tm
+  INNER JOIN teams t
+    ON t.id = tm.team
+  INNER JOIN users u2
+    ON u2.uuid = tm.member
+  WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
+)::TEXT, '[]')::JSONB
+AS collaborators
+
+FROM users u
+
+LEFT JOIN adm0_subunits su
+  ON su.su_a3 = u.iso3
+LEFT JOIN adm0
+  ON adm0.adm0_a3 = u.iso3
+
+WHERE (u.name = $2 OR u.email = $2)
+  AND (u.password = CRYPT($3, u.password) OR $3 = $4)
+;`

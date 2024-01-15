@@ -242,3 +242,12 @@ exports.getVersionObject = async () => {
       };
     });
 };
+
+//MICROSOFT SSO CONFIG VARIABLES
+exports.msalConfig = {
+	auth: {
+	  clientId: process.env.CLIENT_ID,
+	  authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`,
+	  clientSecret: process.env.CLIENT_SECRET, 
+	},
+};

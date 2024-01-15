@@ -174,8 +174,18 @@ app.get('/:language/home', routes.check.login, routes.dispatch.public);
 app
   .route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
   // .get(routes.redirect.home, routes.render.login)
-  .get(routes.redirect.browse, routes.render.login)
-  .post(loginRateLimiterMiddleware, routes.process.login);
+  .get(routes.redirect.browse, routes.render.sso_redirect)
+
+//ENDPOINTS FOR LOGIN PLATFORM
+app.route('/sso-login')
+.get(routes.redirect.browse, routes.render.login)
+.post(loginRateLimiterMiddleware, routes.process.login);
+
+//MICROSOFT SSO PATHS
+app.get('/sso-inits', routes.initiate_sso);
+
+app.get('/auth/openid/return', routes.validate_sso);
+
 app.get('/transfer', routes.process.login);
 app
   .route('/logout/:session')

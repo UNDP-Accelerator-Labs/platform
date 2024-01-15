@@ -89,7 +89,8 @@ module.exports = (req, res, next) => {
 				})
 			}).catch(err => console.log(err))
 		} else res.redirect('/login')
-	} else {
+	}
+	 else {
 		const { username, password, originalUrl, is_trusted } = req.body || {}
 		const { sessionID: sid } = req || {}
 

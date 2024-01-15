@@ -157,6 +157,10 @@ exports.process.callapi = (req, res) => {
 /* =============================================================== */
 exports.check.login = require('./login/').check
 exports.render.login = require('./login/').render
+exports.render.sso_redirect = require('./login/').sso_redirect
+exports.initiate_sso = require('./login').initiate_sso
+exports.validate_sso = require('./login').validate_sso
+
 exports.process.login = require('./login/').process
 exports.redirect.home = require('./redirect/').home
 exports.redirect.browse = require('./redirect/').browse

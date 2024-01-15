@@ -11,6 +11,7 @@ import { d3, uuidv4 } from '/js/globals.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
 import { renderFormModal, renderImgZoom } from '/js/modals.js';
 import { showToast } from '/js/notification/toast.js';
+import { isLoading } from '/js/notification/loader.js';
 
 // TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
@@ -1446,7 +1447,7 @@ export const Entry = function (_kwargs) {
               if (['like', 'dislike'].includes(e)) {
                 const sel = d3.select(this);
 
-                d3.select('#loader').style('display', 'block');
+                isLoading(true)
 
                 const res = await POST('/engage', {
                   object: object.slice(0, -1),
@@ -1481,9 +1482,9 @@ export const Entry = function (_kwargs) {
                       .select('button.engagement-like')
                       .attr('disabled', res.active);
                   }
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                 }
-                else d3.select('#loader').style('display', 'none');
+                else isLoading(false)
               }
             });
         });
@@ -1542,7 +1543,7 @@ export const Entry = function (_kwargs) {
             .addElems('label', 'close', (d) => (d.editable ? [d] : []))
             .on('click', async function (d) {
               //SHOW LOADER
-              d3.select('#loader').style('display', 'block');
+              isLoading(true)
 
               const res = await POST('/pin', {
                 board_id: d.id,
@@ -1568,7 +1569,7 @@ export const Entry = function (_kwargs) {
                 }
               }
               else{
-                d3.select('#loader').style('display', 'none');
+                isLoading(false)
                 showToast('Error occurred! Please try again.', 'danger')
               }
             });
@@ -1588,7 +1589,7 @@ export const Entry = function (_kwargs) {
               const pins = sel.findAncestor('pinboard-group').select('.pins');
 
               if (this.checked) {
-                d3.select('#loader').style('display', 'block');
+                isLoading(true)
                 const res = await POST('/pin', {
                   board_id: d.id,
                   object_id: d.object_id,
@@ -1604,14 +1605,14 @@ export const Entry = function (_kwargs) {
                   renderPinNavigation(res.pinboards_list);
 
                   showToast('Successfully added pad from pinboard.', 'success');
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                 }
                 else {
                   showToast('Error occurred! Please try again.', 'danger')
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                 }
               } else {
-                d3.select('#loader').style('display', 'block');
+                isLoading(true)
                 const res = await POST('/pin', {
                   board_id: d.id,
                   object_id: d.object_id,
@@ -1630,11 +1631,11 @@ export const Entry = function (_kwargs) {
                   renderPinNavigation(res.pinboards_list);
 
                   showToast('Successfully deleted pad from pinboard.', 'success');
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                 }
                 else {
                   showToast('Error occurred! Please try again.', 'danger')
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                 }
               }
             });
@@ -1795,7 +1796,7 @@ export const Entry = function (_kwargs) {
                 });
 
               if (existingBoard.node()) {
-                d3.select('#loader').style('display', 'block');
+                isLoading(true)
 
                 // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
                 const res = await POST('/pin', {
@@ -1812,12 +1813,12 @@ export const Entry = function (_kwargs) {
                   renderDropdown(d.id);
                   renderPinNavigation(res.pinboards_list);
 
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                 }
-                else d3.select('#loader').style('display', 'none');
+                else isLoading(false)
               } else {
                 //SHOW LOADER
-                d3.select('#loader').style('display', 'block');
+                isLoading(true)
 
                 // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
                 const res = await POST('/pin', {
@@ -1833,7 +1834,7 @@ export const Entry = function (_kwargs) {
                   location.reload();
                 }
                 else{
-                  d3.select('#loader').style('display', 'none');
+                  isLoading(false)
                   showToast('Error occurred while trying to create pinboard. Please try again!', 'danger')
                 }
               }
@@ -1885,7 +1886,7 @@ export const Entry = function (_kwargs) {
         .html((d) => d.label)
         .on('click', function (d) {
           d.fn ? d.fn.call(this, 'unpublish') : null;
-          d3.select('#loader').style('display', 'block');
+          isLoading(true)
         });
     },
     delete: function (_sel) {

@@ -10,6 +10,7 @@ import {
   scrollToPad,
   toggleOptions,
 } from '/js/main.js';
+import { isLoading } from '/js/notification/loader.js'
 
 async function onLoad() {
   const vocabulary = await getTranslations();
@@ -203,10 +204,10 @@ async function onLoad() {
 
   //SHOW LOADING ICON WHEN A SUBMIT BUTTON IS CLICKED
   d3.select('button[type="submit"]').on('click', function () {
-      d3.select('#loader').style('display', 'block');
+    isLoading(true)
   });
 
-  d3.select('#loader').style('display', 'none');
+  isLoading(false)
 }
 
 if (document.readyState === 'loading') {

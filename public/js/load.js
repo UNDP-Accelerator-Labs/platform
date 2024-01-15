@@ -203,8 +203,8 @@ async function onLoad() {
   });
 
   //SHOW LOADING ICON WHEN A SUBMIT BUTTON IS CLICKED
-  d3.selectAll('button[type="submit"]').on('click', function () {
-    isLoading(true)
+  d3.selectAll('form').on('submit', function () {
+    isLoading(true);
   });
 
   isLoading(false)

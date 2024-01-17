@@ -1,141 +1,134 @@
 const msal = require('@azure/msal-node');
 const { datastructures } = include('routes/helpers/')
-const { app_languages, modules, msalConfig, DB } = include('config/')
+const { app_languages, modules, msalConfig, DB, app_base_host } = include('config/')
+const { deviceInfo } = require('./device-info')
+const { v4: uuidv4 } = require("uuid");
+const crypto = require('crypto');
+
 const msalClient = new msal.ConfidentialClientApplication(msalConfig);
 
 module.exports = (req, res, next) => {
-    const { referer, host } = req.headers || {}
-    const { originalUrl } = req.body;
-    const { sso_redirect_url } = req.query || {}
-    const { path } = req || {}
-
 	const tokenRequest = {
 		code: req.query.code,
-		redirectUri: sso_redirect_url,
+		redirectUri: 'http://localhost:2000/auth/openid/return', //sso_redirect_url,
 		scopes: ['user.read', 'User.ReadBasic.All'], // Adjust the scopes based on your requirements
 	};
+
+    const device = deviceInfo(req)
+    const { sessionID: sid } = req || {}
+
+    //NEW USER DEFAUL VALUES
+    const rights = 1;
+    const iso3 = 'USA'; 
+    const password= crypto.randomBytes(16).toString('hex')
+    const position=''
+    const createdFromSso = true;
+    const deviceGUID1 = uuidv4(); 
+    const deviceGUID2 = uuidv4();
+    const deviceGUID3 = uuidv4();
 
 	msalClient.acquireTokenByCode(tokenRequest)
 	.then((response) => {
 		// Handle successful authentication
-		// You can access the access token, user information, etc. from the response
-        let email = response.account.username;
-        let accessToken= response.accessToken;
+        const email = response.account.username;
+        const accessToken= response.accessToken;
         const { name } = response?.account?.idTokenClaims;
 
-        const userInfoQuery = `
-            SELECT u.uuid, u.rights, u.name, u.email, u.iso3, c.lng, c.lat, c.bureau,
-            CASE WHEN u.language IN ($1:csv)
-                THEN u.language
-                ELSE 'en'
-            END AS language,
-            CASE WHEN u.language IN ($1:csv)
-                THEN (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = u.language)
-                ELSE (SELECT cn.name FROM country_names cn WHERE cn.iso3 = u.iso3 AND cn.language = 'en')
-            END AS countryname,
-            COALESCE(
-                (SELECT json_agg(DISTINCT(jsonb_build_object(
-                    'uuid', u2.uuid,
-                    'name', u2.name,
-                    'rights', u2.rights
-                ))) FROM team_members tm
-                INNER JOIN teams t
-                    ON t.id = tm.team
-                INNER JOIN users u2
-                    ON u2.uuid = tm.member
-                WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
-            )::TEXT, '[]')::JSONB
-            AS collaborators
-            FROM users u
-            INNER JOIN countries c
-                ON u.iso3 = c.iso3
-            WHERE (u.name = $2 OR u.email = $2)
-        ;`
-
-        // Check if user already exists in the database
         DB.general.tx(t => {
-            // TEST USERNAME
+            // Check if user already exists, otherwise create new record for user
             return t.oneOrNone(`
-                SELECT * FROM users
-                WHERE email = $1
-            ;`, [ email ])
+                INSERT INTO users (email, name, rights, position, password, iso3, createdFromSso) 
+                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, $7) 
+                ON CONFLICT (email)
+                DO UPDATE SET name = EXCLUDED.name
+            ;`, [email, name, rights, position, password, iso3, createdFromSso])
             .then(uname_result => {
-
-                if (uname_result) {
-                    // User already exists
+                console.log('uname_result ', uname_result)
                     // Authenticate the user and set up the session or token
-
-                    // GET USER INFO
-                    return t.oneOrNone(userInfoQuery, [ app_languages, email ])
+                    // GET USER INFO AND UPDATE TRUSTED DEVICE INFO 
+                    return t.oneOrNone(`
+                        SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
+                        COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
+        
+                        CASE WHEN u.language IN ($1:csv)
+                            THEN u.language
+                            ELSE 'en'
+                        END AS language,
+        
+                        COALESCE(
+                            (SELECT json_agg(DISTINCT(jsonb_build_object(
+                                'uuid', u2.uuid,
+                                'name', u2.name,
+                                'rights', u2.rights
+                            ))) FROM team_members tm
+                            INNER JOIN teams t
+                                ON t.id = tm.team
+                            INNER JOIN users u2
+                                ON u2.uuid = tm.member
+                            WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
+                        )::TEXT, '[]')::JSONB
+                        AS collaborators
+        
+                        FROM users u
+        
+                        LEFT JOIN adm0_subunits su
+                            ON su.su_a3 = u.iso3
+                        LEFT JOIN adm0
+                            ON adm0.adm0_a3 = u.iso3
+        
+                        WHERE (u.name = $2 OR u.email = $2)
+                    ;`, [ app_languages, email ])
                     .then(async results => {
                         if (!results) {
                             res.redirect('/login')
                         } else {
-                            const { language, rights } = results;
-                            results.accessToken = accessToken;
-                            await Object.assign(req.session, datastructures.sessiondata(results))
+                            const { language, rights, uuid } = results;
+                            // results.accessToken = accessToken;
 
-                            if (!originalUrl || originalUrl === path) {
-                                const { read, write } = modules.find(d => d.type === 'pads')?.rights;
-                                if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
-                                else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
-                                else res.redirect(`/${language}/browse/pads/public`)
-                            } else res.redirect(originalUrl || referer)
+                            let redirecturl;
+                            const { read, write } = modules.find(d => d.type === 'pads')?.rights;
+                            if (rights >= (write ?? Infinity)) redirecturl = `/${language}/browse/pads/private`
+                            else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/shared`
+                            else redirecturl = `/${language}/browse/pads/public`
+
+                            return t.none(`
+                                INSERT INTO trusted_devices (user_uuid, device_name, device_os, device_browser, last_login, session_sid, duuid1, duuid2, duuid3, is_trusted)
+                                VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, true)
+                                ON CONFLICT (user_uuid, device_os, device_browser)
+                                DO UPDATE SET last_login = EXCLUDED.last_login, session_sid = EXCLUDED.session_sid`,
+                                [
+                                    uuid,
+                                    device.device,
+                                    device.os,
+                                    device.browser,
+                                    sid,
+                                    deviceGUID1,
+                                    deviceGUID2,
+                                    deviceGUID3,
+                                ]
+                            )
+                            .then(() => {
+                                const sessionExpiration = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year from now
+                                req.session.domain = app_base_host;
+                                req.session.cookie.expires = sessionExpiration;
+                                req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
+
+                                const sess = { ...results, is_trusted: true, device: {...device, is_trusted: true}}
+                                Object.assign(req.session, datastructures.sessiondata(sess));
+                                res.redirect(redirecturl);
+                            })
+                            .catch(async err =>{
+                                console.log(err)
+                                await Object.assign(req.session, datastructures.sessiondata(results))
+                                return res.redirect(redirecturl);
+                            })
+
                         }
 
                     })
                     .catch((error) => {
                         console.log(error);
                     });
-                } else {
-                    // New user, create a new record in the database
-                    let rights = 1;
-                    let iso3 = 'USA'; //default to usa
-                    let password= " "
-                    let position=''
-                    let createdFromSso = true;
-                    DB.general.tx(t => {
-                        return t.one(`
-                            INSERT INTO users (email, name, rights, position, password, iso3, createdFromSso) 
-                            VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, $7) 
-                            RETURNING *`,
-                            [email, name, rights, position, password, iso3, createdFromSso]
-                        )
-                        .then(result => {
-                            if (result) {
-                                // GET USER INFO
-                                return t.oneOrNone(userInfoQuery, [ app_languages, email ])
-                                .then(async results => {
-
-                                    if (!results) {
-                                        res.redirect('/login')
-                                    } else {
-                                        const { language, rights } = results;
-                                        results.accessToken = accessToken;
-                                        await Object.assign(req.session, datastructures.sessiondata(results))
-
-                                        if (!originalUrl || originalUrl === path) {
-                                            const { read, write } = modules.find(d => d.type === 'pads')?.rights
-
-                                            if (rights >= (write ?? Infinity)) res.redirect(`/${language}/browse/pads/private`)
-                                            else if (rights >= (read ?? Infinity)) res.redirect(`/${language}/browse/pads/shared`)
-                                            else res.redirect(`/${language}/browse/pads/public`)
-                                        } else res.redirect(originalUrl || referer)
-                                    }
-
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                });
-                            }
-
-                            return res.redirect('/login');
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                        });
-                    })
-                };
             })
             .catch((error) => {
                 console.log(error);

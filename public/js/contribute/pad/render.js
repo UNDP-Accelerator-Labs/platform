@@ -280,16 +280,20 @@ Media.prototype.move = function (dir) {
     return this.style.maxHeight.length;
   });
   // CHECK WHETHER AN INSET IS OPEN
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (openInset.node() && this.container.classed('meta-container')) {
       openInset.node().style.maxHeight = null;
       window.setTimeout((_) => {
-        sourceTop = this.container.node().offsetTop;
-        sourceHeight = this.container.node().offsetHeight;
-        sourceMargin = parseInt(
-          getComputedStyle(this.container.node()).marginBottom,
-        );
-        resolve();
+        try {
+          sourceTop = this.container.node().offsetTop;
+          sourceHeight = this.container.node().offsetHeight;
+          sourceMargin = parseInt(
+            getComputedStyle(this.container.node()).marginBottom,
+          );
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
       }, 500);
     } else resolve();
   })
@@ -308,21 +312,25 @@ Media.prototype.move = function (dir) {
             .classed('move', true)
             .style('transform', `translateY(${moveTarget}px)`);
 
-          await new Promise((resolve) => {
+          await new Promise((resolve, reject) => {
             window.setTimeout(async (_) => {
-              this.container.classed('move', false).style('transform', null);
-              d3.select(target)
-                .classed('move', false)
-                .style('transform', null);
-              this.container
-                .node()
-                .parentNode.insertBefore(this.container.node(), target);
+              try {
+                this.container.classed('move', false).style('transform', null);
+                d3.select(target)
+                  .classed('move', false)
+                  .style('transform', null);
+                this.container
+                  .node()
+                  .parentNode.insertBefore(this.container.node(), target);
 
-              if (this.editing) {
-                if (page.type === 'private') await partialSave(level);
-                else await updateStatus();
+                if (this.editing) {
+                  if (page.type === 'private') await partialSave(level);
+                  else await updateStatus();
+                }
+                resolve();
+              } catch (err) {
+                reject(err);
               }
-              resolve();
             }, 1000);
           });
           if (openInset.node())
@@ -356,25 +364,29 @@ Media.prototype.move = function (dir) {
             .classed('move', true)
             .style('transform', `translateY(${moveTarget}px)`);
 
-          await new Promise((resolve) => {
+          await new Promise((resolve, reject) => {
             window.setTimeout(async (_) => {
-              this.container.classed('move', false).style('transform', null);
-              d3.select(target)
-                .classed('move', false)
-                .style('transform', null);
-              this.container
-                .node()
-                .parentNode.insertBefore(target, this.container.node());
-              if (openInset.node())
-                openInset.node().style.maxHeight = `${
-                  openInset.node().scrollHeight
-                }px`;
+              try {
+                this.container.classed('move', false).style('transform', null);
+                d3.select(target)
+                  .classed('move', false)
+                  .style('transform', null);
+                this.container
+                  .node()
+                  .parentNode.insertBefore(target, this.container.node());
+                if (openInset.node())
+                  openInset.node().style.maxHeight = `${
+                    openInset.node().scrollHeight
+                  }px`;
 
-              if (this.editing) {
-                if (page.type === 'private') await partialSave(level);
-                else await updateStatus();
+                if (this.editing) {
+                  if (page.type === 'private') await partialSave(level);
+                  else await updateStatus();
+                }
+                resolve();
+              } catch (err) {
+                reject(err);
               }
-              resolve();
             }, 1000);
           });
           if (openInset.node())
@@ -4130,7 +4142,7 @@ export async function addAttachment(kwargs) {
           type: 'button',
           label: vocabulary['link file'],
           resolve: (_) => {
-            return new Promise(async (resolve) => {
+            return async () => {
               const pad_id = await partialSave('meta');
               const params = new URLSearchParams();
               params.set('uri', d.uri);
@@ -4143,12 +4155,10 @@ export async function addAttachment(kwargs) {
                   params.append('resources', c);
                 });
               }
-              resolve(
-                window.location.replace(
-                  `/request/resource?${params.toString()}`,
-                ),
+              return window.location.replace(
+                `/request/resource?${params.toString()}`,
               );
-            });
+            };
           },
         });
       } else {
@@ -4161,14 +4171,12 @@ export async function addAttachment(kwargs) {
           resolve: async (_) => {
             const input = d3.select('.modal input[type="url"]').node().value;
             if (input.isURL()) {
-              return new Promise(async (resolve) => {
+              return async () => {
                 const pad_id = await partialSave('meta');
-                resolve(
-                  window.location.replace(
-                    `/save/resource?pad_id=${pad_id}&element_id=${meta.id}&name=${name}&type=${type}&src=${input}`,
-                  ),
+                return window.location.replace(
+                  `/save/resource?pad_id=${pad_id}&element_id=${meta.id}&name=${name}&type=${type}&src=${input}`,
                 );
-              });
+              };
             } else alert('This is not a URL.');
           },
         });
@@ -4488,19 +4496,16 @@ async function addSlides(kwargs) {
           .findAncestor('pad')
           .selectAll('.body>*')
           .each(function (d, i) {
-            promises.push(
-              new Promise(async (resolve) => {
-                if (this === section.node()) {
-                  kwargs.sibling = `section:nth-child(${i + 2})`;
-                  kwargs.focus = true;
+            promises.push(async () => {
+              if (this === section.node()) {
+                kwargs.sibling = `section:nth-child(${i + 2})`;
+                kwargs.focus = true;
 
-                  // const new_section =
-                  await addSlides(kwargs); // THIS TOO IS DIFFERENT TO addSection
-                  initSlideshow(main);
-                }
-                resolve();
-              }),
-            );
+                // const new_section =
+                await addSlides(kwargs); // THIS TOO IS DIFFERENT TO addSection
+                initSlideshow(main);
+              }
+            });
           });
 
         Promise.all(promises).then((_) => switchslide(main, idx));

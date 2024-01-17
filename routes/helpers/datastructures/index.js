@@ -56,36 +56,32 @@ exports.sessionsummary = async _kwargs => {
 	const conn = _kwargs.connection || DB.general
 	const { uuid } = _kwargs
 
-	return new Promise(resolve, reject => {
-		if (uuid) {
-			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
-			.then(sessions => {
-				if (sessions) {
-					// EXTRACT SESSION DATA
-					const sessionsArr = sessions.map(d => d.sess)
-					sessionsArr.forEach(d => {
-						d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
-					})
+	if (uuid) {
+		return conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
+		.then(sessions => {
+			if (sessions) {
+				// EXTRACT SESSION DATA
+				const sessionsArr = sessions.map(d => d.sess)
+				sessionsArr.forEach(d => {
+					d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
+				})
 
-					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
-					.map(d => {
-						const { values, ...data } = d
-						return data
-					})
-					const total = array.sum.call(sessions, 'count')
-					sessions.push({ key: 'All', count: total, app: 'All' })
-					resolve(sessions)
-				} else {
-					resolve(null)
-				}
-			}).catch(err => {
-				console.log(err)
-				reject();
-			})
-		} else {
-			resolve(null)
-		}
-	})
+				sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
+				.map(d => {
+					const { values, ...data } = d
+					return data
+				})
+				const total = array.sum.call(sessions, 'count')
+				sessions.push({ key: 'All', count: total, app: 'All' })
+				return sessions;
+			}
+			return null;
+		}).catch(err => {
+			console.log(err)
+			return null;
+		})
+	}
+	return null;
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn

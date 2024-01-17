@@ -251,7 +251,7 @@ function parseColumns(json, keys) {
 function parseGroups(json, keys) {
   // json HERE HAS ALREADY BEEN PROCESSED (IN parseColumns)
   const cols = keys.map((d) => {
-    return new Promise(async (resolve) => {
+    return async () => {
       // CHECK IF KEY IS UNIQUE OR GROUPED
       if (Array.isArray(d)) {
         const obj = {};
@@ -355,9 +355,10 @@ function parseGroups(json, keys) {
         obj.bool = false;
         // obj.inferredtype = 'checklist'
         obj.type = 'checklist';
-        resolve(obj);
-      } else resolve(json.find((c) => c.key === d));
-    });
+        return obj;
+      }
+      return json.find((c) => c.key === d);
+    };
   });
   Promise.all(cols).then(async (data) => await renderTable(data));
 }
@@ -1040,11 +1041,12 @@ export async function dropColumns() {
   await renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
 }
 function compileLocations(idx) {
-  return new Promise(async (resolve) => {
+  return async () => {
     const cols = d3.select('table.xls-preview').datum();
     let locations = cols.find((d) => d.type === 'location-txt')?.entries;
-    if (!locations?.length) resolve(null);
-    else {
+    if (!locations?.length) {
+      return null;
+    } else {
       if (![null, undefined].includes(idx)) {
         if (Array.isArray(locations[idx])) locations = locations[idx];
         else locations = [locations[idx]];
@@ -1054,9 +1056,9 @@ function compileLocations(idx) {
       const results = await POST('/forwardGeocoding', {
         locations: locations,
       });
-      resolve(results);
+      return results;
     }
-  });
+  };
 }
 export async function compilePads(idx, structureOnly = false) {
   const language = await getCurrentLanguage();
@@ -1080,11 +1082,10 @@ export async function compilePads(idx, structureOnly = false) {
       else return true; // COMPILE ALL PADS
     })
     .map((i) => {
-      return new Promise(async (resolve0) => {
+      return async () => {
         const items = cols.map((c) => {
-          return new Promise(async (resolve1) => {
+          return async () => {
             const item = {};
-
             if (
               ['txt', 'title'].includes(c.type) ||
               ['txt', 'title'].includes(
@@ -1422,8 +1423,8 @@ export async function compilePads(idx, structureOnly = false) {
             }
 
             item.instruction = c.key;
-            resolve1(item);
-          });
+            return item;
+          };
         });
         const results = await Promise.all(items);
 
@@ -1522,7 +1523,7 @@ export async function compilePads(idx, structureOnly = false) {
         let status = 0;
         if (completion.every((d) => d === true)) status = 1;
 
-        resolve0({
+        return {
           title,
           sections: [
             {
@@ -1589,8 +1590,8 @@ export async function compilePads(idx, structureOnly = false) {
               }
             })
             .flat(),
-        });
-      });
+        };
+      };
     });
   return Promise.all(pads);
 }

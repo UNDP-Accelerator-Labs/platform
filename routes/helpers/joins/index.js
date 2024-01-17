@@ -6,7 +6,7 @@ exports.joinObj = function (obj = {}) {
 }
 exports.multijoin = function (args = []) {
 	const [ arr, key ] = args
-		
+
 	return this.map(d => {
 		const obj = arr.find(c => c[key] === d[key]) || {}
 		return {...d, ...obj}
@@ -18,13 +18,13 @@ exports.users = (data, args = []) => {
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const uuids = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
-		
+
 		return DB.general.tx(async t => {
 			const name_column = await adm0.name_column({ connection: t, language })
 
 			return t.any(`
-				SELECT DISTINCT(u.uuid) AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, 
-					COALESCE(su.$2:name, adm0.$2:name) AS country 
+				SELECT DISTINCT(u.uuid) AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights,
+					COALESCE(su.$2:name, adm0.$2:name) AS country
 				FROM users u
 				LEFT JOIN adm0_subunits su
 					ON su.su_a3 = u.iso3
@@ -37,11 +37,11 @@ exports.users = (data, args = []) => {
 				else return this.joinObj.call(data, users[0])
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
-	} else return new Promise(resolve => resolve(data))
+	} else return async () => data
 }
 exports.tags = (data, args = []) => {
 	const [ lang, key, tagname, tagtype ] = args
-	if (!key) return new Promise(resolve => resolve(data))
+	if (!key) return async () => data
 
 	if (data?.length) {
 		return DB.general.tx(t => {
@@ -117,7 +117,7 @@ exports.tags = (data, args = []) => {
 		// 		AND id IN ($3:csv)
 		// 		AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
 		// ;`, [ key, tagname, data.map(d => d[key]), lang ])
-	} else return new Promise(resolve => resolve(data))
+	} else return async () => (data)
 }
 exports.concatunique = function (args = []) {
 	let [ arr, key, keep ] = args
@@ -146,16 +146,16 @@ exports.locations = (data, kwargs = {}) => {
 	let { language, key, name_key, concat_location_key } = kwargs
 	if (!key) key = 'iso3'
 	if (!name_key) name_key = 'country'
-	
+
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const iso3s = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];
-		
+
 		return conn.task(async t => {
 			const name_column = await adm0.name_column({ connection: t, language })
 
 			let location_structure = DB.pgp.as.format(`
 				ST_Y(ST_Centroid(wkb_geometry)) AS lat,
-				ST_X(ST_Centroid(wkb_geometry)) AS lng 
+				ST_X(ST_Centroid(wkb_geometry)) AS lng
 			`)
 			if (concat_location_key) {
 				if (concat_location_key === 'geometry') {
@@ -174,7 +174,7 @@ exports.locations = (data, kwargs = {}) => {
 			// THE su_a3 <> adm0_a3 IS IMPORTANT TO AVOID DUPLICATES IN THE END
 			batch.push(t.any(`
 				SELECT su_a3 AS $1:name, $2:name AS $3:name,
-					$4:raw				
+					$4:raw
 
 				FROM adm0_subunits
 				WHERE su_a3 IN ($5:csv)
@@ -199,7 +199,7 @@ exports.locations = (data, kwargs = {}) => {
 
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
-	
-	} else return new Promise(resolve => resolve(data))
+
+	} else return async () => (data)
 
 }

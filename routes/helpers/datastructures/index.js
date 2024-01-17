@@ -56,7 +56,7 @@ exports.sessionsummary = async _kwargs => {
 	const conn = _kwargs.connection || DB.general
 	const { uuid } = _kwargs
 
-	return new Promise(resolve => {
+	return new Promise(resolve, reject => {
 		if (uuid) {
 			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
 			.then(sessions => {
@@ -75,9 +75,16 @@ exports.sessionsummary = async _kwargs => {
 					const total = array.sum.call(sessions, 'count')
 					sessions.push({ key: 'All', count: total, app: 'All' })
 					resolve(sessions)
+				} else {
+					resolve(null)
 				}
-			}).catch(err => console.log(err))
-		} else resolve(null)
+			}).catch(err => {
+				console.log(err)
+				reject();
+			})
+		} else {
+			resolve(null)
+		}
 	})
 }
 exports.pagemetadata = (_kwargs) => {
@@ -155,8 +162,8 @@ exports.pagemetadata = (_kwargs) => {
 				FROM mobilizations m
 				WHERE (
 					m.id IN (
-						SELECT mobilization 
-						FROM mobilization_contributors 
+						SELECT mobilization
+						FROM mobilization_contributors
 						WHERE participant = $1
 					)
 					OR m.owner = $1
@@ -278,7 +285,7 @@ exports.pagemetadata = (_kwargs) => {
 				d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
 			})
 		} else review_templates = []
-		
+
 		const obj = {}
 		obj.metadata = {
 			site: {
@@ -379,13 +386,13 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 			}).catch(err => console.log(err))
 		}
 	} else {
-		return new Promise(resolve => {
+		return async () => {
 			if (Array.isArray(data)) {
 				data.forEach(d => d.publishable = (d.status >= 1 || false))
 			} else data.publishable = data.status >= 1 || false
 
-			resolve(data)
-		})
+			return data
+		}
 	}
 }
 

@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
 
 	if (language) language = checklanguage(language)
 
-	return new Promise(async resolve => {
+	return async () => {
 
 		let general_filters = []
 		let platform_filters = []
@@ -42,11 +42,11 @@ module.exports = async (req, res) => {
 					const batch = []
 
 					batch.push(t.any(`
-						SELECT DISTINCT (su_a3) AS iso3 FROM adm0_subunits 
+						SELECT DISTINCT (su_a3) AS iso3 FROM adm0_subunits
 						WHERE undp_bureau IN ($1:csv)
 					;`, [ regions ]))
 					batch.push(t.any(`
-						SELECT DISTINCT (adm0_a3) AS iso3 FROM adm0_subunits 
+						SELECT DISTINCT (adm0_a3) AS iso3 FROM adm0_subunits
 						WHERE undp_bureau IN ($1:csv)
 					;`, [ regions ]))
 					return t.batch(batch)
@@ -77,6 +77,6 @@ module.exports = async (req, res) => {
 		if (general_filters.length && general_filters.slice(0, 3) !== 'AND') general_filters = `AND ${general_filters}`
 		if (platform_filters.length && platform_filters.slice(0, 3) !== 'AND') platform_filters = `AND ${platform_filters}`
 
-		resolve([ general_filters, platform_filters, f_type ])
-	})
+		return [ general_filters, platform_filters, f_type ]
+	}
 }

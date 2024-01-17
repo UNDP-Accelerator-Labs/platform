@@ -236,9 +236,9 @@ function check_authorization (_kwargs) {
 	const { id, uuid, rights, public } = _kwargs
 	const { read, write } = modules.find(d => d.type === 'contributors')?.rights || {}
 
-	if (public) return new Promise(resolve => resolve({ authorized: false }))
+	if (public) return async () => ({ authorized: false })
 	else if (id) {
-		if (id === uuid || rights > 2) return new Promise(resolve => resolve({ authorized: true, redirect: 'edit' }))
+		if (id === uuid || rights > 2) return async () => ({ authorized: true, redirect: 'edit' })
 		else return conn.oneOrNone(`
 			SELECT DISTINCT (TRUE) AS bool FROM cohorts
 			WHERE contributor = $1
@@ -248,5 +248,5 @@ function check_authorization (_kwargs) {
 			if (result) return { authorized: true, redirect: 'view' } // THIS SHOULD ACTUALLY PREVENT EVEN PEOPLE WHO CREATED A THIRD PARTY ACCOUNT FROM CHANGING THE SETTINGS OF THAT ACCOUNT
 			else return { authorized: false }
 		}).catch(err => console.log(err))
-	} else return new Promise(resolve => resolve({ authorized: rights >= write }))
+	} else return async () => ({ authorized: rights >= write })
 }

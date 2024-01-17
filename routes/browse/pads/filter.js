@@ -138,7 +138,7 @@ module.exports = async (req, res) => {
 	}
 
 	// FILTERS
-	return new Promise(async resolve => {
+	return async () => {
 		// BASE FILTERS
 		const base_filters = []
 		if (search) base_filters.push(DB.pgp.as.format(`p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
@@ -254,7 +254,7 @@ module.exports = async (req, res) => {
 					const mobs = (await DB.general.any(`
 						SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
 					`, [ pinboard, ownId ])).map(row => row.mobilization);
-				
+
 					f_space = DB.pgp.as.format(`
 					(
 						(
@@ -401,6 +401,6 @@ module.exports = async (req, res) => {
 
 		if (filters.length && filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
 
-		resolve([ `AND ${f_space}`, order, page, filters ])
-	})
+		return [ `AND ${f_space}`, order, page, filters ]
+	}
 }

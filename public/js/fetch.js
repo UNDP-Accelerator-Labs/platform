@@ -22,9 +22,7 @@ function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
       })
       .then((results) => resolve(results))
       .catch((err) => {
-        if (err) {
-          reject(err);
-        }
+        reject(err);
       });
   });
 }

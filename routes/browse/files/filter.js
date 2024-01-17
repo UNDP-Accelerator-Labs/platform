@@ -14,11 +14,11 @@ module.exports = req => {
 	else page = +page
 
 	// FILTERS
-	return new Promise(async resolve => {
+	return async () => {
 		// BASE FILTERS
 		const base_filters = []
 		if (search) base_filters.push(DB.pgp.as.format(`f.full_text ~* $1 OR f.name ~* $1`, [ parsers.regexQuery(search) ]))
-		if (status) base_filters.push(DB.pgp.as.format(`f.status IN ($1:csv)`, [ status ]))		
+		if (status) base_filters.push(DB.pgp.as.format(`f.status IN ($1:csv)`, [ status ]))
 
 		let f_space = null
 		if (space === 'private') f_space = DB.pgp.as.format(`f.owner IN ($1:csv)`, [ collaborators_ids ])
@@ -31,7 +31,7 @@ module.exports = req => {
 		const platform_filters = []
 		if (files) platform_filters.push(DB.pgp.as.format(`f.id IN ($1:csv)`, [ files ]))
 		if (paths) platform_filters.push(DB.pgp.as.format(`f.path IN ($1:csv)`, [ paths ]))
-		if (contributors) platform_filters.push(DB.pgp.as.format(`f.owner IN ($1:csv)`, [ contributors ]))		
+		if (contributors) platform_filters.push(DB.pgp.as.format(`f.owner IN ($1:csv)`, [ contributors ]))
 
 		if (countries?.length) {
 			platform_filters.push(await DB.general.any(`
@@ -54,7 +54,7 @@ module.exports = req => {
 		// CONTENT FILTERS
 		const content_filters = []
 		// NO CONTENT FILTERS (LIKE TAGS) ARE SET FOR files FOR NOW
-	
+
 		let filters = [ base_filters.filter(d => d).join(' AND '), platform_filters.filter(d => d).join(' AND '), content_filters.filter(d => d).join(' AND ') ]
 			.filter(d => d?.length)
 			.map(d => `(${d.trim()})`)
@@ -67,6 +67,6 @@ module.exports = req => {
 		let order = DB.pgp.as.format(`ORDER BY f.date DESC`)
 		if (orderby === 'random') order = DB.pgp.as.format(`ORDER BY RANDOM()`)
 
-		resolve([ `AND ${f_space}`, order, page, filters ])
-	})
+		return [ `AND ${f_space}`, order, page, filters ]
+	}
 }

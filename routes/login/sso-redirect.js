@@ -1,10 +1,8 @@
-const { own_app_url, app_title_short, app_title, translations } = include('config/');
-const { email: sendEmail } = include('routes/helpers/')
+const { own_app_url, sso_app_url } = include('config/');
 
 exports.ssoRedirect = (req, res) => {
-const { uri, } = req.query || {}
-const { host, referer } = req.headers || {}
-console.log(' refe ', referer)
-  return res.redirect('/sso-login')
+    console.log(' own_app_url ', own_app_url, sso_app_url)
+    // return res.redirect(`${sso_app_url}?originalUrl=${own_app_url}`)
+    return res.redirect('/sso-login')
 };
 

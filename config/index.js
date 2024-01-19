@@ -249,5 +249,21 @@ exports.msalConfig = {
 	  clientId: process.env.CLIENT_ID,
 	  authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`,
 	  clientSecret: process.env.CLIENT_SECRET, 
+    redirectUri: "/auth/openid/return",
 	},
+  system: {
+      loggerOptions: {
+          loggerCallback: (logLevel, message, containsPii) => {
+              if (containsPii) {
+                  return;
+              }
+              console.log(message);
+          },
+          piiLoggingEnabled: false,
+          logLevel: 3,
+      },
+  }
 };
+exports.allowsso = true
+exports.sso_app_url = 'https://login.sdg-innovation-commons.org/'
+exports.sso_redirect_url = 'http://localhost:2000/auth/openid/return'

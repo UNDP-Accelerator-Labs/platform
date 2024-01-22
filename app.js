@@ -12,6 +12,7 @@ const {
   app_base_host,
   getVersionObject,
   lodashNonce,
+  sso_app_url,
 } = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
@@ -145,6 +146,24 @@ function redirectOldUrl(req, res, next) {
   return res.redirect(301, `${newbase}${req.originalUrl}`);
 }
 
+//REDIRECT TO LOGIN PLATFORM MIDDLEWARE
+function redirectToLoginPlatform(req, res, next) {
+  const originHost = req.get('host');
+  const returnUrl = `${sso_app_url}?path=${encodeURIComponent(originHost)}`;
+
+  const parsedUrl = new URL(sso_app_url);
+  const strippedUrl = parsedUrl.host;
+
+  if (
+    process.env.NODE_ENV === 'production' &&
+    !originHost.endsWith('azurewebsites.net') &&
+    strippedUrl != originHost
+  ) {
+    return res.redirect(returnUrl);
+  }
+  next();
+}
+
 app.use(redirectOldUrl);
 
 function setAccessControlAllowOrigin(req, res, next) {
@@ -173,17 +192,11 @@ app.get('/:language/home', routes.check.login, routes.dispatch.public);
 
 app
   .route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
-  // .get(routes.redirect.home, routes.render.login)
-  .get(routes.redirect.browse, routes.render.sso_redirect)
-
-//ENDPOINTS FOR LOGIN PLATFORM
-app.route('/sso-login')
-.get(routes.redirect.browse, routes.render.login)
-.post(loginRateLimiterMiddleware, routes.process.login);
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
+  .post(loginRateLimiterMiddleware, routes.process.login);
 
 //MICROSOFT SSO PATHS
-app.get('/sso-inits', routes.initiate_sso);
-
+app.get('/sso-inits', redirectToLoginPlatform, routes.initiate_sso);
 app.get('/auth/openid/return', routes.validate_sso);
 
 app.get('/transfer', routes.process.login);
@@ -192,16 +205,18 @@ app
   .get(routes.process.logout)
   .post(routes.process.logout);
 
-app.route('/reset/:token').get(routes.redirect.browse, routes.render.login);
+app
+  .route('/reset/:token')
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login);
 
 app
   .route('/forget-password')
-  .get(routes.redirect.browse, routes.render.login)
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
   .post(routes.process.forgetPassword);
 
 app
   .route('/reset-password')
-  .get(routes.redirect.browse, routes.render.login)
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
   .post(routes.process.updatePassword);
 
 app.route('/confirm-email/:token').get(routes.update.email);

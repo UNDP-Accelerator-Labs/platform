@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
 
   const device = deviceInfo(req);
   const { sessionID: sid } = req || {};
-
+  const { __ucd_app, __puid, __cduid } = req.cookies;
   //NEW USER DEFAULT VALUES
   const rights = 1;
   const iso3 = 'USA';
@@ -118,7 +118,7 @@ module.exports = (req, res, next) => {
                         deviceGUID3,
                       ],
                     )
-                    .then(() => {
+                    .then(async() => {
                       const sessionExpiration = new Date(
                         Date.now() + 365 * 24 * 60 * 60 * 1000,
                       ); // 1 year from now
@@ -131,20 +131,20 @@ module.exports = (req, res, next) => {
                         is_trusted: true,
                         device: { ...device, is_trusted: true },
                       };
-                      Object.assign(
+                      await Object.assign(
                         req.session,
                         datastructures.sessiondata(sess),
                       );
 
-                      res.cookie('__ucd_app', deviceGUID1, {
+                      await res.cookie('__ucd_app', deviceGUID1, {
                         expires: sessionExpiration,
                         domain: app_base_host,
                       });
-                      res.cookie('__puid', deviceGUID2, {
+                      await res.cookie('__puid', deviceGUID2, {
                         expires: sessionExpiration,
                         domain: app_base_host,
                       });
-                      res.cookie('__cduid', deviceGUID3, {
+                      await res.cookie('__cduid', deviceGUID3, {
                         expires: sessionExpiration,
                         domain: app_base_host,
                       });

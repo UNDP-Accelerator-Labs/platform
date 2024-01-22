@@ -18,39 +18,17 @@ exports.modules = [
     rights: { read: 0, write: { blank: 4, templated: 1 } },
     publish: 'def',
   }, // respond IS FOR TEMPLATED PADS
-  { type: 'templates', rights: { read: 1, write: 3 } },
-  { type: 'files', rights: { read: 1, write: 1 } },
 ];
 
 const metafields = [
-  {
-    type: 'drawing',
-    name: 'signature',
-    required: true,
-    instruction: 'Signature',
-  },
+  // {
+  //   type: 'drawing',
+  //   name: 'signature',
+  //   required: true,
+  //   instruction: 'Signature',
+  // },
 ];
 
-if (process.env.NODE_ENV !== 'production') {
-  metafields.push(
-    {
-      type: 'attachment',
-      name: 'consent',
-      required: false,
-      uris: [
-        {
-          uri:
-            process.env.NODE_ENV === 'production'
-              ? 'https://consent.sdg-innovation-commons.org/en/contribute/resource'
-              : 'http://localhost:2000/en/contribute/resource',
-          resources: ['pads', 'files'], // IF THIS IS A CALL TO ANOTHER INSTANCE OF THE PLATFORM (LIKE THE CONSENT MODULE), DECLARE WHICH modules CAN BE SHARED AS RESOURCES
-        },
-        { uri: undefined },
-      ],
-      limit: 1,
-    }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
-  );
-}
 exports.metafields = metafields;
 
 // DESIRED ENGAGEMENT TYPES

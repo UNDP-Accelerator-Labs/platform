@@ -150,12 +150,12 @@ function redirectOldUrl(req, res, next) {
 function redirectToLoginPlatform(req, res, next) {
   const originHost = req.get('host');
   const pathname = new URL(req.originalUrl, `https://${originHost}`).pathname;
-  const returnUrl = `${sso_app_url}${pathname}?origin=${encodeURIComponent('https://' + originHost)}`;
+  const returnUrl = `${sso_app_url}${pathname}?origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost)}`;
   const parsedUrl = new URL(sso_app_url);
   const strippedUrl = parsedUrl.host;
 
   if (
-   process.env.NODE_ENV === 'production' &&
+  //  process.env.NODE_ENV === 'production' &&
     !originHost.endsWith('azurewebsites.net') &&
     strippedUrl != originHost
   ) {

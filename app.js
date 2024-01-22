@@ -178,7 +178,9 @@ app.use((req, res, next)=>{
     '/confirm-email/:token',
     '/confirm-device',
     '/resend-otp-code',
-    '/remove-trusted-device'
+    '/remove-trusted-device',
+
+    '/load/metadata'
 ]);
 
     const path = req.path;

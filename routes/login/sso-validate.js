@@ -28,7 +28,7 @@ module.exports = (req, res, next) => {
 
   const device = deviceInfo(req);
   const { sessionID: sid } = req || {};
-  const { __ucd_app, __puid, __cduid } = extraData;
+  const { __ucd_app, __puid, __cduid, origin_url } = extraData;
   //NEW USER DEFAULT VALUES
   const rights = 0;
   const iso3 = 'USA';
@@ -100,7 +100,7 @@ module.exports = (req, res, next) => {
                   res.redirect('/login');
                 } else {
                   const { language, rights, uuid } = results;
-                  const redirecturl = extraData?.origin_url ?? getPath(rights, language, modules)
+                  const redirecturl = origin_url ?? getPath(rights, language, modules)
 
                   return t
                     .none(

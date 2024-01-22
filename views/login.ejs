@@ -4,6 +4,7 @@
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
 	const allowsso = locals.metadata.site.allowsso
+	const origin_url = locals?.origin_url
 %>
 
 <head>
@@ -75,7 +76,7 @@
 			<br/>
 			<hr/>
 			<br/>
-			<p>Forgot password? <a href="/forget-password">Reset your password.</a></p>
+			<p>Forgot password? <a href="/forget-password<% if(origin_url){ %>?origin=<%= origin_url %><% } %>">Reset your password.</a></p>
 			
 			<% if (allowsso) { %>
 				<h5>OR</h5>

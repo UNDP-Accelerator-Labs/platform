@@ -1,6 +1,6 @@
 const { DB, app_base_host } = include("config/");
 const { sessionupdate } = include('routes/helpers/')
-const { deviceInfo, sendDeviceCode } = require("./device-info");
+const { deviceInfo, sendDeviceCode, extractPathValue } = require("./device-info");
 const { v4: uuidv4 } = require("uuid");
 
 exports.confirmDevice = async (req, res, next) => {
@@ -8,6 +8,9 @@ exports.confirmDevice = async (req, res, next) => {
   const { confirm_dev_origins } = req.session;
   const { redirecturl, uuid } = confirm_dev_origins || {};
   const { sessionID: sid } = req || {};
+
+  const { referer, host } = req.headers || {}
+  const origin_url = extractPathValue(referer)
 
   const deviceGUID1 = uuidv4(); // Generate a unique GUID for the device
   const deviceGUID2 = uuidv4();
@@ -84,20 +87,23 @@ exports.confirmDevice = async (req, res, next) => {
         .catch((err) => {
           console.log("err ", err);
           req.session.errormessage = "Invalid OTP";
-          res.redirect("/confirm-device");
+          res.redirect(`/confirm-device?origin=${encodeURIComponent(origin_url)}`);
         });
     })
     .catch((err) => {
       console.log("err ", err);
       req.session.errormessage = "Invalid OTP";
-      res.redirect("/confirm-device");
+      res.redirect(`/confirm-device?origin=${encodeURIComponent(origin_url)}`);
     });
 };
 
 exports.resendCode = async (req, res, next) => {
   const { confirm_dev_origins } = req.session;
-
   const { name, email, uuid } = confirm_dev_origins || {};
+
+  const { referer } = req.headers || {}
+  const origin_url = extractPathValue(referer)
+  
   sendDeviceCode({
     name,
     email,
@@ -107,7 +113,7 @@ exports.resendCode = async (req, res, next) => {
   })
     .then(() => {
       req.session.errormessage = "OTP code sent successfully!";
-      res.redirect("/confirm-device");
+      res.redirect(`/confirm-device?origin=${encodeURIComponent(origin_url)}`);
     })
     .catch((err) => res.redirect("/module-error"));
 };

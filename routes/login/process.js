@@ -204,7 +204,7 @@ module.exports = (req, res, next) => {
 										redirecturl,
 										...result,
 									}
-									res.redirect('/confirm-device');
+									res.redirect(`/confirm-device?origin=${encodeURIComponent(origin_url)}`);
 								}).catch(err => res.redirect('/module-error'))
 							}
 							else {

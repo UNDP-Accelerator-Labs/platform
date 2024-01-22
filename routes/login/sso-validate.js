@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
 
   // Retrieve and decode the SSO state parameter if it exists
   const state = req.query.state ? decodeURIComponent(req.query.state) : null;
-  let extraData = null;
+  let extraData = {};
   if (state) {
       try {
           extraData = JSON.parse(state);
@@ -28,7 +28,7 @@ module.exports = (req, res, next) => {
 
   const device = deviceInfo(req);
   const { sessionID: sid } = req || {};
-  const { __ucd_app, __puid, __cduid } = req.cookies;
+  const { __ucd_app, __puid, __cduid } = extraData;
   //NEW USER DEFAULT VALUES
   const rights = 1;
   const iso3 = 'USA';
@@ -57,7 +57,7 @@ module.exports = (req, res, next) => {
             ;`,
             [email, name, rights, position, password, iso3, true],
           )
-          .then((uname_result) => {
+          .then(() => {
             // GET USER INFO, UPDATE SESSION AND TRUSTED DEVICE INFO
             return t
               .oneOrNone(

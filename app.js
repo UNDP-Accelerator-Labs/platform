@@ -164,6 +164,32 @@ function redirectToLoginPlatform(req, res, next) {
   next();
 }
 
+//ONLY ALLOW LOGIN/ACCOUNT RELATED ROUTES IN LOGIN PLATFORM
+app.use((req, res, next)=>{
+  const allowedRoutes = new Set([
+    '/login',
+    '/sso-inits',
+    '/auth/openid/return',
+    '/transfer',
+    '/logout/:session',
+    '/reset/:token',
+    '/forget-password',
+    '/reset-password',
+    '/confirm-email/:token',
+    '/confirm-device',
+    '/resend-otp-code',
+    '/remove-trusted-device'
+]);
+
+    const path = req.path;
+    const isAllowed = allowedRoutes.has(path) || [...allowedRoutes].some(route => req.path.match(new RegExp(`^${route}$`)));
+
+    if (!isAllowed && process.env.APP_ID === 'login') {
+        return res.redirect('/login');
+    }
+    next();
+})
+
 app.use(redirectOldUrl);
 
 function setAccessControlAllowOrigin(req, res, next) {
@@ -414,7 +440,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // RUN THE SERVER
-app.listen(process.env.PORT || 2000, async (_) => {
+app.listen(process.env.PORT || 3000, async (_) => {
   console.log(`the app is running on port ${process.env.PORT || 2000}`);
   const vo = await getVersionObject();
   console.log('name', vo.name);

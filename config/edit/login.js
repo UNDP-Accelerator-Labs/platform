@@ -13,21 +13,11 @@ exports.own_app_url = 'https://login.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
-  {
-    type: 'pads',
-    rights: { read: 0, write: { blank: 4, templated: 1 } },
-    publish: 'def',
-  }, // respond IS FOR TEMPLATED PADS
+  { type: 'teams', rights: { read: 2, write: 2 } },
+  { type: 'contributors', rights: { read: 2, write: 2 } },
 ];
 
-const metafields = [
-  // {
-  //   type: 'drawing',
-  //   name: 'signature',
-  //   required: true,
-  //   instruction: 'Signature',
-  // },
-];
+const metafields = [];
 
 exports.metafields = metafields;
 

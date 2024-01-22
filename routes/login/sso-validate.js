@@ -2,7 +2,7 @@ const msal = require('@azure/msal-node');
 const { datastructures } = include('routes/helpers/');
 const { app_languages, modules, msalConfig, DB, app_base_host, sso_redirect_url } =
   include('config/');
-const { deviceInfo } = require('./device-info');
+const { deviceInfo, getPath } = require('./device-info');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
@@ -14,6 +14,17 @@ module.exports = (req, res, next) => {
     redirectUri: sso_redirect_url,
     scopes: ['user.read'],
   };
+
+  // Retrieve and decode the SSO state parameter if it exists
+  const state = req.query.state ? decodeURIComponent(req.query.state) : null;
+  let extraData = null;
+  if (state) {
+      try {
+          extraData = JSON.parse(state);
+      } catch (error) {
+          console.error('Error parsing state:', error);
+      }
+  }
 
   const device = deviceInfo(req);
   const { sessionID: sid } = req || {};
@@ -89,16 +100,7 @@ module.exports = (req, res, next) => {
                   res.redirect('/login');
                 } else {
                   const { language, rights, uuid } = results;
-
-                  let redirecturl;
-                  const { read, write } = modules.find(
-                    (d) => d.type === 'pads',
-                  )?.rights;
-                  if (rights >= (write ?? Infinity))
-                    redirecturl = `/${language}/browse/pads/private`;
-                  else if (rights >= (read ?? Infinity))
-                    redirecturl = `/${language}/browse/pads/shared`;
-                  else redirecturl = `/${language}/browse/pads/public`;
+                  const redirecturl = extraData?.origin_url ?? getPath(rights, language, modules)
 
                   return t
                     .none(

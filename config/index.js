@@ -265,5 +265,5 @@ exports.msalConfig = {
   }
 };
 exports.allowsso = true
-exports.sso_app_url = 'http://localhost:2000' //'https://login.sdg-innovation-commons.org'
-exports.sso_redirect_url = 'http://localhost:2000/auth/openid/return'
+exports.sso_app_url = 'http://localhost:3000' //'https://login.sdg-innovation-commons.org'
+exports.sso_redirect_url = 'http://localhost:3000/auth/openid/return' //'https://login.sdg-innovation-commons.org/auth/openid/return'

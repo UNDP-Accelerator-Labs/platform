@@ -13,6 +13,8 @@ const {
   getVersionObject,
   lodashNonce,
   sso_app_url,
+  allowed_routes,
+  restricted_routes,
 } = include('config/');
 const { loginRateLimiterMiddleware } = include('routes/helpers/');
 const express = require('express');
@@ -155,7 +157,7 @@ function redirectToLoginPlatform(req, res, next) {
   const strippedUrl = parsedUrl.host;
 
   if (
-  //  process.env.NODE_ENV === 'production' &&
+   process.env.NODE_ENV === 'production' &&
     !originHost.endsWith('azurewebsites.net') &&
     strippedUrl != originHost
   ) {
@@ -164,33 +166,28 @@ function redirectToLoginPlatform(req, res, next) {
   next();
 }
 
-//ONLY ALLOW LOGIN/ACCOUNT RELATED ROUTES IN LOGIN PLATFORM
-app.use((req, res, next)=>{
-  const allowedRoutes = new Set([
-    '/login',
-    '/sso-inits',
-    '/auth/openid/return',
-    '/transfer',
-    '/logout/:session',
-    '/reset/:token',
-    '/forget-password',
-    '/reset-password',
-    '/confirm-email/:token',
-    '/confirm-device',
-    '/resend-otp-code',
-    '/remove-trusted-device',
+//USE MIDDLEWARE TO SET ALLOWABLE OR RESTRICTED ROUTES/ENDPOINT FOR A PLATFORM
+app.use((req, res, next) => {
+  const path = req.path;
+  const isAllowed = allowed_routes && Array.isArray(allowed_routes) && allowed_routes.some(route => {
+      const modifiedRoute = route.replace(/:\w+/g, '[^/]+').replace(/\*/g, '.*'); 
+      return path.match(new RegExp(`^${modifiedRoute}$`));
+  });
 
-    '/load/metadata'
-]);
+  const isRestricted = restricted_routes && Array.isArray(restricted_routes) && restricted_routes.some(route => {
+      const modifiedRoute = route.replace(/:\w+/g, '[^/]+').replace(/\*/g, '.*'); 
+      return path.match(new RegExp(`^${modifiedRoute}$`));
+  });
 
-    const path = req.path;
-    const isAllowed = allowedRoutes.has(path) || [...allowedRoutes].some(route => req.path.match(new RegExp(`^${route}$`)));
+  // Redirect to login if the route is not allowed or is restricted
+  if (!isAllowed || isRestricted) {
+      return res.redirect('/login');
+  }
 
-    if (!isAllowed && process.env.APP_ID === 'login') {
-        return res.redirect('/login');
-    }
-    next();
-})
+  next();
+});
+
+
 
 app.use(redirectOldUrl);
 

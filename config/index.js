@@ -22,6 +22,8 @@ let {
   welcome_module,
   fixed_uuid,
   translations,
+  allowed_routes,
+  restricted_routes,
 } = require('./edit/');
 const fs = require('fs');
 
@@ -265,5 +267,9 @@ exports.msalConfig = {
   }
 };
 exports.allowsso = true
-exports.sso_app_url = 'https://login.sdg-innovation-commons.org' //'http://localhost:3000' //
+exports.sso_app_url = 'https://login.sdg-innovation-commons.org' //'http://localhost:3000'
 exports.sso_redirect_url = 'https://login.sdg-innovation-commons.org/auth/openid/return' //'http://localhost:3000/auth/openid/return'
+
+//CONFIG TO SET APP ALLOWED OR RESTRICTED ROUTES FOR A PLATFORM INSTANCE
+exports.allowed_routes = allowed_routes || null
+exports.restricted_routes = restricted_routes || null

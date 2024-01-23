@@ -62,3 +62,24 @@ exports.browse_display = 'columns';
 exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'carousel';
+
+exports.allowed_routes = [
+  '/login',
+  '/sso-inits',
+  '/auth/openid/return',
+  '/transfer',
+  '/logout/:session',
+  '/reset/:token',
+  '/forget-password',
+  '/reset-password',
+  '/confirm-email/:token',
+  '/confirm-device',
+  '/resend-otp-code',
+  '/remove-trusted-device',
+
+  '/load/*',
+  '/:lang/contribute/*',
+  '/:lang/browse/contributors/*'
+];
+
+exports.restricted_routes = [];

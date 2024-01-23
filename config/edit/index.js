@@ -43,6 +43,8 @@ const {
   view_display,
   welcome_module,
   fixed_uuid,
+  allowed_routes,
+  restricted_routes,
 } = app_obj;
 
 exports.is_staging = is_staging;
@@ -71,3 +73,5 @@ exports.welcome_module = welcome_module;
 exports.fixed_uuid = fixed_uuid;
 
 exports.translations = require('./translations.js').translations;
+exports.allowed_routes = allowed_routes || null
+exports.restricted_routes = restricted_routes || null

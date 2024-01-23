@@ -180,7 +180,7 @@ app.use((req, res, next) => {
   });
 
   // Redirect to login if the route is not allowed or is restricted
-  if (!isAllowed || isRestricted) {
+  if ((!isAllowed && allowed_routes && allowed_routes.length) || (isRestricted && restricted_routes && restricted_routes.length)) {
       return res.redirect('/login');
   }
 
@@ -439,7 +439,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // RUN THE SERVER
-app.listen(process.env.PORT || 3000, async (_) => {
+app.listen(process.env.PORT || 2000, async (_) => {
   console.log(`the app is running on port ${process.env.PORT || 2000}`);
   const vo = await getVersionObject();
   console.log('name', vo.name);

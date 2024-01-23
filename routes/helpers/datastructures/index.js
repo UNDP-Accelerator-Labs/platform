@@ -17,6 +17,7 @@ const {
 	DB,
 	ownDB,
 	allowsso,
+	sso_app_url,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -24,6 +25,11 @@ const array = require('../array');
 
 function stripExplorationId(url) {
 	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
+}
+function compareReqDomain (req, domain){
+	const referrer = req.get('Referer');
+	const referrerUrl = new URL(referrer);
+	return referrerUrl.origin === domain;
 }
 
 if (!exports.legacy) exports.legacy = {}
@@ -279,7 +285,7 @@ exports.pagemetadata = (_kwargs) => {
 				d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
 			})
 		} else review_templates = []
-		
+
 		const obj = {}
 		obj.metadata = {
 			site: {
@@ -296,6 +302,7 @@ exports.pagemetadata = (_kwargs) => {
 				app_id,
 				app_suite_url,
 				allowsso,
+				login_url: !compareReqDomain(req, sso_app_url) ? sso_app_url : null
 			},
 			user: {
 				uuid,

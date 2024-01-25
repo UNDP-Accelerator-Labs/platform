@@ -1,10 +1,9 @@
 const { page_content_limit, modules, metafields, lazyload, DB } = include('config/')
 const load = require('./load/')
-const { array, datastructures, } = include('routes/helpers/')
+const { array, datastructures,redirectUnauthorized } = include('routes/helpers/')
 
 // TO DO: INTEGRATE OPTIONS FROM config.js
 const filter = require('./filter.js')
-const { redirectUnauthorized } = require('../../helpers/index.js')
 
 module.exports = async (req, res) => {
 	const { public, rights } = req.session || {}

@@ -1,5 +1,3 @@
-const { redirectBack } = require("../../helpers")
-
 const { modules, metafields, map, DB } = include('config/')
 const { checklanguage, array, join, geo, redirectError, redirectBack } = include('routes/helpers/')
 

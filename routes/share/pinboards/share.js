@@ -1,5 +1,5 @@
 const { DB, own_app_url, app_title, app_title_short, translations } = include('config/')
-const { email: sendemail, safeArr, DEFAULT_UUID, redirectUnauthorized } = include('routes/helpers/')
+const { email: sendemail, safeArr, DEFAULT_UUID, redirectBack } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -48,8 +48,7 @@ module.exports = (req, res) => {
 								<br><br>Please click <a href='${referer}'>this link</a> to view the collection.` // TO DO: TRANSLATE AND STYLIZE
 						})
 					})).then(_ => {
-						if (referer) res.redirect(referer)
-						else redirectUnauthorized(req, res)
+						redirectBack(req, res)
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err))

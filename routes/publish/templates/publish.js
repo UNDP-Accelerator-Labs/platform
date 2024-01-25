@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { safeArr, DEFAULT_UUID, redirectUnauthorized } = include('routes/helpers/')
+const { safeArr, DEFAULT_UUID, redirectBack } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -41,8 +41,7 @@ module.exports = (req, res) => {
 
 		return t.batch(batch)
 		.then(_ => {
-			if (referer) res.redirect(referer)
-			else redirectUnauthorized(req, res)
+			redirectBack(req, res)
 		}).catch(err => console.log(err))
 	})
 }

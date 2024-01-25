@@ -1,5 +1,5 @@
 const { modules } = include('config/')
-const { redirectUnauthorized } = include('routes/helpers/')
+const { redirectUnauthorized, redirectError } = include('routes/helpers/')
 
 const pad = require('./pad/')
 // const template = require('./template/')
@@ -22,5 +22,5 @@ module.exports = (req, res) => {
 		else {
 			redirectUnauthorized(req, res)
 		}
-	} else res.redirect('/module-error')
+	} else redirectError(req, res)
 }

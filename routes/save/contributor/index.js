@@ -1,10 +1,9 @@
 const { modules, app_suite_url, own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
-const { email: sendemail, sessionupdate, redirectUnauthorized } = include('routes/helpers/')
+const { email: sendemail, sessionupdate, redirectBack, redirectError } = include('routes/helpers/')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
 module.exports =async (req, res) => {
-	const { referer } = req.headers || {}
 	const { uuid, rights: session_rights, username, is_trusted, email: initiatorEmail } = req.session || {}
 	let { id, teams, new_teams, ...userinfo } = req.body || {}
 	let { new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, reviewer, email_notifications: notifications, secondary_languages } = userinfo || {}
@@ -15,14 +14,16 @@ module.exports =async (req, res) => {
 	let logoutAll = false;
 
 	let redirect_url;
-	const referer_url = new URL(referer)
-	const referer_params = new URLSearchParams(referer_url.search)
+	const nextUrl = new URL(
+		`${protocol}://${req.get('host')}/${language}/edit/contributor?id=${uuid}`
+	);
+	const nextParams = new URLSearchParams(nextUrl.search);
 
 	if (id && password?.length) {
 		let message = isPasswordSecure(password);
 		if (message.length) {
-			referer_params.set('errormessage', message);
-			return res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);
+			nextParams.set('errormessage', message);
+			return res.redirect(`${nextUrl.pathname}?${nextParams.toString()}`);
 		}
 	}
 	if (!id) {
@@ -117,8 +118,8 @@ module.exports =async (req, res) => {
 			if (result) res.redirect(`/${language}/edit/contributor?id=${result}`)
 			else { // TELL THE USER TO LOG IN OR USE A DIFFERENT EMAIL
 				const message = 'It seems the email you want to use is already associated with an account. Please use a different email for the new account.' // TO DO: TRANSLATE
-				referer_params.set('errormessage', message)
-				res.redirect(`${referer_url.pathname}?${referer_params.toString()}`);
+				nextParams.set('errormessage', message)
+				res.redirect(`${nextUrl.pathname}?${nextParams.toString()}`);
 			}
 		}).catch(err => console.log(err))
 	} else {
@@ -150,8 +151,8 @@ module.exports =async (req, res) => {
 									if(!update_pw && u_user.name == name) logoutAll = false
 									message = 'An email has been sent to your email address. Please confirm the email to proceed with the email update.'
 									req.session.errormessage = message
-									referer_params.set('u_errormessage', message);
-									redirect_url = `${referer_url.pathname}?${referer_params.toString()}`
+									nextParams.set('u_errormessage', message);
+									redirect_url = `${nextUrl.pathname}?${nextParams.toString()}`
 								}
 
 								updateRecord({
@@ -170,10 +171,13 @@ module.exports =async (req, res) => {
 										/* $11 */ id
 									]
 								})
-								.catch(err => res.redirect('/module-error'))
+								.catch(err => {
+									console.error(err)
+									redirectError(req, res)
+								})
 							} else {
-								referer_params.set('u_errormessage', 'This action can only be authorized on trusted devices. Please log in from a trusted device');
-								redirect_url = `${referer_url.pathname}?${referer_params.toString()}`
+								nextParams.set('u_errormessage', 'This action can only be authorized on trusted devices. Please log in from a trusted device');
+								redirect_url = `${nextUrl.pathname}?${nextParams.toString()}`
 							}
 						} else {
 							return t.none(`
@@ -344,8 +348,8 @@ module.exports =async (req, res) => {
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err))
 		}).then(_ => {
-			if (redirect_url || referer) res.redirect(redirect_url || referer)
-			else redirectUnauthorized(req, res)
+			if (redirect_url) res.redirect(redirect_url)
+			else redirectBack(req, res)
 		}).catch(err => console.log(err))
 	}
 }

@@ -730,12 +730,14 @@ exports.robots = async (req, res) => {
 
 exports.notfound = async(req, res) => {
 	const metadata = await helpers.datastructures.pagemetadata({ req, res })
-	res.render('errors/e404', metadata)
+	const data = Object.assign(metadata, { page: req.query?.page ?? req.originalUrl });
+	res.render('errors/e404', data)
 }
 
 exports.error = async(req, res) => {
 	const metadata = await helpers.datastructures.pagemetadata({ req, res })
-	res.render('errors/e500', metadata)
+	const data = Object.assign(metadata, { page: req.query?.page ?? req.originalUrl });
+	res.render('errors/e500', data)
 }
 
 String.prototype.simplify = function () {

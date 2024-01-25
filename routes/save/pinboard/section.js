@@ -1,9 +1,10 @@
+const { redirectBack } = require("../../helpers")
+
 const { modules, metafields, map, DB } = include('config/')
-const { checklanguage, array, join, geo } = include('routes/helpers/')
+const { checklanguage, array, join, geo, redirectError, redirectBack } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { xhr } = req
-	const { referer } = req.headers || {}
 	const { id, pinboard, title, description, ...insert_data } = req.body || {}
 	let { section_type, countries, templates, mobilizations } = insert_data
 
@@ -17,13 +18,13 @@ module.exports = async (req, res) => {
 			await DB.general.none(`
 				UPDATE pinboard_sections
 					SET title = $1
-				WHERE id = $2 
+				WHERE id = $2
 			;`, [ title, id ]).catch(err => console.log(err))
 		} else if (description) {
 			await DB.general.none(`
 				UPDATE pinboard_sections
 					SET description = $1
-				WHERE id = $2 
+				WHERE id = $2
 			;`, [ description, id ]).catch(err => console.log(err))
 		}
 	} else {
@@ -81,9 +82,9 @@ module.exports = async (req, res) => {
 								FULL OUTER JOIN adm0 a
 									ON a.name = s.name
 								WHERE s.name IN (
-									SELECT name FROM adm0_subunits 
+									SELECT name FROM adm0_subunits
 									WHERE su_a3 IN ($1:csv) OR adm0_a3 IN ($1:csv)
-								) 
+								)
 								GROUP BY s.adm0_a3
 								)
 								SELECT DISTINCT e.iso3 AS equivalents, COALESCE(a.$2:name, s.$2:name) AS title, '' AS description, $3::INT AS pinboard
@@ -101,7 +102,7 @@ module.exports = async (req, res) => {
 							batch.push('templates')
 
 							batch.push(t.any(`
-								SELECT p.id AS pad, t.title AS ref 
+								SELECT p.id AS pad, t.title AS ref
 								FROM pads p
 								LEFT JOIN templates t
 									ON t.id = p.template
@@ -131,14 +132,14 @@ module.exports = async (req, res) => {
 								SELECT title, description, $1::INT AS pinboard FROM mobilizations
 								WHERE id IN ($2:csv)
 							;`, [ pinboard, mobilizations ]))
-						} else res.redirect('/module-error')
+						} else redirectError(req, res)
 
 						return t.batch(batch)
 						.then(results => {
 							const [ type, section_pads, sections ] = results
-							
+
 							// THIS IS TO HANDLE PADS THAT DO NOT HAVE A TEMPLATE OR A MOBILIZATION
-							
+
 							if (['templates', 'mobilizations'].includes(type)) {
 								const unlabeled_sections = array.unique.call(section_pads, { key: 'ref', onkey: true }).filter(d => !sections.some(c => c.title === d))
 								if (unlabeled_sections.length) {
@@ -176,13 +177,13 @@ module.exports = async (req, res) => {
 								return gt.none(update_pinboard_contributions)
 								.catch(err => console.log(err))
 							})
-							
+
 						}).catch(err => console.log(err))
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err)) // END gt
 			}).catch(err => console.log(err)) // END t
 		}
 	}
-	if (!xhr) res.redirect(referer)
+	if (!xhr) redirectBack(req, res)
 	else res.status(200).json({ status: 200, message: 'Successfully saved.' })
 }

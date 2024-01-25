@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { redirectUnauthorized } = include('routes/helpers/')
+const { redirectUnauthorized, redirectBack } = include('routes/helpers/')
 const cron = require('node-cron')
 
 module.exports = (req, res) => {
@@ -61,8 +61,7 @@ module.exports = (req, res) => {
 						}
 					}).catch(err => console.log(err))
 				}).then(_ => {
-					if (referer) res.redirect(referer)
-					else redirectUnauthorized(req, res)
+					redirectBack(req, res)
 				}).catch(err => console.log(err))
 			})
 		} else {
@@ -87,8 +86,7 @@ module.exports = (req, res) => {
 					}
 				}).catch(err => console.log(err))
 			}).then(_ => {
-				if (referer) res.redirect(referer)
-				else redirectUnauthorized(req, res)
+				redirectBack(req, res)
 			}).catch(err => console.log(err))
 		}
 

@@ -1,5 +1,5 @@
 const { DB } = include('config/')
-const { redirectUnauthorized } = include('routes/helpers/')
+const { redirectBack } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -12,7 +12,6 @@ module.exports = (req, res) => {
 		WHERE id = $1::INT
 	;`, [ id ])
 	.then(_ => {
-		if (referer) res.redirect(referer)
-		else redirectUnauthorized(req, res)
+		redirectBack(req, res)
 	}).catch(err => console.log(err))
 }

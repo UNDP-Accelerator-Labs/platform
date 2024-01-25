@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { checklanguage, safeArr, DEFAULT_UUID, redirectUnauthorized } = include('routes/helpers/')
+const { checklanguage, safeArr, DEFAULT_UUID, redirectBack } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
@@ -84,8 +84,7 @@ module.exports = (req, res) => {
 		return t.batch(batch)
 		.then(_ => {
 			if (redirect) res.redirect(redirect)
-			else if (referer) res.redirect(referer)
-			else redirectUnauthorized(req, res)
+			else redirectBack(req, res)
 		}).catch(err => console.log(err))
 	})
 }

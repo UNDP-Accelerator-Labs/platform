@@ -17,6 +17,7 @@ exports.createResetLink = createResetLink;
 
 // Generate and send password reset token
 exports.forgetPassword = async (req, res, next) => {
+  const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
   const { email } = req.body;
    // Check if the provided email exists in the database
   const user = await DB.general.oneOrNone(`
@@ -55,7 +56,7 @@ exports.forgetPassword = async (req, res, next) => {
   req.session.errormessage = 'Password reset link has been successfully sent to your email. Please check your email inbox/spam to use the reset link.'
 
    // Redirect the user to a page indicating that the reset email has been sent
-  res.redirect('/forget-password');
+  res.redirect(`/forget-password?path=${redirectPath ? encodeURIComponent(redirectPath) : ''}`);
 };
 
 function verifyTokenFields(decoded, res) {

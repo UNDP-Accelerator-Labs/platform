@@ -1,5 +1,5 @@
 const { app_languages, modules, app_base_host, DB } = include('config/')
-const { datastructures, join, removeSubdomain, redirectUnauthorized } = include('routes/helpers/')
+const { datastructures, join, removeSubdomain, redirectUnauthorized, redirectError } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode } = require('./device-info')
 
@@ -74,7 +74,7 @@ module.exports = (req, res, next) => {
 					Object.assign(req.session, datastructures.sessiondata(result))
 
 					if(redirectPath) {
-						res.redirect(`${redirectPath}`)
+						res.redirect(redirectPath)
 					} else if (next) {
 						next()
 					} else {
@@ -203,7 +203,10 @@ module.exports = (req, res, next) => {
 										...result,
 									}
 									res.redirect(`/confirm-device?path=${encodeURIComponent(redirecturl)}`);
-								}).catch(err => res.redirect('/module-error'))
+								}).catch(err => {
+									console.error(err)
+									redirectError(req, res)
+								})
 							}
 							else {
 								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}}
@@ -216,7 +219,10 @@ module.exports = (req, res, next) => {
 
 				}
 			}).catch(err => console.log(err))
-		}).catch(err => res.redirect('/module-error'))
+		}).catch(err => {
+			console.error(err)
+			redirectError(req, res)
+		})
 		}
 	}
 }

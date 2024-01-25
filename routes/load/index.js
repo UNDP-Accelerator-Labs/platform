@@ -1,4 +1,5 @@
 const { app_languages, modules, metafields, ownDB, DB } = include('config/')
+const { redirectError } = include('routes/helpers/')
 
 const pads = require('../browse/pads/')
 const pad = require('../contribute/pad/')
@@ -16,8 +17,8 @@ module.exports = async (req, res) => {
 	let { feature } = req.body || {}
 
 	if (modules.some(d => [object, `${object}s`].includes(d.type))) {
-		let data 
-		
+		let data
+
 		if (object === 'pads') {
 			// FOR PADS, res NEEDS TO BE PASSED FOR CHECKING THE instance IN /routes/browse/pads/filter.js
 			if (feature === 'ids') { data = await pads.load.ids({ req, res }) }
@@ -31,12 +32,12 @@ module.exports = async (req, res) => {
 
 		else if (object === 'templates') data = await templates.load.data({ req })
 		else if (object === 'template') data = await template.load.data({ req })
-		
+
 		else if (object === 'files') data = await files.load.data({ req })
 		else if (object === 'reviews') data = await reviews.load.data({ req })
 		else if (object === 'mobilizations') data = await mobilizations.load.data({ req })
 		else if (object === 'contributors') data = await contributors.load.data({ req })
-		
+
 		res.status(200).json(data)
 	// } else if (object === 'rights') {
 	// 	data = await DB.general.one(`SELECT rights FROM users WHERE uuid = $1;`, [ uuid ])
@@ -55,5 +56,5 @@ module.exports = async (req, res) => {
 			else if (f === 'languages') data['languages'] = app_languages
 		}
 		res.status(200).json(data)
-	} else res.redirect('/module-error')
+	} else redirectError(req, res)
 }

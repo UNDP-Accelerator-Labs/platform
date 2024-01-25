@@ -1,4 +1,5 @@
 const { modules } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 const pads = require('./pads/')
 const pinboards = require('./pinboards/')
@@ -26,8 +27,7 @@ exports.publish = (req, res) => {
 		else if (object === 'mobilizations' && rights >= write) mobilizations.publish(req, res)
 
 		else {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
 	} else res.redirect('/module-error')
 }

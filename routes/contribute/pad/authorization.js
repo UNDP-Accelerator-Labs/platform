@@ -34,7 +34,7 @@ module.exports = async _kwargs => {
 					if (result === true) return { authorized: (public || rights >= read), redirect: 'view' }
 					else return { authorized: false }
 				}).catch(err => console.log(err))
-			else return async () => ({ authorized: false }) // THIS IS A NEW PAD, BUT THE USER IS IN PUBLIC VIEW OR DOES NOT HAVE THE RIGHTS TO WRITE
+			else return (async () => ({ authorized: false }))() // THIS IS A NEW PAD, BUT THE USER IS IN PUBLIC VIEW OR DOES NOT HAVE THE RIGHTS TO WRITE
 		}
 	} else {
 		if (id) return conn.oneOrNone(`

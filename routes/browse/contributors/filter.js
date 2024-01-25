@@ -11,7 +11,7 @@ module.exports = req => {
 	// TO DO: UPDATE BELOW BASED ON FILTERS PASSED
 	let { search, status, countries, positions, rights: userrights, pinboard, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
-	return async () => {
+	return (async () => {
 		// BASE FILTERS
 		const base_filters = []
 		// const f_search = search ? DB.pgp.as.format(`AND (u.name::TEXT || u.position::TEXT || cn.name::TEXT ~* $1)`, [ parsers.regexQuery(search) ]) : null
@@ -57,5 +57,5 @@ module.exports = req => {
 		}
 
 		return [ f_space, page, filters.join(' ') ]
-	}
+	})()
 }

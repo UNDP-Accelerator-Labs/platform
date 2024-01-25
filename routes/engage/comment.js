@@ -1,8 +1,8 @@
 const { DB } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { uuid } = req.session || {}
-	const { referer } = req.headers || {}
 	const { object, id, message, source } = req.body || {}
 
 	if (uuid) {
@@ -14,8 +14,7 @@ module.exports = (req, res) => {
 
 		DB.conn.one(saveSQL)
 		.then(result => {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}).catch(err => console.log(err))
 	} else res.json({ status: 400, message: 'You need to be logged in to engage with content.' })
 }

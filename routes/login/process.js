@@ -1,11 +1,11 @@
 const { app_languages, modules, app_base_host, DB } = include('config/')
-const { datastructures, join, removeSubdomain } = include('routes/helpers/')
+const { datastructures, join, removeSubdomain, redirectUnauthorized } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode } = require('./device-info')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
-	const redirectPath = req.query.path;
+	const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
 	const { referer, host } = req.headers || {}
 	const mainHost = removeSubdomain(host);
 	// console.log('TOKEN VERIFY', host, mainHost);
@@ -88,14 +88,14 @@ module.exports = (req, res, next) => {
 					}
 				})
 			}).catch(err => console.log(err))
-		} else res.redirect('/login')
+		} else redirectUnauthorized(req, res)
 	} else {
 		const { username, password, originalUrl, is_trusted } = req.body || {}
 		const { sessionID: sid } = req || {}
 
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
-			res.redirect('/login')
+			redirectUnauthorized(req, res)
 		} else {
 			DB.general.tx(t => {
 				// GET USER INFO
@@ -136,13 +136,12 @@ module.exports = (req, res, next) => {
 				if (!result) {
 					req.session.errormessage = 'Invalid login credentails. ' + (req.session.attemptmessage || '');
 					req.session.attemptmessage = ''
-					res.redirect('/login')
+					redirectUnauthorized(req, res)
 				} else {
 					const { language, rights } = result
 					// JOIN LOCATION INFO
 					result = await join.locations(result, { connection: t, language, key: 'iso3', name_key: 'countryname' })
 					const device = deviceInfo(req)
-
 					let redirecturl;
 					if (redirectPath) {
 						redirecturl = redirectPath
@@ -203,7 +202,7 @@ module.exports = (req, res, next) => {
 										redirecturl,
 										...result,
 									}
-									res.redirect('/confirm-device');
+									res.redirect(`/confirm-device?path=${encodeURIComponent(redirecturl)}`);
 								}).catch(err => res.redirect('/module-error'))
 							}
 							else {

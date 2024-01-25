@@ -47,7 +47,7 @@ DB.conn.one(`
 
 exports.populateSection = (data, doc, inset = false) => {
 	// MEDIA
-	return async () => {
+	return (async () => {
 		if (data.type === 'title') this.addTxt(data, doc, inset)
 		if (data.type === 'img') await this.addImg(data, doc, inset)
 		if (data.type === 'mosaic') await this.addMosaic(data, doc, inset)
@@ -65,7 +65,7 @@ exports.populateSection = (data, doc, inset = false) => {
 		// GROUP
 		if (data.type === 'group') await this.addGroup(data, doc, inset)
 		doc.moveDown()
-	}
+	})()
 }
 
 exports.addInstruction = (data, doc, inset = false) => {

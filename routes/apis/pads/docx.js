@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
 
 		// TO DO: PROBABLY ONLY USE ONE SECTION BECUSE IN WORD, NEW SECTIONS FORCE PAGE BREAKS THAT CANNOT BE REMOVED EASILY
 		let sections = await Promise.all(data.map(async d => {
-			return async () => {
+			return (async () => {
 				const arr = []
 				if (d.key) {
 					const title_obj = {}
@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
 				}
 
 				const pads = await Promise.all(d.values.map((c, j) => {
-					return async () => {
+					return (async () => {
 						const obj = {}
 						// if (j > 0) obj.properties = { type: SectionType.NEXT_PAGE }
 						obj.children = []
@@ -142,17 +142,17 @@ module.exports = async (req, res) => {
 						}
 
 						return obj
-					}
+					})()
 				}))
 
 				arr.push(...pads)
 				return arr
-			}
+			})()
 		})).then(results => results.flat())
 		.catch(err => console.log(err))
 
 		async function populateSection (data, repetition = 0) {
-			return async () => {
+			return (async () => {
 				const { instruction, type, name, level } = data
 				const arr = []
 				// ADD THE INSTRUCTION IF THERE IS ONE
@@ -403,7 +403,7 @@ module.exports = async (req, res) => {
 				}
 
 				return arr
-			}
+			})()
 		}
 
 		function resizeImg (p, maxwidth = 600, maxheight = 900) {

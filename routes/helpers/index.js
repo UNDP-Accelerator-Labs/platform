@@ -161,3 +161,12 @@ exports.removeSubdomain = (hostname) => {
 	}
 	return host.split(".").slice(-2).join(".");
 };
+
+exports.redirectUnauthorized = (req, res) => {
+	const orig = req.originalUrl;
+	if (orig.startsWith('/login')) {
+		res.redirect(orig);
+		return;
+	}
+	res.redirect(`/login?path=${encodeURIComponent(orig)}`)
+}

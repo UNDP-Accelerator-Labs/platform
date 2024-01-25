@@ -1,13 +1,14 @@
 const { DB } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
-module.exports = (req, res) => {	
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	let { id } = req.query || {}
 	const { uuid, rights, public } = req.session || {}
 	// CONVERT id TO ARRAY
 	if (!Array.isArray(id)) id = [id]
 	id = id.map(d => +d).filter(d => !isNaN(d))
-	
+
 	if (id.length && !public) {
 		DB.conn.none(`
 			DELETE FROM pads
@@ -17,10 +18,9 @@ module.exports = (req, res) => {
 		;`, [ id, uuid, rights ])
 		.then(_ => {
 			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			else redirectUnauthorized(req, res)
 		}).catch(err => console.log(err))
 	} else {
-		if (referer) res.redirect(referer)
-		else res.redirect('/login')
+		redirectUnauthorized(req, res)
 	}
 }

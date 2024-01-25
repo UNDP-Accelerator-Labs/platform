@@ -382,13 +382,13 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 			}).catch(err => console.log(err))
 		}
 	} else {
-		return async () => {
+		return (async () => {
 			if (Array.isArray(data)) {
 				data.forEach(d => d.publishable = (d.status >= 1 || false))
 			} else data.publishable = data.status >= 1 || false
 
 			return data
-		}
+		})()
 	}
 }
 

@@ -1,4 +1,5 @@
 const { modules, DB } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -24,7 +25,7 @@ module.exports = (req, res) => {
 			})
 		}).then(_ => {
 			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			else redirectUnauthorized(req, res)
 		}).catch(err => console.log(err))
 	}
 }

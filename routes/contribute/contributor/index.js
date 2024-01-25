@@ -1,10 +1,10 @@
 const { modules, engagementtypes, metafields, app_languages, DB } = include('config/')
-const { checklanguage, datastructures, geo, join } = include('routes/helpers/')
+const { checklanguage, datastructures, geo, join, redirectUnauthorized } = include('routes/helpers/')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
 
-	if (public) res.redirect('/login')
+	if (public) redirectUnauthorized(req, res)
 	else {
 		const { referer } = req.headers || {}
 		const { id, errormessage, u_errormessage } = req.query || {}
@@ -18,8 +18,7 @@ module.exports = async (req, res) => {
 			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
-					if (referer) return res.redirect(referer)
-					else res.redirect('/login')
+					redirectUnauthorized(req, res)
 				} else if (authorized && redirect && redirect !== activity) {
 					// const query = []
 					// for (const [key, value] of req.query) {
@@ -236,9 +235,9 @@ function check_authorization (_kwargs) {
 	const { id, uuid, rights, public } = _kwargs
 	const { read, write } = modules.find(d => d.type === 'contributors')?.rights || {}
 
-	if (public) return async () => ({ authorized: false })
+	if (public) return (async () => ({ authorized: false }))()
 	else if (id) {
-		if (id === uuid || rights > 2) return async () => ({ authorized: true, redirect: 'edit' })
+		if (id === uuid || rights > 2) return (async () => ({ authorized: true, redirect: 'edit' }))()
 		else return conn.oneOrNone(`
 			SELECT DISTINCT (TRUE) AS bool FROM cohorts
 			WHERE contributor = $1
@@ -248,5 +247,5 @@ function check_authorization (_kwargs) {
 			if (result) return { authorized: true, redirect: 'view' } // THIS SHOULD ACTUALLY PREVENT EVEN PEOPLE WHO CREATED A THIRD PARTY ACCOUNT FROM CHANGING THE SETTINGS OF THAT ACCOUNT
 			else return { authorized: false }
 		}).catch(err => console.log(err))
-	} else return async () => ({ authorized: rights >= write })
+	} else return (async () => ({ authorized: rights >= write }))()
 }

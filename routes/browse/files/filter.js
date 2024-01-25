@@ -14,7 +14,7 @@ module.exports = req => {
 	else page = +page
 
 	// FILTERS
-	return async () => {
+	return (async () => {
 		// BASE FILTERS
 		const base_filters = []
 		if (search) base_filters.push(DB.pgp.as.format(`f.full_text ~* $1 OR f.name ~* $1`, [ parsers.regexQuery(search) ]))
@@ -68,5 +68,5 @@ module.exports = req => {
 		if (orderby === 'random') order = DB.pgp.as.format(`ORDER BY RANDOM()`)
 
 		return [ `AND ${f_space}`, order, page, filters ]
-	}
+	})()
 }

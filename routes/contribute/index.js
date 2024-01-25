@@ -1,4 +1,5 @@
 const { modules } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 const pad = require('./pad/')
 const xlsx = require('./xlsx/')
@@ -13,7 +14,7 @@ module.exports = (req, res) => {
 	const { object } = req.params || {}
 
 	if (
-		modules.some(d => d.type === `${object}s`) 
+		modules.some(d => d.type === `${object}s`)
 		|| (object === 'xlsx' && (modules.some(d => d.type === 'pads')))
 		|| object === 'resource'
 	) {
@@ -26,8 +27,7 @@ module.exports = (req, res) => {
 		else if (object === 'mobilization') return mobilization.render(req, res)
 
 		else {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
 
 	} else res.redirect('/module-error')

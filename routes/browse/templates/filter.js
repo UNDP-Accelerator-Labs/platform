@@ -14,7 +14,7 @@ module.exports = req => {
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	// FILTERS
-	return async () => {
+	return (async () => {
 
 		// BASE FILTERS
 		const base_filters = []
@@ -76,7 +76,7 @@ module.exports = req => {
 		if (filters.length && filters.slice(0, 3) !== 'AND') filters = `AND ${filters}`
 
 		return [ `AND ${f_space}`, order, page, filters ]
-	}
+	})()
 
 	// const platform_filters = [f_contributors, f_countries, f_mobilizations].filter(d => d).join(' OR ')
 	// const content_filters = [].filter(d => d).join(' OR ')

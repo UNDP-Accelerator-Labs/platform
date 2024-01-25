@@ -1,5 +1,5 @@
 const { modules, app_suite_url, own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
-const { email: sendemail, sessionupdate } = include('routes/helpers/')
+const { email: sendemail, sessionupdate, redirectUnauthorized } = include('routes/helpers/')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
@@ -345,7 +345,7 @@ module.exports =async (req, res) => {
 			}).catch(err => console.log(err))
 		}).then(_ => {
 			if (redirect_url || referer) res.redirect(redirect_url || referer)
-			else res.redirect('/login')
+			else redirectUnauthorized(req, res)
 		}).catch(err => console.log(err))
 	}
 }

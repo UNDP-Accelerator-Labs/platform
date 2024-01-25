@@ -9,7 +9,7 @@
 
 <%- include ('partials/head.ejs') %>
 
-<% 
+<%
 	const pagedata = {
 		language
 	}
@@ -25,7 +25,7 @@
 
 <div class='screen <% if (locals.errormessage) { %>error<% } else { %>blue<% } %>'>
 	<div class='modal login-module'>
-		<form action='/login' method='POST'>
+		<form action='/login?path=<%= locals.redirectPath %>' method='POST'>
 			<input type='hidden' name='originalUrl' value='<%- locals.originalUrl %>'>
 			<ul>
 				<% if (locals.errormessage) { %>
@@ -72,7 +72,7 @@
 
 		<div class='foot'>
 			<hr/>
-			<p>Forgot password? <a href="/forget-password">Reset your password</a></p>
+			<p>Forgot password? <a href="/forget-password?path=<%= locals.redirectPath %>">Reset your password</a></p>
 			<!-- TO DO: TRANSLATE -->
 		</div>
 	</div>

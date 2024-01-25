@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
 
 	if (language) language = checklanguage(language)
 
-	return async () => {
+	return (async () => {
 
 		let general_filters = []
 		let platform_filters = []
@@ -78,5 +78,5 @@ module.exports = async (req, res) => {
 		if (platform_filters.length && platform_filters.slice(0, 3) !== 'AND') platform_filters = `AND ${platform_filters}`
 
 		return [ general_filters, platform_filters, f_type ]
-	}
+	})()
 }

@@ -12,7 +12,7 @@ exports.multijoin = function (args = []) {
 		return {...d, ...obj}
 	})
 }
-exports.users = (data, args = []) => {
+exports.users = async (data, args = []) => {
 	const [ language, key ] = args
 	if (!key) key = 'owner'
 
@@ -37,11 +37,11 @@ exports.users = (data, args = []) => {
 				else return this.joinObj.call(data, users[0])
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
-	} else return async () => data
+	} else return (async () => data)()
 }
-exports.tags = (data, args = []) => {
+exports.tags = async (data, args = []) => {
 	const [ lang, key, tagname, tagtype ] = args
-	if (!key) return async () => data
+	if (!key) return (async () => data)()
 
 	if (data?.length) {
 		return DB.general.tx(t => {
@@ -117,7 +117,7 @@ exports.tags = (data, args = []) => {
 		// 		AND id IN ($3:csv)
 		// 		AND language = (COALESCE((SELECT language FROM tags WHERE type = $2 AND language = $4 LIMIT 1), 'en'))
 		// ;`, [ key, tagname, data.map(d => d[key]), lang ])
-	} else return async () => (data)
+	} else return (async () => (data))()
 }
 exports.concatunique = function (args = []) {
 	let [ arr, key, keep ] = args
@@ -141,7 +141,7 @@ exports.concatunique = function (args = []) {
 
 	return output.concat(arrcopy)
 }
-exports.locations = (data, kwargs = {}) => {
+exports.locations = async (data, kwargs = {}) => {
 	const conn = kwargs.connection || DB.general
 	let { language, key, name_key, concat_location_key } = kwargs
 	if (!key) key = 'iso3'
@@ -196,10 +196,8 @@ exports.locations = (data, kwargs = {}) => {
 
 				if (Array.isArray(data)) return this.multijoin.call(data, [ locations, key ])
 				else return this.joinObj.call(data, locations[0])
-
 			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
 
-	} else return async () => (data)
-
+	} else return (async () => (data))()
 }

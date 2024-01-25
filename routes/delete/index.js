@@ -1,4 +1,5 @@
 const { modules } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 const pad = require('./pad/')
 const template = require('./template/')
@@ -21,8 +22,7 @@ module.exports = (req, res) => {
 		else if (object === 'contributors' && rights >= write) return contributor(req, res)
 
 		else {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
 	} else res.redirect('/module-error')
 }

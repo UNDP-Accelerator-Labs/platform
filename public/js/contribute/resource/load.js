@@ -51,11 +51,11 @@ async function onLoad() {
             src = new URL(path, url.origin).href;
           }
 
-          return async () => {
+          return (async () => {
             return window.location.replace(
               `/share/resource?token=${encodeURIComponent(token)}&src=${src}`,
             );
-          };
+          })();
         },
       });
       if (key !== Object.keys(readables)[Object.keys(readables).length - 1]) {
@@ -167,7 +167,7 @@ async function onLoad() {
           // const storage_url = new URL(`<%- locals.metadata.site.app_storage %>`)
           // storage_url.pathname = `${storage_url.pathname}/${'/uploads/save'}`.replace(/\/\//g, '/')
 
-          return async () => {
+          return (async () => {
             const res = await uploadFile(form, language);
             if (res.every((d) => d.status === 200)) {
               const filepath = res[0].src;
@@ -186,7 +186,7 @@ async function onLoad() {
                 )}&src=${src}`,
               );
             }
-          };
+          })();
         },
       });
     }

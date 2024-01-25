@@ -157,14 +157,14 @@ module.exports = async (req, res) => {
 						if (include_tags) {
 							const nest = array.nest.call(d.tags, { key: 'type' })
 						 	const tags = await Promise.all(nest.map(d => {
-								return async () => {
+								return (async () => {
 									const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
 									tags?.forEach(d => {
 										// delete d.tag_id
 										delete d.equivalents
 									})
 									return tags
-								}
+								})()
 							}))
 							d.tags = tags.flat()
 						} else delete d.tags
@@ -190,7 +190,7 @@ module.exports = async (req, res) => {
 			}
 
 			pads = await Promise.all(pads.map(pad_group => {
-				return async () => {
+				return (async () => {
 					if (include_imgs) {
 						pad_group.values.forEach(d => {
 							// GET THE MEDIA ITEMS
@@ -207,7 +207,7 @@ module.exports = async (req, res) => {
 					}
 
 					pad_group.values = await Promise.all(pad_group.values.map(d => {
-						return async () => {
+						return (async () => {
 							// ANONYMIZE CONTRIBUTORS
 							// NOTE THIS id IS DISSOCIATED FROM COMMENTS
 							d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
@@ -223,14 +223,14 @@ module.exports = async (req, res) => {
 							if (include_tags) {
 								const nest = array.nest.call(d.tags, { key: 'type' })
 							 	const tags = await Promise.all(nest.map(d => {
-									return async () => {
+									return (async () => {
 										const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
 										tags?.forEach(d => {
 											// delete d.tag_id
 											delete d.equivalents
 										})
 										return tags
-									}
+									})()
 								}))
 								d.tags = tags.flat()
 							} else delete d.tags
@@ -280,7 +280,7 @@ module.exports = async (req, res) => {
 							if (!include_data) delete d.sections
 
 							return d
-						}
+						})()
 					}))
 
 					if (output === 'geojson') {
@@ -309,7 +309,7 @@ module.exports = async (req, res) => {
 									const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 									await Promise.all(imgs.map((d, i) => {
-										return async () => {
+										return (async () => {
 											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
 
@@ -317,7 +317,7 @@ module.exports = async (req, res) => {
 												const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 												await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 											} catch(err) { console.log(err) }
-										}
+										})()
 									}))
 								} else {
 									imgs.forEach((d, i) => {
@@ -343,7 +343,7 @@ module.exports = async (req, res) => {
 									const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 									await Promise.all(imgs.map((d, i) => {
-										return async () => {
+										return (async () => {
 											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
 
@@ -351,7 +351,7 @@ module.exports = async (req, res) => {
 												const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 												await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 											} catch(err) { console.log(err) }
-										}
+										})()
 									}))
 								} else {
 									imgs.forEach((d, i) => {
@@ -368,7 +368,7 @@ module.exports = async (req, res) => {
 						}
 					}
 					return pad_group
-				}
+				})()
 			}))
 			return [ open, pads.map(d => d.values) ]
 		}).catch(err => console.log(err))

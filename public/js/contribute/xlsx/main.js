@@ -112,7 +112,7 @@ export function parseXLSX(file, node) {
       // });
     }
     const sheets = workbook.SheetNames.map((s, i) => {
-      return async () => {
+      return (async () => {
         const json = XLSX.utils.sheet_to_json(workbook.Sheets[s], {
           defval: null,
         });
@@ -140,7 +140,7 @@ export function parseXLSX(file, node) {
           const cols = parseColumns(json, keys);
           await renderTable(cols);
         }
-      };
+      })();
     });
     for (const sheet of sheets) {
       await sheet();
@@ -251,7 +251,7 @@ function parseColumns(json, keys) {
 function parseGroups(json, keys) {
   // json HERE HAS ALREADY BEEN PROCESSED (IN parseColumns)
   const cols = keys.map((d) => {
-    return async () => {
+    return (async () => {
       // CHECK IF KEY IS UNIQUE OR GROUPED
       if (Array.isArray(d)) {
         const obj = {};
@@ -358,7 +358,7 @@ function parseGroups(json, keys) {
         return obj;
       }
       return json.find((c) => c.key === d);
-    };
+    })();
   });
   Promise.all(cols).then(async (data) => await renderTable(data));
 }
@@ -1041,7 +1041,7 @@ export async function dropColumns() {
   await renderTable(cols.filter((d) => !dropkeys.includes(d.key)));
 }
 function compileLocations(idx) {
-  return async () => {
+  return (async () => {
     const cols = d3.select('table.xls-preview').datum();
     let locations = cols.find((d) => d.type === 'location-txt')?.entries;
     if (!locations?.length) {
@@ -1058,7 +1058,7 @@ function compileLocations(idx) {
       });
       return results;
     }
-  };
+  })();
 }
 export async function compilePads(idx, structureOnly = false) {
   const language = await getCurrentLanguage();
@@ -1082,9 +1082,9 @@ export async function compilePads(idx, structureOnly = false) {
       else return true; // COMPILE ALL PADS
     })
     .map((i) => {
-      return async () => {
+      return (async () => {
         const items = cols.map((c) => {
-          return async () => {
+          return (async () => {
             const item = {};
             if (
               ['txt', 'title'].includes(c.type) ||
@@ -1424,7 +1424,7 @@ export async function compilePads(idx, structureOnly = false) {
 
             item.instruction = c.key;
             return item;
-          };
+          })();
         });
         const results = await Promise.all(items);
 
@@ -1591,7 +1591,7 @@ export async function compilePads(idx, structureOnly = false) {
             })
             .flat(),
         };
-      };
+      })();
     });
   return Promise.all(pads);
 }

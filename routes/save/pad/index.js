@@ -205,7 +205,7 @@ module.exports = (req, res) => {
 			const promises = deletion.map(f => {
 				if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 					// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-delete-javascript
-					return async () => {
+					return (async () => {
 						const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 						const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
@@ -213,12 +213,12 @@ module.exports = (req, res) => {
 						const blockBlobClient = await containerClient.getBlockBlobClient(f)
 						await blockBlobClient.delete(options)
 						console.log('file', f, 'deleted')
-					}
+					})()
 				} else {
 					if (fs.existsSync(path.join(__dirname, `../public/${f}`))) {
-						return async () => {
+						return (async () => {
 							return fs.unlinkSync(path.join(__dirname, `../public/${f}`))
-						}
+						})()
 					}
 				}
 			})

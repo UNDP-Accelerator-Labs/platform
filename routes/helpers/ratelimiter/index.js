@@ -1,3 +1,4 @@
+const { redirectUnauthorized } = include('routes/helpers/')
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 
 const rateLimiter = new RateLimiterMemory({
@@ -16,7 +17,7 @@ const rateLimiterMiddleware = (req, res, next) => {
     })
     .catch((rateLimiterRes) => {
         req.session.errormessage = 'Too many failed login requests. Please try again after 3 hours or contact system admin.'
-        res.redirect('/login');
+        redirectUnauthorized(req, res)
     });
 };
 

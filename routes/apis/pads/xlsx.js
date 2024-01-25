@@ -570,7 +570,7 @@ module.exports = async (req, res) => {
 										const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 										await Promise.all(imgs.map((d, i) => {
-											return async () => {
+											return (async () => {
 												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
 
@@ -578,7 +578,7 @@ module.exports = async (req, res) => {
 													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 												} catch(err) { console.log(err) }
-											}
+											})()
 										}))
 									} else {
 										imgs.forEach((d, i) => {
@@ -605,7 +605,7 @@ module.exports = async (req, res) => {
 										const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 										await Promise.all(imgs.map((d, i) => {
-											return async () => {
+											return (async () => {
 												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
 
@@ -613,7 +613,7 @@ module.exports = async (req, res) => {
 													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 												} catch(err) { console.log(err) }
-											}
+											})()
 										}))
 									} else {
 										imgs.forEach((d, i) => {

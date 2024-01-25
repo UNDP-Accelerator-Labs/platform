@@ -1,5 +1,5 @@
 const { app_title_short, translations, app_title, modules, DB } = include('config/')
-const { checklanguage, parsers, email: sendemail, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, parsers, email: sendemail, safeArr, DEFAULT_UUID, redirectUnauthorized } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { host, referer } = req.headers || {}
@@ -168,6 +168,6 @@ module.exports = (req, res) => {
 		}).catch(err => console.log(err))
 	}).then(_ => {
 		if (referer) res.redirect(referer)
-		else res.redirect('/login')
+		else redirectUnauthorized(req, res)
 	}).catch(err => console.log(err))
 }

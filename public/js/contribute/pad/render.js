@@ -1011,7 +1011,7 @@ export async function dispatchFiles(kwargs) {
   if (fls.length === 1) {
     const afls = fls.map((f) => {
       // THIS IS A BIT OVERKILL SINCE WE KNOW THAT IN THIS CASE, THERE IS ONLY ONE FILE TO PROCESS
-      return async () => {
+      return (async () => {
         const { type } = f;
         let datum = {};
         if (container) datum = container.datum();
@@ -1042,7 +1042,7 @@ export async function dispatchFiles(kwargs) {
         // ENABLE SAVING
         if (page.type === 'private') await switchButtons(lang);
         else window.sessionStorage.setItem('changed-content', true);
-      };
+      })();
     }); // ONLY ONE FILE, SO IF IMAGE, NO MOSAIC
     for (const afl of afls) {
       await afl();
@@ -4142,7 +4142,7 @@ export async function addAttachment(kwargs) {
           type: 'button',
           label: vocabulary['link file'],
           resolve: (_) => {
-            return async () => {
+            return (async () => {
               const pad_id = await partialSave('meta');
               const params = new URLSearchParams();
               params.set('uri', d.uri);
@@ -4158,7 +4158,7 @@ export async function addAttachment(kwargs) {
               return window.location.replace(
                 `/request/resource?${params.toString()}`,
               );
-            };
+            })();
           },
         });
       } else {
@@ -4171,12 +4171,12 @@ export async function addAttachment(kwargs) {
           resolve: async (_) => {
             const input = d3.select('.modal input[type="url"]').node().value;
             if (input.isURL()) {
-              return async () => {
+              return (async () => {
                 const pad_id = await partialSave('meta');
                 return window.location.replace(
                   `/save/resource?pad_id=${pad_id}&element_id=${meta.id}&name=${name}&type=${type}&src=${input}`,
                 );
-              };
+              })();
             } else alert('This is not a URL.');
           },
         });

@@ -2,7 +2,7 @@ const { fork } = require('child_process')
 const path = require('path')
 
 const { app_title, app_title_short, translations, own_app_url } = include('config/')
-const { email: sendemail } = include('routes/helpers/')
+const { email: sendemail, redirectUnauthorized } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
@@ -36,6 +36,6 @@ module.exports = (req, res) => {
 		console.log('child process done')
 		console.log(code)
 		if (referer) res.redirect(referer)
-		else res.redirect('/login')
+		else redirectUnauthorized(req, res)
 	})
 }

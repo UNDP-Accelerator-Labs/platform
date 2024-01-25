@@ -1,5 +1,5 @@
 const { modules } = include('config/')
-// const { checklanguage } = include('routes/helpers/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 const pad = require('./pad/')
 // const template = require('./template/')
@@ -18,10 +18,9 @@ module.exports = (req, res) => {
 		// else if (object === 'template' && rights >= modules.find(d => d.type === 'templates').rights.write) template.create(req, res)
 		// else if (object === 'mobilization' && rights >= modules.find(d => d.type === 'mobilizations').rights.write) mobilization.create(req, res)
 		// else res.redirect(`/${language}/browse/${object}s/public`)
-		
+
 		else {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
 	} else res.redirect('/module-error')
 }

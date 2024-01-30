@@ -1,7 +1,7 @@
 const { modules, DB } = include('config/')
+const { redirectBack } = include('routes/helpers/')
 
 module.exports = (req, res) => {
-	const { referer } = req.headers || {}
 	const { id, redirection } = req.query || {}
 	const { uuid } = req.session || {}
 	const { object } = req.params || {}
@@ -23,8 +23,7 @@ module.exports = (req, res) => {
 				} else return null
 			})
 		}).then(_ => {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectBack(req, res)
 		}).catch(err => console.log(err))
 	}
 }

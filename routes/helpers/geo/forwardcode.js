@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 exports.code = (locations, centerpoint, list = false) => {
 	console.log('pay attention to forward geocode')
 	return locations.map(l => {
-		return new Promise(resolve => {
+		return new Promise(resolve, reject => {
 			if (!l || typeof l !== 'string') {
 				const obj = {}
 				obj.input = l
@@ -14,9 +14,8 @@ exports.code = (locations, centerpoint, list = false) => {
 				obj.caption = `No location was found for <strong>${l}</strong>.` // TO DO: TRANSLATE
 				resolve(obj)
 			} else {
-				setTimeout(_ => {
-					l_formatted = l.removeAccents().replacePunctuation(', ').trim()
-
+				const l_formatted = l.removeAccents().replacePunctuation(', ').trim()
+				setTimeout(() => {
 					fetch(`https://api.opencagedata.com/geocode/v1/json?q=${l_formatted}&key=${process.env.OPENCAGE_API}`)
 					.then(response => response.json())
 					.then(data => {
@@ -37,7 +36,10 @@ exports.code = (locations, centerpoint, list = false) => {
 							obj.caption = `No location was found for <strong>${l.trim().capitalize()}</strong>.` // TO DO: TRANSLATE
 						}
 						resolve(obj)
-					}).catch(err => console.log(err))
+					}).catch(err => {
+						console.log(err)
+						reject(err)
+					})
 				}, 1000)
 			}
 		})
@@ -46,7 +48,7 @@ exports.code = (locations, centerpoint, list = false) => {
 exports.render = (req, res) => {
 	const { locations, list } = req.body || {}
 	const { country } = req.session || {}
-	
+
 	const promises = this.code(locations, country.lnglat, list)
 	Promise.all(promises)
 	.then(data => res.json(data))

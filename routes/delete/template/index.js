@@ -1,13 +1,13 @@
 const { DB } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
-module.exports = (req, res) => {	
-	const { referer } = req.headers || {}
+module.exports = (req, res) => {
 	let { id } = req.query || {}
 	const { uuid, rights, public } = req.session || {}
 	// CONVERT id TO ARRAY
 	if (!Array.isArray(id)) id = [id]
 	id = id.map(d => +d).filter(d => !isNaN(d))
-	
+
 	if (id.length && !public) {
 		DB.conn.none(`
 			DELETE FROM templates
@@ -16,11 +16,9 @@ module.exports = (req, res) => {
 					OR $3 > 2)
 		;`, [ id, uuid, rights ])
 		.then(_ => {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}).catch(err => console.log(err))
 	} else {
-		if (referer) res.redirect(referer)
-		else res.redirect('/login')
+		redirectUnauthorized(req, res)
 	}
 }

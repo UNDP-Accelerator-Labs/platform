@@ -10,8 +10,8 @@ import { POST } from '/js/fetch.js';
 import { d3, uuidv4 } from '/js/globals.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';
 import { renderFormModal, renderImgZoom } from '/js/modals.js';
-import { showToast } from '/js/notification/toast.js';
 import { isLoading } from '/js/notification/loader.js';
+import { showToast } from '/js/notification/toast.js';
 
 // TO DO: THIS CREATES AN ERROR FOR THE MAP ON THE HOMEPAGE (WHERE THERE IS NO fixedEid AND NO NEED FOR AN EXPLORATION)
 // THIS ALSO CREATES AN ERROR FOR SLIDESHOWS
@@ -1447,7 +1447,7 @@ export const Entry = function (_kwargs) {
               if (['like', 'dislike'].includes(e)) {
                 const sel = d3.select(this);
 
-                isLoading(true)
+                isLoading(true);
 
                 const res = await POST('/engage', {
                   object: object.slice(0, -1),
@@ -1482,9 +1482,8 @@ export const Entry = function (_kwargs) {
                       .select('button.engagement-like')
                       .attr('disabled', res.active);
                   }
-                  isLoading(false)
-                }
-                else isLoading(false)
+                  isLoading(false);
+                } else isLoading(false);
               }
             });
         });
@@ -1542,8 +1541,8 @@ export const Entry = function (_kwargs) {
           pin
             .addElems('label', 'close', (d) => (d.editable ? [d] : []))
             .on('click', async function (d) {
-              //SHOW LOADER
-              isLoading(true)
+              // SHOW LOADER
+              isLoading(true);
 
               const res = await POST('/pin', {
                 board_id: d.id,
@@ -1552,7 +1551,10 @@ export const Entry = function (_kwargs) {
                 object: object.slice(0, -1),
               });
               if (res.status === 200) {
-                showToast('Successfully deleted pad from pinboard.', 'success');
+                showToast(
+                  'Successfully deleted pad from pinboard.',
+                  'success',
+                );
 
                 if (space === 'pinned') {
                   location.reload();
@@ -1567,10 +1569,9 @@ export const Entry = function (_kwargs) {
                   renderDropdown(d.object_id);
                   renderPinNavigation(res.pinboards_list);
                 }
-              }
-              else{
-                isLoading(false)
-                showToast('Error occurred! Please try again.', 'danger')
+              } else {
+                isLoading(false);
+                showToast('Error occurred! Please try again.', 'danger');
               }
             });
         }
@@ -1589,7 +1590,7 @@ export const Entry = function (_kwargs) {
               const pins = sel.findAncestor('pinboard-group').select('.pins');
 
               if (this.checked) {
-                isLoading(true)
+                isLoading(true);
                 const res = await POST('/pin', {
                   board_id: d.id,
                   object_id: d.object_id,
@@ -1604,15 +1605,17 @@ export const Entry = function (_kwargs) {
                   renderDropdown(d.object_id);
                   renderPinNavigation(res.pinboards_list);
 
-                  showToast('Successfully added pad from pinboard.', 'success');
-                  isLoading(false)
-                }
-                else {
-                  showToast('Error occurred! Please try again.', 'danger')
-                  isLoading(false)
+                  showToast(
+                    'Successfully added pad from pinboard.',
+                    'success',
+                  );
+                  isLoading(false);
+                } else {
+                  showToast('Error occurred! Please try again.', 'danger');
+                  isLoading(false);
                 }
               } else {
-                isLoading(true)
+                isLoading(true);
                 const res = await POST('/pin', {
                   board_id: d.id,
                   object_id: d.object_id,
@@ -1630,12 +1633,14 @@ export const Entry = function (_kwargs) {
                   renderDropdown(d.object_id);
                   renderPinNavigation(res.pinboards_list);
 
-                  showToast('Successfully deleted pad from pinboard.', 'success');
-                  isLoading(false)
-                }
-                else {
-                  showToast('Error occurred! Please try again.', 'danger')
-                  isLoading(false)
+                  showToast(
+                    'Successfully deleted pad from pinboard.',
+                    'success',
+                  );
+                  isLoading(false);
+                } else {
+                  showToast('Error occurred! Please try again.', 'danger');
+                  isLoading(false);
                 }
               }
             });
@@ -1796,7 +1801,7 @@ export const Entry = function (_kwargs) {
                 });
 
               if (existingBoard.node()) {
-                isLoading(true)
+                isLoading(true);
 
                 // SIMPLY ADD THE OBJECT TO AN EXISTING BOARD
                 const res = await POST('/pin', {
@@ -1813,12 +1818,11 @@ export const Entry = function (_kwargs) {
                   renderDropdown(d.id);
                   renderPinNavigation(res.pinboards_list);
 
-                  isLoading(false)
-                }
-                else isLoading(false)
+                  isLoading(false);
+                } else isLoading(false);
               } else {
-                //SHOW LOADER
-                isLoading(true)
+                // SHOW LOADER
+                isLoading(true);
 
                 // CREATE A NEW BOARD AND ADD THE OBJECT TO IT
                 const res = await POST('/pin', {
@@ -1829,13 +1833,18 @@ export const Entry = function (_kwargs) {
                 });
 
                 if (res.status === 200) {
-                  showToast('Successfully created pinboard and added pad.', 'success')  
+                  showToast(
+                    'Successfully created pinboard and added pad.',
+                    'success',
+                  );
                   // RELOAD THE PAGE
                   location.reload();
-                }
-                else{
-                  isLoading(false)
-                  showToast('Error occurred while trying to create pinboard. Please try again!', 'danger')
+                } else {
+                  isLoading(false);
+                  showToast(
+                    'Error occurred while trying to create pinboard. Please try again!',
+                    'danger',
+                  );
                 }
               }
               // RESET DROPDOWN
@@ -1886,7 +1895,7 @@ export const Entry = function (_kwargs) {
         .html((d) => d.label)
         .on('click', function (d) {
           d.fn ? d.fn.call(this, 'unpublish') : null;
-          isLoading(true)
+          isLoading(true);
         });
     },
     delete: function (_sel) {

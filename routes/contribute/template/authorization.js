@@ -18,8 +18,7 @@ module.exports = _kwargs => {
 				if (result === true) return { authorized: rights >= read, redirect: 'view' }
 				else return { authorized: false }
 			}).catch(err => console.log(err))
-		else return new Promise(resolve => resolve({ authorized: false }))
-		// return new Promise(resolve => resolve({ authorized: rights >= read, redirect: 'view' }))
+		else return (async () => ({ authorized: false }))()
 	} else {
 		if (id) return conn.oneOrNone(`
 			SELECT TRUE AS bool FROM templates
@@ -30,6 +29,6 @@ module.exports = _kwargs => {
 			if (result) return { authorized: true, redirect: 'edit' }
 			else return { authorized: rights >= read, redirect: 'view' }
 		}).catch(err => console.log(err))
-		else return new Promise(resolve => resolve({ authorized: true, redirect: 'contribute' }))
+		else return (async () => ({ authorized: true, redirect: 'contribute' }))()
 	}
 }

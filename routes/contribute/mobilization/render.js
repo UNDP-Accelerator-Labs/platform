@@ -1,5 +1,5 @@
 const { DB } = include('config/')
-const { checklanguage, datastructures } = include('routes/helpers/')
+const { checklanguage, datastructures, redirectUnauthorized } = include('routes/helpers/')
 
 const check_authorization = require('./authorization.js')
 const load = require('./load/')
@@ -7,7 +7,7 @@ const load = require('./load/')
 module.exports = (req, res) => {
 	const { uuid, rights, public } = req.session || {}
 
-	if (public) res.redirect('/login')
+	if (public) redirectUnauthorized(req, res)
 	else {
 		const { id, display } = req.query || {}
 		const path = req.path.substring(1).split('/')
@@ -19,8 +19,7 @@ module.exports = (req, res) => {
 			.then(async result => {
 				const { authorized, redirect } = result
 				if (!authorized) {
-					if (referer) return res.redirect(referer)
-					else return res.redirect('/login')
+					return redirectUnauthorized(req, res)
 				} else if (authorized && redirect && redirect !== activity) {
 					const language = checklanguage(req.params?.language || req.session.language)
 					const query = new URLSearchParams(req.query || {});

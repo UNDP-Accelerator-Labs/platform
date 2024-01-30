@@ -1,5 +1,5 @@
 const { page_content_limit, modules, DB } = include('config/')
-const { array, checklanguage, datastructures } = include('routes/helpers/')
+const { array, checklanguage, datastructures, redirectUnauthorized } = include('routes/helpers/')
 
 const load = require('./load/')
 
@@ -8,18 +8,18 @@ const filter = require('./filter.js')
 
 module.exports = async (req, res) => {
 	const { public, rights } = req.session || {}
-	
+
 	// GET FILTERS
 	const filter_result = await filter(req);
 	const [ f_space, order, page, full_filters ] = filter_result;
 
-	if (public || rights < modules.find(d => d.type === 'files')?.rights.read) res.redirect('/login')
+	if (public || rights < modules.find(d => d.type === 'files')?.rights.read) redirectUnauthorized(req, res)
 	else {
 		const { display } = req.query || {}
 
-		DB.conn.tx(async t => {		
+		DB.conn.tx(async t => {
 			const batch = []
-			
+
 			// FILE DATA
 			// batch.push(load.data({ connection: t, req }))  // THIS IS DEPRECATED: SEE brouse/pads/render.js FOR EXPLANATION
 			batch.push(null)
@@ -30,20 +30,20 @@ module.exports = async (req, res) => {
 
 			return t.batch(batch)
 			.then(async results => {
-				let [ data, 
+				let [ data,
 					filters_menu,
 					statistics
 				] = results
 
-				const stats = { 
-					total: array.sum.call(statistics.total, 'count'), 
+				const stats = {
+					total: array.sum.call(statistics.total, 'count'),
 					filtered: array.sum.call(statistics.filtered, 'count'),
-					
+
 					private: statistics.private,
 					shared: statistics.shared,
 					public: statistics.public,
 					all: statistics.all,
-					
+
 					displayed: page_content_limit,
 					breakdown: statistics.filtered,
 					contributors: statistics.contributors

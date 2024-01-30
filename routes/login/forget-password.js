@@ -1,5 +1,5 @@
 const { DB, own_app_url, app_title_short, app_title, translations } = include('config/');
-const { email: sendEmail, removeSubdomain, datastructures, sessionupdate } = include('routes/helpers/')
+const { email: sendEmail, removeSubdomain, datastructures, sessionupdate, redirectUnauthorized } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
 const { isPasswordSecure } = require('./password-requirement')
 
@@ -17,6 +17,7 @@ exports.createResetLink = createResetLink;
 
 // Generate and send password reset token
 exports.forgetPassword = async (req, res, next) => {
+  const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
   const { email } = req.body;
    // Check if the provided email exists in the database
   const user = await DB.general.oneOrNone(`
@@ -24,7 +25,7 @@ exports.forgetPassword = async (req, res, next) => {
   `, [email]);
    if (!user) {
     req.session.errormessage = 'Email not found.';
-    res.redirect('/login');
+    redirectUnauthorized(req, res)
     return;
   }
   const { host } = req.headers || {}
@@ -55,7 +56,7 @@ exports.forgetPassword = async (req, res, next) => {
   req.session.errormessage = 'Password reset link has been successfully sent to your email. Please check your email inbox/spam to use the reset link.'
 
    // Redirect the user to a page indicating that the reset email has been sent
-  res.redirect('/forget-password');
+  res.redirect(`/forget-password?path=${redirectPath ? encodeURIComponent(redirectPath) : ''}`);
 };
 
 function verifyTokenFields(decoded, res) {
@@ -68,6 +69,7 @@ function verifyTokenFields(decoded, res) {
 
 // Reset password page
 exports.getResetToken = async (req, res, next) => {
+  const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
   const { token } = req.params;
   req.session.errormessage = '';
   jwt.verify(token, process.env.APP_SECRET, async function(err, decoded) {
@@ -79,18 +81,19 @@ exports.getResetToken = async (req, res, next) => {
       const { originalUrl, path } = req || {}
       const { errormessage, successmessage } = req.session || {}
       const metadata = await datastructures.pagemetadata({ req, res })
-      const data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+      const data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token, redirectPath: redirectPath ? encodeURIComponent(redirectPath) : undefined })
 
       return res.render('reset-password', data );
     } else {
       req.session.errormessage = 'Invalid or expired token.';
-      return res.redirect('/login');
+      return redirectUnauthorized(req, res);
     }
   });
 };
 
 // Update password after reset
 exports.updatePassword = async (req, res, next) => {
+  const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
   const { password, confirmPassword, token } = req.body;
   req.session.errormessage = '';
 
@@ -109,7 +112,7 @@ exports.updatePassword = async (req, res, next) => {
           const { errormessage, successmessage } = req.session || {}
           const metadata = await datastructures.pagemetadata({ req, res })
 
-          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token, redirectPath: redirectPath ? encodeURIComponent(redirectPath) : undefined })
 
           return res.render('reset-password', data );
         }
@@ -120,7 +123,7 @@ exports.updatePassword = async (req, res, next) => {
 
           const { errormessage, successmessage } = req.session || {}
           const metadata = await datastructures.pagemetadata({ req, res })
-          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token })
+          let data = Object.assign(metadata, { originalUrl, errormessage, successmessage, token, redirectPath: redirectPath ? encodeURIComponent(redirectPath) : undefined })
 
           return res.render('reset-password', data );
         }
@@ -142,10 +145,10 @@ exports.updatePassword = async (req, res, next) => {
         })
 
         // Redirect the user to the login page
-        res.redirect('/login');
+        redirectUnauthorized(req, res)
     } else {
       req.session.errormessage = 'Invalid or expired token.';
-      return res.redirect('/login');
+      return redirectUnauthorized(req, res);
     }
   });
 };

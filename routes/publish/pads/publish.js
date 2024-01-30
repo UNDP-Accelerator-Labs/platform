@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { checklanguage, safeArr, DEFAULT_UUID, redirectBack } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
@@ -12,9 +12,9 @@ module.exports = (req, res) => {
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
-	
+
 	let redirect = undefined
-	
+
 	if (req_token) {
 		const auth = jwt.verify(req_token, process.env.APP_SUITE_SECRET)
 		if (!auth) return res.json({ status: 403, message: 'The token is no longer valid.' })
@@ -26,9 +26,9 @@ module.exports = (req, res) => {
 				const referer_url = new URL(referer)
 				const path = `/${language}/view/pad?id=${id}`
 				const src = new URL(path, referer_url.origin).href
-				
+
 				const res_token = jwt.sign({ uuid, callback, resource_path: src }, process.env.APP_SUITE_SECRET, { expiresIn: 15 * 60 }) // EXPIRES IN 15 MINUTES
-				
+
 				const { origin } = new URL(cb_referer)
 				const callbackurl = new URL(endpoint, origin)
 				const queryparams = new URLSearchParams(callbackurl.search)
@@ -84,8 +84,7 @@ module.exports = (req, res) => {
 		return t.batch(batch)
 		.then(_ => {
 			if (redirect) res.redirect(redirect)
-			else if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			else redirectBack(req, res)
 		}).catch(err => console.log(err))
 	})
 }

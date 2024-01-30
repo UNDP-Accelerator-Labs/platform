@@ -1,3 +1,5 @@
+const { redirectError } = include('routes/helpers/')
+
 const tag = require('./tag/')
 const { pinboard, section: pinboard_section } = require('./pinboard/')
 const contributor = require('./contributor/')
@@ -25,5 +27,5 @@ module.exports = (req, res) => {
 	else if (object === 'resource') resource(req, res)
 	else if (object === 'mobilization') mobilization(req, res)
 	else if (object === 'img') img(req, res)
-	else res.redirect('/module-error')
+	else redirectError(req, res)
 }

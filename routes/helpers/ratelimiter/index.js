@@ -1,4 +1,3 @@
-const { redirectUnauthorized } = include('routes/helpers/')
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 
 const rateLimiter = new RateLimiterMemory({
@@ -6,6 +5,16 @@ const rateLimiter = new RateLimiterMemory({
   duration: 60 * 60 * 1, // per 1 hrs by IP
   blockDuration: 3 * 60 * 60, // Block for 3 hours
 });
+
+// NOTE: redefining redirect here to avoid circular dependency
+const redirectUnauthorized = (req, res) => {
+  const orig = req.originalUrl;
+	if (orig.startsWith('/login')) {
+		res.redirect(orig);
+		return;
+	}
+	res.redirect(`/login?path=${encodeURIComponent(orig)}`)
+}
 
 const rateLimiterMiddleware = (req, res, next) => {
   rateLimiter.consume(req.ip)

@@ -1,7 +1,8 @@
 const { modules, DB } = include('config/')
+const { redirectUnauthorized, redirectBack } = include('routes/helpers/')
 const cron = require('node-cron')
 
-module.exports = (req, res) => {	
+module.exports = (req, res) => {
 	const { referer } = req.headers || {}
 	let { id, type, date } = req.query || {}
 	const { uuid, rights, public } = req.session || {}
@@ -11,7 +12,7 @@ module.exports = (req, res) => {
 	if (id.length && !public) {
 		const now = new Date()
 		const end_date = new Date(date)
-		
+
 		const usersql = DB.pgp.as.format(`
 			UPDATE users
 			SET rights = 0,
@@ -49,8 +50,8 @@ module.exports = (req, res) => {
 									DELETE FROM teams t
 									WHERE t.host = $1
 										AND t.id IN (
-											SELECT team 
-											FROM team_members 
+											SELECT team
+											FROM team_members
 											GROUP BY team
 											HAVING COUNT (member) = 1
 											AND $1 = ANY (array_agg(member))
@@ -60,8 +61,7 @@ module.exports = (req, res) => {
 						}
 					}).catch(err => console.log(err))
 				}).then(_ => {
-					if (referer) res.redirect(referer)
-					else res.redirect('/login')
+					redirectBack(req, res)
 				}).catch(err => console.log(err))
 			})
 		} else {
@@ -75,8 +75,8 @@ module.exports = (req, res) => {
 								DELETE FROM teams t
 								WHERE t.host = $1
 									AND t.id IN (
-										SELECT team 
-										FROM team_members 
+										SELECT team
+										FROM team_members
 										GROUP BY team
 										HAVING COUNT (member) = 1
 										AND $1 = ANY (array_agg(member))
@@ -86,8 +86,7 @@ module.exports = (req, res) => {
 					}
 				}).catch(err => console.log(err))
 			}).then(_ => {
-				if (referer) res.redirect(referer)
-				else res.redirect('/login')
+				redirectBack(req, res)
 			}).catch(err => console.log(err))
 		}
 
@@ -120,7 +119,6 @@ module.exports = (req, res) => {
 			.catch(err => console.log(err))
 		} else res.redirect(referer)*/
 	} else {
-		if (referer) res.redirect(referer)
-		else res.redirect('/login')
+		redirectUnauthorized(req, res)
 	}
 }

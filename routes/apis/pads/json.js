@@ -42,27 +42,27 @@ module.exports = async (req, res) => {
 
 	return DB.conn.tx(t => {
 		return t.any(`
-			SELECT p.id AS pad_id, 
-				p.owner AS contributor_id, 
-				p.title, 
-				p.date AS created_at, 
-				p.update_at AS updated_at, 
-				p.status, 
-				p.source AS source_pad_id, 
-				p.template, 
-				-- p.full_text, 
+			SELECT p.id AS pad_id,
+				p.owner AS contributor_id,
+				p.title,
+				p.date AS created_at,
+				p.update_at AS updated_at,
+				p.status,
+				p.source AS source_pad_id,
+				p.template,
+				-- p.full_text,
 				p.sections,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('tag_id', t.tag_id, 'type', t.type))) FILTER (WHERE t.tag_id IS NOT NULL), '[]') AS tags,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
-				
+
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', m.type, 'name', m.name, 'value', m.value))) FILTER (WHERE m.value IS NOT NULL), '[]') AS metadata,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', e.type, 'count', (SELECT count(type) FROM engagement WHERE type = e.type AND docid = p.id )))) FILTER (WHERE e.type IS NOT NULL), '[]') AS engagement,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('message_id', c.id, 'response_to_message_id', c.source, 'user_id', c.contributor, 'date', c.date, 'message', c.message))) FILTER (WHERE c.id IS NOT NULL), '[]') AS comments
-			
+
 			FROM pads p
 
 			LEFT JOIN tagging t
@@ -84,11 +84,11 @@ module.exports = async (req, res) => {
 				$1:raw
 				$2:raw
 				AND p.id NOT IN (SELECT review FROM reviews)
-			
+
 			GROUP BY (p.id)
 			ORDER BY p.id DESC
 		;`, [ full_filters, cors_filter ])
-		.then(async pads => {	
+		.then(async pads => {
 			pads = await join.users(pads, [ language, 'contributor_id' ])
 			// AND DELETE ALL THE PERSONAL INFORMATION
 			pads.forEach(d => {
@@ -96,7 +96,7 @@ module.exports = async (req, res) => {
 				delete d.ownername
 				delete d.rights
 			})
-			
+
 			let contributor_list = array.unique.call(pads, { key: 'contributor_id', onkey: true })
 			contributor_list = array.shuffle.call(contributor_list)
 
@@ -105,19 +105,19 @@ module.exports = async (req, res) => {
 			// IF SOURCES ARE REQUESTED, CREATE A NEW OBJECT WITH THE BASIC INFORMATION ABOUT THE SOURCE
 			if (include_source) {
 				const sources = await t.any(`
-					SELECT p.id AS source_pad_id, 
-						p.owner AS contributor_id, 
-						p.title, 
-						p.date AS created_at, 
-						p.update_at AS updated_at, 
-						p.status,  
-						p.template, 
+					SELECT p.id AS source_pad_id,
+						p.owner AS contributor_id,
+						p.title,
+						p.date AS created_at,
+						p.update_at AS updated_at,
+						p.status,
+						p.template,
 						p.sections,
 
 						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('tag_id', t.tag_id, 'type', t.type))) FILTER (WHERE t.tag_id IS NOT NULL), '[]') AS tags,
 
 						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
-						
+
 						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', m.type, 'name', m.name, 'value', m.value))) FILTER (WHERE m.value IS NOT NULL), '[]') AS metadata
 
 					FROM pads p
@@ -157,14 +157,14 @@ module.exports = async (req, res) => {
 						if (include_tags) {
 							const nest = array.nest.call(d.tags, { key: 'type' })
 						 	const tags = await Promise.all(nest.map(d => {
-								return new Promise(async resolve1 => {
+								return (async () => {
 									const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
 									tags?.forEach(d => {
 										// delete d.tag_id
 										delete d.equivalents
 									})
-									resolve1(tags)
-								})
+									return tags
+								})()
 							}))
 							d.tags = tags.flat()
 						} else delete d.tags
@@ -190,7 +190,7 @@ module.exports = async (req, res) => {
 			}
 
 			pads = await Promise.all(pads.map(pad_group => {
-				return new Promise(async resolve => {
+				return (async () => {
 					if (include_imgs) {
 						pad_group.values.forEach(d => {
 							// GET THE MEDIA ITEMS
@@ -207,7 +207,7 @@ module.exports = async (req, res) => {
 					}
 
 					pad_group.values = await Promise.all(pad_group.values.map(d => {
-						return new Promise(async resolve => {
+						return (async () => {
 							// ANONYMIZE CONTRIBUTORS
 							// NOTE THIS id IS DISSOCIATED FROM COMMENTS
 							d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
@@ -223,14 +223,14 @@ module.exports = async (req, res) => {
 							if (include_tags) {
 								const nest = array.nest.call(d.tags, { key: 'type' })
 							 	const tags = await Promise.all(nest.map(d => {
-									return new Promise(async resolve1 => {
+									return (async () => {
 										const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
 										tags?.forEach(d => {
 											// delete d.tag_id
 											delete d.equivalents
 										})
-										resolve1(tags)
-									})
+										return tags
+									})()
 								}))
 								d.tags = tags.flat()
 							} else delete d.tags
@@ -279,8 +279,8 @@ module.exports = async (req, res) => {
 							// SET MAIN DATA
 							if (!include_data) delete d.sections
 
-							resolve(d)
-						})
+							return d
+						})()
 					}))
 
 					if (output === 'geojson') {
@@ -309,16 +309,15 @@ module.exports = async (req, res) => {
 									const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 									await Promise.all(imgs.map((d, i) => {
-										return new Promise(async resolve1 => {
+										return (async () => {
 											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-											
+
 											try {
 												const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 												await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 											} catch(err) { console.log(err) }
-											resolve1()
-										})
+										})()
 									}))
 								} else {
 									imgs.forEach((d, i) => {
@@ -344,16 +343,15 @@ module.exports = async (req, res) => {
 									const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 									await Promise.all(imgs.map((d, i) => {
-										return new Promise(async resolve1 => {
+										return (async () => {
 											const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 											if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
-											
+
 											try {
 												const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 												await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 											} catch(err) { console.log(err) }
-											resolve1()
-										})
+										})()
 									}))
 								} else {
 									imgs.forEach((d, i) => {
@@ -369,8 +367,8 @@ module.exports = async (req, res) => {
 							fs.writeFileSync(path.join(dir, `${app_title_short}_data.json`), JSON.stringify(pad_group.values))
 						}
 					}
-					resolve(pad_group)
-				})
+					return pad_group
+				})()
 			}))
 			return [ open, pads.map(d => d.values) ]
 		}).catch(err => console.log(err))
@@ -378,8 +376,9 @@ module.exports = async (req, res) => {
 		const [ open, data ] = results
 		console.log(`is open: ${open}`)
 		if (render) {
-			if (open) var zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
-			else var zip = spawn('zip',[ '-rP', pw, 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+			let zip;
+			if (open) zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+			else zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
 			// zip.stdin.on('data', d => { console.log(`stdin: ${d}`) })
 			zip.stdout.on('data', d => console.log(`stdout: ${d}`))
 			zip.stderr.on('data', d => console.log(`stderr: ${d}`))

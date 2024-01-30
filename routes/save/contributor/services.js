@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { email: sendEmail, sessionupdate, removeSubdomain } = include("routes/helpers/");
+const { email: sendEmail, sessionupdate, removeSubdomain, redirectUnauthorized } = include("routes/helpers/");
 const { DB, own_app_url, app_title, app_title_short, translations } = include("config/");
 
 exports.confirmEmail = async (_kwarg) => {
@@ -121,12 +121,12 @@ exports.updateNewEmail = async (req, res, next) => {
 
       if(req.session.uuid === uuid){
         req.session.destroy()
-        return res.redirect("/login");
+        return redirectUnauthorized(req, res);
       }
       else res.render(referer || '/');
     } else {
       req.session.errormessage = "Invalid or expired token.";
-      return res.redirect("/login");
+      return redirectUnauthorized(req, res);
     }
   });
 };

@@ -1,3 +1,5 @@
+import { isLoading } from '/js/notification/loader.js';
+
 const jsonQueryHeader = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
@@ -5,6 +7,7 @@ const jsonQueryHeader = {
 };
 function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
   return new Promise((resolve, reject) => {
+    isLoading(true);
     const args = { method: _method, headers: jsonQueryHeader };
     if (_q) {
       args['body'] = JSON.stringify(_q);
@@ -13,6 +16,7 @@ function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
       .then((response) => {
         if (_checkStatus && !response.ok) {
           reject(response);
+          isLoading(false);
           return;
         }
         if (_expectJSON) {
@@ -20,11 +24,13 @@ function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
         }
         return response;
       })
-      .then((results) => resolve(results))
+      .then((results) => {
+        resolve(results);
+        isLoading(false);
+      })
       .catch((err) => {
-        if (err) {
-          reject(err);
-        }
+        reject(err);
+        isLoading(false);
       });
   });
 }

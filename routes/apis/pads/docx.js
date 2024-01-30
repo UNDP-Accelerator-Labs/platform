@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
 
 		// TO DO: PROBABLY ONLY USE ONE SECTION BECUSE IN WORD, NEW SECTIONS FORCE PAGE BREAKS THAT CANNOT BE REMOVED EASILY
 		let sections = await Promise.all(data.map(async d => {
-			return new Promise(async resolve => {
+			return (async () => {
 				const arr = []
 				if (d.key) {
 					const title_obj = {}
@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
 				}
 
 				const pads = await Promise.all(d.values.map((c, j) => {
-					return new Promise(async resolve1 => {
+					return (async () => {
 						const obj = {}
 						// if (j > 0) obj.properties = { type: SectionType.NEXT_PAGE }
 						obj.children = []
@@ -141,18 +141,18 @@ module.exports = async (req, res) => {
 							obj.children.push(...items.flat())
 						}
 
-						resolve1(obj)
-					})
+						return obj
+					})()
 				}))
 
 				arr.push(...pads)
-				resolve(arr)
-			})
+				return arr
+			})()
 		})).then(results => results.flat())
 		.catch(err => console.log(err))
 
 		async function populateSection (data, repetition = 0) {
-			return new Promise(async resolve => {
+			return (async () => {
 				const { instruction, type, name, level } = data
 				const arr = []
 				// ADD THE INSTRUCTION IF THERE IS ONE
@@ -176,24 +176,28 @@ module.exports = async (req, res) => {
 					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 						if (src) {
 							// TO DO: FILTER IF URL
-							await new Promise(resolve1 => {
+							await new Promise(resolve, reject => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
-									if (err) console.log(err)
-									// TO DO: MIGHT NEED resizeImgBuffer AFTER ALL
-									const { width, height } = resizeImg(buffer)
-									resolve1(arr.push(new Paragraph({
-										children: [
-											new ImageRun({
-												data: buffer,
-												transformation: {
-													width,
-													height
-												}
-											})
-										],
-										alignment: AlignmentType.CENTER,
-										style: 'images'
-									})))
+									try {
+										if (err) console.log(err)
+										// TO DO: MIGHT NEED resizeImgBuffer AFTER ALL
+										const { width, height } = resizeImg(buffer)
+										resolve(arr.push(new Paragraph({
+											children: [
+												new ImageRun({
+													data: buffer,
+													transformation: {
+														width,
+														height
+													}
+												})
+											],
+											alignment: AlignmentType.CENTER,
+											style: 'images'
+										})))
+									} catch (e) {
+										reject(e)
+									}
 								})
 							})
 						}
@@ -227,18 +231,22 @@ module.exports = async (req, res) => {
 						// TO DO: FILTER IF URL
 						// src.isURL()
 						await Promise.all(srcs.map(d => {
-							return new Promise(resolve1 => {
+							return new Promise(resolve, reject => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, d), app_storage).href, function (err, res, buffer) {
-									if (err) console.log(err)
-									const { width, height } = resizeImg(buffer, maxwidth)
+									try {
+										if (err) console.log(err)
+										const { width, height } = resizeImg(buffer, maxwidth)
 
-									resolve1(children.push(new ImageRun({
-										data: buffer,
-										transformation: {
-											width,
-											height
-										}
-									})))
+										resolve(children.push(new ImageRun({
+											data: buffer,
+											transformation: {
+												width,
+												height
+											}
+										})))
+									} catch (e) {
+										reject(e)
+									}
 								})
 							})
 						}))
@@ -394,8 +402,8 @@ module.exports = async (req, res) => {
 					})
 				}
 
-				resolve(arr)
-			})
+				return arr
+			})()
 		}
 
 		function resizeImg (p, maxwidth = 600, maxheight = 900) {

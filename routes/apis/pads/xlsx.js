@@ -93,16 +93,14 @@ module.exports = async (req, res) => {
 							ORDER BY (pad, type)
 						;`, [ ids ]).then(async results => {
 							const nest = array.nest.call(results, { key: 'type' })
-							const tags = await Promise.all(nest.map(d => {
-								return new Promise(async resolve => {
-									const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
-									tags.forEach(d => {
-										delete d.tag_id
-										delete d.equivalents
-									})
-									resolve(tags)
+							const tags = await Promise.all(nest.map(d => (async () => {
+								const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
+								tags.forEach(d => {
+									delete d.tag_id
+									delete d.equivalents
 								})
-							}))
+								return tags;
+							})));
 							return tags.flat().sort((a, b) => a.pad_id - b.pad_id)
 
 						}).catch(err => console.log(err)))
@@ -206,18 +204,20 @@ module.exports = async (req, res) => {
 							if (use_templates) {
 								// FLATTEN CONTENT
 								function create_id (d, id_prefix, name_prefix) {
+									let id;
+									let name;
 									if (Array.isArray(d)) {
-										var id = id_prefix
-										var name = name_prefix
+										id = id_prefix
+										name = name_prefix
 									} else if (d.type === 'section') {
-										var id = `${id_prefix ? `${id_prefix}--` : ''}${d.type ?? undefined}-${d.title ?? undefined}-${d.lead ?? undefined}`
-										var name = `${name_prefix ? `${name_prefix}--` : ''}${d.title ?? undefined}`
+										id = `${id_prefix ? `${id_prefix}--` : ''}${d.type ?? undefined}-${d.title ?? undefined}-${d.lead ?? undefined}`
+										name = `${name_prefix ? `${name_prefix}--` : ''}${d.title ?? undefined}`
 									} else if (d.type === 'group') {
-										var id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.name ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
-										var name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
+										id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.name ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
+										name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
 									} else {
-										var id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
-										var name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
+										id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
+										name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
 									}
 
 									return [ id, name ]
@@ -365,7 +365,7 @@ module.exports = async (req, res) => {
 								headers = Object.keys(headers).filter(c => c !== 'pad_id')
 							}
 
-							 
+
 							const data = pad_group.values.map(d => {
 								let { ...obj } = d
 
@@ -404,7 +404,7 @@ module.exports = async (req, res) => {
 									}
 								}
 								delete obj.img
-								
+
 								if (single_sheet && include_locations) {
 									const pad_locations = locations.filter(c => c.pad_id === obj.pad_id)
 									if (transpose_locations) {
@@ -435,7 +435,7 @@ module.exports = async (req, res) => {
 
 								return obj
 							}).flat()
-							
+
 							/*
 							pad_group.values.forEach(d => {
 								// ANONYMIZE CONTRIBUTORS
@@ -473,7 +473,7 @@ module.exports = async (req, res) => {
 									}
 								}
 								delete d.img
-								
+
 								if (single_sheet && include_locations) {
 									const pad_locations = locations.filter(c => c.pad_id === d.pad_id)
 									for (let i = 0; i < max_locations; i ++) {
@@ -570,7 +570,7 @@ module.exports = async (req, res) => {
 										const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 										await Promise.all(imgs.map((d, i) => {
-											return new Promise(async resolve1 => {
+											return (async () => {
 												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
 
@@ -578,8 +578,7 @@ module.exports = async (req, res) => {
 													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 												} catch(err) { console.log(err) }
-												resolve1()
-											})
+											})()
 										}))
 									} else {
 										imgs.forEach((d, i) => {
@@ -606,7 +605,7 @@ module.exports = async (req, res) => {
 										const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
 										await Promise.all(imgs.map((d, i) => {
-											return new Promise(async resolve1 => {
+											return (async () => {
 												const img_pad_dir = path.join(img_dir, `pad-${d.pad_id}`)
 												if (!fs.existsSync(img_pad_dir)) fs.mkdirSync(img_pad_dir)
 
@@ -614,8 +613,7 @@ module.exports = async (req, res) => {
 													const blobClient = containerClient.getBlobClient(`${d.image.replace('/uploads/sm', 'uploads')}`)
 													await blobClient.downloadToFile(path.join(img_pad_dir, `image-${i + 1}${path.extname(d.image)}`))
 												} catch(err) { console.log(err) }
-												resolve1()
-											})
+											})()
 										}))
 									} else {
 										imgs.forEach((d, i) => {
@@ -650,8 +648,9 @@ module.exports = async (req, res) => {
 		const [ open, data ] = results
 		console.log(`is open: ${open}`)
 		if (render) {
-			if (open) var zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
-			else var zip = spawn('zip',[ '-rP', pw, 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+			let zip;
+			if (open) zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+			else zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
 			// zip.stdin.on('data', (data) => { console.log(`stdin: ${data}`) })
 			zip.stdout.on('data', data => console.log(`stdout: ${data}`))
 			zip.stderr.on('data', data => console.log(`stderr: ${data}`))

@@ -202,30 +202,34 @@ exports.csp_links = [
 let versionObj = null;
 
 function getVersionString() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (versionObj !== null) {
       resolve(versionObj);
       return;
     }
     fs.readFile('version.txt', (err, data) => {
-      if (err) {
-        versionObj = {
-          name: 'no version available',
-          commit: 'unknown',
-          date: 'unknown',
-          app: `${app_id}`,
-          error: true,
-        };
-      } else {
-        const lines = data.toString().split(/[\r\n]+/);
-        versionObj = {
-          name: lines[0] || 'no version available',
-          commit: lines[1] || 'unknown',
-          date: lines[2] || 'unknown',
-          app: `${app_id}`,
-        };
+      try {
+        if (err) {
+          versionObj = {
+            name: 'no version available',
+            commit: 'unknown',
+            date: 'unknown',
+            app: `${app_id}`,
+            error: true,
+          };
+        } else {
+          const lines = data.toString().split(/[\r\n]+/);
+          versionObj = {
+            name: lines[0] || 'no version available',
+            commit: lines[1] || 'unknown',
+            date: lines[2] || 'unknown',
+            app: `${app_id}`,
+          };
+        }
+        resolve(versionObj);
+      } catch (err) {
+        reject(err);
       }
-      resolve(versionObj);
     });
   });
 }

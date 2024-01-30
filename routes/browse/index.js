@@ -1,4 +1,5 @@
 const { modules } = include('config/')
+const { redirectError } = include('routes/helpers/')
 
 const pads = require('./pads/')
 const templates = require('./templates/')
@@ -22,7 +23,7 @@ module.exports = async (req, res) => {
 			else if (object === 'contributors') contributors.render(req, res)
 		} else { // AJAX CALL
 			const { feature } = req.body || {}
-			let data 
+			let data
 			if (object === 'pads') {
 				if (feature === 'locations') { data = await pads.load.locations({ req }) }
 				else if (feature === 'samples') { data = await pads.load.samples({ req }) }
@@ -37,5 +38,5 @@ module.exports = async (req, res) => {
 		}
 	} else if (instance) {
 		pads.render(req, res)
-	} else res.redirect('/module-error')
+	} else redirectError(req, res)
 }

@@ -161,3 +161,38 @@ exports.removeSubdomain = (hostname) => {
 	}
 	return host.split(".").slice(-2).join(".");
 };
+
+const redirectUnauthorized = (req, res) => {
+	const orig = req.originalUrl;
+	if (orig.startsWith('/login')) {
+		res.redirect(orig);
+		return;
+	}
+	res.redirect(`/login?path=${encodeURIComponent(orig)}`)
+}
+exports.redirectUnauthorized = redirectUnauthorized;
+
+exports.redirectError = (req, res) => {
+	const orig = req.originalUrl;
+	res.redirect(`/module-error?page=${encodeURIComponent(orig)}`)
+}
+
+exports.redirectBack = (req, res, baseIfEmpty = false) => {
+	const { referer } = req.headers || {};
+	let ref = null;
+	if (referer) {
+		const hostname = req.get('host');
+		const refUrl = new URL(referer)
+		if (refUrl.hostname === hostname) {
+			ref = referer;
+		}
+	}
+	if (!ref) {
+		if (baseIfEmpty) {
+			return res.redirect('/');
+		} else {
+			return redirectUnauthorized(req, res);
+		}
+	}
+	res.redirect(ref)
+}

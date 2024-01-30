@@ -1,7 +1,7 @@
 const { followup_count, metafields, DB } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 module.exports = (req, res) => {
-	const { referer } = req.headers || {}
 	const { id, mobilization } = req.query || {}
 
 	// THIS SOLUTION IS TAKEN FROM https://dba.stackexchange.com/questions/122120/duplicate-row-with-primary-key-in-postgresql
@@ -35,7 +35,7 @@ module.exports = (req, res) => {
 							version = version || $2::TEXT
 						WHERE id = $2::INT
 					;`, [ id, result.id ]))
-					
+
 					// FORWARD ALL THE TAGGING
 					if (metafields.some(d => ['tag', 'index'].includes(d.type))) {
 						batch.push(t.none(`
@@ -60,7 +60,7 @@ module.exports = (req, res) => {
 								WHERE pad = $2::INT
 						;`, [ result.id, id ]))
 					}
-					
+
 					// TO DO: AT SOME POINT, RECONSIDER FORWARDING IN DISTRIBUTED MOBILIZATIONS
 					batch.push(t.none(`
 						INSERT INTO mobilization_contributions (pad, mobilization)
@@ -72,8 +72,7 @@ module.exports = (req, res) => {
 		})
 	})
 	.then(_ => {
-		if (referer) res.redirect(referer)
-		else res.redirect('/login')
+		redirectUnauthorized(req, res)
 	}) // TO DO: OPEN NEW PAGE WITH THE PAD
-	.catch(err => console.log(err))	
+	.catch(err => console.log(err))
 }

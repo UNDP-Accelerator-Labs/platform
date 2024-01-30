@@ -1,5 +1,5 @@
 const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, welcome_module, ownDB, DB } = include('config/')
-const { array, datastructures, checklanguage, join, parsers, pagestats } = include('routes/helpers/')
+const { array, datastructures, checklanguage, join, parsers, pagestats, redirectUnauthorized } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
 
@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
 
 	const language = checklanguage(req.params?.language || req.session.language)
 
-	if (public && !(['public', 'pinned'].includes(space) || instance)) res.redirect('/login')
+	if (public && !(['public', 'pinned'].includes(space) || instance)) redirectUnauthorized(req, res)
 	else if (rights < modules.find(d => d.type === 'pads')?.rights.read && !(['public', 'pinned'].includes(space) || instance)) res.redirect(`./public`)
 	else if (space === 'pinned' && !pinboard) res.redirect(`./public`)
 	else {
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
 		// GET FILTERS
 		const filter_result = await filter(req, res);
 		if (!filter_result) {
-			return res.redirect('/login');
+			return redirectUnauthorized(req, res);
 		}
 		const [ f_space, order, page, full_filters ] = filter_result;
 

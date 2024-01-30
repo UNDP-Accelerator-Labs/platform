@@ -6,25 +6,8 @@ const jsonQueryHeader = {
   'X-Requested-With': 'XMLHttpRequest',
 };
 function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
-  let isActive = true;
-  let isRendering = false;
-
-  const stop = () => {
-    if (isRendering) {
-      isLoading(false);
-      isRendering = false;
-    }
-    isActive = false;
-  };
-
-  setTimeout(() => {
-    if (isActive) {
-      isLoading(true);
-      isRendering = true;
-    }
-  }, 500);
-
   return new Promise((resolve, reject) => {
+    isLoading(true);
     const args = { method: _method, headers: jsonQueryHeader };
     if (_q) {
       args['body'] = JSON.stringify(_q);
@@ -33,7 +16,7 @@ function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
       .then((response) => {
         if (_checkStatus && !response.ok) {
           reject(response);
-          stop();
+          isLoading(false);
           return;
         }
         if (_expectJSON) {
@@ -43,11 +26,11 @@ function _fetch(_method, _uri, _q, _expectJSON, _checkStatus) {
       })
       .then((results) => {
         resolve(results);
-        stop();
+        isLoading(false);
       })
       .catch((err) => {
         reject(err);
-        stop();
+        isLoading(false);
       });
   });
 }

@@ -171,4 +171,14 @@ exports.translations = {
       `,
     },
   },
+  'disclaimer': {
+    'en': `<p>Important Note!</p>
+    <small>Please note that the content you are about to explore consists of desk or field notes curated by our team. These notes are personal reflections, observations, or insights shared by the curator. The information presented here is not intended to be exhaustive or authoritative. It reflects the curator's individual perspective. While we strive for accuracy, we cannot guarantee the completeness or currency of the content.</small>`,
+    'es': `<p>¡Nota importante!</p>
+    <small>Tenga en cuenta que el contenido que está a punto de explorar consiste en notas de escritorio o de campo seleccionadas por nuestro equipo. Estas notas son reflexiones, observaciones o ideas personales compartidas por el curador. La información presentada aquí no pretende ser exhaustiva ni autorizada. Refleja la perspectiva individual del curador. Si bien nos esforzamos por lograr la precisión, no podemos garantizar la integridad o actualidad del contenido.</small>`,
+    'fr': `<p>Remarque importante !</p>
+    <small>Veuillez noter que le contenu que vous êtes sur le point d'explorer est constitué de notes de bureau ou de terrain organisées par notre équipe. Ces notes sont des réflexions personnelles, des observations ou des idées partagées par le conservateur. Les informations présentées ici ne prétendent pas être exhaustives ou faisant autorité. Il reflète le point de vue individuel du conservateur. Bien que nous nous efforcions d'assurer l'exactitude, nous ne pouvons garantir l'exhaustivité ou l'actualité du contenu.</small>`,
+    'pt': `<p>Nota importante!</p>
+    <small>Observe que o conteúdo que você está prestes a explorar consiste em notas documentais ou de campo com curadoria de nossa equipe. Essas notas são reflexões pessoais, observações ou insights compartilhados pelo curador. As informações aqui apresentadas não pretendem ser exaustivas ou oficiais. Reflete a perspectiva individual do curador. Embora nos esforcemos pela precisão, não podemos garantir a integridade ou atualidade do conteúdo.</small>`,
+  }
 };

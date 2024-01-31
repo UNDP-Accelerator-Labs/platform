@@ -199,3 +199,22 @@
     }
   }
 }
+
+
+.disclaimer-alert {
+  padding: 15px;
+  border: 1px dotted $c-dark-yellow;
+  box-sizing: border-box;
+  margin: 15px 0;
+  animation: animate-down 1s;
+  // background-color: ;
+
+  p {
+    color: $c-dark-yellow;
+  }
+  small {
+    color: $c-light-grey;
+    font-size: $t-small;
+    line-height: 1.2em;
+  }
+}

@@ -241,7 +241,10 @@
 					</div>
 				</div>
 			<% } %>
-
+			<!-- SHOW DISCLAIMER FOR PUBLIC VIEWS OR IF THE BROWSING USER IS NOT THE CURATOR -->
+			<% if (publicpage ||locals.data.owner !== locals.metadata.user.uuid ){ %>
+				<%- include ('../../partials/page-alert.ejs') %>
+			<% } %>
 			<!-- IF THE PAD IS A CONTRIBUTION TO A MOBILIZATION, DISPLAY THE MOBILIZATION INFORMATION -->
 			<% if (locals.display_mobilization && !locals.data?.id && editing) { %>
 				<div class='meta-info mobilization-info'>

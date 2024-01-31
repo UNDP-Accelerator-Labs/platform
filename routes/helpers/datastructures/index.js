@@ -16,6 +16,7 @@ const {
 	map,
 	DB,
 	ownDB,
+	translations
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -297,6 +298,7 @@ exports.pagemetadata = (_kwargs) => {
 				own_db: await ownDB(),
 				app_id,
 				app_suite_url,
+				disclaimer: translations['disclaimer'][`${language || 'en'}`]
 			},
 			user: {
 				uuid,

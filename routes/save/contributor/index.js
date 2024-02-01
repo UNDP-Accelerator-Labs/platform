@@ -14,6 +14,7 @@ module.exports =async (req, res) => {
 	let logoutAll = false;
 
 	let redirect_url;
+	const { protocol } = req
 	const nextUrl = new URL(
 		`${protocol}://${req.get('host')}/${language}/edit/contributor?id=${uuid}`
 	);

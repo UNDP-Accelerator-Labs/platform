@@ -1,7 +1,6 @@
 const { DB, app_base_host } = include("config/");
 const { deviceInfo, sendDeviceCode, extractPathValue } = require("./device-info");
 const { sessionupdate, redirectError } = include('routes/helpers/')
-const { deviceInfo, sendDeviceCode } = require("./device-info");
 const { v4: uuidv4 } = require("uuid");
 
 exports.confirmDevice = async (req, res, next) => {

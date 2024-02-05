@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
 	const { originalUrl, path } = req || {}
 	const redirectPath = req?.query?.path;
 	const { errormessage, successmessage, page_message, confirm_dev_origins } = req.session || {}
-	const origin_url = encodeURIComponent(query.origin) || null
+	const origin_url = encodeURIComponent(req.query.origin) || null
 
 	const { token } = req.params;
 

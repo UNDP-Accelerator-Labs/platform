@@ -151,17 +151,16 @@ function redirectOldUrl(req, res, next) {
 //REDIRECT TO LOGIN PLATFORM MIDDLEWARE
 function redirectToLoginPlatform(req, res, next) {
   const originHost = req.get('host');
-  const pathname = new URL(req.originalUrl, `https://${originHost}`).pathname;
-  const returnUrl = `${sso_app_url}${pathname}?origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost)}`;
-  const parsedUrl = new URL(sso_app_url);
-  const strippedUrl = parsedUrl.host;
+  const pathname = req?.originalUrl?.startsWith('/login') ? '' : req?.originalUrl
+  const loginUrl = `${sso_app_url}/login?origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost + '?path=' + pathname)}`;
+  const loginHost = new URL(sso_app_url).host;
 
   if (
    process.env.NODE_ENV === 'production' &&
     !originHost.endsWith('azurewebsites.net') &&
-    strippedUrl != originHost
+    loginHost != originHost
   ) {
-    return res.redirect(returnUrl);
+    return res.redirect(loginUrl);
   }
   next();
 }

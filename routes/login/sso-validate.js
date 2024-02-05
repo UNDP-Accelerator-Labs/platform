@@ -1,5 +1,5 @@
 const msal = require('@azure/msal-node');
-const { datastructures, redirectUnauthorized } = include('routes/helpers/');
+const { datastructures, redirectUnauthorized, checkOrigin } = include('routes/helpers/');
 const { app_languages, modules, msalConfig, DB, app_base_host, sso_redirect_url } =
   include('config/');
 const { deviceInfo, getPath } = require('./device-info');
@@ -151,11 +151,13 @@ module.exports = (req, res, next) => {
                         expires: sessionExpiration,
                         domain: app_base_host,
                       });
-
-                      req.session.save(function(err) {
-                        if(err) console.log(' err ', err)
-                        return res.redirect(redirecturl)
-                      })
+                      if(checkOrigin(redirecturl, origin_url)){
+                        req.session.save(function(err) {
+                          if(err) console.log(' err ', err)
+                          return res.redirect(redirecturl)
+                        })
+                      }
+                      else redirectUnauthorized(req, res)
                     })
                     .catch(async (err) => {
                       console.log(err);
@@ -163,10 +165,13 @@ module.exports = (req, res, next) => {
                         req.session,
                         datastructures.sessiondata(results),
                       );
-                      req.session.save(function(err) {
-                        if(err) console.log(' err ', err)
-                        return res.redirect(redirecturl)
-                      })
+                      if(checkOrigin(redirecturl, origin_url)){
+                        req.session.save(function(err) {
+                          if(err) console.log(' err ', err)
+                          return res.redirect(redirecturl)
+                        })
+                      }
+                      else redirectUnauthorized(req, res)
                     });
                 }
               })

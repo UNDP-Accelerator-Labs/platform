@@ -1,4 +1,4 @@
-const { DB, app_title, sso_app_url } = include('config/');
+const { DB, app_title, sso_app_url, base_host } = include('config/');
 
 exports.array = require('./array/');
 exports.blobContainer = require('./blobcontainer/');
@@ -295,4 +295,14 @@ exports.redirectToLoginPlatform = (req, res, next) => {
     return res.redirect(loginUrl);
   }
   next();
+};
+
+exports.checkOrigin = (url, origin_url) => {
+  const base_extract = new URL(url, origin_url).host.split('.').slice(1).join('.');
+  if (process.env.NODE_ENV === 'production' && origin_url)
+    return (
+      (base_extract === base_host) ||
+      (host === 'acclabs-staging.azurewebsites.net')
+	);
+  else return true;
 };

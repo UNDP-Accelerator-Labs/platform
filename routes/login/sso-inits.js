@@ -7,16 +7,14 @@ module.exports = async (req, res, next) => {
 	const { referer } = req.headers || {}
 	const { __ucd_app, __puid, __cduid } = req.cookies;
 
-	const origin_url = extractPathValue(referer)
 	const extraData = {
-        origin_url,
-		app: req.query.app ?? app_title,
+        origin_url: extractPathValue(referer),
+		app: extractPathValue(referer, true),
 		__ucd_app,
 		__puid,
 		__cduid
     };
     const encodedState = encodeURIComponent(JSON.stringify(extraData));
-
 	const authCodeUrlParameters = {
 		scopes: ['user.read'], 
 		redirectUri: sso_redirect_url,

@@ -89,11 +89,11 @@ exports.checkDevice = async (_kwarg) => {
 };
 
 
-exports.extractPathValue = (urlString) => {
+exports.extractPathValue = (urlString, app) => {
   const url = new URL(urlString);
   const params = new URLSearchParams(url.search);
-  const pathValue = params.get('origin');
-  return pathValue ? decodeURIComponent(pathValue) : '';
+  if(app) return decodeURIComponent(params.get('amp;app')) ?? ''
+  return decodeURIComponent(params.get('origin')) ?? '';
 }
 
 exports.getPath = (rights, language, modules) =>{

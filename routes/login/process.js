@@ -184,9 +184,12 @@ module.exports = (req, res, next) => {
 
 								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: req.query.app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess));
-								res.redirect(redirecturl);
-
-							}).catch(err => console.log(err))
+								return 
+							})
+							.then(() => {
+							  res.redirect(redirecturl);
+							})
+							.catch(err => console.log(err))
 
 						} else {
 							//USER REQUEST TO ADD DEVICE TO LIST OF TRUSTED DEVICES

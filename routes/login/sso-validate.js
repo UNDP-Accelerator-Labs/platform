@@ -152,7 +152,7 @@ module.exports = (req, res, next) => {
                         domain: app_base_host,
                       });
 
-                      res.redirect(redirecturl);
+                      return res.redirect(redirecturl);
                     })
                     .catch(async (err) => {
                       console.log(err);

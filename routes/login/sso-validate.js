@@ -1,5 +1,5 @@
 const msal = require('@azure/msal-node');
-const { datastructures } = include('routes/helpers/');
+const { datastructures, redirectUnauthorized } = include('routes/helpers/');
 const { app_languages, modules, msalConfig, DB, app_base_host, sso_redirect_url } =
   include('config/');
 const { deviceInfo, getPath } = require('./device-info');
@@ -33,7 +33,7 @@ module.exports = (req, res, next) => {
   const rights = 0;
   const iso3 = 'USA';
   const password = crypto.randomBytes(16).toString('hex');
-  const position = '';
+  const position = 'UNDP';
   const deviceGUID1 = __ucd_app || uuidv4();
   const deviceGUID2 = __puid || uuidv4();
   const deviceGUID3 = __cduid || uuidv4();
@@ -97,7 +97,7 @@ module.exports = (req, res, next) => {
               )
               .then(async (results) => {
                 if (!results) {
-                  res.redirect('/login');
+                  redirectUnauthorized(req, res)
                 } else {
                   const { language, rights, uuid } = results;
                   const redirecturl = origin_url ?? getPath(rights, language, modules)

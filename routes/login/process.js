@@ -150,7 +150,7 @@ module.exports = (req, res, next) => {
 					} else if (!originalUrl || originalUrl === path) {
 						redirecturl = getPath(rights, language, modules)
 					} else if(origin_url){
-						redirecturl = origin_url + getPath(rights, language, modules)
+						redirecturl = origin_url
 					} else {
 						redirecturl = originalUrl || referer;
 					}

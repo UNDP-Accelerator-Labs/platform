@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
 				return;
 			}
 		}
-		
+
 		const { uuid, rights, ip, acceptedorigins } = tobj;
 
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
@@ -154,7 +154,7 @@ module.exports = (req, res, next) => {
 					} else {
 						redirecturl = originalUrl || referer;
 					}
-					
+
 					// CHECK IF DEVICE IS TRUSTED
 					return t.oneOrNone(`
 						SELECT * FROM trusted_devices
@@ -228,14 +228,17 @@ module.exports = (req, res, next) => {
 									})
 								  }
 								  else redirectUnauthorized(req, res)
-								
+
 							}
 						}
 					})
 
 
 				}
-			}).catch(err => console.log(err))
+			}).catch(err => {
+				console.log(err)
+				redirectError(req, res)
+			})
 		}).catch(err => {
 			console.error(err)
 			redirectError(req, res)

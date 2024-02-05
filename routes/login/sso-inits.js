@@ -16,11 +16,11 @@ module.exports = async (req, res, next) => {
     };
     const encodedState = encodeURIComponent(JSON.stringify(extraData));
 	const authCodeUrlParameters = {
-		scopes: ['user.read'], 
+		scopes: ['user.read'],
 		redirectUri: sso_redirect_url,
 		state: encodedState
 	};
-	
+
 	const authUrl = await msalClient.getAuthCodeUrl(authCodeUrlParameters);
 	res.redirect(authUrl);
 }

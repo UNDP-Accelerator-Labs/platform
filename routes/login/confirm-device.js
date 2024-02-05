@@ -107,7 +107,7 @@ exports.resendCode = async (req, res, next) => {
 
   const { referer } = req.headers || {}
   const origin_url = extractPathValue(referer)
-  
+
   sendDeviceCode({
     name,
     email,

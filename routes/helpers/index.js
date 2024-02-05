@@ -277,7 +277,7 @@ exports.redirectBack = (req, res, baseIfEmpty = false) => {
 exports.redirectToLoginPlatform = (req, res, next) => {
   const originHost = req.get('host');
   const pathname = req?.originalUrl?.startsWith('/login')
-    ? new URL(originHost +req?.originalUrl ).searchParams.get('path')
+    ? new URL(originHost + req?.originalUrl).searchParams.get('path')
     : req?.originalUrl;
   const loginUrl = new URL(
     `${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent(
@@ -288,8 +288,8 @@ exports.redirectToLoginPlatform = (req, res, next) => {
   const loginHost = new URL(sso_app_url).host;
 
   if (
-    // process.env.NODE_ENV === 'production' &&
-    !originHost.endsWith('azurewebsites.net') &&
+    process.env.NODE_ENV === 'production' &&
+    originHost.endsWith('.sdg-innovation-commons.org') &&
     loginHost != originHost
   ) {
     return res.redirect(loginUrl);

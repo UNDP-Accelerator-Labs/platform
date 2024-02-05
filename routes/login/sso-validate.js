@@ -1,5 +1,5 @@
 const msal = require('@azure/msal-node');
-const { datastructures, redirectUnauthorized, checkOrigin } = include('routes/helpers/');
+const { datastructures, redirectUnauthorized, redirectError, checkOrigin } = include('routes/helpers/');
 const { app_languages, modules, msalConfig, DB, app_base_host, sso_redirect_url } =
   include('config/');
 const { deviceInfo, getPath } = require('./device-info');
@@ -50,8 +50,8 @@ module.exports = (req, res, next) => {
         return t
           .oneOrNone(
             `
-                INSERT INTO users (email, name, rights, position, password, iso3, created_from_sso) 
-                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, $7) 
+                INSERT INTO users (email, name, rights, position, password, iso3, created_from_sso)
+                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, $7)
                 ON CONFLICT (email)
                 DO UPDATE SET name = EXCLUDED.name
             ;`,
@@ -64,12 +64,12 @@ module.exports = (req, res, next) => {
                 `
                         SELECT u.uuid, u.rights, u.name, u.email, u.iso3,
                         COALESCE (su.undp_bureau, adm0.undp_bureau) AS bureau,
-        
+
                         CASE WHEN u.language IN ($1:csv)
                             THEN u.language
                             ELSE 'en'
                         END AS language,
-        
+
                         COALESCE(
                             (SELECT json_agg(DISTINCT(jsonb_build_object(
                                 'uuid', u2.uuid,
@@ -83,14 +83,14 @@ module.exports = (req, res, next) => {
                             WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
                         )::TEXT, '[]')::JSONB
                         AS collaborators
-        
+
                         FROM users u
-        
+
                         LEFT JOIN adm0_subunits su
                             ON su.su_a3 = u.iso3
                         LEFT JOIN adm0
                             ON adm0.adm0_a3 = u.iso3
-        
+
                         WHERE (u.name = $2 OR u.email = $2)
                     ;`,
                 [app_languages, email],
@@ -153,7 +153,9 @@ module.exports = (req, res, next) => {
                       });
                       if(checkOrigin(redirecturl, origin_url)){
                         req.session.save(function(err) {
-                          if(err) console.log(' err ', err)
+                          if (err) {
+                            console.log(' err ', err)
+                          }
                           return res.redirect(redirecturl)
                         })
                       }
@@ -167,7 +169,9 @@ module.exports = (req, res, next) => {
                       );
                       if(checkOrigin(redirecturl, origin_url)){
                         req.session.save(function(err) {
-                          if(err) console.log(' err ', err)
+                          if (err) {
+                            console.log(' err ', err)
+                          }
                           return res.redirect(redirecturl)
                         })
                       }
@@ -177,16 +181,18 @@ module.exports = (req, res, next) => {
               })
               .catch((error) => {
                 console.log(error);
+                redirectError(req, res)
               });
           })
           .catch((error) => {
             console.log(error);
+            redirectError(req, res)
           });
       });
     })
     .catch((error) => {
       // Handle authentication failure
       console.log(error);
-      res.redirect('/login');
+      redirectUnauthorized(req, res)
     });
 };

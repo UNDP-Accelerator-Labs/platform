@@ -296,6 +296,9 @@ exports.redirectToLoginPlatform = (req, res, next) => {
 };
 
 exports.checkOrigin = (url, origin_url) => {
+  if (url.startsWith('/')) {
+    return true;
+  }
   const host = new URL(url).host;
   // FIXME move to config
   return [

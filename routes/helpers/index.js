@@ -285,7 +285,7 @@ exports.redirectToLoginPlatform = (req, res, next) => {
         originHost + (pathname ?? ''),
     )}`,
   );
-  const loginHost = new URL(sso_app_url).host;
+  const loginHost = loginUrl.host;
 
   if (
     process.env.NODE_ENV === 'production' &&

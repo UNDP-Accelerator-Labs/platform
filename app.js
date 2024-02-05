@@ -428,7 +428,8 @@ app.get('*', routes.notfound);
 
 if (process.env.NODE_ENV === 'production') {
   app.use((err, req, res, next) => {
-    res.status(500).redirect('/module-error');
+    const orig = req.originalUrl;
+    res.status(500).redirect(`/module-error?page=${encodeURIComponent(orig)}`);
   });
 }
 

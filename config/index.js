@@ -249,31 +249,32 @@ exports.getVersionObject = async () => {
     });
 };
 
-//MICROSOFT SSO CONFIG VARIABLES
+// MICROSOFT SSO CONFIG VARIABLES
 exports.msalConfig = {
-	auth: {
-	  clientId: process.env.CLIENT_ID,
-	  authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`,
-	  clientSecret: process.env.CLIENT_SECRET, 
-    redirectUri: "/auth/openid/return",
-	},
+  auth: {
+    clientId: process.env.CLIENT_ID,
+    authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`,
+    clientSecret: process.env.CLIENT_SECRET,
+    redirectUri: '/auth/openid/return',
+  },
   system: {
-      loggerOptions: {
-          loggerCallback: (logLevel, message, containsPii) => {
-              if (containsPii) {
-                  return;
-              }
-              console.log(message);
-          },
-          piiLoggingEnabled: false,
-          logLevel: 3,
+    loggerOptions: {
+      loggerCallback: (logLevel, message, containsPii) => {
+        if (containsPii) {
+          return;
+        }
+        console.log(message);
       },
-  }
+      piiLoggingEnabled: false,
+      logLevel: 3,
+    },
+  },
 };
-exports.allowsso = false  //SET TO TRUE WHEN MIRCOSOFT OPENID API KEYS ARE AVAILABLE
-exports.sso_app_url = 'https://login.sdg-innovation-commons.org' //'http://localhost:3000'
-exports.sso_redirect_url = 'https://login.sdg-innovation-commons.org/auth/openid/return' //'http://localhost:3000/auth/openid/return'
+exports.allowsso = false; // SET TO TRUE WHEN MIRCOSOFT OPENID API KEYS ARE AVAILABLE
+exports.sso_app_url = 'https://login.sdg-innovation-commons.org'; // 'http://localhost:3000'
+exports.sso_redirect_url =
+  'https://login.sdg-innovation-commons.org/auth/openid/return'; // 'http://localhost:3000/auth/openid/return'
 
-//CONFIG TO SET APP ALLOWED OR RESTRICTED ROUTES FOR A PLATFORM INSTANCE
-exports.allowed_routes = allowed_routes || null
-exports.restricted_routes = restricted_routes || null
+// CONFIG TO SET APP ALLOWED OR RESTRICTED ROUTES FOR A PLATFORM INSTANCE
+exports.allowed_routes = allowed_routes || null;
+exports.restricted_routes = restricted_routes || null;

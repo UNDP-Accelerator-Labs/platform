@@ -16,7 +16,8 @@ const {
   allowed_routes,
   restricted_routes,
 } = include('config/');
-const { loginRateLimiterMiddleware, redirectToLoginPlatform } = include('routes/helpers/');
+const { loginRateLimiterMiddleware, redirectToLoginPlatform } =
+  include('routes/helpers/');
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -148,29 +149,39 @@ function redirectOldUrl(req, res, next) {
   return res.redirect(301, `${newbase}${req.originalUrl}`);
 }
 
-
-//USE MIDDLEWARE TO SET ALLOWABLE OR RESTRICTED ROUTES/ENDPOINT FOR A PLATFORM
+// USE MIDDLEWARE TO SET ALLOWABLE OR RESTRICTED ROUTES/ENDPOINT FOR A PLATFORM
 app.use((req, res, next) => {
   const path = req.path;
-  const isAllowed = allowed_routes && Array.isArray(allowed_routes) && allowed_routes.some(route => {
-      const modifiedRoute = route.replace(/:\w+/g, '[^/]+').replace(/\*/g, '.*'); 
+  const isAllowed =
+    allowed_routes &&
+    Array.isArray(allowed_routes) &&
+    allowed_routes.some((route) => {
+      const modifiedRoute = route
+        .replace(/:\w+/g, '[^/]+')
+        .replace(/\*/g, '.*');
       return path.match(new RegExp(`^${modifiedRoute}$`));
-  });
+    });
 
-  const isRestricted = restricted_routes && Array.isArray(restricted_routes) && restricted_routes.some(route => {
-      const modifiedRoute = route.replace(/:\w+/g, '[^/]+').replace(/\*/g, '.*'); 
+  const isRestricted =
+    restricted_routes &&
+    Array.isArray(restricted_routes) &&
+    restricted_routes.some((route) => {
+      const modifiedRoute = route
+        .replace(/:\w+/g, '[^/]+')
+        .replace(/\*/g, '.*');
       return path.match(new RegExp(`^${modifiedRoute}$`));
-  });
+    });
 
   // Redirect to login if the route is not allowed or is restricted
-  if ((!isAllowed && allowed_routes && allowed_routes.length) || (isRestricted && restricted_routes && restricted_routes.length)) {
-      return res.redirect('/login');
+  if (
+    (!isAllowed && allowed_routes && allowed_routes.length) ||
+    (isRestricted && restricted_routes && restricted_routes.length)
+  ) {
+    return res.redirect('/login');
   }
 
   next();
 });
-
-
 
 app.use(redirectOldUrl);
 
@@ -203,7 +214,7 @@ app
   .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
   .post(loginRateLimiterMiddleware, routes.process.login);
 
-//MICROSOFT SSO PATHS
+// MICROSOFT SSO PATHS
 app.get('/sso-inits', redirectToLoginPlatform, routes.initiate_sso);
 app.get('/auth/openid/return', routes.validate_sso);
 

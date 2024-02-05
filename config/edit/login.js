@@ -80,7 +80,7 @@ exports.allowed_routes = [
   '/load/*',
   '/:lang/contribute/*',
   '/:lang/edit/contributor',
-  '/:lang/browse/contributors/*'
+  '/:lang/browse/contributors/*',
 ];
 
 exports.restricted_routes = [];

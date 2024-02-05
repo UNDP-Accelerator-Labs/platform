@@ -279,12 +279,9 @@ exports.redirectToLoginPlatform = (req, res, next) => {
   const pathname = req?.originalUrl?.startsWith('/login')
     ? new URL(`${req.protocol}${originHost}${req.originalUrl}`).searchParams.get('path')
     : req.originalUrl;
-  console.log(originHost, pathname);
+  const innerUrl = `${req.protocol}${originHost}${(pathname ?? '')}`;
   const loginUrl = new URL(
-    `${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent(
-      (process.env.NODE_ENV === 'production' ? 'https://' : 'http://') +
-        originHost + (pathname ?? ''),
-    )}`,
+    `${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent(innerUrl)}`,
   );
   const loginHost = loginUrl.host;
 
@@ -293,7 +290,6 @@ exports.redirectToLoginPlatform = (req, res, next) => {
     originHost.endsWith('.sdg-innovation-commons.org') &&
     loginHost != originHost
   ) {
-    console.log(loginUrl);
     return res.redirect(loginUrl);
   }
   next();

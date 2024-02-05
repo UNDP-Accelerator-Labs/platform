@@ -152,7 +152,10 @@ module.exports = (req, res, next) => {
                         domain: app_base_host,
                       });
 
-                      return res.redirect(redirecturl);
+                      req.session.save(function(err) {
+                        if(err) console.log(' err ', err)
+                        return res.redirect(redirecturl)
+                      })
                     })
                     .catch(async (err) => {
                       console.log(err);
@@ -160,7 +163,10 @@ module.exports = (req, res, next) => {
                         req.session,
                         datastructures.sessiondata(results),
                       );
-                      return res.redirect(redirecturl);
+                      req.session.save(function(err) {
+                        if(err) console.log(' err ', err)
+                        return res.redirect(redirecturl)
+                      })
                     });
                 }
               })

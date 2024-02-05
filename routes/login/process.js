@@ -186,10 +186,10 @@ module.exports = (req, res, next) => {
 
 								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: original_app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess));
-								return 
-							})
-							.then(() => {
-							  res.redirect(redirecturl);
+								req.session.save(function(err) {
+									if(err) console.log(' err ', err)
+									return res.redirect(redirecturl)
+								})
 							})
 							.catch(err => console.log(err))
 
@@ -217,7 +217,11 @@ module.exports = (req, res, next) => {
 							else {
 								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}, app: original_app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess))
-								res.redirect(redirecturl)
+								req.session.save(function(err) {
+									if(err) console.log(' err ', err)
+									return res.redirect(redirecturl)
+								})
+								
 							}
 						}
 					})

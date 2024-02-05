@@ -204,7 +204,7 @@ exports.redirectToLoginPlatform = (req, res, next) =>{
 	const loginHost = new URL(sso_app_url).host;
   
 	if (
-	//  process.env.NODE_ENV === 'production' &&
+	 process.env.NODE_ENV === 'production' &&
 	  !originHost.endsWith('azurewebsites.net') &&
 	  loginHost != originHost
 	) {

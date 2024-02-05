@@ -81,9 +81,11 @@ exports.confirmDevice = async (req, res, next) => {
           res.cookie("__ucd_app", deviceGUID1, { expires: sessionExpiration, domain: app_base_host });
           res.cookie("__puid", deviceGUID2, { expires: sessionExpiration, domain: app_base_host });
           res.cookie("__cduid", deviceGUID3, { expires: sessionExpiration, domain: app_base_host });
-
-          res.redirect(redirecturl);
           req.session.confirm_dev_origins = null;
+          req.session.save(function(err) {
+            if(err) console.log(' err ', err)
+            return res.redirect(redirecturl)
+          })
         })
         .catch((err) => {
           console.log("err ", err);

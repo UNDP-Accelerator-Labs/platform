@@ -1,5 +1,5 @@
 const msal = require('@azure/msal-node');
-const { msalConfig, sso_redirect_url, app_title } = include('config/')
+const { msalConfig, sso_redirect_url } = include('config/')
 const msalClient = new msal.ConfidentialClientApplication(msalConfig);
 const { extractPathValue } = require('./device-info')
 

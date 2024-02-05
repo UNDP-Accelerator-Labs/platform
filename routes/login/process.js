@@ -92,6 +92,8 @@ module.exports = (req, res, next) => {
 	} else {
 		const { username, password, originalUrl, is_trusted } = req.body || {}
 		const { sessionID: sid } = req || {}
+		const urlParams = new URLSearchParams(originalUrl)
+		const original_app = urlParams.get('/login?app');
 
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
@@ -182,7 +184,7 @@ module.exports = (req, res, next) => {
 								req.session.cookie.expires = sessionExpiration;
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 
-								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: req.query.app ?? app_title }
+								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: original_app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess));
 								return 
 							})
@@ -203,6 +205,7 @@ module.exports = (req, res, next) => {
 								.then(()=>{
 									req.session.confirm_dev_origins = {
 										redirecturl,
+										app: original_app ?? app_title,
 										...result,
 									}
 									res.redirect(`/confirm-device?path=${encodeURIComponent(redirecturl)}&origin=${encodeURIComponent(origin_url)}`);
@@ -212,7 +215,7 @@ module.exports = (req, res, next) => {
 								})
 							}
 							else {
-								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}, app: req.query.app ?? app_title }
+								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}, app: original_app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess))
 								res.redirect(redirecturl)
 							}

@@ -200,7 +200,7 @@ exports.redirectBack = (req, res, baseIfEmpty = false) => {
 exports.redirectToLoginPlatform = (req, res, next) =>{
 	const originHost = req.get('host');
 	const pathname = req?.originalUrl?.startsWith('/login') ? '' : req?.originalUrl
-	const loginUrl = `${sso_app_url}/login?origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost + '?path=' + pathname)}&app=${app_title}`;
+	const loginUrl = new URL(`${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost + '?path=' + pathname)}`);
 	const loginHost = new URL(sso_app_url).host;
   
 	if (

@@ -7,7 +7,7 @@ exports.confirmDevice = async (req, res, next) => {
   const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
   const { otp } = req.body;
   const { confirm_dev_origins } = req.session;
-  const { redirecturl, uuid } = confirm_dev_origins || {};
+  const { redirecturl, uuid, app } = confirm_dev_origins || {};
   const { sessionID: sid } = req || {};
 
   const { referer, host } = req.headers || {}
@@ -75,10 +75,9 @@ exports.confirmDevice = async (req, res, next) => {
               ...device,
               is_trusted: true,
             },
+            app,
             confirm_dev_origins: null,
-            app: req.query.app ?? app_title
           });
-
           res.cookie("__ucd_app", deviceGUID1, { expires: sessionExpiration, domain: app_base_host });
           res.cookie("__puid", deviceGUID2, { expires: sessionExpiration, domain: app_base_host });
           res.cookie("__cduid", deviceGUID3, { expires: sessionExpiration, domain: app_base_host });

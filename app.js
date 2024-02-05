@@ -12,8 +12,12 @@ const {
   app_base_host,
   getVersionObject,
   lodashNonce,
+  sso_app_url,
+  allowed_routes,
+  restricted_routes,
 } = include('config/');
-const { loginRateLimiterMiddleware } = include('routes/helpers/');
+const { loginRateLimiterMiddleware, redirectToLoginPlatform } =
+  include('routes/helpers/');
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -145,6 +149,40 @@ function redirectOldUrl(req, res, next) {
   return res.redirect(301, `${newbase}${req.originalUrl}`);
 }
 
+// USE MIDDLEWARE TO SET ALLOWABLE OR RESTRICTED ROUTES/ENDPOINT FOR A PLATFORM
+app.use((req, res, next) => {
+  const path = req.path;
+  const isAllowed =
+    allowed_routes &&
+    Array.isArray(allowed_routes) &&
+    allowed_routes.some((route) => {
+      const modifiedRoute = route
+        .replace(/:\w+/g, '[^/]+')
+        .replace(/\*/g, '.*');
+      return path.match(new RegExp(`^${modifiedRoute}$`));
+    });
+
+  const isRestricted =
+    restricted_routes &&
+    Array.isArray(restricted_routes) &&
+    restricted_routes.some((route) => {
+      const modifiedRoute = route
+        .replace(/:\w+/g, '[^/]+')
+        .replace(/\*/g, '.*');
+      return path.match(new RegExp(`^${modifiedRoute}$`));
+    });
+
+  // Redirect to login if the route is not allowed or is restricted
+  if (
+    (!isAllowed && allowed_routes && allowed_routes.length) ||
+    (isRestricted && restricted_routes && restricted_routes.length)
+  ) {
+    return res.redirect('/login');
+  }
+
+  next();
+});
+
 app.use(redirectOldUrl);
 
 function setAccessControlAllowOrigin(req, res, next) {
@@ -173,25 +211,31 @@ app.get('/:language/home', routes.check.login, routes.dispatch.public);
 
 app
   .route('/login') // TO DO: UPDATE FOR GET TO PASS LANGUAGE
-  // .get(routes.redirect.home, routes.render.login)
-  .get(routes.redirect.browse, routes.render.login)
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
   .post(loginRateLimiterMiddleware, routes.process.login);
+
+// MICROSOFT SSO PATHS
+app.get('/sso-inits', redirectToLoginPlatform, routes.initiate_sso);
+app.get('/auth/openid/return', routes.validate_sso);
+
 app.get('/transfer', routes.process.login);
 app
   .route('/logout/:session')
   .get(routes.process.logout)
   .post(routes.process.logout);
 
-app.route('/reset/:token').get(routes.redirect.browse, routes.render.login);
+app
+  .route('/reset/:token')
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login);
 
 app
   .route('/forget-password')
-  .get(routes.redirect.browse, routes.render.login)
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
   .post(routes.process.forgetPassword);
 
 app
   .route('/reset-password')
-  .get(routes.redirect.browse, routes.render.login)
+  .get(routes.redirect.browse, redirectToLoginPlatform, routes.render.login)
   .post(routes.process.updatePassword);
 
 app.route('/confirm-email/:token').get(routes.update.email);

@@ -87,3 +87,21 @@ exports.checkDevice = async (_kwarg) => {
     (d) => (d?.id ? true : false)
   );
 };
+
+
+exports.extractPathValue = (urlString, app) => {
+  const url = new URL(urlString);
+  const params = new URLSearchParams(url.search);
+  if(app) return decodeURIComponent(params.get('app')) ?? ''
+  return decodeURIComponent(params.get('amp;origin')) ?? '';
+}
+
+exports.getPath = (rights, language, modules) =>{
+	let redirecturl = ''
+	const { read, write } = modules.find(d => d.type === 'pads')?.rights;
+	if (rights >= (write ?? Infinity)) redirecturl = `/${language}/browse/pads/private`;
+	else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/published`;
+	else redirecturl = `/${language}/browse/pads/published`;
+	return redirecturl
+}
+

@@ -16,6 +16,8 @@ const {
 	map,
 	DB,
 	ownDB,
+	allowsso,
+	sso_app_url,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -24,11 +26,16 @@ const array = require('../array');
 function stripExplorationId(url) {
 	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
 }
+function compareReqDomain (req, page_url, domain){
+	const referrer = req.get('Referer');
+	const referrerUrl = new URL(referrer, page_url);
+	return referrerUrl.origin === domain;
+}
 
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
-	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device, is_trusted } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device, is_trusted, app } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
@@ -46,7 +53,7 @@ exports.sessiondata = _data => {
 		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
-	obj.app = title
+	obj.app = app || title
 	obj.device = device || {}
 	obj.is_trusted= is_trusted || false
 
@@ -297,6 +304,8 @@ exports.pagemetadata = (_kwargs) => {
 				own_db: await ownDB(),
 				app_id,
 				app_suite_url,
+				allowsso,
+				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null
 			},
 			user: {
 				uuid,

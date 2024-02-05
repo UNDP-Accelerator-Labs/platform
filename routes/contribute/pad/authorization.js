@@ -11,8 +11,8 @@ module.exports = async _kwargs => {
 	if (typeof write === 'object') {
 		if (!id && template) write = write.templated
 		else if (id) {
-			const used_template = await conn.one(`SELECT template FROM pads WHERE id = $1::INT;`, [ id ], d => d.template ?? false)
-			if (used_template) write = write.templated
+			const used_template = await conn.oneOrNone(`SELECT template FROM pads WHERE id = $1::INT;`, [ id ], d => d?.template ?? false)
+			if (used_template) write = write?.templated
 		} else write = write.blank
 	}
 

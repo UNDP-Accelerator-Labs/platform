@@ -166,7 +166,7 @@ CREATE TABLE mobilization_contributions (
 );
 
 CREATE TABLE extern_db (
-    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL, 
     db VARCHAR(20) UNIQUE NOT NULL,
     url_prefix TEXT NOT NULL
 );
@@ -363,3 +363,10 @@ CREATE TABLE public.device_confirmation_code (
   code INTEGER NOT NULL,
   expiration_time TIMESTAMP with time zone NOT NULL
 );
+
+ALTER TABLE users
+ADD COLUMN created_from_sso BOOLEAN DEFAULT FALSE,
+ADD CONSTRAINT unique_email UNIQUE (email);
+
+ALTER TABLE trusted_devices
+ADD CONSTRAINT unique_user_device UNIQUE (user_uuid, device_os, device_browser, session_sid, duuid1, duuid2, duuid3);

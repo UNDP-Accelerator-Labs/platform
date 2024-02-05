@@ -10,6 +10,8 @@ if (app_id === 'ap') {
   app_obj = { ...app_obj, ...require('./sm.js') };
 } else if (app_id === 'consent') {
   app_obj = { ...app_obj, ...require('./consent.js') };
+} else if (app_id === 'login') {
+  app_obj = { ...app_obj, ...require('./login.js') };
 } else if (app_id === 'global') {
   app_obj = {
     ...app_obj,
@@ -41,6 +43,8 @@ const {
   view_display,
   welcome_module,
   fixed_uuid,
+  allowed_routes,
+  restricted_routes,
 } = app_obj;
 
 exports.is_staging = is_staging;
@@ -69,3 +73,5 @@ exports.welcome_module = welcome_module;
 exports.fixed_uuid = fixed_uuid;
 
 exports.translations = require('./translations.js').translations;
+exports.allowed_routes = allowed_routes || null;
+exports.restricted_routes = restricted_routes || null;

@@ -1,4 +1,4 @@
-const { DB } = include('config/')
+const { DB, app_title, sso_app_url } = include('config/')
 
 exports.array = require('./array/')
 exports.blobContainer = require('./blobcontainer/')
@@ -195,4 +195,20 @@ exports.redirectBack = (req, res, baseIfEmpty = false) => {
 		}
 	}
 	res.redirect(ref)
+}
+
+exports.redirectToLoginPlatform = (req, res, next) =>{
+	const originHost = req.get('host');
+	const pathname = req?.originalUrl?.startsWith('/login') ? '' : req?.originalUrl
+	const loginUrl = `${sso_app_url}/login?origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost + '?path=' + pathname)}&app=${app_title}`;
+	const loginHost = new URL(sso_app_url).host;
+  
+	if (
+	//  process.env.NODE_ENV === 'production' &&
+	  !originHost.endsWith('azurewebsites.net') &&
+	  loginHost != originHost
+	) {
+	  return res.redirect(loginUrl);
+	}
+	next();
 }

@@ -16,7 +16,7 @@ const {
   allowed_routes,
   restricted_routes,
 } = include('config/');
-const { loginRateLimiterMiddleware } = include('routes/helpers/');
+const { loginRateLimiterMiddleware, redirectToLoginPlatform } = include('routes/helpers/');
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -148,22 +148,6 @@ function redirectOldUrl(req, res, next) {
   return res.redirect(301, `${newbase}${req.originalUrl}`);
 }
 
-//REDIRECT TO LOGIN PLATFORM MIDDLEWARE
-function redirectToLoginPlatform(req, res, next) {
-  const originHost = req.get('host');
-  const pathname = req?.originalUrl?.startsWith('/login') ? '' : req?.originalUrl
-  const loginUrl = `${sso_app_url}/login?origin=${encodeURIComponent((process.env.NODE_ENV === 'production' ? 'https://' : 'http://') + originHost + '?path=' + pathname)}`;
-  const loginHost = new URL(sso_app_url).host;
-
-  if (
-   process.env.NODE_ENV === 'production' &&
-    !originHost.endsWith('azurewebsites.net') &&
-    loginHost != originHost
-  ) {
-    return res.redirect(loginUrl);
-  }
-  next();
-}
 
 //USE MIDDLEWARE TO SET ALLOWABLE OR RESTRICTED ROUTES/ENDPOINT FOR A PLATFORM
 app.use((req, res, next) => {

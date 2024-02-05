@@ -724,7 +724,7 @@ exports.robots = async (req, res) => {
 	const obj = {
 		metadata: {
 			own_app_url,
-			is_staging || app_title_short === 'login',
+			is_staging: is_staging || app_title_short === 'login',
 		},
 	};
 	res.setHeader('content-type', 'text/plain');

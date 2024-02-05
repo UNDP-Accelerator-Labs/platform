@@ -6,7 +6,15 @@ const { deviceInfo, getPath } = require('./device-info');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
-const msalClient = new msal.ConfidentialClientApplication(msalConfig);
+let _msalClient = null;
+
+function getClient() {
+	if (!_msalClient) {
+		const msalClient = new msal.ConfidentialClientApplication(msalConfig);
+		_msalClient = msalClient;
+	}
+	return _msalClient;
+}
 
 module.exports = (req, res, next) => {
   const tokenRequest = {
@@ -38,7 +46,7 @@ module.exports = (req, res, next) => {
   const deviceGUID2 = __puid || uuidv4();
   const deviceGUID3 = __cduid || uuidv4();
 
-  msalClient
+  getClient()
     .acquireTokenByCode(tokenRequest)
     .then((response) => {
       // Handle successful authentication

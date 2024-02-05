@@ -12,7 +12,6 @@ const {
   app_base_host,
   getVersionObject,
   lodashNonce,
-  sso_app_url,
   allowed_routes,
   restricted_routes,
 } = include('config/');
@@ -428,6 +427,7 @@ app.get('*', routes.notfound);
 
 if (process.env.NODE_ENV === 'production') {
   app.use((err, req, res, next) => {
+    console.error(err);
     const orig = req.originalUrl;
     res.status(500).redirect(`/module-error?page=${encodeURIComponent(orig)}`);
   });

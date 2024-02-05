@@ -279,6 +279,7 @@ exports.redirectToLoginPlatform = (req, res, next) => {
   const pathname = req?.originalUrl?.startsWith('/login')
     ? new URL(originHost + req?.originalUrl).searchParams.get('path')
     : req?.originalUrl;
+  console.log(originHost, pathname);
   const loginUrl = new URL(
     `${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent(
       (process.env.NODE_ENV === 'production' ? 'https://' : 'http://') +
@@ -292,6 +293,7 @@ exports.redirectToLoginPlatform = (req, res, next) => {
     originHost.endsWith('.sdg-innovation-commons.org') &&
     loginHost != originHost
   ) {
+    console.log(loginUrl);
     return res.redirect(loginUrl);
   }
   next();

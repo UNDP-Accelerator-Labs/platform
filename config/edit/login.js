@@ -79,6 +79,7 @@ exports.allowed_routes = [
 
   '/load/*',
   '/:lang/contribute/*',
+  '/:lang/edit/contributor',
   '/:lang/browse/contributors/*'
 ];
 

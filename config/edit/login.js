@@ -64,6 +64,9 @@ exports.view_display = 'page';
 exports.welcome_module = 'carousel';
 
 exports.allowed_routes = [
+  '/version',
+  '/sitemap.xml',
+  '/robots.txt',
   '/login',
   '/sso-inits',
   '/auth/openid/return',

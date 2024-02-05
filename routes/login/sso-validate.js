@@ -28,7 +28,7 @@ module.exports = (req, res, next) => {
 
   const device = deviceInfo(req);
   const { sessionID: sid } = req || {};
-  const { __ucd_app, __puid, __cduid, origin_url } = extraData;
+  const { __ucd_app, __puid, __cduid, origin_url, app } = extraData;
   //NEW USER DEFAULT VALUES
   const rights = 0;
   const iso3 = 'USA';
@@ -132,6 +132,7 @@ module.exports = (req, res, next) => {
                         ...results,
                         is_trusted: true,
                         device: { ...device, is_trusted: true },
+                        app
                       };
                       await Object.assign(
                         req.session,

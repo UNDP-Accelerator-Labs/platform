@@ -1,4 +1,4 @@
-const { app_languages, modules, app_base_host, DB } = include('config/')
+const { app_languages, modules, app_base_host, DB, app_title } = include('config/')
 const { datastructures, join, removeSubdomain, redirectUnauthorized, redirectError } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode, extractPathValue, getPath } = require('./device-info')
@@ -182,7 +182,7 @@ module.exports = (req, res, next) => {
 								req.session.cookie.expires = sessionExpiration;
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 
-								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}}
+								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: req.query.app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess));
 								res.redirect(redirecturl);
 
@@ -209,7 +209,7 @@ module.exports = (req, res, next) => {
 								})
 							}
 							else {
-								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}}
+								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}, app: req.query.app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess))
 								res.redirect(redirecturl)
 							}

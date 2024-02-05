@@ -1,4 +1,4 @@
-const { DB, app_base_host } = include("config/");
+const { DB, app_base_host, app_title } = include("config/");
 const { deviceInfo, sendDeviceCode, extractPathValue } = require("./device-info");
 const { sessionupdate, redirectError } = include('routes/helpers/')
 const { v4: uuidv4 } = require("uuid");
@@ -76,6 +76,7 @@ exports.confirmDevice = async (req, res, next) => {
               is_trusted: true,
             },
             confirm_dev_origins: null,
+            app: req.query.app ?? app_title
           });
 
           res.cookie("__ucd_app", deviceGUID1, { expires: sessionExpiration, domain: app_base_host });

@@ -712,7 +712,12 @@ exports.sitemap = async (req, res) => {
 	all_urls.sort((a, b) => -(a.date - b.date));
 	const obj = {
 		metadata: {
-			all_urls: app_title_short === 'login' ? [] : all_urls,
+			all_urls: app_title_short === 'login' ? [
+				{
+					url: '/login',
+					date: maxDate,
+				}
+			] : all_urls,
 			own_app_url,
 		},
 	};

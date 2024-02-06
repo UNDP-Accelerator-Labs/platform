@@ -19,7 +19,7 @@ module.exports = req => {
 
 		let f_space = null
 		// THE all SPACE SHOWS ALL CONTRIBUTORS, i.e. USERS WHO ARE ALLOWED TO WRTIE PADS
-		let { write } = modules.find(d => d.type === 'pads')?.rights
+		let { write } = modules.find(d => d.type === 'pads')?.rights || { write: {}}
 		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 
 		if (space === 'all') f_space = DB.pgp.as.format(`AND (u.rights >= $1::INT)`, [ write ?? 4 ])

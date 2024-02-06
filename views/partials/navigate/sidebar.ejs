@@ -19,7 +19,7 @@
 		else mapscale = 'contain'
 	}
 
-	const { write: writepads } = modules.find(d => d.type === 'pads')?.rights
+	const { write: writepads } = modules.find(d => d.type === 'pads')?.rights || {write: {}}
 	let minwritepads = writepads
 	if (typeof writepads === 'object') minwritepads = Math.min(writepads.blank, writepads.templated)
 

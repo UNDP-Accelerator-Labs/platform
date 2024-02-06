@@ -58,12 +58,12 @@ exports.colors = colors;
 // DESIRED MODULES
 if (!modules) modules = [];
 // if (!modules.includes('pads')) modules.unshift('pads') // ALWAYS INCLUDE PADS
-if (!modules.some((d) => d.type === 'pads')) {
-  modules.unshift({
-    type: 'pads',
-    rights: { read: 0, write: { blank: 1, templated: 1 } },
-  });
-} // ALWAYS INCLUDE PADS
+// if (!modules.some((d) => d.type === 'pads')) {
+//   modules.unshift({
+//     type: 'pads',
+//     rights: { read: 0, write: { blank: 1, templated: 1 } },
+//   });
+// } // ALWAYS INCLUDE PADS
 // THIS IS TO MAKE SURE THE pads MODULE ALWAYS HAS write.blank AND write.templated
 if (
   modules.some((d) => d.type === 'pads' && typeof d.rights?.write === 'number')

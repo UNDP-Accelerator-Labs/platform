@@ -63,27 +63,14 @@ exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'carousel';
 
-exports.allowed_routes = [
-  '/version',
-  '/sitemap.xml',
-  '/robots.txt',
-  '/login',
-  '/sso-inits',
-  '/auth/openid/return',
-  '/transfer',
-  '/logout/:session',
-  '/reset/:token',
-  '/forget-password',
-  '/reset-password',
-  '/confirm-email/:token',
-  '/confirm-device',
-  '/resend-otp-code',
-  '/remove-trusted-device',
+exports.allowed_routes = [];
 
-  '/load/*',
-  '/:lang/contribute/*',
-  '/:lang/edit/contributor',
-  '/:lang/browse/contributors/*',
+exports.restricted_routes = [
+  '/:lang/home',
+  '/:lang/browse/pads/*',
+  '/:lang/browse/templates/*',
+  '/:lang/browse/reviews/*',
+  '/:lang/browse/mobilizations/*',
+  '/:lang/preview/*',
+  '/upload/*',
 ];
-
-exports.restricted_routes = [];

@@ -10,7 +10,7 @@ import {
   scrollToPad,
   toggleOptions,
 } from '/js/main.js';
-import { isLoading } from '/js/notification/loader.js'
+import { isLoading } from '/js/notification/loader.js';
 
 async function onLoad() {
   const vocabulary = await getTranslations();
@@ -202,12 +202,12 @@ async function onLoad() {
     );
   });
 
-  //SHOW LOADING ICON WHEN A SUBMIT BUTTON IS CLICKED
+  // SHOW LOADING ICON WHEN A SUBMIT BUTTON IS CLICKED
   d3.selectAll('form').on('submit', function () {
     isLoading(true);
   });
 
-  isLoading(false)
+  isLoading(false);
 }
 
 if (document.readyState === 'loading') {

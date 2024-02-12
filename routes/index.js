@@ -1,4 +1,4 @@
-const { own_app_url, getVersionObject, is_staging, DB } = include('config/')
+const { app_title_short, own_app_url, getVersionObject, is_staging, DB } = include('config/')
 const helpers = include('routes/helpers/')
 // const request = require('request')
 // const format = require('./formatting.js')
@@ -157,6 +157,9 @@ exports.process.callapi = (req, res) => {
 /* =============================================================== */
 exports.check.login = require('./login/').check
 exports.render.login = require('./login/').render
+exports.initiate_sso = require('./login').initiate_sso
+exports.validate_sso = require('./login').validate_sso
+
 exports.process.login = require('./login/').process
 exports.redirect.home = require('./redirect/').home
 exports.redirect.browse = require('./redirect/').browse
@@ -709,7 +712,12 @@ exports.sitemap = async (req, res) => {
 	all_urls.sort((a, b) => -(a.date - b.date));
 	const obj = {
 		metadata: {
-			all_urls,
+			all_urls: app_title_short === 'login' ? [
+				{
+					url: '/login',
+					date: maxDate,
+				}
+			] : all_urls,
 			own_app_url,
 		},
 	};
@@ -721,7 +729,7 @@ exports.robots = async (req, res) => {
 	const obj = {
 		metadata: {
 			own_app_url,
-			is_staging,
+			is_staging: is_staging || app_title_short === 'login',
 		},
 	};
 	res.setHeader('content-type', 'text/plain');

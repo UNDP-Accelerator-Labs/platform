@@ -2,12 +2,14 @@ const { DB, own_app_url, app_title_short, app_title, translations } = include('c
 const { email: sendEmail, removeSubdomain, datastructures, sessionupdate, redirectUnauthorized } = include('routes/helpers/')
 const jwt = require('jsonwebtoken');
 const { isPasswordSecure } = require('./password-requirement')
+const { extractPathValue } = require('./device-info');
 
-const createResetLink = async (protocol, host, email) => {
+const createResetLink = async (protocol, host, email, origin= '' ) => {
   const mainHost = removeSubdomain(host);
+
   // Generate JWT token
   const token = await jwt.sign(
-    { email, action: 'password-reset' },
+    { email, action: 'password-reset', origin: origin ? extractPathValue(origin) : '' },
     process.env.APP_SECRET,
     { expiresIn: '24h', issuer: mainHost })
 
@@ -28,9 +30,9 @@ exports.forgetPassword = async (req, res, next) => {
     redirectUnauthorized(req, res)
     return;
   }
-  const { host } = req.headers || {}
+  const { host, referer } = req.headers || {}
   const protocol = req.protocol
-  const resetLink = await createResetLink(protocol, host, email);
+  const resetLink = await createResetLink(protocol, host, email, referer);
   const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
   const html = `
   <div>

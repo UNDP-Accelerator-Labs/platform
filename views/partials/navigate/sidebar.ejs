@@ -10,6 +10,7 @@
 	const rights = locals.metadata.user.rights
 	const uuid = locals.metadata.user.uuid
 	const pagedisplay = locals.metadata.page.display
+	const login_url = locals.metadata.site.login_url 
 
 	let mapscale = locals.metadata.page.mscale
 	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
@@ -18,7 +19,7 @@
 		else mapscale = 'contain'
 	}
 
-	const { write: writepads } = modules.find(d => d.type === 'pads')?.rights
+	const { write: writepads } = modules.find(d => d.type === 'pads')?.rights || {write: {}}
 	let minwritepads = writepads
 	if (typeof writepads === 'object') minwritepads = Math.min(writepads.blank, writepads.templated)
 
@@ -287,7 +288,7 @@
 						<% if (locals.metadata?.site?.modules?.some(d => d.type === 'contributors')) { %>
 							<% if (rights >= (modules.find(d => d.type === 'contributors')?.rights.write ?? Infinity)) { %>
 								<li class="google-translate-attr">
-									<a href='/<%- language %>/contribute/contributor'>
+									<a <% if (login_url) { %>target="_blank" <% } %> href='<% if (login_url) { %><%= login_url %><% } %>/<%- language %>/contribute/contributor'>
 										<button>
 											<img src='/imgs/icons/i-contributor.svg'>
 											<label data-vocab='["contributor", "singular"]'></label>
@@ -500,7 +501,7 @@
 			<% if (d.type === 'mobilizations') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/ongoing' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } else if (d.type === 'contributors') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/invited' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+				<a <% if (login_url) { %>target="_blank" href="<%= login_url %>/<%- language %>/browse/<%- d.type %>/invited"<% } else { %>href="/<%- language %>/browse/<%- d.type %>/invited"<% } %> data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } else if (d.type === 'reviews') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/pending' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% }

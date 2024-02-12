@@ -1,17 +1,17 @@
-const { app_languages, modules, app_base_host, DB } = include('config/')
-const { datastructures, join, removeSubdomain, redirectUnauthorized, redirectError } = include('routes/helpers/')
+const { app_languages, modules, app_base_host, DB, app_title } = include('config/')
+const { datastructures, join, removeSubdomain, redirectUnauthorized, redirectError, checkOrigin } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
-const {deviceInfo, sendDeviceCode } = require('./device-info')
+const {deviceInfo, sendDeviceCode, extractPathValue, getPath } = require('./device-info')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
 	const redirectPath = (req.query?.path ?? '').startsWith('/') ? req.query.path : null;
 	const { referer, host } = req.headers || {}
 	const mainHost = removeSubdomain(host);
-	// console.log('TOKEN VERIFY', host, mainHost);
-	const { path, ip: ownIp } = req || {}
 
+	const { path, ip: ownIp } = req || {}
 	const { __ucd_app, __puid, __cduid } = req.cookies
+	const origin_url = extractPathValue(referer)
 
 	if (token) {
 		// VERIFY TOKEN
@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
 				return;
 			}
 		}
-		// console.log('TOKEN VERIFY TOBJ', tobj);
+
 		const { uuid, rights, ip, acceptedorigins } = tobj;
 
 		if (ip && `${ip}`.replace(/:.*$/, '') !== `${ownIp}`.replace(/:.*$/, '')) {
@@ -92,6 +92,8 @@ module.exports = (req, res, next) => {
 	} else {
 		const { username, password, originalUrl, is_trusted } = req.body || {}
 		const { sessionID: sid } = req || {}
+		const urlParams = new URLSearchParams(originalUrl)
+		const original_app = urlParams.get('/login?app');
 
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
@@ -146,13 +148,13 @@ module.exports = (req, res, next) => {
 					if (redirectPath) {
 						redirecturl = redirectPath
 					} else if (!originalUrl || originalUrl === path) {
-						const { read, write } = modules.find(d => d.type === 'pads')?.rights;
-						if (rights >= (write ?? Infinity)) redirecturl = `/${language}/browse/pads/private`;
-						else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/published`;
-						else redirecturl = `/${language}/browse/pads/published`;
+						redirecturl = getPath(rights, language, modules)
+					} else if(origin_url){
+						redirecturl = origin_url
 					} else {
 						redirecturl = originalUrl || referer;
 					}
+
 					// CHECK IF DEVICE IS TRUSTED
 					return t.oneOrNone(`
 						SELECT * FROM trusted_devices
@@ -166,7 +168,7 @@ module.exports = (req, res, next) => {
 						AND session_sid = $8
 						AND is_trusted IS TRUE`,
 						[result.uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid, sid ]
-					).then(deviceResult => {
+					).then(async deviceResult => {
 						if (deviceResult) {
 							// Device is trusted, update last login info
 							return t.none(`
@@ -176,17 +178,24 @@ module.exports = (req, res, next) => {
 								AND device_browser = $4`,
 								[new Date(), result.uuid, device.os, device.browser, sid]
 							)
-							.then(() => {
+							.then(async () => {
 								const sessionExpiration = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year from now
 								req.session.domain = app_base_host;
 								req.session.cookie.expires = sessionExpiration;
 								req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000; // 1 year in milliseconds
 
-								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}}
-								Object.assign(req.session, datastructures.sessiondata(sess));
-								res.redirect(redirecturl);
+								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: original_app ?? app_title }
+								await Object.assign(req.session, datastructures.sessiondata(sess));
 
-							}).catch(err => console.log(err))
+								if(checkOrigin(redirecturl, origin_url)){
+									req.session.save(function(err) {
+									  if(err) console.log(' err ', err)
+									  return res.redirect(redirecturl)
+									})
+								  }
+								  else redirectUnauthorized(req, res)
+							})
+							.catch(err => console.log(err))
 
 						} else {
 							//USER REQUEST TO ADD DEVICE TO LIST OF TRUSTED DEVICES
@@ -200,25 +209,36 @@ module.exports = (req, res, next) => {
 								.then(()=>{
 									req.session.confirm_dev_origins = {
 										redirecturl,
+										app: original_app ?? app_title,
 										...result,
 									}
-									res.redirect(`/confirm-device?path=${encodeURIComponent(redirecturl)}`);
+									res.redirect(`/confirm-device?path=${encodeURIComponent(redirecturl)}&origin=${encodeURIComponent(origin_url)}`);
 								}).catch(err => {
 									console.error(err)
 									redirectError(req, res)
 								})
 							}
 							else {
-								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}}
-								Object.assign(req.session, datastructures.sessiondata(sess))
-								res.redirect(redirecturl)
+								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}, app: original_app ?? app_title }
+								await Object.assign(req.session, datastructures.sessiondata(sess))
+								if(checkOrigin(redirecturl, origin_url)){
+									req.session.save(function(err) {
+									  if(err) console.log(' err ', err)
+									  return res.redirect(redirecturl)
+									})
+								  }
+								  else redirectUnauthorized(req, res)
+
 							}
 						}
 					})
 
 
 				}
-			}).catch(err => console.log(err))
+			}).catch(err => {
+				console.log(err)
+				redirectError(req, res)
+			})
 		}).catch(err => {
 			console.error(err)
 			redirectError(req, res)

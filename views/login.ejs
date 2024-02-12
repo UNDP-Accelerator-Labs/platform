@@ -3,6 +3,8 @@
 <%
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
+	const allowsso = locals.metadata.site.allowsso
+	const origin_url = locals?.origin_url
 %>
 
 <head>
@@ -71,8 +73,15 @@
 
 
 		<div class='foot'>
+			<br/>
 			<hr/>
-			<p>Forgot password? <a href="/forget-password?path=<%= locals.redirectPath %>">Reset your password</a></p>
+			<br/>
+			<p>Forgot password? <a href="/forget-password?path=<%= locals.redirectPath %><% if(origin_url){ %>&origin=<%= origin_url %><% } %>">Reset your password.</a></p>
+			
+			<% if (allowsso) { %>
+				<h5>OR</h5>
+				<p class="mt-5"><a href="/sso-inits">Login with your UNDP account. </a></p>
+			<% } %>
 			<!-- TO DO: TRANSLATE -->
 		</div>
 	</div>

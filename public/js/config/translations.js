@@ -604,6 +604,44 @@ export const fullVocabulary = {
       singular: 'Gênero',
     },
   },
+  "rnd stage": {
+    // USED
+    en: {
+      plural: 'R&D stages',
+      singular: 'R&D stage',
+    },
+    fr: {
+      plural: '',
+      singular: '',
+    },
+    es: {
+      plural: '',
+      singular: '',
+    },
+    pt: {
+      plural: '',
+      singular: '',
+    },
+  },
+  "rnd function": {
+    // USED
+    en: {
+      plural: 'R&D functions',
+      singular: 'R&D function',
+    },
+    fr: {
+      plural: '',
+      singular: '',
+    },
+    es: {
+      plural: '',
+      singular: '',
+    },
+    pt: {
+      plural: '',
+      singular: '',
+    },
+  },
   position: {
     // USED
     en: {

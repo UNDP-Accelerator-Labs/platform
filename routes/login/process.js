@@ -13,11 +13,15 @@ module.exports = (req, res, next) => {
 	const { __ucd_app, __puid, __cduid } = req.cookies
 	const origin_url = extractPathValue(referer)
 
+	const reqHost = req.get('host');
+	// NOTE: hack to allow API tokens from the platform on localhost
+	const isLocalhost = `${reqHost}`.startsWith('localhost:') || `${reqHost}` === 'localhost';
+
 	if (token) {
 		// VERIFY TOKEN
 		let tobj;
 		try {
-			tobj = jwt.verify(token, process.env.APP_SECRET, { audience: 'user:known', issuer: mainHost })
+			tobj = jwt.verify(token, process.env.APP_SECRET, isLocalhost ? {} : { audience: 'user:known', issuer: mainHost })
 		} catch(_) {
 			tobj = {};
 			if (redirectPath) {

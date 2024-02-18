@@ -115,3 +115,12 @@ jobs:
           app-name: 'acclabs-login'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_LOGIN }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'
+
+      - name: Wait for login
+        run: sleep 60
+
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'acclabs-login'
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_CODIFICATION }}
+          images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'

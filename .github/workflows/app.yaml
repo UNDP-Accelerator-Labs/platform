@@ -121,6 +121,6 @@ jobs:
 
       - uses: azure/webapps-deploy@v2
         with:
-          app-name: 'acclabs-login'
+          app-name: 'acclabs-codification'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_CODIFICATION }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'

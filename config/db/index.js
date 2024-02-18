@@ -1,4 +1,7 @@
-const logSQL = true;
+const logSQL = process.env.LOG_SQL !== 'false';
+if (!logSQL) {
+  console.warn('suppressing SQL output! use LOG_SQL to configure');
+}
 const initOptions = {
   query(e) {
     if (logSQL) console.log(e.query);

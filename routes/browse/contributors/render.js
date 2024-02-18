@@ -1,13 +1,13 @@
 const { page_content_limit, modules, metafields, lazyload, map, DB } = include('config/')
 const load = require('./load/')
-const { array, checklanguage, datastructures, pagestats } = include('routes/helpers/')
+const { array, checklanguage, datastructures, pagestats, redirectUnauthorized } = include('routes/helpers/')
 
 const filter = require('./filter.js')
 
 module.exports = async (req, res) => {
 	const { uuid, rights, collaborators, public } = req.session || {}
 
-	if (public || rights < modules.find(d => d.type === 'contributors')?.rights.read) res.redirect('/login')
+	if (public || rights < modules.find(d => d.type === 'contributors')?.rights.read) redirectUnauthorized(req, res)
 	else {
 		const { object, space } = req.params || {}
 		const { pinboard, display } = req.query || {}

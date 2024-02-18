@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 exports.code = (locations, list = false) => {
 	console.log('pay attention to reverse geocode')
 	return locations.map(l => {
-		return new Promise(resolve => {
+		return new Promise(resolve, reject => {
 			if (!l || !Array.isArray(l) || l.length !== 2 || !l.every(d => !isNaN(d))) {
 				console.log('does not meet requirements')
 				const obj = {}
@@ -14,9 +14,8 @@ exports.code = (locations, list = false) => {
 				obj.caption = `No location was found for <strong>${l}</strong>.` // TO DO: TRANSLATE
 				resolve(obj)
 			} else {
+				const l_formatted = l.join('+')
 				setTimeout(_ => {
-					l_formatted = l.join('+')
-
 					fetch(`https://api.opencagedata.com/geocode/v1/json?q=${l_formatted}&key=${process.env.OPENCAGE_API}`)
 					.then(response => response.json())
 					.then(data => {
@@ -37,7 +36,10 @@ exports.code = (locations, list = false) => {
 							obj.caption = `No location was found for <strong>${l}</strong>.` // TO DO: TRANSLATE
 						}
 						resolve(obj)
-					}).catch(err => console.log(err))
+					}).catch(err => {
+						console.log(err)
+						reject(err)
+					})
 				}, 1000)
 			}
 		})
@@ -46,7 +48,7 @@ exports.code = (locations, list = false) => {
 exports.render = (req, res) => {
 	const { locations, list } = req.body || {}
 	const { country } = req.session || {}
-	
+
 	const promises = this.code(locations, list)
 	Promise.all(promises)
 	.then(data => res.json(data))

@@ -7,7 +7,7 @@
 const include_incomplete = false
 
 function addPrintSection (kwargs) {
-	return new Promise(async resolve => {
+	return (async () => {
 		const { data, lang, article } = kwargs || {}
 		let { id, title, lead, structure, items, repeat, group, instruction } = data || {}
 
@@ -40,12 +40,12 @@ function addPrintSection (kwargs) {
 			await Promise.all(promises.flat())
 		}
 
-		resolve(section.node())
-	})
+		return section.node()
+	})()
 }
 function populatePrintSection (data, lang = 'en', section) {
 	// MEDIA
-	return new Promise(async resolve => {
+	return (async () => {
 		// if (data.type === 'title' && publicpage) addTitle({ data, lang, section }) // TO DO
 		if (data.type === 'img') addPrintImg({ data, lang, section })
 		if (data.type === 'mosaic') addPrintMosaic({ data, lang, section })
@@ -65,9 +65,7 @@ function populatePrintSection (data, lang = 'en', section) {
 
 		// GROUP
 		if (data.type === 'group') await addPrintGroup({ data, lang, section })
-
-		resolve()
-	})
+	})()
 }
 
 function addPrintImg (kwargs) {
@@ -220,7 +218,7 @@ function addPrintList (kwargs) {
 }
 // META ELEMENTS
 function addPrintLocations (kwargs) {
-	return new Promise(async resolve => {
+	return (async () => {
 		// TO DO: INCLUDE CONSTRAINT
 		const { data, lang, section } = kwargs || {}
 		let { name, instruction, centerpoints } = data || {}
@@ -250,8 +248,7 @@ function addPrintLocations (kwargs) {
 			parent.addElem('p', 'caption')
 				.html(results[0].caption)
 		}
-		resolve()
-	})
+	})()
 }
 function addPrintIndexes (kwargs) {
 	const { data, lang, section } = kwargs || {}
@@ -306,7 +303,7 @@ function addPrintTags (kwargs) {
 }
 // GROUPS
 function addPrintGroup (kwargs) {
-	return new Promise(async resolve => {
+	return (async () => {
 		const { data, lang, section } = kwargs || {}
 		let { name, items, instruction, repeat } = data || {}
 		if (!name) name = null
@@ -319,8 +316,7 @@ function addPrintGroup (kwargs) {
 			}))
 		})
 		await Promise.all(promises.flat())
-		resolve()
-	})
+	})()
 }
 
 

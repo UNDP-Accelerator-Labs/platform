@@ -17,6 +17,7 @@
 		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
 		else mapscale = 'contain'
 	}
+	const login_url = locals.metadata.site.login_url 
 %>
 
 <nav id='languages'>
@@ -42,7 +43,8 @@
 		</li>
 		<li class='user-id'>
 			<% if (!publicpage) { %>
-				<span ><span class='sm m lg xl xxl' data-vocab='logged in'></span> <a href='/<%= language %>/edit/contributor?id=<%= uuid %>'><u><%= username %></u></a>. | </span><a href='/logout/current' class='logout' data-vocab='log out'></a>
+				<span ><span class='sm m lg xl xxl' data-vocab='logged in'></span> 
+				<a <% if (login_url) { %>target="_blank" <% } %> href='<% if (login_url) { %><%= login_url %><% } %>/<%= language %>/edit/contributor?id=<%= uuid %>'><u><%= username %></u></a>. | </span><a href='/logout/current' class='logout' data-vocab='log out'></a>
 			<% } else { %>
 				<a href='/login' class='login' data-vocab='log in'></a>
 			<% } %>

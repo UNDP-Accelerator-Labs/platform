@@ -7,7 +7,9 @@ export async function getCurrentLanguage() {
   if (cachedLanguage) {
     return cachedLanguage;
   }
-  let language = JSON.parse(d3.select('data[name="page"]')?.node()?.value ?? '{}')?.language;
+  let language = JSON.parse(
+    d3.select('data[name="page"]')?.node()?.value ?? '{}',
+  )?.language;
   if (!language) {
     const { languages } = await POST('/load/metadata', {
       feature: 'languages',

@@ -11,7 +11,7 @@ module.exports = req => {
 	// TO DO: UPDATE BELOW BASED ON FILTERS PASSED
 	let { search, status, countries, positions, rights: userrights, pinboard, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
-	return new Promise(async resolve => {
+	return (async () => {
 		// BASE FILTERS
 		const base_filters = []
 		// const f_search = search ? DB.pgp.as.format(`AND (u.name::TEXT || u.position::TEXT || cn.name::TEXT ~* $1)`, [ parsers.regexQuery(search) ]) : null
@@ -19,7 +19,7 @@ module.exports = req => {
 
 		let f_space = null
 		// THE all SPACE SHOWS ALL CONTRIBUTORS, i.e. USERS WHO ARE ALLOWED TO WRTIE PADS
-		let { write } = modules.find(d => d.type === 'pads')?.rights
+		let { write } = modules.find(d => d.type === 'pads')?.rights || { write: {}}
 		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 
 		if (space === 'all') f_space = DB.pgp.as.format(`AND (u.rights >= $1::INT)`, [ write ?? 4 ])
@@ -56,6 +56,6 @@ module.exports = req => {
 			filters.push(DB.pgp.as.format(`AND LEFT(u.name, 1) = $1`, [ page ]))
 		}
 
-		resolve([ f_space, page, filters.join(' ') ])
-	})
+		return [ f_space, page, filters.join(' ') ]
+	})()
 }

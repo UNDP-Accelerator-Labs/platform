@@ -56,9 +56,9 @@ module.exports = async kwargs => {
 		;`, [ uuid, rights ], d => d.count).then(d => { return { invited: d } }))
 		// GET ALL CONTRIBUTOR BREAKDOOWN BY CONFIRMATION STATUS
 		// THE all SPACE SHOWS ALL CONTRIBUTORS, i.e. USERS WHO ARE ALLOWED TO WRTIE PADS
-		let { write } = modules.find(d => d.type === 'pads')?.rights
-		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-		console.log('check write', write)
+		let { write } = modules.find(d => d.type === 'pads')?.rights || {write : {}}
+		if (typeof write === 'object') write = Math.min(write.blank ?? 0, write.templated ?? 0)
+		
 		batch.push(t.one(`
 			SELECT COUNT(DISTINCT (u.uuid))::INT FROM users u
 			WHERE rights >= $1::INT

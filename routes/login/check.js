@@ -1,5 +1,6 @@
 const { app_suite, DB } = include('config/')
 const { datastructures } = include('routes/helpers/')
+const { redirectUnauthorized } = include('routes/helpers/')
 const processlogin = require('./process.js')
 const jwt = require('jsonwebtoken')
 
@@ -37,7 +38,7 @@ module.exports = async (req, res, next) => {
 		if (cleared === true) next()
 		else {
 			req.session.destroy()
-			res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
 	} else if (token) processlogin(req, res, next) // A LOGIN TOKEN IS RECEIVED
 	else {

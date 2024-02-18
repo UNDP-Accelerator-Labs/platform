@@ -4,6 +4,7 @@
 	// CREATE ALIASES
 	const language = locals.metadata.page.language
 	const page_message = locals?.page_message || ''
+	const origin_url = locals?.origin_url
 %>
 
 <head>
@@ -16,7 +17,7 @@
 
 <div class='screen <% if (locals.errormessage) { %>error<% } else { %>blue<% } %>'>
 	<div class='modal login-module'>
-		<form action='/confirm-device' method='POST'>
+		<form action='/confirm-device?path=<%= locals.redirectPath %>' method='POST'>
 			<ul>
 				<% if (locals.errormessage) { %>
 					<li>
@@ -46,7 +47,7 @@
 		</form>
        <div class='foot'>
 			<hr/>
-			<p> Did not get the One Time Passcode (OTP)? <a href="/resend-otp-code">Resend OTP</a></p>
+			<p> Did not get the One Time Passcode (OTP)? <a href="/resend-otp-code?path=<%= locals.redirectPath %><% if(origin_url){ %>&origin=<%= origin_url %><% } %>">Resend OTP</a></p>
 			<!-- TO DO: TRANSLATE -->
 		</div>
 	</div>

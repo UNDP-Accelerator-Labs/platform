@@ -1,5 +1,5 @@
 const { engagementtypes, map, DB } = include('config/')
-const { checklanguage, engagementsummary, join, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, redirectUnauthorized } = include('routes/helpers/')
 
 const check_authorization = require('./authorization.js')
 const load = require('./load/')
@@ -22,8 +22,7 @@ module.exports = async (req, res) => {
 			const { authorized, redirect } = result || {}
 
 			if (!authorized) {
-				if (referer) return res.redirect(referer)
-				else res.redirect('/login')
+				return redirectUnauthorized(req, res)
 			} else if (authorized && redirect && redirect !== activity) {
 				// const query = []
 				// for (const key in req.query) {

@@ -27,7 +27,7 @@ module.exports = (req, res) => {
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
-		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'completion', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
+		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'completion', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata', 'source', 'version'].includes(d)), 'pads') + condition
 	}
 
 	DB.conn.tx(t => {
@@ -205,7 +205,7 @@ module.exports = (req, res) => {
 			const promises = deletion.map(f => {
 				if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 					// SEE HERE: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-delete-javascript
-					return new Promise(async resolve => {
+					return (async () => {
 						const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING)
 						const containerClient = blobServiceClient.getContainerClient(app_title_short)
 
@@ -213,13 +213,12 @@ module.exports = (req, res) => {
 						const blockBlobClient = await containerClient.getBlockBlobClient(f)
 						await blockBlobClient.delete(options)
 						console.log('file', f, 'deleted')
-						resolve()
-					})
+					})()
 				} else {
 					if (fs.existsSync(path.join(__dirname, `../public/${f}`))) {
-						return new Promise(resolve => {
-							resolve(fs.unlinkSync(path.join(__dirname, `../public/${f}`)))
-						})
+						return (async () => {
+							return fs.unlinkSync(path.join(__dirname, `../public/${f}`))
+						})()
 					}
 				}
 			})

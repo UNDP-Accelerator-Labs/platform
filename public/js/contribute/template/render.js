@@ -199,96 +199,102 @@ Media.prototype.move = function (dir) {
     return this.style.maxHeight.length;
   });
   // CHECK WHETHER AN INSET IS OPEN
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     if (openInset.node()) {
       openInset.node().style.maxHeight = null;
       window.setTimeout((_) => {
-        sourceTop = this.container.node().offsetTop;
-        sourceHeight = this.container.node().offsetHeight;
-        sourceMargin = parseInt(
-          getComputedStyle(this.container.node()).marginBottom,
-        );
-        resolve();
+        try {
+          sourceTop = this.container.node().offsetTop;
+          sourceHeight = this.container.node().offsetHeight;
+          sourceMargin = parseInt(
+            getComputedStyle(this.container.node()).marginBottom,
+          );
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
       }, 500);
     } else resolve();
-  }).then((_) => {
-    if (dir.includes('up')) {
-      // THE SOURCE IS MOVING UP AND THE TARGET IS MOVING DOWN
-      const target = this.container.node().previousSibling;
-      if (
-        target &&
-        target.classList !== undefined &&
-        (target.classList.contains('media-container') ||
-          target.classList.contains('meta-container')) &&
-        !target.classList.contains('title-container') &&
-        !target.classList.contains('lead-container') &&
-        !target.classList.contains('media-group')
-      ) {
-        const targetTop = target.offsetTop;
-        const moveSource = targetTop - sourceTop;
-        const moveTarget = sourceHeight + sourceMargin;
-        this.container
-          .classed('move', true)
-          .style('transform', `translateY(${moveSource}px)`);
-        d3.select(target)
-          .classed('move', true)
-          .style('transform', `translateY(${moveTarget}px)`);
-        window.setTimeout(async (_) => {
-          this.container.classed('move', false).style('transform', null);
-          d3.select(target).classed('move', false).style('transform', null);
+  })
+    .then((_) => {
+      if (dir.includes('up')) {
+        // THE SOURCE IS MOVING UP AND THE TARGET IS MOVING DOWN
+        const target = this.container.node().previousSibling;
+        if (
+          target &&
+          target.classList !== undefined &&
+          (target.classList.contains('media-container') ||
+            target.classList.contains('meta-container')) &&
+          !target.classList.contains('title-container') &&
+          !target.classList.contains('lead-container') &&
+          !target.classList.contains('media-group')
+        ) {
+          const targetTop = target.offsetTop;
+          const moveSource = targetTop - sourceTop;
+          const moveTarget = sourceHeight + sourceMargin;
           this.container
-            .node()
-            .parentNode.insertBefore(this.container.node(), target);
+            .classed('move', true)
+            .style('transform', `translateY(${moveSource}px)`);
+          d3.select(target)
+            .classed('move', true)
+            .style('transform', `translateY(${moveTarget}px)`);
+          window.setTimeout(async (_) => {
+            this.container.classed('move', false).style('transform', null);
+            d3.select(target).classed('move', false).style('transform', null);
+            this.container
+              .node()
+              .parentNode.insertBefore(this.container.node(), target);
 
-          if (_self.editable) await partialSave(level);
-        }, 1000);
-        if (openInset.node())
-          window.setTimeout(
-            (_) =>
-              (openInset.node().style.maxHeight = `${
-                openInset.node().scrollHeight
-              }px`),
-            1250,
-          );
-      }
-    } else {
-      const target = this.container.node().nextSibling;
-      if (target) {
-        const targetTop = target.offsetTop;
-        const targetHeight = target.offsetHeight;
-        const targetMargin = parseInt(getComputedStyle(target).marginBottom);
-        const moveSource = targetHeight + targetMargin;
-        const moveTarget = sourceTop - targetTop;
-        this.container
-          .classed('move', true)
-          .style('transform', `translateY(${moveSource}px)`);
-        d3.select(target)
-          .classed('move', true)
-          .style('transform', `translateY(${moveTarget}px)`);
-        window.setTimeout(async (_) => {
-          this.container.classed('move', false).style('transform', null);
-          d3.select(target).classed('move', false).style('transform', null);
-          this.container
-            .node()
-            .parentNode.insertBefore(target, this.container.node());
+            if (_self.editable) await partialSave(level);
+          }, 1000);
           if (openInset.node())
-            openInset.node().style.maxHeight = `${
-              openInset.node().scrollHeight
-            }px`;
-
-          if (_self.editable) await partialSave(level);
-        }, 1000);
-        if (openInset.node())
-          window.setTimeout(
-            (_) =>
-              (openInset.node().style.maxHeight = `${
+            window.setTimeout(
+              (_) =>
+                (openInset.node().style.maxHeight = `${
+                  openInset.node().scrollHeight
+                }px`),
+              1250,
+            );
+        }
+      } else {
+        const target = this.container.node().nextSibling;
+        if (target) {
+          const targetTop = target.offsetTop;
+          const targetHeight = target.offsetHeight;
+          const targetMargin = parseInt(getComputedStyle(target).marginBottom);
+          const moveSource = targetHeight + targetMargin;
+          const moveTarget = sourceTop - targetTop;
+          this.container
+            .classed('move', true)
+            .style('transform', `translateY(${moveSource}px)`);
+          d3.select(target)
+            .classed('move', true)
+            .style('transform', `translateY(${moveTarget}px)`);
+          window.setTimeout(async (_) => {
+            this.container.classed('move', false).style('transform', null);
+            d3.select(target).classed('move', false).style('transform', null);
+            this.container
+              .node()
+              .parentNode.insertBefore(target, this.container.node());
+            if (openInset.node())
+              openInset.node().style.maxHeight = `${
                 openInset.node().scrollHeight
-              }px`),
-            1250,
-          );
+              }px`;
+
+            if (_self.editable) await partialSave(level);
+          }, 1000);
+          if (openInset.node())
+            window.setTimeout(
+              (_) =>
+                (openInset.node().style.maxHeight = `${
+                  openInset.node().scrollHeight
+                }px`),
+              1250,
+            );
+        }
       }
-    }
-  });
+    })
+    .catch((err) => console.log(err));
 };
 
 const Meta = function (kwargs) {

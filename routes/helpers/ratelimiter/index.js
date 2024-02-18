@@ -6,6 +6,16 @@ const rateLimiter = new RateLimiterMemory({
   blockDuration: 3 * 60 * 60, // Block for 3 hours
 });
 
+// NOTE: redefining redirect here to avoid circular dependency
+const redirectUnauthorized = (req, res) => {
+  const orig = req.originalUrl;
+	if (orig.startsWith('/login')) {
+		res.redirect(orig);
+		return;
+	}
+	res.redirect(`/login?path=${encodeURIComponent(orig)}`)
+}
+
 const rateLimiterMiddleware = (req, res, next) => {
   rateLimiter.consume(req.ip)
     .then((rateLimiterRes) => {
@@ -16,7 +26,7 @@ const rateLimiterMiddleware = (req, res, next) => {
     })
     .catch((rateLimiterRes) => {
         req.session.errormessage = 'Too many failed login requests. Please try again after 3 hours or contact system admin.'
-        res.redirect('/login');
+        redirectUnauthorized(req, res)
     });
 };
 

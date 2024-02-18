@@ -177,6 +177,7 @@ INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://solutions.sdg-inno
 INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://blogs.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('consent', 'https://consent.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('login', 'https://login.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('codification', 'https://codification.sdg-innovation-commons.org/');
 
 CREATE TABLE pinboards (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,
@@ -203,7 +204,7 @@ ALTER TABLE pinboards ADD CONSTRAINT unique_pinboard_owner UNIQUE (title, owner)
 
 CREATE TABLE pinboard_contributors (
     participant uuid NOT NULL,
-    pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE
+    pinboard INT REFERENCES pinboards(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (participant, pinboard)
 );
 

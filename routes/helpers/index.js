@@ -300,22 +300,11 @@ exports.checkOrigin = (url, origin_url) => {
     return true;
   }
   const host = new URL(url).host;
-  // FIXME move to config
+  if (host.endsWith('.sdg-innovation-commons.org')) {
+    return true;
+  }
   return [
     'localhost',
     'acclabs-staging.azurewebsites.net',
-    'solutions.sdg-innovation-commons.org',
-    'learningplans.sdg-innovation-commons.org',
-    'experiments.sdg-innovation-commons.org',
-    'consent.sdg-innovation-commons.org',
-    'login.sdg-innovation-commons.org',
   ].includes(host);
-  // console.log(url, origin_url)
-  // const base_extract = new URL(url, origin_url).host.split('.').slice(1).join('.');
-  // if (process.env.NODE_ENV === 'production' && origin_url)
-  //   return (
-  //     (base_extract === base_host) ||
-  //     (host === 'acclabs-staging.azurewebsites.net')
-	// );
-  // else return true;
 };

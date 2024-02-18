@@ -9,7 +9,7 @@ exports.app_description =
   require('./translations.js').translations['app description'];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.own_app_url = 'https://codification.sdg-innovation-commons.org/';
+exports.own_app_url = 'https://practice.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
@@ -20,7 +20,7 @@ exports.modules = [
 ];
 
 exports.metafields = [
-   {
+  {
     type: 'tag',
     name: 'thematic areas',
     required: false,

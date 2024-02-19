@@ -306,5 +306,6 @@ exports.checkOrigin = (url, origin_url) => {
   return [
     'localhost',
     'acclabs-staging.azurewebsites.net',
+    'sdg-innovation-commons.org',
   ].includes(host);
 };

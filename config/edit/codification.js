@@ -1,7 +1,7 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'Codification';
-exports.app_title_short = 'codification';
+exports.app_title = 'R&D Practice';
+exports.app_title_short = 'practice';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
 exports.app_languages = ['en', 'fr', 'es', 'pt'];
@@ -27,7 +27,7 @@ exports.metafields = [
     opencode: true,
     limit: 5,
   },
-  { type: 'tag', name: 'methods', required: true, opencode: false },
+  { type: 'tag', name: 'methods', required: false, opencode: false },
   // { type: 'tag', name: 'datasources', required: true, opencode: true },
   {
     type: 'radiolist',
@@ -49,6 +49,19 @@ exports.metafields = [
       { name: 'Exploration' },
       { name: 'Solutions mapping' },
       { name: 'Experimentation' },
+    ],
+  },
+  {
+    type: 'radiolist',
+    name: 'tool type',
+    required: false,
+    instruction: 'Primary tool type',
+    options: [
+      { name: 'Framework, Model' },
+      { name: 'Guide, Manual' },
+      { name: 'Platform, Portal' },
+      { name: 'Playbook, Toolkit' },
+      { name: 'Process' },
     ],
   },
 ];

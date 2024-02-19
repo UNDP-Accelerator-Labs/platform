@@ -17,6 +17,7 @@ exports.modules = [
   { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 3 } },
   // { type: 'files', rights: { read: 0, write: 1 } },
+  { type: 'mobilizations', rights: { read: 2, write: 3 } },
 ];
 
 exports.metafields = [

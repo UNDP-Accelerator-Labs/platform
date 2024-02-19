@@ -611,16 +611,16 @@ export const fullVocabulary = {
       singular: 'R&D stage',
     },
     fr: {
-      plural: '',
-      singular: '',
+      plural: 'Étapes de R&D',
+      singular: 'Étape de R&D',
     },
     es: {
-      plural: '',
-      singular: '',
+      plural: 'Etapas de I+D',
+      singular: 'Etapa de I+D',
     },
     pt: {
-      plural: '',
-      singular: '',
+      plural: 'Estágio de P&D',
+      singular: 'Etapas de P&D',
     },
   },
   "rnd function": {
@@ -630,16 +630,35 @@ export const fullVocabulary = {
       singular: 'R&D function',
     },
     fr: {
-      plural: '',
-      singular: '',
+      plural: 'Fonction R&D',
+      singular: 'Fonctions R&D',
     },
     es: {
-      plural: '',
-      singular: '',
+      plural: 'Función de I+D',
+      singular: 'Funciones de I+D',
     },
     pt: {
-      plural: '',
-      singular: '',
+      plural: 'Funções de P&D',
+      singular: 'Função de P&D',
+    },
+  },
+  "tool type": {
+    // USED
+    en: {
+      plural: 'Tool types',
+      singular: 'Tool type',
+    },
+    fr: {
+      plural: 'Types d’outils',
+      singular: 'Type d’outil',
+    },
+    es: {
+      plural: 'Tipos de herramientas',
+      singular: 'Tipo de herramienta',
+    },
+    pt: {
+      plural: 'Tipos de ferramentas',
+      singular: 'Tipo de ferramenta',
     },
   },
   position: {

@@ -14,18 +14,18 @@ module.exports = (req, res) => {
 				obj[key] = req.body[key]
 				return obj
 			}, {})
-		
+
 		var saveSQL = DB.pgp.as.format(`
-			INSERT INTO pads ($1:name, owner) 
+			INSERT INTO pads ($1:name, owner)
 			VALUES ($1:csv, $2)
 			RETURNING id
 		;`, [ insert, uuid ])
 	} else { // UPDATE OBJECT
 		const condition = DB.pgp.as.format(` WHERE id = $1::INT;`, [ id ])
 		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'completion', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
-	}	
+	}
 
-	DB.conn.tx(t => { 
+	DB.conn.tx(t => {
 		console.log('update start ')
 		return t.oneOrNone(saveSQL)
 		.then(result => {
@@ -37,7 +37,7 @@ module.exports = (req, res) => {
 				UPDATE pads SET update_at = NOW() WHERE id = $1::INT
 			;`, [ newID || id]))
 
-			
+
 			// UPDATE STATUS
 			batch.push(t.one(`
 				SELECT status FROM pads
@@ -77,7 +77,7 @@ module.exports = (req, res) => {
 					.catch(err => console.log(err))
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err)))
-			
+
 			return t.batch(batch)
 			.then(results => {
 				const status = results[results.length - 1]

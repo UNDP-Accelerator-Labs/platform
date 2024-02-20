@@ -12,7 +12,6 @@ module.exports = (req, res) => {
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
-	
 	let redirect = undefined
 	
 	if (req_token) {

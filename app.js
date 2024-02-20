@@ -74,6 +74,9 @@ app.use(
     strictTransportSecurity: {
       maxAge: 123456,
     },
+    // defaultProps: {
+    //   encodeSpecialCharacters: false,
+    // },
   }),
 );
 

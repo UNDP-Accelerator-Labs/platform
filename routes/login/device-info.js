@@ -87,3 +87,27 @@ exports.checkDevice = async (_kwarg) => {
     (d) => (d?.id ? true : false)
   );
 };
+
+
+exports.extractPathValue = (urlString, app) => {
+  if (!urlString) return undefined;
+  const url = new URL(urlString);
+  const params = new URLSearchParams(url.search);
+  if(app) return params.get('app') ? (decodeURIComponent(params.get('app')) ?? '') : ''
+  const res = params.get('origin') ? (decodeURIComponent(params.get('origin')) ?? '') : '';
+  // FIXME @adedapo the url shouldn't have '&amp;origin' the below is not a solution
+  if (!res) {
+    return params.get('amp;origin') ? (decodeURIComponent(params.get('amp;origin')) ?? '') : '';
+  }
+  return res
+}
+
+exports.getPath = (rights, language, modules) =>{
+	let redirecturl = ''
+	const { read, write } = modules.find(d => d.type === 'pads')?.rights;
+	if (rights >= (write ?? Infinity)) redirecturl = `/${language}/browse/pads/private`;
+	else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/published`;
+	else redirecturl = `/${language}/browse/pads/published`;
+	return redirecturl
+}
+

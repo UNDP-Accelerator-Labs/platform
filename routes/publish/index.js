@@ -1,4 +1,5 @@
 const { modules } = include('config/')
+const { redirectUnauthorized, redirectError } = include('routes/helpers/')
 
 const pads = require('./pads/')
 const pinboards = require('./pinboards/')
@@ -6,6 +7,7 @@ const templates = require('./templates/')
 const files = require('./files/')
 const reviews = require('./reviews/')
 const mobilizations = require('./mobilizations/')
+const { redirectBack } = require('../helpers')
 
 exports.publish = (req, res) => {
 	const { referer } = req.headers || {}
@@ -26,15 +28,13 @@ exports.publish = (req, res) => {
 		else if (object === 'mobilizations' && rights >= write) mobilizations.publish(req, res)
 
 		else {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
-	} else res.redirect('/module-error')
+	} else redirectError(req, res)
 }
 
 
 exports.unpublish = (req, res) => {
-	const { referer } = req.headers || {}
 	const { rights } = req.session || {}
 	const { object } = req.params || {}
 
@@ -43,6 +43,6 @@ exports.unpublish = (req, res) => {
 
 		if (object === 'mobilizations' && rights >= write) mobilizations.unpublish(req, res)
 
-		else res.redirect(referer)
-	} else res.redirect('/module-error')
+		else redirectBack(req, res, true);
+	} else redirectError(req, res)
 }

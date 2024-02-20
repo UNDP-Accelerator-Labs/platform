@@ -23,7 +23,7 @@ const lang = 'en'
 // 6233
 
 DB.conn.one(`
-	SELECT title, sections FROM pads 
+	SELECT title, sections FROM pads
 	WHERE id = 5929
 ;`).then(async results => {
 	const { title, sections } = results
@@ -47,7 +47,7 @@ DB.conn.one(`
 
 exports.populateSection = (data, doc, inset = false) => {
 	// MEDIA
-	return new Promise(async resolve => {
+	return (async () => {
 		if (data.type === 'title') this.addTxt(data, doc, inset)
 		if (data.type === 'img') await this.addImg(data, doc, inset)
 		if (data.type === 'mosaic') await this.addMosaic(data, doc, inset)
@@ -65,8 +65,7 @@ exports.populateSection = (data, doc, inset = false) => {
 		// GROUP
 		if (data.type === 'group') await this.addGroup(data, doc, inset)
 		doc.moveDown()
-		resolve()
-	})
+	})()
 }
 
 exports.addInstruction = (data, doc, inset = false) => {
@@ -79,7 +78,7 @@ exports.addInstruction = (data, doc, inset = false) => {
 			.text(instruction, inset ? margins.left * 1.5 : margins.left, doc.y)
 			.fillColor(colors['dark-grey']) // RESET
 	} else return false
-} 
+}
 
 exports.addTitle = (data, doc, inset = false) => {
 	let { txt } = data || {}
@@ -96,11 +95,11 @@ exports.addImg = async (data, doc, inset = false) => {
 	const maxwidth = width - margins.left - margins.right
 	const maxheight = height - margins.top - margins.bottom
 	if (!textalign) textalign = 'left'
-	
+
 	if (!src) src = null
 	// else if (src.isURL() || src.isBlob()) img.src = src
 	else {
-		if (app_storage) { 
+		if (app_storage) {
 			// CREDIT TO: https://stackoverflow.com/questions/72036447/createobjecturl-error-argument-must-be-an-instance-of-blob-received-an-instan
 			const buff = await fetch(new URL(`${app_storage.replace('consent', 'solutions-mapping')}/${src}`).href)
 			.then(response => response.arrayBuffer())
@@ -112,7 +111,7 @@ exports.addImg = async (data, doc, inset = false) => {
 	}
 
 	this.addInstruction(data, doc, inset)
-	
+
 	const { width: imgwidth, height: imgheight, scale } = getIMGsize(new Buffer.from(src), { maxwidth, maxheight })
 	// DETERMINE WHETHER TO PUSH TO NEW PAGE
 	if (doc.y + imgheight > height - margins.bottom) doc.addPage()
@@ -151,7 +150,7 @@ exports.addMosaic = async (data, doc, inset = false) => {
 			if (!src) src = null
 			// else if (src.isURL() || src.isBlob()) img.src = src
 			else {
-				if (app_storage) { 
+				if (app_storage) {
 					// CREDIT TO: https://stackoverflow.com/questions/72036447/createobjecturl-error-argument-must-be-an-instance-of-blob-received-an-instan
 					const buff = await fetch(new URL(`${app_storage.replace('consent', 'solutions-mapping')}/${src}`).href)
 					.then(response => response.arrayBuffer())
@@ -189,7 +188,7 @@ exports.addMosaic = async (data, doc, inset = false) => {
 	doc.y = y
 }
 exports.addVideo = (data, doc, inset = false) => {
-	return false // CANNOT ADD A VIDEO TO A PDF	
+	return false // CANNOT ADD A VIDEO TO A PDF
 }
 exports.addDrawing = (data, doc, inset = false) => {
 	let { shapes, size } = data || {}
@@ -204,7 +203,7 @@ exports.addDrawing = (data, doc, inset = false) => {
 		const { color, lineWidth, points } = d || {}
 		if (!color) color = colors['dark-grey']
 		if (!lineWidth) lineWidth = 2
-		
+
 		const path = `M ${points.join(' L ')}`
 		doc.translate(margins.left, doc.y)
 			.scale(r)
@@ -371,12 +370,12 @@ exports.addIndexes = async (data, doc, inset = false) => {
 		const srcchunk = chunks[i]
 		const row = []
 		n = srcchunk.length
-		
+
 		for (let j = 0; j < srcchunk.length; j ++) {
 			let src = srcchunk[j]
 
 			if (!src) src = null
-			
+
 			if (j % cols === 0) {
 				if (n < cols) {
 					x = margins.left + ((width - margins.left - margins.right) - n * imgwidth - (n - 1) * colgap) / 2
@@ -486,7 +485,7 @@ exports.addGroup = async (data, doc, inset = false) => {
 
 function getIMGsize (src, kwargs = {}) {
 	const { maxwidth, maxheight } = kwargs
-	
+
 	try {
 		let { width, height } = imgsize(src)
 		let scale = 'original'

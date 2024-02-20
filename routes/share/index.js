@@ -1,4 +1,5 @@
 const { modules } = include('config/')
+const { redirectUnauthorized } = include('routes/helpers/')
 
 const pinboards = require('./pinboards/')
 const resource = require('./resource/')
@@ -12,12 +13,11 @@ exports.share = (req, res) => {
 	if (['pinboard', 'pinboards'].includes(object)) {
 		if (modules.some(d => d.type === 'pinboards' && rights >= d.rights.write)) pinboards.share(req, res)
 		else {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectUnauthorized(req, res)
 		}
 	} else if (['resource', 'resources'].includes(object)) {
 		resource.share(req, res)
-		
+
 		// LOGIC IS
 		// request/resource
 		// AND ON THE OTHER END

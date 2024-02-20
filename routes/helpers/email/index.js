@@ -3,7 +3,7 @@ const nodeMailer = require('nodemailer');
 module.exports = async (kwargs) => {
 	if (process.env.NODE_ENV !== "production" || !process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER) {
 		console.log('working locally so no need to send email', kwargs);
-		return new Promise(resolve => resolve(null));
+		return (async () => (null))();
 	}
 	const { to, subject, cc, bcc, html } = kwargs;
 	const from = `"No Reply" <no-reply@sdg-innovation-commons.org>`

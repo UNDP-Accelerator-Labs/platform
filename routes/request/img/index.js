@@ -1,4 +1,6 @@
 const { modules } = include('config/')
+const { redirectError } = include('routes/helpers/')
+
 const buffer = require('./buffer.js')
 const url = require('./url.js')
 
@@ -14,6 +16,6 @@ module.exports = (req, res) => {
 	if (authorized) {
 		if (from === 'buffer') buffer(req, res);
 		else if (from === 'url') url(req, res);
-		else res.redirect('/module-error');
-	} else res.redirect('/module-error');
+		else redirectError(req, res)
+	} else redirectError(req, res);
 }

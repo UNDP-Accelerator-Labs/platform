@@ -159,7 +159,7 @@ function findNests (_str) {
 }
 
 function jsonify (_str) {
-	_str = JSON.parse(`[${_str.replace(/\s?\bor\b/gi, '').replace(/\(/g, '[').replace(/\)/g, ']').replace(/\b(?!\*)/g, '"').replace(/\b\*/g, '*"').replace(/\s+/g, ',')}]`)
+	_str = JSON.parse(`[${_str.replace(/\s?\bor\b/gi, '').replace(/\(/g, '[').replace(/\)/g, ']').replace(/\b(?!\*)/g, '"').replace(/\b\*/g, '*"').replace(/\s+/g, ',').replace('"\'"', '\'')}]`)
 	return _str
 }
 

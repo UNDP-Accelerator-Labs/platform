@@ -1,5 +1,5 @@
 const { modules, metafields, map, DB } = include('config/')
-const { checklanguage, flatObj, datastructures } = include('routes/helpers/')
+const { checklanguage, flatObj, datastructures, redirectUnauthorized } = include('routes/helpers/')
 
 const check_authorization = require('./authorization.js')
 
@@ -10,16 +10,15 @@ module.exports = async (req, res) => {
 	const language = checklanguage(req.params?.language || req.session.language)
 
 	const { authorized } = check_authorization({ rights })
-	
+
 	if (!authorized) {
-		if (referer) return res.redirect(referer)
-		else res.redirect('/login')
+		redirectUnauthorized(req, res)
 	} else {
 		DB.general.task(t => {
 			const batch1 = metafields.filter(d => ['tag', 'index'].includes(d.type))
 			.map(d => {
 				return t.any(`
-					SELECT id, key, name, type FROM tags 
+					SELECT id, key, name, type FROM tags
 					WHERE type = $1
 						AND language = (COALESCE((SELECT language FROM tags WHERE type = $1 AND language = $2 LIMIT 1), 'en'))
 				;`, [ d.label, language ])

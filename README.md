@@ -12,6 +12,8 @@ https://learningplans.sdg-innovation-commons.org/
 
 https://consent.sdg-innovation-commons.org/
 
+https://practice.sdg-innovation-commons.org/
+
 This is a Node.js application that uses Express.js for routing and EJS as the view engine. It interacts with two Postgres databases, where one stores shared information like user sessions and credentials, and the other stores information on pads.
 
 ## Local Setup

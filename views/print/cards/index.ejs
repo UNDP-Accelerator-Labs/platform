@@ -118,11 +118,10 @@
 		return cards.map((data, i) => {
 			const { id, title, img, txt, sdgs, tags, iso3, country, date } = data
 
-			return new Promise(resolve => {
+			return new Promise(resolve, reject => {
 				// ADD THE TITLE
 				const article = d3.select('div.document')
 				.addElem('article', 'print card')
-
 
 				if (img) {
 					const imgnode = article.addElem('img')
@@ -138,8 +137,10 @@
 
 							const { width, height } = canvas
 							resolve({ imgdata, width, height })
-
-						}).catch(err => console.log(err))
+						}).catch(err => {
+							console.log(err)
+							reject(err)
+						})
 					}
 					blob.onerror = function () {
 						html2canvas(article.node(), { scale: 1 })
@@ -150,7 +151,10 @@
 
 							const { width, height } = canvas
 							resolve({ imgdata, width, height })
-						}).catch(err => console.log(err))
+						}).catch(err => {
+							console.log(err)
+							reject(err);
+						})
 					}
 
 					<% if (locals.metadata.site.app_storage) { %>
@@ -193,6 +197,10 @@
 
 				article.addElem('small', 'meta meta-source')
 				.html(`Source: ${window.location.origin}/<%- language %>/view/pad?id=${id}`)
+
+				if (!img) {
+					resolve(null)
+				}
 			})
 		})
 	}

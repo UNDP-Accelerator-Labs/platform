@@ -1,5 +1,5 @@
 const { DB } = include('config/')
-const { checklanguage } = include('routes/helpers/')
+const { checklanguage, redirectError } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { id, cohort } = req.body || {}
@@ -7,7 +7,7 @@ module.exports = (req, res) => {
 	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
 
 	if (id) { // UPDATE OBJECT
-		
+
 		DB.conn.tx(t => {
 			const values = Object.keys(req.body)
 				.filter(key => !['id', 'cohort'].includes(key))
@@ -17,7 +17,7 @@ module.exports = (req, res) => {
 				}, {})
 
 			const update = `${DB.pgp.helpers.update(values, null, 'mobilizations')} ${DB.pgp.as.format('WHERE id = $1::INT', [ id ])}`;
-			
+
 			return t.one(update)
 			.then(result => {
 				if (cohort) {
@@ -40,6 +40,9 @@ module.exports = (req, res) => {
 			}).catch(err => console.log(err))
 		}).then(_ => {
 			res.redirect(`/${language}/browse/mobilizations/ongoing`)
-		}).catch(err => console.log(err))
-	} else res.redirect('/module-error')
+		}).catch(err => {
+			console.error(err)
+			redirectError(req, res)
+		})
+	} else redirectError(req, res)
 }

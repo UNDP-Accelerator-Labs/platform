@@ -1,4 +1,4 @@
-const { removeSubdomain } = require('../../helpers')
+const { removeSubdomain, redirectError } = require('../../helpers')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
@@ -8,5 +8,5 @@ module.exports = (req, res) => {
 	if (uuid) {
 		const token = jwt.sign({ uuid, rights }, process.env.APP_SECRET, { audience: 'user:known', issuer: mainHost })
 		res.status(200).json(token)
-	} else res.redirect('/module-error')
+	} else redirectError(req, res)
 }

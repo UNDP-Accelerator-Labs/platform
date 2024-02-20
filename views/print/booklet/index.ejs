@@ -87,7 +87,7 @@
 		return booklet.map(data => {
 			const { title, sections } = data
 
-			return new Promise(resolve => {
+			return (async () => {
 				// ADD THE TITLE
 				const article = d3.select('div.document')
 				.addElem('article')
@@ -95,10 +95,10 @@
 				article.addElem('h1', 'title')
 				.html(data.title)
 
-				Promise.all(data.sections.map(async d => {
+				await Promise.all(data.sections.map(async d => {
 					await addPrintSection({ data: d, lang: '<%- language %>', article })
-				})).then(_ => resolve())
-			})
+				}))
+			})()
 		})
 	}
 

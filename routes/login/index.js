@@ -9,3 +9,6 @@ exports.isPasswordSecure = require('./password-requirement.js').isPasswordSecure
 exports.confirmDevice = require('./confirm-device.js').confirmDevice
 exports.resendCode = require('./confirm-device.js').resendCode
 exports.removeDevice = require('./confirm-device.js').removeDevice
+
+exports.initiate_sso = require('./sso-inits.js')
+exports.validate_sso = require('./sso-validate.js')

@@ -16,6 +16,8 @@ const {
 	map,
 	DB,
 	ownDB,
+	allowsso,
+	sso_app_url,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -24,11 +26,16 @@ const array = require('../array');
 function stripExplorationId(url) {
 	return `${url}`.replace(/([?&])explorationid=[^&#]+&?/, '$1');
 }
+function compareReqDomain (req, page_url, domain){
+	const referrer = req.get('Referer');
+	const referrerUrl = new URL(referrer, page_url);
+	return referrerUrl.origin === domain;
+}
 
 if (!exports.legacy) exports.legacy = {}
 
 exports.sessiondata = _data => {
-	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device, is_trusted } = _data || {}
+	let { uuid, name, email, team, collaborators, rights, public, language, iso3, countryname, bureau, lng, lat, device, is_trusted, app } = _data || {}
 
 	// GENERIC session INFO
 	const obj = {}
@@ -46,7 +53,7 @@ exports.sessiondata = _data => {
 		bureau: bureau,
 		lnglat: { lng: lng ?? 0, lat: lat ?? 0 }
 	}
-	obj.app = title
+	obj.app = app || title
 	obj.device = device || {}
 	obj.is_trusted= is_trusted || false
 
@@ -56,29 +63,32 @@ exports.sessionsummary = async _kwargs => {
 	const conn = _kwargs.connection || DB.general
 	const { uuid } = _kwargs
 
-	return new Promise(resolve => {
-		if (uuid) {
-			conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
-			.then(sessions => {
-				if (sessions) {
-					// EXTRACT SESSION DATA
-					const sessionsArr = sessions.map(d => d.sess)
-					sessionsArr.forEach(d => {
-						d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
-					})
+	if (uuid) {
+		return conn.manyOrNone(`SELECT sess FROM session WHERE sess ->> 'uuid' = $1;`, [ uuid ])
+		.then(sessions => {
+			if (sessions) {
+				// EXTRACT SESSION DATA
+				const sessionsArr = sessions.map(d => d.sess)
+				sessionsArr.forEach(d => {
+					d.primarykey = `${d.app} (${d.device?.is_trusted ? 'on trusted device' : 'on untrusted device'})`
+				})
 
-					sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
-					.map(d => {
-						const { values, ...data } = d
-						return data
-					})
-					const total = array.sum.call(sessions, 'count')
-					sessions.push({ key: 'All', count: total, app: 'All' })
-					resolve(sessions)
-				}
-			}).catch(err => console.log(err))
-		} else resolve(null)
-	})
+				sessions = array.nest.call(sessions.map(d => d.sess), { key: 'primarykey', keep: ['app'] })
+				.map(d => {
+					const { values, ...data } = d
+					return data
+				})
+				const total = array.sum.call(sessions, 'count')
+				sessions.push({ key: 'All', count: total, app: 'All' })
+				return sessions;
+			}
+			return null;
+		}).catch(err => {
+			console.log(err)
+			return null;
+		})
+	}
+	return null;
 }
 exports.pagemetadata = (_kwargs) => {
 	const conn = _kwargs.connection || DB.conn
@@ -155,8 +165,8 @@ exports.pagemetadata = (_kwargs) => {
 				FROM mobilizations m
 				WHERE (
 					m.id IN (
-						SELECT mobilization 
-						FROM mobilization_contributors 
+						SELECT mobilization
+						FROM mobilization_contributors
 						WHERE participant = $1
 					)
 					OR m.owner = $1
@@ -260,7 +270,7 @@ exports.pagemetadata = (_kwargs) => {
 		.catch(err => console.log(err))
 	}).then(async results => {
 		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards, sessions ] = results
-		let [ languages, speakers ] = languagedata
+		let [ languages, speakers ] = languagedata ?? []
 
 		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
 		// TO WIDEN THE POSSIBLE REVIEWER POOL
@@ -278,7 +288,7 @@ exports.pagemetadata = (_kwargs) => {
 				d.disabled = d.count < (modules.find(d => d.type === 'reviews')?.reviewers ?? 0)
 			})
 		} else review_templates = []
-		
+
 		const obj = {}
 		obj.metadata = {
 			site: {
@@ -294,6 +304,8 @@ exports.pagemetadata = (_kwargs) => {
 				own_db: await ownDB(),
 				app_id,
 				app_suite_url,
+				allowsso,
+				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null
 			},
 			user: {
 				uuid,
@@ -379,13 +391,13 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 			}).catch(err => console.log(err))
 		}
 	} else {
-		return new Promise(resolve => {
+		return (async () => {
 			if (Array.isArray(data)) {
 				data.forEach(d => d.publishable = (d.status >= 1 || false))
 			} else data.publishable = data.status >= 1 || false
 
-			resolve(data)
-		})
+			return data
+		})()
 	}
 }
 

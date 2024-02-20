@@ -1,5 +1,5 @@
 const { modules, app_storage } = include('config/');
-const { blobContainer, moveBlob } = include('routes/helpers/');
+const { blobContainer, moveBlob, redirectError } = include('routes/helpers/');
 const upload = include('routes/upload/img/');
 const { v4: uuidv4 } = require('uuid');
 
@@ -49,5 +49,5 @@ module.exports = async (req, res) => {
 			res.json({ status: 500, message: 'Oops! Something went wrong.' });
 		});
 
-	} else res.redirect('/module-error');
+	} else redirectError(req, res);
 }

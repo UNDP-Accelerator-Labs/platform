@@ -11,8 +11,8 @@ module.exports = async _kwargs => {
 	if (typeof write === 'object') {
 		if (!id && template) write = write.templated
 		else if (id) {
-			const used_template = await conn.one(`SELECT template FROM pads WHERE id = $1::INT;`, [ id ], d => d.template ?? false)
-			if (used_template) write = write.templated
+			const used_template = await conn.oneOrNone(`SELECT template FROM pads WHERE id = $1::INT;`, [ id ], d => d?.template ?? false)
+			if (used_template) write = write?.templated
 		} else write = write.blank
 	}
 
@@ -34,7 +34,7 @@ module.exports = async _kwargs => {
 					if (result === true) return { authorized: (public || rights >= read), redirect: 'view' }
 					else return { authorized: false }
 				}).catch(err => console.log(err))
-			else return new Promise(resolve => resolve({ authorized: false })) // THIS IS A NEW PAD, BUT THE USER IS IN PUBLIC VIEW OR DOES NOT HAVE THE RIGHTS TO WRITE
+			else return (async () => ({ authorized: false }))() // THIS IS A NEW PAD, BUT THE USER IS IN PUBLIC VIEW OR DOES NOT HAVE THE RIGHTS TO WRITE
 		}
 	} else {
 		if (id) return conn.oneOrNone(`

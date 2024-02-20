@@ -176,7 +176,8 @@ INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://www.sdg-innova
 INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://solutions.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://blogs.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('consent', 'https://consent.sdg-innovation-commons.org/');
-INSERT INTO extern_db (db, url_prefix) VALUES ('codification', 'https://codification.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('login', 'https://login.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('codification', 'https://practice.sdg-innovation-commons.org/');
 
 CREATE TABLE pinboards (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,
@@ -364,3 +365,10 @@ CREATE TABLE public.device_confirmation_code (
   code INTEGER NOT NULL,
   expiration_time TIMESTAMP with time zone NOT NULL
 );
+
+ALTER TABLE users
+ADD COLUMN created_from_sso BOOLEAN DEFAULT FALSE,
+ADD CONSTRAINT unique_email UNIQUE (email);
+
+ALTER TABLE trusted_devices
+ADD CONSTRAINT unique_user_device UNIQUE (user_uuid, device_os, device_browser, session_sid, duuid1, duuid2, duuid3);

@@ -1,7 +1,7 @@
 const { modules, DB } = include('config/')
+const { redirectBack } = include('routes/helpers/')
 
 module.exports = (req, res) => {
-	const { referer } = req.headers || {}
 	const { id, template } = req.query || {}
 	const { uuid } = req.session || {}
 	const { object } = req.params || {}
@@ -15,7 +15,7 @@ module.exports = (req, res) => {
 				INSERT INTO reviewer_pool (reviewer, request, status)
 				SELECT $1, id, 1 FROM review_requests WHERE pad = $2::INT
 					ON CONFLICT ON CONSTRAINT unique_reviewer_pad
-					DO UPDATE 
+					DO UPDATE
 						SET status = EXCLUDED.status
 			;`, [ uuid, id ]))
 
@@ -26,7 +26,7 @@ module.exports = (req, res) => {
 			;`, [ uuid, id, template ], d => d.id)
 			.then(result => {
 				return t.none(`
-					INSERT INTO reviews (pad, reviewer, review) 
+					INSERT INTO reviews (pad, reviewer, review)
 					VALUES ($1::INT, $2, $3::INT)
 				;`, [ id, uuid, result ])
 				.catch(err => console.log(err))
@@ -50,8 +50,7 @@ module.exports = (req, res) => {
 				})
 			}).catch(err => console.log(err))
 		}).then(_ => {
-			if (referer) res.redirect(referer)
-			else res.redirect('/login')
+			redirectBack(req, res)
 		}).catch(err => console.log(err))
 	}
 }

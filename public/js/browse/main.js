@@ -2,7 +2,7 @@ import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 import { renderLonglistFormModal, renderPromiseModal } from '/js/modals.js';
-import { isLoading } from '/js/notification/loader.js'
+import { isLoading } from '/js/notification/loader.js';
 
 export function openPreview() {
   const url = new URL(window.location);
@@ -94,7 +94,7 @@ export async function confirmRemoval(action) {
     form.submit();
   }
 
-  isLoading(true)
+  isLoading(true);
 }
 export function deleteArticles() {
   const sel = d3.select(this);

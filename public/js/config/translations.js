@@ -604,7 +604,7 @@ export const fullVocabulary = {
       singular: 'Gênero',
     },
   },
-  "rnd stage": {
+  'rnd stage': {
     // USED
     en: {
       plural: 'R&D stages',
@@ -623,7 +623,7 @@ export const fullVocabulary = {
       singular: 'Etapas de P&D',
     },
   },
-  "rnd function": {
+  'rnd function': {
     // USED
     en: {
       plural: 'R&D functions',
@@ -642,7 +642,7 @@ export const fullVocabulary = {
       singular: 'Função de P&D',
     },
   },
-  "tool type": {
+  'tool type': {
     // USED
     en: {
       plural: 'Tool types',

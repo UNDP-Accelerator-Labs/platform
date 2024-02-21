@@ -1,21 +1,19 @@
 // THIS IS HEAVILY INSPIRED BY browse/pads/filter.js
 const { modules, engagementtypes, metafields, DB } = include('config/')
-const { checklanguage, datastructures, parsers } = include('routes/helpers/')
+const { checklanguage, datastructures, parsers, safeArr, DEFAULT_UUID } = include('routes/helpers/')
 
-module.exports = req => {
+module.exports = async req => {
 	let { object, space } = req.params || {}
 	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : {} // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 	
 	const { uuid, country, rights, collaborators } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
-	let { search, status, contributors, countries, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	let { search, status, contributors, countries, regions, pads, templates, mobilizations, pinboard, methods, page } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 
 	// MAKE SURE WE HAVE PAGINATION INFO
 	if (!page) page = 1
 	else page = +page
 
-	// TO DO: INTEGRATE FILTER FOR COUNTRIES
-	
 	// BASE FILTERS
 	const base_filters = []
 	if (search) base_filters.push(DB.pgp.as.format(`p.full_text ~* $1`, [ parsers.regexQuery(search) ]))
@@ -83,10 +81,63 @@ module.exports = req => {
 	// PLATFORM FILTERS
 	const platform_filters = []
 	if (pads) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM reviews WHERE pad IN ($1:csv))`, [ pads ]))
+	if (contributors) platform_filters.push(DB.pgp.as.format(`p.owner IN ($1:csv)`, [ contributors ]))
+	if (countries?.length) {
+		if (metafields.some((d) => d.type === 'location')) {
+			platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ countries ]))
+		} else {
+			platform_filters.push(await DB.general.any(`
+				SELECT uuid FROM users WHERE iso3 IN ($1:csv)
+			;`, [ countries ])
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+			.catch(err => console.log(err)))
+		}
+	} else if (regions) {
+		if (metafields.some((d) => d.type === 'location')) {
+			platform_filters.push(await DB.general.tx(gt => {
+				const gbatch = []
+				gbatch.push(gt.any(`
+					SELECT su_a3 AS iso3 FROM adm0_subunits
+					WHERE undp_bureau IN ($1:csv)
+						AND su_a3 <> adm0_a3
+				;`, [ regions ]))
+				gbatch.push(gt.any(`
+					SELECT adm0_a3 AS iso3 FROM adm0
+					WHERE undp_bureau IN ($1:csv)
+				;`, [ regions ]))
+				return gt.batch(gbatch)
+				.then(results => {
+					const [ su_a3, adm_a3 ] = results
+					const locations = su_a3.concat(adm_a3)
+					return DB.pgp.as.format(`p.id IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ locations.map(d => d.iso3) ])
+				}).catch(err => console.log(err))
+			}).catch(err => console.log(err)))
+		} else {
+			platform_filters.push(await DB.general.any(`
+				SELECT u.uuid FROM users u
+				INNER JOIN adm0_subunits c
+					ON c.su_a3 = u.iso3
+					OR c.adm0_a3 = u.iso3
+				WHERE c.undp_bureau IN ($1:csv)
+			;`, [ regions ])
+			.then(results => DB.pgp.as.format(`p.owner IN ($1:csv)`, [ safeArr(results.map(d => d.uuid), DEFAULT_UUID) ]))
+			.catch(err => console.log(err)))
+		}
+	}
 	if (templates) platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ templates ]))
+	if (mobilizations) platform_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
 
 	// CONTENT FILTERS
 	const content_filters = []
+	metafields.forEach(d => {
+		if (Object.keys(req.query).includes(d.label) || Object.keys(req.body).includes(d.label)) {
+			if (['tag', 'index'].includes(d.type)) {
+				content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
+			} else if (!['tag', 'index', 'location', 'attachment'].includes(d.type)) {
+				content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
+			}
+		}
+	})
 	
 	// ORDER
 	const order = DB.pgp.as.format(`ORDER BY p.date DESC`)

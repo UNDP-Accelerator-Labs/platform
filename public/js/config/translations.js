@@ -68,7 +68,7 @@ export const fullVocabulary = {
         shared: 'Shared pads',
         reviewing: 'Under review',
         public: 'Public pads',
-        all: 'All published pads',
+        all: 'All public pads',
       },
       templates: {
         private: 'My templates',
@@ -76,14 +76,14 @@ export const fullVocabulary = {
         shared: 'Shared templates',
         public: 'Public templates',
         reviews: 'Review templates',
-        all: 'All published templates',
+        all: 'All public templates',
       },
       files: {
         private: 'My files',
         curated: 'Content curation',
         shared: 'Shared files',
         public: 'Public files',
-        all: 'All published files',
+        all: 'All public files',
       },
       reviews: {
         pending: 'Pending reviews',
@@ -1463,26 +1463,26 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Preprint',
-        3: 'Published',
+        3: 'Public',
       },
       files: {
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Preprint',
-        3: 'Published',
+        3: 'Public',
       },
       templates: {
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Shared',
-        3: 'Published',
+        3: 'Public',
       },
       reviews: {
         '-1': 'Pending',
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Completed',
-        3: 'Published',
+        3: 'Public',
       },
       contributors: {
         0: 'Pending',
@@ -1603,8 +1603,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
           singular: 'Preprint',
         },
         3: {
-          plural: 'Published pads',
-          singular: 'Published pad',
+          plural: 'Public pads',
+          singular: 'Public pad',
         },
       },
       template: {
@@ -1621,8 +1621,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
           singular: 'Shared template',
         },
         3: {
-          plural: 'Published templates',
-          singular: 'Published template',
+          plural: 'Public templates',
+          singular: 'Public template',
         },
       },
       review: {
@@ -1661,8 +1661,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
           singular: 'Shared file',
         },
         3: {
-          plural: 'Published files',
-          singular: 'Published file',
+          plural: 'Public files',
+          singular: 'Public file',
         },
       },
       contributor: {

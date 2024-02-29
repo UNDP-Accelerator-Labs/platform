@@ -270,7 +270,7 @@ exports.msalConfig = {
     },
   },
 };
-exports.allowsso = false; // SET TO TRUE WHEN MIRCOSOFT OPENID API KEYS ARE AVAILABLE
+exports.allowsso = true; // SET TO TRUE WHEN MIRCOSOFT OPENID API KEYS ARE AVAILABLE
 exports.sso_app_url = 'https://login.sdg-innovation-commons.org'; // 'http://localhost:3000'
 exports.sso_redirect_url =
   'https://login.sdg-innovation-commons.org/auth/openid/return'; // 'http://localhost:3000/auth/openid/return'

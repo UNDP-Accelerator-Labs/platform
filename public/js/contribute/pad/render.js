@@ -462,7 +462,7 @@ const Taglist = function (kwargs) {
 
   const { type, list, imglink, altimglink, datum, lang, vocabulary } =
     kwargs || {};
-  const { tags, constraint } = datum || {};
+  const { name, tags, constraint } = datum || {};
   // Taglist IS AN INSTANCE OF Meta
   Meta.call(this, kwargs);
   const meta = this;

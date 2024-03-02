@@ -1,7 +1,7 @@
 // // EDIT THIS
 // GENERAL APP INFO
 exports.app_title = 'R&D Practice';
-exports.app_title_short = 'codification';
+exports.app_title_short = 'practice';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
 exports.app_languages = ['en', 'fr', 'es', 'pt'];

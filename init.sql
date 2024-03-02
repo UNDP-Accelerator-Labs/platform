@@ -176,7 +176,7 @@ INSERT INTO extern_db (db, url_prefix) VALUES ('global', 'https://www.sdg-innova
 INSERT INTO extern_db (db, url_prefix) VALUES ('sm', 'https://solutions.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('blogs', 'https://blogs.sdg-innovation-commons.org/');
 INSERT INTO extern_db (db, url_prefix) VALUES ('consent', 'https://consent.sdg-innovation-commons.org/');
-INSERT INTO extern_db (db, url_prefix) VALUES ('practice', 'https://practice.sdg-innovation-commons.org/');
+INSERT INTO extern_db (db, url_prefix) VALUES ('codification', 'https://practice.sdg-innovation-commons.org/');
 
 CREATE TABLE pinboards (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,

@@ -10,8 +10,8 @@ if (app_id === 'ap') {
   app_obj = { ...app_obj, ...require('./sm.js') };
 } else if (app_id === 'consent') {
   app_obj = { ...app_obj, ...require('./consent.js') };
-} else if (app_id === 'practice') {
-  app_obj = { ...app_obj, ...require('./practice.js') };
+} else if (app_id === 'codification') {
+  app_obj = { ...app_obj, ...require('./codification.js') };
 } else if (app_id === 'global') {
   app_obj = {
     ...app_obj,

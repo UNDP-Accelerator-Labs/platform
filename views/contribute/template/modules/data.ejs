@@ -1,6 +1,7 @@
 <%
 	// CREATE ALIASES
 	const publicpage = locals.metadata.page.public
+	const modules = locals.metadata.site.modules
 	const metafields = locals.metadata.site.metafields
 	const activity = locals.metadata.page.activity
 	const object = locals.metadata.page.object
@@ -41,3 +42,12 @@
 	}
 %>
 <data name='template' value='<%= JSON.stringify(templatedata) %>'></data>
+<%
+	const sitedata = {
+		modules: modules || {},
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || [],
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>

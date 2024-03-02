@@ -2833,7 +2833,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     },
     pt: {
       plural: 'Caracteres',
-      singular: 'Caracter'
+      singular: 'Caracter',
     },
   },
   groups: {
@@ -2877,19 +2877,19 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   tags: {
     // USED
     en: {
-      plural:'Tags',
+      plural: 'Tags',
       singular: 'Tag',
     },
     fr: {
-      plural:'Étiquettes',
+      plural: 'Étiquettes',
       singular: 'Étiquette',
     },
     es: {
-      plural:'Etiquetas',
+      plural: 'Etiquetas',
       singular: 'Etiqueta',
     },
     pt: {
-      plural:'Tags',
+      plural: 'Tags',
       singular: 'Tag',
     },
   },

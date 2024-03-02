@@ -52,7 +52,8 @@ const Media = function (kwargs) {
     d3.select('data[name="page"]').node()?.value,
   );
   const editing = activity === 'edit';
-  const metafields = JSON.parse(d3.select('data[name="site"]').node()?.value)?.metafields || {};
+  const metafields =
+    JSON.parse(d3.select('data[name="site"]').node()?.value)?.metafields || {};
 
   let { parent, container, sibling, type, datum, focus, lang, vocabulary } =
     kwargs || {};
@@ -122,7 +123,8 @@ const Media = function (kwargs) {
     .each(function (d) {
       if (name) d3.select(this).classed(`${level}-${name}`, true);
     });
-  if (editing || activity === 'preview') { // THIS IS TO ENSURE meta fields CAN BE MOVED
+  if (editing || activity === 'preview') {
+    // THIS IS TO ENSURE meta fields CAN BE MOVED
     this.placement = this.container.addElems(
       'div',
       'placement-opts',
@@ -149,7 +151,8 @@ const Media = function (kwargs) {
       .addElems('i', 'material-icons google-translate-attr')
       .html((d) => d.label);
   }
-  if (editing) { // THIS IS TO ENSURE meta fields CAN BE MOVED
+  if (editing) {
+    // THIS IS TO ENSURE meta fields CAN BE MOVED
     const requirement_id = uuidv4();
     this.required = this.container.addElems(
       'div',
@@ -163,7 +166,11 @@ const Media = function (kwargs) {
         id: requirement_id,
         type: 'checkbox',
         checked: (d) => (d.required ? true : null),
-        disabled: level === 'meta' && metafields?.find((d) => d.label === name)?.required ? true : null,
+        disabled:
+          level === 'meta' &&
+          metafields?.find((d) => d.label === name)?.required
+            ? true
+            : null,
       })
       .on('change', async function (d) {
         if (this.editable) {

@@ -2817,6 +2817,82 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     es: 'Límite a:',
     pt: 'Limite de:',
   },
+  characters: {
+    // USED
+    en: {
+      plural: 'Characters',
+      singular: 'Character',
+    },
+    fr: {
+      plural: 'Caractères',
+      singular: 'Caractère',
+    },
+    es: {
+      plural: 'Caracteres',
+      singular: 'Carácter',
+    },
+    pt: {
+      plural: 'Caracteres',
+      singular: 'Caracter'
+    },
+  },
+  groups: {
+    // USED
+    en: {
+      plural: 'Groups',
+      singular: 'Group',
+    },
+    fr: {
+      plural: 'Groupes',
+      singular: 'Groupe',
+    },
+    es: {
+      plural: 'Grupos',
+      singular: 'Grupo',
+    },
+    pt: {
+      plural: 'Groupos',
+      singular: 'Groupo',
+    },
+  },
+  locations: {
+    // USED
+    en: {
+      plural: 'Locations',
+      singular: 'Location',
+    },
+    fr: {
+      plural: 'Emplacements',
+      singular: 'Emplacement',
+    },
+    es: {
+      plural: 'Ubicaciones',
+      singular: 'Ubicación',
+    },
+    pt: {
+      plural: 'Localizações',
+      singular: 'Localização',
+    },
+  },
+  tags: {
+    // USED
+    en: {
+      plural:'Tags',
+      singular: 'Tag',
+    },
+    fr: {
+      plural:'Étiquettes',
+      singular: 'Étiquette',
+    },
+    es: {
+      plural:'Etiquetas',
+      singular: 'Etiqueta',
+    },
+    pt: {
+      plural:'Tags',
+      singular: 'Tag',
+    },
+  },
   'submissions per contributor': {
     // USED
     en: 'submission(s)<br/>per contributor',

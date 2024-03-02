@@ -51,6 +51,8 @@ const Media = function (kwargs) {
   const { activity } = JSON.parse(
     d3.select('data[name="page"]').node()?.value,
   );
+  const editing = activity === 'edit';
+  const metafields = JSON.parse(d3.select('data[name="site"]').node()?.value)?.metafields || {};
 
   let { parent, container, sibling, type, datum, focus, lang, vocabulary } =
     kwargs || {};
@@ -90,7 +92,8 @@ const Media = function (kwargs) {
     .style('text-align', (d) => d.textalign)
     .on('click.focus', function () {
       const sel = d3.select(this);
-      sel.classed('focus', _self.editable);
+      // sel.classed('focus', _self.editable);
+      sel.classed('focus', editing);
       // sel.findAncestor('layout').classed('focus', editing)
     });
   if (this.editable) {
@@ -105,8 +108,9 @@ const Media = function (kwargs) {
       .addElems('label')
       .html((d) => d);
   }
-  if (this.editable || activity === 'preview')
+  if (this.editable || activity === 'preview') {
     this.input = this.container.addElems('div', 'input-group fixed');
+  }
   this.media = this.container
     .addElems(
       'div',
@@ -118,7 +122,7 @@ const Media = function (kwargs) {
     .each(function (d) {
       if (name) d3.select(this).classed(`${level}-${name}`, true);
     });
-  if (this.editable || activity === 'preview') {
+  if (editing || activity === 'preview') { // THIS IS TO ENSURE meta fields CAN BE MOVED
     this.placement = this.container.addElems(
       'div',
       'placement-opts',
@@ -138,13 +142,14 @@ const Media = function (kwargs) {
       .on('click', async (d) => {
         d3.event.stopPropagation();
         d.fn();
-        if (_self.editable) await switchButtons(lang);
+        // if (_self.editable) await switchButtons(lang);
+        if (editing) await switchButtons(lang);
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
       .addElems('i', 'material-icons google-translate-attr')
       .html((d) => d.label);
   }
-  if (this.editable) {
+  if (editing) { // THIS IS TO ENSURE meta fields CAN BE MOVED
     const requirement_id = uuidv4();
     this.required = this.container.addElems(
       'div',
@@ -158,11 +163,13 @@ const Media = function (kwargs) {
         id: requirement_id,
         type: 'checkbox',
         checked: (d) => (d.required ? true : null),
-        disabled: level === 'meta' ? true : null,
+        disabled: level === 'meta' && metafields?.find((d) => d.label === name)?.required ? true : null,
       })
       .on('change', async function (d) {
-        d.required = this.checked;
-        await partialSave(d.level);
+        if (this.editable) {
+          d.required = this.checked;
+          await partialSave(d.level);
+        }
       });
     this.required.addElems('label').attr('for', requirement_id).html('*');
   }
@@ -171,7 +178,8 @@ const Media = function (kwargs) {
     .addElems('div', 'response template', [type])
     .html((d) => vocabulary['expect'][d]);
 
-  if (this.editable) observer.observe(this.container.node(), obsvars);
+  if (editing) observer.observe(this.container.node(), obsvars);
+  // if (this.editable) observer.observe(this.container.node(), obsvars);
 };
 Media.prototype.rmMedia = async function () {
   const datum = this.container.datum();
@@ -183,9 +191,15 @@ Media.prototype.rmMedia = async function () {
     const input = d3.select(`#input-meta-${name}`).node();
     if (input) input.disabled = false;
   }
-  if (this.editable) await level;
+  // if (this.editable) await await partialSave(level);
+  if (editing) await await partialSave(level);
 };
 Media.prototype.move = function (dir) {
+  const { activity } = JSON.parse(
+    d3.select('data[name="page"]').node()?.value,
+  );
+  const editing = activity === 'edit';
+
   const _self = this;
   let sourceTop = this.container.node().offsetTop;
   let sourceHeight = this.container.node().offsetHeight;
@@ -240,7 +254,8 @@ Media.prototype.move = function (dir) {
             .node()
             .parentNode.insertBefore(this.container.node(), target);
 
-          if (_self.editable) await partialSave(level);
+          // if (_self.editable) await partialSave(level);
+          if (editing) await partialSave(level);
         }, 1000);
         if (openInset.node())
           window.setTimeout(
@@ -276,7 +291,8 @@ Media.prototype.move = function (dir) {
               openInset.node().scrollHeight
             }px`;
 
-          if (_self.editable) await partialSave(level);
+          // if (_self.editable) await partialSave(level);
+          if (editing) await partialSave(level);
         }, 1000);
         if (openInset.node())
           window.setTimeout(
@@ -360,10 +376,10 @@ const Taglist = function (kwargs) {
         if (d.key === 'constraint') {
           if (!sel.classed('active')) {
             const message = `${
-              vocabulary['limit input']['tags']
+              vocabulary['limit to']
             } <input type='number' name='length' value=${
-              datum.constraint || list.length || 5
-            } min=1> ${vocabulary['input type']['tags']}`;
+              datum.constraint || Math.min(list.length, 5)
+            } min=1> ${vocabulary['tags']['plural'].toLowerCase()}`;
             const opts = [
               {
                 node: 'button',
@@ -893,10 +909,10 @@ export async function addTxt(kwargs) {
         } else if (d.key === 'constraint') {
           if (!sel.classed('active')) {
             const message = `${
-              vocabulary['limit input']['characters']
+              vocabulary['limit to']
             } <input type='number' name='length' value=${
               datum.constraint || 9999
-            } min=1> ${vocabulary['input type']['characters']}`;
+            } min=1> ${vocabulary['characters']['plural'].toLowerCase()}`;
             const opts = [
               {
                 node: 'button',
@@ -1013,11 +1029,9 @@ export async function addChecklist(kwargs) {
   }
   if (!instruction) instruction = '';
   required = required ?? true;
-  if ([null, undefined].includes(editable))
-    editable = editing && level !== 'meta';
+  if ([null, undefined].includes(editable)) editable = editing && level !== 'meta';
 
-  if (editable && !options.find((d) => !d.name))
-    options.push({ checked: false });
+  if (editable && !options.find((d) => !d.name)) options.push({ checked: false });
   if (!editable) options = options.filter((d) => d.name);
 
   if (level === 'meta' && name) {
@@ -1377,10 +1391,10 @@ export async function addLocations(kwargs) {
         if (d.key === 'constraint') {
           if (!sel.classed('active')) {
             const message = `${
-              vocabulary['limit input']['locations']
+              vocabulary['limit to']
             } <input type='number' name='length' value=${
               datum.constraint || 10
-            } min=1> ${vocabulary['input type']['locations']}`;
+            } min=1> ${vocabulary['locations']['plural'].toLowerCase()}`;
             const opts = [
               {
                 node: 'button',
@@ -1636,10 +1650,10 @@ export async function addGroup(kwargs) {
         if (d.key === 'repeat') {
           if (!sel.classed('active')) {
             const message = `${
-              vocabulary['limit input']['groups']
+              vocabulary['limit to']
             } <input type='number' name='length' value=${
               datum.constraint || 5
-            } min=1> ${vocabulary['input type']['groups']}`;
+            } min=1> ${vocabulary['groups']['plural'].toLowerCase()}`;
             const opts = [
               {
                 node: 'button',

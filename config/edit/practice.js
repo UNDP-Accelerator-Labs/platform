@@ -9,7 +9,7 @@ exports.app_description =
   require('./translations.js').translations['app description'];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.own_app_url = 'https://codification.sdg-innovation-commons.org/';
+exports.own_app_url = 'https://practice.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
@@ -28,10 +28,10 @@ exports.metafields = [
     opencode: true,
     limit: 5,
   },
-  { type: 'tag', name: 'methods', required: false, opencode: false },
+  { type: 'tag', name: 'methods', required: false, opencode: true },
   // { type: 'tag', name: 'datasources', required: true, opencode: true },
   {
-    type: 'radiolist',
+    type: 'checklist',
     name: 'rnd stage',
     required: true,
     instruction: 'Assocaited R&D activity',

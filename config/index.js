@@ -8,6 +8,7 @@ let {
   app_suite_secret,
   app_languages,
   app_description,
+  app_home,
   app_storage,
   modules,
   metafields,
@@ -49,6 +50,7 @@ exports.app_suite_url = is_staging
 
 exports.app_suite_secret = app_suite_secret;
 exports.app_description = app_description;
+exports.app_home = app_home;
 exports.app_storage = process.env.AZURE_STORAGE_CONNECTION_STRING
   ? new URL(app_title_short, app_storage).href
   : undefined; // TO DO: UPDATE THIS WITH THE CORRECT CONTAINER

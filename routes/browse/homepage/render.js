@@ -1,4 +1,4 @@
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, ownDB, DB } = include('config/')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, browse_display, welcome_module, app_home, ownDB, DB } = include('config/')
 const { array, datastructures, checklanguage, join, parsers, safeArr } = include('routes/helpers/')
 
 const load = require('./load/')
@@ -217,7 +217,7 @@ module.exports = async (req, res) => {
 			}
 
 			const metadata = await datastructures.pagemetadata({ req, res, display, map, mscale })
-			return Object.assign(metadata, { locations, stats, countries, pinboards })
+			return Object.assign(metadata, { locations, stats, countries, pinboards, data: app_home[language] ?? app_home['en'] })
 		}).catch(err => console.log(err))
 	}).then(data => res.render('home', data))
 	.catch(err => console.log(err))

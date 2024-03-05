@@ -69,7 +69,7 @@ exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'carousel';
 
-exports.allowed_routes = ['/module-error'];
+exports.allowed_routes = ['/module-error', '/version'];
 
 exports.restricted_routes = [
   '/:lang/home',

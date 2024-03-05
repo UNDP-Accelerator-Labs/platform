@@ -1,6 +1,6 @@
 <%
 	// CREATE ALIASES
-	const language = locals.metadata.page.language
+	const language = locals?.metadata?.page?.language ?? 'en';
 	const languages = locals.metadata.site.languages
 	const page_language = locals.metadata.page.page_language
 	const excerpt = locals.metadata.page.excerpt

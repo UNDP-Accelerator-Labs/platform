@@ -69,7 +69,7 @@ exports.translations = {
         </div>
       </div>
       `,
-    }
+    },
   },
   'app description': {
     'solutions-mapping': {
@@ -90,7 +90,7 @@ exports.translations = {
     },
     practice: {
       en: 'This platform aims to position exploration, solutions mapping, and experimentation as a function of Research and Development (R&D) for Sustainable Development practice.',
-    }
+    },
   },
   'app desc': {
     'solutions-mapping': {
@@ -242,7 +242,8 @@ exports.translations = {
       `,
     },
     'campaign invitation subject': {
-      en: (appTitle) => `[${appTitle}] You are invited to participate in a new documentation campaign`,
+      en: (appTitle) =>
+        `[${appTitle}] You are invited to participate in a new documentation campaign`,
     },
     'campaign invitation body': {
       en: (

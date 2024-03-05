@@ -118,7 +118,7 @@
 		return cards.map((data, i) => {
 			const { id, title, img, txt, sdgs, tags, iso3, country, date } = data
 
-			return new Promise(resolve, reject => {
+			return new Promise((resolve, reject) => {
 				// ADD THE TITLE
 				const article = d3.select('div.document')
 				.addElem('article', 'print card')

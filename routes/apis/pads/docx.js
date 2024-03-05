@@ -176,7 +176,7 @@ module.exports = async (req, res) => {
 					if (app_storage) { // A CLOUD BASED STORAGE OPTION IS AVAILABLE
 						if (src) {
 							// TO DO: FILTER IF URL
-							await new Promise(resolve, reject => {
+							await new Promise((resolve, reject) => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, src), app_storage).href, function (err, res, buffer) {
 									try {
 										if (err) console.log(err)
@@ -231,7 +231,7 @@ module.exports = async (req, res) => {
 						// TO DO: FILTER IF URL
 						// src.isURL()
 						await Promise.all(srcs.map(d => {
-							return new Promise(resolve, reject => {
+							return new Promise((resolve, reject) => {
 								request.get(new URL(path.join(new URL(app_storage).pathname, d), app_storage).href, function (err, res, buffer) {
 									try {
 										if (err) console.log(err)

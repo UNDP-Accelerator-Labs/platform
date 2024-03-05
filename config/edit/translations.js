@@ -70,6 +70,9 @@ exports.translations = {
       </div>
       `,
     },
+    login: {
+      en: `<div class='public-page-panel'><div class='inner'><p class='lead'>You shouldn't be able to see this</p></div></div>`,
+    },
   },
   'app description': {
     'solutions-mapping': {
@@ -90,6 +93,9 @@ exports.translations = {
     },
     practice: {
       en: 'This platform aims to position exploration, solutions mapping, and experimentation as a function of Research and Development (R&D) for Sustainable Development practice.',
+    },
+    login: {
+      en: `You shouldn't be able to see this`,
     },
   },
   'app desc': {

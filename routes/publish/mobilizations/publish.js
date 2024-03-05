@@ -1,4 +1,4 @@
-const { own_app_url, app_title_short, app_title, DB, ownDB, translations } = include('config/');
+const { own_app_url, app_suite_url, app_title_short, app_title, DB, ownDB, translations } = include('config/');
 const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID, limitLength } = include('routes/helpers/')
 
 const cron = require('node-cron')

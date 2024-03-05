@@ -16,7 +16,7 @@ exports.code = (locations, centerpoint, list = false) => {
 			} else {
 				const l_formatted = l.removeAccents().replacePunctuation(', ').trim()
 				setTimeout(() => {
-					fetch(`https://api.opencagedata.com/geocode/v1/json?q=${l_formatted}&key=${process.env.OPENCAGE_API}`)
+					fetch(`https://nlpapi.sdg-innovation-commons.org/api/geoforward?q=${l_formatted}&token=${process.env.API_TOKEN}`)
 					.then(response => response.json())
 					.then(data => {
 						const obj = {}

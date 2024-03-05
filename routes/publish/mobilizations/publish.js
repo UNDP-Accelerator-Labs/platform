@@ -142,7 +142,7 @@ module.exports = (req, res) => {
 						const esubject = temail['campaign invitation subject'][language] ?? temail['campaign invitation subject']['en']
 						const ebody = temail['new user body'][language] ?? temail['new user body']['en']
 						await sendemail({
-							to: initiatorEmail,
+							to: creatorEmail,
 							bcc: bcc.join(','),
 							subject: (esubject)(platformName),
 							html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),

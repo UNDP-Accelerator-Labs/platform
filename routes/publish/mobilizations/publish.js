@@ -140,7 +140,7 @@ module.exports = (req, res) => {
 						const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
 						const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
 						const esubject = temail['campaign invitation subject'][language] ?? temail['campaign invitation subject']['en']
-						const ebody = temail['new user body'][language] ?? temail['new user body']['en']
+						const ebody = temail['campaign invitation body'][language] ?? temail['campaign invitation body']['en']
 						await sendemail({
 							to: creatorEmail,
 							bcc: bcc.join(','),

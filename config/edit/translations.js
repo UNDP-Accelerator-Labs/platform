@@ -259,12 +259,15 @@ exports.translations = {
         <p>Hello dear contributor to the ${appTitle} ${
           baseURL.includes('consent.') ? 'archive' : 'platform'
         }!</p>
-        <p>${mobilizationCreator} is inviting you to participate in a new documentation campaign on the <a href="${baseURL}">${appTitle}</a>.<br/>
+        <p>${mobilizationCreator} is inviting you to participate in a new documentation campaign on the <a href="${baseURL}">${appTitle}</a> ${
+          baseURL.includes('consent.') ? 'archive' : 'platform'
+        }.<br/>
         All your contributions to this ${
           baseURL.includes('consent.') ? 'archive' : 'platform'
         } will be part of the <a href="${suiteURL}">SDG Innovation Commons</a>.
         </p>
-        <p>Here is some specific information about the campaign:<br/>
+        <p>Here is some specific information about the campaign:</p>
+        <p>
         Title: <strong>${mobilizationTitle}</strong><br/>
         Description: <strong>${mobilizationDescription}</strong>
         </p>

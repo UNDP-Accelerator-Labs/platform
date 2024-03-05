@@ -4,6 +4,7 @@ const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID, limitLength } = 
 const cron = require('node-cron')
 
 module.exports = (req, res) => {
+	const { username: creator, email: creatorEmail } = req.session || {}
 	let { title, description, source, cohort, template, public, start_date, end_date } = req.body || {}
 	if (title) title = limitLength(title, 99);
 	if (!Array.isArray(cohort)) cohort = [cohort]
@@ -133,8 +134,21 @@ module.exports = (req, res) => {
 					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
 					.then(async results => {
 						const bcc = results.map(d => d.email)
+						
+						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+						const temail = translations['email notifications'];
+						const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+						const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
+						const esubject = temail['campaign invitation subject'][language] ?? temail['campaign invitation subject']['en']
+						const ebody = temail['new user body'][language] ?? temail['new user body']['en']
+						await sendemail({
+							to: initiatorEmail,
+							bcc: bcc.join(','),
+							subject: (esubject)(platformName),
+							html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
+						})
 
-						const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
+						/*
 						await sendemail({
 							to: email,
 							bcc,
@@ -144,6 +158,7 @@ module.exports = (req, res) => {
 								Here is some information about the campaign:
 								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE
 						})
+						*/
 						return false
 						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))

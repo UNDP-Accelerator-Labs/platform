@@ -32,6 +32,7 @@ const {
   app_suite_secret,
   app_languages,
   app_description,
+  app_home,
   app_storage,
   modules,
   metafields,
@@ -60,6 +61,7 @@ exports.own_app_url = is_staging
 exports.app_suite_secret = app_suite_secret;
 exports.app_languages = app_languages;
 exports.app_description = app_description;
+exports.app_home = app_home;
 exports.app_storage = app_storage;
 exports.modules = modules;
 exports.metafields = metafields;

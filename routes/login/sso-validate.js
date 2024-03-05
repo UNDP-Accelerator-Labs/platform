@@ -58,12 +58,12 @@ module.exports = (req, res, next) => {
         return t
           .oneOrNone(
             `
-                INSERT INTO users (email, name, rights, position, password, iso3, created_from_sso)
-                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, $7)
+                INSERT INTO users (email, name, rights, position, password, iso3, created_from_sso, confirmed, notifications, confirmed_at)
+                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, TRUE, TRUE, TRUE, NOW())
                 ON CONFLICT (email)
                 DO UPDATE SET name = EXCLUDED.name
             ;`,
-            [email, name, rights, position, password, iso3, true],
+            [email, name, rights, position, password, iso3],
           )
           .then(() => {
             // GET USER INFO, UPDATE SESSION AND TRUSTED DEVICE INFO

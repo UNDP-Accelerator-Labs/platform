@@ -241,11 +241,11 @@ exports.translations = {
         </p>
       `,
     },
-    'campaign invitation subject': {
+    'mobilization invitation subject': {
       en: (appTitle) =>
         `[${appTitle}] You are invited to participate in a new documentation campaign`,
     },
-    'campaign invitation body': {
+    'mobilization invitation body': {
       en: (
         baseURL,
         appTitle,

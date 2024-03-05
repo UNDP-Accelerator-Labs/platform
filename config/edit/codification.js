@@ -71,6 +71,17 @@ exports.metafields = [
       { name: 'Process' },
     ],
   },
+  {
+    type: 'radiolist',
+    name: 'tool license',
+    required: false,
+    instruction: 'Tool license',
+    options: [
+      { name: 'Free or open' },
+      { name: 'Freemium' },
+      { name: 'Paid' },
+    ],
+  },
 ];
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']

@@ -22,7 +22,7 @@ exports.modules = [
   { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } } }, // respond IS FOR TEMPLATED PADS
   { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 3 } },
-  // { type: 'files', rights: { read: 0, write: 1 } },
+  { type: 'files', rights: { read: 0, write: 1 } },
   { type: 'mobilizations', rights: { read: 2, write: 3 } },
 ];
 

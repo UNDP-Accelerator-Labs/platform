@@ -133,7 +133,7 @@ module.exports = (req, res) => {
 							AND notifications = TRUE
 					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
 					.then(results => {
-						const bcc = results.map(d => d.email)
+						let bcc = results.map(d => d.email)
 
 						const sendChunk = async () => {
 							if (!bcc) {

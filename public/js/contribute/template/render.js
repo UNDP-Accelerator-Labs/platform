@@ -173,7 +173,7 @@ const Media = function (kwargs) {
             : null,
       })
       .on('change', async function (d) {
-        if (_self.editable) { // TO DO: ERROR HER
+        if (_self.editable) {
           d.required = this.checked;
           await partialSave(d.level);
         }

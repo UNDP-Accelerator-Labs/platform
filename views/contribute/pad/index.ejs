@@ -308,14 +308,14 @@
 				</div>
 			<% } %>
 			<div class='body'>
-				<% if (!publicpage && !locals.display_mobilization && templated && (object !== 'review' && !locals.data?.is_review)) { %>
+				<% if (!publicpage && templated && (object !== 'review' && !locals.data?.is_review)) { %>
 					<section class='description-layout layout view'><!-- THIS IS ALWAYS IN VIEW MODE IF DISPLAYED -->
 						<% if (!publicpage) { %>
 							<div class='meta-container template-container'>
 								<div class='meta meta-template google-translate-attr'>
 									<i data-vocab='pad based on'></i>&nbsp;
 									<a href='/<%- language %>/view/template?id=<%- locals.display_template.id %>'>
-									<%= locals.display_template.title %></a>
+									<%- locals.display_template.title %></a>
 								</div>
 							</div>
 						<% } %>

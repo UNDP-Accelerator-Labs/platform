@@ -1,5 +1,5 @@
 const { engagementtypes, DB } = include('config/')
-const { checklanguage, engagementsummary, join, pagestats } = include('routes/helpers/')
+const { checklanguage, engagementsummary, join, pagestats, parsers } = include('routes/helpers/')
 
 const check_authorization = require('../authorization.js')
 
@@ -65,8 +65,10 @@ module.exports = async kwargs => {
 					result.source = +source
 				}
 				result.copy = result.copy || ![null, undefined, 0].includes(source)
-
 				result.readCount = await pagestats.getReadCount(id, 'template');
+				// PARSE URLs
+				result.description = parsers.URLsToLinks(result.description)
+				
 				const data = await join.users(result, [ language, 'owner' ])
 				return data;
 			} else return null

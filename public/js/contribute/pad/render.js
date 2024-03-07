@@ -69,9 +69,10 @@ const Media = function (kwargs) {
   const { object, type: objecttype } = objectdata || {};
 
   let { id, level, name } = datum;
-  if (!id) id = datum.id = uuidv4();
-  if (!level) level = 'media';
   parent = d3.select(parent).classed('focus', focus);
+
+  if (!id || parent.datum()?.repeat) id = datum.id = uuidv4();
+  if (!level) level = 'media';
 
   const media = this;
 
@@ -83,11 +84,14 @@ const Media = function (kwargs) {
   this.editing = page.activity === 'edit' && object === mainobject;
 
   if (this.editing) {
+    /*
     if (parent.datum()?.repeat) {
       this.id = `${parent.datum().id}-${id}`; // THIS IS TO HANDLE CHECKLISTS INSIDE REPEAT SECTIONS
     } else {
       this.id = id;
     }
+    */
+    this.id = id;
   } else {
     this.id = `${object}-${id}`;
   }

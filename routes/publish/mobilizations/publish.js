@@ -134,7 +134,7 @@ module.exports = (req, res) => {
 					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
 					.then(results => {
 						let bcc = results.map(d => d.email)
-
+						
 						const sendChunk = async () => {
 							if (!bcc) {
 								return;

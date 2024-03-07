@@ -102,12 +102,12 @@
 				<% } %>
 				<% if (['contribute', 'edit'].includes(activity)) { %>
 					<% if (!locals.data?.id && locals.data?.source) { %>
-						<div class='title' data-placeholder='untitled template' contenteditable>[<span data-vocab='["copy", "preposition"]'></span>] <%= locals.data?.title %></div>
+						<div class='title' data-placeholder='untitled template' contenteditable>[<span data-vocab='["copy", "preposition"]'></span>] <%- locals.data?.title %></div>
 					<% } else { %>
-						<div class='title' data-placeholder='untitled template' contenteditable><%= locals.data?.title %></div>
+						<div class='title' data-placeholder='untitled template' contenteditable><%- locals.data?.title %></div>
 					<% } %>
 				<% } else { %>
-					<div class='title' data-placeholder='untitled template'><%= locals.data?.title %></div>
+					<div class='title' data-placeholder='untitled template'><%- locals.data?.title %></div>
 				<% } %>
 				<% if (!(activity === 'contribute' || locals.metadata.user.uuid === locals.data?.owner)) { %>
 					<% if (activity === 'edit') { %>
@@ -145,7 +145,7 @@
 						<label data-vocab='description'></label>
 					</div>
 					<div class='media-container txt-container lead'>
-						<div class='media media-txt template' data-placeholder='missing template description' contenteditable><% if (review_template) { %><% if (locals.data?.description) { %><%= locals.data?.description %><% } else { %><span data-vocab='review template description'></span> <%= languages.find(d => d.language === review_language).name %><% } %><% } else { %><%= locals.data?.description %><% } %></div>
+						<div class='media media-txt template' data-placeholder='missing template description' contenteditable><% if (review_template) { %><% if (locals.data?.description) { %><%- locals.data?.description %><% } else { %><span data-vocab='review template description'></span> <%- languages.find(d => d.language === review_language).name %><% } %><% } else { %><%- locals.data?.description %><% } %></div>
 						<!-- TO DO: TRANSLATE LANGUAGE NAME (e.g. FRENCH > FRANÇAIS) -->
 					</div>
 					<% if (!review_template) { %>

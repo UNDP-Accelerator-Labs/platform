@@ -132,35 +132,33 @@ module.exports = (req, res) => {
 							AND uuid <> $2
 							AND notifications = TRUE
 					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
-					.then(async results => {
+					.then(results => {
 						const bcc = results.map(d => d.email)
-						
-						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
-						const temail = translations['email notifications'];
-						const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
-						const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
-						const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
-						const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
-						await sendemail({
-							to: creatorEmail,
-							bcc: bcc.join(','),
-							subject: (esubject)(platformName),
-							html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
-						})
 
-						/*
-						await sendemail({
-							to: email,
-							bcc,
-							subject: `[${platformName}] New campaign`,
-							html: `Dear contributor, you are invited to participate in a new documentation
-								campaign on the <a href="${own_app_url}">${platformName}</a>.
-								Here is some information about the campaign:
-								<br><br>${title}<br>${description}` // TO DO: TRANSLATE AND STYLIZE
-						})
-						*/
+						const sendChunk = async () => {
+							if (!bcc) {
+								return;
+							}
+							const chunk = bcc.slice(0, 10);
+							bcc = bcc.slice(10);
+
+							// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+							const temail = translations['email notifications'];
+							const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+							const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
+							const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
+							const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
+							await sendemail({
+								to: creatorEmail,
+								bcc: chunk.join(','),
+								subject: (esubject)(platformName),
+								html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
+							});
+							setTimeout(sendChunk, 2000);
+						}
+						
+						setTimeout(sendChunk, 2000);
 						return false
-						// SEE https://stackoverflow.com/questions/57675265/how-to-send-an-email-in-bcc-using-nodemailer FOR bcc
 					}).catch(err => console.log(err)))
 				}
 

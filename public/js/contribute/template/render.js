@@ -1045,12 +1045,14 @@ export async function addChecklist(kwargs) {
   }
   if (!instruction) instruction = '';
   required = required ?? true;
-  if ([null, undefined].includes(editable))
-    editable = editing && level !== 'meta';
+  if ([null, undefined].includes(editable)){
+    // editable = editing && level !== 'meta';
+    editable = editing;
+  }
 
-  if (editable && !options.find((d) => !d.name))
+  if (editable && level !== 'meta' && !options.find((d) => !d.name))
     options.push({ checked: false });
-  if (!editable) options = options.filter((d) => d.name);
+  if (!editable || level !== 'meta') options = options.filter((d) => d.name);
 
   if (level === 'meta' && name) {
     const input = d3.select(`.media-input-group #input-meta-${name}`).node();
@@ -1079,7 +1081,7 @@ export async function addChecklist(kwargs) {
     .addElem('div', 'instruction')
     .attrs({
       'data-placeholder': (d) => vocabulary['request'][type],
-      contenteditable: editing ? true : null,
+      contenteditable: editable ? true : null,
     })
     .on('keydown', (_) => {
       if (editing) switchButtons(lang);
@@ -1091,7 +1093,7 @@ export async function addChecklist(kwargs) {
   const list = media.media.addElem('ol');
   list.call(addItem);
 
-  if (editable) {
+  if (editable && level !== 'meta') {
     media.media
       .addElems('div', 'add-opt')
       .on('click', function () {
@@ -1133,7 +1135,7 @@ export async function addChecklist(kwargs) {
       .attrs({
         for: (d) => `check-item-${checklist_id}-${d.id}`,
         'data-placeholder': vocabulary['new checklist item'],
-        contenteditable: editable ? true : null,
+        contenteditable: (editable && level !== 'meta') ? true : null,
       })
       .on('keydown', function (d) {
         const evt = d3.event;
@@ -1154,11 +1156,11 @@ export async function addChecklist(kwargs) {
           .findAncestor('opt')
           .classed('valid', (d) => d.name?.length);
 
-        if (editable) switchButtons(lang);
+        if (editable && level !== 'meta') switchButtons(lang);
       })
       .html((d) => d.name);
 
-    if (editable) {
+    if (editable && level !== 'meta') {
       opts
         .addElems('div', 'rm')
         .addElems('i', 'material-icons google-translate-attr')
@@ -1169,7 +1171,7 @@ export async function addChecklist(kwargs) {
           );
           list.call(addItem);
 
-          if (editable) switchButtons(lang);
+          switchButtons(lang);
         });
     }
 
@@ -1209,12 +1211,14 @@ export async function addRadiolist(kwargs) {
   }
   if (!instruction) instruction = '';
   required = required ?? true;
-  if ([null, undefined].includes(editable))
-    editable = editing && level !== 'meta';
+  if ([null, undefined].includes(editable)) {
+    // editable = editing && level !== 'meta';
+    editable = editing;
+  }
 
-  if (editable && !options.find((d) => !d.name))
+  if (editable && level !== 'meta' && !options.find((d) => !d.name))
     options.push({ checked: false });
-  if (!editable) options = options.filter((d) => d.name);
+  if (!editable || level !== 'meta') options = options.filter((d) => d.name);
 
   if (level === 'meta' && name) {
     const input = d3.select(`.media-input-group #input-meta-${name}`).node();
@@ -1242,7 +1246,7 @@ export async function addRadiolist(kwargs) {
     .addElem('div', 'instruction')
     .attrs({
       'data-placeholder': (d) => vocabulary['request'][type],
-      contenteditable: editing ? true : null, // NOTE HERE THE editing (INSTEAD OF editable) IS IMPORTANT: WE CAN SET A PREDEFINED INSTRUCTION, BUT THE INTENTION IS TO ALWAYS ALLOW THE EDITOR TO TAILOR WORDING TO THEIR LIKING
+      contenteditable: editable ? true : null,
     })
     .on('keydown', (_) => {
       if (editing) switchButtons(lang);
@@ -1254,7 +1258,7 @@ export async function addRadiolist(kwargs) {
   const list = media.media.addElem('ol');
   list.call(addItem);
 
-  if (editable) {
+  if (editable && level !== 'meta') {
     media.media
       .addElems('div', 'add-opt')
       .on('click', function () {
@@ -1298,7 +1302,7 @@ export async function addRadiolist(kwargs) {
       .attrs({
         for: (d) => `radio-item-${radiolist_id}-${d.id}`,
         'data-placeholder': vocabulary['new checklist item'],
-        contenteditable: editable ? true : null,
+        contenteditable: (editable && level !== 'meta') ? true : null,
       })
       .on('keydown', function (d) {
         const evt = d3.event;
@@ -1320,11 +1324,11 @@ export async function addRadiolist(kwargs) {
           .findAncestor('opt')
           .classed('valid', (d) => d.name?.length);
 
-        if (editable) switchButtons(lang);
+        if (editable && level !== 'meta') switchButtons(lang);
       })
       .html((d) => d.name);
 
-    if (editable) {
+    if (editable && level !== 'meta') {
       opts
         .addElems('div', 'rm')
         .addElems('i', 'material-icons google-translate-attr')
@@ -1335,7 +1339,7 @@ export async function addRadiolist(kwargs) {
           );
           list.call(addItem);
 
-          if (editable) switchButtons(lang);
+          switchButtons(lang);
         });
     }
 

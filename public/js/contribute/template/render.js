@@ -1045,7 +1045,7 @@ export async function addChecklist(kwargs) {
   }
   if (!instruction) instruction = '';
   required = required ?? true;
-  if ([null, undefined].includes(editable)){
+  if ([null, undefined].includes(editable)) {
     // editable = editing && level !== 'meta';
     editable = editing;
   }
@@ -1135,7 +1135,7 @@ export async function addChecklist(kwargs) {
       .attrs({
         for: (d) => `check-item-${checklist_id}-${d.id}`,
         'data-placeholder': vocabulary['new checklist item'],
-        contenteditable: (editable && level !== 'meta') ? true : null,
+        contenteditable: editable && level !== 'meta' ? true : null,
       })
       .on('keydown', function (d) {
         const evt = d3.event;
@@ -1302,7 +1302,7 @@ export async function addRadiolist(kwargs) {
       .attrs({
         for: (d) => `radio-item-${radiolist_id}-${d.id}`,
         'data-placeholder': vocabulary['new checklist item'],
-        contenteditable: (editable && level !== 'meta') ? true : null,
+        contenteditable: editable && level !== 'meta' ? true : null,
       })
       .on('keydown', function (d) {
         const evt = d3.event;

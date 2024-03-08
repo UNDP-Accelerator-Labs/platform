@@ -170,7 +170,7 @@ module.exports = (req, res) => {
 								if (!emails.length) {
 									return;
 								} else {
-									const to_email = emails.slice(0, 1);
+									const to_email = emails[0];
 									emails = emails.slice(1);
 
 									// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION

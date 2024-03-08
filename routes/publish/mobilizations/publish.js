@@ -14,6 +14,8 @@ module.exports = (req, res) => {
 	const { uuid, email } = req.session || {}
 	const language = checklanguage(req.params?.language || req.session.language)
 
+	const use_bcc = false
+
 	DB.conn.tx(t => { // INSERT THE NEW MOBILIZATION
 		// INSPIRED BY https://stackoverflow.com/questions/38750705/filter-object-properties-by-key-in-es6
 		const insert = Object.keys(req.body)
@@ -133,33 +135,61 @@ module.exports = (req, res) => {
 							AND notifications = TRUE
 					;`, [ safeArr(cohort, DEFAULT_UUID) , uuid ])
 					.then(results => {
-						let bcc = results.map(d => d.email)
+						if (use_bcc) {
+							let bcc = results.map(d => d.email)
 
-						const sendChunk = async () => {
-							if (!bcc.length) {
-								return;
-							} else {
-								const chunk = bcc.slice(0, 10);
-								bcc = bcc.slice(10);
+							const sendChunk = async () => {
+								if (!bcc.length) {
+									return;
+								} else {
+									const chunk = bcc.slice(0, 10);
+									bcc = bcc.slice(10);
 
-								// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
-								const temail = translations['email notifications'];
-								const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
-								const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
-								const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
-								const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
-								await sendemail({
-									to: creatorEmail,
-									bcc: chunk.join(','),
-									subject: (esubject)(platformName),
-									html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
-								});
-								setTimeout(sendChunk, 2000);
+									// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+									const temail = translations['email notifications'];
+									const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+									const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
+									const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
+									const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
+									await sendemail({
+										to: creatorEmail,
+										bcc: chunk.join(','),
+										subject: (esubject)(platformName),
+										html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
+									});
+									setTimeout(sendChunk, 2000);
+								}
+							}
+							setTimeout(sendChunk, 2000);
+							return false
+						} else {
+							let emails = results.map(d => d.email)
+							emails.push(creatorEmail)
+
+							const sendIndividualEmail = async () => {
+								if (!emails.length) {
+									return;
+								} else {
+									const to_email = emails.slice(0, 1);
+									emails = emails.slice(1);
+
+									// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+									const temail = translations['email notifications'];
+									const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+									const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
+									const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
+									const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
+									await sendemail({
+										to: to_email,
+										subject: (esubject)(platformName),
+										html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
+									});
+									setTimeout(sendIndividualEmail, 2000);
+								}
+								setTimeout(sendIndividualEmail, 2000);
+								return false
 							}
 						}
-						
-						setTimeout(sendChunk, 2000);
-						return false
 					}).catch(err => console.log(err)))
 				}
 

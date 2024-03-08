@@ -186,9 +186,9 @@ module.exports = (req, res) => {
 									});
 									setTimeout(sendIndividualEmail, 2000);
 								}
-								setTimeout(sendIndividualEmail, 2000);
-								return false
 							}
+							setTimeout(sendIndividualEmail, 2000);
+							return false
 						}
 					}).catch(err => console.log(err)))
 				}

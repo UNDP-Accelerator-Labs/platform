@@ -1,11 +1,4 @@
 exports.translations = {
-  'app description': {
-    en: 'On this platform you can find many early-stage, home-grown and often open-source grassroots solutions developed by people who are innovating in the margins to solve complex development challenges faced by their communities.',
-    // 'en': '<br/><br/>Intriguing solutions are those that, when observed, make you wonder ‘why did they do that?’. You see something happening, but you don’t immediately understand the need behind it. These are solutions that get a mapper to investigate further and dig deeper to understand why.',
-    fr: 'Sur cette plate-forme, vous pouvez trouver de nombreuses solutions de base à un stade précoce, développées en interne et souvent open source, développées par des personnes qui innovent en marge pour résoudre les problèmes de développement complexes auxquels sont confrontées leurs communautés.',
-    es: 'En esta plataforma, puede encontrar muchas soluciones de base en etapa inicial, locales y, a menudo, de código abierto, desarrolladas por personas que están innovando en los márgenes para resolver los complejos desafíos de desarrollo que enfrentan sus comunidades.',
-    pt: 'Nesta plataforma, você pode encontrar muitas soluções de base em estágio inicial, desenvolvidas em casa e muitas vezes de código aberto, desenvolvidas por pessoas que estão inovando nas margens para resolver complexos desafios de desenvolvimento enfrentados por suas comunidades.',
-  },
   'app title': {
     'solutions-mapping': {
       en: 'Solutions Mapping Platform',
@@ -19,6 +12,90 @@ exports.translations = {
     },
     'action-plans': {
       en: 'Action Plans Platform',
+    },
+  },
+  'app home': {
+    'solutions-mapping': {
+      en: `<div class='public-page-panel'>
+        <div class='inner'>
+          <p class='lead'>Grassroots innovations are home-grown solutions that have never been codified, applied elsewhere, nor taken to scale. These customized solutions are naturally frugal, grounded in a specific context, and might be more relevant, given their proximity to the problem. These solutions are often the result of innovation—people solving problems from the bottom up.</p>
+        </div>
+      </div>
+      <div class='public-page-panel blue'>
+        <div class='inner'>
+          <blockquote>“In the drive for a fairer world, we have an—often-overlooked—asset: what 8 billion people around the world know about solving problems.”</blockquote>
+          <p>Gina Lucarelli</p>
+        </div>
+      </div>
+      <div class='public-page-panel'>
+        <div class='inner'>
+          <p class='lead'>On this platform you can find many early-stage, home-grown and often open-source grassroots solutions developed by people who are innovating in the margins to solve complex development challenges faced by their communities.</p>
+        </div>
+      </div>`,
+    },
+    experiments: {
+      en: `
+      <div class='public-page-panel'>
+        <div class='inner'>
+          <p class='lead'>This platform documents the Experiments conducted across the UNDP Accelerator Labs Network.</p>
+        </div>
+      </div>
+      `,
+    },
+    consent: {
+      en: `
+      <div class='public-page-panel'>
+        <div class='inner'>
+          <p class='lead'>This platform documents consent to share information on the SDG Innovation Commons Exchange Suite.</p>
+        </div>
+      </div>
+      `,
+    },
+    'action-plans': {
+      en: `
+      <div class='public-page-panel'>
+        <div class='inner'>
+          <p class='lead'>This platform documents the Action Plans and the Learnings for the UNDP Accelerator Labs.</p>
+        </div>
+      </div>
+      `,
+    },
+    practice: {
+      en: `
+      <div class='public-page-panel'>
+        <div class='inner'>
+          <p class='lead'>This platform aims to position exploration, solutions mapping, and experimentation as a function of Research and Development (R&D) for Sustainable Development practice.
+          Building on the accumulated experience of Heads of Exploration, Heads of Solutions Mapping, and Heads of Experimentation in the Accelerator Labs Network, this site documents reflective content on the evolution of the practices of exploration, solutions mapping, and exploration, and projects how these will contribute to the three stages of the Accelerator Labs R&D model: 1) sense and explore, 2) develop and test, and 3) diffuse and catalyze.</p>
+        </div>
+      </div>
+      `,
+    },
+    login: {
+      en: `<div class='public-page-panel'><div class='inner'><p class='lead'>You shouldn't be able to see this</p></div></div>`,
+    },
+  },
+  'app description': {
+    'solutions-mapping': {
+      en: 'On this platform you can find many early-stage, home-grown and often open-source grassroots solutions developed by people who are innovating in the margins to solve complex development challenges faced by their communities.',
+      // 'en': '<br/><br/>Intriguing solutions are those that, when observed, make you wonder ‘why did they do that?’. You see something happening, but you don’t immediately understand the need behind it. These are solutions that get a mapper to investigate further and dig deeper to understand why.',
+      fr: 'Sur cette plate-forme, vous pouvez trouver de nombreuses solutions de base à un stade précoce, développées en interne et souvent open source, développées par des personnes qui innovent en marge pour résoudre les problèmes de développement complexes auxquels sont confrontées leurs communautés.',
+      es: 'En esta plataforma, puede encontrar muchas soluciones de base en etapa inicial, locales y, a menudo, de código abierto, desarrolladas por personas que están innovando en los márgenes para resolver los complejos desafíos de desarrollo que enfrentan sus comunidades.',
+      pt: 'Nesta plataforma, você pode encontrar muitas soluções de base em estágio inicial, desenvolvidas em casa e muitas vezes de código aberto, desenvolvidas por pessoas que estão inovando nas margens para resolver complexos desafios de desenvolvimento enfrentados por suas comunidades.',
+    },
+    experiments: {
+      en: 'This platform documents the Experiments conducted across the UNDP Accelerator Labs Network.',
+    },
+    consent: {
+      en: 'This platform documents consent to share information on the SDG Innovation Commons Exchange Suite.',
+    },
+    'action-plans': {
+      en: 'This platform documents the Action Plans and the Learnings for the UNDP Accelerator Labs.',
+    },
+    practice: {
+      en: 'This platform aims to position exploration, solutions mapping, and experimentation as a function of Research and Development (R&D) for Sustainable Development practice.',
+    },
+    login: {
+      en: `You shouldn't be able to see this`,
     },
   },
   'app desc': {
@@ -167,6 +244,45 @@ exports.translations = {
         </p>
         <p>
         Agradecemos de antemano tu interés y esperamos con entusiasmo la posibilidad de colaborar estrechamente en esta iniciativa.
+        </p>
+      `,
+    },
+    'mobilization invitation subject': {
+      en: (appTitle) =>
+        `[${appTitle}] You are invited to participate in a new documentation campaign`,
+    },
+    'mobilization invitation body': {
+      en: (
+        baseURL,
+        appTitle,
+        suiteURL,
+        mobilizationTitle,
+        mobilizationDescription,
+        mobilizationCreatorEmail,
+        mobilizationCreator,
+        mobilizationLink,
+      ) => `
+        <p>Hello dear contributor!</p>
+        <p>${mobilizationCreator} is inviting you to participate in a new documentation campaign on the <a href="${baseURL}">${appTitle}</a> ${
+          baseURL.includes('consent.') ? 'archive' : 'platform'
+        }.<br/>
+        Any contribution you make will be part of the <a href="${suiteURL}">SDG Innovation Commons</a>.
+        </p>
+        <p>Here is some specific information about the campaign:</p>
+        <p>
+        Title: <strong>${mobilizationTitle}</strong><br/>
+        Description: <strong>${mobilizationDescription}</strong>
+        </p>
+        <p>Next Steps:<br/>
+        To contribute to this campaign, use the following link: <a href="${mobilizationLink}">${mobilizationLink}</a><br/>
+        If clicking the link in the email doesn't work, try copying and pasting it directly into the browser's address bar.<br/>
+        Once you are connected, please fill out the different fields on the page, especially those that are marked with a red star. These are required.<br/>
+        When you are done, you should see a blue "Submit" or "Publish" button in the top left corner of the page. Click on that button and follow the instructions to submit and/or publish you contribution.
+        <p>
+        You can contact <a href="mailto:${mobilizationCreatorEmail}">${mobilizationCreator}</a> for more information about this campaign.
+        </p>
+        <p>
+        Thank you very much for your contributions to this initiative.
         </p>
       `,
     },

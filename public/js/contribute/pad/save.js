@@ -504,7 +504,6 @@ export async function partialSave(attr) {
         );
         // d3.select('div.meta-status form.generate-pdf input[name="id"]').attr('value', res.object)
       }
-
       await updateStatus(res.data.status);
       return id;
     })

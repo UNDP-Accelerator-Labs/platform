@@ -68,7 +68,7 @@ export const fullVocabulary = {
         shared: 'Shared pads',
         reviewing: 'Under review',
         public: 'Public pads',
-        all: 'All published pads',
+        all: 'All public pads',
       },
       templates: {
         private: 'My templates',
@@ -76,14 +76,14 @@ export const fullVocabulary = {
         shared: 'Shared templates',
         public: 'Public templates',
         reviews: 'Review templates',
-        all: 'All published templates',
+        all: 'All public templates',
       },
       files: {
         private: 'My files',
         curated: 'Content curation',
         shared: 'Shared files',
         public: 'Public files',
-        all: 'All published files',
+        all: 'All public files',
       },
       reviews: {
         pending: 'Pending reviews',
@@ -602,6 +602,63 @@ export const fullVocabulary = {
     pt: {
       plural: 'Gêneros',
       singular: 'Gênero',
+    },
+  },
+  'rnd stage': {
+    // USED
+    en: {
+      plural: 'R&D stages',
+      singular: 'R&D stage',
+    },
+    fr: {
+      plural: 'Étapes de R&D',
+      singular: 'Étape de R&D',
+    },
+    es: {
+      plural: 'Etapas de I+D',
+      singular: 'Etapa de I+D',
+    },
+    pt: {
+      plural: 'Estágio de P&D',
+      singular: 'Etapas de P&D',
+    },
+  },
+  'rnd function': {
+    // USED
+    en: {
+      plural: 'R&D functions',
+      singular: 'R&D function',
+    },
+    fr: {
+      plural: 'Fonction R&D',
+      singular: 'Fonctions R&D',
+    },
+    es: {
+      plural: 'Función de I+D',
+      singular: 'Funciones de I+D',
+    },
+    pt: {
+      plural: 'Funções de P&D',
+      singular: 'Função de P&D',
+    },
+  },
+  'tool type': {
+    // USED
+    en: {
+      plural: 'Tool types',
+      singular: 'Tool type',
+    },
+    fr: {
+      plural: 'Types d’outils',
+      singular: 'Type d’outil',
+    },
+    es: {
+      plural: 'Tipos de herramientas',
+      singular: 'Tipo de herramienta',
+    },
+    pt: {
+      plural: 'Tipos de ferramentas',
+      singular: 'Tipo de ferramenta',
     },
   },
   position: {
@@ -1406,26 +1463,26 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Preprint',
-        3: 'Published',
+        3: 'Public',
       },
       files: {
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Preprint',
-        3: 'Published',
+        3: 'Public',
       },
       templates: {
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Shared',
-        3: 'Published',
+        3: 'Public',
       },
       reviews: {
         '-1': 'Pending',
         0: 'Unfinished',
         1: 'Publishable',
         2: 'Completed',
-        3: 'Published',
+        3: 'Public',
       },
       contributors: {
         0: 'Pending',
@@ -1546,8 +1603,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
           singular: 'Preprint',
         },
         3: {
-          plural: 'Published pads',
-          singular: 'Published pad',
+          plural: 'Public pads',
+          singular: 'Public pad',
         },
       },
       template: {
@@ -1564,8 +1621,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
           singular: 'Shared template',
         },
         3: {
-          plural: 'Published templates',
-          singular: 'Published template',
+          plural: 'Public templates',
+          singular: 'Public template',
         },
       },
       review: {
@@ -1604,8 +1661,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
           singular: 'Shared file',
         },
         3: {
-          plural: 'Published files',
-          singular: 'Published file',
+          plural: 'Public files',
+          singular: 'Public file',
         },
       },
       contributor: {
@@ -2759,6 +2816,82 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     fr: 'Limiter à :',
     es: 'Límite a:',
     pt: 'Limite de:',
+  },
+  characters: {
+    // USED
+    en: {
+      plural: 'Characters',
+      singular: 'Character',
+    },
+    fr: {
+      plural: 'Caractères',
+      singular: 'Caractère',
+    },
+    es: {
+      plural: 'Caracteres',
+      singular: 'Carácter',
+    },
+    pt: {
+      plural: 'Caracteres',
+      singular: 'Caracter',
+    },
+  },
+  groups: {
+    // USED
+    en: {
+      plural: 'Groups',
+      singular: 'Group',
+    },
+    fr: {
+      plural: 'Groupes',
+      singular: 'Groupe',
+    },
+    es: {
+      plural: 'Grupos',
+      singular: 'Grupo',
+    },
+    pt: {
+      plural: 'Groupos',
+      singular: 'Groupo',
+    },
+  },
+  locations: {
+    // USED
+    en: {
+      plural: 'Locations',
+      singular: 'Location',
+    },
+    fr: {
+      plural: 'Emplacements',
+      singular: 'Emplacement',
+    },
+    es: {
+      plural: 'Ubicaciones',
+      singular: 'Ubicación',
+    },
+    pt: {
+      plural: 'Localizações',
+      singular: 'Localização',
+    },
+  },
+  tags: {
+    // USED
+    en: {
+      plural: 'Tags',
+      singular: 'Tag',
+    },
+    fr: {
+      plural: 'Étiquettes',
+      singular: 'Étiquette',
+    },
+    es: {
+      plural: 'Etiquetas',
+      singular: 'Etiqueta',
+    },
+    pt: {
+      plural: 'Tags',
+      singular: 'Tag',
+    },
   },
   'submissions per contributor': {
     // USED

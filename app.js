@@ -77,6 +77,9 @@ app.use(
     strictTransportSecurity: {
       maxAge: 123456,
     },
+    // defaultProps: {
+    //   encodeSpecialCharacters: false,
+    // },
   }),
 );
 
@@ -173,8 +176,12 @@ app.use((req, res, next) => {
 
   // Redirect to login if the route is not allowed or is restricted
   if (
-    (!isAllowed && allowed_routes && allowed_routes.length) ||
-    (isRestricted && restricted_routes && restricted_routes.length)
+    !isAllowed &&
+    allowed_routes &&
+    allowed_routes.length &&
+    isRestricted &&
+    restricted_routes &&
+    restricted_routes.length
   ) {
     return res.redirect('/login');
   }

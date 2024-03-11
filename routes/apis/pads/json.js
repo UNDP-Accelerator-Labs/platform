@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
 				p.status,
 				p.source AS source_pad_id,
 				p.template,
-				-- p.full_text,
+				-- p.full_text,  -- FIXME make option to add
 				p.sections,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('tag_id', t.tag_id, 'type', t.type))) FILTER (WHERE t.tag_id IS NOT NULL), '[]') AS tags,

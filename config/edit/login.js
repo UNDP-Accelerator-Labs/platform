@@ -6,7 +6,13 @@ exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
 exports.app_languages = ['en', 'fr', 'es', 'pt'];
 exports.app_description =
-  require('./translations.js').translations['app description'];
+  require('./translations.js').translations['app description']?.[
+    this.app_title_short
+  ];
+exports.app_home =
+  require('./translations.js').translations['app home']?.[
+    this.app_title_short
+  ];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
 exports.own_app_url = 'https://login.sdg-innovation-commons.org/';
@@ -63,7 +69,7 @@ exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'carousel';
 
-exports.allowed_routes = [];
+exports.allowed_routes = ['/module-error', '/version'];
 
 exports.restricted_routes = [
   '/:lang/home',

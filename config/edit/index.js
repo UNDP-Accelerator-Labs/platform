@@ -10,6 +10,8 @@ if (app_id === 'ap') {
   app_obj = { ...app_obj, ...require('./sm.js') };
 } else if (app_id === 'consent') {
   app_obj = { ...app_obj, ...require('./consent.js') };
+} else if (app_id === 'codification') {
+  app_obj = { ...app_obj, ...require('./codification.js') };
 } else if (app_id === 'login') {
   app_obj = { ...app_obj, ...require('./login.js') };
 } else if (app_id === 'global') {
@@ -30,6 +32,7 @@ const {
   app_suite_secret,
   app_languages,
   app_description,
+  app_home,
   app_storage,
   modules,
   metafields,
@@ -58,6 +61,7 @@ exports.own_app_url = is_staging
 exports.app_suite_secret = app_suite_secret;
 exports.app_languages = app_languages;
 exports.app_description = app_description;
+exports.app_home = app_home;
 exports.app_storage = app_storage;
 exports.modules = modules;
 exports.metafields = metafields;

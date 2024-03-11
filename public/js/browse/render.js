@@ -2079,7 +2079,7 @@ export async function renderSections() {
       arenders.push(async () => {
         section.classed(page.display, true);
       });
-      d.data.forEach((c) => {
+      (d.data ?? []).forEach((c) => {
         arenders.push(async () => {
           await renderVignette(section, { data: c, object, space, page });
         });

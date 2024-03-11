@@ -271,7 +271,7 @@ exports.pagemetadata = (_kwargs) => {
 		.catch(err => console.log(err))
 	}).then(async results => {
 		let [ templates, mobilizations, participations, languagedata, review_templates, pinboards, sessions ] = results
-		let [ languages, speakers ] = languagedata
+		let [ languages, speakers ] = languagedata ?? []
 
 		// THIS PART IS A BIT COMPLEX: IT AIMS TO COMBINE PRIMARY AND SECONDARY LANGUAGES OF USERS
 		// TO WIDEN THE POSSIBLE REVIEWER POOL

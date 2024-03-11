@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 exports.code = (locations, list = false) => {
 	console.log('pay attention to reverse geocode')
 	return locations.map(l => {
-		return new Promise(resolve, reject => {
+		return new Promise((resolve, reject) => {
 			if (!l || !Array.isArray(l) || l.length !== 2 || !l.every(d => !isNaN(d))) {
 				console.log('does not meet requirements')
 				const obj = {}

@@ -41,7 +41,11 @@ module.exports = async (req, res) => {
 				batch.push(t.oneOrNone(`
 					SELECT id, title, description, medium FROM templates
 					WHERE $1:raw
-				;`, [ template_clause ]))
+				;`, [ template_clause ])
+				.then(result => {
+					result.description = parsers.URLsToLinks(result.description)
+					return result
+				}).catch(err => console.log(err)))
 
 				// GET POTENTIAL MOBILIZATION INFORMATION
 				let mobilization_clause = ''

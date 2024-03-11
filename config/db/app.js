@@ -6,7 +6,7 @@ if (['production', 'local-production'].includes(process.env.NODE_ENV)) {
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    ssl: true,
+    ssl: process.env.DB_HOST !== 'localhost',
   };
 } else {
   console.log('in local test envorinment');

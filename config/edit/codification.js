@@ -1,7 +1,7 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'Action Plans';
-exports.app_title_short = 'action-plans';
+exports.app_title = 'R&D Practice';
+exports.app_title_short = 'practice';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
 exports.app_languages = ['en', 'fr', 'es', 'pt'];
@@ -15,44 +15,77 @@ exports.app_home =
   ];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.own_app_url = 'https://learningplans.sdg-innovation-commons.org/';
+exports.own_app_url = 'https://practice.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
   { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } } }, // respond IS FOR TEMPLATED PADS
   { type: 'pinboards', rights: { read: 0, write: 1 } },
-  { type: 'templates', rights: { read: 3, write: 3 } },
+  { type: 'templates', rights: { read: 2, write: 3 } },
   { type: 'files', rights: { read: 0, write: 1 } },
-  {
-    type: 'reviews',
-    rights: { read: 2, write: 2, coordinate: 3 },
-    reviewers: 2,
-  }, // TO DO: UPDATE THIS TO 2
   { type: 'mobilizations', rights: { read: 2, write: 3 } },
-  { type: 'contributors', rights: { read: 2, write: 2 } },
-  { type: 'teams', rights: { read: 1, write: 2 } },
-  // { type: 'analyses', rights: { read: 1, write: 2 } }
 ];
 
-// NOTE: reviews IS DEPENDENT ON tags RIGHT NOW (FOR ASSIGNMENT OF REVIEWERS)
-
-// DESIRED METADATA
-// TO DO: metafields SHOULD BE ANY KIND OF MEDIA, E.G. CHECKBOX WITH VALUES, TEXT, ETC
-// OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
-
 exports.metafields = [
-  { type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 },
-
   {
     type: 'tag',
     name: 'thematic areas',
-    required: true,
+    required: false,
     opencode: true,
     limit: 5,
   },
-  { type: 'tag', name: 'methods', required: true, opencode: false },
-  { type: 'tag', name: 'datasources', required: true, opencode: true },
-  // { type: 'location', name: 'locations', required: true }
+  { type: 'tag', name: 'methods', required: false, opencode: true },
+  // { type: 'tag', name: 'datasources', required: true, opencode: true },
+  {
+    type: 'checklist',
+    name: 'rnd stage',
+    required: true,
+    instruction: 'Assocaited R&D activity',
+    options: [
+      { name: 'Sense' },
+      { name: 'Explore' },
+      { name: 'Develop' },
+      { name: 'Test' },
+      { name: 'Diffuse' },
+      { name: 'Catalyze' },
+    ],
+  },
+  {
+    type: 'checklist',
+    name: 'rnd function',
+    required: true,
+    instruction: 'Assocaited R&D function',
+    options: [
+      { name: 'Exploration' },
+      { name: 'Solutions mapping' },
+      { name: 'Experimentation' },
+    ],
+  },
+  {
+    type: 'radiolist',
+    name: 'tool type',
+    required: false,
+    instruction: 'Primary tool type',
+    options: [
+      { name: 'Framework, Model' },
+      { name: 'Guide, Manual' },
+      { name: 'Platform, Portal' },
+      { name: 'Playbook, Toolkit' },
+      { name: 'Worksheet, Canvas' },
+      { name: 'Process' },
+    ],
+  },
+  {
+    type: 'radiolist',
+    name: 'tool license',
+    required: false,
+    instruction: 'Tool license',
+    options: [
+      { name: 'Free or open' },
+      { name: 'Freemium' },
+      { name: 'Paid' },
+    ],
+  },
 ];
 // DESIRED ENGAGEMENT TYPES
 // OPTIONS: ['like', 'dislike', 'comment']

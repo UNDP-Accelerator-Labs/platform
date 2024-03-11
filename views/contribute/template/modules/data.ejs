@@ -1,6 +1,7 @@
 <%
 	// CREATE ALIASES
 	const publicpage = locals.metadata.page.public
+	const modules = locals.metadata.site.modules
 	const metafields = locals.metadata.site.metafields
 	const activity = locals.metadata.page.activity
 	const object = locals.metadata.page.object
@@ -14,7 +15,7 @@
 <!-- SET DATA ATTRIBUTES -->
 <data name='object' value='<%= object %>'></data>
 <data name='username' value='<%= locals.metadata.user.name %>'></data>
-<% 
+<%
 	const pagedata = {
 		type: publicpage ? 'public' : 'private',
 		activity: editing ? 'edit' : 'view'
@@ -26,18 +27,27 @@
 		id: locals.data?.id ?? null,
 		source: locals.data?.source ?? null,
 		copy: locals.data?.copy ?? false,
-		
+
 		// type: review_template ? 'templated' : 'blank',
 		// template: templated ? locals.display_template : {},
-		
+
 		category: review_template ? 'review' : 'standard',
 		language: review_language || null,
 		metafields: metafields || {},
 		media_value_keys: locals.metadata.site.media_value_keys || [],
-		
+
 		// is_review: locals.data?.is_review || false,
-		
+
 		title: locals.data?.title ?? null
 	}
 %>
 <data name='template' value='<%= JSON.stringify(templatedata) %>'></data>
+<%
+	const sitedata = {
+		modules: modules || {},
+		metafields: metafields || {},
+		media_value_keys: locals.metadata.site.media_value_keys || [],
+		ownDB: locals.metadata.site.own_db
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>

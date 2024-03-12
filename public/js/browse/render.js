@@ -306,7 +306,7 @@ export const Entry = function (_kwargs) {
                       label: vocabulary['internally'],
                     });
                   }
-                  if (d.status <= 2 && d.publishable) {
+                  if (d.status <= 2 && (d.publishable === undefined || d.publishable === true)) {
                     if (!(d.status === 1 && exceeds_publication_limit)) {
                       publish_dropdown.push({
                         name: 'status',

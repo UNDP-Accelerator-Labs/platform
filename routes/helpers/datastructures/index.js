@@ -1,6 +1,7 @@
 const {
 	app_id,
 	app_title: title,
+	app_title_short,
 	app_description: description,
 	app_languages,
 	app_storage,
@@ -362,43 +363,47 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 	const conn = _kwargs.connection || DB.conn
 	const { data } = _kwargs
 
-	const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
-	if (other_metadata.length > 0) {
-		if (Array.isArray(data)) {
-			return Promise.all(data.map(d => {
+	if (app_title_short === 'sm') {
+		const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
+		if (other_metadata.length > 0) {
+			if (Array.isArray(data)) {
+				return Promise.all(data.map(d => {
+					return conn.any(`
+						SELECT type, name, value FROM metafields
+						WHERE pad = $1::INT
+					;`, [ d.id ])
+					.then(meta => {
+						const nesting = array.nest.call(meta, { key: c => `${c.type}-${c.name}`, keep: ['type', 'name'] })
+						const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
+
+						d.publishable = (d.status >= 1 && has_metadata) || false
+						return d
+					}).catch(err => console.log(err))
+				}))
+			} else {
 				return conn.any(`
 					SELECT type, name, value FROM metafields
 					WHERE pad = $1::INT
-				;`, [ d.id ])
+				;`, [ data.id ])
 				.then(meta => {
-					const nesting = array.nest.call(meta, { key: c => `${c.type}-${c.name}`, keep: ['type', 'name'] })
+					const nesting = array.nest.call(meta, { key: d => `${d.type}-${d.name}`, keep: ['type', 'name'] })
 					const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
 
-					d.publishable = (d.status >= 1 && has_metadata) || false
-					return d
+					data.publishable = (data.status >= 1 && has_metadata) || false
+					return data
 				}).catch(err => console.log(err))
-			}))
+			}
 		} else {
-			return conn.any(`
-				SELECT type, name, value FROM metafields
-				WHERE pad = $1::INT
-			;`, [ data.id ])
-			.then(meta => {
-				const nesting = array.nest.call(meta, { key: d => `${d.type}-${d.name}`, keep: ['type', 'name'] })
-				const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
+			return (async () => {
+				if (Array.isArray(data)) {
+					data.forEach(d => d.publishable = (d.status >= 1 || false))
+				} else data.publishable = data.status >= 1 || false
 
-				data.publishable = (data.status >= 1 && has_metadata) || false
 				return data
-			}).catch(err => console.log(err))
+			})()
 		}
 	} else {
-		return (async () => {
-			if (Array.isArray(data)) {
-				data.forEach(d => d.publishable = (d.status >= 1 || false))
-			} else data.publishable = data.status >= 1 || false
-
-			return data
-		})()
+		return data
 	}
 }
 

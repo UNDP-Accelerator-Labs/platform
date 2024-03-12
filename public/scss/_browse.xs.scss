@@ -2919,6 +2919,10 @@ nav.pagination {
     display: initial;
     position: static;
 
+    &.notranslate {
+      display: block;
+    }
+
     ul {
       padding: 0 15px;
       text-align: center;
@@ -2926,9 +2930,13 @@ nav.pagination {
         display: inline-block;
         margin: 0 5px;
 
-        a.page-link.active {
-          font-weight: 700;
-          text-decoration: underline;
+        a {
+          cursor: pointer;
+
+          &.page-link.active {
+            font-weight: 700;
+            text-decoration: underline;
+          }
         }
       }
       li.disabled {

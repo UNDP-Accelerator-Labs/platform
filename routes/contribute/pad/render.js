@@ -249,7 +249,7 @@ module.exports = async (req, res) => {
 					// AND HAS NOT BEEN REVIEWED
 					let disclaimer = null
 					const n_reviews = modules.find(d => d.type === 'reviews')?.reviewers ?? Infinity
-					if (!((data.reviews?.length ?? 0) > n_reviews) && activity === 'view') {
+					if (!((data?.reviews?.length ?? 0) > n_reviews) && activity === 'view') {
 						const disclaimer_text = (translations['app disclaimer'][app_title_short] || translations['app disclaimer']['default'])
 						disclaimer = disclaimer_text?.[`${language || 'en'}`] || disclaimer_text['en']
 					}

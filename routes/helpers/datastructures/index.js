@@ -305,7 +305,6 @@ exports.pagemetadata = (_kwargs) => {
 				own_db: await ownDB(),
 				app_id,
 				app_suite_url,
-				disclaimer: translations['disclaimer'][`${language || 'en'}`],
 				allowsso,
 				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null,
 			},

@@ -1,4 +1,4 @@
-const { engagementtypes, map, DB } = include('config/')
+const { app_title_short, translations, engagementtypes, map, modules, DB } = include('config/')
 const { checklanguage, engagementsummary, join, datastructures, safeArr, DEFAULT_UUID, parsers, pagestats, redirectUnauthorized } = include('routes/helpers/')
 
 const check_authorization = require('./authorization.js')
@@ -43,8 +43,10 @@ module.exports = async (req, res) => {
 					WHERE $1:raw
 				;`, [ template_clause ])
 				.then(result => {
-					result.description = parsers.URLsToLinks(result.description)
-					return result
+					if (result) {
+						result.description = parsers.URLsToLinks(result.description);
+					}
+					return result;
 				}).catch(err => console.log(err)))
 
 				// GET POTENTIAL MOBILIZATION INFORMATION
@@ -243,9 +245,17 @@ module.exports = async (req, res) => {
 					const excerpt = data?.status > 2 ? { title: data.title, txt: parsers.getTxt(data)[0], img: { src: parsers.getImg(data)[0], width: 300, height: 200 }, p: true } : null
 					// const item_attachments = parsers.getPadImgs(data)
 
-					// const metadata = await datastructures.pagemetadata({ connection: t, req, display: display_template?.slideshow ? 'slideshow' : display })
+					// ONLY SHOW DISCLAIMER IF IN VIEW MODE
+					// AND HAS NOT BEEN REVIEWED
+					let disclaimer = null
+					const n_reviews = modules.find(d => d.type === 'reviews')?.reviewers ?? Infinity
+					if (!((data.reviews?.length ?? 0) > n_reviews) && activity === 'view') {
+						const disclaimer_text = (translations['app disclaimer'][app_title_short] || translations['app disclaimer']['default'])
+						disclaimer = disclaimer_text?.[`${language || 'en'}`] || disclaimer_text['en']
+					}
+
 					const metadata = await datastructures.pagemetadata({ connection: t, req, display: display || (display_template?.slideshow ? 'slideshow' : null), excerpt, map })
-					return Object.assign(metadata, { data, tags, display_template, display_mobilization, source, engagement, comments })
+					return Object.assign(metadata, { data, tags, disclaimer, display_template, display_mobilization, source, engagement, comments })
 				}).then(data => {
 					// IF DISPLAY FOR PRINT, RENDER PRINT
 					if (display === 'print') res.render('print/pads/', data)

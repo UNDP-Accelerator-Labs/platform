@@ -168,6 +168,32 @@ exports.translations = {
       `,
     },
   },
+  'app disclaimer': {
+    'action-plans': {
+      en: `
+        <p>Disclaimer:</p>
+        <small>Please be aware that the content herein has not been peer reviewed. It consists of personal reflections, insights, and learnings of the contributor(s). It may not to be exhaustive, nor does it aim to be authoritative knowledge.</small>
+      `,
+      fr: `
+        <p>Clause de non-responsabilité:</p>
+        <small>Veuillez noter que le contenu présenté ici n'a pas été examiné par des pairs. Il est constitué de réflexions personnelles, d’idées et d’apprentissages du ou des contributeurs. Il se peut qu’il ne soit pas exhaustif et il ne vise pas à faire autorité.</small>
+      `,
+      es: `
+        <p>Descargo de responsabilidad:</p>
+        <small>Tenga en cuenta que el contenido de este documento no ha sido revisado por pares. Consiste en reflexiones personales, conocimientos y aprendizajes de los contribuyentes. Puede que no sea exhaustivo ni pretenda ser conocimiento autorizado.</small>
+      `,
+      pt: `
+        <p>Isenção de responsabilidade:</p>
+        <small>Esteja ciente de que o conteúdo aqui contido não foi revisado por pares. Consiste em reflexões pessoais, percepções e aprendizados do(s) colaborador(es). Pode não ser exaustivo, nem pretende ser um conhecimento oficial.</small>
+      `,
+    },
+    default: {
+      en: `
+        <p>Disclaimer:</p>
+        <small>Please be aware that the content herein is comprised of personal reflections, observations, and insights from our contributors. It is not necessarily exhaustive or authoritative, but rather reflects individual perspectives. While we aim for accuracy, we cannot guarantee the completeness or up-to-date nature of the content.</small>
+      `,
+    },
+  },
   'email notifications': {
     'new user subject': {
       en: (appTitle) => `[${appTitle}] An account has been created for you`,

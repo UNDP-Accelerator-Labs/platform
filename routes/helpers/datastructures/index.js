@@ -16,6 +16,7 @@ const {
 	map,
 	DB,
 	ownDB,
+	translations,
 	allowsso,
 	sso_app_url,
 } = include('config/')
@@ -305,7 +306,7 @@ exports.pagemetadata = (_kwargs) => {
 				app_id,
 				app_suite_url,
 				allowsso,
-				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null
+				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null,
 			},
 			user: {
 				uuid,

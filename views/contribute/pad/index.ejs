@@ -241,7 +241,10 @@
 					</div>
 				</div>
 			<% } %>
-
+			<% if (locals.disclaimer){ %>
+				<!-- SHOW DISCLAIMER -->
+				<%- include ('./modules/disclaimer.ejs') %>
+			<% } %>
 			<!-- IF THE PAD IS A CONTRIBUTION TO A MOBILIZATION, DISPLAY THE MOBILIZATION INFORMATION -->
 			<% if (locals.display_mobilization && !locals.data?.id && editing) { %>
 				<div class='meta-info mobilization-info'>

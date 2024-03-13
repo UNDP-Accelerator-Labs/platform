@@ -192,12 +192,11 @@ module.exports = (req, res, next) => {
 								await Object.assign(req.session, datastructures.sessiondata(sess));
 								req.session.save(function(err) {
 									if(err) console.log(' err ', err)
-								  })
-
-								if(checkOrigin(redirecturl, origin_url)){
-									  return res.redirect(redirecturl)
-								  }
-								  else res.redirect(`/${req.session.page.language}/edit/contributor?id=${req.session.user.uuid}`)
+									if(checkOrigin(redirecturl, origin_url)){
+										return res.redirect(redirecturl)
+									}
+									else res.redirect(`/${req.session.page.language}/edit/contributor?id=${req.session.user.uuid}`)
+								})
 							})
 							.catch(err => console.log(err))
 
@@ -227,14 +226,13 @@ module.exports = (req, res, next) => {
 								await Object.assign(req.session, datastructures.sessiondata(sess))
 								req.session.save(function(err) {
 									if(err) console.log(' err ', err)
-								  })
-								if(checkOrigin(redirecturl, origin_url)){
-									  return res.redirect(redirecturl)
-								  }
-								  else {
-									return res.redirect(`/${req.session.page.language}/edit/contributor?id=${req.session.user.uuid}`)
-								  }
-
+									if(checkOrigin(redirecturl, origin_url)){
+										return res.redirect(redirecturl)
+									}
+									else {
+									  return res.redirect(`/${req.session.page.language}/edit/contributor?id=${req.session.user.uuid}`)
+									}
+								})
 							}
 						}
 					})

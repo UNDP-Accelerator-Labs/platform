@@ -164,12 +164,11 @@ module.exports = (req, res, next) => {
                         if (err) {
                           console.log(' err ', err)
                         }
+                        if(checkOrigin(redirecturl)){
+                            return res.redirect(redirecturl)
+                        }
+                        else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                       })
-
-                      if(checkOrigin(redirecturl, origin_url)){
-                          return res.redirect(redirecturl)
-                      }
-                      else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                     })
                     .catch(async (err) => {
                       console.log(err);
@@ -181,12 +180,11 @@ module.exports = (req, res, next) => {
                         if (err) {
                           console.log(' err ', err)
                         }
+                        if(checkOrigin(redirecturl)){
+                            return res.redirect(redirecturl)
+                        }
+                        else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                       })
-
-                      if(checkOrigin(redirecturl, origin_url)){
-                          return res.redirect(redirecturl)
-                      }
-                      else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                     });
                 }
               })

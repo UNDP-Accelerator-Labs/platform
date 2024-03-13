@@ -190,14 +190,14 @@ module.exports = (req, res, next) => {
 
 								const sess = { ...result, is_trusted: true, device: {...device, is_trusted: true}, app: original_app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess));
+								req.session.save(function(err) {
+									if(err) console.log(' err ', err)
+								  })
 
 								if(checkOrigin(redirecturl, origin_url)){
-									req.session.save(function(err) {
-									  if(err) console.log(' err ', err)
 									  return res.redirect(redirecturl)
-									})
 								  }
-								  else redirectUnauthorized(req, res)
+								  else res.redirect(`/${req.session.page.language}/edit/contributor?id=${req.session.user.uuid}`)
 							})
 							.catch(err => console.log(err))
 
@@ -225,13 +225,15 @@ module.exports = (req, res, next) => {
 							else {
 								const sess = { ...result, is_trusted: false, device: {...device, is_trusted: false}, app: original_app ?? app_title }
 								await Object.assign(req.session, datastructures.sessiondata(sess))
+								req.session.save(function(err) {
+									if(err) console.log(' err ', err)
+								  })
 								if(checkOrigin(redirecturl, origin_url)){
-									req.session.save(function(err) {
-									  if(err) console.log(' err ', err)
 									  return res.redirect(redirecturl)
-									})
 								  }
-								  else redirectUnauthorized(req, res)
+								  else {
+									return res.redirect(`/${req.session.page.language}/edit/contributor?id=${req.session.user.uuid}`)
+								  }
 
 							}
 						}

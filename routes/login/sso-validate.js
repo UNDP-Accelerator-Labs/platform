@@ -159,15 +159,17 @@ module.exports = (req, res, next) => {
                         expires: sessionExpiration,
                         domain: app_base_host,
                       });
+
+                      req.session.save(function(err) {
+                        if (err) {
+                          console.log(' err ', err)
+                        }
+                      })
+
                       if(checkOrigin(redirecturl, origin_url)){
-                        req.session.save(function(err) {
-                          if (err) {
-                            console.log(' err ', err)
-                          }
                           return res.redirect(redirecturl)
-                        })
                       }
-                      else redirectUnauthorized(req, res)
+                      else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                     })
                     .catch(async (err) => {
                       console.log(err);
@@ -175,15 +177,16 @@ module.exports = (req, res, next) => {
                         req.session,
                         datastructures.sessiondata(results),
                       );
+                      req.session.save(function(err) {
+                        if (err) {
+                          console.log(' err ', err)
+                        }
+                      })
+
                       if(checkOrigin(redirecturl, origin_url)){
-                        req.session.save(function(err) {
-                          if (err) {
-                            console.log(' err ', err)
-                          }
                           return res.redirect(redirecturl)
-                        })
                       }
-                      else redirectUnauthorized(req, res)
+                      else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                     });
                 }
               })

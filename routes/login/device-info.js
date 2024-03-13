@@ -104,7 +104,7 @@ exports.extractPathValue = (urlString, app) => {
 
 exports.getPath = (rights, language, modules) =>{
 	let redirecturl = ''
-	const { read, write } = modules.find(d => d.type === 'pads')?.rights;
+	const { read, write } = modules.find(d => d.type === 'pads')?.rights || {};
 	if (rights >= (write ?? Infinity)) redirecturl = `/${language}/browse/pads/private`;
 	else if (rights >= (read ?? Infinity)) redirecturl = `/${language}/browse/pads/published`;
 	else redirecturl = `/${language}/browse/pads/published`;

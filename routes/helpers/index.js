@@ -284,8 +284,12 @@ exports.redirectToLoginPlatform = (req, res, next) => {
     `${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent(innerUrl)}`,
   );
   const loginHost = loginUrl.host;
+  const { session } = req
 
-  if (
+  if(app_title == 'Login' && session.uuid){
+    return res.redirect(`/${session.language}/edit/contributor?id=${session.uuid}`)
+  }
+  else if (
     process.env.NODE_ENV === 'production' &&
     originHost.endsWith('.sdg-innovation-commons.org') &&
     loginHost != originHost
@@ -296,6 +300,7 @@ exports.redirectToLoginPlatform = (req, res, next) => {
 };
 
 exports.checkOrigin = (url, origin_url) => {
+  if(!url) return false
   if (url.startsWith('/')) {
     return true;
   }

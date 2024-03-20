@@ -3,7 +3,7 @@ import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 import { getContent, getMediaSize, limitLength } from '/js/main.js';
 
-const store_instructions = true
+const store_instructions = true;
 
 // THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
 export async function switchButtons(lang = 'en') {
@@ -37,9 +37,9 @@ export async function switchButtons(lang = 'en') {
 }
 
 function retrieveItems(kwargs) {
-  const { sel, datum } = kwargs
-  let text = ''
-  
+  const { sel, datum } = kwargs;
+  let text = '';
+
   // MEDIA
   if (datum.type === 'title') {
     datum.txt = (
@@ -48,13 +48,18 @@ function retrieveItems(kwargs) {
     datum.has_content = datum.txt?.trim()?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
-      // text += `${datum.instruction}\n`; // THIS DOES NOT ACCOUNT FOR TRANSLATIONS
-      text += `${sel.select('.instruction').node().innerText}\n`
+    let innerText = '';
+    if (datum.has_content) innerText += datum.txt;
+    innerText = innerText.trim();
+    if (innerText.length) {
+      if (store_instructions && datum.instruction) {
+        // text += `${datum.instruction}\n`; // THIS DOES NOT ACCOUNT FOR TRANSLATIONS
+        text += `${sel.select('.instruction').node().innerText}\n`;
+      }
+      text += `${innerText}\n`;
     }
-    if (datum.has_content) text += datum.txt;
 
-    return { item: datum, text }
+    return { item: datum, text };
   }
   if (['img', 'mosaic', 'video', 'files'].includes(datum.type)) {
     if (['mosaic', 'files'].includes(datum.type))
@@ -62,24 +67,22 @@ function retrieveItems(kwargs) {
     else datum.has_content = datum.src !== null && datum.src !== undefined;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
+    if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+      text += `${sel.select('.instruction').node().innerText}\n`;
     }
     // NO SYSTEMATIC WAY OF GETTING img FOR fullTxt
-    return { item: datum, text }
-
+    return { item: datum, text };
   } else if (datum.type === 'drawing') {
     datum.has_content = datum.shapes?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
+    if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+      text += `${sel.select('.instruction').node().innerText}\n`;
     }
     // NO SYSTEMATIC WAY OF GETTING drawings FOR fullTxt
-    return { item: datum, text }
-
+    return { item: datum, text };
   } else if (datum.type === 'txt') {
     datum.txt = (sel.select('.media-txt').node() ||
       sel.select('.meta-txt').node())[
@@ -88,14 +91,18 @@ function retrieveItems(kwargs) {
     datum.has_content = datum.txt?.trim()?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
-      // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+    let innerText = '';
+    if (datum.has_content) innerText += datum.txt;
+    innerText = innerText.trim();
+    if (innerText.length) {
+      if (store_instructions && datum.instruction) {
+        // text += `${datum.instruction}\n`;
+        text += `${sel.select('.instruction').node().innerText}\n`;
+      }
+      text += `${innerText}\n`;
     }
-    if (datum.has_content) text += datum.txt;
 
-    return { item: datum, text }
-
+    return { item: datum, text };
   } else if (datum.type === 'embed') {
     datum.html = (
       sel.select('.media-embed').node() || sel.select('.meta-embed').node()
@@ -103,19 +110,22 @@ function retrieveItems(kwargs) {
     datum.has_content = datum.html?.trim()?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
-      // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
-    }
+    let innerText = '';
     if (datum.has_content) {
-      text += (sel.select('.media-embed').node() ||
+      innerText += (sel.select('.media-embed').node() ||
         sel.select('.meta-embed').node())[
         'outerText' || 'textContent' || 'innerText'
       ]; // HERE WE DO NOT WANT THE html TAGS IN THE fullTxt
     }
-
-    return { item: datum, text }
-
+    innerText = innerText.trim();
+    if (innerText.length) {
+      if (store_instructions && datum.instruction) {
+        // text += `${datum.instruction}\n`;
+        text += `${sel.select('.instruction').node().innerText}\n`;
+      }
+      text += `${innerText}\n`;
+    }
+    return { item: datum, text };
   } else if (['checklist', 'radiolist'].includes(datum.type)) {
     datum.has_content =
       datum.options.filter((b) => b.name?.length && b.checked).length > 0;
@@ -123,53 +133,74 @@ function retrieveItems(kwargs) {
     clone.options = clone.options.filter((b) => b.name?.length);
     // items.push(clone);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
-      // text += `${clone.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+    let innerText = '';
+    if (datum.has_content)
+      innerText += clone.options
+        .filter((b) => b.name?.length && b.checked)
+        .map((b) => b.name)
+        .join('\n');
+    innerText = innerText.trim();
+    if (innerText.length) {
+      if (store_instructions && datum.instruction) {
+        // text += `${clone.instruction}\n`;
+        text += `${sel.select('.instruction').node().innerText}\n`;
+      }
+      text += `${innerText}\n`;
     }
-    if (datum.has_content) text += clone.options.filter((b) => b.name?.length && b.checked).map((b) => b.name).join('\n');
 
     // datum.options = datum.options.filter(b => b.name && b.name.length)
     // items.push(datum)
-    return { item: clone, text }
+    return { item: clone, text };
   }
   // SPECIFIC META
   else if (datum.type === 'location') {
     datum.has_content = datum.centerpoints?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
+    if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+      text += `${sel.select('.instruction').node().innerText}\n`;
     }
     // NO SYSTEMATIC WAY OF GETTING location FOR fullTxt
-    return { item: datum, text }
-
+    return { item: datum, text };
   } else if (['tag', 'index'].includes(datum.type)) {
     datum.has_content = (datum.sdgs?.length || datum.tags?.length) > 0; // THIS IS LEGACY FOR THE ACTION PLANNING PLATFORM: TO DO: DEPRECATE
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
-      // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+    let innerText = '';
+    if (datum.has_content)
+      innerText += (datum.sdgs || datum.tags)
+        .map((b) => `${b.type}: ${b.name}`)
+        .join('\n');
+    innerText = innerText.trim();
+    if (innerText.length) {
+      if (store_instructions && datum.instruction) {
+        // text += `${datum.instruction}\n`;
+        text += `${sel.select('.instruction').node().innerText}\n`;
+      }
+      text += `${innerText}\n`;
     }
-    if (datum.has_content) text += (datum.sdgs || datum.tags).map((b) => `${b.type}: ${b.name}`).join('\n');
 
-    return { item: datum, text }
-
+    return { item: datum, text };
   } else if (datum.type === 'attachment') {
     datum.has_content = datum.srcs?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
-    if (store_instructions && datum.instruction) {
-      // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`
+    let innerText = '';
+    if (datum.has_content)
+      innerText += datum.srcs.map((b) => `${datum.name}: ${b}`).join('\n');
+    innerText = innerText.trim();
+    if (innerText.length) {
+      if (store_instructions && datum.instruction) {
+        // text += `${datum.instruction}\n`;
+        text += `${sel.select('.instruction').node().innerText}\n`;
+      }
+      text += `${innerText}\n`;
     }
-    if (datum.has_content) text += datum.srcs.map((b) => `${datum.name}: ${b}`).join('\n');
 
-    return { item: datum, text }
+    return { item: datum, text };
   } else {
-    return { item: null, text: null }
+    return { item: null, text: null };
   }
 }
 async function getStatus() {
@@ -230,8 +261,11 @@ async function getStatus() {
           sel
             .selectAll('.media-container, .meta-container')
             .each(function (b) {
-              const { item } = retrieveItems({ sel: d3.select(this), datum: b });
-              if (item) subitems.push(item)
+              const { item } = retrieveItems({
+                sel: d3.select(this),
+                datum: b,
+              });
+              if (item) subitems.push(item);
             });
 
           completion.push(
@@ -241,7 +275,7 @@ async function getStatus() {
       } else {
         if (!ingroup) {
           const { item } = retrieveItems({ sel, datum: c });
-          if (item) items.push(item)
+          if (item) items.push(item);
         }
       }
     });
@@ -285,7 +319,7 @@ async function compileContent(attr) {
     vocabulary['missing title'];
   if (title) title = limitLength(title, 99);
   // MAYBE INCLUDE ALERT IF title IS EMPTY
-  
+
   // COLLECT ALL MEDIA
   const sections = [];
   let fullTxt = `${title}\n\n`;
@@ -295,7 +329,8 @@ async function compileContent(attr) {
     let itemstext = '';
     const sel = d3.select(this);
 
-    const section_title = (sel.select('.section-header h1').node() || {}).innerText;
+    const section_title = (sel.select('.section-header h1').node() || {})
+      .innerText;
     const section_lead = (sel.select('.media-lead').node() || {})[
       'outerText' || 'textContent' || 'innerText'
     ];
@@ -306,11 +341,8 @@ async function compileContent(attr) {
     if (pad.type !== 'templated') {
       d.title = section_title;
       d.lead = section_lead;
-      d.instruction = section_instruction
+      d.instruction = section_instruction;
     }
-
-    if (store_instructions && section_title !== undefined) fullTxt += `${section_title}\n`
-    if (store_instructions && section_lead !== undefined) fullTxt += `${section_lead}\n`
 
     sel.selectAll('.media-container, .meta-container').each(function (c) {
       const sel = d3.select(this);
@@ -326,28 +358,41 @@ async function compileContent(attr) {
           sel
             .selectAll('.media-container, .meta-container')
             .each(function (b) {
-              const { item, text } = retrieveItems({ sel: d3.select(this), datum: b });
-              if (item) subitems.push(item)
-              if (text) subtext += `${text}\n`
+              const { item, text } = retrieveItems({
+                sel: d3.select(this),
+                datum: b,
+              });
+              if (item) subitems.push(item);
+              if (text) subtext += `${text}\n`;
             });
           groupitems.push(subitems);
           grouptext += `${subtext}\n`;
         });
         c.items = groupitems;
         items.push(c);
-        itemstext += `${grouptext}\n`
+        itemstext += `${grouptext}\n`;
       } else {
         if (!ingroup) {
           const { item, text } = retrieveItems({ sel, datum: c });
-          if (item) items.push(item)
-          if (text) itemstext += `${text}\n`
+          if (item) items.push(item);
+          if (text) itemstext += `${text}\n`;
         }
       }
     });
-    
+
     d.items = items;
     sections.push(d);
-    fullTxt += `${itemstext}\n`
+
+    itemstext = itemstext.trim();
+    if (itemstext.length) {
+      if (store_instructions && section_title !== undefined) {
+        fullTxt += `${section_title}\n`;
+      }
+      if (store_instructions && section_lead !== undefined) {
+        fullTxt += `${section_lead}\n`;
+      }
+      fullTxt += `${itemstext}\n`;
+    }
   });
 
   // const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
@@ -390,7 +435,7 @@ async function compileContent(attr) {
     .forEach((d) => {
       main.selectAll(`.${d.label}-container`).each((c) => {
         const { item } = retrieveItems({ sel: d3.select(this), datum: c });
-        if (item) otherMetadata.push(item)
+        if (item) otherMetadata.push(item);
       });
     });
   content.metadata = otherMetadata
@@ -421,29 +466,29 @@ async function compileContent(attr) {
   // COMPILE FULL TXT FOR SEARCH
 
   // const fullTxt = `${title}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.title)
   //     .join('\n\n')
   //     .trim()}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.lead)
   //     .join('\n\n')
   //     .trim()}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'txt')
   //     .map((d) => d.txt)
   //     .join('\n\n')
   //     .trim()}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'embed')
   //     .map((d) => d.html)
   //     .join('\n\n')
   //     .trim()}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'checklist')
@@ -451,7 +496,7 @@ async function compileContent(attr) {
   //     .flat()
   //     .join('\n\n')
   //     .trim()}
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'radiolist')
@@ -459,7 +504,7 @@ async function compileContent(attr) {
   //     .flat()
   //     .join('\n\n')
   //     .trim()}
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'group')
@@ -468,7 +513,7 @@ async function compileContent(attr) {
   //     .map((d) => d.txt)
   //     .join('\n\n')
   //     .trim()}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'group')
@@ -477,7 +522,7 @@ async function compileContent(attr) {
   //     .map((d) => d.html)
   //     .join('\n\n')
   //     .trim()}\n\n
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'group')
@@ -487,7 +532,7 @@ async function compileContent(attr) {
   //     .flat()
   //     .join('\n\n')
   //     .trim()}
-	// 	${sections
+  // 	${sections
   //     .map((d) => d.items)
   //     .flat()
   //     .filter((d) => d.type === 'group')
@@ -499,7 +544,7 @@ async function compileContent(attr) {
   //     .trim()}
   //   `;
 
-  console.log(fullTxt)
+  console.log(fullTxt);
   // ALWAYS SEND fullTxt
   content.full_text = fullTxt;
 
@@ -638,7 +683,7 @@ export async function updateStatus(_status) {
     .classed(`status-${_status}`, true);
   metastatus
     .select('div.btn-group form button.publish')
-    .attr('disabled', (_status >= 1 && curr_status <= 2) ? null : true);
+    .attr('disabled', _status >= 1 && curr_status <= 2 ? null : true);
   metastatus
     .select('div.btn-group form button.generate-pdf')
     .attr('disabled', _status > 0 ? null : true);

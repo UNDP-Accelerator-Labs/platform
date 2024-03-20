@@ -28,7 +28,9 @@ export async function switchButtons(lang = 'en') {
   }
 }
 
-function retrieveItems(sel, datum, items) {
+function retrieveItems(kwargs) {
+  const { sel, datum } = kwargs
+
   const { metafields } = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
   );
@@ -39,31 +41,36 @@ function retrieveItems(sel, datum, items) {
       sel.select('.meta-title').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
   } else if (datum.type === 'img') {
     datum.instruction = (sel.select('.media-img').node() ||
       sel.select('.meta-img').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
   } else if (datum.type === 'drawing') {
     datum.instruction = (sel.select('.media-drawing').node() ||
       sel.select('.meta-drawing').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
   } else if (datum.type === 'txt') {
     datum.instruction = (sel.select('.media-txt').node() ||
       sel.select('.meta-txt').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
   } else if (datum.type === 'embed') {
     datum.instruction = (sel.select('.media-embed').node() ||
       sel.select('.meta-embed').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
   } else if (datum.type === 'checklist') {
     datum.instruction = (sel.select('.media-checklist .instruction').node() ||
       sel.select('.meta-checklist .instruction').node())[
@@ -71,7 +78,8 @@ function retrieveItems(sel, datum, items) {
     ];
     const clone = JSON.parse(JSON.stringify(datum));
     clone.options = clone.options.filter((b) => b.name?.length);
-    items.push(clone);
+    // items.push(clone);
+    return { item: clone };
   } else if (datum.type === 'radiolist') {
     datum.instruction = (sel.select('.media-radiolist .instruction').node() ||
       sel.select('.meta-radiolist .instruction').node())[
@@ -79,14 +87,16 @@ function retrieveItems(sel, datum, items) {
     ];
     const clone = JSON.parse(JSON.stringify(datum));
     clone.options = clone.options.filter((b) => b.name?.length);
-    items.push(clone);
+    // items.push(clone);
+    return { item: clone };
   }
   // META
   else if (datum.type === 'location') {
     datum.instruction = sel.select('.meta-location').node()[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
   } else if (
     metafields.some(
       (d) =>
@@ -98,8 +108,8 @@ function retrieveItems(sel, datum, items) {
       sel.select(`.meta-${datum.name}`).node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
-    // items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
+    // items.push(datum);
+    return { item: datum };
   }
   // skills SHOULD BE DEPRECATED
   else if (
@@ -111,13 +121,16 @@ function retrieveItems(sel, datum, items) {
       sel.select('.meta-skills').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
-    // items.push({ type: datum.type, level: datum.level, instruction: datum.instruction, constraint: datum.constraint, required: datum.required })
+    // items.push(datum);
+    return { item: datum };
   } else if (datum.type === 'attachment') {
     datum.instruction = sel.select('.meta-attachment').node()[
       'outerText' || 'textContent' || 'innerText'
     ];
-    items.push(datum);
+    // items.push(datum);
+    return { item: datum };
+  } else {
+    return { item: null }
   }
 }
 
@@ -160,7 +173,8 @@ function compileContent(attr) {
             '.media-group-items .media-container, .media-group-items .meta-container',
           )
           .each(function (b) {
-            retrieveItems(d3.select(this), b, groupitems);
+            const { item } = retrieveItems({ sel: d3.select(this), datum: b });
+            if (item) groupitems.push(item)
           });
         c.instruction = sel.select('.media-group').node()[
           'outerText' || 'textContent' || 'innerText'
@@ -168,7 +182,10 @@ function compileContent(attr) {
         c.structure = groupitems;
         items.push(c);
       } else {
-        if (!ingroup) retrieveItems(sel, c, items);
+        if (!ingroup) {
+          const { item } = retrieveItems({ sel, datum: c });
+          if (item) items.push(item)
+        }
       }
     });
 

@@ -45,7 +45,7 @@ DB.conn.tx(t => {
           fullTxt += currentTxt;
         }
       })
-
+      fullTxt = fullTxt.trim();
       batch.push(t.none(`
         UPDATE pads
         SET full_text = $1::TEXT

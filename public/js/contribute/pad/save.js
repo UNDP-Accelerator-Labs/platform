@@ -543,6 +543,7 @@ async function compileContent(attr) {
   //     .join('\n\n')
   //     .trim()}
   //   `;
+  fullTxt = fullTxt.trim();
 
   console.log(fullTxt);
   // ALWAYS SEND fullTxt

@@ -1,7 +1,12 @@
 import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
-import { getContent, getMediaSize, limitLength } from '/js/main.js';
+import {
+  getContent,
+  getInnerText,
+  getMediaSize,
+  limitLength,
+} from '/js/main.js';
 
 const store_instructions = true;
 
@@ -48,6 +53,7 @@ function retrieveItems(kwargs) {
     datum.has_content = datum.txt?.trim()?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
+
     let innerText = '';
     if (datum.has_content && datum.txt) innerText += datum.txt;
     innerText = innerText.trim();
@@ -84,13 +90,13 @@ function retrieveItems(kwargs) {
     // NO SYSTEMATIC WAY OF GETTING drawings FOR fullTxt
     return { item: datum, text };
   } else if (datum.type === 'txt') {
-    datum.txt = (sel.select('.media-txt').node() ||
-      sel.select('.meta-txt').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.txt =
+      getInnerText(sel.select('.media-txt')) ||
+      getInnerText(sel.select('.meta-txt'));
     datum.has_content = datum.txt?.trim()?.length > 0;
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
+
     let innerText = '';
     if (datum.has_content && datum.txt) innerText += datum.txt;
     innerText = innerText.trim();
@@ -112,10 +118,9 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     let innerText = '';
     if (datum.has_content) {
-      const newText = (sel.select('.media-embed').node() ||
-        sel.select('.meta-embed').node())[
-        'outerText' || 'textContent' || 'innerText'
-      ]; // HERE WE DO NOT WANT THE html TAGS IN THE fullTxt
+      const newText =
+        getInnerText(sel.select('.media-embed')) ||
+        getInnerText(sel.select('.meta-embed')); // HERE WE DO NOT WANT THE html TAGS IN THE fullTxt
       if (newText) {
         innerText += newText;
       }
@@ -128,6 +133,7 @@ function retrieveItems(kwargs) {
       }
       text += `${innerText}\n`;
     }
+
     return { item: datum, text };
   } else if (['checklist', 'radiolist'].includes(datum.type)) {
     datum.has_content =
@@ -191,12 +197,7 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     let innerText = '';
     if (datum.has_content)
-      innerText += datum.srcs
-        .map((b) => {
-          const front = datum.name ? `${datum.name}: ` : '';
-          return `${front}${b}`;
-        })
-        .join('\n');
+      innerText += datum.srcs.map((b) => `${datum.name}: ${b}`).join('\n');
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
@@ -339,9 +340,7 @@ async function compileContent(attr) {
 
     const section_title = (sel.select('.section-header h1').node() || {})
       .innerText;
-    const section_lead = (sel.select('.media-lead').node() || {})[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    const section_lead = getInnerText(sel.select('.media-lead'));
     const section_instruction = (
       sel.select('.media-repeat button div').node() || {}
     ).innerText;

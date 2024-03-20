@@ -2,6 +2,23 @@ import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 
+export function getInnerText(sel) {
+  const node = sel.node();
+  if (!node) {
+    return null;
+  }
+  if (node.outerText) {
+    return node.outerText;
+  }
+  if (node.textContent) {
+    return node.textContent;
+  }
+  if (node.innerText) {
+    return node.innerText;
+  }
+  return `${node}`;
+}
+
 const debugging = false;
 
 if ('serviceWorker' in navigator) {

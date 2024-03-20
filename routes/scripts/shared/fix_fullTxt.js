@@ -113,7 +113,7 @@ function retrieveText(d) {
     }
   } else if (d.type === 'attachment') {
     let innerText = '';
-    if (d.has_content) innerText += (d.srcs ?? []).map((a) => d.name ? `${d.name}: ${a}` : `${a}`).join('\n');
+    if (d.has_content) innerText += (d.srcs ?? []).map((a) => `${d.name}: ${a}`).join('\n');
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && d.instruction) text += `${d.instruction}\n`;

@@ -64,7 +64,7 @@ function retrieveText(d) {
   let text = '';
   if (d.type === 'title') {
     let innerText = '';
-    if (d.has_content) innerText += d.txt;
+    if (d.has_content && d.txt) innerText += d.txt;
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && d.instruction) text += `${d.instruction}\n`;
@@ -78,7 +78,7 @@ function retrieveText(d) {
     // NO SYSTEMATIC WAY OF GETTING drawings FOR fullTxt
   } else if (d.type === 'txt') {
     let innerText = '';
-    if (d.has_content) innerText += d.txt;
+    if (d.has_content && d.txt) innerText += d.txt;
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && d.instruction) text += `${d.instruction}\n`;
@@ -113,7 +113,7 @@ function retrieveText(d) {
     }
   } else if (d.type === 'attachment') {
     let innerText = '';
-    if (d.has_content) innerText += (d.srcs ?? []).map((a) => `${a.name}: ${a}`).join('\n');
+    if (d.has_content) innerText += (d.srcs ?? []).map((a) => d.name ? `${d.name}: ${a}` : `${a}`).join('\n');
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && d.instruction) text += `${d.instruction}\n`;
@@ -124,6 +124,6 @@ function retrieveText(d) {
   if (!text.length) {
     return null;
   }
-  return `${text}\n\n`;
+  return `${text}\n`;
 }
 

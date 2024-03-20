@@ -49,7 +49,7 @@ function retrieveItems(kwargs) {
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
     let innerText = '';
-    if (datum.has_content) innerText += datum.txt;
+    if (datum.has_content && datum.txt) innerText += datum.txt;
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
@@ -92,7 +92,7 @@ function retrieveItems(kwargs) {
     // items.push(datum);
     // SET THE fullTxt REPRESENTATION
     let innerText = '';
-    if (datum.has_content) innerText += datum.txt;
+    if (datum.has_content && datum.txt) innerText += datum.txt;
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
@@ -112,10 +112,13 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     let innerText = '';
     if (datum.has_content) {
-      innerText += (sel.select('.media-embed').node() ||
+      const newText = (sel.select('.media-embed').node() ||
         sel.select('.meta-embed').node())[
         'outerText' || 'textContent' || 'innerText'
       ]; // HERE WE DO NOT WANT THE html TAGS IN THE fullTxt
+      if (newText) {
+        innerText += newText;
+      }
     }
     innerText = innerText.trim();
     if (innerText.length) {
@@ -188,7 +191,12 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     let innerText = '';
     if (datum.has_content)
-      innerText += datum.srcs.map((b) => `${datum.name}: ${b}`).join('\n');
+      innerText += datum.srcs
+        .map((b) => {
+          const front = datum.name ? `${datum.name}: ` : '';
+          return `${front}${b}`;
+        })
+        .join('\n');
     innerText = innerText.trim();
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
@@ -463,89 +471,8 @@ async function compileContent(attr) {
     })
     .flat();
 
-  // COMPILE FULL TXT FOR SEARCH
-
-  // const fullTxt = `${title}\n\n
-  // 	${sections
-  //     .map((d) => d.title)
-  //     .join('\n\n')
-  //     .trim()}\n\n
-  // 	${sections
-  //     .map((d) => d.lead)
-  //     .join('\n\n')
-  //     .trim()}\n\n
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'txt')
-  //     .map((d) => d.txt)
-  //     .join('\n\n')
-  //     .trim()}\n\n
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'embed')
-  //     .map((d) => d.html)
-  //     .join('\n\n')
-  //     .trim()}\n\n
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'checklist')
-  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-  //     .flat()
-  //     .join('\n\n')
-  //     .trim()}
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'radiolist')
-  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-  //     .flat()
-  //     .join('\n\n')
-  //     .trim()}
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'group')
-  //     .map((d) => d.items)
-  //     .filter((d) => d.type === 'txt')
-  //     .map((d) => d.txt)
-  //     .join('\n\n')
-  //     .trim()}\n\n
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'group')
-  //     .map((d) => d.items)
-  //     .filter((d) => d.type === 'embed')
-  //     .map((d) => d.html)
-  //     .join('\n\n')
-  //     .trim()}\n\n
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'group')
-  //     .map((d) => d.items)
-  //     .filter((d) => d.type === 'checklist')
-  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-  //     .flat()
-  //     .join('\n\n')
-  //     .trim()}
-  // 	${sections
-  //     .map((d) => d.items)
-  //     .flat()
-  //     .filter((d) => d.type === 'group')
-  //     .map((d) => d.items)
-  //     .filter((d) => d.type === 'radiolist')
-  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-  //     .flat()
-  //     .join('\n\n')
-  //     .trim()}
-  //   `;
   fullTxt = fullTxt.trim();
-
-  console.log(fullTxt);
+  // console.log(fullTxt);
   // ALWAYS SEND fullTxt
   content.full_text = fullTxt;
 

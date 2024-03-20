@@ -29,7 +29,7 @@ export async function switchButtons(lang = 'en') {
 }
 
 function retrieveItems(kwargs) {
-  const { sel, datum } = kwargs
+  const { sel, datum } = kwargs;
 
   const { metafields } = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
@@ -130,7 +130,7 @@ function retrieveItems(kwargs) {
     // items.push(datum);
     return { item: datum };
   } else {
-    return { item: null }
+    return { item: null };
   }
 }
 
@@ -174,7 +174,7 @@ function compileContent(attr) {
           )
           .each(function (b) {
             const { item } = retrieveItems({ sel: d3.select(this), datum: b });
-            if (item) groupitems.push(item)
+            if (item) groupitems.push(item);
           });
         c.instruction = sel.select('.media-group').node()[
           'outerText' || 'textContent' || 'innerText'
@@ -184,7 +184,7 @@ function compileContent(attr) {
       } else {
         if (!ingroup) {
           const { item } = retrieveItems({ sel, datum: c });
-          if (item) items.push(item)
+          if (item) items.push(item);
         }
       }
     });

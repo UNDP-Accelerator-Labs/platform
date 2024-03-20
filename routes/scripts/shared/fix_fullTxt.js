@@ -12,7 +12,7 @@ DB.conn.tx(t => {
     const batch = []
     // CONSOLIDATE ATTACHMENT FORMATTING
     pads.forEach(d => {
-      let fullTxt = `${d.title}\n\n`;
+      let fullTxt = d.title !== null ? `${d.title}\n\n` : '';
 
       d.sections.forEach(c => {
         let currentTxt = '';

@@ -322,7 +322,7 @@ async function compileContent(attr) {
 
   // COLLECT ALL MEDIA
   const sections = [];
-  let fullTxt = `${title}\n\n`;
+  let fullTxt = title !== null ? `${title}\n\n` : '';
 
   main.selectAll('.layout:not(.description-layout)').each(function (d) {
     const items = [];

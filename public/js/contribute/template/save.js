@@ -1,7 +1,7 @@
 import { getTranslations } from '/js/config/main.js';
 import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
-import { getMediaSize, limitLength } from '/js/main.js';
+import { getInnerText, getMediaSize, limitLength } from '/js/main.js';
 
 // SAVING BUTTON
 export async function switchButtons(lang = 'en') {
@@ -29,7 +29,7 @@ export async function switchButtons(lang = 'en') {
 }
 
 function retrieveItems(kwargs) {
-  const { sel, datum } = kwargs
+  const { sel, datum } = kwargs;
 
   const { metafields } = JSON.parse(
     d3.select('data[name="template"]').node()?.value,
@@ -37,54 +37,47 @@ function retrieveItems(kwargs) {
 
   // MEDIA OR META
   if (datum.type === 'title') {
-    datum.instruction = (sel.select('.media-title').node() ||
-      sel.select('.meta-title').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-title')) ||
+      getInnerText(sel.select('.meta-title'));
     // items.push(datum);
     return { item: datum };
   } else if (datum.type === 'img') {
-    datum.instruction = (sel.select('.media-img').node() ||
-      sel.select('.meta-img').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-img')) ||
+      getInnerText(sel.select('.meta-img'));
     // items.push(datum);
     return { item: datum };
   } else if (datum.type === 'drawing') {
-    datum.instruction = (sel.select('.media-drawing').node() ||
-      sel.select('.meta-drawing').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-drawing')) ||
+      getInnerText(sel.select('.meta-drawing'));
     // items.push(datum);
     return { item: datum };
   } else if (datum.type === 'txt') {
-    datum.instruction = (sel.select('.media-txt').node() ||
-      sel.select('.meta-txt').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-txt')) ||
+      getInnerText(sel.select('.meta-txt'));
     // items.push(datum);
     return { item: datum };
   } else if (datum.type === 'embed') {
-    datum.instruction = (sel.select('.media-embed').node() ||
-      sel.select('.meta-embed').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-embed')) ||
+      getInnerText(sel.select('.meta-embed'));
     // items.push(datum);
     return { item: datum };
   } else if (datum.type === 'checklist') {
-    datum.instruction = (sel.select('.media-checklist .instruction').node() ||
-      sel.select('.meta-checklist .instruction').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-checklist .instruction')) ||
+      getInnerText(sel.select('.meta-checklist .instruction'));
     const clone = JSON.parse(JSON.stringify(datum));
     clone.options = clone.options.filter((b) => b.name?.length);
     // items.push(clone);
     return { item: clone };
   } else if (datum.type === 'radiolist') {
-    datum.instruction = (sel.select('.media-radiolist .instruction').node() ||
-      sel.select('.meta-radiolist .instruction').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.media-radiolist .instruction')) ||
+      getInnerText(sel.select('.meta-radiolist .instruction'));
     const clone = JSON.parse(JSON.stringify(datum));
     clone.options = clone.options.filter((b) => b.name?.length);
     // items.push(clone);
@@ -92,9 +85,7 @@ function retrieveItems(kwargs) {
   }
   // META
   else if (datum.type === 'location') {
-    datum.instruction = sel.select('.meta-location').node()[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction = getInnerText(sel.select('.meta-location'));
     // items.push(datum);
     return { item: datum };
   } else if (
@@ -104,10 +95,9 @@ function retrieveItems(kwargs) {
         [datum.type, datum.name].includes(d.label),
     )
   ) {
-    datum.instruction = (sel.select(`.meta-${datum.type}`).node() ||
-      sel.select(`.meta-${datum.name}`).node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select(`.meta-${datum.type}`)) ||
+      getInnerText(sel.select(`.meta-${datum.name}`));
     // items.push(datum);
     return { item: datum };
   }
@@ -117,20 +107,17 @@ function retrieveItems(kwargs) {
     (datum.type === 'skills' || datum.name === 'skills')
   ) {
     // skills IS LEGACY FOR THE ACTION PLANS PLATFORM
-    datum.instruction = (sel.select('.meta-methods').node() ||
-      sel.select('.meta-skills').node())[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction =
+      getInnerText(sel.select('.meta-methods')) ||
+      getInnerText(sel.select('.meta-skills'));
     // items.push(datum);
     return { item: datum };
   } else if (datum.type === 'attachment') {
-    datum.instruction = sel.select('.meta-attachment').node()[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    datum.instruction = getInnerText(sel.select('.meta-attachment'));
     // items.push(datum);
     return { item: datum };
   } else {
-    return { item: null }
+    return { item: null };
   }
 }
 
@@ -149,9 +136,9 @@ function compileContent(attr) {
   let title = head.select('.title').node().innerText;
   if (title) title = limitLength(title, 99);
 
-  const description = descriptionLayout
-    .select('.media-container .media-txt')
-    .node()['outerText' || 'textContent' || 'innerText'];
+  const description = getInnerText(
+    descriptionLayout.select('.media-container .media-txt'),
+  );
   const slideshow =
     descriptionLayout.select('.input-slideshow #slideshow-status').node()
       ?.checked || false;
@@ -174,28 +161,22 @@ function compileContent(attr) {
           )
           .each(function (b) {
             const { item } = retrieveItems({ sel: d3.select(this), datum: b });
-            if (item) groupitems.push(item)
+            if (item) groupitems.push(item);
           });
-        c.instruction = sel.select('.media-group').node()[
-          'outerText' || 'textContent' || 'innerText'
-        ];
+        c.instruction = getInnerText(sel.select('.media-group'));
         c.structure = groupitems;
         items.push(c);
       } else {
         if (!ingroup) {
           const { item } = retrieveItems({ sel, datum: c });
-          if (item) items.push(item)
+          if (item) items.push(item);
         }
       }
     });
 
-    d.title = sel.select('.section-header h1').node().innerText;
-    d.lead = (sel.select('.media-lead').node() || {})[
-      'outerText' || 'textContent' || 'innerText'
-    ];
-    d.instruction = (sel.select('.media-repeat button div').node() || {})[
-      'outerText' || 'textContent' || 'innerText'
-    ];
+    d.title = getInnerText(sel.select('.section-header h1'));
+    d.lead = getInnerText(sel.select('.media-lead'));
+    d.instruction = getInnerText(sel.select('.media-repeat button div'));
     d.structure = items;
     sections.push(d);
   });

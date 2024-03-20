@@ -2489,8 +2489,10 @@ export async function addDrawing(kwargs) {
               .html(`${opt.node().value}px`);
           }
           opt
-            .addElems('i', 'material-icons google-translate-attr notranslate', (b) =>
-              b.element === 'button' && b.key !== 'color' ? [b] : [],
+            .addElems(
+              'i',
+              'material-icons google-translate-attr notranslate',
+              (b) => (b.element === 'button' && b.key !== 'color' ? [b] : []),
             )
             .html((b) => b.label);
           // opt.addElems('span', 'constraint', b => b.key === 'constraint' ? [b] : [])

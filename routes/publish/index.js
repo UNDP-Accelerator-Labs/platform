@@ -18,7 +18,6 @@ exports.publish = (req, res) => {
 		let { write } = modules.find(d => d.type === object).rights
 		// MAKE SURE write IS THE NUMERICAL VALUE
 		if (object === 'pads' && typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-		console.log('check write', write)
 
 		if (object === 'pads' && rights >= write) pads.publish(req, res)
 		else if (object === 'pinboards' && rights >= write) pinboards.publish(req, res)

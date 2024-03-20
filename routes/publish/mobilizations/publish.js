@@ -2,6 +2,7 @@ const { own_app_url, app_suite_url, app_title_short, app_title, DB, ownDB, trans
 const { checklanguage, email: sendemail, safeArr, DEFAULT_UUID, limitLength } = include('routes/helpers/')
 
 const cron = require('node-cron')
+const { join } = require('path')
 
 module.exports = (req, res) => {
 	const { username: creator, email: creatorEmail } = req.session || {}
@@ -150,12 +151,14 @@ module.exports = (req, res) => {
 									const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
 									const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
 									const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
-									const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
+									const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']								
+									const direct_link = join(own_app_url, `/en/contribute/pad?mobilization=${id}&template=${template}`)
+
 									await sendemail({
 										to: creatorEmail,
 										bcc: chunk.join(','),
 										subject: (esubject)(platformName),
-										html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
+										html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, direct_link),
 									});
 									setTimeout(sendChunk, 2000);
 								}
@@ -179,10 +182,12 @@ module.exports = (req, res) => {
 									const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
 									const esubject = temail['mobilization invitation subject'][language] ?? temail['mobilization invitation subject']['en']
 									const ebody = temail['mobilization invitation body'][language] ?? temail['mobilization invitation body']['en']
+									const direct_link = join(own_app_url, `/en/contribute/pad?mobilization=${id}&template=${template}`)
+
 									await sendemail({
 										to: to_email,
 										subject: (esubject)(platformName),
-										html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, `${own_app_url}/en/contribute/pad?mobilization=${id}&template=${template}`),
+										html: (ebody)(own_app_url, platformName, app_suite_url, title, description, creatorEmail, creator, direct_link),
 									});
 									setTimeout(sendIndividualEmail, 2000);
 								}

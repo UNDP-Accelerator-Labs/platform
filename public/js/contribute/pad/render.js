@@ -193,7 +193,7 @@ const Media = function (kwargs) {
         }
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
   // ADD REQUIREMENT
@@ -664,7 +664,7 @@ const Taglist = function (kwargs) {
     meta.filter
       .addElems('button', 'add')
       .on('click', (_) => meta.recode(opencode))
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html('add_circle_outline');
   }
 
@@ -1266,7 +1266,7 @@ export async function addSection(kwargs) {
         }
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
 
     async function rmSection() {
@@ -1298,7 +1298,7 @@ export async function addSection(kwargs) {
     }
   }
 
-  // const header =
+  // TO DO: MAKE THIS NOT TRANSLATABLE
   section
     .addElems('div', 'section-header', (d) => {
       if (objecttype === 'templated' && d.title?.length === 0) return [];
@@ -1562,7 +1562,7 @@ async function addImg(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -1662,7 +1662,7 @@ async function addImg(kwargs) {
         .on('mouseup', function () {
           d3.select(this).classed('highlight', false);
         })
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('add_photo_alternate');
     }
   }
@@ -1755,7 +1755,7 @@ function addMosaic(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -1818,7 +1818,7 @@ function addMosaic(kwargs) {
                 else window.sessionStorage.setItem('changed-content', true);
               }
             })
-            .addElems('i', 'material-icons google-translate-attr')
+            .addElems('i', 'material-icons google-translate-attr notranslate')
             .html((d) => d.label);
         }
       };
@@ -1909,7 +1909,7 @@ function addMosaic(kwargs) {
         .on('mouseup', function () {
           d3.select(this).classed('highlight', false);
         })
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('add_photo_alternate');
     }
   }
@@ -1991,7 +1991,7 @@ function addVideo(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -2046,7 +2046,7 @@ function addVideo(kwargs) {
         .on('mouseup', function () {
           d3.select(this).classed('highlight', false);
         })
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('ondemand_video');
     }
   }
@@ -2175,7 +2175,7 @@ function addFiles(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -2246,7 +2246,7 @@ function addFiles(kwargs) {
                 else window.sessionStorage.setItem('changed-content', true);
               }
             })
-            .addElems('i', 'material-icons google-translate-attr')
+            .addElems('i', 'material-icons google-translate-attr notranslate')
             .html((d) => d.label);
         }
 
@@ -2333,7 +2333,7 @@ function addFiles(kwargs) {
         .on('mouseup', function () {
           d3.select(this).classed('highlight', false);
         })
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('add_photo_alternate');
     }
   }
@@ -2489,7 +2489,7 @@ export async function addDrawing(kwargs) {
               .html(`${opt.node().value}px`);
           }
           opt
-            .addElems('i', 'material-icons google-translate-attr', (b) =>
+            .addElems('i', 'material-icons google-translate-attr notranslate', (b) =>
               b.element === 'button' && b.key !== 'color' ? [b] : [],
             )
             .html((b) => b.label);
@@ -2785,7 +2785,7 @@ export async function addTxt(kwargs) {
         }
       });
     opts
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
     opts
       .addElems('span', 'constraint', (d) =>
@@ -2927,7 +2927,7 @@ export async function addEmbed(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -3190,7 +3190,7 @@ export async function addChecklist(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -3217,7 +3217,7 @@ export async function addChecklist(kwargs) {
         });
         list.call(addItem);
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html('add_circle');
   }
 
@@ -3259,7 +3259,7 @@ export async function addChecklist(kwargs) {
       .addElems('div', 'checkbox')
       .addElems('label')
       .attr('for', (d) => `check-item-${checklist_id}-${d.id}`)
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => (d.checked ? 'check_box' : 'check_box_outline_blank'));
     opts
       .addElems('div', 'grow')
@@ -3299,7 +3299,7 @@ export async function addChecklist(kwargs) {
     if (editing && objecttype === 'blank' && level !== 'meta') {
       opts
         .addElems('div', 'rm')
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('clear')
         .on('click', async function (d) {
           media.container.each(
@@ -3459,7 +3459,7 @@ export async function addRadiolist(kwargs) {
           else window.sessionStorage.setItem('changed-content', true);
         }
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
 
@@ -3486,7 +3486,7 @@ export async function addRadiolist(kwargs) {
         });
         list.call(addItem);
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html('add_circle');
   }
 
@@ -3530,7 +3530,7 @@ export async function addRadiolist(kwargs) {
       .addElems('div', 'radio')
       .addElems('label')
       .attr('for', (d) => `radio-item-${radiolist_id}-${d.id}`)
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) =>
         d.checked ? 'radio_button_checked' : 'radio_button_unchecked',
       );
@@ -3572,7 +3572,7 @@ export async function addRadiolist(kwargs) {
     if (editing && objecttype === 'blank' && level !== 'meta') {
       opts
         .addElems('div', 'rm')
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('clear')
         .on('click', async function (d) {
           media.container.each(
@@ -3787,7 +3787,7 @@ export async function addLocations(kwargs) {
     filter
       .addElems('button', 'search')
       .on('click', searchLocation)
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html('search');
 
     async function searchLocation() {
@@ -3994,7 +3994,7 @@ export async function addIndexes(kwargs) {
         .datum({ key: 'constraint', label: 'block', value: constraint })
         .addElems('button', 'opt active');
       opt
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html((d) => d.label);
       opt
         .addElems('span', 'constraint', (d) =>
@@ -4058,7 +4058,7 @@ export async function addTags(kwargs) {
         .datum({ key: 'constraint', label: 'block', value: constraint })
         .addElems('button', 'opt active');
       opt
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html((d) => d.label);
       opt
         .addElems('span', 'constraint', (d) =>
@@ -4118,7 +4118,7 @@ export async function addAttachment(kwargs) {
         .datum({ key: 'constraint', label: 'block', value: constraint })
         .addElems('button', 'opt active');
       opt
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html((d) => d.label);
       opt
         .addElems('span', 'constraint', (d) =>
@@ -4241,7 +4241,7 @@ export async function addAttachment(kwargs) {
           kwargs.container = meta.container;
           await addAttachment(kwargs);
         })
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('badge');
     }
   }
@@ -4311,7 +4311,7 @@ function addGroup(kwargs) {
           if (media.container.selectAll('.media-group-items').size() >= repeat)
             media.media.classed('hide', true);
         })
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('add_circle');
     }
   }
@@ -4375,7 +4375,7 @@ function addGroup(kwargs) {
             }
           })
           .on('mouseup', (_) => d3.event.stopPropagation())
-          .addElems('i', 'material-icons google-translate-attr')
+          .addElems('i', 'material-icons google-translate-attr notranslate')
           .html((d) => d.label);
       }
     });

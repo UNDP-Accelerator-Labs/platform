@@ -148,7 +148,7 @@ const Media = function (kwargs) {
         if (editing) await switchButtons(lang);
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
   }
   if (editing) {
@@ -419,7 +419,7 @@ const Taglist = function (kwargs) {
         if (_self.editable) await partialSave('media');
       });
     opts
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
     opts
       .addElems('span', 'constraint', (d) =>
@@ -589,7 +589,7 @@ export async function addSection(kwargs) {
         if (editing) await switchButtons(lang);
       })
       .on('mouseup', (_) => d3.event.stopPropagation())
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
 
     async function rmSection() {
@@ -953,7 +953,7 @@ export async function addTxt(kwargs) {
         if (editable) await partialSave('media');
       });
     opts
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
     opts
       .addElems('span', 'constraint', (d) =>
@@ -1103,7 +1103,7 @@ export async function addChecklist(kwargs) {
         });
         list.call(addItem);
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html('add_circle');
   }
 
@@ -1127,7 +1127,7 @@ export async function addChecklist(kwargs) {
       .addElems('div', 'checkbox')
       .addElems('label')
       .attr('for', (d) => `check-item-${checklist_id}-${d.id}`)
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => (d.checked ? 'check_box' : 'check_box_outline_blank'));
     opts
       .addElems('div', 'grow')
@@ -1163,7 +1163,7 @@ export async function addChecklist(kwargs) {
     if (editable && level !== 'meta') {
       opts
         .addElems('div', 'rm')
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('clear')
         .on('click', function (d) {
           media.container.each(
@@ -1268,7 +1268,7 @@ export async function addRadiolist(kwargs) {
         });
         list.call(addItem);
       })
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html('add_circle');
   }
 
@@ -1292,7 +1292,7 @@ export async function addRadiolist(kwargs) {
       .addElems('div', 'checkbox')
       .addElems('label')
       .attr('for', (d) => `radio-item-${radiolist_id}-${d.id}`)
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) =>
         d.checked ? 'radio_button_checked' : 'radio_button_unchecked',
       );
@@ -1331,7 +1331,7 @@ export async function addRadiolist(kwargs) {
     if (editable && level !== 'meta') {
       opts
         .addElems('div', 'rm')
-        .addElems('i', 'material-icons google-translate-attr')
+        .addElems('i', 'material-icons google-translate-attr notranslate')
         .html('clear')
         .on('click', function (d) {
           media.container.each(
@@ -1440,7 +1440,7 @@ export async function addLocations(kwargs) {
         if (editable) await partialSave('media');
       });
     opts
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
     opts
       .addElems('span', 'constraint', (d) =>
@@ -1699,7 +1699,7 @@ export async function addGroup(kwargs) {
         if (editable) await partialSave('media');
       });
     opts
-      .addElems('i', 'material-icons google-translate-attr')
+      .addElems('i', 'material-icons google-translate-attr notranslate')
       .html((d) => d.label);
     opts
       .addElems('span', 'repeat', (d) => (d.key === 'repeat' ? [d] : []))

@@ -3,6 +3,8 @@ import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 import { getContent, getMediaSize, limitLength } from '/js/main.js';
 
+const store_instructions = true
+
 // THE FOUR FOLLOWING FUNCTIONS ARE FOR THE SAVING MECHANISM
 export async function switchButtons(lang = 'en') {
   const vocabulary = await getTranslations();
@@ -34,57 +36,140 @@ export async function switchButtons(lang = 'en') {
   }
 }
 
-function retrieveItems(sel, datum, items) {
+function retrieveItems(kwargs) {
+  const { sel, datum } = kwargs
+  let text = ''
+  
   // MEDIA
   if (datum.type === 'title') {
     datum.txt = (
       sel.select('.media-title').node() || sel.select('.meta-title').node()
     ).innerText;
     datum.has_content = datum.txt?.trim()?.length > 0;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`; // THIS DOES NOT ACCOUNT FOR TRANSLATIONS
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    if (datum.has_content) text += datum.txt;
+
+    return { item: datum, text }
   }
   if (['img', 'mosaic', 'video', 'files'].includes(datum.type)) {
     if (['mosaic', 'files'].includes(datum.type))
       datum.has_content = datum?.srcs?.filter((b) => b)?.length > 0;
     else datum.has_content = datum.src !== null && datum.src !== undefined;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    // NO SYSTEMATIC WAY OF GETTING img FOR fullTxt
+    return { item: datum, text }
+
   } else if (datum.type === 'drawing') {
     datum.has_content = datum.shapes?.length > 0;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    // NO SYSTEMATIC WAY OF GETTING drawings FOR fullTxt
+    return { item: datum, text }
+
   } else if (datum.type === 'txt') {
-    // datum.txt = (sel.select('.media-txt').node() || sel.select('.meta-txt').node()).innerHTML
     datum.txt = (sel.select('.media-txt').node() ||
       sel.select('.meta-txt').node())[
       'outerText' || 'textContent' || 'innerText'
     ];
     datum.has_content = datum.txt?.trim()?.length > 0;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    if (datum.has_content) text += datum.txt;
+
+    return { item: datum, text }
+
   } else if (datum.type === 'embed') {
     datum.html = (
       sel.select('.media-embed').node() || sel.select('.meta-embed').node()
     ).innerHTML;
     datum.has_content = datum.html?.trim()?.length > 0;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    if (datum.has_content) {
+      text += (sel.select('.media-embed').node() ||
+        sel.select('.meta-embed').node())[
+        'outerText' || 'textContent' || 'innerText'
+      ]; // HERE WE DO NOT WANT THE html TAGS IN THE fullTxt
+    }
+
+    return { item: datum, text }
+
   } else if (['checklist', 'radiolist'].includes(datum.type)) {
     datum.has_content =
       datum.options.filter((b) => b.name?.length && b.checked).length > 0;
     const clone = JSON.parse(JSON.stringify(datum));
     clone.options = clone.options.filter((b) => b.name?.length);
-    items.push(clone);
+    // items.push(clone);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${clone.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    if (datum.has_content) text += clone.options.filter((b) => b.name?.length && b.checked).map((b) => b.name).join('\n');
 
     // datum.options = datum.options.filter(b => b.name && b.name.length)
     // items.push(datum)
+    return { item: clone, text }
   }
   // SPECIFIC META
   else if (datum.type === 'location') {
     datum.has_content = datum.centerpoints?.length > 0;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    // NO SYSTEMATIC WAY OF GETTING location FOR fullTxt
+    return { item: datum, text }
+
   } else if (['tag', 'index'].includes(datum.type)) {
     datum.has_content = (datum.sdgs?.length || datum.tags?.length) > 0; // THIS IS LEGACY FOR THE ACTION PLANNING PLATFORM: TO DO: DEPRECATE
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    if (datum.has_content) text += (datum.sdgs || datum.tags).map((b) => `${b.type}: ${b.name}`).join('\n');
+
+    return { item: datum, text }
+
   } else if (datum.type === 'attachment') {
     datum.has_content = datum.srcs?.length > 0;
-    items.push(datum);
+    // items.push(datum);
+    // SET THE fullTxt REPRESENTATION
+    if (store_instructions && datum.instruction) {
+      // text += `${datum.instruction}\n`;
+      text += `${sel.select('.instruction').node().innerText}\n`
+    }
+    if (datum.has_content) text += datum.srcs.map((b) => `${datum.name}: ${b}`).join('\n');
+
+    return { item: datum, text }
+  } else {
+    return { item: null, text: null }
   }
 }
 async function getStatus() {
@@ -114,7 +199,6 @@ async function getStatus() {
     .map((d) => d.label);
 
   function checkCompletion(d) {
-    // <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
     if (
       (pad.type === 'templated' &&
         [null, undefined].includes(pad.template.medium)) ||
@@ -140,31 +224,31 @@ async function getStatus() {
       const ingroup = sel.findAncestor('group-container');
       // GROUPS
       if (c.type === 'group') {
-        // const groupitems = []
         sel.selectAll('.media-group-items').each(function () {
           const sel = d3.select(this);
           const subitems = [];
           sel
             .selectAll('.media-container, .meta-container')
             .each(function (b) {
-              retrieveItems(d3.select(this), b, subitems);
+              const { item } = retrieveItems({ sel: d3.select(this), datum: b });
+              if (item) subitems.push(item)
             });
-          // completion.push(!subitems.map(checkCompletion).unique().includes(false))
+
           completion.push(
             subitems.map(checkCompletion).every((d) => d === true),
           );
         });
       } else {
-        if (!ingroup) retrieveItems(sel, c, items);
-        // completion.push(!items.map(checkCompletion).unique().includes(false))
+        if (!ingroup) {
+          const { item } = retrieveItems({ sel, datum: c });
+          if (item) items.push(item)
+        }
       }
     });
-    // if (items.length) completion.push(!items.map(checkCompletion).unique().includes(false))
     if (items.length)
       completion.push(items.map(checkCompletion).every((d) => d === true));
   });
 
-  // <%# if ((templated && [null, undefined].includes(locals.display_template.medium)) || publicpage) { %>
   if (
     (pad.type === 'templated' &&
       [null, undefined].includes(pad.template.medium)) ||
@@ -201,11 +285,32 @@ async function compileContent(attr) {
     vocabulary['missing title'];
   if (title) title = limitLength(title, 99);
   // MAYBE INCLUDE ALERT IF title IS EMPTY
+  
   // COLLECT ALL MEDIA
   const sections = [];
+  let fullTxt = `${title}\n\n`;
+
   main.selectAll('.layout:not(.description-layout)').each(function (d) {
     const items = [];
+    let itemstext = '';
     const sel = d3.select(this);
+
+    const section_title = (sel.select('.section-header h1').node() || {}).innerText;
+    const section_lead = (sel.select('.media-lead').node() || {})[
+      'outerText' || 'textContent' || 'innerText'
+    ];
+    const section_instruction = (
+      sel.select('.media-repeat button div').node() || {}
+    ).innerText;
+
+    if (pad.type !== 'templated') {
+      d.title = section_title;
+      d.lead = section_lead;
+      d.instruction = section_instruction
+    }
+
+    if (store_instructions && section_title !== undefined) fullTxt += `${section_title}\n`
+    if (store_instructions && section_lead !== undefined) fullTxt += `${section_lead}\n`
 
     sel.selectAll('.media-container, .meta-container').each(function (c) {
       const sel = d3.select(this);
@@ -213,32 +318,36 @@ async function compileContent(attr) {
       // GROUPS
       if (c.type === 'group') {
         const groupitems = [];
+        let grouptext = '';
         sel.selectAll('.media-group-items').each(function () {
           const sel = d3.select(this);
           const subitems = [];
+          let subtext = '';
           sel
             .selectAll('.media-container, .meta-container')
             .each(function (b) {
-              retrieveItems(d3.select(this), b, subitems);
+              const { item, text } = retrieveItems({ sel: d3.select(this), datum: b });
+              if (item) subitems.push(item)
+              if (text) subtext += `${text}\n`
             });
           groupitems.push(subitems);
+          grouptext += `${subtext}\n`;
         });
         c.items = groupitems;
         items.push(c);
+        itemstext += `${grouptext}\n`
       } else {
-        if (!ingroup) retrieveItems(sel, c, items);
+        if (!ingroup) {
+          const { item, text } = retrieveItems({ sel, datum: c });
+          if (item) items.push(item)
+          if (text) itemstext += `${text}\n`
+        }
       }
     });
-
-    d.title = (sel.select('.section-header h1').node() || {}).innerText;
-    d.lead = (sel.select('.media-lead').node() || {})[
-      'outerText' || 'textContent' || 'innerText'
-    ];
-    d.instruction = (
-      sel.select('.media-repeat button div').node() || {}
-    ).innerText;
+    
     d.items = items;
     sections.push(d);
+    fullTxt += `${itemstext}\n`
   });
 
   // const location = main.select('.location-container').node() ? main.select('.location-container').datum() : null // THIS IS NOT NEEDED
@@ -280,7 +389,8 @@ async function compileContent(attr) {
     .filter((d) => !['tag', 'index', 'location'].includes(d.type))
     .forEach((d) => {
       main.selectAll(`.${d.label}-container`).each((c) => {
-        retrieveItems(d3.select(this), c, otherMetadata);
+        const { item } = retrieveItems({ sel: d3.select(this), datum: c });
+        if (item) otherMetadata.push(item)
       });
     });
   content.metadata = otherMetadata
@@ -309,84 +419,87 @@ async function compileContent(attr) {
     .flat();
 
   // COMPILE FULL TXT FOR SEARCH
-  const fullTxt = `${title}\n\n
-		${sections
-      .map((d) => d.title)
-      .join('\n\n')
-      .trim()}\n\n
-		${sections
-      .map((d) => d.lead)
-      .join('\n\n')
-      .trim()}\n\n
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'txt')
-      .map((d) => d.txt)
-      .join('\n\n')
-      .trim()}\n\n
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'embed')
-      .map((d) => d.html)
-      .join('\n\n')
-      .trim()}\n\n
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'checklist')
-      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-      .flat()
-      .join('\n\n')
-      .trim()}
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'radiolist')
-      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-      .flat()
-      .join('\n\n')
-      .trim()}
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'group')
-      .map((d) => d.items)
-      .filter((d) => d.type === 'txt')
-      .map((d) => d.txt)
-      .join('\n\n')
-      .trim()}\n\n
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'group')
-      .map((d) => d.items)
-      .filter((d) => d.type === 'embed')
-      .map((d) => d.html)
-      .join('\n\n')
-      .trim()}\n\n
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'group')
-      .map((d) => d.items)
-      .filter((d) => d.type === 'checklist')
-      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-      .flat()
-      .join('\n\n')
-      .trim()}
-		${sections
-      .map((d) => d.items)
-      .flat()
-      .filter((d) => d.type === 'group')
-      .map((d) => d.items)
-      .filter((d) => d.type === 'radiolist')
-      .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
-      .flat()
-      .join('\n\n')
-      .trim()}`;
 
+  // const fullTxt = `${title}\n\n
+	// 	${sections
+  //     .map((d) => d.title)
+  //     .join('\n\n')
+  //     .trim()}\n\n
+	// 	${sections
+  //     .map((d) => d.lead)
+  //     .join('\n\n')
+  //     .trim()}\n\n
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'txt')
+  //     .map((d) => d.txt)
+  //     .join('\n\n')
+  //     .trim()}\n\n
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'embed')
+  //     .map((d) => d.html)
+  //     .join('\n\n')
+  //     .trim()}\n\n
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'checklist')
+  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+  //     .flat()
+  //     .join('\n\n')
+  //     .trim()}
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'radiolist')
+  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+  //     .flat()
+  //     .join('\n\n')
+  //     .trim()}
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'group')
+  //     .map((d) => d.items)
+  //     .filter((d) => d.type === 'txt')
+  //     .map((d) => d.txt)
+  //     .join('\n\n')
+  //     .trim()}\n\n
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'group')
+  //     .map((d) => d.items)
+  //     .filter((d) => d.type === 'embed')
+  //     .map((d) => d.html)
+  //     .join('\n\n')
+  //     .trim()}\n\n
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'group')
+  //     .map((d) => d.items)
+  //     .filter((d) => d.type === 'checklist')
+  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+  //     .flat()
+  //     .join('\n\n')
+  //     .trim()}
+	// 	${sections
+  //     .map((d) => d.items)
+  //     .flat()
+  //     .filter((d) => d.type === 'group')
+  //     .map((d) => d.items)
+  //     .filter((d) => d.type === 'radiolist')
+  //     .map((d) => d.options.filter((c) => c.checked).map((c) => c.name))
+  //     .flat()
+  //     .join('\n\n')
+  //     .trim()}
+  //   `;
+
+  console.log(fullTxt)
   // ALWAYS SEND fullTxt
   content.full_text = fullTxt;
 
@@ -510,8 +623,9 @@ export async function partialSave(attr) {
     .catch((err) => console.log(err));
 }
 export async function updateStatus(_status) {
+  const curr_status = await getContent({ feature: 'status' });
+
   if (!_status) {
-    const curr_status = await getContent({ feature: 'status' });
     const completion = await getStatus();
     if (completion) _status = Math.max(1, curr_status);
     else _status = 0;
@@ -524,7 +638,7 @@ export async function updateStatus(_status) {
     .classed(`status-${_status}`, true);
   metastatus
     .select('div.btn-group form button.publish')
-    .attr('disabled', _status >= 1 ? null : true);
+    .attr('disabled', (_status >= 1 && curr_status <= 2) ? null : true);
   metastatus
     .select('div.btn-group form button.generate-pdf')
     .attr('disabled', _status > 0 ? null : true);

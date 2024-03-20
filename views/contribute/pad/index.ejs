@@ -145,7 +145,7 @@
 							%>
 
 							<% if ((locals.data?.status || 0) < 1
-								|| ((locals.data?.status || 0) === 2 && !locals.data?.publishable)
+								|| ((locals.data?.status || 0) === 2 && locals.data?.publishable === false)
 								|| (locals.data?.status || 0) === 3
 								|| (object === 'review' && (locals.data?.status || 0) === 2))
 							{ %>

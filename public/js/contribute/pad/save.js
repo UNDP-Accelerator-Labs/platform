@@ -338,8 +338,8 @@ async function compileContent(attr) {
     let itemstext = '';
     const sel = d3.select(this);
 
-    const section_title = (sel.select('.section-header h1').node() || {})
-      .innerText;
+    // const section_title = (sel.select('.section-header h1').node() || {}).innerText;
+    const section_title = getInnerText(sel.select('.section-header h1'));
     const section_lead = getInnerText(sel.select('.media-lead'));
     const section_instruction = (
       sel.select('.media-repeat button div').node() || {}

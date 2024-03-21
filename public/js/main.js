@@ -16,7 +16,8 @@ export function getInnerText(sel) {
   if (node.innerText) {
     return node.innerText;
   }
-  return `${node}`;
+  // return `${node}`;
+  return null
 }
 
 const debugging = false;

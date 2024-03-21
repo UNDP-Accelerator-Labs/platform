@@ -14,7 +14,7 @@ DB.conn.tx(t => {
     pads.forEach(d => {
       let fullTxt = d.title !== null ? `${d.title}\n\n` : '';
 
-      d.sections.forEach(c => {
+      (d.sections ?? []).forEach(c => {
         let currentTxt = '';
 
         c.items.forEach(b => {

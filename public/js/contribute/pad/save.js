@@ -60,7 +60,6 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`; // THIS DOES NOT ACCOUNT FOR TRANSLATIONS
-        // text += `${sel.select('.instruction').node().innerText}\n`;
         if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
         else text += `${datum.instruction}\n`
       }
@@ -77,7 +76,6 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      // text += `${sel.select('.instruction').node().innerText}\n`;
       if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
       else text += `${datum.instruction}\n`
     }
@@ -89,7 +87,6 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      // text += `${sel.select('.instruction').node().innerText}\n`;
       if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
       else text += `${datum.instruction}\n`
     }
@@ -109,7 +106,6 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        // text += `${sel.select('.instruction').node().innerText}\n`;
         if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
         else text += `${datum.instruction}\n`
       }
@@ -178,7 +174,6 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      // text += `${sel.select('.instruction').node().innerText}\n`;
       if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
       else text += `${datum.instruction}\n`
     }
@@ -197,7 +192,6 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        // text += `${sel.select('.instruction').node().innerText}\n`;
         if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
         else text += `${datum.instruction}\n`
       }
@@ -216,7 +210,6 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        // text += `${sel.select('.instruction').node().innerText}\n`;
         if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
         else text += `${datum.instruction}\n`
       }

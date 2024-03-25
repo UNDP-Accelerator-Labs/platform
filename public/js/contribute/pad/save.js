@@ -60,7 +60,9 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`; // THIS DOES NOT ACCOUNT FOR TRANSLATIONS
-        text += `${sel.select('.instruction').node().innerText}\n`;
+        // text += `${sel.select('.instruction').node().innerText}\n`;
+        if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+        else text += `${datum.instruction}\n`
       }
       text += `${innerText}\n`;
     }
@@ -75,7 +77,9 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`;
+      // text += `${sel.select('.instruction').node().innerText}\n`;
+      if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+      else text += `${datum.instruction}\n`
     }
     // NO SYSTEMATIC WAY OF GETTING img FOR fullTxt
     return { item: datum, text };
@@ -85,7 +89,9 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`;
+      // text += `${sel.select('.instruction').node().innerText}\n`;
+      if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+      else text += `${datum.instruction}\n`
     }
     // NO SYSTEMATIC WAY OF GETTING drawings FOR fullTxt
     return { item: datum, text };
@@ -103,7 +109,9 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        text += `${sel.select('.instruction').node().innerText}\n`;
+        // text += `${sel.select('.instruction').node().innerText}\n`;
+        if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+        else text += `${datum.instruction}\n`
       }
       text += `${innerText}\n`;
     }
@@ -129,7 +137,8 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        text += `${sel.select('.instruction').node().innerText}\n`;
+        if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+        else text += `${datum.instruction}\n`
       }
       text += `${innerText}\n`;
     }
@@ -152,7 +161,8 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${clone.instruction}\n`;
-        text += `${sel.select('.instruction').node().innerText}\n`;
+        if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+        else text += `${datum.instruction}\n`
       }
       text += `${innerText}\n`;
     }
@@ -168,7 +178,9 @@ function retrieveItems(kwargs) {
     // SET THE fullTxt REPRESENTATION
     if (store_instructions && datum.instruction && datum.has_content) {
       // text += `${datum.instruction}\n`;
-      text += `${sel.select('.instruction').node().innerText}\n`;
+      // text += `${sel.select('.instruction').node().innerText}\n`;
+      if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+      else text += `${datum.instruction}\n`
     }
     // NO SYSTEMATIC WAY OF GETTING location FOR fullTxt
     return { item: datum, text };
@@ -185,7 +197,9 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        text += `${sel.select('.instruction').node().innerText}\n`;
+        // text += `${sel.select('.instruction').node().innerText}\n`;
+        if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+        else text += `${datum.instruction}\n`
       }
       text += `${innerText}\n`;
     }
@@ -202,7 +216,9 @@ function retrieveItems(kwargs) {
     if (innerText.length) {
       if (store_instructions && datum.instruction) {
         // text += `${datum.instruction}\n`;
-        text += `${sel.select('.instruction').node().innerText}\n`;
+        // text += `${sel.select('.instruction').node().innerText}\n`;
+        if (sel.select('.instruction').node()) text += `${sel.select('.instruction').node().innerText}\n`;
+        else text += `${datum.instruction}\n`
       }
       text += `${innerText}\n`;
     }

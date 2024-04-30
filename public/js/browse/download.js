@@ -3,11 +3,14 @@ import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 import { getContent } from '/js/main.js';
 import { renderFormModal } from '/js/modals.js';
+import { isLoading } from '/js/notification/loader.js';
 
 export async function setDownloadOptions() {
   const vocabulary = await getTranslations();
   const object = d3.select('data[name="object"]').node().value;
   const space = d3.select('data[name="space"]').node().value;
+
+  isLoading(true);
 
   const { metafields, modules } = await POST('/load/metadata', {
     feature: ['metafields', 'modules'],
@@ -421,6 +424,6 @@ export async function setDownloadOptions() {
     });
   }
 
-  // const new_constraint =
   await renderFormModal({ message, formdata, opts });
+  isLoading(false);
 }

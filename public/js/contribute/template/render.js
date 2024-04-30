@@ -1606,6 +1606,7 @@ export async function addAttachment(kwargs) {
     },
     focus: focus || false,
     lang,
+    vocabulary,
   });
 
   meta.media

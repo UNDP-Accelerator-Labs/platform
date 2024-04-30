@@ -93,16 +93,16 @@ module.exports = async (req, res) => {
 							ORDER BY (pad, type)
 						;`, [ ids ]).then(async results => {
 							const nest = array.nest.call(results, { key: 'type' })
-							const tags = await Promise.all(nest.map(d => (async () => {
+							const tags = await Promise.all(nest.map(async d => {
 								const tags = await join.tags(d.values, [ language, 'tag_id', d.key ])
 								tags.forEach(d => {
 									delete d.tag_id
 									delete d.equivalents
 								})
 								return tags;
-							})));
-							return tags.flat().sort((a, b) => a.pad_id - b.pad_id)
+							}));
 
+							return tags.flat().sort((a, b) => a.pad_id - b.pad_id);
 						}).catch(err => console.log(err)))
 					} else batch1.push(null)
 					if (include_locations) {
@@ -163,6 +163,8 @@ module.exports = async (req, res) => {
 							}
 							// DETERMINE MAX TAGS BY TYPE
 							if (include_tags) {
+								console.log('check tags')
+								console.log(tags)
 								// TO DO: UPDATE THIS TO type-name
 								const tag_types = array.unique.call(tags, { key: 'type', onkey: true })
 								const tag_counts = array.nest.call(tags, { key: 'pad_id' })
@@ -207,17 +209,17 @@ module.exports = async (req, res) => {
 									let id;
 									let name;
 									if (Array.isArray(d)) {
-										id = id_prefix
-										name = name_prefix
+										id = id_prefix.toString().trim()
+										name = name_prefix.toString().trim()
 									} else if (d.type === 'section') {
-										id = `${id_prefix ? `${id_prefix}--` : ''}${d.type ?? undefined}-${d.title ?? undefined}-${d.lead ?? undefined}`
+										id = `${id_prefix ? `${id_prefix.toString().trim()}--` : ''}${d.type?.toString().trim() ?? undefined}-${d.title?.toString().trim() ?? undefined}-${d.lead?.toString().trim() ?? undefined}`
 										name = `${name_prefix ? `${name_prefix}--` : ''}${d.title ?? undefined}`
 									} else if (d.type === 'group') {
-										id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.name ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
-										name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
+										id = `${id_prefix ? `${id_prefix.toString().trim()}--` : ''}${d.level?.toString().trim() ?? undefined}-${d.type?.toString().trim() ?? undefined}-${d.name?.toString().trim() ?? undefined}-${d.instruction?.length ? d.instruction?.toString().trim() : undefined}`
+										name = `${name_prefix ? `${name_prefix.toString().trim()}--` : ''}${d.instruction?.length ? d.instruction?.toString().trim() : undefined}`
 									} else {
-										id = `${id_prefix ? `${id_prefix}--` : ''}${d.level ?? undefined}-${d.type ?? undefined}-${d.instruction?.length ? d.instruction : undefined}`
-										name = `${name_prefix ? `${name_prefix}--` : ''}${d.instruction?.length ? d.instruction : undefined}`
+										id = `${id_prefix ? `${id_prefix.toString().trim()}--` : ''}${d.level?.toString().trim() ?? undefined}-${d.type?.toString().trim() ?? undefined}-${d.instruction?.length ? d.instruction?.toString().trim() : undefined}`
+										name = `${name_prefix ? `${name_prefix.toString().trim()}--` : ''}${d.instruction?.length ? d.instruction?.toString().trim() : undefined}`
 									}
 
 									return [ id, name ]
@@ -230,9 +232,9 @@ module.exports = async (req, res) => {
 											if (d.type === 'checklist') {
 												d.options?.forEach(c => {
 													const obj = {}
-													obj.id = `${cid}--${c.name}`
+													obj.id = `${cid}--${c.name?.toString().trim()}`
 													obj.repetition = structure.some(c => c.id === obj.id) ? structure.filter(c => c.id === obj.id).length : 0
-													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${c.name}`
+													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${c.name?.toString().trim()}`
 
 													obj.content = c.checked
 													structure.push(obj)
@@ -362,9 +364,8 @@ module.exports = async (req, res) => {
 
 								const content_lengths = flat_content.map(d => Object.keys(d).length)
 								var headers = flat_content.find(d => Object.keys(d).length === Math.max(...content_lengths))
-								headers = Object.keys(headers).filter(c => c !== 'pad_id')
+								headers = Object.keys(headers).filter(c => c !== 'pad_id').map(c => c.trim())
 							}
-
 
 							const data = pad_group.values.map(d => {
 								let { ...obj } = d
@@ -515,6 +516,9 @@ module.exports = async (req, res) => {
 
 						if (!single_sheet && tags?.length) {
 							// ADD TAGS TO WORKBOOK
+							console.log('second instance')
+							console.log(tags)
+
 							tags.forEach(d => {
 								d.type = metafields.find(c => c.label === d.type)?.name ?? d.type
 							})

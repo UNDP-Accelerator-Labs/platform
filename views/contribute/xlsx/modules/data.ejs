@@ -9,7 +9,8 @@
 		modules: modules || {},
 		metafields: metafields || {},
 		media_value_keys: locals.metadata.site.media_value_keys || [],
-		ownDB: locals.metadata.site.own_db
+		ownDB: locals.metadata.site.own_db,
+		app_title_short: locals.metadata.site.app_title_short,
 	}
 %>
 <data name='site' value='<%= JSON.stringify(sitedata) %>'></data>

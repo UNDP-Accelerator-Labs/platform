@@ -14,8 +14,8 @@ module.exports = (req, res) => {
 				const { callback } = auth
 
 				if (src) {
-					console.log('look for resource')
-					console.log(callback)
+					// console.log('look for resource')
+					// console.log(callback)
 
 					if (callback?.referer && callback?.endpoint) {
 						const { referer, endpoint } = callback
@@ -31,7 +31,8 @@ module.exports = (req, res) => {
 					} else res.json({ status: 403, message: 'There is no callback to the request.' })
 
 				} else { // CANCEL THE REQUEST AS NO src IS PASSED: JUST REDIRECT TO THE CALLING PAGE
-					res.redirect(callback.referer)
+					let { referer } = callback
+					res.redirect(referer)
 				}
 			}
 		} catch (err) {

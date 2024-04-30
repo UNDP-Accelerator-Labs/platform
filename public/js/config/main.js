@@ -1,4 +1,4 @@
-import { fullVocabulary } from '/js/config/translations.js';
+import { fullVocabulary } from '/vocabulary/index.js';
 import { POST } from '/js/fetch.js';
 import { d3 } from '/js/globals.js';
 
@@ -52,8 +52,9 @@ export async function getTranslations(language) {
     return cachedTranslations[language];
   }
   const vocabulary = {};
-  Object.keys(fullVocabulary).forEach((d) => {
-    vocabulary[d] = fullVocabulary[d][language];
+  const translations = await fullVocabulary();
+  Object.keys(translations).forEach((d) => {
+    vocabulary[d] = translations[d][language];
   });
   cachedTranslations[language] = vocabulary;
   return vocabulary;

@@ -1,4 +1,4 @@
-export const fullVocabulary = {
+export const vocabulary = {
   contribute: {
     en: 'Contribute',
     fr: 'Contribuer',
@@ -68,7 +68,7 @@ export const fullVocabulary = {
         shared: 'Shared pads',
         reviewing: 'Under review',
         public: 'Public pads',
-        all: 'All public pads',
+        all: 'All published pads',
       },
       templates: {
         private: 'My templates',
@@ -76,14 +76,14 @@ export const fullVocabulary = {
         shared: 'Shared templates',
         public: 'Public templates',
         reviews: 'Review templates',
-        all: 'All public templates',
+        all: 'All published templates',
       },
       files: {
         private: 'My files',
         curated: 'Content curation',
         shared: 'Shared files',
         public: 'Public files',
-        all: 'All public files',
+        all: 'All published files',
       },
       reviews: {
         pending: 'Pending reviews',

@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
 		const auth = jwt.verify(token, process.env.APP_SUITE_SECRET)
 		if (!auth) res.json({ status: 403, message: 'You are not allowed to request resources on this platform.' })
 		else {
-			const { resources } = auth;
+			let { resources } = auth;
 			if (resources) {
 				if (!Array.isArray(resources)) resources = [resources];
 				req_resources = resources.filter(d => modules.some(c => c.type === d));

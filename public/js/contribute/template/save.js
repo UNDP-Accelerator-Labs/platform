@@ -286,7 +286,7 @@ function compileContent(attr) {
   content.title = title; // ALWAYS SAVE THE TITLE
   content.slideshow = slideshow; // ALWAYS SAVE THE SLIDESHOW OPTION
   if (!attr || attr === 'description')
-    content.description = description.trim();
+    content.description = description?.trim();
   if (
     !attr ||
     ['lead', 'media', 'meta'].includes(attr) ||

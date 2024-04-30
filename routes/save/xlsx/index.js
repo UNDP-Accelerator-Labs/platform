@@ -131,16 +131,45 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 
 						if (d.metadata?.length) {
 							// SAVE METAFIELDS
-							d.metadata.forEach(c => {
-								c.pad = pad_id
-								if (!Number.isInteger(c.key)) c.key = null
-							})
-							const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'key', 'value'], 'metafields')
-							batch1.push(t1.none(`
-								$1:raw
-								ON CONFLICT ON CONSTRAINT pad_value_type
-									DO NOTHING
-							;`, [ metadata_sql ]))
+
+							// TO DO: GET THE KEYS
+							// const { options: metaoptions } = metafields.find((c) => c.label === d.name)
+							// console.log(obj.value)
+							// console.log(metaoptions)
+							batch1.push(t.any(`
+								SELECT DISTINCT type, name, value, key::INT FROM metafields;
+							`).then((results) => {
+								// CREATE A MAX KEY COUNT FOR EACH
+								// type + name + maxkey
+
+								d.metadata.forEach(c => {
+									c.pad = pad_id
+									c.value = c.value.replace(/\&amp;/g, '&'); // THIS IS TO COUNTER THE HTML CHANGE
+
+
+									if (!Number.isInteger(c.key)) {
+										let identified = results.find((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && b.name?.toLowerCase() === c.name?.toLowerCase() && b.value?.toLowerCase() === c.value?.toLowerCase())
+										if (identified) {
+											c.key = identified.key;
+										} else {
+											identified = metafields.find((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase()))
+											if (identified) {
+												const { options } = identified
+												const idx = options.findIndex((b) => b.name?.toLowerCase() === c.value?.toLowerCase())
+												if (idx > -1) c.key = idx;
+												else c.key = null; // TO DO: CHANGE THIS TO MAX AND INCREMENT
+											} else c.key = null;
+										}
+									}
+								})
+								const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'key', 'value'], 'metafields')
+								return t1.none(`
+									$1:raw
+									ON CONFLICT ON CONSTRAINT pad_value_type
+										DO NOTHING
+								;`, [ metadata_sql ])
+								.catch((err) => console.log(err))
+							}).catch((err) => console.log(err)));
 						}
 
 						if (+mobilization !== -1) {

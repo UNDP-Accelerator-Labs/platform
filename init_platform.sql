@@ -170,7 +170,7 @@ CREATE TABLE public.mobilizations (
     language character varying(9),
     old_collection integer,
     version public.ltree,
-    collection integer,
+    collection integer
 );
 
 CREATE SEQUENCE public.mobilizations_id_seq

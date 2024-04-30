@@ -12,6 +12,8 @@ if (app_id === 'ap') {
   app_obj = { ...app_obj, ...require('./consent.js') };
 } else if (app_id === 'codification') {
   app_obj = { ...app_obj, ...require('./codification.js') };
+} else if (app_id === 'signals') {
+  app_obj = { ...app_obj, ...require('./signals.js') };
 } else if (app_id === 'login') {
   app_obj = { ...app_obj, ...require('./login.js') };
 } else if (app_id === 'global') {

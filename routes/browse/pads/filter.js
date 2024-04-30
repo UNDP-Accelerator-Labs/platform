@@ -378,7 +378,6 @@ module.exports = async (req, res) => {
 	// CONTENT FILTERS
 	const content_filters = []
 	metafields.forEach(d => {
-		// TO DO: FINSIH THIS FOR OTHER METAFIELDS
 		if (Object.keys(req.query).includes(d.label) || Object.keys(req.body).includes(d.label)) {
 			if (['tag', 'index'].includes(d.type)) {
 				content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))

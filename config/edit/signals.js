@@ -1,7 +1,7 @@
 // // EDIT THIS
 // GENERAL APP INFO
 exports.app_title = 'RBLAC Signals Scanning';
-exports.app_title_short = 'rblac-signals';
+exports.app_title_short = 'signals';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
 exports.app_languages = ['en', 'fr', 'es', 'pt'];
@@ -23,11 +23,6 @@ exports.modules = [
   { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 2 } },
   // { type: 'files', rights: { read: 0, write: 1 } },
-  {
-    type: 'reviews',
-    rights: { read: 2, write: 2, coordinate: 3 },
-    reviewers: 1,
-  }, // TO DO: UPDATE THIS TO 2
   { type: 'mobilizations', rights: { read: 2, write: 2 } },
   { type: 'contributors', rights: { read: 2, write: 2 } },
   { type: 'teams', rights: { read: 2, write: 2 } },
@@ -42,43 +37,82 @@ exports.modules = [
 // OPTIONS: ['tags', 'sdgs', 'methods', 'datasources', 'locations']
 
 exports.metafields = [
-  { type: 'index', name: 'SDGs', required: true, opencode: false, limit: 5 },
-
   {
     type: 'tag',
     name: 'thematic areas',
     required: true,
     opencode: true,
-    limit: 5,
+    limit: 10,
   },
   { type: 'location', name: 'locations', required: true },
   {
-    type: 'attachment',
-    name: 'consent',
-    required: true,
-    uris: [
-      {
-        uri:
-          process.env.NODE_ENV === 'production'
-            ? 'https://consent.sdg-innovation-commons.org/en/contribute/resource'
-            : 'http://localhost:2000/en/contribute/resource',
-        resources: ['pads', 'files'], // IF THIS IS A CALL TO ANOTHER INSTANCE OF THE PLATFORM (LIKE THE CONSENT MODULE), DECLARE WHICH modules CAN BE SHARED AS RESOURCES
-      },
-      { uri: undefined },
+    type: 'radiolist',
+    name: 'approach',
+    required: false,
+    instruction: 'Approach',
+    options: [
+      { name: 'Cultural' },
+      { name: 'Economic' },
+      { name: 'Political & institutional' },
+      { name: 'Social' },
+      { name: 'Socio-technical' },
     ],
-    limit: 1,
-  }, // THIS IS FOR CONSENT FORMS. A DOCUMENT CAN COME FROM THE CONTEXT, OR BE AN EMBEDED LINK
-
+  },
   {
     type: 'radiolist',
-    name: 'gender',
+    name: 'topics',
     required: false,
-    instruction: 'Innovator gender',
+    instruction: 'Topics',
     options: [
-      { name: 'Female' },
-      { name: 'Male' },
-      { name: 'Other' },
-      { name: 'Undisclosed' },
+      { name: 'Cultural fusion' },
+      { name: 'Xenophobia' },
+      { name: 'Get into debt to migrate' },
+      { name: 'International investment & Remittances' },
+      { name: 'Migrants and host communities relationships' },
+      { name: 'Opportunities' },
+      { name: 'Return migration' },
+      { name: 'Border Issues' },
+      { name: 'Internal displacement (climate change, violence, poverty)' },
+      { name: 'Irregular migration' },
+      { name: 'Migration status' },
+      { name: 'Transit migration' },
+      { name: 'Migration and specific population groups' },
+      { name: 'Resilience' },
+      { name: 'Digital nomads' },
+    ],
+  },
+  {
+    type: 'radiolist',
+    name: 'cause or effect',
+    required: false,
+    instruction: 'Cause or effect',
+    options: [
+      { name: 'Cause' },
+      { name: 'Effect' },
+    ],
+  },
+  {
+    type: 'radiolist',
+    name: 'sentiment',
+    required: false,
+    instruction: 'Sentiment',
+    options: [
+      { name: 'Positive' },
+      { name: 'Negative' },
+    ],
+  },
+  {
+    type: 'radiolist',
+    name: 'temporality',
+    required: false,
+    instruction: 'Temporality',
+    options: [
+      { name: '0' },
+      { name: 'Saw it once' },
+      { name: '1 week' },
+      { name: '2-3 weeks' },
+      { name: 'A month' },
+      { name: 'More than a month' },
     ],
   },
 

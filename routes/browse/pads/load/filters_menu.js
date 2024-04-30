@@ -157,7 +157,7 @@ module.exports = async kwargs => {
 			} else batch1.push(null)
 
 			// GET MOBILIZATIONS BREAKDOWN
-			// TO DO: IF USER IS NOT HOST OF THE MBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
+			// TO DO: IF USER IS NOT HOST OF THE MOBILIZATION, ONLY MAKE THIS AVAILABLE IN PUBLIC VIEW
 			// (CONTRIBUTORS CAN ONLY SEE WHAT OTHERS HAVE PUBLISHED)
 			// if (modules.some(d => d.type === 'mobilizations') && participations.length) {
 			if (modules.some(d => d.type === 'mobilizations')) {
@@ -174,7 +174,7 @@ module.exports = async kwargs => {
 					) OR m.owner = $1)
 						AND p.id NOT IN (SELECT review FROM reviews)
 						$2:raw
-					GROUP BY m.id
+					GROUP BY (m.id, m.title, start_date)
 					ORDER BY m.start_date DESC
 				;`, [ uuid, f_space ]) // [ uuid, full_filters ])
 				.then(results => {

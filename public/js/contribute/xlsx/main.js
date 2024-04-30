@@ -1423,6 +1423,8 @@ export async function compilePads(idx, structureOnly = false) {
             }
 
             item.instruction = c.key;
+            item.required = metafields.find((b) => b.label === c.type)?.required || false;
+
             return item;
           })();
         });
@@ -1540,7 +1542,7 @@ export async function compilePads(idx, structureOnly = false) {
           imgs: results
             .filter((d) => ['img', 'mosaic'].includes(d.type))
             .map((d) => d.src || d.srcs)
-            .flat(),
+            .flat().filter((d) => d),
 
           tags: results
             .filter((d) =>
@@ -1578,14 +1580,16 @@ export async function compilePads(idx, structureOnly = false) {
                   const obj = {};
                   obj.type = d.type;
                   obj.name = d.name;
-                  obj.value = c;
+                  if (typeof c === 'object' && !Array.isArray(c) && c !== null && c.name !== undefined) obj.value = c.name
+                  else obj.value = c;
                   return obj;
                 });
               } else {
                 const obj = {};
                 obj.type = d.type;
                 obj.name = d.name;
-                obj.value = value;
+                if (typeof value === 'object' && !Array.isArray(value) && value !== null && value.name !== undefined) obj.value = value.name;
+                else obj.value = value;
                 return obj;
               }
             })

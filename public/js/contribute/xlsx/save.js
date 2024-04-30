@@ -58,8 +58,6 @@ export async function catchSubmit(evt) {
   const pads = await compilePads();
   const template = await compileTemplate();
 
-  // TO DO: ADD LOADER FEEDBACK
-
   // 2) SAVE IMAGES
   const sources = [];
   const imgs = pads

@@ -22,7 +22,7 @@ module.exports = kwargs => {
 					if (d === 'pads') {
 						return t1.any(`
 							SELECT id, title, owner FROM pads
-							WHERE status > 2
+							WHERE status >= 0
 								AND owner IN ($1:csv)
 							ORDER BY date DESC
 						;`, [ collaborators_ids, rights ])

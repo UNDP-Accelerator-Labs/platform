@@ -1,3 +1,9 @@
+<%
+	const sitedata = {
+		app_title_short: locals.metadata.site.app_title_short,
+	}
+%>
+<data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
 <% 
 	const pagedata = {
 		language: locals.metadata.page.language

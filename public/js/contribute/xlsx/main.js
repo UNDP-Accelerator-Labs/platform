@@ -143,7 +143,7 @@ export function parseXLSX(file, node) {
       })();
     });
     for (const sheet of sheets) {
-      await sheet();
+      await sheet;
     }
     // HIDE THE LOADING BUTTON
     const main = d3.select('div.table main');

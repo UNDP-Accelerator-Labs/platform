@@ -27,7 +27,7 @@ module.exports = (req, res) => {
 					type,
 					host, 
 					endpoint: '/save/resource', 
-					referer, 
+					referer: referer.replace(/\&amp;/g, '&'), // TO DO: THIS IS A SUPER HACK 
 					uuid
 				} 
 			}, 

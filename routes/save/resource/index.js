@@ -108,7 +108,8 @@ module.exports = (req, res) => {
 				} else res.json({ status: 404, message: 'Something went wrong. There is no external resource meta element in the pad.' })
 			}).catch(err => console.log(err))
 		}).then(_ => {
-			redirectBack(req, res)
+			if (referer) res.redirect(referer);
+			else redirectBack(req, res);
 		}).catch(err => console.log(err))
 	} else res.json({ status: 404, message: 'Something went wrong. There is missing information.' })
 }

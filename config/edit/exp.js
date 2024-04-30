@@ -162,10 +162,14 @@ exports.metafields = [
   {
     type: 'attachment',
     name: 'learning plan',
-    required: true,
+    required: false,
     uris: [
       {
-        uri: 'https://learningplans.sdg-innovation-commons.org/en/contribute/resource',
+        uri:
+          process.env.NODE_ENV === 'production'
+            ? 'https://learningplans.sdg-innovation-commons.org/en/contribute/resource'
+            : 'http://localhost:2000/en/contribute/resource',
+        resources: ['pads']
       },
       { uri: undefined },
     ],

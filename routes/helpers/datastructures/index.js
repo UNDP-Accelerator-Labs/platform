@@ -294,6 +294,7 @@ exports.pagemetadata = (_kwargs) => {
 		const obj = {}
 		obj.metadata = {
 			site: {
+				app_title_short,
 				title,
 				description,
 				languages,
@@ -363,7 +364,7 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 	const conn = _kwargs.connection || DB.conn
 	const { data } = _kwargs
 
-	if (app_title_short === 'sm') {
+	if (app_title_short === 'solutions-mapping') {
 		const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
 		if (other_metadata.length > 0) {
 			if (Array.isArray(data)) {

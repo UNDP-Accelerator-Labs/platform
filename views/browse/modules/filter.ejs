@@ -67,7 +67,7 @@
 				<% } else { %>
 					<input type='text' name='search' id='search-field'>
 				<% } %>
-				<label for='search-field' data-vocab='["search", "<%= object === "contributors" ? "person" : "object" %>"]'></label>
+				<label for='search-field' data-vocab='["search", "<%- object === "contributors" ? "person" : "object" %>"]'></label>
 				<button id='search' type='submit'><img src='/imgs/icons/i-search.svg'></button>
 			</div>
 
@@ -78,7 +78,7 @@
 							<% for (let key in d) { %>
 								<div class='filter google-translate-attr'>
 									<input type='text' id='<%- key %>'>
-									<label for='<%- key %>' data-vocab='["<%= key.slice(0, -1)?.replace(/_/g, " ") %>", "plural"]' data-altvocab='["<%= key.replace(/_/g, " ") %>", "plural"]'></label>
+									<label for='<%- key %>' data-vocab='["<%- key.slice(0, -1)?.replace(/_/g, " ") %>", "plural"]' data-altvocab='["<%- key.replace(/_/g, " ") %>", "plural"]'></label>
 									<div class='dropdown'>
 										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
@@ -88,12 +88,12 @@
 															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id?.toString())) { %>disabled<% } %>>
 														<% }) %>
 													<% } %>
-													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id?.toString())) { %>checked<% } %> data-id='<%= c.id %>' data-name='<%= c.name %>'>
+													<input type='checkbox' value='<%- c.id %>' id='<%- key %>-<%- c.id %>' name='<%- key %>' <% if (query?.[key]?.includes(c.id?.toString())) { %>checked<% } %> data-id='<%- c.id %>' data-name='<%- c.name %>'>
 													<label for='<%- key %>-<%- c.id %>'>
 														<% if (Number.isInteger(c.name)) { %>
-															<%= c.name %>
+															<%- c.name %>
 														<% } else if (c.name) { %>
-															<%= c.name.capitalize() %>
+															<%- c.name.capitalize() %>
 														<% } else { %>
 															<span data-vocab='unknown'></span>
 														<% } %>
@@ -110,15 +110,15 @@
 										<% active_filters.forEach(c => { %>
 											<div class='tag' data-id='<%- c.id %>'>
 												<% if (Number.isInteger(c.name)) { %>
-													<label class='name' title='<%= c.name %>'>
-														<%= c.name %>
+													<label class='name' title='<%- c.name %>'>
+														<%- c.name %>
 													</label>
 												<% } else if (c.name) { %>
-													<label class='name' title='<%= c.name.capitalize() %>'>
+													<label class='name' title='<%- c.name.capitalize() %>'>
 														<% if (c.name?.length > 15) { %>
-															<%= `${c.name.slice(0, 15).capitalize()}…` %>
+															<%- `${c.name.slice(0, 15).capitalize()}…` %>
 														<% } else { %>
-															<%= c.name.capitalize() %>
+															<%- c.name.capitalize() %>
 														<% } %>
 													</label>
 												<% } else { %>
@@ -126,7 +126,7 @@
 														<span data-vocab='unknown'></span>
 													</label>
 												<% } %>
-												<label class='close' data-id='<%= c.id %>' data-name='<%= c.name %>'></label>
+												<label class='close' data-id='<%- c.id %>' data-name='<%- c.name %>'></label>
 											</div>
 										<% }) %>
 									</div>
@@ -155,8 +155,8 @@
 						<% locals.stats?.persistent_breakdown?.forEach(d => { %>
 							<li>
 								<input type='checkbox' class='toggle' id='status-<%- d.status %>' value='<%- d.status %>' name='status' <% if (!query?.status || query?.status?.some(c => +c === d.status)) { %>checked<% } %>>
-								<label for='status-<%= d.status %>' data-content='<%= simplifyNumber(d.count) %>'></label>
-								<p data-vocab='["status", "<%= object %>", "<%= d.status %>"]'></p>
+								<label for='status-<%- d.status %>' data-content='<%- simplifyNumber(d.count) %>'></label>
+								<p data-vocab='["status", "<%- object %>", "<%- d.status %>"]'></p>
 							</li>
 						<% }) %>
 					</menu>
@@ -171,7 +171,7 @@
 							<div class='add filter pinboards google-translate-attr'>
 								<input type='text' id='pin-all'>
 								<label for='pin-all'>
-									<span data-vocab='["add all", "<%= (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span> <%= locals.stats?.filtered ?? 0 %> <span data-vocab='["pads to pinboard", "<%= (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span>
+									<span data-vocab='["add all", "<%- (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span> <%- locals.stats?.filtered ?? 0 %> <span data-vocab='["pads to pinboard", "<%- (locals.stats?.filtered ?? 0) !== 1 ? "plural" : "singular" %>"]'></span>
 								</label>
 								<button id='new-pinboard' type='button'></button>
 								<div class='dropdown'>
@@ -209,5 +209,5 @@
 <% } %>
 
 <% if (locals.metadata?.user?.uuid) { %>
-	<data name='fixedEid' value='<%= fixedEid %>'></data>
+	<data name='fixedEid' value='<%- fixedEid %>'></data>
 <% } %>

@@ -1,6 +1,7 @@
 <% 
 	const sitedata = {
-		languages: locals.languages
+		languages: locals.languages,
+		app_title_short: locals.metadata.site.app_title_short,
 	}
 %>
 <data name='site' value='<%= JSON.stringify(sitedata) %>'></data>

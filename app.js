@@ -122,6 +122,7 @@ function redirectOldUrl(req, res, next) {
   const hostname = req.get('host');
   if (
     hostname === 'acclabs-staging.azurewebsites.net' ||
+    hostname === 'signal-scanning.azurewebsites.net' || // REMOVE THIS LINE ONCE SIGNAL SUB-DOMAIN IS FINALIZED
     !hostname.endsWith('azurewebsites.net')
   ) {
     return next();

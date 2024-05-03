@@ -124,3 +124,12 @@ jobs:
           app-name: 'acclabs-codification'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_CODIFICATION }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'
+
+      - name: Wait for signal-scanning
+        run: sleep 60
+      
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'signal-scanning'
+          publish-profile: ${{ secrets.AZURE_PUBLISH_SIGNAL_SCANNING }}
+          images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'

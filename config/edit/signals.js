@@ -15,7 +15,7 @@ exports.app_home =
   ];
 
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
-exports.own_app_url = 'https://signal-scanning.azurewebsites.net/';
+exports.own_app_url = 'https://horizons.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [

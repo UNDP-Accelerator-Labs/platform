@@ -130,6 +130,6 @@ jobs:
       
       - uses: azure/webapps-deploy@v2
         with:
-          app-name: 'signal-scanning'
+          app-name: 'acclabs-signal-scanning'
           publish-profile: ${{ secrets.AZURE_PUBLISH_SIGNAL_SCANNING }}
           images: 'acclabdocker.azurecr.io/platform:${{ env.IMAGE_TAG }}'

@@ -17,6 +17,7 @@ exports.app_home =
 exports.app_storage = 'https://acclabplatforms.blob.core.windows.net/';
 exports.own_app_url = 'https://horizons.sdg-innovation-commons.org/';
 
+
 // DESIRED MODULES
 exports.modules = [
   { type: 'pads', rights: { read: 0, write: { blank: 2, templated: 0 } } }, // templated: 0 IS FOR PUBLIC MOBILIZATIONS

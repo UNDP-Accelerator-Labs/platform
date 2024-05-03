@@ -54,8 +54,8 @@ exports.metafields = [
       { name: 'Cultural' },
       { name: 'Economic' },
       { name: 'Political & institutional' },
-      { name: 'Social' },
-      { name: 'Socio-technical' },
+      // { name: 'Social' },
+      // { name: 'Socio-technical' },
     ],
   },
   {

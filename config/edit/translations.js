@@ -13,6 +13,9 @@ exports.translations = {
     'action-plans': {
       en: 'Action Plans Platform',
     },
+    signals: {
+      en: 'RBLAC Signals Scanning',
+    }
   },
   'app home': {
     'solutions-mapping': {
@@ -70,6 +73,9 @@ exports.translations = {
       </div>
       `,
     },
+    signals: {
+      en: '',
+    },
     login: {
       en: `<div class='public-page-panel'><div class='inner'><p class='lead'>You shouldn't be able to see this</p></div></div>`,
     },
@@ -93,6 +99,9 @@ exports.translations = {
     },
     practice: {
       en: 'This platform aims to position exploration, solutions mapping, and experimentation as a function of Research and Development (R&D) for Sustainable Development practice.',
+    },
+    signals: {
+      en: '',
     },
     login: {
       en: `You shouldn't be able to see this`,

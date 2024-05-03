@@ -4,6 +4,7 @@ import { POST } from '/js/fetch.js';
 import { XLSX, d3 } from '/js/globals.js';
 import { toggleClass } from '/js/main.js';
 import { renderPromiseModal } from '/js/modals.js';
+import { isLoading } from '/js/notification/loader.js';
 
 export async function dropHandler(evt, node) {
   evt.preventDefault();
@@ -171,9 +172,9 @@ function parseColumns(json, keys) {
         return testdate.toISOString();
       } else {
         const e = c[d];
-        if (![null, undefined].includes(e) && !isNaN(e))
+        if (![null, undefined].includes(e) && !isNaN(e) && typeof e !== 'string')
           return +e; // IF e IS A NUMBER, FORCE TYPE
-        else return e;
+        else return e?.trim();
       }
     });
     let ref = obj.entries
@@ -935,7 +936,6 @@ async function renderTable(cols, update = false) {
         .each(function (c, j) {
           if (this === node) idx = j;
         });
-
       previewPad(idx);
     })
     .addElems('span')
@@ -994,7 +994,7 @@ async function splitValues(col, separator) {
             // NOTE THIS SHOULD ALWAYS BE THE CASE
             e = e.map((b) => {
               if (!isNaN(b)) return +b;
-              else return b;
+              else return b?.trim();
             });
           }
           return e;
@@ -1003,6 +1003,7 @@ async function splitValues(col, separator) {
       d.values = d.values
         .map((c) => c.replace(regex, separator).split(separator))
         .flat()
+        .map((c) => c?.trim())
         .unique();
       d.types = d.entries
         .filter((c) => c !== undefined)
@@ -1423,6 +1424,8 @@ export async function compilePads(idx, structureOnly = false) {
             }
 
             item.instruction = c.key;
+            item.required = metafields.find((b) => b.label === c.type)?.required || false;
+
             return item;
           })();
         });
@@ -1540,7 +1543,7 @@ export async function compilePads(idx, structureOnly = false) {
           imgs: results
             .filter((d) => ['img', 'mosaic'].includes(d.type))
             .map((d) => d.src || d.srcs)
-            .flat(),
+            .flat().filter((d) => d),
 
           tags: results
             .filter((d) =>
@@ -1574,18 +1577,35 @@ export async function compilePads(idx, structureOnly = false) {
               // NEED TO MAKE SURE THE INPUT IN THE xlsx MATCHES THE options IN THE metafield
 
               if (Array.isArray(value)) {
-                return value.map((c) => {
+                return value.filter((c) => {
+                  if (Object.keys(c).includes('checked')) return c.checked;
+                  else return true;
+                }).map((c) => {
                   const obj = {};
                   obj.type = d.type;
                   obj.name = d.name;
-                  obj.value = c;
+                  if (typeof c === 'object' && !Array.isArray(c) && c !== null && c.name !== undefined) {
+                    if (typeof c.name === 'string') obj.value = c.name?.trim();
+                    else obj.value = c.name;
+                  }
+                  else {
+                    if (typeof c === 'string') obj.value = c.trim();
+                    else obj.value = c;
+                  }
                   return obj;
                 });
               } else {
                 const obj = {};
                 obj.type = d.type;
                 obj.name = d.name;
-                obj.value = value;
+                if (typeof value === 'object' && !Array.isArray(value) && value !== null && value.name !== undefined) {
+                  if (typeof value.name === 'string') obj.value = value.name.trim();
+                  else obj.value = value.name;
+                }
+                else {
+                  if (typeof value === 'string') obj.value = value.trim();
+                  else obj.value = value;
+                }
                 return obj;
               }
             })
@@ -1770,6 +1790,8 @@ async function previewPad(idx) {
   const data = await compilePads(idx);
   const datum = data[0];
 
+  isLoading(true);
+
   const screen = d3.select('div.screen').classed('hide', false);
   const modal = screen.addElems('div', 'modal pad-preview');
   modal
@@ -1800,7 +1822,6 @@ async function previewPad(idx) {
     modal.remove();
     screen.classed('hide', true);
   }
-
   const main = modal
     .addElems('div', 'document')
     .addElems('main', 'pad')
@@ -1868,4 +1889,6 @@ async function previewPad(idx) {
   const nextTitle = 'Preview pad';
   const nextState = { additionalInformation: 'Updated the URL with JS' };
   window.history.pushState(nextState, nextTitle, nextURL);
+
+  isLoading(false);
 }

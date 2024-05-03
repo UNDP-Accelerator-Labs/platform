@@ -9,16 +9,44 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 	template.owner = uuid
 
 	DB.conn.tx(t => {
+		const batch = []
+
 		// INSERT THE TEMPLATE TO GET THE id
 		if (template.title) template.title = limitLength(template.title, 99);
 		template.sections = JSON.stringify(template.sections)
 		const sql = DB.pgp.helpers.insert(template, null, 'templates')
-		return t.one(`
+		batch.push(t.one(`
 			$1:raw
 			RETURNING id AS template_id
-		;`, [ sql ])
-		.then(async result => {
-			const { template_id } = result
+		;`, [ sql ], d => d.template_id))
+
+		batch.push(t.any(`
+			SELECT DISTINCT type, name, value, key::INT FROM metafields;
+		`).then((results) => {
+			// CREATE A MAX KEY COUNT FOR EACH
+			// type + name + maxkey
+			const maxkeys = metafields.filter((c) => !['tag', 'index', 'location'].includes(c.type))
+			.map((c) => {
+				let identified = results.filter((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && (b.name?.toLowerCase() === c.label?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase()));
+				let dbvalue = 0;
+				if (identified.length) dbvalue = Math.max(...identified.map((b) => b.key));
+				const obj = {}
+				obj.type = c.type;
+				obj.label = c.label;
+				obj.name = c.name;
+				obj.max = Math.max((dbvalue + 1) ?? 0, c?.options?.length ?? 0);
+				return obj
+			});
+
+			return [ results, maxkeys ];
+		}).catch(err => console.log(err)))
+
+		return t.batch(batch)
+		.then(async (results) => {
+			const [ template_id, keys ] = results;
+			const [ dbkeys, maxkeys ] = keys;
+			// const { template_id } = result
+			const tempkeys = [];
 
 			return t.batch(pads.map(d => {
 				d.owner = uuid
@@ -130,17 +158,148 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 						}
 
 						if (d.metadata?.length) {
-							// SAVE METAFIELDS
-							d.metadata.forEach(c => {
+							d.metadata.forEach((c) => {
 								c.pad = pad_id
-								if (!Number.isInteger(c.key)) c.key = null
-							})
+								c.value = c.value.replace(/\&amp;/g, '&');
+
+								// SET THE KEYS
+								if (!Number.isInteger(c.key)) {
+									if (['radiolist', 'checklist'].includes(c.type)) {
+										let identified = dbkeys.find((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && b.name?.toLowerCase() === c.name?.toLowerCase() && b.value?.toLowerCase() === c.value?.toLowerCase())
+										if (identified) {
+											console.log(c.value, 'identified in db results')
+											c.key = identified.key;
+										} else {
+											identified = tempkeys.find((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && b.name?.toLowerCase() === c.name?.toLowerCase() && b.value?.toLowerCase() === c.value?.toLowerCase())
+											
+											if (identified) {
+												console.log(c.value, 'identified in tempkeys')
+												c.key = identified.key;
+											} else {
+												identified = metafields.find((b) => {
+													return b.type?.toLowerCase() === c.type?.toLowerCase() 
+													&& (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase())
+													&& b.options.some((a) => a.name?.toLowerCase() === c.value?.toLowerCase())
+												})
+												if (identified) {
+													console.log(c.value, 'identified in metafields')
+													const { options } = identified
+													c.key = options.findIndex((b) => b.name?.toLowerCase() === c.value?.toLowerCase())
+													// if (idx > -1) c.key = idx;
+													// else c.key = null; // TO DO: CHANGE THIS TO MAX AND INCREMENT
+												} else {
+													console.log(c.value, 'incremented in maxkeys')
+													let max = maxkeys.find((b) => {
+														return b.type?.toLowerCase() === c.type?.toLowerCase()
+														&& (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase())
+													})?.max;
+													tempkeys.push({ type: c.type, name: c.name, value: c.value, key: max });
+													c.key = max;
+													// max += 1;
+													maxkeys.forEach((b) => {
+														if (b.type?.toLowerCase() === c.type?.toLowerCase()
+														&& (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase())) {
+															b.max += 1
+														}
+													})
+												}
+											}
+										}
+									} else c.key = null
+								}
+							});
+
 							const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'key', 'value'], 'metafields')
-							batch1.push(t1.none(`
+							return t1.none(`
 								$1:raw
 								ON CONFLICT ON CONSTRAINT pad_value_type
 									DO NOTHING
-							;`, [ metadata_sql ]))
+							;`, [ metadata_sql ])
+							.catch((err) => console.log(err))
+
+								// SAVE METAFIELDS
+							// GET OR SET THE KEYS
+							/*
+							batch1.push(t.any(`
+								SELECT DISTINCT type, name, value, key::INT FROM metafields;
+							`).then((results) => {
+								// CREATE A MAX KEY COUNT FOR EACH
+								// type + name + maxkey
+								const maxkeys = metafields.filter((c) => !['tag', 'index', 'location'].includes(c.type))
+								.map((c) => {
+									let identified = results.filter((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && (b.name?.toLowerCase() === c.label?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase()));
+									let dbvalue = 0;
+									if (identified.length) dbvalue = Math.max(...identified.map((b) => b.key));
+									const obj = {}
+									obj.type = c.type;
+									obj.label = c.label;
+									obj.name = c.name;
+									obj.max = Math.max(dbvalue + 1, c.options.length);
+									return obj
+								});
+								
+								const tempkeys = [];
+
+								d.metadata.forEach((c) => {
+									c.pad = pad_id
+									c.value = c.value.replace(/\&amp;/g, '&'); // THIS IS TO COUNTER THE HTML CHANGE
+
+									if (!Number.isInteger(c.key)) {
+										let identified = results.find((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && b.name?.toLowerCase() === c.name?.toLowerCase() && b.value?.toLowerCase() === c.value?.toLowerCase())
+										if (identified) {
+											console.log(c.value, 'identified in db results')
+											c.key = identified.key;
+										} else {
+											identified = tempkeys.find((b) => b.type?.toLowerCase() === c.type?.toLowerCase() && b.name?.toLowerCase() === c.name?.toLowerCase() && b.value?.toLowerCase() === c.value?.toLowerCase())
+											
+											if (identified) {
+												console.log(c.value, 'identified in tempkeys')
+												c.key = identified.key;
+											} else {
+												identified = metafields.find((b) => {
+													return b.type?.toLowerCase() === c.type?.toLowerCase() 
+													&& (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase())
+													&& b.options.some((a) => a.name?.toLowerCase() === c.value?.toLowerCase())
+												})
+												if (identified) {
+													console.log(c.value, 'identified in metafields')
+													const { options } = identified
+													c.key = options.findIndex((b) => b.name?.toLowerCase() === c.value?.toLowerCase())
+													// if (idx > -1) c.key = idx;
+													// else c.key = null; // TO DO: CHANGE THIS TO MAX AND INCREMENT
+												} else {
+													console.log(c.value, 'incremented in maxkeys')
+													let max = maxkeys.find((b) => {
+														return b.type?.toLowerCase() === c.type?.toLowerCase()
+														&& (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase())
+													})?.max;
+													tempkeys.push({ type: c.type, name: c.name, value: c.value, key: max });
+													c.key = max;
+													// max += 1;
+													maxkeys.forEach((b) => {
+														if (b.type?.toLowerCase() === c.type?.toLowerCase()
+														&& (b.label?.toLowerCase() === c.name?.toLowerCase() || b.name?.toLowerCase() === c.name?.toLowerCase())) {
+															b.max += 1
+														console.log('increment')
+														console.log(b.max)
+														}
+													})
+													console.log(maxkeys)
+												}
+											}
+										}
+									}
+								})
+
+								const metadata_sql = DB.pgp.helpers.insert(d.metadata, ['pad', 'type', 'name', 'key', 'value'], 'metafields')
+								return t1.none(`
+									$1:raw
+									ON CONFLICT ON CONSTRAINT pad_value_type
+										DO NOTHING
+								;`, [ metadata_sql ])
+								.catch((err) => console.log(err))
+							}).catch((err) => console.log(err)));
+							*/
 						}
 
 						if (+mobilization !== -1) {

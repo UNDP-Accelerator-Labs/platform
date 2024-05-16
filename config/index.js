@@ -273,10 +273,50 @@ exports.msalConfig = {
   },
 };
 exports.allowsso = true; // SET TO TRUE WHEN MIRCOSOFT OPENID API KEYS ARE AVAILABLE
-exports.sso_app_url = 'https://login.sdg-innovation-commons.org'; // 'http://localhost:3000'
+exports.sso_app_url =
+  process.env.NODE_ENV === 'production'
+    ? 'https://login.sdg-innovation-commons.org'
+    : 'http://localhost:3000';
 exports.sso_redirect_url =
-  'https://login.sdg-innovation-commons.org/auth/openid/return'; // 'http://localhost:3000/auth/openid/return'
+  process.env.NODE_ENV === 'production'
+    ? 'https://login.sdg-innovation-commons.org/auth/openid/return'
+    : 'http://localhost:3000/auth/openid/return';
 
 // CONFIG TO SET APP ALLOWED OR RESTRICTED ROUTES FOR A PLATFORM INSTANCE
 exports.allowed_routes = allowed_routes || null;
 exports.restricted_routes = restricted_routes || null;
+
+exports.platform_urls = [
+  {
+    title: 'Solution mapping',
+    url: 'https://solutions.sdg-innovation-commons.org',
+  },
+  {
+    title: 'Action plans',
+    url: 'https://learningplans.sdg-innovation-commons.org',
+  },
+  {
+    title: 'Experiments',
+    url: 'https://experiments.sdg-innovation-commons.org',
+  },
+  {
+    title: 'R&D Practice',
+    url: 'https://practice.sdg-innovation-commons.org',
+  },
+  {
+    title: 'Signal Scanning',
+    url: 'https://horizons.sdg-innovation-commons.org',
+  },
+  {
+    title: 'Insight Hub',
+    url: 'https://insights.sdg-innovation-commons.org',
+  },
+  {
+    title: 'SDG Map',
+    url: 'https://map.sdg-innovation-commons.org/',
+  },
+  {
+    title: 'Github',
+    url: 'https://github.com/orgs/UNDP-Accelerator-Labs/repositories',
+  },
+];

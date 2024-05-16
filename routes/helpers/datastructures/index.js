@@ -20,6 +20,7 @@ const {
 	translations,
 	allowsso,
 	sso_app_url,
+	platform_urls
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -309,6 +310,7 @@ exports.pagemetadata = (_kwargs) => {
 				app_suite_url,
 				allowsso,
 				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null,
+				platform_urls
 			},
 			user: {
 				uuid,

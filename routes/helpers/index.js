@@ -276,22 +276,33 @@ exports.redirectBack = (req, res, baseIfEmpty = false) => {
 
 exports.redirectToLoginPlatform = (req, res, next) => {
   const originHost = req.get('host');
+  const { referer } = req.headers || {}
   const pathname = req?.originalUrl?.startsWith('/login')
     ? new URL(`${req.protocol}://${originHost}${req.originalUrl}`).searchParams.get('path')
-    : req.originalUrl;
-  const innerUrl = `${req.protocol}://${originHost}${(pathname ?? '')}`;
+    : req.originalUrl
+  let innerUrl = `${req.protocol}://${originHost}${(pathname ?? '')}`;
+  
+  const { session } = req
+  if(referer){
+    const { pathname, search } = new URL (referer);
+    const path = `${pathname || ''}${search || ''}`
+    innerUrl = innerUrl + path
+  }
+
   const loginUrl = new URL(
     `${sso_app_url}/login?app=${app_title}&origin=${encodeURIComponent(innerUrl)}`,
   );
+
   const loginHost = loginUrl.host;
-  const { session } = req
+
+  console.log('loginUrl ', loginUrl )
 
   if(app_title == 'Login' && session.uuid){
     return res.redirect(`/${session.language}/edit/contributor?id=${session.uuid}`)
   }
   else if (
-    process.env.NODE_ENV === 'production' &&
-    originHost.endsWith('.sdg-innovation-commons.org') &&
+    // process.env.NODE_ENV === 'production' &&
+    // originHost.endsWith('.sdg-innovation-commons.org') &&
     loginHost != originHost
   ) {
     return res.redirect(loginUrl);
@@ -308,6 +319,8 @@ exports.checkOrigin = (url, origin_url) => {
   if (host.endsWith('.sdg-innovation-commons.org')) {
     return true;
   }
+  if(process.env.NODE_ENV == 'local') return true
+  
   return [
     'localhost',
     'acclabs-staging.azurewebsites.net',

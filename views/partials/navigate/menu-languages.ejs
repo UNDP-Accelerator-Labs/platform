@@ -18,6 +18,7 @@
 		else mapscale = 'contain'
 	}
 	const login_url = locals.metadata.site.login_url 
+	const platform_urls = locals.metadata.site.platform_urls
 %>
 
 <nav id='languages'>
@@ -26,6 +27,18 @@
 		<li class='home-btn lg xl xxl'>
 			<a href='<%= app_suite_url %>'>SDG Innovation Commons</a>
 		</li>
+
+		<li class="platform">
+			<div class="dropdown">
+				<button class="dropbtn">Platforms</button>
+				<div class="dropdown-content">
+					<% platform_urls.forEach(d => { %>
+						<a href='<%- d.url %>'><%- d.title %></a>
+					<% }) %>
+				</div>
+			</div>
+		</li>
+
 		<li class='options'>
 			<ul>
 				<% languages.forEach(d => { %>
@@ -34,11 +47,6 @@
 					</li>
 				<% }) %>
 				<li  class='googletranslator' id="google_translate_element"></li >
-				<li id="gtranslate-dummy-lang">
-					<a>Select language</a>
-					<!-- TO DO: TRANSLATE -->
-				</li >
-
 			</ul>
 		</li>
 		<li class='user-id'>

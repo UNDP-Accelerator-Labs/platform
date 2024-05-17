@@ -471,8 +471,9 @@
 		<% if (!publicpage) { %>
 			<h2>
 				<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
-				<% } else if (locals.metadata.user.country.name === 'Null Island') { %> 
-				<% } else { %><%- locals.metadata.user.country.name %><% } %>
+				<% } else if (locals.metadata.user.country.name != 'Null Island') { %> 
+					<%- locals.metadata.user.country.name 
+				%><% } %>
 			</h2>
 		<% } %>
 

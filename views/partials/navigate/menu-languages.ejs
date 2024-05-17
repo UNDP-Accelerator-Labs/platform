@@ -18,14 +18,29 @@
 		else mapscale = 'contain'
 	}
 	const login_url = locals.metadata.site.login_url 
+	const platform_urls = locals.metadata.site.platform_urls
 %>
 
 <nav id='languages'>
 	<menu class='google-translate-attr'>
 		<!-- TO DO: PASS THIS FROM CONFIG FILE (THERE MIGHT NOT ALWAYS BE A SUITE) -->
-		<li class='home-btn lg xl xxl'>
-			<a href='<%= app_suite_url %>'>SDG Innovation Commons</a>
-		</li>
+		<!-- <li></li><li></li> -->
+		<div class="menu-container">
+            <span class="hamburger-icon">
+				<span class="fs-16">☰</span>
+				<span class="fs-12">Menu</span>
+			</span>
+            <nav>
+                <div class="dropdown-content">
+                    <% platform_urls.forEach(d => { %>
+                        <a href='<%- d.url %>'><%- d.title %></a>
+                    <% }) %>
+                </div>
+            </nav>
+        </div>
+
+		<li class='home-btn lg xl xxl'></li>
+
 		<li class='options'>
 			<ul>
 				<% languages.forEach(d => { %>
@@ -33,14 +48,11 @@
 						<a class='notranslate <% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
 					</li>
 				<% }) %>
-				<li  class='googletranslator' id="google_translate_element"></li >
-				<li id="gtranslate-dummy-lang">
-					<a>Select language</a>
-					<!-- TO DO: TRANSLATE -->
-				</li >
-
+				<li  class='googletranslator' id="google_translate_element"></li>
 			</ul>
+			
 		</li>
+		
 		<li class='user-id'>
 			<% if (!publicpage) { %>
 				<span ><span class='sm m lg xl xxl' data-vocab='logged in'></span> 

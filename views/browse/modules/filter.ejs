@@ -188,6 +188,15 @@
 						<% } %>
 
 						<button type='button' class='download m lg xl xxl' data-vocab='download all'></button>
+
+						<span class="ps-5">
+							<span class="tooltip">
+								<i class='fa fa-info-circle fs-12'> </i>
+								<span class="tooltiptext">
+									Preprints are notes are in peer review stage. Public publications are finalised notes that have been published and are publicly accessible.
+								</span>
+							</span>
+						</span>
 					</div>
 				<% } else if (object === 'contributors') { %>
 					<div class='global-actions'>
@@ -201,6 +210,13 @@
 				<button type='button' class='expand-filters'>
 					<div class='line l1'></div><div class='line l2'></div><div class='line l3'></div>
 				</button>
+
+				<span class="tooltip">
+					<i class='fa fa-info-circle fs-12'> </i>
+					<span class="tooltiptext">
+						Click to see more filter options.
+					</span>
+				</span>
 			<% } %>
 		</form>
 	</nav>

@@ -505,8 +505,9 @@
 				<a <% if (login_url) { %>target="_blank" href="<%= login_url %>/<%- language %>/browse/<%- d.type %>/invited"<% } else { %>href="/<%- language %>/browse/<%- d.type %>/invited"<% } %> data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } else if (d.type === 'reviews') { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/pending' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
-			<% }
-			else { %>
+			<% } else if (d.type === 'pads') { %>
+				<a href='/<%- language %>/browse/<%- d.type %>/<%- uuid ? "published" : "public" %>' data-vocab='browse'></a>
+			<% } else { %>
 				<a href='/<%- language %>/browse/<%- d.type %>/private' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
 			<% } %>
 		</li>

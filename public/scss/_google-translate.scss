@@ -1,9 +1,11 @@
 .goog-te-gadget-simple {
   width: 0px !important;
+  pointer-events: all;
 }
 
 .googletranslator {
   padding-left: 0;
+  pointer-events: all;
 }
 
 .VIpgJd-ZVi9od-ORHb-OEVmcd {
@@ -25,3 +27,14 @@
 #gtranslate-dummy-lang {
   width: 100px !important;
 }
+
+
+//NEW DESIGN
+// .goog-te-gadget {
+//   font-family: 'Noto Sans', Helvetica, Arial, sans-serif !important;
+//   font-size: 12px !important;
+// }
+
+// .goog-te-gadget-simple {
+//   border: 0 #fff !important;
+// }

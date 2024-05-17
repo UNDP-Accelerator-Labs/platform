@@ -386,8 +386,16 @@
 <div class='sidebar lg xl xxl'></div>
 </div>
 
-<footer></footer>
-<%- include ('../../partials/footer.ejs') %>
+<footer>
+	<h4>Contribute to:</h4>
+	<menu>
+		<% locals.metadata.site.platform_urls.forEach(d => { %>
+			<a href='<%- d.url %>' target='_blank'>
+				<li><h3><%- d.title %></h3></li>
+			</a>
+		<% }) %>
+	</menu>
+</footer>
 
 </body>
 </html>

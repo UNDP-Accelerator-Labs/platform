@@ -38,7 +38,7 @@ module.exports = (req, res, next) => {
   const { sessionID: sid } = req || {};
   const { __ucd_app, __puid, __cduid, origin_url, app } = extraData;
   //NEW USER DEFAULT VALUES
-  const rights = 0;
+  const rights = 1;
   const iso3 = 'USA';
   const password = crypto.randomBytes(16).toString('hex');
   const position = 'UNDP';

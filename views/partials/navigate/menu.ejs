@@ -1,0 +1,64 @@
+<%
+	// CREATE ALIASES
+	const activity = locals.metadata.page.activity
+	const publicpage = locals.metadata.page.public
+	const space = locals.metadata.page.space
+	const is_public = locals.metadata.page.public || activity === 'preview'
+	const languages = locals.metadata.site.languages
+	const language = locals.metadata.page.language
+	const username = locals.metadata.user.name
+	const uuid = locals.metadata.user.uuid
+	const pagedisplay = locals.metadata.page.display
+	const app_suite_url = locals.metadata.site.app_suite_url
+
+	let mapscale = locals.metadata.page.mscale
+	// THIS IS FOR PUBLIC PINBOARDS: TO ENSURE THAT THE DEFINED MAP SCALE IS PRESERVED
+	if (space === 'pinned' && (!locals.pinboard?.editable || activity === 'preview') && locals.pinboard?.display_map) {
+		if (locals.pinboard?.display_fullscreen) mapscale = 'full-screen'
+		else mapscale = 'contain'
+	}
+	const login_url = locals.metadata.site.login_url 
+	const platform_urls = locals.metadata.site.platform_urls
+%>
+
+<data name='language' value='<%= language %>'></data>
+<div id="loader" class="loader"></div>
+
+<header>
+    <div class="header-left">
+        <a href="/">
+            <img src="/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png" alt="UNDP Logo" class="logo">
+        </a>
+        <div class="menu-container">
+            <span class="hamburger-icon">☰ Menu</span>
+            <nav>
+                <div class="dropdown-content">
+                    <% platform_urls.forEach(d => { %>
+                        <a href='<%- d.url %>'><%- d.title %></a>
+                    <% }) %>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="header-right">
+        <nav>
+            <ul>
+                <% languages.forEach(d => { %>
+					<li id='lang-<%- d.language %>' >
+						<a class='notranslate <% if (language === d.language) { %>active<% } %>'><%- d.language.toUpperCase() %></a>
+					</li>
+				<% }) %>
+                <li  id="google_translate_element"></li >
+                <li class='user-id'>
+                    <% if (!publicpage) { %>
+                        <a <% if (login_url) { %>target="_blank" <% } %> href='<% if (login_url) { %><%= login_url %><% } %>/<%= language %>/edit/contributor?id=<%= uuid %>'><u><%= username %></u></a>. | </span><a href='/logout/current' class='logout' data-vocab='log out'></a>
+                    <% } else { %>
+                        <a href='/login' class='login' data-vocab='log in'></a>
+                    <% } %>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+

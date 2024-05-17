@@ -368,3 +368,168 @@ li.googletranslator {
     transform: rotate(360deg);
   }
 }
+
+.menu-container {
+  display: inline-block;
+  align-items: center;
+  position: relative;
+  margin-left: 20px;
+  font-size: 12px;
+  color: white;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  z-index: 1000;
+  min-width: 160px;
+  text-transform: uppercase;
+  text-align: start;
+}
+
+.menu-container:hover .dropdown-content,
+.menu-container .dropdown-content:hover {
+  display: block;
+}
+
+.dropdown-content a {
+  display: block;
+  color: #0056b3;
+  text-decoration: none;
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.dropdown-content a:hover {
+  background-color: #f0f0f0;
+}
+
+.hamburger-icon {
+  font-size: 12px;
+  cursor: pointer;
+  padding-right: 20px;
+}
+
+footer {
+  h4 {
+    height: 45px;
+    text-align: center;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 45px;
+    color: #969696;
+  }
+
+  menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 150px);
+    grid-auto-rows: 1fr;
+    column-gap: 15px;
+    row-gap: 15px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 30px 0;
+    margin: auto;
+
+    li {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 150px;
+      height: 150px;
+      list-style: none;
+      font-size: 20px;
+      text-align: center;
+      overflow: hidden;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 3px,
+        rgb(255, 255, 255) 3px,
+        rgb(255, 255, 255) 6px
+      );
+
+      h3 {
+        padding: 5px;
+        font-size: 16px;
+        line-height: 1.3em;
+        z-index: 10;
+        color: #0468b1;
+      }
+    }
+  }
+}
+
+@for $i from 0 through 20 {
+  .m-#{$i} {
+    margin: $i * 0.25rem !important;
+  }
+  .mb-#{$i} {
+    margin-bottom: $i * 0.25rem !important;
+  }
+
+  .mt-#{$i} {
+    margin-top: $i * 0.25rem !important;
+  }
+  .ms-#{$i} {
+    margin-left: $i * 0.25rem !important;
+  }
+  .me-#{$i} {
+    margin-right: $i * 0.25rem !important;
+  }
+
+  .my-#{$i} {
+    margin-top: $i * 0.25rem !important;
+    margin-bottom: $i * 0.25rem !important;
+  }
+  .mx-#{$i} {
+    margin-right: $i * 0.25rem !important;
+    margin-left: $i * 0.25rem !important;
+  }
+
+  .p-#{$i} {
+    padding: $i * 0.25rem !important;
+  }
+  .pb-#{$i} {
+    padding-bottom: $i * 0.25rem !important;
+  }
+  .pt-#{$i} {
+    padding-top: $i * 0.25rem !important;
+  }
+  .ps-#{$i} {
+    padding-left: $i * 0.25rem !important;
+  }
+  .pe-#{$i} {
+    padding-right: $i * 0.25rem !important;
+  }
+
+  .px-#{$i} {
+    padding-right: $i * 0.25rem !important;
+    padding-left: $i * 0.25rem !important;
+  }
+
+  .py-#{$i} {
+    padding-top: $i * 0.25rem !important;
+    padding-bottom: $i * 0.25rem !important;
+  }
+  //HEIGHT
+  .h-#{$i} {
+    height: $i * 100px !important;
+  }
+  //FONT SIZE
+  .fs-#{$i} {
+    font-size: $i * 1px !important;
+  }
+  //LINE HEIGHTS
+  .ly-#{$i} {
+    line-height: $i * 0.25rem !important;
+  }
+}

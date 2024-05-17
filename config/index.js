@@ -288,7 +288,7 @@ exports.restricted_routes = restricted_routes || null;
 
 exports.platform_urls = [
   {
-    title: 'Solution mapping',
+    title: 'Solutions',
     url: 'https://solutions.sdg-innovation-commons.org',
   },
   {
@@ -299,24 +299,24 @@ exports.platform_urls = [
     title: 'Experiments',
     url: 'https://experiments.sdg-innovation-commons.org',
   },
+  // {
+  //   title: 'R&D Practice',
+  //   url: 'https://practice.sdg-innovation-commons.org',
+  // },
+  // {
+  //   title: 'Signal Scanning',
+  //   url: 'https://horizons.sdg-innovation-commons.org',
+  // },
   {
-    title: 'R&D Practice',
-    url: 'https://practice.sdg-innovation-commons.org',
+    title: 'Blogs',
+    url: 'https://sdg-innovation-commons.org',
   },
-  {
-    title: 'Signal Scanning',
-    url: 'https://horizons.sdg-innovation-commons.org',
-  },
-  {
-    title: 'Insight Hub',
-    url: 'https://insights.sdg-innovation-commons.org',
-  },
-  {
-    title: 'SDG Map',
-    url: 'https://map.sdg-innovation-commons.org/',
-  },
-  {
-    title: 'Github',
-    url: 'https://github.com/orgs/UNDP-Accelerator-Labs/repositories',
-  },
+  // {
+  //   title: 'SDG Map',
+  //   url: 'https://map.sdg-innovation-commons.org/',
+  // },
+  // {
+  //   title: 'Github',
+  //   url: 'https://github.com/orgs/UNDP-Accelerator-Labs/repositories',
+  // },
 ];

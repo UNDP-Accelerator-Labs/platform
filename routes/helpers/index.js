@@ -295,14 +295,12 @@ exports.redirectToLoginPlatform = (req, res, next) => {
 
   const loginHost = loginUrl.host;
 
-  console.log('loginUrl ', loginUrl )
-
   if(app_title == 'Login' && session.uuid){
     return res.redirect(`/${session.language}/edit/contributor?id=${session.uuid}`)
   }
   else if (
-    // process.env.NODE_ENV === 'production' &&
-    // originHost.endsWith('.sdg-innovation-commons.org') &&
+    process.env.NODE_ENV === 'production' &&
+    originHost.endsWith('.sdg-innovation-commons.org') &&
     loginHost != originHost
   ) {
     return res.redirect(loginUrl);
@@ -320,7 +318,7 @@ exports.checkOrigin = (url, origin_url) => {
     return true;
   }
   if(process.env.NODE_ENV == 'local') return true
-  
+
   return [
     'localhost',
     'acclabs-staging.azurewebsites.net',

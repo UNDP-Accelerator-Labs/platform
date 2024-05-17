@@ -277,10 +277,7 @@ exports.redirectBack = (req, res, baseIfEmpty = false) => {
 exports.redirectToLoginPlatform = (req, res, next) => {
   const originHost = req.get('host');
   const { referer } = req.headers || {}
-  const pathname = req?.originalUrl?.startsWith('/login')
-    ? new URL(`${req.protocol}://${originHost}${req.originalUrl}`).searchParams.get('path')
-    : req.originalUrl
-  let innerUrl = `${req.protocol}://${originHost}${(pathname ?? '')}`;
+  let innerUrl = `${req.protocol}://${originHost}`;
   
   const { session } = req
   if(referer){

@@ -209,7 +209,14 @@
 				</a>
 			</li>
 		<% } %> -->
-
+		<li class='<% if (space === "published") { %>active<% } %>'>
+			<a data-location='./published'>
+				<button>
+					<span data-vocab='["space", "<%= object %>", "all"]'></span>
+					<div class='count'><%- locals.stats?.all %></div>
+				</button>
+			</a>
+		</li>
 		<% if (object === 'templates' && modules.some(d => d.type === 'reviews' && rights >= d.rights.read)
 			&& locals.metadata.menu.review_templates?.length > 0)
 		{ %>
@@ -224,13 +231,5 @@
 			</li>
 		<% } %>
 
-		<li class='<% if (space === "published") { %>active<% } %>'>
-			<a data-location='./published'>
-				<button>
-					<span data-vocab='["space", "<%= object %>", "all"]'></span>
-					<div class='count'><%- locals.stats?.all %></div>
-				</button>
-			</a>
-		</li>
 	<% } %>
 </menu>

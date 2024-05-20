@@ -62,13 +62,13 @@ export const vocabulary = {
   space: {
     en: {
       pads: {
-        private: 'My experiments',
+        private: 'My pads',
         curated: 'Content curation',
         pinned: 'My collections',
-        shared: 'Shared experiments',
+        shared: 'Shared pads',
         reviewing: 'Under review',
-        public: 'Public experiments',
-        all: 'All published experiments',
+        public: 'Public pads',
+        all: 'All published pads',
       },
       templates: {
         private: 'My templates',
@@ -103,13 +103,13 @@ export const vocabulary = {
     },
     fr: {
       pads: {
-        private: 'Mes expérimentations',
+        private: 'Mes bloc-notes',
         curated: 'Curation de contenu',
         pinned: 'Mes collections',
-        shared: 'Expérimentations partagés',
+        shared: 'Bloc-notes partagés',
         reviewing: 'En cours de relecture',
-        public: 'Expérimentations publics',
-        all: 'Toutes les expérimentations publiés',
+        public: 'Bloc-notes publics',
+        all: 'Tous les bloc-notes publiés',
       },
       templates: {
         private: 'Mes gabarits',
@@ -144,13 +144,13 @@ export const vocabulary = {
     },
     es: {
       pads: {
-        private: 'Mis experimentos',
+        private: 'Mis libretas',
         curated: 'Curación de contenidos',
         pinned: 'Mis colecciones',
-        shared: 'Experimentos compartidos',
+        shared: 'Libretas compartidas',
         reviewing: 'Bajo revisión',
-        public: 'Experimentos públicos',
-        all: 'Todos los experimentos publicados',
+        public: 'Libretas publicas',
+        all: 'Todas las libretas publicadas',
       },
       templates: {
         private: 'Mis plantillas',
@@ -185,13 +185,13 @@ export const vocabulary = {
     },
     pt: {
       pads: {
-        private: 'Meus experimentos',
+        private: 'Meus blocos de notas',
         curated: 'Restauração de conteúdo',
         pinned: 'Minhas coleções',
-        shared: 'Experimentos compartilhados',
+        shared: 'Blocos de notas compartilhados',
         reviewing: 'Sob revisão',
-        public: 'Experimentos públicos',
-        all: 'Todos os experimentos publicados',
+        public: 'Blocos de notas públicos',
+        all: 'Todos os blocos de notas publicados',
       },
       templates: {
         private: 'Meus modelos',
@@ -227,7 +227,7 @@ export const vocabulary = {
   },
 
   'import pads': {
-    en: 'Import experiments',
+    en: 'Import pads',
     fr: 'Importer des bloc-notes',
     es: 'Importar libretas',
     pt: 'Importar blocos de notas',
@@ -267,7 +267,7 @@ export const vocabulary = {
     },
   },
   'import to workspace or mobilization': {
-    en: 'Choose a workspace or campaign to import experiments to.',
+    en: 'Choose a workspace or campaign to import pads to.',
     fr: 'Choisissez un espace de travail ou une campagne vers laquelle importer les bloc-notes.',
     es: 'Elija un espacio de trabajo o campañas para importar a las libretas.',
     pt: 'Escolha um espaço de trabalho ou campanha para importar os blocos de notas.',
@@ -467,10 +467,10 @@ export const vocabulary = {
   },
   'accept or reject pad': {
     // USED
-    en: 'Is this experiment ready for publication?',
-    fr: 'Cette expérimentation est-il prêt à être publié ?',
-    es: '¿Este experimento está listo para su publicación?',
-    pt: 'Este experimento está pronto para publicação?',
+    en: 'Is this pad ready for publication?',
+    fr: 'Ce bloc-notes est-il prêt à être publié ?',
+    es: '¿Está este bloc listo para su publicación?',
+    pt: 'Este bloco está pronto para publicação?',
   },
   'review template description': {
     en: 'This is a template for reviews in',
@@ -547,138 +547,97 @@ export const vocabulary = {
       singular: 'Tema',
     },
   },
-  method: {
-    // USED
+  approach: {
     en: {
-      plural: 'Methods',
-      singular: 'Method',
+      plural: 'Approaches',
+      singular: 'Approach',
     },
     fr: {
-      plural: 'Méthodes',
-      singular: 'Méthode',
+      plural: '',
+      singular: '',
     },
     es: {
-      plural: 'Métodos',
-      singular: 'Método',
+      plural: '',
+      singular: '',
     },
     pt: {
-      plural: 'Métodos',
-      singular: 'Método',
+      plural: '',
+      singular: '',
     },
   },
-  datasource: {
-    // USED
+  topics: {
     en: {
-      plural: 'Datasources',
-      singular: 'Datasource',
+      plural: 'Topics',
+      singular: 'Topic',
     },
     fr: {
-      plural: 'Sources de données',
-      singular: 'Source de données',
+      plural: '',
+      singular: '',
     },
     es: {
-      plural: 'Fuentes de datos',
-      singular: 'Fuente de datos',
+      plural: '',
+      singular: '',
     },
     pt: {
-      plural: 'Fontes de dados',
-      singular: 'Fonte de dados',
+      plural: '',
+      singular: '',
     },
   },
-  gender: {
-    // USED
+  'cause or effect': {
     en: {
-      plural: 'Genders',
-      singular: 'Gender',
+      plural: 'Causes or effects',
+      singular: 'Cause or effect',
     },
     fr: {
-      plural: 'Genres',
-      singular: 'Genre',
+      plural: '',
+      singular: '',
     },
     es: {
-      plural: 'Géneros',
-      singular: 'Género',
+      plural: '',
+      singular: '',
     },
     pt: {
-      plural: 'Gêneros',
-      singular: 'Gênero',
+      plural: '',
+      singular: '',
     },
   },
-  'rnd stage': {
-    // USED
+  sentiment: {
     en: {
-      plural: 'R&D activities',
-      singular: 'R&D activity',
+      plural: 'Sentiments',
+      singular: 'Sentiment',
     },
     fr: {
-      plural: 'Activités de R&D',
-      singular: 'Activité de R&D',
+      plural: '',
+      singular: '',
     },
     es: {
-      plural: 'Actividades de I+D',
-      singular: 'Actividad de I+D',
+      plural: '',
+      singular: '',
     },
     pt: {
-      plural: 'Atividade de P&D',
-      singular: 'Atividades de P&D',
+      plural: '',
+      singular: '',
     },
   },
-  'rnd function': {
-    // USED
+  temporality: {
     en: {
-      plural: 'R&D functions',
-      singular: 'R&D function',
+      plural: 'Temporalities',
+      singular: 'Temporality',
     },
     fr: {
-      plural: 'Fonction R&D',
-      singular: 'Fonctions R&D',
+      plural: '',
+      singular: '',
     },
     es: {
-      plural: 'Función de I+D',
-      singular: 'Funciones de I+D',
+      plural: '',
+      singular: '',
     },
     pt: {
-      plural: 'Funções de P&D',
-      singular: 'Função de P&D',
+      plural: '',
+      singular: '',
     },
   },
-  'tool type': {
-    // USED
-    en: {
-      plural: 'Tool types',
-      singular: 'Tool type',
-    },
-    fr: {
-      plural: 'Types d’outils',
-      singular: 'Type d’outil',
-    },
-    es: {
-      plural: 'Tipos de herramientas',
-      singular: 'Tipo de herramienta',
-    },
-    pt: {
-      plural: 'Tipos de ferramentas',
-      singular: 'Tipo de ferramenta',
-    },
-  },
-  'tool license': {
-    en: {
-      plural: 'Tool licenses',
-      singular: 'Tool license',
-    },
-    fr: {
-      plural: 'Licences de l’outil',
-      singular: 'Licence de l’outil',
-    },
-    es: {
-      plural: 'Licencias de herramientas',
-      singular: 'Licencia de herramienta',
-    },
-    pt: {
-      plural: 'Licenças de ferramentas',
-      singular: 'Licença de ferramenta',
-    },
-  },
+  
   position: {
     // USED
     en: {
@@ -849,20 +808,20 @@ export const vocabulary = {
   },
   pad: {
     en: {
-      plural: 'Experiments',
-      singular: 'Experiment',
+      plural: 'Pads',
+      singular: 'Pad',
     },
     fr: {
-      plural: 'Expérimentation',
-      singular: 'Expérimentation',
+      plural: 'Blocs-notes',
+      singular: 'Bloc-notes',
     },
     es: {
-      plural: 'Experimentos',
-      singular: 'Experimento',
+      plural: 'Libretas',
+      singular: 'Libreta',
     },
     pt: {
-      plural: 'Experimentos',
-      singular: 'Experimento',
+      plural: 'Blocos de notas',
+      singular: 'Bloco de notas',
     },
   },
   // [NEW] MENU
@@ -1214,13 +1173,13 @@ and approve of the use of the indicated data for further uses.
 <h2>Exploration Feature and Data Usage</h2>
 <p>
 Explorations are a special type of collection that is tightly integrated with browsing the platform.
-You can select relevant experiments for an exploration, which adds them to the collection.
-You can also indicate that an experiment is not relevant for an exploration,
-which will make the experiment translucent when it appears in search results.
-This way, you can quickly see which experiments might be of interest when doing multiple
+You can select relevant pads for an exploration, which adds them to the collection.
+You can also indicate that a pad is not relevant for an exploration,
+which will make the pad translucent when it appears in search results.
+This way, you can quickly see which pads might be of interest when doing multiple
 queries for building a collection featuring a certain topic.
 In the future, we plan to let the exploration description prioritize
-relevant experiments in your searches. Therefore, it is best to describe what you are
+relevant pads in your searches. Therefore, it is best to describe what you are
 looking for in detail when naming an exploration.
 </p><p>
 For the above-mentioned suggestion feature, we might collect questions and corresponding documents
@@ -1609,20 +1568,20 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     en: {
       pad: {
         0: {
-          plural: 'Unfinished experiments',
-          singular: 'Unfinished experiment',
+          plural: 'Unfinished pads',
+          singular: 'Unfinished pad',
         },
         1: {
-          plural: 'Publishable experiments',
-          singular: 'Publishable experiment',
+          plural: 'Publishable pads',
+          singular: 'Publishable pad',
         },
         2: {
           plural: 'Preprints',
           singular: 'Preprint',
         },
         3: {
-          plural: 'Public experiments',
-          singular: 'Public experiment',
+          plural: 'Public pads',
+          singular: 'Public pad',
         },
       },
       template: {
@@ -3311,7 +3270,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
   'dblclick to preview': {
     en: {
-      pad: 'Double click to view experiment.',
+      pad: 'Double click to view pad.',
     },
     fr: {
       pad: 'Double-cliquez pour afficher le bloc-notes.',
@@ -3499,7 +3458,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
   'pad based on': {
     // USED
-    en: 'This experiment is based on:',
+    en: 'This pad is based on:',
     fr: 'Ce bloc-notes est basé sur :',
     es: 'Este libreta se basa en:',
     pt: 'Este bloco de notas é baseado em:',
@@ -3527,7 +3486,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
   'select review language': {
     // USED
-    en: 'Select the language the experiment should be reviewed in.',
+    en: 'Select the language the pad should be reviewed in.',
     fr: 'Sélectionner la langue dans laquelle le bloc-notes doit être relu.',
     es: 'Seleccione el idioma en el que se debe revisar el bloc.',
     pt: 'Selecione o idioma em que o bloco deve ser revisado.',
@@ -3542,8 +3501,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   'pads to display': {
     // USED
     en: {
-      plural: ' experiments to display.',
-      singular: ' experiment to display.',
+      plural: ' pads to display.',
+      singular: ' pad to display.',
     },
     fr: {
       plural: ' blocs-notes à afficher.',
@@ -3630,8 +3589,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   'pads to pinboard': {
     // USED
     en: {
-      plural: 'experiments to a collection',
-      singular: 'experiment to a collection',
+      plural: 'pads to a collection',
+      singular: 'pad to a collection',
     },
     fr: {
       plural: 'blocs-notes à une collection',
@@ -3662,14 +3621,14 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
   'what pads to delete': {
     // USED
-    en: 'Which experiments should be deleted?',
+    en: 'Which pads should be deleted?',
     fr: 'Quels bloc-notes faut-il supprimer ?',
     es: '¿Qué plantillas se deben eliminar?',
     pt: 'Quais blocos de notas devem ser excluídos?',
   },
   'what pads to unpublish': {
     // USED
-    en: 'Which experiments should be retracted?',
+    en: 'Which pads should be retracted?',
     fr: 'Quels bloc-notes faut-il retracter ?',
     es: '¿Qué plantillas deben retraerse?',
     pt: 'Quais blocos de notas devem ser recolhidos?',

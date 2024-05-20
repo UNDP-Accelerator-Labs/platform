@@ -108,7 +108,7 @@
 			let { write } = d.rights
 			if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 			return d.type === object && rights >= write 
-		})) { %>
+		}) && locals.stats?.private > 0) { %>
 			<li class='<% if (space === "private") { %>active<% } %>'>
 				<a data-location='./private'>
 					<button>
@@ -209,6 +209,7 @@
 				</a>
 			</li>
 		<% } %> -->
+		
 		<li class='<% if (space === "published") { %>active<% } %>'>
 			<a data-location='./published'>
 				<button>

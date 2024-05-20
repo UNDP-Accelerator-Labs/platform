@@ -467,15 +467,18 @@
 				</div>
 			</div>
 		<% } %>
-		<h1 ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>') %></h1>
-		<% if (!publicpage) { %>
+		<h1 ><%- (locals.metadata.site.title).replace(/\s+/g, '<br>').replace(/---/g, '&nbsp;') %></h1>
+		
+		<!--
+		<%# if (!publicpage) { %>
 			<h2>
-				<% if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
-				<% } else if (locals.metadata.user.country.name != 'Null Island') { %> 
-					<%- locals.metadata.user.country.name 
-				%><% } %>
+				<%# if (locals.metadata.user.country.iso3 === 'NUL') { %>Global
+				<%# } else if (locals.metadata.user.country.name != 'Null Island') { %> 
+					<%# locals.metadata.user.country.name %>
+				<%# } %>
 			</h2>
-		<% } %>
+		<%# } %>
+		-->
 
 		<% if (['contribute', 'edit'].includes(activity)) { %>
 			<div class='save lg xl xxl hide google-translate-attr'>
@@ -485,35 +488,39 @@
 	</div>
 </nav>
 <nav id='modules'>
-	<menu class="google-translate-attr">
-	<% modules.filter(d => {
-		let { write } = d.rights
-		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+	<% 
+		const available_modules = modules.filter(d => {
+			let { write } = d.rights
+			if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
 
-		if (rights < write) return false
-		else return !['pinboards', 'teams'].includes(d.type)
-	}).forEach(d => { %>
-		<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity)
-			&& [d.type, d.type.slice(0, -1)].includes(object)
-		) { %>
-			<li class='active'>
-		<% } else { %>
-			<li>
-		<% } %>
-			<% if (d.type === 'mobilizations') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/ongoing' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
-			<% } else if (d.type === 'contributors') { %>
-				<a <% if (login_url) { %>target="_blank" href="<%= login_url %>/<%- language %>/browse/<%- d.type %>/invited"<% } else { %>href="/<%- language %>/browse/<%- d.type %>/invited"<% } %> data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
-			<% } else if (d.type === 'reviews') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/pending' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
-			<% } else if (d.type === 'pads') { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/<%- uuid ? "published" : "public" %>' data-vocab='browse'></a>
+			if (rights < write) return false
+			else return !['pinboards', 'teams'].includes(d.type)
+		});
+	%>
+	<% if (available_modules?.length) { %>
+		<menu class="google-translate-attr">
+			<li class='label' data-vocab='browse'></li>
+		<% available_modules.forEach(d => { %>
+			<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity)
+				&& [d.type, d.type.slice(0, -1)].includes(object)
+			) { %>
+				<li class='active'>
 			<% } else { %>
-				<a href='/<%- language %>/browse/<%- d.type %>/private' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+				<li>
 			<% } %>
-		</li>
-	<% }) %>
-	</menu>
+				<% if (d.type === 'mobilizations') { %>
+					<a href='/<%- language %>/browse/<%- d.type %>/ongoing' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+				<% } else if (d.type === 'contributors') { %>
+					<a <% if (login_url) { %>target="_blank" href="<%= login_url %>/<%- language %>/browse/<%- d.type %>/invited"<% } else { %>href="/<%- language %>/browse/<%- d.type %>/invited"<% } %> data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+				<% } else if (d.type === 'reviews') { %>
+					<a href='/<%- language %>/browse/<%- d.type %>/pending' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+				<% } else { %>
+					<a href='/<%- language %>/browse/<%- d.type %>/published' data-vocab='["<%= d.type.slice(0, -1) %>", "plural"]'></a>
+				<% } %>
+			</li>
+		<% }) %>
+		</menu>
+	<% } %>
 </nav>
 <nav class='pagination <% if (pagedisplay === "slideshow") { %>xs sm m <% } %>lg xl xxl'>
 	<% if ((activity === 'browse' || locals.instance_vars?.activity === 'browse') && mapscale !== 'full-screen') { %>

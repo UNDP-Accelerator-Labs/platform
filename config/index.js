@@ -288,15 +288,15 @@ exports.restricted_routes = restricted_routes || null;
 
 exports.platform_urls = [
   {
-    title: 'Solutions',
+    title: 'Solutions: Desk & Field Notes',
     url: 'https://solutions.sdg-innovation-commons.org',
   },
   {
-    title: 'Action plans',
+    title: 'Action Plans & Reflections',
     url: 'https://learningplans.sdg-innovation-commons.org',
   },
   {
-    title: 'Experiments',
+    title: 'Experiment Designs, Results & Learnings',
     url: 'https://experiments.sdg-innovation-commons.org',
   },
   // {

@@ -464,6 +464,21 @@ async function onLoad() {
       }
     };
   }
+
+  (function scrollToActiveSection(node) {
+    if (!mediaSize) var mediaSize = getMediaSize();
+    if (!['xs', 'sm'].includes(mediaSize)) {
+      const menu = d3.select('nav.tabs div.m.lg.xl.xxl menu');
+      const section = menu.select('li.active').node();
+      if (section) {
+        menu.node().scrollTo({
+          top: 0,
+          left: section.offsetLeft,
+          behavior: 'smooth',
+        });
+      }
+    }
+  })();
 }
 
 if (document.readyState === 'loading') {

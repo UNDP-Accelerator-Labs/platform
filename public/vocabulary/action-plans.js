@@ -62,13 +62,13 @@ export const vocabulary = {
   space: {
     en: {
       pads: {
-        private: 'My experiments',
+        private: 'My plans and learnings',
         curated: 'Content curation',
         pinned: 'My collections',
-        shared: 'Shared experiments',
+        shared: 'Shared plans and learnings',
         reviewing: 'Under review',
-        public: 'Public experiments',
-        all: 'All published experiments',
+        public: 'Public plans and learnings',
+        all: 'All published plans and learnings',
       },
       templates: {
         private: 'My templates',
@@ -103,13 +103,13 @@ export const vocabulary = {
     },
     fr: {
       pads: {
-        private: 'Mes expérimentations',
+        private: 'Mes bloc-notes',
         curated: 'Curation de contenu',
         pinned: 'Mes collections',
-        shared: 'Expérimentations partagés',
+        shared: 'Bloc-notes partagés',
         reviewing: 'En cours de relecture',
-        public: 'Expérimentations publics',
-        all: 'Toutes les expérimentations publiés',
+        public: 'Bloc-notes publics',
+        all: 'Tous les bloc-notes publiés',
       },
       templates: {
         private: 'Mes gabarits',
@@ -144,13 +144,13 @@ export const vocabulary = {
     },
     es: {
       pads: {
-        private: 'Mis experimentos',
+        private: 'Mis libretas',
         curated: 'Curación de contenidos',
         pinned: 'Mis colecciones',
-        shared: 'Experimentos compartidos',
+        shared: 'Libretas compartidas',
         reviewing: 'Bajo revisión',
-        public: 'Experimentos públicos',
-        all: 'Todos los experimentos publicados',
+        public: 'Libretas publicas',
+        all: 'Todas las libretas publicadas',
       },
       templates: {
         private: 'Mis plantillas',
@@ -185,13 +185,13 @@ export const vocabulary = {
     },
     pt: {
       pads: {
-        private: 'Meus experimentos',
+        private: 'Meus blocos de notas',
         curated: 'Restauração de conteúdo',
         pinned: 'Minhas coleções',
-        shared: 'Experimentos compartilhados',
+        shared: 'Blocos de notas compartilhados',
         reviewing: 'Sob revisão',
-        public: 'Experimentos públicos',
-        all: 'Todos os experimentos publicados',
+        public: 'Blocos de notas públicos',
+        all: 'Todos os blocos de notas publicados',
       },
       templates: {
         private: 'Meus modelos',
@@ -227,7 +227,7 @@ export const vocabulary = {
   },
 
   'import pads': {
-    en: 'Import experiments',
+    en: 'Import plans and learnings',
     fr: 'Importer des bloc-notes',
     es: 'Importar libretas',
     pt: 'Importar blocos de notas',
@@ -267,7 +267,7 @@ export const vocabulary = {
     },
   },
   'import to workspace or mobilization': {
-    en: 'Choose a workspace or campaign to import experiments to.',
+    en: 'Choose a workspace or campaign to import plans and learnings to.',
     fr: 'Choisissez un espace de travail ou une campagne vers laquelle importer les bloc-notes.',
     es: 'Elija un espacio de trabajo o campañas para importar a las libretas.',
     pt: 'Escolha um espaço de trabalho ou campanha para importar os blocos de notas.',
@@ -467,10 +467,10 @@ export const vocabulary = {
   },
   'accept or reject pad': {
     // USED
-    en: 'Is this experiment ready for publication?',
-    fr: 'Cette expérimentation est-il prêt à être publié ?',
-    es: '¿Este experimento está listo para su publicación?',
-    pt: 'Este experimento está pronto para publicação?',
+    en: 'Is this plan and learning ready for publication?',
+    fr: 'Ce bloc-notes est-il prêt à être publié ?',
+    es: '¿Está este bloc listo para su publicación?',
+    pt: 'Este bloco está pronto para publicação?',
   },
   'review template description': {
     en: 'This is a template for reviews in',
@@ -849,20 +849,20 @@ export const vocabulary = {
   },
   pad: {
     en: {
-      plural: 'Experiments',
-      singular: 'Experiment',
+      plural: 'Plans and learnings',
+      singular: 'Plan and learning',
     },
     fr: {
-      plural: 'Expérimentation',
-      singular: 'Expérimentation',
+      plural: 'Blocs-notes',
+      singular: 'Bloc-notes',
     },
     es: {
-      plural: 'Experimentos',
-      singular: 'Experimento',
+      plural: 'Libretas',
+      singular: 'Libreta',
     },
     pt: {
-      plural: 'Experimentos',
-      singular: 'Experimento',
+      plural: 'Blocos de notas',
+      singular: 'Bloco de notas',
     },
   },
   // [NEW] MENU
@@ -876,7 +876,7 @@ export const vocabulary = {
 
   'blank pad': {
     // USED
-    en: 'Blank pad',
+    en: 'Blank plan and learning',
     fr: 'Bloc-notes vierge',
     es: 'Libreta en blanco',
     pt: 'bloco de notas em branco',
@@ -1051,14 +1051,14 @@ export const vocabulary = {
     pt: 'Deixado em',
   },
   'untitled pad': {
-    en: 'Untitled pad',
+    en: 'Untitled plan and learning',
     fr: 'Bloc-notes sans titre',
     es: 'Libreta sin título',
     pt: 'Bloco de notas sem título',
   },
   'untitled review': {
     // TO DO
-    en: 'Untitled pad',
+    en: 'Untitled review',
     fr: 'Bloc-notes sans titre',
     es: 'Libreta sin título',
     pt: 'Bloco de notas sem título',
@@ -1214,13 +1214,13 @@ and approve of the use of the indicated data for further uses.
 <h2>Exploration Feature and Data Usage</h2>
 <p>
 Explorations are a special type of collection that is tightly integrated with browsing the platform.
-You can select relevant experiments for an exploration, which adds them to the collection.
-You can also indicate that an experiment is not relevant for an exploration,
-which will make the experiment translucent when it appears in search results.
-This way, you can quickly see which experiments might be of interest when doing multiple
+You can select relevant plans and learnings for an exploration, which adds them to the collection.
+You can also indicate that a plan and learning is not relevant for an exploration,
+which will make the plan and learning translucent when it appears in search results.
+This way, you can quickly see which plans and learnings might be of interest when doing multiple
 queries for building a collection featuring a certain topic.
 In the future, we plan to let the exploration description prioritize
-relevant experiments in your searches. Therefore, it is best to describe what you are
+relevant plans and learnings in your searches. Therefore, it is best to describe what you are
 looking for in detail when naming an exploration.
 </p><p>
 For the above-mentioned suggestion feature, we might collect questions and corresponding documents
@@ -1609,20 +1609,20 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     en: {
       pad: {
         0: {
-          plural: 'Unfinished experiments',
-          singular: 'Unfinished experiment',
+          plural: 'Unfinished plans and learnings',
+          singular: 'Unfinished plan and learning',
         },
         1: {
-          plural: 'Publishable experiments',
-          singular: 'Publishable experiment',
+          plural: 'Publishable plans and learnings',
+          singular: 'Publishable plan and learning',
         },
         2: {
           plural: 'Preprints',
           singular: 'Preprint',
         },
         3: {
-          plural: 'Public experiments',
-          singular: 'Public experiment',
+          plural: 'Public plans and learnings',
+          singular: 'Public plan and learning',
         },
       },
       template: {
@@ -3311,7 +3311,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
   'dblclick to preview': {
     en: {
-      pad: 'Double click to view experiment.',
+      pad: 'Double click to view plan and learning.',
     },
     fr: {
       pad: 'Double-cliquez pour afficher le bloc-notes.',
@@ -3499,7 +3499,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
   'pad based on': {
     // USED
-    en: 'This experiment is based on:',
+    en: 'This plan and learning is based on:',
     fr: 'Ce bloc-notes est basé sur :',
     es: 'Este libreta se basa en:',
     pt: 'Este bloco de notas é baseado em:',
@@ -3527,7 +3527,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
   'select review language': {
     // USED
-    en: 'Select the language the experiment should be reviewed in.',
+    en: 'Select the language the plan and learning should be reviewed in.',
     fr: 'Sélectionner la langue dans laquelle le bloc-notes doit être relu.',
     es: 'Seleccione el idioma en el que se debe revisar el bloc.',
     pt: 'Selecione o idioma em que o bloco deve ser revisado.',
@@ -3542,8 +3542,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   'pads to display': {
     // USED
     en: {
-      plural: ' experiments to display.',
-      singular: ' experiment to display.',
+      plural: ' plans and learnings to display.',
+      singular: ' plan and learning to display.',
     },
     fr: {
       plural: ' blocs-notes à afficher.',
@@ -3630,8 +3630,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   'pads to pinboard': {
     // USED
     en: {
-      plural: 'experiments to a collection',
-      singular: 'experiment to a collection',
+      plural: 'plans and learnings to a collection',
+      singular: 'plan and learning to a collection',
     },
     fr: {
       plural: 'blocs-notes à une collection',
@@ -3662,14 +3662,14 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
   'what pads to delete': {
     // USED
-    en: 'Which experiments should be deleted?',
+    en: 'Which plans and learnings should be deleted?',
     fr: 'Quels bloc-notes faut-il supprimer ?',
     es: '¿Qué plantillas se deben eliminar?',
     pt: 'Quais blocos de notas devem ser excluídos?',
   },
   'what pads to unpublish': {
     // USED
-    en: 'Which experiments should be retracted?',
+    en: 'Which plans and learnings should be retracted?',
     fr: 'Quels bloc-notes faut-il retracter ?',
     es: '¿Qué plantillas deben retraerse?',
     pt: 'Quais blocos de notas devem ser recolhidos?',

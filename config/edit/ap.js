@@ -1,6 +1,6 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'Action Plans';
+exports.app_title = 'Action Plans---& Reflections';
 exports.app_title_short = 'action-plans';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
@@ -88,7 +88,7 @@ exports.lazyload = false;
 exports.page_content_limit = 25;
 exports.followup_count = 1;
 // OPTIONS: 'columns', 'rows'
-exports.browse_display = 'columns';
+exports.browse_display = 'rows';
 exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'carousel';

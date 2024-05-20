@@ -332,7 +332,7 @@ exports.pagemetadata = (_kwargs) => {
 				language,
 				page_language,
 				public,
-				excerpt: excerpt || { title: res?.locals.instance_vars?.title || title, txt: res?.locals.instance_vars?.description || description, p: false },
+				excerpt: excerpt || { title: res?.locals.instance_vars?.title?.toString().replace(/---/g, ' ') || title?.toString().replace(/---/g, ''), txt: res?.locals.instance_vars?.description || description, p: false },
 
 				path,
 				referer: stripExplorationId(headers.referer),

@@ -1077,6 +1077,11 @@ header {
           position: relative;
           text-align: center;
 
+          &.label {
+            font-size: $t-mid-small;
+            color: $c-light-grey;
+          }
+
           a {
             display: block;
             width: 100%;
@@ -1095,7 +1100,7 @@ header {
             color: $c-dark-blue;
           }
         }
-        li:not(:first-child)::before {
+        li:nth-child(n+3)::before {
           content: '';
           position: absolute;
           width: 100px;

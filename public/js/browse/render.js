@@ -810,9 +810,14 @@ export const Entry = function (_kwargs) {
         .attrs({ loading: 'lazy', alt: (_) => vocabulary['missing image'] })
         .each(function (d) {
           const node = this;
+          const sel = d3.select(this);
           const img = new Image();
           img.onload = function () {
             node.src = this.src;
+          };
+          img.onerror = function () {
+            sel.remove();
+            return null;
           };
 
           if (!Array.isArray(d.img)) d.img = [d.img];

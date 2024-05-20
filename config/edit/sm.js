@@ -1,6 +1,6 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'Solutions Mapping';
+exports.app_title = 'Solutions: Desk---&---Field Notes';
 exports.app_title_short = 'solutions-mapping';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';

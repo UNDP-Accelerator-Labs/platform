@@ -25,19 +25,22 @@
 	<menu class='google-translate-attr'>
 		<!-- TO DO: PASS THIS FROM CONFIG FILE (THERE MIGHT NOT ALWAYS BE A SUITE) -->
 		<!-- <li></li><li></li> -->
-		<div class="menu-container">
+		<li class="menu-container">
             <span class="hamburger-icon">
-				<span class="fs-16">☰</span>
-				<span class="fs-12">Menu</span>
+				<span>☰ Platforms</span>
 			</span>
-            <nav>
-                <div class="dropdown-content">
-                    <% platform_urls.forEach(d => { %>
-                        <a href='<%- d.url %>'><%- d.title %></a>
-                    <% }) %>
-                </div>
-            </nav>
-        </div>
+            <div class='dropdown-content dropdown'>
+                <ul>
+                	<% platform_urls.forEach(d => { %>
+                    	<li>
+                    		<a href='<%- d.url %>'>
+                    			<button><%- d.title %></button>
+                    		</a>
+                    	</li>
+                	<% }) %>
+                </ul>
+            </div>
+        </li>
 
 		<li class='home-btn lg xl xxl'></li>
 

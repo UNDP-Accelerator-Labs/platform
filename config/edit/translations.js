@@ -41,7 +41,7 @@ exports.translations = {
         <div class='public-page-panel'>
           <div class='inner'>
             <p class='lead'>This platform archives desk and filed notes on existing development solutions mapped by the UNDP Accelerator Labs. They may either be documented as notes of solutions already available online or identified during the Labs’ ethnographic on-the-ground research. All development solutions displayed are open source.</p>
-            <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</p>
+            <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</a></p>
           </div>
         </div>
       `
@@ -51,7 +51,7 @@ exports.translations = {
       <div class='public-page-panel'>
         <div class='inner'>
           <p class='lead'>Discover and learn through our experimentation platform how many small experiments conducted by the Accelerator Labs Network contribute to collective knowledge on what works and what doesn’t and provide policy makers with robust insights, potential solutions and policies towards achieving the SDGs.</p>
-          <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</p>
+          <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</a></p>
         </div>
       </div>
       `,
@@ -70,7 +70,7 @@ exports.translations = {
       <div class='public-page-panel'>
         <div class='inner'>
           <p class='lead'>On this platform, you can access the Action Learning Plans developed by the Accelerator Labs Network and gain inspiration and practical learnings on how to best structure and systemize a roadmap for sustainable development. Through these plans, the Labs can identify the way forward by seeing thematic patterns and can foster cross-Lab collaboration.</p>
-          <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</p>
+          <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</a></p>
         </div>
       </div>
       `,

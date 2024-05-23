@@ -1,4 +1,4 @@
-const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, welcome_module, ownDB, DB } = include('config/')
+const { page_content_limit, modules, metafields, engagementtypes, lazyload, map, welcome_module, app_home, ownDB, DB } = include('config/')
 const { array, datastructures, checklanguage, join, parsers, pagestats, redirectUnauthorized } = include('routes/helpers/')
 
 const fetch = require('node-fetch')
@@ -189,7 +189,7 @@ module.exports = async (req, res) => {
 			const excerpt = pinboard_out?.status > 2 ? { title: pinboard_out.title, txt: pinboard_out.description, p: true } : null
 
 			const metadata = await datastructures.pagemetadata({ req, res, page, pagecount: Math.ceil((array.sum.call(statistics.filtered, 'count') || 0) / page_content_limit), map, display: pinboard_out?.slideshow && (!pinboard_out?.editable || activity === 'preview') ? 'slideshow' : display, mscale, excerpt })
-			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard: pinboard_out, sample_images, stats, filters_menu })
+			return Object.assign(metadata, { sections, pads, clusters, pinboards_list, pinboard: pinboard_out, sample_images, stats, filters_menu, blurb: app_home[language] || app_home['en'] })
 		}).then(data => res.render('browse/', data))
 		.catch(err => console.log(err))
 	}

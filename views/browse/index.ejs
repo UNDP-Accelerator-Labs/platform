@@ -134,6 +134,8 @@
 				<div class='inner'>
 					<!-- MULTI-SESSION ALERT -->
 					<%- include('../partials/sessions-alert') %>
+					<!-- INCLUDE THE BLURB -->
+					<%- locals.blurb %>
 					<!-- (IF PINBOARD SPACE) PINBOARD TITLE -->
 					<% if (space === 'pinned' && locals.pinboard && pagedisplay !== 'slideshow') { %>
 						<% if (editable_pinboard) { %>

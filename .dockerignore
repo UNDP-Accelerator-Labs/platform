@@ -8,3 +8,11 @@ feedback/
 *.ai
 *.diff
 *.sql
+public/*uploads/
+*.env
+timelines/
+branding/
+dump/
+*.sublime-workspace
+*.sublime-project
+presentations/

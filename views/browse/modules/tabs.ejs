@@ -119,15 +119,17 @@
 			</li>
 		<% } %>
 
-		<li class='<% if (space === "shared") { %>active<% } %>'>
-			<a data-location='./shared'>
-				<button>
-					<span data-vocab='["space", "<%= object %>", "shared"]'></span>
-					<div class='count'><%- locals.stats?.shared %></div>
-					<!-- TO DO: CHANGE TRANSLATION TERM preprint TO SHARED -->
-				</button>
-			</a>
-		</li>
+		<% if (locals.stats?.shared > 0) { %>
+			<li class='<% if (space === "shared") { %>active<% } %>'>
+				<a data-location='./shared'>
+					<button>
+						<span data-vocab='["space", "<%= object %>", "shared"]'></span>
+						<div class='count'><%- locals.stats?.shared %></div>
+						<!-- TO DO: CHANGE TRANSLATION TERM preprint TO SHARED -->
+					</button>
+				</a>
+			</li>
+		<% } %>
 
 		<% if (['pads', 'templates'].includes(object)
 			&& (modules.some(d => d.type === 'mobilizations' && rights >= d.rights.write) || rights > 2)

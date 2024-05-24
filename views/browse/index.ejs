@@ -102,12 +102,22 @@
 					</button>
 				</div>
 			<% } %>
-			<% if (!publicpage
-				&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
-				&& pagedisplay !== 'slideshow'
-				// && !(locals.metadata.page.map && mapscale === 'full-screen')
-				&& !locals.metadata.page.instance_title
-			) { %>
+
+
+			<% 
+				const anytabs = ['private', 'curated', 'shared', 'reviewing'].some(c => locals.stats?.[c] > 0) 
+					|| (locals.pinboards_list ?? []).filter(d => d.count)?.lenght > 0
+			%>
+
+			<% 
+				if (!publicpage
+					&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)
+					&& pagedisplay !== 'slideshow'
+					// && !(locals.metadata.page.map && mapscale === 'full-screen')
+					&& !locals.metadata.page.instance_title
+					&& ((object === 'pads' && anytabs) || object !== 'pads')
+				) 
+			{ %>
 				<nav class='tabs<% if (mapscale === "full-screen") { %> fill-screen<% } %>'>
 					<div class='inner'>
 						<div class='xs sm'>
@@ -135,7 +145,7 @@
 					<!-- MULTI-SESSION ALERT -->
 					<%- include('../partials/sessions-alert') %>
 					<!-- INCLUDE THE BLURB -->
-					<%- locals.blurb %>
+					<div class='lesser-padding'><%- locals.blurb %></div>
 					<!-- (IF PINBOARD SPACE) PINBOARD TITLE -->
 					<% if (space === 'pinned' && locals.pinboard && pagedisplay !== 'slideshow') { %>
 						<% if (editable_pinboard) { %>
@@ -339,12 +349,6 @@
 
 
 <%- include ('../partials/footer.ejs') %>
-
-<!-- fixedEid IS SET IN modules/filter.ejs -->
-<% if (locals.metadata?.user?.uuid) { %>
-	<!-- <script type='text/javascript' src='/js/exploration.js'></script> -->
-	<!-- <script type='text/javascript' src='/js/browse/exploration.js'></script> -->
-<% } // logged in (uuid) %>
 
 </body>
 </html>

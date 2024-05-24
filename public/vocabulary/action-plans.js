@@ -62,13 +62,13 @@ export const vocabulary = {
   space: {
     en: {
       pads: {
-        private: 'My plans and learnings',
+        private: 'My learning plans',
         curated: 'Content curation',
         pinned: 'My collections',
-        shared: 'Shared plans and learnings',
+        shared: 'Shared learning plans',
         reviewing: 'Under review',
-        public: 'Public plans and learnings',
-        all: 'All published plans and learnings',
+        public: 'Public learning plans',
+        all: 'All published learning plans',
       },
       templates: {
         private: 'My templates',
@@ -227,7 +227,7 @@ export const vocabulary = {
   },
 
   'import pads': {
-    en: 'Import plans and learnings',
+    en: 'Import learning plans',
     fr: 'Importer des bloc-notes',
     es: 'Importar libretas',
     pt: 'Importar blocos de notas',
@@ -267,7 +267,7 @@ export const vocabulary = {
     },
   },
   'import to workspace or mobilization': {
-    en: 'Choose a workspace or campaign to import plans and learnings to.',
+    en: 'Choose a workspace or campaign to import learning plans to.',
     fr: 'Choisissez un espace de travail ou une campagne vers laquelle importer les bloc-notes.',
     es: 'Elija un espacio de trabajo o campañas para importar a las libretas.',
     pt: 'Escolha um espaço de trabalho ou campanha para importar os blocos de notas.',
@@ -467,7 +467,7 @@ export const vocabulary = {
   },
   'accept or reject pad': {
     // USED
-    en: 'Is this plan and learning ready for publication?',
+    en: 'Is this learning plan ready for publication?',
     fr: 'Ce bloc-notes est-il prêt à être publié ?',
     es: '¿Está este bloc listo para su publicación?',
     pt: 'Este bloco está pronto para publicação?',
@@ -849,8 +849,8 @@ export const vocabulary = {
   },
   pad: {
     en: {
-      plural: 'Plans and learnings',
-      singular: 'Plan and learning',
+      plural: 'Learning plans',
+      singular: 'Learning plan',
     },
     fr: {
       plural: 'Blocs-notes',
@@ -876,7 +876,7 @@ export const vocabulary = {
 
   'blank pad': {
     // USED
-    en: 'Blank plan and learning',
+    en: 'Blank learning plan',
     fr: 'Bloc-notes vierge',
     es: 'Libreta en blanco',
     pt: 'bloco de notas em branco',
@@ -1051,7 +1051,7 @@ export const vocabulary = {
     pt: 'Deixado em',
   },
   'untitled pad': {
-    en: 'Untitled plan and learning',
+    en: 'Untitled learning plan',
     fr: 'Bloc-notes sans titre',
     es: 'Libreta sin título',
     pt: 'Bloco de notas sem título',
@@ -1214,13 +1214,13 @@ and approve of the use of the indicated data for further uses.
 <h2>Exploration Feature and Data Usage</h2>
 <p>
 Explorations are a special type of collection that is tightly integrated with browsing the platform.
-You can select relevant plans and learnings for an exploration, which adds them to the collection.
-You can also indicate that a plan and learning is not relevant for an exploration,
-which will make the plan and learning translucent when it appears in search results.
-This way, you can quickly see which plans and learnings might be of interest when doing multiple
+You can select relevant learning plans for an exploration, which adds them to the collection.
+You can also indicate that a learning plan is not relevant for an exploration,
+which will make the learning plan translucent when it appears in search results.
+This way, you can quickly see which learning plans might be of interest when doing multiple
 queries for building a collection featuring a certain topic.
 In the future, we plan to let the exploration description prioritize
-relevant plans and learnings in your searches. Therefore, it is best to describe what you are
+relevant learning plans in your searches. Therefore, it is best to describe what you are
 looking for in detail when naming an exploration.
 </p><p>
 For the above-mentioned suggestion feature, we might collect questions and corresponding documents
@@ -1609,20 +1609,20 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
     en: {
       pad: {
         0: {
-          plural: 'Unfinished plans and learnings',
-          singular: 'Unfinished plan and learning',
+          plural: 'Unfinished learning plans',
+          singular: 'Unfinished learning plan',
         },
         1: {
-          plural: 'Publishable plans and learnings',
-          singular: 'Publishable plan and learning',
+          plural: 'Publishable learning plans',
+          singular: 'Publishable learning plan',
         },
         2: {
           plural: 'Preprints',
           singular: 'Preprint',
         },
         3: {
-          plural: 'Public plans and learnings',
-          singular: 'Public plan and learning',
+          plural: 'Public learning plans',
+          singular: 'Public learning plan',
         },
       },
       template: {
@@ -3311,7 +3311,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
   'dblclick to preview': {
     en: {
-      pad: 'Double click to view plan and learning.',
+      pad: 'Double click to view learning plan.',
     },
     fr: {
       pad: 'Double-cliquez pour afficher le bloc-notes.',
@@ -3499,7 +3499,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
 
   'pad based on': {
     // USED
-    en: 'This plan and learning is based on:',
+    en: 'This learning plan is based on:',
     fr: 'Ce bloc-notes est basé sur :',
     es: 'Este libreta se basa en:',
     pt: 'Este bloco de notas é baseado em:',
@@ -3527,7 +3527,7 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
   'select review language': {
     // USED
-    en: 'Select the language the plan and learning should be reviewed in.',
+    en: 'Select the language the learning plan should be reviewed in.',
     fr: 'Sélectionner la langue dans laquelle le bloc-notes doit être relu.',
     es: 'Seleccione el idioma en el que se debe revisar el bloc.',
     pt: 'Selecione o idioma em que o bloco deve ser revisado.',
@@ -3542,8 +3542,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   'pads to display': {
     // USED
     en: {
-      plural: ' plans and learnings to display.',
-      singular: ' plan and learning to display.',
+      plural: ' learning plans to display.',
+      singular: ' learning plan to display.',
     },
     fr: {
       plural: ' blocs-notes à afficher.',
@@ -3630,8 +3630,8 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   'pads to pinboard': {
     // USED
     en: {
-      plural: 'plans and learnings to a collection',
-      singular: 'plan and learning to a collection',
+      plural: 'learning plans to a collection',
+      singular: 'learning plan to a collection',
     },
     fr: {
       plural: 'blocs-notes à une collection',
@@ -3662,14 +3662,14 @@ Se você tiver alguma dúvida ou preocupação, sinta-se à vontade para entrar 
   },
   'what pads to delete': {
     // USED
-    en: 'Which plans and learnings should be deleted?',
+    en: 'Which learning plans should be deleted?',
     fr: 'Quels bloc-notes faut-il supprimer ?',
     es: '¿Qué plantillas se deben eliminar?',
     pt: 'Quais blocos de notas devem ser excluídos?',
   },
   'what pads to unpublish': {
     // USED
-    en: 'Which plans and learnings should be retracted?',
+    en: 'Which learning plans should be retracted?',
     fr: 'Quels bloc-notes faut-il retracter ?',
     es: '¿Qué plantillas deben retraerse?',
     pt: 'Quais blocos de notas devem ser recolhidos?',

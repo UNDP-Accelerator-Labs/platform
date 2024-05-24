@@ -217,7 +217,7 @@ module.exports = async (req, res) => {
 			}
 
 			const metadata = await datastructures.pagemetadata({ req, res, display, map, mscale })
-			return Object.assign(metadata, { locations, stats, countries, pinboards, data: app_home[language] ?? app_home['en'] })
+			return Object.assign(metadata, { locations, stats, countries, pinboards, blurb: app_home[language] || app_home['en'] })
 		}).catch(err => console.log(err))
 	}).then(data => res.render('home', data))
 	.catch(err => console.log(err))

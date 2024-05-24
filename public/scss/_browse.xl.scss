@@ -469,6 +469,12 @@ div.public-page-panel {
   }
 }
 
+div.lesser-padding {
+  div.public-page-panel {
+    padding-top: 55px;
+  }
+}
+
 div.main-content {
   display: grid;
   grid-template-columns: 1fr calc(300px * 3 + 15px * 4) 1fr;

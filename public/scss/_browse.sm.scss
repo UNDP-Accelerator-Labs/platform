@@ -476,6 +476,12 @@ div.public-page-panel {
   }
 }
 
+div.lesser-padding {
+  div.public-page-panel {
+    padding-top: 60px;
+  }
+}
+
 div.browse {
   display: block;
   width: calc(300px * 2 + 15px);

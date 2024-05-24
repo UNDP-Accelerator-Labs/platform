@@ -472,6 +472,12 @@ div.public-page-panel {
   }
 }
 
+div.lesser-padding {
+  div.public-page-panel {
+    padding-top: 0px;
+  }
+}
+
 div.main-content {
   &.force-height {
     min-height: 100vh;

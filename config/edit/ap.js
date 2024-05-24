@@ -1,6 +1,6 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'Action Plans---& Reflections';
+exports.app_title = 'Learning Plans';
 exports.app_title_short = 'action-plans';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
@@ -22,7 +22,7 @@ exports.modules = [
   { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } } }, // respond IS FOR TEMPLATED PADS
   { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 3, write: 3 } },
-  { type: 'files', rights: { read: 0, write: 1 } },
+  { type: 'files', rights: { read: 2, write: 2 } },
   {
     type: 'reviews',
     rights: { read: 2, write: 2, coordinate: 3 },

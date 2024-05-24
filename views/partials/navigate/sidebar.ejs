@@ -24,11 +24,39 @@
 	if (typeof writepads === 'object') minwritepads = Math.min(writepads.blank, writepads.templated)
 
 	const writablemodules = modules.filter(d => !['pinboards', 'teams'].includes(d.type))
-		.map(d => {
-			const { write } = d.rights
-			if (typeof write === 'object') return Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-			else return write
+		.filter(d => {
+			let { write } = d.rights
+			if (typeof write === 'object') {
+				let { blank, templated } = write
+
+				if (templated < blank && locals.metadata.menu.templates?.length > 0) {
+					return rights >= (templated ?? Infinity)
+				} else {
+					return rights >= blank
+				}
+			} else return rights >= write
 		})
+
+	const readablemodules = modules.filter(d => {
+		/*
+		let { write } = d.rights
+		if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
+		if (rights < write) return false
+		*/
+
+		const { read } = d.rights;
+		if (rights < read) return false
+		else return !['pinboards', 'teams'].includes(d.type)
+	});
+
+	const activeparticipations = locals.metadata.menu.participations?.filter(p => {
+		if (p.source) {
+			if (p.copy || p.child) return p.status === 1
+			else return false
+		} else if (p.collection) {
+			return false
+		} else return p.status === 1
+	}) || []
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
@@ -39,14 +67,23 @@
 			</div>
 		</a>
 
-		<% if (rights >= Math.min(...writablemodules)) { %>
+		<%# if (rights >= Math.min(...writablemodules)) { %>
+		
+		<% if (writablemodules?.length) { %>
 			<div class='create'>
 				<button data-vocab='new'></button>
 				<div class='dropdown main'>
 					<ul>
 						<% if (modules.some(d => d.type === 'pads')) { %>
 
-							<% if (rights >= Math.min(minwritepads ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
+							<%# if (rights >= Math.min(minwritepads ?? Infinity, modules.find(d => d.type === 'moblizations')?.rights.write ?? Infinity)) { %>
+
+							<% if (
+								rights >= ((writepads.blank ?? writepads) ?? Infinity)
+								|| (rights >= ((writepads.templated ?? writepads) ?? Infinity)
+									&& locals.metadata.menu.templates?.length > 0)
+								|| activeparticipations?.length > 0
+							) { %>
 								<li>
 									<button class="google-translate-attr">
 										<img src='/imgs/icons/i-pad.svg'>
@@ -65,9 +102,11 @@
 													</a>
 												</li>
 											<% } // rights %>
-											<% if (rights >= (writepads.templated ?? writepads) ?? Infinity) { %>
-												<% if (locals.metadata.menu.templates?.length > 0) { %>
-													<li class="google-translate-attr">
+											<% if (
+												rights >= ((writepads.templated ?? writepads) ?? Infinity)
+												&& locals.metadata.menu.templates?.length > 0
+											) { %>
+												<li class="google-translate-attr">
 														<button>
 															<label data-vocab='templated pad'></label>
 															<span class='expandable'>></span>
@@ -104,19 +143,9 @@
 																<% }) // locals.metadata.menu.templates.forEach %>
 															</ul>
 														</div>
-													</li>
-												<% } // locals.metadata.menu.templates 0 %>
+												</li>
 											<% } // rights %>
-											<% if (
-												locals.metadata.menu.participations?.filter(p => {
-													if (p.source) {
-														if (p.copy || p.child) return p.status === 1
-														else return false
-													} else if (p.collection) {
-														return false
-													} else return p.status === 1
-												}).length > 0
-											) { %>
+											<% if (activeparticipations?.length > 0) { %>
 												<li class="google-translate-attr">
 													<button>
 														<label data-vocab='campaign pad'></label>
@@ -488,19 +517,10 @@
 	</div>
 </nav>
 <nav id='modules'>
-	<% 
-		const available_modules = modules.filter(d => {
-			let { write } = d.rights
-			if (typeof write === 'object') write = Math.min(write.blank ?? Infinity, write.templated ?? Infinity)
-
-			if (rights < write) return false
-			else return !['pinboards', 'teams'].includes(d.type)
-		});
-	%>
-	<% if (available_modules?.length) { %>
+	<% if (readablemodules?.length > 1) { %>
 		<menu class="google-translate-attr">
 			<li class='label' data-vocab='browse'></li>
-		<% available_modules.forEach(d => { %>
+		<% readablemodules.forEach(d => { %>
 			<% if (['browse', 'view', 'contribute', 'edit', 'import'].includes(activity)
 				&& [d.type, d.type.slice(0, -1)].includes(object)
 			) { %>

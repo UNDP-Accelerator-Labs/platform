@@ -1,6 +1,6 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'Experiment Designs, Results---& Learnings';
+exports.app_title = 'Experiments';
 exports.app_title_short = 'experiments';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
@@ -19,13 +19,13 @@ exports.own_app_url = 'https://experiments.sdg-innovation-commons.org/';
 
 // DESIRED MODULES
 exports.modules = [
-  { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 1 } } }, // respond IS FOR TEMPLATED PADS
+  { type: 'pads', rights: { read: 0, write: { blank: 4, templated: 2 } } }, // respond IS FOR TEMPLATED PADS
   { type: 'pinboards', rights: { read: 0, write: 1 } },
   { type: 'templates', rights: { read: 2, write: 3 } },
   // { type: 'files', rights: { read: 0, write: 1 } },
   {
     type: 'reviews',
-    rights: { read: 1, write: 1, coordinate: 3 },
+    rights: { read: 2, write: 2, coordinate: 3 },
     reviewers: 1,
   },
   // { type: 'mobilizations', rights: { read: 2, write: 2 } },

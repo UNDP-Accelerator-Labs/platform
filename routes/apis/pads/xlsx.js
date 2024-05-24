@@ -278,7 +278,7 @@ module.exports = async (req, res) => {
 													obj.repetition = structure.some(c => c.id === obj.id) ? structure.filter(c => c.id === obj.id).length : 0
 													obj.name = `${obj.repetition > 0 ? `[${obj.repetition}]--` : ''}${cname}--${i + 1}`
 
-													obj.content = d.tags[i]?.name ?? null
+													obj.content = d.tags?.[i]?.name ?? null
 													structure.push(obj)
 												}
 											} else if (include_metafields && metafields.filter(c => !['tag', 'index', 'location'].includes(c.type)).some(c => c.type === d.type && c.name === d.name)) {

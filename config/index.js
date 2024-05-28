@@ -292,7 +292,7 @@ exports.platform_urls = [
     url: 'https://solutions.sdg-innovation-commons.org',
   },
   {
-    title: 'Action Plans & Reflections',
+    title: 'Learning Plans & Reflections',
     url: 'https://learningplans.sdg-innovation-commons.org',
   },
   {

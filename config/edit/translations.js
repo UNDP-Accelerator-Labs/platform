@@ -69,7 +69,7 @@ exports.translations = {
       en: `
       <div class='public-page-panel'>
         <div class='inner'>
-          <p class='lead'>On this platform, you can access the Action Learning Plans developed by the Accelerator Labs Network and gain inspiration and practical learnings on how to best structure and systemize a roadmap for sustainable development. Through these plans, the Labs can identify the way forward by seeing thematic patterns and can foster cross-Lab collaboration.</p>
+          <p class='lead'>On this platform, you can access the Learning Plans developed by the Accelerator Labs Network and gain inspiration and practical learnings on how to best structure and systemize a roadmap for sustainable development. Through these plans, the Labs can identify the way forward by seeing thematic patterns and can foster cross-Lab collaboration.</p>
           <p class='lead call-to-action'>Join the R&D movement! To become a power user and curator, <a href='mailto:accelerator.labs@undp.org'>contact us.</a></p>
         </div>
       </div>

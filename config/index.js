@@ -288,16 +288,16 @@ exports.restricted_routes = restricted_routes || null;
 
 exports.platform_urls = [
   {
-    title: 'Solutions: Desk & Field Notes',
-    url: 'https://solutions.sdg-innovation-commons.org',
+    title: 'Learning Plans',
+    url: 'https://learningplans.sdg-innovation-commons.org/en/browse/pads/published',
   },
   {
-    title: 'Learning Plans & Reflections',
-    url: 'https://learningplans.sdg-innovation-commons.org',
+    title: 'Solutions',
+    url: 'https://solutions.sdg-innovation-commons.org/en/browse/pads/published',
   },
   {
-    title: 'Experiment Designs, Results & Learnings',
-    url: 'https://experiments.sdg-innovation-commons.org',
+    title: 'Experiments',
+    url: 'https://experiments.sdg-innovation-commons.org/en/browse/pads/published',
   },
   // {
   //   title: 'R&D Practice',
@@ -308,7 +308,7 @@ exports.platform_urls = [
   //   url: 'https://horizons.sdg-innovation-commons.org',
   // },
   {
-    title: 'Blogs',
+    title: 'Insights',
     url: 'https://sdg-innovation-commons.org',
   },
   // {

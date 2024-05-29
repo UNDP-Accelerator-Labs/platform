@@ -60,6 +60,10 @@
 						<label class="google-translate-attr" for='password' data-vocab='password'></label>
 					</div>
 				</li>
+				<li>
+					<p class='small'>Forgot password? <a href="/forget-password?path=<%= locals.redirectPath %><% if(origin_url){ %>&origin=<%= origin_url %><% } %>">Reset your password.</a></p>
+					<!-- TO DO: TRANSLATE -->
+				</li>
 
 				<li>
 					<div class='alert session-alert pt-5'>
@@ -77,16 +81,11 @@
 			</ul>
 		</form>
 
+		<div class='divider'><span data-vocab='or'></div>
 
 		<div class='foot'>
-			<br/>
-			<hr/>
-			<br/>
-			<p>Forgot password? <a href="/forget-password?path=<%= locals.redirectPath %><% if(origin_url){ %>&origin=<%= origin_url %><% } %>">Reset your password.</a></p>
-			
 			<% if (allowsso) { %>
-				<h5>OR</h5>
-				<p class="mt-5"><a href="/sso-inits">Login with your UNDP account. </a></p>
+				<a href="/sso-inits"><button>Log in as a UNDP user.</button></a>
 			<% } %>
 			<!-- TO DO: TRANSLATE -->
 		</div>

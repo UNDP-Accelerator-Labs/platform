@@ -106,6 +106,40 @@
       p.errormessage {
         color: $c-dark-red;
       }
+
+      p.small {
+        font-size: $t-small;
+        color: $c-mid-grey;
+      }
+    }
+  }
+
+  div.divider {
+    position: relative;
+    width: calc(100% + 30px);
+    height: 30px;
+    margin: 15px 0;
+    margin-left: -15px;
+    line-height: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    color: $c-light-grey;
+    font-size: $t-small;
+
+    &:before {
+      content: '';
+      position: absolute;
+      border: 1px dotted $c-light-grey;
+      top: 50%;
+      left: 0;
+      width: 100%;
+    }
+
+    span {
+      position: relative;
+      padding: 0 5px;
+      background-color: #fff;
+      z-index: 1;
     }
   }
 }

@@ -1,12 +1,12 @@
 import { setDownloadOptions } from '/js/browse/download.js';
+// FIXME: reactivate explorations later
+// import { getExploration } from '/js/browse/exploration.js';
 import {
   confirmRemoval,
   deleteArticles,
   unpublishArticles,
 } from '/js/browse/main.js';
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
-// reactivate explorations later
-// import { getExploration } from '/js/browse/exploration.js';
 import { POST } from '/js/fetch.js';
 import { d3, uuidv4 } from '/js/globals.js';
 import { dateOptions, fixLabel, getContent, getMediaSize } from '/js/main.js';

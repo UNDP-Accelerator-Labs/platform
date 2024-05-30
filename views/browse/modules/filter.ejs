@@ -24,7 +24,7 @@
 
 <% if (locals.stats?.total > 0) { %>
 	<nav id='search-and-filter' class='xs sm m lg xl xxl<% if (mapscale === "full-screen") { %> anchor-bottom<% } %>'>
-		<% if (logged && object === 'pads') { %>
+		<% if (false && logged && object === 'pads') { // FIXME reactivate explorations later (and the tabs here) %>
 			<div class="search-type-menu">
 				<span class="stm stm-select google-translate-attr" id="stm-browse" data-vocab='["search-type-menu", "browse"]'></span>
 				<span class="stm google-translate-attr" id="stm-exploration">
@@ -57,7 +57,7 @@
 				})
 			%>
 
-			<% if (locals.metadata?.user?.uuid) { %>
+			<% if (false && locals.metadata?.user?.uuid) { // FIXME: reactivate explorations later %>
 			<div class='exploration'></div>
 			<% } // logged in (uuid) %>
 			<% } // object is pads %>

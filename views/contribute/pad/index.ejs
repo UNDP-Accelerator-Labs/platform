@@ -330,7 +330,7 @@
 					</section>
 				<% } %>
 			</div>
-			<% if (locals.metadata?.user?.uuid) { %>
+			<% if (false && locals.metadata?.user?.uuid) { // FIXME: reactivate explorations later %>
 			<div class='exploration-local'></div>
 			<% } %>
 		</div>
@@ -481,7 +481,7 @@
 
 <%- include ('../../partials/footer.ejs') %>
 
-<% if (locals.metadata?.user?.uuid) { %>
+<% if (false && locals.metadata?.user?.uuid) { // FIXME: reactivate explorations later %>
 	<!-- <script type='text/javascript' src='/js/exploration.js'></script> -->
 	<!-- <script type='text/javascript' src='/js/contribute/pad/exploration.js'></script> -->
 <% } %>

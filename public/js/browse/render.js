@@ -1,5 +1,6 @@
 import { setDownloadOptions } from '/js/browse/download.js';
-import { getExploration } from '/js/browse/exploration.js';
+// FIXME: reactivate explorations later
+// import { getExploration } from '/js/browse/exploration.js';
 import {
   confirmRemoval,
   deleteArticles,
@@ -1982,7 +1983,8 @@ export const Entry = function (_kwargs) {
       _sel.addElems('div', 'meta meta-country').html((d) => d.countryname);
     },
     exploration: async (_sel) => {
-      (await getExploration()).addDocButtons(_sel, true);
+      // FIXME: reactivate explorations later
+      // (await getExploration()).addDocButtons(_sel, true);
     },
   };
 };

@@ -4,6 +4,8 @@ import {
   switchButtons,
   updateStatus,
 } from '/js/contribute/pad/save.js';
+// reactivate explorations later
+// import { getExploration } from '/js/contribute/pad/exploration.js';
 import { POST } from '/js/fetch.js';
 import { L, d3, uuidv4 } from '/js/globals.js';
 import { fixLabel, toggleClass, uploadFile } from '/js/main.js';

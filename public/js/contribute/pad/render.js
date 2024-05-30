@@ -1,11 +1,10 @@
 import { getCurrentLanguage, getTranslations } from '/js/config/main.js';
-import { getExploration } from '/js/contribute/pad/exploration.js';
 import {
   partialSave,
   switchButtons,
   updateStatus,
 } from '/js/contribute/pad/save.js';
-import { POST, GET } from '/js/fetch.js';
+import { POST } from '/js/fetch.js';
 import { L, d3, uuidv4 } from '/js/globals.js';
 import { fixLabel, toggleClass, uploadFile } from '/js/main.js';
 import { renderImgZoom, renderPromiseModal } from '/js/modals.js';
@@ -4826,6 +4825,7 @@ export async function renderPad(kwargs) {
     await addSection({ lang: language, objectdata });
   }
   if (display !== 'slideshow' && id && ['edit', 'view'].includes(activity)) {
-    await getExploration();
+    // FIXME: reactivate explorations later
+    // await getExploration();
   }
 }

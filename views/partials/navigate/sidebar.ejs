@@ -57,10 +57,12 @@
 			return false
 		} else return p.status === 1
 	}) || []
+
+	const app_suite_url = locals.metadata.site.app_suite_url
 %>
 <nav id='site-title' class='<% if (publicpage) { %>public<% } %>'>
 	<div class='inner'>
-		<a href='/'>
+		<a href="<%- app_suite_url %>">
 			<div class='logo-container'>
 				<img class='logo' src='/imgs/branding/UNDP_accelerator_labs_logo_vertical_left_align_color_RGB.png'>
 				<div class='filler'></div>

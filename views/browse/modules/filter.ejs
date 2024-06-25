@@ -83,6 +83,7 @@
 										<menu class="google-translate-attr">
 											<% d[key]?.forEach(c => { %>
 												<li>
+													<!-- c.equivalents CAN BE REMOVED. THIS IS LEGACY FOR THE sdgs -->
 													<% if (c.equivalents?.length) { %>
 														<% c.equivalents.filter(b => b !== c.id).forEach(b => { %>
 															<input type='hidden' value='<%- b %>' name='<%- key %>' <% if (!query?.[key]?.includes(c.id?.toString())) { %>disabled<% } %>>

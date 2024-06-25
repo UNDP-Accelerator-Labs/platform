@@ -1093,7 +1093,9 @@ export const Entry = function (_kwargs) {
         );
       sdgs
         .addElems('a', 'sdg-link', (d) => d)
-        .attr('href', (d) => `?sdgs=${d.key || d}`)
+        .attr('href', (d) => {
+          return `?sdgs=${d.id || d}`
+        })
         .html((d) => d.key || d);
       taggroup
         .addElems('div', 'meta meta-tags', (d) =>

@@ -471,7 +471,7 @@ const Taglist = function (kwargs) {
   // Taglist IS AN INSTANCE OF Meta
   Meta.call(this, kwargs);
   const meta = this;
-
+  
   const opencode =
     meta.metafields.find((d) => d.label === name)?.opencode || false;
 
@@ -3964,7 +3964,8 @@ export async function addIndexes(kwargs) {
   const input = d3.select(`.media-input-group #input-meta-${name}`).node();
   if (input) input.disabled = true;
 
-  const options = await POST('/apis/fetch/tags', { type: name, language });
+  // const options = await POST('/apis/fetch/tags', { type: name, language });
+  const options = await POST('/apis/fetch/tags', { type: name, language: 'en' });
   options.sort((a, b) => a.key - b.key);
 
   const list = new Taglist({

@@ -160,6 +160,20 @@ exports.metafields = [
     ],
   },
   {
+    type: 'checklist',
+    name: 'scaling',
+    required: true,
+    instruction: 'Considering the outcomes of this experimental activity, which of the following best describe what happened after? (Please select all that apply)',
+    options: [
+      { name: 'This experiment influenced public policy at a national or local level'},
+      { name: 'Solutions tested in this experiment were scaled in numbers'},
+      { name: 'This experiment led to partnerships'},
+      { name: 'This experiment led to resource mobilization'},
+      { name: 'This experiment led to adoption of new ways of working by our partners'},
+      { name: 'This experiment did not scale yet'},
+    ],
+  },
+  {
     type: 'attachment',
     name: 'learning plan',
     required: false,

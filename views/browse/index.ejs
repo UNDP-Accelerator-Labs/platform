@@ -105,10 +105,9 @@
 
 
 			<% 
-				const anytabs = ['private', 'curated', 'shared', 'reviewing'].some(c => locals.stats?.[c] > 0) 
+				const anytabs = ['private', 'curated', 'shared', 'reviewing', 'all'].some(c => locals.stats?.[c] > 0) 
 					|| (locals.pinboards_list ?? []).filter(d => d.count)?.length > 0
 			%>
-
 			<% 
 				if (!publicpage
 					&& rights >= (modules.find(d => d.type === object)?.rights.read ?? Infinity)

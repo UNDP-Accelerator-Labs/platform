@@ -18,6 +18,7 @@ module.exports = async (req, res) => {
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
 	if (typeof include_data === 'string') include_data = JSON.parse(include_data)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
+	if (typeof include_tags === 'string') include_tags = JSON.parse(include_tags	)
 	if (action === 'fetch') include_data = true
 
 	const pw = req.session.email || null
@@ -163,8 +164,6 @@ module.exports = async (req, res) => {
 							}
 							// DETERMINE MAX TAGS BY TYPE
 							if (include_tags) {
-								console.log('check tags')
-								console.log(tags)
 								// TO DO: UPDATE THIS TO type-name
 								const tag_types = array.unique.call(tags, { key: 'type', onkey: true })
 								const tag_counts = array.nest.call(tags, { key: 'pad_id' })
@@ -424,14 +423,23 @@ module.exports = async (req, res) => {
 											obj = subobjs
 										}
 									} else {
-										for (let i = 0; i < max_locations; i ++) {
-											if (pad_locations[i]) {
-												const { lat, lng } = pad_locations[i]
+										for (let i = 0; i < max_locations; i++) {
+											// if (pad_locations[i]) {
+												const { lat, lng } = pad_locations[i] || {}
 												obj[`location-${i + 1}-lat`] = lat
 												obj[`location-${i + 1}-lng`] = lng
-											}
+											// }
 										}
 									}
+								}
+
+								if (single_sheet && include_tags) {									
+									max_tags.forEach(c => {
+										const pad_tags = tags.filter(b => b.pad_id === d.pad_id && b.type === c.type)
+										for (let i = 0; i < c.max; i++) {
+											obj[`${c.type}-tag-${i + 1}`] = pad_tags[i]?.name
+										}
+									})
 								}
 
 								return obj

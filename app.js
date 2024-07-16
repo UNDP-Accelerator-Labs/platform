@@ -95,7 +95,14 @@ app.use('/scripts', express.static(path.join(__dirname, './node_modules')));
 app.use('/config', express.static(path.join(__dirname, './config')));
 app.use(bodyparser.json({ limit: '50mb' }));
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
-app.use(xss());
+
+const options = {
+  allowedKeys: ['referer'],
+  allowedAttributes: {
+    referer: ['&'],
+  },
+}
+app.use(xss(options));
 
 const cookie = {
   domain: process.env.NODE_ENV === 'production' ? app_base_host : undefined,

@@ -19,7 +19,7 @@ exports.translations = {
   },
   'app home': {
     'solutions-mapping': {
-      /*en: `
+      /* en: `
       <div class='public-page-panel'>
         <div class='inner'>
           <p class='lead'>Grassroots innovations are home-grown solutions that have never been codified, applied elsewhere, nor taken to scale. These customized solutions are naturally frugal, grounded in a specific context, and might be more relevant, given their proximity to the problem. These solutions are often the result of innovation—people solving problems from the bottom up.</p>

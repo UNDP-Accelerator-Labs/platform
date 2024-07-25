@@ -1232,7 +1232,7 @@ export async function compilePads(idx, structureOnly = false) {
                           c.entries[i].some((b) =>
                             typeof b === 'string' && typeof d === 'string'
                               ? b.toLowerCase().trim() ===
-                                b.toLowerCase().trim()
+                                d.toLowerCase().trim()
                               : b === d,
                           )
                         )

@@ -4418,6 +4418,28 @@ function addGroup(kwargs) {
   }
 }
 
+// TABLE OF CONTENTS
+function addToC(sections) {
+  const toc = d3.select('.toc-container');
+  toc.addElems('h1', 'toc-tile')
+  .html('Table of contents') // TO DO: TRANSLATE
+
+  toc.addElems('ul', null, sections.length ? [sections.filter(d => d.items?.length || d.structure?.length)] : [])
+  .addElems('li', 'section-header-ref', d => d)
+  .on('click', function (d) {
+    const target = d3.selectAll('.section-header')
+    .filter(c => c.title === d.title).node();
+    if (target) {
+      window.scrollTo({
+        top: target.getBoundingClientRect().y - 90,
+        left: 0,
+        behavior: 'smooth',
+      });
+    }
+  })
+  .html(d => d.title);
+}
+
 let idx = 0;
 // FOR SLIDESHOW VIEW
 async function addSlides(kwargs) {
@@ -4733,6 +4755,8 @@ export async function renderPad(kwargs) {
           await addSection({ data, lang: language, objectdata });
         }
       }
+
+      addToC(sections);
     }
     if (display === 'slideshow') {
       initSlideshow(main);
@@ -4784,6 +4808,8 @@ export async function renderPad(kwargs) {
           await addSection({ data, lang: language, objectdata });
         }
       }
+
+      addToC(sections)
     } else {
       // THIS IS AN AUTO GENERATED PAD
       if (type === 'templated') {
@@ -4825,6 +4851,8 @@ export async function renderPad(kwargs) {
               await addSection({ data, lang: language, objectdata });
             }
           }
+
+          addToC(sections);
         }
       }
     }

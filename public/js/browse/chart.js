@@ -1,6 +1,7 @@
 import { getCurrentLanguage } from '/js/config/main.js';
 
 let chart,
+  allData,    
   rendered = false;
 
 function onLoad() {

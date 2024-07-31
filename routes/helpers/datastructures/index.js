@@ -101,6 +101,7 @@ exports.pagemetadata = (_kwargs) => {
 	path = path.substring(1).split('/')
 	let activity = path[1]
 	const currentpage_url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
+	let add_web_analytics = process.env.NODE_ENV == 'production' && !req.get('host').includes('azurewebsites.net')
 
 	let { object, space, instance } = params || {}
 	if (instance) {
@@ -310,7 +311,8 @@ exports.pagemetadata = (_kwargs) => {
 				app_suite_url,
 				allowsso,
 				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null,
-				platform_urls
+				platform_urls,
+				add_web_analytics,
 			},
 			user: {
 				uuid,

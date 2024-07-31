@@ -372,3 +372,20 @@ ADD CONSTRAINT unique_email UNIQUE (email);
 
 ALTER TABLE trusted_devices
 ADD CONSTRAINT unique_user_device UNIQUE (user_uuid, device_os, device_browser, session_sid, duuid1, duuid2, duuid3);
+
+
+-- Add created_at column and set its value for existing users
+ALTER TABLE public.users
+ADD COLUMN created_at timestamp with time zone;
+
+-- Update created_at column with invited_at value for existing users
+UPDATE public.users
+SET created_at = invited_at;
+
+-- Set default value for created_at column for new users
+ALTER TABLE public.users
+ALTER COLUMN created_at SET DEFAULT now();
+
+-- Add last_login column
+ALTER TABLE public.users
+ADD COLUMN last_login timestamp with time zone;

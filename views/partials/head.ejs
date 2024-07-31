@@ -4,6 +4,7 @@
 	const languages = locals.metadata.site.languages
 	const page_language = locals.metadata.page.page_language
 	const excerpt = locals.metadata.page.excerpt
+	const add_web_analytics = locals.metadata.site.add_web_analytics
 
 	const currentpage_url = new URL(locals.metadata.page.currentpage_url?.replace('/edit/', '/view/'))
 	const currentpage_query = new URLSearchParams(currentpage_url.search)
@@ -85,18 +86,20 @@
 <script type='text/javascript' src='/js/Math.extensions.js'></script>
 <script type='text/javascript' src='/js/Array.prototype.extensions.js'></script>
 <script type='text/javascript' src='/js/Date.prototype.extensions.js'></script>
-<!-- <script type='text/javascript' src='/js/basics.js'></script> -->
 
 <!-- TO DO: MODULARIZE modules.js -->
-<!-- <script type='module' src='/vocabulary/index.js'></script> -->
 <script type='module' src='/js/load.js'></script>
 <script type='module' src='/js/navigate/load.js'></script>
-<!-- <script type='module' src='/js/navigate/gtranslate.js'></script> -->
-<!-- <script type='text/javascript' src='/js/upload.js'></script> -->
 
 <!-- Google Translate CDN -->
 <script type='text/javascript' src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" nonce="<%- nonce %>"></script>
-<!-- <script src = '/socket.io/socket.io.js'></script> -->
+
+<!-- ADD WEB ANALYTICS SCRIPT -->
+<% if (add_web_analytics) { %>
+	<script data-goatcounter="https://sdg-innovation-commons.goatcounter.com/count" async src="//gc.zgo.at/count.js" nonce="<%- nonce %>" ></script>
+<% } %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js" nonce="<%- nonce %>" ></script>
 
 <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined'>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">

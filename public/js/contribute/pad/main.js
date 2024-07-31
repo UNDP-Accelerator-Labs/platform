@@ -99,3 +99,37 @@ export async function selectReviewLanguage(node) {
   // const new_constraint =
   await renderFormModal({ message, formdata, opts });
 }
+
+export function nextMissingVal () {
+  let nextMedia = d3.select('.media-container .required');
+  let nextMeta = d3.select('.meta-container .required');
+
+  if (nextMedia.node()) nextMedia = nextMedia.findAncestor('media-container');
+  if (nextMeta.node()) nextMeta = nextMeta.findAncestor('meta-container');
+
+  const targets = [];
+  
+  d3.selectAll('.media-container, .meta-container')
+  .each(function (d) {
+    const sel = d3.select(this);
+    if (d?.required && !d?.has_content) {
+      const { y } = this.getBoundingClientRect();
+      targets.push(y);
+
+      sel.selectAll('.media, .meta')
+      .classed('status-0', true)
+    } else {
+      sel.selectAll('.media, .meta')
+      .classed('status-0', false)
+    }
+  });
+  
+  if (targets.length) {
+    window.scrollTo({
+      top: targets[0] - 60, // THE -60 IS TO COMPENSATE FOR THE TOP BAND (WHERE THE BUTTON IS)
+      left: 0,
+      behavior: 'smooth',
+    });
+  }
+  else return null;
+}

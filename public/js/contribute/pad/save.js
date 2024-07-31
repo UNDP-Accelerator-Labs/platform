@@ -544,6 +544,9 @@ export async function partialSave(attr) {
       const vocabulary = await getTranslations();
       // ADD THE NOTIFICATION
       window.sessionStorage.removeItem('changed-content');
+      // RESET STATUSES OF media AND meta
+      d3.selectAll('.media, .meta')
+      .classed('status-0', d => d?.required && !d.has_content)
 
       const mediaSize = getMediaSize();
       if (['xs', 'sm'].includes(mediaSize)) {
@@ -617,6 +620,9 @@ export async function updateStatus(_status) {
     .select('div.meta-status')
     .classed('status-0 status-1 status-2', false)
     .classed(`status-${_status}`, true);
+  metastatus
+    .select('div#next-missing-val')
+    .attr('disabled', _status >= 1 ? true : null)
   metastatus
     .select('div.btn-group form button.publish')
     .attr('disabled', _status >= 1 && curr_status <= 2 ? null : true);

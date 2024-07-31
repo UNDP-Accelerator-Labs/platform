@@ -137,6 +137,11 @@
 						<% } %>
 						<form method='GET' action='/publish/<%- `${object}s` %>'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
+
+							<% if (editing && templated && (locals.data?.status || 0) < 1) { %>
+								<button type='button' name='missing-values' id='next-missing-val'>Check missing values</button>
+							<% } %>
+
 							<%
 								const currentpage_url = new URL(locals.metadata.page.currentpage_url)
 								const queryparams = new URLSearchParams(currentpage_url.search)

@@ -69,7 +69,7 @@ const Media = function (kwargs) {
     kwargs || {};
   const { object, type: objecttype } = objectdata || {};
 
-  let { id, level, name } = datum;
+  let { id, level, name, required, has_content } = datum;
   parent = d3.select(parent).classed('focus', focus);
 
   if (!id || parent.datum()?.repeat) id = datum.id = uuidv4();
@@ -149,6 +149,7 @@ const Media = function (kwargs) {
       (d) => d.type,
     )
     .classed(`${level}-${type}`, true)
+    .classed('status-0', required && !has_content)
     .each(function (d) {
       if (name) d3.select(this).classed(`${level}-${name}`, true);
     });
@@ -2629,6 +2630,7 @@ export async function addTxt(kwargs) {
     constraint,
     is_excerpt,
     required,
+    has_content,
   } = data || {};
   if (!level) level = 'media';
   if (!type) type = 'txt';
@@ -2677,6 +2679,7 @@ export async function addTxt(kwargs) {
       constraint,
       is_excerpt,
       required,
+      has_content,
     },
     focus: focus || false,
     lang,
@@ -2847,7 +2850,7 @@ export async function addEmbed(kwargs) {
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
   const { object } = objectdata || {};
-  let { id, level, type, name, textalign, html, src, instruction, required } =
+  let { id, level, type, name, textalign, html, src, instruction, required, has_content } =
     data || {};
   if (!level) level = 'media';
   if (!type) type = 'embed';
@@ -2889,6 +2892,7 @@ export async function addEmbed(kwargs) {
       html,
       instruction,
       required,
+      has_content,
     },
     focus: focus || false,
     lang,
@@ -3076,6 +3080,7 @@ export async function addChecklist(kwargs) {
     options,
     instruction,
     required,
+    has_content,
   } = data || {};
   if (!level) level = 'media';
   if (!type) type = 'checklist';
@@ -3134,6 +3139,7 @@ export async function addChecklist(kwargs) {
       options,
       instruction,
       required,
+      has_content,
     },
     focus: focus || false,
     lang,
@@ -3345,6 +3351,7 @@ export async function addRadiolist(kwargs) {
     options,
     instruction,
     required,
+    has_content,
   } = data || {};
   if (!level) level = 'media';
   if (!type) type = 'radiolist';
@@ -3403,6 +3410,7 @@ export async function addRadiolist(kwargs) {
       options,
       instruction,
       required,
+      has_content,
     },
     focus: focus || false,
     lang,
@@ -3619,6 +3627,7 @@ export async function addLocations(kwargs) {
     caption,
     constraint,
     required,
+    has_content,
   } = data || {};
   if (!level) level = 'meta';
   if (!type) type = 'location';
@@ -3652,6 +3661,7 @@ export async function addLocations(kwargs) {
       instruction,
       constraint,
       required,
+      has_content,
     },
     focus: focus || false,
     lang,
@@ -3946,7 +3956,7 @@ export async function addIndexes(kwargs) {
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
   const { object } = objectdata || {};
-  let { id, level, type, name, instruction, tags, constraint, required } =
+  let { id, level, type, name, instruction, tags, constraint, required, has_content } =
     data || {};
   if (!level) level = 'meta';
   if (!type) type = 'index';
@@ -3975,7 +3985,7 @@ export async function addIndexes(kwargs) {
       d3.selectAll('.media-layout').last().node(),
     sibling,
     type,
-    datum: { id, level, type, name, tags, instruction, constraint, required },
+    datum: { id, level, type, name, tags, instruction, constraint, required, has_content },
     focus: focus || false,
     lang,
     objectdata,
@@ -4015,7 +4025,7 @@ export async function addTags(kwargs) {
 
   const { data, lang, section, sibling, focus, objectdata } = kwargs || {};
   const { object } = objectdata || {};
-  let { id, level, type, name, instruction, tags, constraint, required } =
+  let { id, level, type, name, instruction, tags, constraint, required, has_content } =
     data || {};
   if (!level) level = 'meta';
   if (!type) type = 'tag';
@@ -4041,7 +4051,7 @@ export async function addTags(kwargs) {
       d3.selectAll('.media-layout').last().node(),
     sibling,
     type,
-    datum: { id, level, type, name, tags, instruction, constraint, required },
+    datum: { id, level, type, name, tags, instruction, constraint, required, has_content },
     focus: focus || false,
     lang,
     objectdata,
@@ -4080,7 +4090,7 @@ export async function addAttachment(kwargs) {
   const { data, lang, section, sibling, container, focus, objectdata } =
     kwargs || {};
   const { object, type: objecttype } = objectdata || {};
-  let { id, level, type, name, srcs, instruction, constraint, required } =
+  let { id, level, type, name, srcs, instruction, constraint, required, has_content } =
     data || {};
   if (!level) level = 'meta';
   if (!type) type = 'attachment';
@@ -4104,7 +4114,7 @@ export async function addAttachment(kwargs) {
     sibling,
     container,
     type,
-    datum: { id, level, type, name, srcs, instruction, required },
+    datum: { id, level, type, name, srcs, instruction, required, has_content },
     focus: focus || false,
     lang,
     objectdata,

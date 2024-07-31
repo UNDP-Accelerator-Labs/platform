@@ -1,4 +1,4 @@
-import { selectReviewLanguage } from '/js/contribute/pad/main.js';
+import { selectReviewLanguage, nextMissingVal } from '/js/contribute/pad/main.js';
 import { renderPad } from '/js/contribute/pad/render.js';
 import { partialSave, saveAndSubmit } from '/js/contribute/pad/save.js';
 import { initToolbarInteractions } from '/js/contribute/pad/toolbar.interactions.js';
@@ -124,6 +124,7 @@ async function onLoad() {
     );
   }
 
+  // ADD THE TOP BAR INTERACTION
   d3.select('button.publish')
     .on('click', function () {
       this.focus();
@@ -149,6 +150,9 @@ async function onLoad() {
       const dropdown = form.select('.dropdown');
       if (dropdown.node()) dropdown.node().style.maxHeight = null;
     });
+
+  d3.select('button#next-missing-val')
+    .on('click', nextMissingVal);
 }
 
 if (document.readyState === 'loading') {

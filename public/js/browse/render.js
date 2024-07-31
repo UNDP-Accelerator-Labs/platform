@@ -271,6 +271,9 @@ export const Entry = function (_kwargs) {
             // CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
             if (['files', 'pads'].includes(object)) {
               if (d.editable) {
+                const internal_option = false;
+                // const publishable = (d.publishable === undefined || d.publishable === true);
+                const publishable = d.publishable !== false;
                 const publish_dropdown = [];
                 const exceeds_publication_limit =
                   d.available_publications === 0;
@@ -298,7 +301,7 @@ export const Entry = function (_kwargs) {
                       });
                     }
                   }
-                } else {
+                } else if (internal_option) {
                   if (d.status === 1 && !exceeds_publication_limit) {
                     publish_dropdown.push({
                       name: 'status',
@@ -307,10 +310,7 @@ export const Entry = function (_kwargs) {
                       label: vocabulary['internally'],
                     });
                   }
-                  if (
-                    d.status <= 2 &&
-                    (d.publishable === undefined || d.publishable === true)
-                  ) {
+                  if (d.status <= 2 && publishable) {
                     if (!(d.status === 1 && exceeds_publication_limit)) {
                       publish_dropdown.push({
                         name: 'status',
@@ -322,24 +322,30 @@ export const Entry = function (_kwargs) {
                   }
                 }
 
+                const inputs = [
+                  { name: 'id', value: d.id },
+                  { name: 'title', value: d.title },
+                ]
+
+                if (publishable && !publish_dropdown.length) {
+                  inputs.push({ name: 'status', value: 3 });
+                }
+
                 opts.push({
                   action: `/publish/${object}`,
                   method: 'GET',
                   node: 'button',
-                  type: 'button',
+                  type: publish_dropdown.length ? 'button' : 'submit',
                   value: d.id,
                   disabled: !(
                     d.editable &&
                     [1, 2].includes(d.status) &&
-                    publish_dropdown.length
+                    publishable
                   ),
                   classname: 'publish',
                   label: vocabulary['publish'],
                   dropdown: publish_dropdown,
-                  inputs: [
-                    { name: 'id', value: d.id },
-                    { name: 'title', value: d.title },
-                  ],
+                  inputs,
                 });
 
                 // if (d.status > 1) opts.push({ action: `/publish/${object}`, method: 'GET', node: 'button', type: 'submit', value: d.id, disabled: !d.editable, classname: 'unpublish', label: vocabulary['unpublish'], inputs: [{ name: 'status', value: 1 }] })

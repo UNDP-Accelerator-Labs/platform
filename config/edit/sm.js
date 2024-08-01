@@ -122,3 +122,4 @@ exports.browse_display = 'columns';
 exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'mosaic';
+exports.internal_publication = false;

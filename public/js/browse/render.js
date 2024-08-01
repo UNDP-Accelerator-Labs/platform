@@ -271,7 +271,7 @@ export const Entry = function (_kwargs) {
             // CHANGED THE LOGIC HERE FOR THE PUBLICATION LIMIT
             if (['files', 'pads'].includes(object)) {
               if (d.editable) {
-                const internal_option = false;
+                const internal_publication = JSON.parse(d3.select('data[name="site"]').node()?.value).internal_publication;
                 // const publishable = (d.publishable === undefined || d.publishable === true);
                 const publishable = d.publishable !== false;
                 const publish_dropdown = [];
@@ -301,7 +301,7 @@ export const Entry = function (_kwargs) {
                       });
                     }
                   }
-                } else if (internal_option) {
+                } else if (internal_publication) {
                   if (d.status === 1 && !exceeds_publication_limit) {
                     publish_dropdown.push({
                       name: 'status',

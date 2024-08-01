@@ -39,7 +39,7 @@ module.exports = req => {
 		if (limit === null) content_filters.push(DB.pgp.as.format(`AND TRUE`))
 		else if (typeof limit === 'string' && limit.length === 1) page = limit.toUpperCase()
 		
-		const is_sso_user = sso_user == 'true'
+		const is_sso_user = sso_user === 'true'
 
 		if(+year && month) {
 			content_filters.push(DB.pgp.as.format(`

@@ -21,7 +21,7 @@ function setupPage() {
   // Create canvas for chart
   metricsContainer
     .append('canvas')
-    .attr('id', 'userChart')
+    .attr('id', 'user-chart')
     .attr('width', 800)
     .attr('height', 400);
 }
@@ -84,7 +84,7 @@ function displayTotalCounts(ssoData, nonSsoData) {
 }
 
 async function renderChart(labels, ssoData, nonSsoData, year) {
-  const ctx = document.getElementById('userChart').getContext('2d');
+  const ctx = document.getElementById('user-chart').getContext('2d');
   const language = await getCurrentLanguage();
 
   if (chart) {

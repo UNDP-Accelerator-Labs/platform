@@ -25,6 +25,7 @@ let {
   translations,
   allowed_routes,
   restricted_routes,
+  internal_publication,
 } = require('./edit/');
 const fs = require('fs');
 
@@ -176,6 +177,7 @@ exports.followup_count = followup_count;
 exports.browse_display = browse_display;
 exports.view_display = view_display;
 exports.welcome_module = welcome_module;
+exports.internal_publication = internal_publication;
 
 exports.fixed_uuid = fixed_uuid;
 

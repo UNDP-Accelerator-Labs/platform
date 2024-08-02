@@ -1471,6 +1471,27 @@ div.document {
               color: $c-light-grey;
             }
           }
+          .toc-container {
+            h1 {
+              font-size: $t-mid;
+              line-height: 1.5em;
+              color: $c-mid-grey;
+              font-weight: normal;
+            }
+            li {
+              font-size: $t-main;
+              line-height: 1.5em;
+              color: $c-light-blue;
+              font-weight: normal;
+              cursor: pointer;
+              list-style: initial;
+              margin-left: 15px;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
           .input-slideshow {
             display: flex;
             justify-content: flex-start;

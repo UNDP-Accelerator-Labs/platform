@@ -50,6 +50,7 @@ const {
   fixed_uuid,
   allowed_routes,
   restricted_routes,
+  internal_publication,
 } = app_obj;
 
 exports.is_staging = is_staging;
@@ -77,6 +78,7 @@ exports.browse_display = browse_display;
 exports.view_display = view_display;
 exports.welcome_module = welcome_module;
 exports.fixed_uuid = fixed_uuid;
+exports.internal_publication = internal_publication || false;
 
 exports.translations = require('./translations.js').translations;
 exports.allowed_routes = allowed_routes || null;

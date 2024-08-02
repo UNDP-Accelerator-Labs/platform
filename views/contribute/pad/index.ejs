@@ -137,6 +137,12 @@
 						<% } %>
 						<form method='GET' action='/publish/<%- `${object}s` %>'>
 							<input type='hidden' name='id' value='<%- locals.data?.id %>'>
+
+							<% if (editing && templated && (locals.data?.status || 0) < 1) { %>
+								<button type='button' name='missing-values' id='next-missing-val'>Check missing values</button>
+								<!-- TO DO: TRANSLATE -->
+							<% } %>
+
 							<%
 								const currentpage_url = new URL(locals.metadata.page.currentpage_url)
 								const queryparams = new URLSearchParams(currentpage_url.search)
@@ -169,11 +175,16 @@
 									<!-- TO DO: INTERCEPT AND partialSave -->
 									<button type='submit' class='publish google-translate-attr' name='status' value='1' data-vocab='submit'></button>
 								<% } else { %>
-									<% if (locals.data?.status === 2 && locals.data?.review_status === 1) { %>
-										<!-- THE PAD IS ALREADY A PREPRINT AND SUBMITTED FOR REVIEW -->
+									<% if (
+										modules.some(d => d.type === 'reviews') 
+										&& locals.data?.status === 2 
+										&& locals.data?.review_status === 1
+									) { %><!-- THE PAD IS ALREADY A PREPRINT AND SUBMITTED FOR REVIEW -->
 										<button type='button' class='publish google-translate-attr' data-vocab='publish' disabled></button>
-									<% } else { %>
+									<% } else if (locals.metadata.site.internal_publication) { %>
 										<button type='button' class='publish google-translate-attr' data-vocab='publish'></button>
+									<% } else { %>
+										<button type='submit' class='publish google-translate-attr' name='status' value='3' data-vocab='publish'></button>
 									<% } %>
 								<% } %>
 							<% } %>
@@ -197,7 +208,7 @@
 													<button id='submit-for-review' type='button' name='review_status' value='1' data-vocab='submit for review'></button>
 												</li>
 											<% } %>
-										<% } else { %>
+										<% } else if (locals.metadata.site.internal_publication) { %>
 											<% if ((locals.data?.status || 0) < 2) { %>
 												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='2' data-vocab='internally'></button>
@@ -206,7 +217,6 @@
 											<% if (
 												(locals.data?.status || 0) <= 2
 												&& (locals.data?.publishable !== undefined ? locals.data?.publishable : true)
-
 											) { %>
 												<li class='opt google-translate-attr'>
 													<button type='submit' name='status' value='3' data-vocab='externally'></button>
@@ -327,6 +337,7 @@
 								<%- locals.display_template.description %>
 							</div>
 						</div>
+						<div class='toc-container'></div>
 					</section>
 				<% } %>
 			</div>

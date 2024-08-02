@@ -31,6 +31,7 @@ module.exports = (req, res) => {
 			else redirectError(req, res)
 		} else if (object === 'files') files(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
+		else if (object === 'user-metrics') contributors.metrics(req, res)
 		else if (object === 'tags') tags(req, res)
 		else if (object === 'statistics') statistics(req, res)
 		else if (object === 'countries') locations.countries(req, res)

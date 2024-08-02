@@ -99,6 +99,7 @@ export const vocabulary = {
         all: 'All contributors',
         invited: 'My contributors',
         pinned: 'My teams',
+        metrics: 'Metrics'
       },
     },
     fr: {
@@ -140,6 +141,7 @@ export const vocabulary = {
         all: 'Tou.te.s les contribut.rices.eurs',
         invited: 'Mes contribut.rices.eurs',
         pinned: 'Mes équipes',
+        metrics: 'Métriques'
       },
     },
     es: {
@@ -181,6 +183,7 @@ export const vocabulary = {
         all: 'Tod.a.o.s l.a.o.s contribuyentes',
         invited: 'Mis contribuyentes',
         pinned: 'Mis equipos',
+        metrics: 'Métricas',
       },
     },
     pt: {
@@ -222,6 +225,7 @@ export const vocabulary = {
         all: 'Todos os ontribuidor.e.a.s',
         invited: 'Meus contribuidor.e.a.s',
         pinned: 'Minhas equipes',
+        metrics: 'Métricas',
       },
     },
   },

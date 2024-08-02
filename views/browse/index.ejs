@@ -56,7 +56,11 @@
 
 <%- include ('./modules/data.ejs') %>
 
-<script type='module' src='/js/browse/load.js'></script>
+<% if (space == 'metrics') { %>
+	<script type='module' src='/js/browse/chart.js'></script>
+<%} else { %>
+	<script type='module' src='/js/browse/load.js'></script>
+<% } %>
 
 </head>
 
@@ -141,6 +145,10 @@
 
 			<main>
 				<div class='inner'>
+					<% if (space == 'metrics') { %>
+						<div id="metrics"></div>
+					<% } %>
+
 					<!-- MULTI-SESSION ALERT -->
 					<%- include('../partials/sessions-alert') %>
 					<!-- INCLUDE THE BLURB -->

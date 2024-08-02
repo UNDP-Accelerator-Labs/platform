@@ -21,8 +21,9 @@
 		else return num
 	}
 %>
-
-<% if (locals.stats?.total > 0) { %>
+<% if (space == 'metrics') { %>
+	<span></span>
+<% } else if (locals.stats?.total > 0 ) { %>
 	<nav id='search-and-filter' class='xs sm m lg xl xxl<% if (mapscale === "full-screen") { %> anchor-bottom<% } %>'>
 		<% if (false && logged && object === 'pads') { // FIXME reactivate explorations later (and the tabs here) %>
 			<div class="search-type-menu">

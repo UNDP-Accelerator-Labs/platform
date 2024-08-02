@@ -31,11 +31,10 @@ function fetchData(year) {
 
   fetch(url)
     .then((response) => response.json())
-    .then((results) => {
-      const { data, years } = results;
-
+    .then(async (results) => {
+      const { data, years } = await results;
       // Convert period strings to labels
-      const labels = data.map((d) => d.period.trim());
+      const labels = data.map((d) => `${d.period}`.trim());
       const ssoData = data.map((d) => +d.sso_count);
       const nonSsoData = data.map((d) => +d.non_sso_count);
 

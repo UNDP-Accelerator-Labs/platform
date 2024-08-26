@@ -533,11 +533,13 @@ DB.conn
 
 //TEMPORARY:: TODO: Remove 
 // Schedule the task to run every Monday at 10:00 AM
-cron.schedule('0 10 * * 1', () => {
-  console.log('Running consent sanitanizer task every Monday at 10:00 AM');
+if(app_id == 'sm' || app_id == 'exp' || app_id == 'ap'){
+  cron.schedule('0 10 * * 1', () => {
+    console.log('Running consent sanitanizer task every Monday at 10:00 AM');
 
-  consent_sanity_check();
-});
+    consent_sanity_check();
+  });
+}
 
 // const io = require('socket.io')(server)
 // // CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session

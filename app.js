@@ -1,7 +1,4 @@
-// INSPIRED BY https://coderwall.com/p/th6ssq/absolute-paths-require
-global.include = (path) => require(`${__dirname}/${path}`);
-global.rootpath = __dirname;
-
+require('./globals')
 const {
   app_id,
   app_suite,
@@ -29,6 +26,9 @@ const upload = multer({ dest: './tmp' });
 const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
+
+//TEMPORARY:: TODO: Remove 
+const consent_sanity_check =require('./routes/scripts/shared/consent_link_sanity_check')
 
 const app = express();
 app.disable('x-powered-by');
@@ -530,6 +530,14 @@ DB.conn
       .catch((err) => console.log(err));
   })
   .catch((err) => console.log(err));
+
+//TEMPORARY:: TODO: Remove 
+// Schedule the task to run every Monday at 10:00 AM
+cron.schedule('0 10 * * 1', () => {
+  console.log('Running consent sanitanizer task every Monday at 10:00 AM');
+
+  consent_sanity_check();
+});
 
 // const io = require('socket.io')(server)
 // // CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session

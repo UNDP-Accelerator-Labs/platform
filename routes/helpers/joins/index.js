@@ -23,7 +23,7 @@ exports.users = async (data, args = []) => {
 			const name_column = await adm0.name_column({ connection: t, language })
 
 			return t.any(`
-				SELECT DISTINCT(u.uuid) AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights,
+				SELECT DISTINCT(u.uuid) AS $1:name, u.name AS ownername, u.iso3, u.position, u.rights, u.email,
 					COALESCE(su.$2:name, adm0.$2:name) AS country
 				FROM users u
 				LEFT JOIN adm0_subunits su

@@ -107,7 +107,7 @@ async function sendBrokenLinkEmail(owner, brokenLinks) {
     await sendMail({
         subject: 'Broken Links Detected in Your Content',
         to: owner.email,
-        cc: process.env.ADMIN_EMAILS,
+        cc: process.env.ADMIN_EMAILS || '',
         html: `
             <p>Dear ${owner.ownername},</p>
     

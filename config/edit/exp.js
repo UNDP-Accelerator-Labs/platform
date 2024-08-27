@@ -51,14 +51,14 @@ exports.metafields = [
     opencode: true,
     limit: 5,
   },
-  { type: 'tag', name: 'methods', required: true, opencode: false },
-  { type: 'tag', name: 'datasources', required: true, opencode: true },
+  { type: 'tag', name: 'methods', required: false, opencode: false },
+  { type: 'tag', name: 'datasources', required: false, opencode: true },
   // { type: 'location', name: 'locations', required: true },
 
   {
     type: 'radiolist',
     name: 'experiment status',
-    required: true,
+    required: false,
     instruction: 'Current status of experimental activity',
     options: [
       { name: 'Idea stage' },
@@ -71,7 +71,7 @@ exports.metafields = [
   {
     type: 'checklist',
     name: 'experiment type',
-    required: true,
+    required: false,
     instruction:
       'Please categorize the type that best identifies this experimental activity:',
     options: [
@@ -84,7 +84,7 @@ exports.metafields = [
   {
     type: 'checklist',
     name: 'partnering sector',
-    required: true,
+    required: false,
     instruction:
       'Which sector are you partnering with for this activity? Please select all that apply',
     options: [
@@ -110,7 +110,7 @@ exports.metafields = [
   {
     type: 'checklist',
     name: 'assignment type',
-    required: true,
+    required: false,
     instruction:
       'How is the intervention assigned to different groups in your experiment?',
     options: [
@@ -122,7 +122,7 @@ exports.metafields = [
   {
     type: 'checklist',
     name: 'sample size',
-    required: true,
+    required: false,
     instruction: 'What is the estimated sample size?',
     options: [
       { name: '1' },
@@ -149,7 +149,7 @@ exports.metafields = [
   {
     type: 'checklist',
     name: 'quality check',
-    required: true,
+    required: false,
     instruction: 'Quality Check',
     options: [
       { name: 'This activity is relevant to a CPD outcome' },

@@ -85,3 +85,17 @@ body {
     padding-bottom: $i * 0.25rem !important;
   }
 }
+
+.line {
+  fill: none;
+  stroke-width: 2px;
+}
+.sso-line {
+  stroke: steelblue;
+}
+.non-sso-line {
+  stroke: orange;
+}
+.axis-label {
+  font-size: 12px;
+}

@@ -159,6 +159,15 @@ module.exports = (req, res, next) => {
 						redirecturl = originalUrl || referer;
 					}
 
+					//UPDATE USER LAST LOGIN INFO
+					t.none(`
+						UPDATE public.users 
+						SET last_login = now() 
+						WHERE uuid = $1`,
+						[ result.uuid]
+					)
+					.catch(err => console.log(err));
+
 					// CHECK IF DEVICE IS TRUSTED
 					return t.oneOrNone(`
 						SELECT * FROM trusted_devices
@@ -174,7 +183,7 @@ module.exports = (req, res, next) => {
 						[result.uuid, device.os, device.browser, device.device, __ucd_app, __puid, __cduid, sid ]
 					).then(async deviceResult => {
 						if (deviceResult) {
-							// Device is trusted, update last login info
+							// Device is trusted, update device last login info
 							return t.none(`
 								UPDATE trusted_devices SET last_login = $1, session_sid = $5
 								WHERE user_uuid = $2

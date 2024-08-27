@@ -102,7 +102,17 @@
 				</button>
 			</a>
 		</li>
-
+		
+		<% if (rights >= 3){ %>
+		<li class='<% if (space === "metrics") { %>active<% } %>'>
+			<a href='./metrics'>
+				<button>
+					<span data-vocab='["space", "<%= object %>", "metrics"]'></span>
+					<div id="metrics-count" class='count'></div>
+				</button>
+			</a>
+		</li>
+		<% } %>
 	<% } else { %>
 		<% if (modules.some(d => {
 			let { write } = d.rights

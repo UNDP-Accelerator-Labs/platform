@@ -37,6 +37,7 @@
 		modules: modules || {},
 		ownDB: locals.metadata.site.own_db,
 		app_title_short: locals.metadata.site.app_title_short,
+		internal_publication: locals.metadata.site.internal_publication,
 	}
 %>
 <data name='site' value='<%= JSON.stringify(sitedata) %>'></data>
@@ -48,7 +49,7 @@
 		id: locals.metadata.page.id,
 		load: locals.metadata.page.lazyload ? 'lazy' : 'pages',
 		mapscale,
-		language
+		language,
 	}
 %>
 <data name='page' value='<%= JSON.stringify(pagedata) %>'></data>

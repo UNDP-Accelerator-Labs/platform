@@ -1578,9 +1578,12 @@ div.browse {
                     display: grid;
                     grid-gap: 5px;
                     grid-template-columns: repeat(2, 1fr);
-                    margin: -16px -1px 0 auto;
+                    /*margin: -16px -1px 0 auto;*/
                     justify-content: right;
                     align-content: start;
+                    transform: translateY(calc(-100% + 14px));
+                    align-items: end;
+                    margin: 0 -1px 0 auto;
 
                     form {
                       position: relative;

@@ -58,8 +58,8 @@ module.exports = (req, res, next) => {
         return t
           .oneOrNone(
             `
-                INSERT INTO users (email, name, rights, position, password, iso3, created_from_sso, confirmed, notifications, confirmed_at)
-                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, TRUE, TRUE, TRUE, NOW())
+                INSERT INTO users (email, name, rights, position, password, iso3, created_from_sso, confirmed, notifications, confirmed_at, last_login)
+                VALUES ($1, $2, $3, $4, crypt($5, GEN_SALT('bf', 8)), $6, TRUE, TRUE, TRUE, NOW(), NOW())
                 ON CONFLICT (email)
                 DO UPDATE SET name = EXCLUDED.name
             ;`,

@@ -20,7 +20,8 @@ const {
 	translations,
 	allowsso,
 	sso_app_url,
-	platform_urls
+	platform_urls,
+	internal_publication,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -101,6 +102,7 @@ exports.pagemetadata = (_kwargs) => {
 	path = path.substring(1).split('/')
 	let activity = path[1]
 	const currentpage_url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
+	let add_web_analytics = process.env.NODE_ENV == 'production' && !req.get('host').includes('azurewebsites.net')
 
 	let { object, space, instance } = params || {}
 	if (instance) {
@@ -310,7 +312,9 @@ exports.pagemetadata = (_kwargs) => {
 				app_suite_url,
 				allowsso,
 				login_url: !compareReqDomain(req, currentpage_url, sso_app_url) ? sso_app_url : null,
-				platform_urls
+				platform_urls,
+				add_web_analytics,
+				internal_publication,
 			},
 			user: {
 				uuid,
@@ -367,7 +371,8 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 	const { data } = _kwargs
 
 	if (app_title_short === 'solutions-mapping') {
-		const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
+		// const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type))
+		const other_metadata = metafields.filter(d => !['tag', 'index', 'location'].includes(d.type) && d.required)
 		if (other_metadata.length > 0) {
 			if (Array.isArray(data)) {
 				return Promise.all(data.map(d => {
@@ -377,7 +382,7 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 					;`, [ d.id ])
 					.then(meta => {
 						const nesting = array.nest.call(meta, { key: c => `${c.type}-${c.name}`, keep: ['type', 'name'] })
-						const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
+						const has_metadata = other_metadata.every(c => nesting.some(b => b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
 
 						d.publishable = (d.status >= 1 && has_metadata) || false
 						return d
@@ -390,7 +395,7 @@ exports.legacy.publishablepad = (_kwargs) => { // THIS IS LEGACY FOR THE SOLUTIO
 				;`, [ data.id ])
 				.then(meta => {
 					const nesting = array.nest.call(meta, { key: d => `${d.type}-${d.name}`, keep: ['type', 'name'] })
-					const has_metadata = other_metadata.every(c => nesting.some(b => c.required && b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
+					const has_metadata = other_metadata.every(c => nesting.some(b => b.type === c.type && b.name === c.name && b.count <= (c.limit ?? Infinity)))
 
 					data.publishable = (data.status >= 1 && has_metadata) || false
 					return data

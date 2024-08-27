@@ -1,7 +1,4 @@
-// INSPIRED BY https://coderwall.com/p/th6ssq/absolute-paths-require
-global.include = (path) => require(`${__dirname}/${path}`);
-global.rootpath = __dirname;
-
+require('./globals')
 const {
   app_id,
   app_suite,
@@ -30,6 +27,9 @@ const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
 
+//TEMPORARY:: TODO: Remove 
+const consent_sanity_check =require('./routes/scripts/shared/consent_link_sanity_check')
+
 const app = express();
 app.disable('x-powered-by');
 
@@ -47,6 +47,7 @@ app.use(
           (req, res) => `'nonce-${res.locals.nonce}'`,
           'sha256-NNiElek2Ktxo4OLn2zGTHHeUR6b91/P618EXWJXzl3s=',
           'strict-dynamic',
+          "https://gc.zgo.at",
         ]),
         'script-src-attr': [
           "'self'",
@@ -54,7 +55,9 @@ app.use(
           'sdg-innovation-commons.org',
         ],
         'style-src': csp_links,
-        'connect-src': csp_links,
+        'connect-src': csp_links.concat([
+          "https://sdg-innovation-commons.goatcounter.com/count",
+        ]),
         'frame-src': [
           "'self'",
           '*.sdg-innovation-commons.org',
@@ -527,6 +530,16 @@ DB.conn
       .catch((err) => console.log(err));
   })
   .catch((err) => console.log(err));
+
+//TEMPORARY:: TODO: Remove 
+// Schedule the task to run every Monday at 10:00 AM
+if(app_id == 'sm' || app_id == 'exp' || app_id == 'ap'){
+  cron.schedule('0 10 * * 1', () => {
+    console.log('Running consent sanitanizer task every Monday at 10:00 AM');
+
+    consent_sanity_check();
+  });
+}
 
 // const io = require('socket.io')(server)
 // // CODE BELOW COMES FROM: https://socket.io/how-to/use-with-express-session

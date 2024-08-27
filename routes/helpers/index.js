@@ -257,10 +257,11 @@ exports.redirectError = (req, res) => {
 exports.redirectBack = (req, res, baseIfEmpty = false) => {
   const { referer } = req.headers || {};
   let ref = null;
+
   if (referer) {
     const hostname = req.get('host');
     const refUrl = new URL(referer);
-    if (refUrl.hostname === hostname) {
+    if (refUrl.host === hostname) {
       ref = referer;
     }
   }

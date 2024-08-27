@@ -59,6 +59,7 @@ DB.conn.tx(t => {
             ) AS data
         FROM pads
         WHERE update_at < '2024-08-26'
+        AND status >= 2
         AND EXISTS (
             SELECT 1
             FROM jsonb_array_elements(pads.sections) AS section,

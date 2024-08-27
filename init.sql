@@ -389,3 +389,18 @@ ALTER COLUMN created_at SET DEFAULT now();
 -- Add last_login column
 ALTER TABLE public.users
 ADD COLUMN last_login timestamp with time zone;
+
+-- Create a Function to Update update_at
+CREATE OR REPLACE FUNCTION update_timestamp()
+    RETURNS TRIGGER AS $$
+    BEGIN
+    NEW.update_at = NOW();
+    RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+-- Create a Trigger to Call the Function
+CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON pads
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();

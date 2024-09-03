@@ -11,6 +11,7 @@ const {
   lodashNonce,
   allowed_routes,
   restricted_routes,
+  is_staging,
 } = include('config/');
 const { loginRateLimiterMiddleware, redirectToLoginPlatform } =
   include('routes/helpers/');
@@ -533,7 +534,12 @@ DB.conn
 
 //TEMPORARY:: TODO: Remove 
 // Schedule the task to run every Monday at 10:00 AM
-if(app_id == 'sm' || app_id == 'exp' || app_id == 'ap'){
+if(!is_staging 
+  && (app_id == 'sm' 
+    || app_id == 'exp' 
+    || app_id == 'ap'
+    )
+  ){
   cron.schedule('0 10 * * 1', () => {
     console.log('Running consent sanitanizer task every Monday at 10:00 AM');
 

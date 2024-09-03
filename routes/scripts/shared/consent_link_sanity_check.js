@@ -8,7 +8,7 @@ const fetch = require('node-fetch')
 module.exports = async () => {
 
 //CREATE A TRIGGER FUNCTION TO MAKE SURE `update_at` IS SET TO RECENT DATE WHEN PAD IS UPDATED
-DB.conn.tx(async t => {
+await DB.conn.tx(async t => {
     await t.any(`
         CREATE OR REPLACE FUNCTION update_timestamp()
         RETURNS TRIGGER AS $$

@@ -1,4 +1,4 @@
-require('./globals')
+require('./globals');
 const {
   app_id,
   app_suite,
@@ -13,8 +13,11 @@ const {
   restricted_routes,
   is_staging,
 } = include('config/');
-const { loginRateLimiterMiddleware, redirectToLoginPlatform } =
-  include('routes/helpers/');
+const {
+  loginRateLimiterMiddleware,
+  redirectToLoginPlatform,
+  consent_sanity_check,
+} = include('routes/helpers/');
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -27,9 +30,6 @@ const upload = multer({ dest: './tmp' });
 const helmet = require('helmet');
 const { xss } = require('express-xss-sanitizer');
 const cookieParser = require('cookie-parser');
-
-//TEMPORARY:: TODO: Remove 
-const consent_sanity_check =require('./routes/scripts/shared/consent_link_sanity_check')
 
 const app = express();
 app.disable('x-powered-by');
@@ -48,7 +48,7 @@ app.use(
           (req, res) => `'nonce-${res.locals.nonce}'`,
           'sha256-NNiElek2Ktxo4OLn2zGTHHeUR6b91/P618EXWJXzl3s=',
           'strict-dynamic',
-          "https://gc.zgo.at",
+          'https://gc.zgo.at',
         ]),
         'script-src-attr': [
           "'self'",
@@ -57,7 +57,7 @@ app.use(
         ],
         'style-src': csp_links,
         'connect-src': csp_links.concat([
-          "https://sdg-innovation-commons.goatcounter.com/count",
+          'https://sdg-innovation-commons.goatcounter.com/count',
         ]),
         'frame-src': [
           "'self'",
@@ -105,7 +105,7 @@ const options = {
   allowedAttributes: {
     referer: ['&'],
   },
-}
+};
 app.use(xss(options));
 
 const cookie = {
@@ -532,14 +532,9 @@ DB.conn
   })
   .catch((err) => console.log(err));
 
-//TEMPORARY:: TODO: Remove 
+//TEMPORARY:: TODO: Remove
 // Schedule the task to run every Monday at 10:00 AM
-if(!is_staging 
-  && (app_id == 'sm' 
-    || app_id == 'exp' 
-    || app_id == 'ap'
-    )
-  ){
+if (!is_staging && (app_id == 'sm' || app_id == 'exp' || app_id == 'ap')) {
   cron.schedule('0 10 * * 1', () => {
     console.log('Running consent sanitanizer task every Monday at 10:00 AM');
 

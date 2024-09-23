@@ -4424,11 +4424,17 @@ function addToC(sections) {
   toc.addElems('h1', 'toc-tile')
   .html('Table of contents') // TO DO: TRANSLATE
 
-  toc.addElems('ul', null, sections.length ? [sections.filter(d => d.items?.length || d.structure?.length)] : [])
+  sections = sections.filter(d => d.items?.length || d.structure?.length);
+  // LOOK FOR SECION TITLES
+  let entries = sections.map(d => d.title).filter(d => d)
+  // IF THERE ARE NONE, TAKE THE TEMPLATE INSTRUCTIONS
+  if (!entries.length) entries = sections.map(d => d.items.map(c => c.instruction)).flat()
+  
+  toc.addElems('ul', null, entries.length ? [entries] : [])
   .addElems('li', 'section-header-ref', d => d)
   .on('click', function (d) {
-    const target = d3.selectAll('.section-header')
-    .filter(c => c.title === d.title).node();
+    const target = d3.selectAll('.section-header, .instruction')
+    .filter(c => c.title === d || c.instruction === d).node();
     if (target) {
       window.scrollTo({
         top: target.getBoundingClientRect().y - 90,
@@ -4437,7 +4443,7 @@ function addToC(sections) {
       });
     }
   })
-  .html(d => d.title);
+  .html(d => d);
 }
 
 let idx = 0;

@@ -22,6 +22,7 @@ const {
 	sso_app_url,
 	platform_urls,
 	internal_publication,
+	is_staging,
 } = include('config/')
 const checklanguage = require('../language')
 const join = require('../joins')
@@ -33,6 +34,7 @@ function stripExplorationId(url) {
 function compareReqDomain (req, page_url, domain){
 	const referrer = req.get('Referer');
 	const referrerUrl = new URL(referrer, page_url);
+	if(is_staging) return true
 	return referrerUrl.origin === domain;
 }
 

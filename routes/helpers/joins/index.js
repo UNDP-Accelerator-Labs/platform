@@ -12,7 +12,7 @@ exports.multijoin = function (args = []) {
 		return {...d, ...obj}
 	})
 }
-exports.users = async (data, args = []) => {
+exports.users = async (data, args = [], query_conditions = '') => {
 	const [ language, key ] = args
 	if (!key) key = 'owner'
 
@@ -31,7 +31,8 @@ exports.users = async (data, args = []) => {
 				LEFT JOIN adm0
 					ON adm0.adm0_a3 = u.iso3
 				WHERE u.uuid IN ($3:csv)
-			;`, [ key, name_column, uuids ])
+				$4:raw
+			;`, [ key, name_column, uuids, query_conditions ])
 			.then(users => {
 				if (Array.isArray(data)) return this.multijoin.call(data, [ users, key ])
 				else return this.joinObj.call(data, users[0])

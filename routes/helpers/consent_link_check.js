@@ -69,7 +69,8 @@ DB.conn.tx(t => {
         GROUP BY owner;
 `)
 .then(async result => {
-    const data = await users(result, [ 'en', 'owner' ])
+    const query_condition = DB.pgp.as.format(`AND u.rights >= 2`)
+    const data = await users(result, [ 'en', 'owner' ], query_condition)
     return data
 })
 .then(async result => {

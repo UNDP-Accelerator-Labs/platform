@@ -1,5 +1,5 @@
 const app_id = process.env.APP_ID;
-const is_staging = `${process.env.LOGIN_DB_HOST}`.includes('staging');
+const is_staging = `${process.env.LOGIN_DB_NAME}`.includes('staging');
 
 let app_obj = require('./local.js');
 if (app_id === 'ap') {

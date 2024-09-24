@@ -69,7 +69,12 @@ exports.view_display = 'page';
 // OPTIONS: 'mosaic', 'carousel'
 exports.welcome_module = 'carousel';
 
-exports.allowed_routes = ['/module-error', '/version', '/apis/fetch/user-metrics'];
+exports.allowed_routes = [
+  '/module-error',
+  '/version',
+  '/apis/fetch/user-metrics',
+  '/:lang/browse/contributors/*',
+];
 
 exports.restricted_routes = [
   '/:lang/home',

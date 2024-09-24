@@ -1,4 +1,4 @@
-const { app_languages, modules, app_base_host, DB, app_title } = include('config/')
+const { app_languages, modules, app_base_host, DB, app_title, is_staging } = include('config/')
 const { datastructures, join, removeSubdomain, redirectUnauthorized, redirectError, checkOrigin } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode, extractPathValue, getPath } = require('./device-info')
@@ -151,7 +151,7 @@ module.exports = (req, res, next) => {
 					let redirecturl;
 					if (redirectPath) {
 						redirecturl = redirectPath
-					} else if (!originalUrl || originalUrl === path) {
+					} else if (!originalUrl || originalUrl === path || is_staging) {
 						redirecturl = getPath(rights, language, modules)
 					} else if(origin_url){
 						redirecturl = origin_url

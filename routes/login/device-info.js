@@ -95,9 +95,10 @@ exports.extractPathValue = (urlString, app) => {
   const params = new URLSearchParams(url.search);
   if(app) return params.get('app') ? (decodeURIComponent(params.get('app')) ?? '') : ''
   const res = params.get('origin') ? (decodeURIComponent(params.get('origin')) ?? '') : '';
-  // FIXME @adedapo the url shouldn't have '&amp;origin' the below is not a solution
   if (!res) {
-    return params.get('amp;origin') ? (decodeURIComponent(params.get('amp;origin')) ?? '') : '';
+    return params.get('origin') ? (decodeURIComponent(params.get('origin')) ?? '') 
+      : params.get('amp;origin') ? (decodeURIComponent(params.get('amp;origin')) ?? '') //amp; has been fixed in previous PRs. This is now deprecated.
+      : '';
   }
   return res
 }

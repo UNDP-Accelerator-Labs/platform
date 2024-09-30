@@ -140,6 +140,13 @@ async function onLoad() {
           },
         });
       }
+      if (opts.length && opts[opts.length - 1]?.class !== 'divider') {
+        opts.push({
+          node: 'div',
+          class: 'divider',
+          label: vocabulary['or'].toUpperCase(),
+        });
+      }
     } else if (key === 'files' && writables[key]) {
       if (opts.length && opts[opts.length - 1]?.class !== 'divider') {
         opts.push({

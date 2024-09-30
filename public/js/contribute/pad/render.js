@@ -4428,7 +4428,7 @@ function addToC(sections) {
   // LOOK FOR SECION TITLES
   let entries = sections.map(d => d.title).filter(d => d)
   // IF THERE ARE NONE, TAKE THE TEMPLATE INSTRUCTIONS
-  if (!entries.length) entries = sections.map(d => d.items.map(c => c.instruction)).flat()
+  if (!entries.length) entries = sections.map(d => (d.items || d.structure.filter(c => c.type !== 'title'))?.map(c => c.instruction)).flat()
   
   toc.addElems('ul', null, entries.length ? [entries] : [])
   .addElems('li', 'section-header-ref', d => d)

@@ -3689,8 +3689,7 @@ export async function addLocations(kwargs) {
     html: '<i class="material-icons google-translate-attr">place</i>',
   });
 
-  async function rmPin(marker, container) {
-    const vocabulary = await getTranslations();
+  function rmPin(marker, container) {
     const btn = document.createElement('BUTTON');
     btn.innerHTML = vocabulary['remove pin'];
     btn.addEventListener('click', async (_) => {

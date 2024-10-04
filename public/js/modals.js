@@ -418,6 +418,7 @@ async function addInputNode(_sel, _data) {
               }
               modal.remove();
               screen.classed('hide', true);
+              
             }
           });
 

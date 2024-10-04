@@ -86,6 +86,7 @@ module.exports = async kwargs => {
 				return data
 			}).catch(err => console.log(err))
 		}).then(users => {
+			if (process.env.NODE_ENV !== 'production') return users.sort((a, b) => a?.name?.localeCompare(b.name));
 			if (users.length) {
 				return DB.conn.task(t => {
 					const batch = []
@@ -123,68 +124,19 @@ module.exports = async kwargs => {
 
 					return t.batch(batch)
 					.then(results => {
-						// const [ ongoing_associated_mobilizations, past_associated_mobilizations, private_associated_pads, associated_pads ] = results
-
-						// let data = join.multijoin.call(users, [ ongoing_associated_mobilizations, 'id' ])
-						// data = join.multijoin.call(data, [ past_associated_mobilizations, 'id' ])
-						// data = join.multijoin.call(data, [ private_associated_pads, 'id' ])
-						// data = join.multijoin.call(data, [ associated_pads, 'id' ])
-
 						results.forEach(d => {
-							users = join.multijoin.call(users, [ d, 'id' ])
-						})
+							users = join.multijoin.call(users, [ d, 'id' ]);
+						});
 
 						users.forEach(d => { // UPDATE STATUS BASED ON PADS
 							if (d.status === 1 && (d.associated_pads > 0 || d.private_associated_pads > 0)) d.status = 2
-						})
+						});
 
 						return users.sort((a, b) => a?.name?.localeCompare(b.name))
 					}).catch(err => console.log(err))
 				}).catch(err => console.log(err))
 			} else return users.sort((a, b) => a?.name?.localeCompare(b.name))
 		}).catch(err => console.log(err))
-		/*
-		return gt.any(`
-			-- SELECT DISTINCT (u.uuid) AS id, u.name, u.email, u.position AS txt, u.iso3, u.confirmed::INT AS status,
-			-- u.confirmed_at, u.left_at,
-			-- u.language, u.secondary_languages,
-			-- to_char(u.confirmed_at, 'DD Mon YYYY') AS start_date, 
-			-- to_char(u.left_at, 'DD Mon YYYY') AS end_date,
-			
-			-- CASE WHEN u.uuid IN (SELECT contributor FROM cohorts WHERE host = $4) 
-			-- 	OR $1 > 2
-			-- 		THEN TRUE
-			-- 		ELSE FALSE
-			-- END AS editable,
-
-			-- THIS IS THE PINBOARD CASE STATEMENT
-			--COALESCE(
-			--(SELECT json_agg(json_build_object(
-			--		'id', t.id,
-			--		'title', t.name,
-			--		'is_exploration', FALSE,
-			--		'editable', (u.uuid IN (SELECT contributor FROM cohorts WHERE host = $4) OR $1 > 2)
-			--	)) FROM teams t
-			--	INNER JOIN team_members tm
-			--		ON tm.team = t.id
-			--	WHERE 
-			--		-- u.uuid IN ($2:csv)
-			--		-- AND 
-			--		tm.member = u.uuid
-			--	GROUP BY tm.member
-			--)::TEXT, '[]')::JSONB
-			--AS pinboards
-
-			--FROM users u
-			--
-			--LEFT JOIN languages l
-			--	ON l.iso3 = u.iso3
-			--WHERE TRUE
-			--	$3:raw
-			--ORDER BY u.name
-		;`, [ rights, collaborators_ids, full_filters, uuid ])
-		*/
-		
 	}).then(data => {
 		return {
 			data,

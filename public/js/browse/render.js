@@ -1721,6 +1721,7 @@ export const Entry = function (_kwargs) {
             }),
           );
           // RENDER THE DROPDOWN
+          console.log(pinboards)
           newpin.call(renderPinOptions, data);
         };
 

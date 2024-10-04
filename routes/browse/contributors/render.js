@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
 						statistics,
 						pinboards_list, // LIST OF AVAILABLE TEAMS
 						pinboard // CURRENTLY DISLAYED TEAM (IF APPLICABLE)
-					] = results
+					] = results;
 
 					if (pinboard) {
 						pinboard.readCount = await pagestats.getReadCount(pinboard.id, 'team');

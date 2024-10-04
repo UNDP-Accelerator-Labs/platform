@@ -102,7 +102,7 @@ function renderPin() {
     pin
       .addElem('label', 'name')
       .classed('notranslate', true)
-      .html(this.dataset.label);
+      .html(this.dataset.label?.length > 30 ? `${this.dataset.label.slice(0, 30)}…` : this.dataset.label);
     pin
       .addElem('div', 'close')
       .attrs({ 'data-name': this.name, 'data-id': this.value })

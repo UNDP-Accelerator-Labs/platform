@@ -7,14 +7,15 @@ const fs = require('fs')
 const turf = require('@turf/turf')
 const { BlobServiceClient } = require('@azure/storage-blob')
 
-const { app_title_short, app_storage, metafields, DB } = include('config/')
+const { app_title_short, app_storage, page_content_limit, metafields, DB } = include('config/')
 const { checklanguage, array, join, parsers, safeArr } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter')
 
 module.exports = async (req, res) => {
 	const { host } = req.headers || {}
- 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	const token = req.body.token || req.query.token || req.headers['x-access-token']
+ 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, page, limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
 	if (typeof include_imgs === 'string') include_imgs = JSON.parse(include_imgs)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
@@ -22,9 +23,12 @@ module.exports = async (req, res) => {
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.session.language)
 
-	const [ f_space, order, page, full_filters ] = await filter(req, res)
+	const [ f_space, order, default_page, full_filters ] = await filter(req, res)
 	let cors_filter = ''
 	if (!pw) cors_filter = DB.pgp.as.format(`AND p.status > 2`)
+
+	let page_filter = ''
+	if (!isNaN(+page)) page_filter = DB.pgp.as.format(`LIMIT $1 OFFSET $2;`, [ limit ? +limit : page_content_limit, limit ? (+page - 1) * +limit : (+page - 1) * page_content_limit ])
 
 	if (output === 'geojson') {
 		include_locations = true
@@ -87,7 +91,8 @@ module.exports = async (req, res) => {
 
 			GROUP BY (p.id)
 			ORDER BY p.id DESC
-		;`, [ full_filters, cors_filter ])
+			$3:raw
+		;`, [ full_filters, cors_filter, page_filter ])
 		.then(async pads => {
 			pads = await join.users(pads, [ language, 'contributor_id' ])
 			// AND DELETE ALL THE PERSONAL INFORMATION
@@ -394,7 +399,7 @@ module.exports = async (req, res) => {
 				})
 			})
 		} else {
-			req.session.destroy() // THIS IS TO PREVENT EXTERNAL CALLS TO THE API FROM LOGGING IN
+			if (token) req.session.destroy() // THIS IS TO PREVENT EXTERNAL CALLS TO THE API FROM LOGGING IN
 			if (data.length) res.json(data)
 			else res.status(400).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
 		}

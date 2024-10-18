@@ -23,3 +23,5 @@ feedback/
 version.txt
 public/css/
 timelines/
+routes/scripts
+!routes/scripts/shared

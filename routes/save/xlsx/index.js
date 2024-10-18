@@ -1,7 +1,7 @@
 const { modules, metafields, DB } = include('config/')
 const { limitLength, array } = include('routes/helpers/')
 
-module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCATION TO locations TABLE
+module.exports = (req, res) => {
 	// 1 CREATE AND STORE THE TEMPLATE
 	// 2 CREATE AND STORE THE PADS
 	const { pads, template, tags, mobilization } = req.body || {}
@@ -65,23 +65,23 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 						const { pad_id } = result
 						const batch1 = []
 
+						// SAVE NEW TAGS
 						// CHECK WHETHER THE TAGS ARE null AND IF THEY ARE OPEN FOR CODING
-						d.tags = d.tags.filter(c => {
+						const new_tag_candidates = d.tags.filter(c => {
 							const { opencode, type: metatype } = metafields.find(b => b.label?.toLowerCase() === c.type?.toLowerCase()) || {}
 							const isnull = !c.name || (!c.key && metatype === 'index') || false
 							return (opencode && !isnull) || false
 						})
-
-						if (d.tags?.length) {
+						if (new_tag_candidates?.length) {
 							// STORE NEW TAGS
-							const tag_types = array.unique.call(d.tags, { key: 'type' })
+							const tag_types = array.unique.call(new_tag_candidates, { key: 'type' })
 
-							d.tags.forEach(c => {
+							new_tag_candidates.forEach(c => {
 								c.contributor = uuid
 								c.name = c.name?.trim()
 							})
 							
-							const sql = DB.pgp.helpers.insert(d.tags, ['name', 'type', 'contributor'], 'tags')
+							const sql = DB.pgp.helpers.insert(new_tag_candidates, ['name', 'type', 'contributor'], 'tags')
 							batch1.push(DB.general.task(gt => {
 								return gt.any(`
 									$1:raw
@@ -89,7 +89,7 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 										DO NOTHING
 								;`, [ sql ])
 								.then(results => {
-									return gt.batch(d.tags.map(c => {
+									return gt.batch(new_tag_candidates.map(c => {
 										return gt.one(`
 											SELECT id AS tag_id, type FROM tags
 											WHERE name = $1
@@ -108,7 +108,29 @@ module.exports = (req, res) => { // TO DO: FIX TAGGING ISSUES AND ADD iso3 LOCAT
 											DO NOTHING
 									;`, [ tags_sql ])
 								} else return null
-							}).catch(err => console.log(err)))
+							}).catch(err => console.log(err)));
+						}
+						// REGISTER EXISTING TAGS
+						const other_tags = d.tags.filter(c => {
+							return c.name?.length && !new_tag_candidates.some(b => {
+								return c.type === b.type && c.name === b.name;
+							});
+						});
+						if (other_tags.length) {
+							batch1.push(DB.general.any(`
+								SELECT id AS tag_id, type FROM tags
+								WHERE (type || '.' || name) IN ($1:csv)
+							;`, [ other_tags.map(c => `${c.type}.${c.name}`) ])
+							.then(results => {
+								// SAVE TAGS INFO
+								results.forEach(c => c.pad = pad_id)
+								const tags_sql = DB.pgp.helpers.insert(results, ['pad', 'tag_id', 'type'], 'tagging')
+								return t1.none(`
+									$1:raw
+									ON CONFLICT ON CONSTRAINT unique_pad_tag_type
+										DO NOTHING
+								;`, [ tags_sql ]);
+							}).catch(err => console.log(err)));
 						}
 
 						if (d.locations?.filter(d => d).length) {

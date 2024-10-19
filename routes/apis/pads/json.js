@@ -7,7 +7,7 @@ const fs = require('fs')
 const turf = require('@turf/turf')
 const { BlobServiceClient } = require('@azure/storage-blob')
 
-const { app_title_short, app_storage, page_content_limit, metafields, DB } = include('config/')
+const { app_title_short, app_storage, page_content_limit, metafields, ownDB, DB } = include('config/')
 const { checklanguage, array, join, parsers, safeArr } = include('routes/helpers/')
 
 const filter = include('routes/browse/pads/filter')
@@ -94,13 +94,16 @@ module.exports = async (req, res) => {
 			$3:raw
 		;`, [ full_filters, cors_filter, page_filter ])
 		.then(async pads => {
-			pads = await join.users(pads, [ language, 'contributor_id' ])
+			// GET THE LIST OF PAD ids
+			const padIds = pads.map(d => d.pad_id);
+			// JOIN THE USER INFORMATION
+			pads = await join.users(pads, [ language, 'contributor_id' ]);
 			// AND DELETE ALL THE PERSONAL INFORMATION
 			pads.forEach(d => {
 				delete d.position
 				delete d.ownername
 				delete d.rights
-			})
+			});
 
 			let contributor_list = array.unique.call(pads, { key: 'contributor_id', onkey: true })
 			contributor_list = array.shuffle.call(contributor_list)
@@ -186,6 +189,21 @@ module.exports = async (req, res) => {
 
 				// JOIN THE SOURCES TO THE PADS
 				pads = join.multijoin.call(pads, [ sources, 'source_pad_id' ])
+			}
+			// IF ENGAGEMENT IS REQUESTED, JOIN PAGE VIEWS
+			if (include_engagement) {
+				const dbId = await ownDB();
+				const pageviews = await DB.general.any(`
+					SELECT doc_id AS pad_id, COALESCE(jsonb_build_object('views', COALESCE(view_count, 0), 'reads', COALESCE(read_count, 0)), '{}') AS views
+					FROM page_stats
+					WHERE doc_type = 'pad'
+						AND doc_id IN ($1:csv)
+						AND db = $2
+				;`, [ padIds, dbId ])
+				.catch(err => console.log(err));
+
+				// JOIN THE PAGE VIEWS TO THE PADS
+				pads = join.multijoin.call(pads, [ pageviews, 'pad_id' ]);
 			}
 
 			if (use_templates) {

@@ -81,8 +81,26 @@
       width: 300px !important;
       max-height: 400px;
       margin: 0;
-      padding-top: 20px;
+/*      padding-top: 20px;*/
       overflow: auto;
+
+      .rm-btn {
+        width: 100%;
+        min-height: 45px;
+        padding: 0 15px;
+        border: none;
+        outline: none;
+        background-color: transparent;
+        font-size: $t-main;
+        line-height: 1.5em;
+        color: $c-dark-grey;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $c-light-2;
+          border-color: $c-light-2;
+        }
+      }
 
       .container {
         .layout.columns {
@@ -243,13 +261,40 @@
 .leaflet-container {
   a.leaflet-popup-close-button {
     width: calc(100% - 10px);
-    height: 20px;
+    height: 25px !important;
+    width: 25px !important;
     top: 0;
-    padding: 0 10px 0 0;
+    padding: 0 !important;
+    margin: 10px 10px 0 0 !important;
     background-color: $c-dark-blue;
     text-align: right;
     line-height: 20px;
-    color: #fff;
+    color: $c-mid-grey !important;
+    display: block;
+    font-size: 0 !important;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background-color: $c-mid-grey;
+      width: 25px;
+      transform: translateY(12.5px) rotate(-45deg);
+      transform-origin: center;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background-color: $c-mid-grey;
+      width: 25px;
+      transform: translateY(12.5px) rotate(45deg);
+      transform-origin: center;
+    }
   }
 }
 /* PINS */

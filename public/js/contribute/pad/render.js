@@ -3690,7 +3690,10 @@ export async function addLocations(kwargs) {
   });
 
   function rmPin(marker, container) {
+    console.log(marker)
+    console.log(marker._popup)
     const btn = document.createElement('BUTTON');
+    btn.classList.add('rm-btn');
     btn.innerHTML = vocabulary['remove pin'];
     btn.addEventListener('click', async (_) => {
       group.removeLayer(marker);
@@ -3700,10 +3703,12 @@ export async function addLocations(kwargs) {
         const latlng = l.getLatLng();
         centerpoints.push({ lat: latlng.lat, lng: latlng.lng });
       });
-      if (container.node())
+      if (container.node()) {
         container.each((d) => (d.centerpoints = centerpoints));
-      if (markers.length === 0)
+      }
+      if (markers.length === 0) {
         meta.container.select('figcaption').html((c) => (c.caption = null));
+      }
 
       if (editing) {
         if (page.type === 'private') await switchButtons(lang);

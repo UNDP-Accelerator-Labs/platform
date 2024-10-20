@@ -777,6 +777,13 @@ export const vocabulary = {
     es: 'Control de calidad',
     pt: 'Verificação de qualidade',
   },
+  'scaling': {
+    // USED
+    en: 'Scaling',
+    fr: 'Passage à échelle',
+    es: 'Escalada',
+    pt: 'Dimensionamento',
+  },
   contributor: {
     en: {
       plural: 'Contributors',

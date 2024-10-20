@@ -174,7 +174,8 @@ function parseColumns(json, keys) {
         const e = c[d];
         if (![null, undefined].includes(e) && !isNaN(e) && typeof e !== 'string')
           return +e; // IF e IS A NUMBER, FORCE TYPE
-        else return e?.trim();
+        else if (typeof e === 'string') return e?.trim();
+        else return e;
       }
     });
     let ref = obj.entries

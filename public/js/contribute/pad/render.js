@@ -3689,9 +3689,11 @@ export async function addLocations(kwargs) {
     html: '<i class="material-icons google-translate-attr">place</i>',
   });
 
-  async function rmPin(marker, container) {
-    const vocabulary = await getTranslations();
+  function rmPin(marker, container) {
+    console.log(marker)
+    console.log(marker._popup)
     const btn = document.createElement('BUTTON');
+    btn.classList.add('rm-btn');
     btn.innerHTML = vocabulary['remove pin'];
     btn.addEventListener('click', async (_) => {
       group.removeLayer(marker);
@@ -3701,10 +3703,12 @@ export async function addLocations(kwargs) {
         const latlng = l.getLatLng();
         centerpoints.push({ lat: latlng.lat, lng: latlng.lng });
       });
-      if (container.node())
+      if (container.node()) {
         container.each((d) => (d.centerpoints = centerpoints));
-      if (markers.length === 0)
+      }
+      if (markers.length === 0) {
         meta.container.select('figcaption').html((c) => (c.caption = null));
+      }
 
       if (editing) {
         if (page.type === 'private') await switchButtons(lang);
@@ -4428,7 +4432,7 @@ function addToC(sections) {
   // LOOK FOR SECION TITLES
   let entries = sections.map(d => d.title).filter(d => d)
   // IF THERE ARE NONE, TAKE THE TEMPLATE INSTRUCTIONS
-  if (!entries.length) entries = sections.map(d => d.items.map(c => c.instruction)).flat()
+  if (!entries.length) entries = sections.map(d => (d.items || d.structure.filter(c => c.type !== 'title'))?.map(c => c.instruction)).flat()
   
   toc.addElems('ul', null, entries.length ? [entries] : [])
   .addElems('li', 'section-header-ref', d => d)

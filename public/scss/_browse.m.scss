@@ -2472,6 +2472,10 @@ div.browse.slideshow {
     .inner {
       height: 100%;
 
+      .blurb {
+        display: none;
+      }
+
       section {
         height: 100%;
 
@@ -2488,7 +2492,7 @@ div.browse.slideshow {
           article {
             position: relative;
             width: 100vw;
-            height: 100%;
+            height: 100vh;
             scroll-snap-align: center;
             padding: 0;
             border: none;
@@ -2606,6 +2610,10 @@ div.browse.slideshow {
                     }
                   }
                 }
+              }
+              .foot {
+                flex: unset;
+                position: static;
               }
             }
             .inner.centered {

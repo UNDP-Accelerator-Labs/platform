@@ -1,3 +1,4 @@
+# /pads
 output { string: 'json' } // must specify
 use_templates { boolean: false }
 include_data { boolean: true }

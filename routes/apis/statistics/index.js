@@ -2,14 +2,14 @@ const { array } = include('routes/helpers/')
 const load = include('routes/browse/pads/load/')
 
 module.exports = async (req, res) => {
-	const { space } = req.body || {}
-	const { uuid } = req.session || {}
+	// const { space } = req.body || {}
+	// const { uuid } = req.session || {}
 	
-	if (!space) {
-		// INJECT SPACE
-		if (uuid) req.body.space = 'private'
-		else req.body.space = 'public'
-	} else if (space === 'private' && !uuid) req.body.space = 'public'
+	// if (!space) {
+	// 	// INJECT SPACE
+	// 	if (uuid) req.body.space = 'private'
+	// 	else req.body.space = 'public'
+	// } else if (space === 'private' && !uuid) req.body.space = 'public'
 	
 	const statistics = await load.statistics({ req, res })
 

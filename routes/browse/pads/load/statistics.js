@@ -19,7 +19,7 @@ module.exports = async kwargs => {
 
 	// GET FILTERS
 	if (!filters?.length) filters = await filter(req, res)
-	const [ f_space, order, page, full_filters ] = filters
+	const [ f_space, order, page, full_filters ] = filters;
 
 	const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 

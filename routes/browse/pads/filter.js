@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
 	let { read, write } = modules.find(d => d.type === 'pads')?.rights || {}
 
 	let { space, object, instance } = req.params || {}
-	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : null // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
+	if (!space) space = Object.keys(req.query)?.length ? req.query.space : Object.keys(req.body)?.length ? req.body.space : 'public' // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 	if (!instance) instance = Object.keys(req.query)?.length ? req.query.instance : Object.keys(req.body)?.length ? req.body.instance : null // req.body?.space // THIS IS IN CASE OF POST REQUESTS (e.g. COMMING FROM APIS/ DOWNLOAD)
 
 	let { search, status, contributors, countries, regions, teams, pads, templates, mobilizations, pinboard, section, methods, page, nodes, orderby } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
@@ -248,7 +248,7 @@ module.exports = async (req, res) => {
 				} else {
 					pbpads = (await DB.general.any(`
 						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					`, [ pinboard, ownId ])).map(row => row.pad);
+					;`, [ pinboard, ownId ])).map(row => row.pad);
 				}
 				const mobs = (await DB.general.any(`
 					SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2

@@ -393,7 +393,7 @@ module.exports = async (req, res) => {
 					return pad_group
 				})()
 			}))
-			return [ open, pads.map(d => d.values) ]
+			return [ open, pads.map(d => d.values).flat() ];
 		}).catch(err => console.log(err))
 	}).then(results => {
 		const [ open, data ] = results

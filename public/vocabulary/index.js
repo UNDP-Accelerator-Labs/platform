@@ -10,8 +10,5 @@ export async function fullVocabulary () {
 		vocabulary = baseVocabulary;
 	}
 	// NEED TO SET app_title_short IN ALL /data.ejs FILES
-	
-	console.log(app_title_short)
-	
 	return vocabulary
 }

@@ -232,10 +232,11 @@ module.exports = async (req, res) => {
 			}
 			else f_space = DB.pgp.as.format(`(p.status > 2 OR (p.status > 1 AND p.owner IS NULL))`) // TO DO: CHECK THIS LOGIC
 		} else { // THE USER IS LOGGED IN
+			const isUNDP = await DB.general.oneOrNone(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ], d => d?.bool);
+			
 			if (pinboard) {
 				const ownId = await ownDB();
 				let pbpads = ''
-				const isUNDP = await DB.general.oneOrNone(`SELECT email LIKE '%@undp.org' AS bool FROM users WHERE uuid = $1;`, [ uuid ], d => d?.bool)
 
 				if (section) {
 					pbpads = (await DB.general.any(`

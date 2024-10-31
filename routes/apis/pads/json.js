@@ -10,7 +10,7 @@ const { BlobServiceClient } = require('@azure/storage-blob')
 const { app_title_short, app_storage, page_content_limit, metafields, ownDB, DB } = include('config/')
 const { checklanguage, array, join, parsers, safeArr } = include('routes/helpers/')
 
-const filter = include('routes/browse/pads/filter')
+const filter = include('routes/browse/pads/filter');
 
 module.exports = async (req, res) => {
 	const { host } = req.headers || {}
@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('tag_id', t.tag_id, 'type', t.type))) FILTER (WHERE t.tag_id IS NOT NULL), '[]') AS tags,
 
-				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
+				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng, 'iso3', l.iso3))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', m.type, 'name', m.name, 'value', m.value))) FILTER (WHERE m.value IS NOT NULL), '[]') AS metadata,
 
@@ -100,6 +100,7 @@ module.exports = async (req, res) => {
 			pads = await join.users(pads, [ language, 'contributor_id' ]);
 			// AND DELETE ALL THE PERSONAL INFORMATION
 			pads.forEach(d => {
+				d.source = `${host}/en/view/pad?id=${d.pad_id}` // ADD LINK TO SOURCE PAD
 				delete d.position
 				delete d.ownername
 				delete d.rights
@@ -124,7 +125,7 @@ module.exports = async (req, res) => {
 
 						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('tag_id', t.tag_id, 'type', t.type))) FILTER (WHERE t.tag_id IS NOT NULL), '[]') AS tags,
 
-						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
+						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('lat', l.lat, 'lng', l.lng, 'iso3', l.iso3))) FILTER (WHERE l.lat IS NOT NULL AND l.lng IS NOT NULL), '[]') AS locations,
 
 						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', m.type, 'name', m.name, 'value', m.value))) FILTER (WHERE m.value IS NOT NULL), '[]') AS metadata
 

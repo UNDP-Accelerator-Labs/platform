@@ -8,7 +8,7 @@ const { redirectError } = include('routes/helpers/')
 
 module.exports = (req, res) => {
 	const { action, object } = req.params || {}
-	const { output, render } = Object.keys(req.body)?.length ? req.body : Object.keys(req.query)?.length ? req.query : {}
+	let { output, render } = Object.keys(req.body)?.length ? req.body : Object.keys(req.query)?.length ? req.query : {}
 
 	// TO DO: ADD Readme.md TO DOWNLOADS
 	if (action === 'download') {
@@ -25,6 +25,8 @@ module.exports = (req, res) => {
 			}
 		} else redirectError(req, res)
 	} else if (action === 'fetch') {
+		if (!output) output = 'json';
+
 		if (object === 'pads') {
 			if (output === 'csv') pads.xlsx(req, res)
 			else if (['json', 'geojson'].includes(output)) pads.json(req, res)

@@ -1,13 +1,13 @@
 const { DB } = include('config/')
 const { join, array } = include('routes/helpers/')
 
-const filter = require('./filter.js')
+const filter = require('./filter.js');
 
 module.exports = async (req, res) => {
 	let { timeseries, aggregation } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	if (!aggregation) aggregation = 'day'
 	// GET FILTERS
-	const [ general_filters, platform_filters, f_type ] = await filter(req, res)
+	const [ general_filters, platform_filters, f_type ] = await filter(req, res);
 
 	if (platform_filters.length) {
 		if (timeseries) {

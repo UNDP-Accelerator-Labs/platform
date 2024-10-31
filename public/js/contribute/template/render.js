@@ -1390,6 +1390,7 @@ export async function addLocations(kwargs) {
     },
     focus: focus,
     lang,
+    vocabulary,
   });
 
   if (meta.opts) {

@@ -42,7 +42,6 @@ module.exports = async kwargs => {
 	}
 	return conn.any(sql)
 	.then(results => {
-		console.log(results)
 		return results.map(d => d.id)
 	}).catch(err => console.log(err))
 }

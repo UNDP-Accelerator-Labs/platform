@@ -1,16 +1,21 @@
-const { metafields, DB } = include('config/')
-const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers/')
+const { metafields, DB } = include('config/');
+const { checklanguage, safeArr, DEFAULT_UUID } = include('routes/helpers/');
+
+const padfilters = include('routes/browse/pads/filter');
 
 module.exports = async (req, res) => {
-	let { tags, type, pads, language, mobilizations, countries, regions, timeseries } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
-	if (tags && !Array.isArray(tags)) tags = [tags]
-	if (pads && !Array.isArray(pads)) pads = [pads]
-	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations]
-	if (countries && !Array.isArray(countries)) countries = [countries]
-	if (regions && !Array.isArray(regions)) regions = [regions]
-	if (!type) type = 'thematic_areas'
+	let { tags, type, pads, language, mobilizations, countries, regions, timeseries, use_pads } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+	if (tags && !Array.isArray(tags)) tags = [tags];
+	if (pads && !Array.isArray(pads)) pads = [pads];
+	if (mobilizations && !Array.isArray(mobilizations)) mobilizations = [mobilizations];
+	if (countries && !Array.isArray(countries)) countries = [countries];
+	if (regions && !Array.isArray(regions)) regions = [regions];
+	if (typeof use_pads === 'string') use_pads = JSON.parse(use_pads);
+	
+	if (type && !Array.isArray(type)) type = [type];
+	else if (!type) type = ['thematic_areas'];
 
-	if (language) language = checklanguage(language)
+	if (language) language = checklanguage(language);
 
 	return (async () => {
 
@@ -24,8 +29,22 @@ module.exports = async (req, res) => {
 		if (language) {
 			general_filters.push(DB.pgp.as.format(`t.language = $1`, [ language ]))
 		}
-		if (pads) platform_filters.push(DB.pgp.as.format(`t.pad IN ($1:csv)`, [ pads ]))
-		if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
+		// if (pads) platform_filters.push(DB.pgp.as.format(`t.pad IN ($1:csv)`, [ pads ]))
+		// if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
+		// IF THERE ARE PAD LEVEL FILTERS, ADD THEM
+		console.log(use_pads)
+		if (use_pads) {
+			const [ f_space, order, default_page, full_filters ] = await padfilters(req, res);
+			platform_filters.push(DB.pgp.as.format(`
+				t.pad IN (
+					SELECT p.id FROM pads p
+					WHERE TRUE
+						$1:raw
+						AND p.id NOT IN (SELECT review FROM reviews)
+				)
+			`, [ full_filters ])); 
+		}
+
 		if (countries) {
 			if (metafields.some((d) => d.type === 'location')) {
 				platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM locations WHERE iso3 IN ($1:csv))`, [ countries ]))
@@ -69,7 +88,7 @@ module.exports = async (req, res) => {
 				.catch(err => console.log(err)))
 			}
 		}
-		const f_type = DB.pgp.as.format(`AND t.type = $1`, [ type ])
+		const f_type = DB.pgp.as.format(`AND t.type IN ($1:csv)`, [ type ])
 
 		general_filters = general_filters.join(' AND ')
 		platform_filters = platform_filters.join(' AND ')

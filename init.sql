@@ -88,7 +88,8 @@ CREATE TABLE locations (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,
     pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
     lat DOUBLE PRECISION,
-    lng DOUBLE PRECISION
+    lng DOUBLE PRECISION,
+    iso3 VARCHAR(3)
 );
 ALTER TABLE locations ADD CONSTRAINT unique_pad_lnglat UNIQUE (pad, lng, lat);
 -- CREATE TABLE skills (

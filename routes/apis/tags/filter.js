@@ -32,7 +32,6 @@ module.exports = async (req, res) => {
 		// if (pads) platform_filters.push(DB.pgp.as.format(`t.pad IN ($1:csv)`, [ pads ]))
 		// if (mobilizations) platform_filters.push(DB.pgp.as.format(`t.pad IN (SELECT pad FROM mobilization_contributions WHERE mobilization IN ($1:csv))`, [ mobilizations ]))
 		// IF THERE ARE PAD LEVEL FILTERS, ADD THEM
-		console.log(use_pads)
 		if (use_pads) {
 			const [ f_space, order, default_page, full_filters ] = await padfilters(req, res);
 			platform_filters.push(DB.pgp.as.format(`

@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
 			FROM adm0
 			WHERE TRUE
 				$2:raw
-		;`, [ name_column, countries ? DB.pgp.as.format('AND adm_a3 IN ($1:csv)', [ countries ]) : '' ])
+		;`, [ name_column, countries ? DB.pgp.as.format('AND adm0	_a3 IN ($1:csv)', [ countries ]) : '' ])
 		.catch(err => console.log(err)))
 
 		return t.batch(batch)

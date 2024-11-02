@@ -1,17 +1,40 @@
-const { DB } = include('config/')
-const { checklanguage, join, geo } = include('routes/helpers/')
+const { DB } = include('config/');
+const { checklanguage, join, geo } = include('routes/helpers/');
+
+const filter = include('routes/browse/pads/filter');
 
 module.exports = async (req, res) => {
-	let { countries, regions, has_lab } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
-	if (typeof has_lab === 'string') has_lab = JSON.parse(has_lab)
-	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language)
+	let { countries, regions, has_lab, use_pads } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+	if (typeof has_lab === 'string') has_lab = JSON.parse(has_lab);
+	const language = checklanguage(req.params?.language || req.query.language || req.body.language || req.session.language);
 
-	let filters = []
-	if (regions) filters.push(DB.pgp.as.format('c.bureau IN ($1:csv)', [ regions ]))
-	if (has_lab) filters.push(DB.pgp.as.format('c.has_lab = TRUE'))
+	if (countries && !Array.isArray(countries)) countries = [countries];
+
+	let filters = [];
+	if (regions) filters.push(DB.pgp.as.format('c.bureau IN ($1:csv)', [ regions ]));
+	if (has_lab) filters.push(DB.pgp.as.format('c.has_lab = TRUE'));
 	
-	if (filters.length) filters = filters.join(' AND ')
-	else filters = 'TRUE'
+	if (filters.length) filters = filters.join(' AND ');
+	else filters = 'TRUE';
+
+	// GET FILTERS
+	let full_filters = '';
+	let pad_locations;
+	if (use_pads) {
+		const filters = await filter(req, res);
+		full_filters = filters[filters.length - 1];
+		pad_locations = await DB.conn.any(`
+			SELECT DISTINCT (iso3) FROM locations
+			WHERE pad IN (
+				SELECT p.id FROM pads p
+				WHERE true
+					$1:raw
+			)
+		;`, [ full_filters ]);
+		pad_locations = pad_locations.map(d => d.iso3);
+		if (countries) countries = [ ...countries, ...pad_locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
+		else countries = pad_locations;
+	}
 
 	DB.general.tx(async t => {
 		const name_column = await geo.adm0.name_column({ connection: t, language })
@@ -35,7 +58,7 @@ module.exports = async (req, res) => {
 			FROM adm0
 			WHERE TRUE
 				$2:raw
-		;`, [ name_column, countries ? DB.pgp.as.format('AND adm_a3 IN ($1:csv)', [ countries ]) : '' ])
+		;`, [ name_column, countries ? DB.pgp.as.format('AND adm0_a3 IN ($1:csv)', [ countries ]) : '' ])
 		.catch(err => console.log(err)))
 
 		return t.batch(batch)

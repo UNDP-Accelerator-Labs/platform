@@ -1,15 +1,18 @@
-const { DB, ownDB } = include('config/');
+const { page_content_limit, ownDB, DB } = include('config/');
 
 module.exports = async (req, res) => {
 	const { uuid } = req.session || {};
-	let { pinboards } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
-	const ownId = await ownDB();
+	let { pinboards, page, limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+	// const ownId = await ownDB();
 
 	let filters = [];
 	if (pinboards) filters.push(DB.pgp.as.format('p.id IN ($1:csv)', [ pinboards ]));
 	
 	if (filters.length) filters = filters.join(' AND ');
 	else filters = 'TRUE';
+
+	let page_filter = '';
+	if (!isNaN(+page)) page_filter = DB.pgp.as.format(`LIMIT $1 OFFSET $2;`, [ limit ? +limit : page_content_limit, limit ? (+page - 1) * +limit : (+page - 1) * page_content_limit ]);
 
 	DB.general.any(`
 		WITH counts AS (
@@ -37,7 +40,8 @@ module.exports = async (req, res) => {
 			)
 			AND pc.is_included = true
 		GROUP BY (p.id)
-	;`, [ filters, uuid ])
+		$3:raw
+	;`, [ filters, uuid, page_filter ])
 	.then(data => res.json(data))
 	.catch(err => console.log(err));
 }

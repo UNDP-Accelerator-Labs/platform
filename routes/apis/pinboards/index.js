@@ -13,10 +13,12 @@ module.exports = async (req, res) => {
 
 	DB.general.any(`
 		WITH counts AS (
-			SELECT pinboard, db, COUNT(pad)::INT AS count
-			FROM pinboard_contributions
-			GROUP BY (pinboard, db)
-			ORDER BY pinboard
+			SELECT pc.pinboard, edb.db AS platform, COUNT(pc.pad)::INT AS count
+			FROM pinboard_contributions pc
+			INNER JOIN extern_db edb
+				ON edb.id = pc.db
+			GROUP BY (pc.pinboard, edb.db)
+			ORDER BY pc.pinboard
 		)
 		SELECT p.id AS pinboard_id, p.title, p.description, p.date, 
 			json_agg(DISTINCT(c.*)) AS counts,

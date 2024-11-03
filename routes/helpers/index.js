@@ -79,16 +79,16 @@ exports.engagementsummary = function (kwargs = {}) {
         cases.push(
           DB.pgp.as.format(
             `
-				CASE WHEN $1:raw.status >= 2
-					AND $2 IN (
-						SELECT type FROM engagement
-						WHERE docid = $1:raw.id
-							AND doctype = $3
-							AND contributor = $4
-						) THEN TRUE
-						ELSE FALSE
-					END AS $5:name
-			`,
+      				CASE WHEN $1:raw.status >= 2
+      					AND $2 IN (
+      						SELECT type FROM engagement
+      						WHERE docid = $1:raw.id
+      							AND doctype = $3
+      							AND contributor = $4
+      						) THEN TRUE
+      						ELSE FALSE
+      					END AS $5:name
+      			`,
             [
               doctype.charAt(0),
               e,

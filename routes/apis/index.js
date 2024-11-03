@@ -4,6 +4,7 @@ const contributors = require('./contributors/')
 const tags = require('./tags/')
 const statistics = require('./statistics/')
 const locations = require('./locations/')
+const pinboards = require('./pinboards/')
 const { redirectError } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -38,6 +39,7 @@ module.exports = (req, res) => {
 		else if (object === 'statistics') statistics(req, res)
 		else if (object === 'countries') locations.countries(req, res)
 		else if (object === 'regions') locations.regions(req, res)
+		else if (object === 'pinboards') pinboards(req, res)
 		else redirectError(req, res)
 	} else redirectError(req, res)
 }

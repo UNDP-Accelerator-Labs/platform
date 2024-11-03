@@ -2,11 +2,11 @@ const { page_content_limit, ownDB, DB } = include('config/');
 
 module.exports = async (req, res) => {
 	const { uuid } = req.session || {};
-	let { pinboards, page, limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+	let { pinboard, page, limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
 	// const ownId = await ownDB();
 
 	let filters = [];
-	if (pinboards) filters.push(DB.pgp.as.format('p.id IN ($1:csv)', [ pinboards ]));
+	if (pinboard) filters.push(DB.pgp.as.format('p.id IN ($1:csv)', [ pinboard ]));
 	
 	if (filters.length) filters = filters.join(' AND ');
 	else filters = 'TRUE';

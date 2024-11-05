@@ -1694,7 +1694,7 @@ div.browse {
             .foot {
               display: flex;
               flex-direction: column;
-              justify-content: end;
+              justify-content: start;
               flex-grow: 1;
 
               .media-img {
@@ -2404,6 +2404,8 @@ div.browse {
               }
             }
             .foot {
+              justify-content: end;
+              
               .meta,
               .media {
                 margin: 5px 0;

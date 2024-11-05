@@ -5,6 +5,7 @@ const tags = require('./tags/')
 const statistics = require('./statistics/')
 const locations = require('./locations/')
 const pinboards = require('./pinboards/')
+const map = require('./map/')
 const { redirectError } = include('routes/helpers/')
 
 module.exports = (req, res) => {
@@ -23,6 +24,8 @@ module.exports = (req, res) => {
 				if (['xlsx', 'csv'].includes(output)) contributors.xlsx(req, res)
 				else if (['json', 'geojson'].includes(output)) contributors.json(req, res)
 				else redirectError(req, res)
+			} else if (object === 'map') {
+				map(req, res);
 			}
 		} else redirectError(req, res)
 	} else if (action === 'fetch') {
@@ -32,7 +35,8 @@ module.exports = (req, res) => {
 			if (output === 'csv') pads.xlsx(req, res)
 			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
 			else redirectError(req, res)
-		} else if (object === 'files') files(req, res)
+		} 
+		else if (object === 'files') files(req, res)
 		else if (object === 'contributors') contributors.json(req, res)
 		else if (object === 'user-metrics') contributors.metrics(req, res)
 		else if (object === 'tags') tags(req, res)
@@ -40,6 +44,7 @@ module.exports = (req, res) => {
 		else if (object === 'countries') locations.countries(req, res)
 		else if (object === 'regions') locations.regions(req, res)
 		else if (object === 'pinboards') pinboards(req, res)
+		else if (object === 'map') map(req, res)
 		else redirectError(req, res)
 	} else redirectError(req, res)
 }

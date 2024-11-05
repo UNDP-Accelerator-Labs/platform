@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
 
 	DB.general.any(`
 		WITH counts AS (
-			SELECT pc.pinboard AS pinboard_id, edb.db AS platform, COUNT(pc.pad)::INT AS count
+			SELECT pc.pinboard AS pinboard_id, edb.db AS platform, COUNT(DISTINCT(pc.pad))::INT AS count
 			FROM pinboard_contributions pc
 			INNER JOIN extern_db edb
 				ON edb.id = pc.db
@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
 
 		SELECT p.id AS pinboard_id, p.title, p.description, p.date, 
 			json_agg(DISTINCT(c.*)) AS counts,
-			COUNT(pc.pad)::INT AS total,
+			COUNT(DISTINCT(pc.pad || '' || pc.db))::INT AS total,
 			COUNT(DISTINCT(pct.participant))::INT AS contributors,
 			json_build_object(
 				'name', u.name, 

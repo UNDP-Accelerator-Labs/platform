@@ -405,3 +405,10 @@ CREATE TRIGGER set_timestamp
     BEFORE UPDATE ON pads
     FOR EACH ROW
     EXECUTE FUNCTION update_timestamp();
+
+-- Create a table to store maps generated via API calls
+CREATE TABLE IF NOT EXISTS public.generated_maps (
+    id SERIAL PRIMARY KEY,
+    filename VARCHAR(255),
+    query_string TEXT
+);

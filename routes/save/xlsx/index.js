@@ -39,7 +39,7 @@ module.exports = (req, res) => {
 			});
 
 			return [ results, maxkeys ];
-		}).catch(err => console.log(err)))
+		}).catch(err => console.log(err)));
 
 		return t.batch(batch)
 		.then(async (results) => {

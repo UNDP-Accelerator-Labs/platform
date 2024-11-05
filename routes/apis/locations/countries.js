@@ -24,16 +24,17 @@ module.exports = async (req, res) => {
 		const filters = await filter(req, res);
 		full_filters = filters[filters.length - 1];
 		pad_locations = await DB.conn.any(`
-			SELECT DISTINCT (iso3) FROM locations
+			SELECT DISTINCT(iso3), COUNT(DISTINCT(pad))::INT 
+			FROM locations
 			WHERE pad IN (
 				SELECT p.id FROM pads p
 				WHERE true
 					$1:raw
-			)
+			) GROUP BY iso3
 		;`, [ full_filters ]);
-		pad_locations = pad_locations.map(d => d.iso3);
-		if (countries) countries = [ ...countries, ...pad_locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
-		else countries = pad_locations;
+		const locations = pad_locations.map(d => d.iso3);
+		if (countries) countries = [ ...countries, ...locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
+		else countries = locations;
 	}
 
 	DB.general.tx(async t => {
@@ -41,7 +42,7 @@ module.exports = async (req, res) => {
 
 		const batch = []
 		batch.push(t.any(`
-			SELECT su_a3 AS iso3, $1:name AS country,
+			SELECT adm0_a3 AS iso3, su_a3 AS sub_iso3, $1:name AS country,
 				jsonb_build_object('lat', ST_Y(ST_Centroid(wkb_geometry)), 'lng', ST_X(ST_Centroid(wkb_geometry))) AS location
 
 			FROM adm0_subunits 
@@ -84,6 +85,13 @@ module.exports = async (req, res) => {
 		}).catch(err => console.log(err))
 	}).then(results => {
 		results.sort((a, b) => a.country.localeCompare(b.country))
+		
+		if (use_pads && pad_locations) {
+			results.forEach(d => {
+				d.count = pad_locations.find(c => c.iso3 === d.iso3 || c.iso3 === d.sub_iso3)?.count ?? 0;
+			})
+		}
+
 		if (results.length) res.json(results)
 		else res.status(400).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
 	}).catch(err => console.log(err))

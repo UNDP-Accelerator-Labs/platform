@@ -33,8 +33,10 @@ module.exports = async (req, res) => {
 			) GROUP BY iso3
 		;`, [ full_filters ]);
 		const locations = pad_locations.map(d => d.iso3);
-		if (countries) countries = [ ...countries, ...locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
-		else countries = locations;
+		if (locations.length) {
+			if (countries) countries = [ ...countries, ...locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
+			else countries = locations;
+		}
 	}
 
 	DB.general.tx(async t => {
@@ -86,7 +88,7 @@ module.exports = async (req, res) => {
 	}).then(results => {
 		results.sort((a, b) => a.country.localeCompare(b.country))
 		
-		if (use_pads && pad_locations) {
+		if (use_pads && pad_locations?.length) {
 			results.forEach(d => {
 				d.count = pad_locations.find(c => c.iso3 === d.iso3 || c.iso3 === d.sub_iso3)?.count ?? 0;
 			})

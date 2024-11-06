@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
 		if (file) {
 			// THE FILE EXISTS SO JUST SEND THE LINK
 			console.log('the file already exists');
-			res.send(file);
+			res.json({ status: 200, file });
 		} else {
 			// NEED TO GENERATE THE FILE
 			const { data: basemap, projection } = await project({ loadbase: true, zoom: false, projsize, connection: t });
@@ -64,8 +64,8 @@ module.exports = async (req, res) => {
 				;`, [ file, queryString ])
 				.catch(err => console.log(err));
 				
-				return res.send(file);
-			} else res.send('an error occurred and the image file could not be generated');
+				return res.json({ status: 200, file });
+			} else res.json({ status: 500, message: 'an error occurred and the image file could not be generated' });
 		}
 	}).catch(err => console.log(err));
 }

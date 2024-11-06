@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
 				.catch(err => console.log(err));
 				
 				return res.json({ status: 200, file });
-			} else res.send('an error occurred and the image file could not be generated');
+			} else res.json({ status: 500, message: 'an error occurred and the image file could not be generated' });
 		}
 	}).catch(err => console.log(err));
 }

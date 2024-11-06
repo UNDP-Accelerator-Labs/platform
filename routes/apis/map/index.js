@@ -2,7 +2,7 @@ const { DB } = include('config/');
 const project = require('./geo.js');
 const render = require('./render.js');
 const { topology } = require('topojson-server');
-const { feature } = require('topojson-client');
+const { feature, quantize } = require('topojson-client');
 const { presimplify } = require('topojson-simplify');
 
 module.exports = async (req, res) => {
@@ -53,6 +53,7 @@ module.exports = async (req, res) => {
 			// NEED TO GENERATE THE FILE
 			const { data: basemap, projection } = await project({ loadbase: true, zoom: false, projsize, connection: t });
 			let topo_basemap = topology({ basemap });
+			topo_basemap = quantize(topo_basemap, 1e3)
 			topo_basemap = feature(presimplify(topo_basemap), topo_basemap.objects.basemap);
 
 			const { status, file } = await render({ ...{ basemap: topo_basemap, projection }, ...kwargs });

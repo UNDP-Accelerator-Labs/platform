@@ -37,6 +37,7 @@ function getBasemap (conn) {
 	if (!conn) conn = DB.general
 	return conn.any(`
 		SELECT ST_AsGeoJSON(wkb_geometry)::json AS geojson FROM adm0
+		WHERE name <> 'Antarctica'
 	;`, [], d => d.geojson).then(results => {
 		return {
 			'type': 'FeatureCollection',
@@ -50,8 +51,7 @@ function getBasemap (conn) {
 	}).catch(err => console.log(err))
 }
 async function setProjection (kwargs) {
-	let { geojson, loadbase, projsize, zoom } = kwargs || {}
-	if (zoom !== false) zoom = true;
+	let { geojson, loadbase, projsize } = kwargs || {}
 	const conn = kwargs.connection || DB.general;
 	
 	let basemap = geojson;
@@ -64,6 +64,6 @@ async function setProjection (kwargs) {
 	const projection = d3.geoEquirectangular()
 		.fitSize([projsize, projsize], basemap)
 		.translate([(projsize / 2), (projsize / 2)]);
-	if (zoom) projection.scale(((projsize - 1) / 2 / Math.PI) * 4);
+		
 	return { geojson, projection, projsize };
 }

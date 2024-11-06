@@ -16,11 +16,12 @@ module.exports = async function (kwargs) {
 	const canvas = createCanvas(width, height);
 	const context = canvas.getContext('2d');
 
-	let { background_color, base_color, layers } = renderProperties;
+	let { background_color, base_color, layers, simplification } = renderProperties;
 
 	if (!background_color) background_color = 'transparent';
 	if (!base_color) base_color = 'rgba(102,117,127,.25)';
 	if (layers && !Array.isArray(layers)) layers = [layers];
+	if (!simplification) simplification = 10;
 	/*
 	layers: [
 		{
@@ -34,7 +35,6 @@ module.exports = async function (kwargs) {
 	*/
 
 	const clip = d3.geoClipRectangle(0 ,0, width, height);
-	const simplification = 10;
 
 	simplify = d3.geoTransform({
 		point: function (x, y, z) {
@@ -82,7 +82,7 @@ module.exports = async function (kwargs) {
 	if (layers?.length) {
 		const scale = d3.scaleLinear()
 			.domain(d3.extent(layers, d => d.count))
-			.range([ 0, Math.min(50, projsize / 50) ]);
+			.range([ Math.min(10, projsize / 250), Math.min(50, projsize / 50) ]);
 		layers.forEach(d => {
 			let { type, lat, lng, count, color } = d;
 			if (!color) color = '#32bee1';
@@ -129,7 +129,7 @@ module.exports = async function (kwargs) {
 			}
 		});
 		if(!fileerror) return { status: 200, file: `${new URL('maps', origin).href}/${blobClient.name}` };
-		else return { status: 400, message: 'error generating the file' };
+		else return { status: 500, message: 'error generating the file' };
 	}
 	
 	// return canvas.toDataURL();

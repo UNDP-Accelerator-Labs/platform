@@ -63,9 +63,18 @@ module.exports = async (req, res) => {
 			if (isNaN(+limit)) limit = page_content_limit;
 			page_filter = DB.pgp.as.format(`[$1:$2]`, [ (+page - 1) * +limit + 1, +page * +limit ]);
 		}
-
 		data = await DB.general.oneOrNone(`
+			WITH counts AS (
+				SELECT pc.pinboard AS pinboard_id, edb.db AS platform, COUNT(DISTINCT(pc.pad))::INT AS count
+				FROM pinboard_contributions pc
+				INNER JOIN extern_db edb
+					ON edb.id = pc.db
+				GROUP BY (pc.pinboard, edb.db)
+				ORDER BY pc.pinboard
+			)
+
 			SELECT p.id AS pinboard_id, p.title, p.description, p.date,
+				json_agg(DISTINCT(c.*)) AS counts,
 				COUNT(DISTINCT(pc.pad || '' || pc.db))::INT AS total,
 				COUNT(DISTINCT(pct.participant))::INT AS contributors,
 				(array_agg(json_build_object('pad_id', pc.pad, 'db', edb.db)))$3:raw AS pads,
@@ -80,6 +89,8 @@ module.exports = async (req, res) => {
 				ON pc.pinboard = p.id
 			INNER JOIN pinboard_contributors pct
 				ON pct.pinboard = p.id
+			INNER JOIN counts c
+				ON c.pinboard_id = p.id
 			INNER JOIN users u
 				ON u.uuid = p.owner
 			INNER JOIN extern_db edb

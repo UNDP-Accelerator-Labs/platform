@@ -1,5 +1,5 @@
-const { DB } = include('config/');
-const { checklanguage, join, geo } = include('routes/helpers/');
+const { metafields, DB } = include('config/');
+const { checklanguage, join, geo, array } = include('routes/helpers/');
 
 const filter = include('routes/browse/pads/filter');
 
@@ -17,30 +17,61 @@ module.exports = async (req, res) => {
 	if (filters.length) filters = filters.join(' AND ');
 	else filters = 'TRUE';
 
-	// GET FILTERS
-	let full_filters = '';
 	let pad_locations;
-	if (use_pads) {
-		const filters = await filter(req, res);
-		full_filters = filters[filters.length - 1];
-		pad_locations = await DB.conn.any(`
-			SELECT DISTINCT(iso3), COUNT(DISTINCT(pad))::INT 
-			FROM locations
-			WHERE pad IN (
-				SELECT p.id FROM pads p
-				WHERE true
-					$1:raw
-			) GROUP BY iso3
-		;`, [ full_filters ]);
-		const locations = pad_locations.map(d => d.iso3);
-		if (locations.length) {
-			if (countries) countries = [ ...countries, ...locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
-			else countries = locations;
-		}
-	}
 
 	DB.general.tx(async t => {
-		const name_column = await geo.adm0.name_column({ connection: t, language })
+		const name_column = await geo.adm0.name_column({ connection: t, language });
+
+		// GET FILTERS
+		let full_filters = '';
+		if (use_pads) {
+			const filters = await filter(req, res);
+			full_filters = filters[filters.length - 1];
+			let locations = [];
+			
+			if (metafields.some((d) => d.type === 'location')) {
+				pad_locations = await DB.conn.any(`
+					SELECT DISTINCT(iso3), COUNT(DISTINCT(pad))::INT 
+					FROM locations
+					WHERE pad IN (
+						SELECT p.id FROM pads p
+						WHERE true
+							$1:raw
+					) GROUP BY iso3
+				;`, [ full_filters ]);
+				locations = pad_locations.map(d => d.iso3);
+			} else {
+				pad_locations = await DB.conn.any(`
+					SELECT DISTINCT(p.owner), COUNT(DISTINCT(p.id))::INT
+					FROM pads p
+					WHERE TRUE
+						$1:raw
+					GROUP BY p.owner
+				;`, [ full_filters ])
+				.then(results => {
+					return t.any(`
+						SELECT uuid AS owner, iso3 FROM users
+						WHERE uuid IN ($1:csv)
+					;`, [ results.map(d => d.owner) ])
+					.then(iso3 => {
+						const joined = join.multijoin.call(iso3, [ results, 'owner' ]);
+						const nested = array.nest.call(joined, { key: 'iso3' })
+						.map(d => {
+							const { key: iso3, values } = d;
+							const count = array.sum.call(values, 'count');
+							return { iso3, count };
+						})
+						return nested;
+					}).catch(err => console.log(err));
+				}).catch(err => console.log(err));
+				locations = pad_locations.map(d => d.iso3);
+			}
+
+			if (locations.length) {
+				if (countries) countries = [ ...countries, ...locations ]; // THIS ACTUALLY DOES NOT DO ANYTHING SINCE THE PADS WILL BE FILTERED BY THE REQUESTED COUNTRIES ANYWAY
+				else countries = locations;
+			}
+		}
 
 		const batch = []
 		batch.push(t.any(`

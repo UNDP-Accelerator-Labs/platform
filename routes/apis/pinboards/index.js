@@ -77,7 +77,7 @@ module.exports = async (req, res) => {
 				json_agg(DISTINCT(c.*)) AS counts,
 				COUNT(DISTINCT(pc.pad || '' || pc.db))::INT AS total,
 				COUNT(DISTINCT(pct.participant))::INT AS contributors,
-				(array_agg(json_build_object('pad_id', pc.pad, 'db', edb.db)))$3:raw AS pads,
+				(array_agg(json_build_object('pad_id', pc.pad, 'platform', edb.db)))$3:raw AS pads,
 				json_build_object(
 					'name', u.name, 
 					'iso3', u.iso3,

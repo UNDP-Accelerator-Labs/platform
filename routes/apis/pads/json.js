@@ -16,10 +16,12 @@ module.exports = async (req, res) => {
 	const { host } = req.headers || {}
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
  	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	
+	if (typeof pseudonymize === 'string') pseudonymize = JSON.parse(pseudonymize);
 	if (![false, 'false'].includes(pseudonymize)) pseudonimize = true;
-	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
-	if (typeof include_imgs === 'string') include_imgs = JSON.parse(include_imgs)
-	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
+	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates);
+	if (typeof include_imgs === 'string') include_imgs = JSON.parse(include_imgs);
+	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations);
 
 	const pw = req.session.email || null
 	const language = checklanguage(req.params?.language || req.session.language)

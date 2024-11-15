@@ -15,7 +15,8 @@ const filter = include('routes/browse/pads/filter');
 module.exports = async (req, res) => {
 	const { host } = req.headers || {}
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
- 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, page, limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+ 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	if (![false, 'false'].includes(pseudonymize)) pseudonimize = true;
 	if (typeof use_templates === 'string') use_templates = JSON.parse(use_templates)
 	if (typeof include_imgs === 'string') include_imgs = JSON.parse(include_imgs)
 	if (typeof include_locations === 'string') include_locations = JSON.parse(include_locations)
@@ -101,8 +102,11 @@ module.exports = async (req, res) => {
 			// AND DELETE ALL THE PERSONAL INFORMATION
 			pads.forEach(d => {
 				d.source = `${host}/en/view/pad?id=${d.pad_id}` // ADD LINK TO SOURCE PAD
-				delete d.position
-				delete d.ownername
+				if (pseudonymize) {
+					delete d.position
+					delete d.ownername
+					delete d.email
+				}
 				delete d.rights
 			});
 
@@ -153,7 +157,7 @@ module.exports = async (req, res) => {
 					const data = await Promise.all(sources.map(async d => {
 						// ANONYMIZE CONTRIBUTORS
 						// NOTE THIS id IS DISSOCIATED FROM COMMENTS
-						d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
+						d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`;
 
 						// GET SNIPPET
 						d.snippet = parsers.getTxt(d)?.[0]
@@ -176,9 +180,11 @@ module.exports = async (req, res) => {
 								})()
 							}))
 							d.tags = tags.flat()
-						} else delete d.tags
+						} else delete d.tags;
 
-						if (!include_locations) delete d.locations
+						if (!include_locations) delete d.locations;
+						else d.locations = await join.locations(d.locations, { language, key: 'iso3' });
+						
 						if (!include_metafields) delete d.metadata
 
 						delete d.sections
@@ -257,10 +263,11 @@ module.exports = async (req, res) => {
 									})()
 								}))
 								d.tags = tags.flat()
-							} else delete d.tags
+							} else delete d.tags;
 
 							// SET LOCATIONS
-							if (!include_locations) delete d.locations
+							if (!include_locations) delete d.locations;
+							else d.locations = await join.locations(d.locations, { language, key: 'iso3' });
 
 							// SET IMAGES
 							if (include_imgs) {

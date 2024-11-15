@@ -118,7 +118,7 @@ export function parseXLSX(file, node) {
           defval: null,
         });
 
-        const keys = Object.keys(json[0]);
+        const keys = Object.keys(json[0] || {});
         if (images.length) {
           // WE FIRST NEED TO FIND WHICH COLUMN THE IMAGES WOULD BE IN
           // THIS SHOULD BE A FULLY EMPTY COLUMN, WITH VALUES SET TO null, AS PER THE defval

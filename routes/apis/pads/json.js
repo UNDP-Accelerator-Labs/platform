@@ -269,7 +269,10 @@ module.exports = async (req, res) => {
 
 							// SET LOCATIONS
 							if (!include_locations) delete d.locations;
-							else d.locations = await join.locations(d.locations, { language, key: 'iso3' });
+							else {
+								if (d.locations?.length) d.locations = await join.locations(d.locations, { language, key: 'iso3' });
+								else d.locations = await join.locations([{ iso3: d.iso3 }], { language, key: 'iso3' });
+							}
 
 							// SET IMAGES
 							if (include_imgs) {

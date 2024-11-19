@@ -39,7 +39,8 @@ module.exports = async (req, res) => {
 							$1:raw
 					) GROUP BY iso3
 				;`, [ full_filters ]);
-				locations = pad_locations.map(d => d.iso3);
+				if (pad_locations.length) locations = pad_locations.map(d => d?.iso3);
+				else locations = ['000'];
 			} else {
 				pad_locations = await DB.conn.any(`
 					SELECT DISTINCT(p.owner), COUNT(DISTINCT(p.id))::INT
@@ -49,22 +50,25 @@ module.exports = async (req, res) => {
 					GROUP BY p.owner
 				;`, [ full_filters ])
 				.then(results => {
-					return t.any(`
-						SELECT uuid AS owner, iso3 FROM users
-						WHERE uuid IN ($1:csv)
-					;`, [ results.map(d => d.owner) ])
-					.then(iso3 => {
-						const joined = join.multijoin.call(iso3, [ results, 'owner' ]);
-						const nested = array.nest.call(joined, { key: 'iso3' })
-						.map(d => {
-							const { key: iso3, values } = d;
-							const count = array.sum.call(values, 'count');
-							return { iso3, count };
-						})
-						return nested;
-					}).catch(err => console.log(err));
+					if (results.length) {
+						return t.any(`
+							SELECT uuid AS owner, iso3 FROM users
+							WHERE uuid IN ($1:csv)
+						;`, [ results.map(d => d.owner) ])
+						.then(iso3 => {
+							const joined = join.multijoin.call(iso3, [ results, 'owner' ]);
+							const nested = array.nest.call(joined, { key: 'iso3' })
+							.map(d => {
+								const { key: iso3, values } = d;
+								const count = array.sum.call(values, 'count');
+								return { iso3, count };
+							})
+							return nested;
+						}).catch(err => console.log(err));
+					}
 				}).catch(err => console.log(err));
-				locations = pad_locations.map(d => d.iso3);
+				if (pad_locations.length) locations = pad_locations.map(d => d?.iso3);
+				else locations = ['000']; // 000 IS A NON ECISTING iso3 TO USE AS PLACEHOLDER
 			}
 
 			if (locations.length) {
@@ -83,7 +87,7 @@ module.exports = async (req, res) => {
 				$2:raw
 				AND su_a3 <> adm0_a3
 		;`, [ name_column, countries ? DB.pgp.as.format('AND su_a3 IN ($1:csv)', [ countries ]) : '' ])
-		.catch(err => console.log(err)))
+		.catch(err => console.log(err)));
 
 		batch.push(t.any(`
 			SELECT adm0_a3 AS iso3, $1:name AS country,
@@ -93,7 +97,7 @@ module.exports = async (req, res) => {
 			WHERE TRUE
 				$2:raw
 		;`, [ name_column, countries ? DB.pgp.as.format('AND adm0_a3 IN ($1:csv)', [ countries ]) : '' ])
-		.catch(err => console.log(err)))
+		.catch(err => console.log(err)));
 
 		return t.batch(batch)
 		.then(results => {
@@ -114,10 +118,10 @@ module.exports = async (req, res) => {
 				.then(async results => {
 					return join.multijoin.call(locations, [ results, 'iso3' ])
 				}).catch(err => console.log(err))
-			} else return null
+			} else return [];
 		}).catch(err => console.log(err))
 	}).then(results => {
-		results.sort((a, b) => a.country.localeCompare(b.country))
+		results.sort((a, b) => a?.country.localeCompare(b?.country))
 		
 		if (use_pads && pad_locations?.length) {
 			results.forEach(d => {
@@ -126,6 +130,6 @@ module.exports = async (req, res) => {
 		}
 
 		if (results.length) res.json(results)
-		else res.status(400).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
+		else res.status(204).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
 	}).catch(err => console.log(err))
 }

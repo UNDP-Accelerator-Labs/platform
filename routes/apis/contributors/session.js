@@ -16,10 +16,6 @@ module.exports = async (req, res) => {
             rights: session?.rights
         }
 
-        if(!req.session?.uuid) {
-            delete sess.username
-            return res.json(sess);
-        }
         return res.json(sess);
     })
     .catch(err => {

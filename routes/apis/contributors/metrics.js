@@ -2,6 +2,8 @@ const { DB } = include('config/')
 module.exports = async (req, res) => {
 	const { year } = req.query;
     let query, params;
+    
+    if(!req.session?.uuid) return res.send('Invalid session!') 
 
     if (year && +year) {
         // Query to group by month if a year is provided

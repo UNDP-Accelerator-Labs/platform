@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
 							})
 							return nested;
 						}).catch(err => console.log(err));
-					}
+					} else return []
 				}).catch(err => console.log(err));
 				if (pad_locations.length) locations = pad_locations.map(d => d?.iso3);
 				else locations = ['000']; // 000 IS A NON ECISTING iso3 TO USE AS PLACEHOLDER

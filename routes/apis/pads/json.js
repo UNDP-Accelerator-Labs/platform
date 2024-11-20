@@ -432,7 +432,7 @@ module.exports = async (req, res) => {
 		} else {
 			if (token) req.session.destroy() // THIS IS TO PREVENT EXTERNAL CALLS TO THE API FROM LOGGING IN
 			if (data.length) res.json(data)
-			else res.status(400).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
+			else res.json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
 		}
 	}).catch(err => console.log(err))
 }

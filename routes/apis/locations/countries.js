@@ -1,5 +1,5 @@
 const { metafields, DB } = include('config/');
-const { checklanguage, join, geo, array } = include('routes/helpers/');
+const { checklanguage, join, geo, array, safeArr } = include('routes/helpers/');
 
 const filter = include('routes/browse/pads/filter');
 
@@ -86,7 +86,7 @@ module.exports = async (req, res) => {
 			WHERE TRUE
 				$2:raw
 				AND su_a3 <> adm0_a3
-		;`, [ name_column, countries ? DB.pgp.as.format('AND su_a3 IN ($1:csv)', [ countries ]) : '' ])
+		;`, [ name_column, countries ? DB.pgp.as.format('AND su_a3 IN ($1:csv)', [ safeArr(countries, '000') ]) : '' ])
 		.catch(err => console.log(err)));
 
 		batch.push(t.any(`
@@ -96,7 +96,7 @@ module.exports = async (req, res) => {
 			FROM adm0
 			WHERE TRUE
 				$2:raw
-		;`, [ name_column, countries ? DB.pgp.as.format('AND adm0_a3 IN ($1:csv)', [ countries ]) : '' ])
+		;`, [ name_column, countries ? DB.pgp.as.format('AND adm0_a3 IN ($1:csv)', [ safeArr(countries, '000') ]) : '' ])
 		.catch(err => console.log(err)));
 
 		return t.batch(batch)
@@ -130,6 +130,6 @@ module.exports = async (req, res) => {
 		}
 
 		if (results.length) res.json(results)
-		else res.status(204).json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
+		else res.json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
 	}).catch(err => console.log(err))
 }

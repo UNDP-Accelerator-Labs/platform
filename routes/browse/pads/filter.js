@@ -211,19 +211,19 @@ module.exports = async (req, res) => {
 				if (section) {
 					pbpads = (await DB.general.any(`
 						SELECT pad FROM pinboard_contributions
-						WHERE pinboard = $1::INT
+						WHERE pinboard IN ($1:csv)
 							AND db = $2
 							AND is_included = true
 							AND section = $3::INT
-					`, [ pinboard, ownId, section ])).map(row => row.pad);
+					`, [ safeArr(pinboard, -1), ownId, section ])).map(row => row.pad);
 				} else {
 					pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					`, [ pinboard, ownId ])).map(row => row.pad);
+						SELECT pad FROM pinboard_contributions WHERE pinboard IN ($1:csv) AND db = $2 AND is_included = true
+					`, [ safeArr(pinboard, -1), ownId ])).map(row => row.pad);
 				}
 				const mobs = (await DB.general.any(`
-					SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
-				`, [ pinboard, ownId ])).map(row => row.mobilization);
+					SELECT mobilization FROM pinboards WHERE id IN ($1:csv) AND mobilization_db = $2
+				`, [ safeArr(pinboard, -1), ownId ])).map(row => row.mobilization);
 				f_space = DB.pgp.as.format(`
 					((p.status > 2 OR (p.status > 1 AND p.owner IS NULL))
 					AND (p.id IN ($1:csv)
@@ -241,19 +241,19 @@ module.exports = async (req, res) => {
 				if (section) {
 					pbpads = (await DB.general.any(`
 						SELECT pad FROM pinboard_contributions
-						WHERE pinboard = $1::INT
+						WHERE pinboard IN ($1:csv)
 							AND db = $2
 							AND is_included = true
 							AND section = $3::INT
-					`, [ pinboard, ownId, section ])).map(row => row.pad);
+					`, [ safeArr(pinboard, -1), ownId, section ])).map(row => row.pad);
 				} else {
 					pbpads = (await DB.general.any(`
-						SELECT pad FROM pinboard_contributions WHERE pinboard = $1::INT AND db = $2 AND is_included = true
-					;`, [ pinboard, ownId ])).map(row => row.pad);
+						SELECT pad FROM pinboard_contributions WHERE pinboard IN ($1:csv) AND db = $2 AND is_included = true
+					;`, [ safeArr(pinboard, -1), ownId ])).map(row => row.pad);
 				}
 				const mobs = (await DB.general.any(`
-					SELECT mobilization FROM pinboards WHERE id = $1::INT AND mobilization_db = $2
-				`, [ pinboard, ownId ])).map(row => row.mobilization);
+					SELECT mobilization FROM pinboards WHERE id IN ($1:csv) AND mobilization_db = $2
+				`, [ safeArr(pinboard, -1), ownId ])).map(row => row.mobilization);
 
 				f_space = DB.pgp.as.format(`
 				(

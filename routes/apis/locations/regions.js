@@ -21,6 +21,6 @@ module.exports = async (req, res) => {
 	;`, [ filters ])
 	.then(results => {
 		if (results.length) res.json(results)
-		else res.json({ message: 'Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.' })
+		else res.json([])
 	}).catch(err => console.log(err))
 }

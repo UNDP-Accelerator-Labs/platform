@@ -172,8 +172,8 @@ module.exports = async (req, res) => {
 				})
 			})
 		} else {
-			if (data.length) res.json(data)
-			else res.send('Sorry you do not have the rights to download this content. Please enquire about getting an access token to view download this content.')
+			if (data.length) res.json(data);
+			else res.json([]);
 		}
 	}).catch(err => console.log(err))
 }

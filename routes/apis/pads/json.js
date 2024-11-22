@@ -16,6 +16,7 @@ module.exports = async (req, res) => {
 	const { host } = req.headers || {}
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
  	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+ 	const { uuid } = req.session;
 	
 	if (typeof pseudonymize === 'string') pseudonymize = JSON.parse(pseudonymize);
 	if (![false, 'false'].includes(pseudonymize)) pseudonimize = true;
@@ -47,6 +48,11 @@ module.exports = async (req, res) => {
 		if (!fs.existsSync(dir)) fs.mkdirSync(dir)
 	}
 
+	let userengagement = '';
+	if (uuid) {
+		userengagement = DB.pgp.as.format(`COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', e.type, 'count', (SELECT count(type) FROM engagement WHERE type = e.type AND docid = p.id )))) FILTER (WHERE e.type IS NOT NULL AND e.contributor = $1), '[]') AS current_user_engagement,`, [uuid]);
+	}
+
 	return DB.conn.tx(t => {
 		return t.any(`
 			SELECT p.id AS pad_id,
@@ -67,6 +73,8 @@ module.exports = async (req, res) => {
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', m.type, 'name', m.name, 'value', m.value))) FILTER (WHERE m.value IS NOT NULL), '[]') AS metadata,
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('type', e.type, 'count', (SELECT count(type) FROM engagement WHERE type = e.type AND docid = p.id )))) FILTER (WHERE e.type IS NOT NULL), '[]') AS engagement,
+
+				$4:raw
 
 				COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('message_id', c.id, 'response_to_message_id', c.source, 'user_id', c.contributor, 'date', c.date, 'message', c.message))) FILTER (WHERE c.id IS NOT NULL), '[]') AS comments
 
@@ -95,7 +103,7 @@ module.exports = async (req, res) => {
 			GROUP BY (p.id)
 			ORDER BY p.id DESC
 			$3:raw
-		;`, [ full_filters, cors_filter, page_filter ])
+		;`, [ full_filters, cors_filter, page_filter, userengagement ])
 		.then(async pads => {
 			// GET THE LIST OF PAD ids
 			const padIds = pads.map(d => d.pad_id);

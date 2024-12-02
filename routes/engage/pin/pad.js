@@ -5,7 +5,7 @@ const { ids: padsids } = include('routes/browse/pads/load')
 
 exports.pin = async (req, res) => {
 	const { uuid, collaborators } = req.session || {}
-	let { board_id, board_title, object_id, mobilization, load_object } = req.body || {}
+	let { board_id, board_title, object_id, mobilization, load_object, source } = req.body || {}
 
 	if (!object_id && load_object) {
 		object_id = await padsids({ req, res })
@@ -32,7 +32,11 @@ exports.pin = async (req, res) => {
 					;`, [ board_title, uuid ])
 				}).then(async result => {
 					const { id } = result
-					const ownId = await ownDB();
+					const idz = await ownDB();
+					let ownId = idz;
+					if( source && source === 'blog'){
+						ownId = await get_db_id(gt, 'blogs') 
+					}
 					const batch = []
 
 					batch.push(gt.none(`
@@ -64,7 +68,12 @@ exports.pin = async (req, res) => {
 	} else { // SIMPLY ADD PAD TO BOARD
 		if (object_id) {
 			return DB.general.tx(gt => {
-				return ownDB().then(async ownId => {
+				return ownDB().then(async idz => {
+					let ownId = idz;
+					if( source && source === 'blog'){
+						ownId = await get_db_id(gt, 'blogs') 
+					}
+					
 					if(await can_inserts(gt, board_id, uuid)){
 						await gt.none(insertpads(board_id, object_id, mobilization, ownId));
 						await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
@@ -85,13 +94,17 @@ exports.pin = async (req, res) => {
 
 exports.unpin = (req, res) => {
 	const { uuid, collaborators } = req.session || {}
-	const { board_id, object_id, mobilization } = req.body || {}
+	const { board_id, object_id, mobilization, source } = req.body || {}
 
 	// const collaborators_ids = safeArr(collaborators.map(d => d.uuid), uuid ?? DEFAULT_UUID)
 
 	if (object_id) {
 		return DB.general.tx(gt => {
-			return ownDB().then(async ownId => {
+			return ownDB().then(async idz => {
+				let ownId = idz;
+				if( source && source === 'blog'){
+					ownId = await get_db_id(gt, 'blogs') 
+				}
 				await gt.none(removepads(board_id, object_id, mobilization, uuid, ownId));
 				await gt.none(await updatestatus(board_id, object_id, mobilization, uuid, ownId));
 				// we ignore the db and is_included fields here so we don't delete pinboards if the only
@@ -249,5 +262,12 @@ async function can_inserts (t, id, uuid) {
 			WHERE pc.pinboard = $1::INT
 			AND pc.participant = $2`,
 		[id, uuid], d => d?.bool)
+}
+
+async function get_db_id(t, source){
+	return t.oneOrNone(`
+		SELECT id FROM extern_db 
+		WHERE db = $1`,
+	[source], d => d?.id)
 }
 

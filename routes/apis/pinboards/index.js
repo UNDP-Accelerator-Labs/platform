@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
 					ORDER BY pc.pinboard
 				)
 
-				SELECT p.id AS pinboard_id, p.title, p.description, p.date, 
+				SELECT p.id AS pinboard_id, p.title, p.description, p.date, p.status,
 					json_agg(DISTINCT(c.*)) AS counts,
 					COUNT(DISTINCT(pc.pad || '' || pc.db))::INT AS total,
 					COUNT(DISTINCT(pct.participant))::INT AS contributors,
@@ -115,7 +115,7 @@ module.exports = async (req, res) => {
 				ORDER BY pc.pinboard
 			)
 
-			SELECT p.id AS pinboard_id, p.title, p.description, p.date,
+			SELECT p.id AS pinboard_id, p.title, p.description, p.date, p.status,
 				json_agg(DISTINCT(c.*)) AS counts,
 				COUNT(DISTINCT(pc.pad || '' || pc.db))::INT AS total,
 				COUNT(DISTINCT(pct.participant))::INT AS contributors,

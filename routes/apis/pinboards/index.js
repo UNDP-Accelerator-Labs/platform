@@ -2,11 +2,33 @@ const { page_content_limit, ownDB, DB } = include('config/');
 
 module.exports = async (req, res) => {
 	const { uuid } = req.session || {};
-	let { pinboard, page, limit } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+	let { pinboard, page, limit, space } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
 	// const ownId = await ownDB();
 
 	let filters = [];
 	if (pinboard) filters.push(DB.pgp.as.format('p.id IN ($1:csv)', [ pinboard ]));
+	
+	if (space === 'private') {
+		filters.push(DB.pgp.as.format(`
+			(
+				p.id IN (
+					SELECT pinboard FROM pinboard_contributors
+					WHERE participant = $1
+				) OR p.owner = $1
+			)
+		`, [ uuid ]));
+	} else if (space === 'published') {
+		filters.push(DB.pgp.as.format('p.status > 2'));
+	} else if (!space || space === 'all') { // DEFAULT TO THE PINBOARDS OF THE USER AND THE PUBLISHED ONES
+		filters.push(DB.pgp.as.format(`
+			(
+				p.id IN (
+					SELECT pinboard FROM pinboard_contributors
+					WHERE participant = $1
+				) OR (p.status > 2 OR p.owner = $1)
+			)
+		`, [ uuid ]));
+	}
 	
 	if (filters.length) filters = filters.join(' AND ');
 	else filters = 'TRUE';
@@ -37,7 +59,12 @@ module.exports = async (req, res) => {
 						'name', u.name, 
 						'iso3', u.iso3,
 						'isUNDP', u.email LIKE '%@undp.org'
-					) AS creator
+					) AS creator,
+
+					CASE WHEN p.owner = $2 OR $2 = ANY (array_agg(pct.participant))
+						THEN TRUE
+						ELSE FALSE
+					END AS is_contributor
 
 				FROM pinboards p
 				INNER JOIN pinboard_contributions pc
@@ -49,15 +76,10 @@ module.exports = async (req, res) => {
 				INNER JOIN users u
 					ON u.uuid = p.owner
 				WHERE $1:raw
-					AND (
-						p.id IN (
-							SELECT pinboard FROM pinboard_contributors
-							WHERE participant = $2
-						) OR (p.status > 2 OR p.owner = $2)
-					)
 					AND pc.is_included = true
 				GROUP BY (p.id, u.name, u.iso3, u.email)
 				$3:raw
+				ORDER BY p.id DESC
 			;`, [ filters, uuid, page_filter ]));
 
 			batch.push(t.one(`
@@ -102,7 +124,12 @@ module.exports = async (req, res) => {
 					'name', u.name, 
 					'iso3', u.iso3,
 					'isUNDP', u.email LIKE '%@undp.org'
-				) AS creator
+				) AS creator,
+
+				CASE WHEN p.owner = $2 OR $2 = ANY (array_agg(pct.participant))
+					THEN TRUE
+					ELSE FALSE
+				END AS is_contributor
 
 			FROM pinboards p
 			INNER JOIN pinboard_contributions pc

@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
 
 	if (!pinboard || Array.isArray(pinboard)) { // EITHER NO pinboard OR MULTIPLE pinboards ARE QUERIED
 		if (!isNaN(+page)) page_filter = DB.pgp.as.format(`LIMIT $1 OFFSET $2;`, [ limit ? +limit : page_content_limit, limit ? (+page - 1) * +limit : (+page - 1) * page_content_limit ]);
-
+console.log(page_filter)
 		data = await DB.general.tx(t => {
 			const batch = [];
 			batch.push(t.any(`
@@ -78,8 +78,8 @@ module.exports = async (req, res) => {
 				WHERE $1:raw
 					AND pc.is_included = true
 				GROUP BY (p.id, u.name, u.iso3, u.email)
-				$3:raw
 				ORDER BY p.id DESC
+				$3:raw
 			;`, [ filters, uuid, page_filter ]));
 
 			batch.push(t.one(`

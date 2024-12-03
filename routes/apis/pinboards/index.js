@@ -1,7 +1,7 @@
 const { page_content_limit, ownDB, DB } = include('config/');
 
 module.exports = async (req, res) => {
-	const { uuid } = req.session || {};
+	const { uuid, rights } = req.session || {};
 	let { pinboard, page, limit, space } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
 	// const ownId = await ownDB();
 
@@ -15,10 +15,11 @@ module.exports = async (req, res) => {
 					SELECT pinboard FROM pinboard_contributors
 					WHERE participant = $1
 				) OR p.owner = $1
+				OR $2 > 2
 			)
-		`, [ uuid ]));
+		`, [ uuid, rights ]));
 	} else if (space === 'published') {
-		filters.push(DB.pgp.as.format('p.status > 2'));
+		filters.push(DB.pgp.as.format('(p.status > 2 OR $1 > 2)', [ rights ]));
 	} else if (!space || space === 'all') { // DEFAULT TO THE PINBOARDS OF THE USER AND THE PUBLISHED ONES
 		filters.push(DB.pgp.as.format(`
 			(
@@ -26,8 +27,9 @@ module.exports = async (req, res) => {
 					SELECT pinboard FROM pinboard_contributors
 					WHERE participant = $1
 				) OR (p.status > 2 OR p.owner = $1)
+				OR $2 > 2
 			)
-		`, [ uuid ]));
+		`, [ uuid, rights ]));
 	}
 	
 	if (filters.length) filters = filters.join(' AND ');
@@ -38,7 +40,7 @@ module.exports = async (req, res) => {
 
 	if (!pinboard || Array.isArray(pinboard)) { // EITHER NO pinboard OR MULTIPLE pinboards ARE QUERIED
 		if (!isNaN(+page)) page_filter = DB.pgp.as.format(`LIMIT $1 OFFSET $2;`, [ limit ? +limit : page_content_limit, limit ? (+page - 1) * +limit : (+page - 1) * page_content_limit ]);
-console.log(page_filter)
+
 		data = await DB.general.tx(t => {
 			const batch = [];
 			batch.push(t.any(`
@@ -61,7 +63,7 @@ console.log(page_filter)
 						'isUNDP', u.email LIKE '%@undp.org'
 					) AS creator,
 
-					CASE WHEN p.owner = $2 OR $2 = ANY (array_agg(pct.participant))
+					CASE WHEN p.owner = $2 OR $2 = ANY (array_agg(pct.participant)) OR $4 > 2
 						THEN TRUE
 						ELSE FALSE
 					END AS is_contributor
@@ -80,7 +82,7 @@ console.log(page_filter)
 				GROUP BY (p.id, u.name, u.iso3, u.email)
 				ORDER BY p.id DESC
 				$3:raw
-			;`, [ filters, uuid, page_filter ]));
+			;`, [ filters, uuid, page_filter, rights ]));
 
 			batch.push(t.one(`
 				SELECT COUNT(p.id)::INT
@@ -126,7 +128,7 @@ console.log(page_filter)
 					'isUNDP', u.email LIKE '%@undp.org'
 				) AS creator,
 
-				CASE WHEN p.owner = $2 OR $2 = ANY (array_agg(pct.participant))
+				CASE WHEN p.owner = $2 OR $2 = ANY (array_agg(pct.participant)) OR $4 > 2
 					THEN TRUE
 					ELSE FALSE
 				END AS is_contributor
@@ -148,10 +150,11 @@ console.log(page_filter)
 						SELECT pinboard FROM pinboard_contributors
 						WHERE participant = $2
 					) OR (p.status > 2 OR p.owner = $2)
+					OR $4 > 2
 				)
 				AND pc.is_included = true
 			GROUP BY (p.id, u.name, u.iso3, u.email)
-		;`, [ filters, uuid, page_filter ]);
+		;`, [ filters, uuid, page_filter, rights ]);
 	}
 	
 	return res.json(data);

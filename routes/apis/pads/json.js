@@ -15,7 +15,7 @@ const filter = include('routes/browse/pads/filter');
 module.exports = async (req, res) => {
 	const { host } = req.headers || {}
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
- 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+ 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, include_pinboards, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
  	const { uuid } = req.session;
 	
 	if (typeof pseudonymize === 'string') pseudonymize = JSON.parse(pseudonymize);
@@ -125,6 +125,51 @@ module.exports = async (req, res) => {
 
 			const open = pads.every(d => d.status > 2)
 
+			// IF PINBOARDS ARE REQUESTED
+			if (include_pinboards === 'all') {
+				const dbId = await ownDB();
+				const pinboards = await DB.general.any(`
+					SELECT pc.pad AS pad_id,
+						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('pinboard_id', pc.pinboard, 'title', p.title))), '[]') AS pinboards
+					
+					FROM pinboard_contributions pc
+					INNER JOIN pinboards p
+						ON p.id = pc.pinboard
+					
+					WHERE pc.pad IN ($1:csv)
+						AND pc.db = $2
+						AND pc.is_included = TRUE
+					GROUP BY pc.pad
+				;`, [ safeArr(pads.map(d => d.pad_id).filter(d => d), -1), dbId ]);
+				// JOIN THE PINBOARDS TO THE PADS
+				pads = join.multijoin.call(pads, [ pinboards, 'pad_id' ]);
+			} else if (include_pinboards === 'own') {
+				const dbId = await ownDB();
+				const pinboards = await DB.general.any(`
+					SELECT pc.pad AS pad_id,
+						COALESCE(jsonb_agg(DISTINCT (jsonb_build_object('pinboard_id', pc.pinboard, 'title', p.title))), '[]') AS pinboards
+
+					FROM pinboard_contributions pc
+					INNER JOIN pinboards p
+						ON p.id = pc.pinboard
+					INNER JOIN pinboard_contributors pct
+						ON pct.pinboard = pc.pinboard
+					
+					WHERE pc.pad IN ($1:csv)
+						AND pc.db = $2
+						AND pc.is_included = TRUE
+						AND (
+							pc.pinboard IN (
+								SELECT id FROM pinboards
+								WHERE owner = $3
+							) OR pct.participant = $3
+						)
+					GROUP BY pc.pad
+				;`, [ safeArr(pads.map(d => d.pad_id).filter(d => d), -1), dbId, uuid ]);
+				// JOIN THE PINBOARDS TO THE PADS
+				pads = join.multijoin.call(pads, [ pinboards, 'pad_id' ]);
+			}
+
 			// IF SOURCES ARE REQUESTED, CREATE A NEW OBJECT WITH THE BASIC INFORMATION ABOUT THE SOURCE
 			if (include_source) {
 				const sources = await t.any(`
@@ -205,7 +250,7 @@ module.exports = async (req, res) => {
 				}).catch(err => console.log(err))
 
 				// JOIN THE SOURCES TO THE PADS
-				pads = join.multijoin.call(pads, [ sources, 'source_pad_id' ])
+				pads = join.multijoin.call(pads, [ sources, 'source_pad_id' ]);
 			}
 			// IF ENGAGEMENT IS REQUESTED, JOIN PAGE VIEWS
 			if (include_engagement) {

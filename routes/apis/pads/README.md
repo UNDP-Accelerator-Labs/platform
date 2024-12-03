@@ -9,3 +9,4 @@ include_metafields { boolean: false }
 include_source { boolean: false }
 include_engagement { boolean: false }
 include_comments { boolean: false }
+include_pinboards { string: 'all', 'own' }

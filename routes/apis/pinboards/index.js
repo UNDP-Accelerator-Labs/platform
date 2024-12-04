@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
 	let page_filter = '';
 	let data;
 
-	if (databases) db_filter = DB.pgp.as.format('(edb.db IN ($1:csv) OR edb.id IN ($1:csv))', [ databases ]);
+	if (databases) db_filter = DB.pgp.as.format('edb.db IN ($1:csv)', [ databases ]);
 	else db_filter = 'TRUE';
 
 	if (!pinboard || Array.isArray(pinboard)) { // EITHER NO pinboard OR MULTIPLE pinboards ARE QUERIED

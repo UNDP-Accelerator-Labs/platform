@@ -2,12 +2,16 @@ const { page_content_limit, ownDB, DB } = include('config/');
 
 module.exports = async (req, res) => {
 	const { uuid, rights } = req.session || {};
-	let { pinboard, page, limit, space } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
-	// const ownId = await ownDB();
+	let { pinboard, page, limit, space, databases } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+
+	// IF databases IS PASSED, MAKE SURE IT IS AN ARRAY
+	if (databases && !Array.isArray(databases)) databases = [databases];
 
 	let filters = [];
 	if (pinboard) filters.push(DB.pgp.as.format('p.id IN ($1:csv)', [ pinboard ]));
 	
+	// IN THE CONDITIONS BELOW, SUPER USERS CANNOT ACCESS NON PUBLISHED PINBOARDS
+	// TO CHANGE THIS, REMOVE THE `AND p.status > 2` AFTER THE `rights > 2` CLAUSE
 	if (space === 'private') {
 		filters.push(DB.pgp.as.format(`
 			(
@@ -15,11 +19,11 @@ module.exports = async (req, res) => {
 					SELECT pinboard FROM pinboard_contributors
 					WHERE participant = $1
 				) OR p.owner = $1
-				OR $2 > 2
+				OR ($2 > 2 AND p.status > 2)
 			)
 		`, [ uuid, rights ]));
 	} else if (space === 'published') {
-		filters.push(DB.pgp.as.format('(p.status > 2 OR $1 > 2)', [ rights ]));
+		filters.push(DB.pgp.as.format('(p.status > 2 OR ($1 > 2 AND p.status > 2))', [ rights ]));
 	} else if (!space || space === 'all') { // DEFAULT TO THE PINBOARDS OF THE USER AND THE PUBLISHED ONES
 		filters.push(DB.pgp.as.format(`
 			(
@@ -27,7 +31,7 @@ module.exports = async (req, res) => {
 					SELECT pinboard FROM pinboard_contributors
 					WHERE participant = $1
 				) OR (p.status > 2 OR p.owner = $1)
-				OR $2 > 2
+				OR ($2 > 2 AND p.status > 2)
 			)
 		`, [ uuid, rights ]));
 	}
@@ -38,9 +42,12 @@ module.exports = async (req, res) => {
 	let page_filter = '';
 	let data;
 
+	if (databases) db_filter = DB.pgp.as.format('(edb.db IN ($1:csv) OR edb.id IN ($1:csv))', [ databases ]);
+	else db_filter = 'TRUE';
+
 	if (!pinboard || Array.isArray(pinboard)) { // EITHER NO pinboard OR MULTIPLE pinboards ARE QUERIED
 		if (!isNaN(+page)) page_filter = DB.pgp.as.format(`LIMIT $1 OFFSET $2;`, [ limit ? +limit : page_content_limit, limit ? (+page - 1) * +limit : (+page - 1) * page_content_limit ]);
-
+		
 		data = await DB.general.tx(t => {
 			const batch = [];
 			batch.push(t.any(`
@@ -49,6 +56,7 @@ module.exports = async (req, res) => {
 					FROM pinboard_contributions pc
 					INNER JOIN extern_db edb
 						ON edb.id = pc.db
+					WHERE $5:raw
 					GROUP BY (pc.pinboard, edb.db)
 					ORDER BY pc.pinboard
 				)
@@ -82,7 +90,7 @@ module.exports = async (req, res) => {
 				GROUP BY (p.id, u.name, u.iso3, u.email)
 				ORDER BY p.id DESC
 				$3:raw
-			;`, [ filters, uuid, page_filter, rights ]));
+			;`, [ filters, uuid, page_filter, rights, db_filter ]));
 
 			batch.push(t.one(`
 				SELECT COUNT(p.id)::INT
@@ -107,12 +115,14 @@ module.exports = async (req, res) => {
 			if (isNaN(+limit)) limit = page_content_limit;
 			page_filter = DB.pgp.as.format(`[$1:$2]`, [ (+page - 1) * +limit + 1, +page * +limit ]);
 		}
+
 		data = await DB.general.oneOrNone(`
 			WITH counts AS (
 				SELECT pc.pinboard AS pinboard_id, edb.db AS platform, COUNT(DISTINCT(pc.pad))::INT AS count
 				FROM pinboard_contributions pc
 				INNER JOIN extern_db edb
 					ON edb.id = pc.db
+				WHERE $5:raw
 				GROUP BY (pc.pinboard, edb.db)
 				ORDER BY pc.pinboard
 			)
@@ -161,8 +171,9 @@ module.exports = async (req, res) => {
 					OR $4 > 2
 				)
 				AND pc.is_included = true
+				AND $5:raw
 			GROUP BY (p.id, u.name, u.iso3, u.email)
-		;`, [ filters, uuid, page_filter, rights ]);
+		;`, [ filters, uuid, page_filter, rights, db_filter ]);
 	}
 	
 	return res.json(data);

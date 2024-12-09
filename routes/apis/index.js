@@ -46,6 +46,7 @@ module.exports = (req, res) => {
 		else if (object === 'pinboards') pinboards(req, res)
 		else if (object === 'map') map(req, res)
 		else if (object === 'session') contributors.session(req, res)
+		else if (object === 'share') contributors.share(req, res)
 		else redirectError(req, res)
 	} else redirectError(req, res)
 }

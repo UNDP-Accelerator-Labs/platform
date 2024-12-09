@@ -63,13 +63,13 @@ module.exports = async (req, res) => {
       await sendEmail({
         to: email,
         cc: c_email,
-        subject: `You Have Been Added to the "${board.title}" board`,
+        subject: `[SDG Commons] - You have been added to the "${board.title}" board`,
         html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <p>Dear ${user.name},</p>
             <br/>
             <p>We are excited to inform you that you have been added as a contributor to the board on <a href="https://www.sdg-innovation-commons.org/boards/all/${pinboard}" style="color: #007bff; text-decoration: none;"><strong>"${board.title}"</strong></a> on SDG Commons.</p>
-            <p>As a contributor, you can now access this board, collaborate with other contributors, and contribute your insights to the project.</p>
+            <p>As a contributor, you have been invited to keep track of content related to topic ${board.title}. As you browse content on the SDG Commons from now on, please remember to bookmark any content that you find interesting that is related to topic ${board.title}</p>
             <br/>
             <p>To view or contribute to this board, please log in to your account via the platform.</p>
             <br/>

@@ -60,7 +60,17 @@ module.exports = (req, res, next) => {
 							ON u2.uuid = tm.member
 						WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
 					)::TEXT, '[]')::JSONB
-					AS collaborators
+					AS collaborators,
+
+					COALESCE(
+						(SELECT json_agg(DISTINCT(p.id))
+						FROM pinboards p
+						WHERE p.id IN (
+							SELECT pinboard FROM pinboard_contributors
+							WHERE participant = u.uuid
+						) OR p.owner = u.uuid
+						)::TEXT, '[]')::JSONB
+					AS pinboards
 
 					FROM users u
 
@@ -126,7 +136,17 @@ module.exports = (req, res, next) => {
 							ON u2.uuid = tm.member
 						WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
 					)::TEXT, '[]')::JSONB
-					AS collaborators
+					AS collaborators,
+
+					COALESCE(
+						(SELECT json_agg(DISTINCT(p.id))
+						FROM pinboards p
+						WHERE p.id IN (
+							SELECT pinboard FROM pinboard_contributors
+							WHERE participant = u.uuid
+						) OR p.owner = u.uuid
+						)::TEXT, '[]')::JSONB
+					AS pinboards
 
 					FROM users u
 

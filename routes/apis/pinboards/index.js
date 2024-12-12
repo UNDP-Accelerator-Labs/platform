@@ -122,7 +122,7 @@ module.exports = async (req, res) => {
 				FROM pinboard_contributions pc
 				INNER JOIN extern_db edb
 					ON edb.id = pc.db
-				WHERE $5:raw
+				-- WHERE $5:raw
 				GROUP BY (pc.pinboard, edb.db)
 				ORDER BY pc.pinboard
 			)

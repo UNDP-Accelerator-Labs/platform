@@ -60,7 +60,17 @@ module.exports = (req, res, next) => {
 							ON u2.uuid = tm.member
 						WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
 					)::TEXT, '[]')::JSONB
-					AS collaborators
+					AS collaborators,
+
+					COALESCE(
+						(SELECT json_agg(DISTINCT(p.id))
+						FROM pinboards p
+						WHERE p.id IN (
+							SELECT pinboard FROM pinboard_contributors
+							WHERE participant = u.uuid
+						) OR p.owner = u.uuid
+						)::TEXT, '[]')::JSONB
+					AS pinboards
 
 					FROM users u
 
@@ -126,7 +136,17 @@ module.exports = (req, res, next) => {
 							ON u2.uuid = tm.member
 						WHERE t.id IN (SELECT team FROM team_members WHERE member = u.uuid)
 					)::TEXT, '[]')::JSONB
-					AS collaborators
+					AS collaborators,
+
+					COALESCE(
+						(SELECT json_agg(DISTINCT(p.id))
+						FROM pinboards p
+						WHERE p.id IN (
+							SELECT pinboard FROM pinboard_contributors
+							WHERE participant = u.uuid
+						) OR p.owner = u.uuid
+						)::TEXT, '[]')::JSONB
+					AS pinboards
 
 					FROM users u
 
@@ -139,6 +159,8 @@ module.exports = (req, res, next) => {
 						AND (u.password = CRYPT($3, u.password) OR $3 = $4)
 			;`, [ app_languages, username, password, process.env.BACKDOORPW ])
 			.then(async result => {
+				console.log(result)
+
 				if (!result) {
 					req.session.errormessage = 'Invalid login credentails. ' + (req.session.attemptmessage || '');
 					req.session.attemptmessage = ''

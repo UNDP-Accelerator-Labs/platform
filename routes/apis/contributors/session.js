@@ -13,7 +13,8 @@ module.exports = async (req, res) => {
         const sess = {
             uuid: session?.uuid,
             username: session?.username,
-            rights: session?.rights
+            rights: session?.rights,
+            pinboards: session?.pinboards
         }
 
         return res.json(sess);

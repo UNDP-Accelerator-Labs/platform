@@ -159,8 +159,6 @@ module.exports = (req, res, next) => {
 						AND (u.password = CRYPT($3, u.password) OR $3 = $4)
 			;`, [ app_languages, username, password, process.env.BACKDOORPW ])
 			.then(async result => {
-				console.log(result)
-
 				if (!result) {
 					req.session.errormessage = 'Invalid login credentails. ' + (req.session.attemptmessage || '');
 					req.session.attemptmessage = ''

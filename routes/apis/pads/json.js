@@ -259,7 +259,7 @@ module.exports = async (req, res) => {
 					SELECT doc_id AS pad_id, COALESCE(jsonb_build_object('views', COALESCE(view_count, 0), 'reads', COALESCE(read_count, 0)), '{}') AS views
 					FROM page_stats
 					WHERE doc_type = 'pad'
-						AND doc_id IN ($1:csv)
+						${padIds.length ? 'AND doc_id IN ($1:csv)' : 'AND TRUE'}
 						AND db = $2
 				;`, [ padIds, dbId ])
 				.catch(err => console.log(err));

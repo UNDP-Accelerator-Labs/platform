@@ -5,6 +5,7 @@ const tags = require('./tags/')
 const statistics = require('./statistics/')
 const locations = require('./locations/')
 const pinboards = require('./pinboards/')
+const pinboard = require('./pinboards/utils')
 const map = require('./map/')
 const { redirectError } = include('routes/helpers/')
 
@@ -30,7 +31,6 @@ module.exports = (req, res) => {
 		} else redirectError(req, res)
 	} else if (action === 'fetch') {
 		if (!output) output = 'json';
-
 		if (object === 'pads') {
 			if (output === 'csv') pads.xlsx(req, res)
 			else if (['json', 'geojson'].includes(output)) pads.json(req, res)
@@ -43,6 +43,11 @@ module.exports = (req, res) => {
 		else if (object === 'statistics') statistics(req, res)
 		else if (object === 'countries') locations.countries(req, res)
 		else if (object === 'regions') locations.regions(req, res)
+		else if (object === 'pinboard'){
+			if(output === 'delete') pinboard.delete_pinboard(req, res)
+			if(output === 'create') pinboard.create_pinboard(req, res)
+			if(output === 'request') pinboard.request_collaboration(req, res)
+		}
 		else if (object === 'pinboards') pinboards(req, res)
 		else if (object === 'map') map(req, res)
 		else if (object === 'session') contributors.session(req, res)

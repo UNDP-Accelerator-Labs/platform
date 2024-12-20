@@ -108,7 +108,7 @@ module.exports = async (req, res) => {
 					} else batch1.push(null)
 					if (include_locations) {
 						batch1.push(t1.any(`
-							SELECT pad AS pad_id, lat, lng FROM locations
+							SELECT pad AS pad_id, lat, lng, iso3 FROM locations
 							WHERE pad IN ($1:csv)
 							ORDER BY pad
 						;`, [ ids ]))

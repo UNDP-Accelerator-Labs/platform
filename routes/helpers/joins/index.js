@@ -143,10 +143,10 @@ exports.concatunique = function (args = []) {
 	return output.concat(arrcopy)
 }
 exports.locations = async (data, kwargs = {}) => {
-	const conn = kwargs.connection || DB.general
-	let { language, key, name_key, concat_location_key } = kwargs
-	if (!key) key = 'iso3'
-	if (!name_key) name_key = 'country'
+	const conn = kwargs.connection || DB.general;
+	let { language, key, name_key, concat_location_key } = kwargs;
+	if (!key) key = 'iso3';
+	if (!name_key) name_key = 'country';
 
 	if ((Array.isArray(data) && data.length) || data?.[key]) {
 		const iso3s = Array.isArray(data) ? [...new Set(data.map(d => d[key]))] : data[key];

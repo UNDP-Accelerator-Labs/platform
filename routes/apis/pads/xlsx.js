@@ -106,12 +106,14 @@ module.exports = async (req, res) => {
 							return tags.flat().sort((a, b) => a.pad_id - b.pad_id);
 						}).catch(err => console.log(err)))
 					} else batch1.push(null)
-					if (include_locations) {
+					if (include_locations && metafields.some((d) => d.type === 'location')) {
 						batch1.push(t1.any(`
 							SELECT pad AS pad_id, lat, lng, iso3 FROM locations
 							WHERE pad IN ($1:csv)
 							ORDER BY pad
-						;`, [ ids ]))
+						;`, [ ids ]).then(async results => {
+							return await join.locations(results, { language, key: 'iso3' })
+						}).catch(err => console.log(err)))
 					} else batch1.push(null)
 					if (include_metafields) {
 						batch1.push(t1.any(`
@@ -405,29 +407,35 @@ module.exports = async (req, res) => {
 								}
 								delete obj.img
 
-								if (single_sheet && include_locations) {
+								if (single_sheet && include_locations && metafields.some((d) => d.type === 'location')) {
 									const pad_locations = locations.filter(c => c.pad_id === obj.pad_id)
 									if (transpose_locations) {
 										if (pad_locations.length === 1) {
-											const { lat, lng } = pad_locations[0]
-											obj[`location-1-lat`] = lat
-											obj[`location-1-lng`] = lng
+											const { lat, lng, iso3, country } = pad_locations[0];
+											obj[`location-1-lat`] = lat;
+											obj[`location-1-lng`] = lng;
+											obj[`location-1-iso3`] = iso3;
+											obj[`location-1-country`] = country;
 										} else if (pad_locations.length > 1) {
 											const subobjs = pad_locations.map(c => {
 												let subobj = Object.assign({}, obj)
-												const { lat, lng } = c
-												subobj[`location-1-lat`] = lat
-												subobj[`location-1-lng`] = lng
-												return subobj
+												const { lat, lng, iso3, country } = c;
+												subobj[`location-1-lat`] = lat;
+												subobj[`location-1-lng`] = lng;
+												subobj[`location-1-iso3`] = iso3;
+												subobj[`location-1-country`] = country;
+												return subobj;
 											})
-											obj = subobjs
+											obj = subobjs;
 										}
 									} else {
 										for (let i = 0; i < max_locations; i++) {
 											// if (pad_locations[i]) {
-												const { lat, lng } = pad_locations[i] || {}
-												obj[`location-${i + 1}-lat`] = lat
-												obj[`location-${i + 1}-lng`] = lng
+												const { lat, lng, iso3, country } = pad_locations[i] || {};
+												obj[`location-${i + 1}-lat`] = lat;
+												obj[`location-${i + 1}-lng`] = lng;
+												obj[`location-${i + 1}-iso3`] = iso3;
+												obj[`location-${i + 1}-country`] = country;
 											// }
 										}
 									}
@@ -435,14 +443,14 @@ module.exports = async (req, res) => {
 
 								if (single_sheet && include_tags) {									
 									max_tags.forEach(c => {
-										const pad_tags = tags.filter(b => b.pad_id === d.pad_id && b.type === c.type)
+										const pad_tags = tags.filter(b => b.pad_id === d.pad_id && b.type === c.type);
 										for (let i = 0; i < c.max; i++) {
-											obj[`${c.type}-tag-${i + 1}`] = pad_tags[i]?.name
+											obj[`${c.type}-tag-${i + 1}`] = pad_tags[i]?.name;
 										}
 									})
 								}
 
-								return obj
+								return obj;
 							}).flat()
 
 							/*

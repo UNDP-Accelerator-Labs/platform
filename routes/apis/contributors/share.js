@@ -70,11 +70,8 @@ module.exports = async (req, res) => {
             <br/>
             <p>We are excited to inform you that you have been added as a contributor to the board on <a href="https://www.sdg-innovation-commons.org/boards/all/${pinboard}" style="color: #007bff; text-decoration: none;"><strong>"${board.title}"</strong></a> on SDG Commons.</p>
             <p>As a contributor, you have been invited to keep track of content related to topic ${board.title}. As you browse content on the SDG Commons from now on, please remember to bookmark any content that you find interesting that is related to topic ${board.title}</p>
-            <br/>
             <p>To view or contribute to this board, please log in to your account via the platform.</p>
-            <br/>
             <p>If you have any questions or require assistance, feel free to reach out to ${username} or contact our support team.</p>
-            <br/>
             <p>We look forward to your valuable contributions!</p>
             <br/>
             <p>Best regards,</p>

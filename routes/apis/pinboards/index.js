@@ -2,7 +2,7 @@ const { page_content_limit, ownDB, DB } = include('config/');
 
 module.exports = async (req, res) => {
 	const { uuid, rights } = req.session || {};
-	let { pinboard, page, limit, space, databases } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
+	let { pinboard, page, limit, space, databases, search } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {};
 
 	// IF databases IS PASSED, MAKE SURE IT IS AN ARRAY
 	if (databases && !Array.isArray(databases)) databases = [databases];
@@ -35,6 +35,18 @@ module.exports = async (req, res) => {
 			)
 		`, [ uuid, rights ]));
 	}
+
+	const _search = search?.trim()
+	if (_search?.length) {
+		const words = _search?.split(/\s+/);
+		const patterns = words.map(word => `%${word}%`);
+		filters.push(
+			DB.pgp.as.format(
+				`(p.title ILIKE ANY($1) OR p.description ILIKE ANY($1))`,
+				[patterns]
+			)
+		);
+	}
 	
 	if (filters.length) filters = filters.join(' AND ');
 	else filters = 'TRUE';
@@ -54,7 +66,7 @@ module.exports = async (req, res) => {
 				WITH counts AS (
 					SELECT pc.pinboard AS pinboard_id, edb.db AS platform, COUNT(DISTINCT(pc.pad))::INT AS count
 					FROM pinboard_contributions pc
-					INNER JOIN extern_db edb
+					LEFT JOIN extern_db edb
 						ON edb.id = pc.db
 					WHERE $5:raw
 					GROUP BY (pc.pinboard, edb.db)
@@ -77,16 +89,30 @@ module.exports = async (req, res) => {
 					END AS is_contributor
 
 				FROM pinboards p
-				INNER JOIN pinboard_contributions pc
+				LEFT JOIN pinboard_contributions pc
 					ON pc.pinboard = p.id
-				INNER JOIN pinboard_contributors pct
+				LEFT JOIN pinboard_contributors pct
 					ON pct.pinboard = p.id
-				INNER JOIN counts c
+				LEFT JOIN counts c
 					ON c.pinboard_id = p.id
-				INNER JOIN users u
+				LEFT JOIN users u
 					ON u.uuid = p.owner
 				WHERE $1:raw
-					AND pc.is_included = true
+					AND (
+						-- Condition for contributions or pc.is_included
+						(
+							EXISTS (
+								SELECT 1 
+								FROM pinboard_contributions pc_sub
+								WHERE pc_sub.pinboard = p.id
+							) AND pc.is_included = true
+						) 
+						OR NOT EXISTS (
+							SELECT 1 
+							FROM pinboard_contributions pc_sub
+							WHERE pc_sub.pinboard = p.id
+						)
+					)
 				GROUP BY (p.id, u.name, u.iso3, u.email)
 				ORDER BY p.id DESC
 				$3:raw
@@ -120,7 +146,7 @@ module.exports = async (req, res) => {
 			WITH counts AS (
 				SELECT pc.pinboard AS pinboard_id, edb.db AS platform, COUNT(DISTINCT(pc.pad))::INT AS count
 				FROM pinboard_contributions pc
-				INNER JOIN extern_db edb
+				LEFT JOIN extern_db edb
 					ON edb.id = pc.db
 				-- WHERE $5:raw
 				GROUP BY (pc.pinboard, edb.db)
@@ -129,8 +155,8 @@ module.exports = async (req, res) => {
 
 			SELECT p.id AS pinboard_id, p.title, p.description, p.date, p.status,
 				json_agg(DISTINCT(c.*)) AS counts,
-				COUNT(DISTINCT(pc.pad || '' || pc.db))::INT AS total,
-				COUNT(DISTINCT(pct.participant))::INT AS contributors,
+				COALESCE(COUNT(DISTINCT pc.pad || '' || pc.db), 0)::INT AS total,
+    			COALESCE(COUNT(DISTINCT pct.participant), 0)::INT AS contributors,
 				
 				(COALESCE (
 					array_agg(
@@ -152,15 +178,15 @@ module.exports = async (req, res) => {
 				END AS is_contributor
 
 			FROM pinboards p
-			INNER JOIN pinboard_contributions pc
+			LEFT JOIN pinboard_contributions pc
 				ON pc.pinboard = p.id
-			INNER JOIN pinboard_contributors pct
+			LEFT JOIN pinboard_contributors pct
 				ON pct.pinboard = p.id
-			INNER JOIN counts c
+			LEFT JOIN counts c
 				ON c.pinboard_id = p.id
-			INNER JOIN users u
+			LEFT JOIN users u
 				ON u.uuid = p.owner
-			INNER JOIN extern_db edb
+			LEFT JOIN extern_db edb
 				ON edb.id = pc.db
 			WHERE $1:raw
 				AND (
@@ -170,7 +196,21 @@ module.exports = async (req, res) => {
 					) OR (p.status > 2 OR p.owner = $2)
 					OR $4 > 2
 				)
-				AND pc.is_included = true
+				AND (
+					-- Condition for contributions or pc.is_included
+					(
+						EXISTS (
+							SELECT 1 
+							FROM pinboard_contributions pc_sub
+							WHERE pc_sub.pinboard = p.id
+						) AND pc.is_included = true
+					) 
+					OR NOT EXISTS (
+						SELECT 1 
+						FROM pinboard_contributions pc_sub
+						WHERE pc_sub.pinboard = p.id
+					)
+				)
 				AND $5:raw
 			GROUP BY (p.id, u.name, u.iso3, u.email)
 		;`, [ filters, uuid, page_filter, rights, db_filter ]);

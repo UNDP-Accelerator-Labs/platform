@@ -75,7 +75,7 @@ module.exports = async (req, res) => {
             <p>We look forward to your valuable contributions!</p>
             <br/>
             <p>Best regards,</p>
-            <p>SDG Commons Team</p>
+            <p>UNDP Accelerator Labs Team</p>
           </div>
         `,
       });

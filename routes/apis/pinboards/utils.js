@@ -230,7 +230,7 @@ const request_collaboration = async (req, res) => {
                 <p>Your request to contribute to the board <strong>"${boardTitle}"</strong> has been sent to the owner and contributors for review.</p>
                 <p>You will be notified once a decision is made.</p>
                 <p>Best regards,</p>
-                <p>SDG Commons Team</p>
+                <p>UNDP Accelerator Labs Team</p>
               </div>
             `,
         });

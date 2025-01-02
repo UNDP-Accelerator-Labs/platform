@@ -47,6 +47,7 @@ module.exports = (req, res) => {
 			if(output === 'delete') pinboard.delete_pinboard(req, res)
 			if(output === 'create') pinboard.create_pinboard(req, res)
 			if(output === 'request') pinboard.request_collaboration(req, res)
+			if(output === 'decide') pinboard.handleCollaborationDecision(req, res)
 		}
 		else if (object === 'pinboards') pinboards(req, res)
 		else if (object === 'map') map(req, res)

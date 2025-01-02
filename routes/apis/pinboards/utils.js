@@ -247,6 +247,138 @@ const request_collaboration = async (req, res) => {
     }
 };
 
+
+
+const handleCollaborationDecision = async (req, res) => {
+    const { uuid, username } = req.session || {};
+    const { pinboard_id, decision, requestor_email } = req.body || {};
+
+    // Validate required fields
+    if (!uuid) {
+        return res.status(403).json({ success: false, message: 'Unauthorized access.' });
+    }
+
+    if (!pinboard_id) {
+        return res.status(400).json({ success: false, message: 'Board ID is required.' });
+    }
+
+    if (!decision || !['approve', 'deny'].includes(decision)) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing decision.' });
+    }
+
+    if (!requestor_email) {
+        return res.status(400).json({ success: false, message: 'Requestor email is required.' });
+    }
+
+    try {
+        // Check if the user is the owner or an existing contributor of the board
+        const boardData = await DB.general.oneOrNone(`
+            SELECT p.owner, p.title, array_agg(pc.participant) AS contributors
+            FROM pinboards p
+            LEFT JOIN pinboard_contributors pc ON pc.pinboard = p.id
+            WHERE p.id = $1
+            GROUP BY p.owner, p.title
+        `, [pinboard_id]);
+
+        if (!boardData) {
+            return res.status(200).json({ success: false, message: 'Board not found.' });
+        }
+
+        const isAuthorized =
+            boardData.owner === uuid || (boardData.contributors || []).includes(uuid);
+
+        if (!isAuthorized) {
+            return res.status(200).json({ success: false, message: 'You are not authorized to make decisions on this board.' });
+        }
+
+        const boardTitle = boardData.title;
+
+        if (decision === 'approve') {
+            // Get the UUID of the requestor using their email
+            const requestorData = await DB.general.oneOrNone(`
+                SELECT uuid
+                FROM users
+                WHERE email = $1
+            `, [requestor_email]);
+            
+            if (!requestorData) {
+                return res.status(200).json({ success: false, message: 'Requestor is not a valid user.' });
+            }
+
+            const requestorUuid = requestorData.uuid;
+
+            // Check if the user is already a collaborator
+            const isAlreadyContributor = await DB.general.oneOrNone(`
+                SELECT 1
+                FROM pinboard_contributors
+                WHERE pinboard = $1 AND participant = $2
+            `, [pinboard_id, requestorUuid]);
+
+            if (isAlreadyContributor) {
+                return res.status(200).json({
+                    success: true,
+                    message: `The user (${requestor_email}) is already a collaborator on this board.`,
+                });
+            }
+
+            // Add requestor as a collaborator
+            await DB.general.none(`
+                INSERT INTO pinboard_contributors (pinboard, participant)
+                VALUES ($1, $2)
+            `, [pinboard_id, requestorUuid]);
+
+
+            // Send email to the requester
+            await sendEmail({
+                to: requestor_email,
+                subject: `[SDG Commons] - Collaboration Approved for "${boardTitle}"`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                        <p>Dear User,</p>
+                        <p>Your request to contribute to the board <strong>"${boardTitle}"</strong> has been approved by ${username}.</p>
+                        <p>You now have full collaborator access to the board.</p>
+                        <p>Best regards,</p>
+                        <p>SDG Commons Team</p>
+                    </div>
+                `,
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: `The user (${requestor_email}) has been granted collaborator access to the board.`,
+            });
+        } else if (decision === 'deny') {
+            // Send email to the requester
+            await sendEmail({
+                to: requestor_email,
+                subject: `[SDG Commons] - Collaboration Denied for "${boardTitle}"`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                        <p>Dear User,</p>
+                        <p>Your request to contribute to the board <strong>"${boardTitle}"</strong> has been denied.</p>
+                        <p>If you have any questions, please contact the board owner or existing contributors for clarification.</p>
+                        <p>Best regards,</p>
+                        <p>SDG Commons Team</p>
+                    </div>
+                `,
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: `The collaboration request from (${requestor_email}) has been denied.`,
+            });
+        }
+    } catch (error) {
+        console.error('Error processing decision:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while processing the decision.',
+            error,
+        });
+    }
+};
+
+
 // Helper function to get user email by UUID
 async function getUserEmail(uuid) {
     const user = await DB.general.one('SELECT email FROM users WHERE uuid = $1', [uuid]);
@@ -258,4 +390,5 @@ module.exports = {
     delete_pinboard,
     create_pinboard,
     request_collaboration,
+    handleCollaborationDecision,
 }

@@ -12,7 +12,7 @@ const { checklanguage, datastructures, parsers, array, join, geo } = include('ro
 const { filter } = require('../../browse/pads/')
 
 module.exports = async (req, res) => {
-	const { output, render, include_data, include_toc, chapters, standardize_structure } = req.body || {}
+	const { output, render, include_data, include_toc, chapters, standardize_structure } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
 	const { object } = req.params || {}
 	const pw = req.session.email || null
 

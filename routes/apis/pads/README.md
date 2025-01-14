@@ -1,12 +1,55 @@
-# /pads
-output { string: 'json' } // must specify
-use_templates { boolean: false }
-include_data { boolean: true }
-include_imgs { boolean: false }
-include_tags { boolean: false }
-include_locations { boolean: false }
-include_metafields { boolean: false }
-include_source { boolean: false }
-include_engagement { boolean: false }
-include_comments { boolean: false }
-include_pinboards { string: 'all', 'own' }
+# /pads API specification
+
+## General parameters
+- output { string: 'json' } // must specify
+- use_templates { boolean: false }
+- include_data { boolean: true }
+- include_imgs { boolean: false }
+- include_tags { boolean: false }
+- include_locations { boolean: false }
+- include_metafields { boolean: false }
+- include_source { boolean: false }
+- include_engagement { boolean: false }
+- include_comments { boolean: false }
+- include_pinboards { string: 'all', 'own' }
+
+## Specific filters for pads
+- space { string: 'private', 'shared', 'published', 'all' }
+	- 'private' are the user's own pads
+	- 'shared' are the pads created by the user's team mates
+	- 'published' are all published pads, whether they are published internally or externally
+		- what is returned depends on the user's rights, passed with a token (0 if no token-external publications only).
+- search { string: 'search string with boolean opeartors' } 
+- status { int: 0, 1, 2, 3 }
+	- 0: pads that are not publishable (missing some required information). 
+		- only the user's pads are returned.
+	- 1: pads that are ready to be published, but are not yet. 
+		- only the user's pads are returned.
+	- 2: pads that are internally published.
+		- what is returned depends on the user's rights, passed with a token (0 if no token-external publications only).
+- contributors { string: uuid }
+	- uuid of the contributor(s)
+- countries { string: ISO3 }
+	- ISO3 code of the countries/ locations
+- regions { string: 'RBA', 'RBAP', 'RBAS', 'RBEC', 'RBLAC' }, 
+- teams { string }
+	- team name
+- pads { int }
+	- individual pad ids
+- templates { int }
+	- individual template ids that are used in pads. This returns all the pads that use the given template.
+- mobilizations { int }
+	- individual mobilization ids that are used in pads. This returns all the pads that are contributed through the given mobilization.
+- pinboard { int }
+	- individual pinboard ids that are used in pads. This returns all the pads that are pinned to the given board.
+- thematic_areas { int }
+	- the ids of given thematic area tags.
+		- please find the tag ids by using the filters on any of our platforms, and looking for the id in the query parameters of the webpage.
+- sdgs { int }
+	- the ids of given sdg tags (beware these are not related to the usual SDG indexes, e.g. SDG-1 for No Poverty). 
+		- please find the tag ids by using the filters on any of our platforms, and looking for the id in the query parameters of the webpage.
+- datasources { int }
+	- the ids of given datasource tags.
+		- please find the tag ids by using the filters on any of our platforms, and looking for the id in the query parameters of the webpage.
+- page { int }
+	- page number (for pagination)

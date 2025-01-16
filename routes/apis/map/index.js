@@ -22,18 +22,18 @@ module.exports = async (req, res) => {
 				if (typeof sv === 'object') {
 					return Object.keys(sv).sort((a, b) => a.localeCompare(b))
 					.map(sk => {
-						return `${sk}_${sv[sk].toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '')}`;
+						return `${sk}_${(sv[sk] || '')?.toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '')}`;
 					}).join('_');
-				} else return sv.toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '');
+				} else return (sv || '')?.toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '');
 			}).join('_');
 			return `${k}_${sVs}`;
 		} else if (typeof v === 'object') {
 			const sVs = Object.keys(v).sort((a, b) => a.localeCompare(b))
 			.map(sk => {
-				return `${sk}_${v[sk].toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '')}`;
+				return `${sk}_${(sv[sk] || '')?.toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '')}`;
 			}).join('_');
 			return `${k}_${sVs}`;
-		} else return `${k}_${v.toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '')}`;
+		} else return `${k}_${(v || '')?.toString().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'').replace(/\s+/, '')}`;
 	}).join('_');
 	console.log('check name', queryString);
 

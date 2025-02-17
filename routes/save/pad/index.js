@@ -1,5 +1,5 @@
 const { app_title_short, app_storage, DB } = include('config/')
-const { limitLength, embed_document } = include('routes/helpers/')
+const { limitLength } = include('routes/helpers/')
 const fs = require('fs')
 const path = require('path')
 const { BlobServiceClient } = require('@azure/storage-blob')
@@ -38,9 +38,6 @@ module.exports = (req, res) => {
 			const newID = result ? result.id : undefined
 			const batch = []
 
-			//EMBED DOCUMENT
-			embed_document(newID || id)
-			
 			// SAVE TAGS INFO
 			if (tagging?.length) {
 				// SAVE TAGS INFO

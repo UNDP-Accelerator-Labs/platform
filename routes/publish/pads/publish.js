@@ -1,5 +1,5 @@
 const { modules, DB } = include('config/')
-const { checklanguage, safeArr, DEFAULT_UUID, redirectBack } = include('routes/helpers/')
+const { checklanguage, safeArr, DEFAULT_UUID, redirectBack, embed_document } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
@@ -82,6 +82,10 @@ module.exports = (req, res) => {
 
 		return t.batch(batch)
 		.then(_ => {
+			for (const i of id) {
+				//EMBED DOCUMENT
+				embed_document(i)
+			}
 			if (redirect) res.redirect(redirect)
 			else redirectBack(req, res)
 		}).catch(err => console.log(err))

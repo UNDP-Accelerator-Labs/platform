@@ -290,6 +290,10 @@ exports.restricted_routes = restricted_routes || null;
 
 exports.platform_urls = [
   {
+    title: 'SDG Commons',
+    url: 'https://sdg-innovation-commons.org',
+  },
+  {
     title: 'Learning Plans',
     url: 'https://learningplans.sdg-innovation-commons.org/en/browse/pads/published',
   },
@@ -309,10 +313,6 @@ exports.platform_urls = [
   //   title: 'Signal Scanning',
   //   url: 'https://horizons.sdg-innovation-commons.org',
   // },
-  {
-    title: 'Insights',
-    url: 'https://sdg-innovation-commons.org',
-  },
   // {
   //   title: 'SDG Map',
   //   url: 'https://map.sdg-innovation-commons.org/',

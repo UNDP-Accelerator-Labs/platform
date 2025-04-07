@@ -1314,7 +1314,8 @@ div.browse {
           article {
             position: relative;
             display: flex;
-            padding: 15px 0 15px 15px;
+/*            padding: 15px 0 15px 15px;*/
+            padding: 0 0 15px 15px;
             margin-bottom: 15px;
             border: 1px solid transparent;
             box-sizing: border-box;
@@ -1345,6 +1346,7 @@ div.browse {
 
                   .meta-data {
                     margin-bottom: 0;
+                    padding-top: 15px;
 
                     .meta-contributor {
                       font-size: $t-mid-small;
@@ -1363,9 +1365,9 @@ div.browse {
                     grid-auto-flow: column;
                     /*margin: -16px -1px 0 auto;*/
                     justify-content: right;
-                    transform: translateY(calc(-100% + 14px));
-                    align-items: end;
-                    margin: 0 -1px 0 auto;
+/*                    transform: translateY(calc(-100% + 14px));*/
+                    align-items: start;
+                    margin: -1px -1px 0 auto;
 
                     form {
                       position: relative;

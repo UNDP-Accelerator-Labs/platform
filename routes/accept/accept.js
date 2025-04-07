@@ -26,8 +26,8 @@ module.exports = (req, res) => {
 			;`, [ uuid, id, template ], d => d.id)
 			.then(result => {
 				return t.none(`
-					INSERT INTO reviews (pad, reviewer, review)
-					VALUES ($1::INT, $2, $3::INT)
+					INSERT INTO reviews (pad, reviewer, review, request)
+					SELECT $1::INT, $2, $3::INT, id FROM review_requests WHERE pad = $1::INT
 				;`, [ id, uuid, result ])
 				.catch(err => console.log(err))
 			}).catch(err => console.log(err)))

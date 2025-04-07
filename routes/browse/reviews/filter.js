@@ -61,11 +61,24 @@ module.exports = async req => {
 
 	let f_space = null
 	if (space === 'pending') f_space = DB.pgp.as.format(`
-		(p.id IN (
-			SELECT DISTINCT (pad) 
-			FROM review_requests 
-			WHERE id IN (SELECT request FROM reviewer_pool WHERE (reviewer = $1 OR $2 > 2) AND status = 0) 
-		) AND p.id NOT IN (SELECT pad FROM reviews WHERE reviewer = $1))
+		(p.id IN 
+			(
+				SELECT DISTINCT (pad) 
+				FROM review_requests 
+				WHERE id IN (
+					SELECT request FROM reviewer_pool 
+					WHERE (reviewer = $1 OR $2 > 2) 
+					AND status = 0
+				) 
+			) AND p.id NOT IN (
+				SELECT pad FROM reviews 
+				WHERE reviewer = $1
+				AND request IS NOT NULL
+				AND request IN (
+					SELECT id FROM review_requests
+				)
+			)
+		)
 	`, [ uuid, rights ])
 	
 	if (space === 'ongoing') f_space = DB.pgp.as.format(`

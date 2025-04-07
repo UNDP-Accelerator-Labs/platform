@@ -39,7 +39,13 @@ module.exports = async kwargs => {
 			-- END AS date,
 
 		-- GET STATUS
-			COALESCE((SELECT status FROM reviews WHERE (review = p.id OR pad = p.id) AND reviewer = $1), -1) AS status,
+			COALESCE(
+				(
+					-- SELECT status FROM reviews WHERE (review = p.id OR pad = p.id) 
+					SELECT status FROM reviews WHERE (review = p.id) 
+					AND reviewer = $1
+				), 
+			-1) AS status,
 
 		-- DETERMINE IF REVIEWER IS POOLED
 			CASE WHEN $1 IN (
@@ -164,7 +170,7 @@ module.exports = async kwargs => {
 			d.tags = parsers.getTags(d)
 			d.txt = parsers.getTxt(d)
 			delete d.sections // WE DO NOT NEED TO SEND ALL THE DATA (JSON PAD STRUCTURE) AS WE HAVE EXTRACTED THE NECESSARY INFO ABOVE
-		})
+		});
 
 		const data = await join.users(results.flat(), [ language, 'owner' ])
 		return {

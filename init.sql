@@ -297,7 +297,8 @@ CREATE TABLE reviews (
     pad INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
     review INT REFERENCES pads(id) ON UPDATE CASCADE ON DELETE CASCADE,
     reviewer uuid,
-    status INT DEFAULT 0
+    status INT DEFAULT 0,
+    request INT
     -- CONSTRAINT unique_reviewer UNIQUE (pad, reviewer)
 );
 

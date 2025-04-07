@@ -29,7 +29,6 @@ module.exports = (req, res) => {
 						AND (reviewer = $3
 							OR $4 > 2)
 				;`, [ status, id, uuid, rights ]))
-
 			}
 		}
 
@@ -79,6 +78,13 @@ module.exports = (req, res) => {
 									batch.push(t1.none(`
 										UPDATE pads
 										SET status = 3
+										WHERE id = $1
+									;`, [ source ]))
+								} else {
+									// 3/ DEMOTE PAD TO PUBLISHABLE
+									batch.push(t1.none(`
+										UPDATE pads
+										SET status = 1
 										WHERE id = $1
 									;`, [ source ]))
 								}

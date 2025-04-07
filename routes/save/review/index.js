@@ -25,11 +25,11 @@ module.exports = (req, res) => {
 		var saveSQL = DB.pgp.helpers.update(req.body, Object.keys(req.body).filter(d => !['id', 'completion', 'deletion', 'mobilization', 'tagging', 'locations', 'metadata'].includes(d)), 'pads') + condition
 	}
 
-	DB.conn.tx(t => {
-		console.log('update start ')
+	return DB.conn.tx(t => {
+		console.log('update start')
 		return t.oneOrNone(saveSQL)
 		.then(result => {
-			const newID = result ? result.id : undefined
+			const newID = result ? result.id : id
 			const batch = []
 
 			// UPDATE THE REVIEW REQUEST
@@ -37,14 +37,13 @@ module.exports = (req, res) => {
 				UPDATE pads SET update_at = NOW() WHERE id = $1::INT
 			;`, [ newID || id]))
 
-
 			// UPDATE STATUS
 			batch.push(t.one(`
 				SELECT status FROM pads
 				WHERE id = $1::INT
 			;`, [ newID || id ], d => d.status)
 			.then(status => {
-				if (completion) status = Math.max(Math.max(1, status), 2) // REVIEWS ARE ALWAYS INTERNAL
+				if (completion) status = Math.min(Math.max(1, status), 2) // REVIEWS ARE ALWAYS INTERNAL
 				else status = 0
 
 				return t.task(t1 => {
@@ -59,8 +58,8 @@ module.exports = (req, res) => {
 					if (!id) { // INSERT NEW REVIEW
 						// SAVE STATUS FOR REVIEW INSTANCE
 						batch1.push(t1.none(`
-							INSERT INTO reviews (pad, reviewer, review, status)
-							SELECT $1, $2, $3, $4
+							INSERT INTO reviews (pad, reviewer, review, status, request)
+							SELECT $1::INT, $2, $3::INT, $4, id FROM review_requests WHERE pad = $1::INT
 						;`, [ source, uuid, newID || id, status ]))
 					} else {
 						// SAVE STATUS FOR REVIEW INSTANCE

@@ -340,7 +340,8 @@ export const Entry = function (_kwargs) {
                   disabled: !(
                     d.editable &&
                     [1, 2].includes(d.status) &&
-                    publishable
+                    publishable &&
+                    !(modules.some((d) => d.type === 'reviews') && d.status === 2 && d.review_status === 1)
                   ),
                   classname: 'publish',
                   label: vocabulary['publish'],

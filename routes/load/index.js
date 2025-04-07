@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
 	let { feature } = req.body || {}
 
 	if (modules.some(d => [object, `${object}s`].includes(d.type))) {
-		let data
+		let data;
 
 		if (object === 'pads') {
 			// FOR PADS, res NEEDS TO BE PASSED FOR CHECKING THE instance IN /routes/browse/pads/filter.js
@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
 			else if (feature === 'locations') { data = await pads.load.locations({ req, res }) }
 			else if (feature === 'samples') { data = await pads.load.samples({ req, res }) }
 			else { data = await pads.load.data({ req, res }); }
-		} else if (object === 'pad') {
+		} else if (['pad', 'review'].includes(object)) {
 			if (feature === 'status') { data = await pad.load.status({ req }) }
 			else { data = await pad.load.data({ req }) }
 		}

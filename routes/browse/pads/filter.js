@@ -460,8 +460,8 @@ module.exports = async (req, res) => {
 		.catch(err => console.log(err)))
 	}
 	if (templates) {
-		const positive_filter = templates.filter(d => d.charAt(0) !== '-');
-		const negative_filter = templates.filter(d => d.charAt(0) === '-').map(d => d.substring(1));
+		const positive_filter = templates.filter(d => d.toString().charAt(0) !== '-');
+		const negative_filter = templates.filter(d => d.toString().charAt(0) === '-').map(d => d.toString().substring(1));
 		
 		if (positive_filter.length) {
 			platform_filters.push(DB.pgp.as.format(`p.template IN ($1:csv)`, [ positive_filter ]))
@@ -473,8 +473,8 @@ module.exports = async (req, res) => {
 		}
 	}
 	if (mobilizations) {
-		const positive_filter = mobilizations.filter(d => d.charAt(0) !== '-');
-		const negative_filter = mobilizations.filter(d => d.charAt(0) === '-').map(d => d.substring(1));
+		const positive_filter = mobilizations.filter(d => d.toString().charAt(0) !== '-');
+		const negative_filter = mobilizations.filter(d => d.toString().charAt(0) === '-').map(d => d.toString().substring(1));
 		
 		if (positive_filter.length) {
 			platform_filters.push(DB.pgp.as.format(`
@@ -495,9 +495,37 @@ module.exports = async (req, res) => {
 	metafields.forEach(d => {
 		if (Object.keys(req.query).includes(d.label) || Object.keys(req.body).includes(d.label)) {
 			if (['tag', 'index'].includes(d.type)) {
-				content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))`, [ d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
+				let values = req.query[d.label] || req.body[d.label];
+				if (!Array.isArray(values)) values = [values];
+				const positive_filter = values.filter(d => d.toString().charAt(0) !== '-');
+				const negative_filter = values.filter(d => d.toString().charAt(0) === '-').map(d => d.toString().substring(1));
+
+				if (positive_filter.length) {
+					content_filters.push(DB.pgp.as.format(`
+						p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id IN ($2:csv))
+					`, [ d.label, safeArr(positive_filter, -1) ]));
+				}
+				if (negative_filter.length) {
+					content_filters.push(DB.pgp.as.format(`
+						p.id IN (SELECT pad FROM tagging WHERE type = $1 AND tag_id NOT IN ($2:csv))
+					`, [ d.label, safeArr(negative_filter, -1) ]));
+				}
 			} else if (!['tag', 'index', 'location', 'attachment'].includes(d.type)) {
-				content_filters.push(DB.pgp.as.format(`p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))`, [ d.type, d.label, safeArr(req.query[d.label] || req.body[d.label], -1) ]))
+				let values = req.query[d.label] || req.body[d.label];
+				if (!Array.isArray(values)) values = [values];
+				const positive_filter = values.filter(d => d.toString().charAt(0) !== '-');
+				const negative_filter = values.filter(d => d.toString().charAt(0) === '-').map(d => d.toString().substring(1));
+
+				if (positive_filter.length) {
+					content_filters.push(DB.pgp.as.format(`
+						p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key IN ($3:csv))
+					`, [ d.type, d.label, safeArr(positive_filter, -1) ]))
+				}
+				if (negative_filter.length) {
+					content_filters.push(DB.pgp.as.format(`
+						p.id IN (SELECT pad FROM metafields WHERE type = $1 AND name = $2 AND key NOT IN ($3:csv))
+					`, [ d.type, d.label, safeArr(negative_filter, -1) ]))
+				}
 			}
 		}
 	})

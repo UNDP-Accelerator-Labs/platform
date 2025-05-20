@@ -15,7 +15,7 @@ const filter = include('routes/browse/pads/filter');
 module.exports = async (req, res) => {
 	const { host } = req.headers || {}
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
- 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, include_pinboards, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+ 	let { output, render, use_templates, include_data, include_imgs, include_tags, include_locations, include_metafields, include_source, include_engagement, include_comments, anonymize_comments = true, include_pinboards, page, limit, pseudonymize } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
  	const { uuid } = req.session;
 	
 	if (typeof pseudonymize === 'string') pseudonymize = JSON.parse(pseudonymize);
@@ -357,12 +357,16 @@ module.exports = async (req, res) => {
 
 							// ANONYMIZE COMMENTERS
 							if (include_comments) {
-								let commenter_list = array.unique.call(pad_group.values.map(d => d.comments).flat(), { key: 'user_id', onkey: true })
-								commenter_list = array.shuffle.call(commenter_list)
+								if(anonymize_comments === false || anonymize_comments === 'false') {
+									d.comments = await join.users(d.comments, [ 'en', 'user_id' ])
+								} else {
+									let commenter_list = array.unique.call(pad_group.values.map(d => d.comments).flat(), { key: 'user_id', onkey: true })
+									commenter_list = array.shuffle.call(commenter_list)
 
-								d.comments.forEach(c => {
-									c.user_id = `u-${commenter_list.indexOf(c.user_id) + 1}`
-								})
+									d.comments.forEach(c => {
+										c.user_id = `u-${commenter_list.indexOf(c.user_id) + 1}`
+									})
+								}
 							} else delete d.comments
 
 							// SET MAIN DATA

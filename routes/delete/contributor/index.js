@@ -1,11 +1,19 @@
 const { modules, DB } = include('config/')
-const { redirectUnauthorized, redirectBack } = include('routes/helpers/')
+const { redirectUnauthorized, redirectBack, sessionupdate } = include('routes/helpers/')
 const cron = require('node-cron')
 
 module.exports = (req, res) => {
 	const { referer } = req.headers || {}
-	let { id, type, date } = req.query || {}
+	let { id, type, date, anonymize, is_api_call } = req.query || {}
 	const { uuid, rights, public } = req.session || {}
+
+	anonymize = anonymize === 'true' || anonymize === true
+	is_api_call = is_api_call === 'true' || is_api_call === true
+
+	// Anonymize user-generated content
+	const placeholderName = 'Anonymous User';
+	const placeholderEmail = 'deleted.' +  new Date().valueOf() + '@deleted.com';
+
 	// CONVERT id TO ARRAY
 	if (!Array.isArray(id)) id = [id]
 
@@ -13,17 +21,32 @@ module.exports = (req, res) => {
 		const now = new Date()
 		const end_date = new Date(date)
 
-		const usersql = DB.pgp.as.format(`
-			UPDATE users
-			SET rights = 0,
-				left_at = $1
-			WHERE uuid IN ($2:csv)
-				AND (uuid IN (
-					SELECT contributor FROM cohorts
-					WHERE host = $3
-				) OR $4 > 2)
-		;`, [ date, id, uuid, rights ])
-
+		const usersql = anonymize
+			? DB.pgp.as.format(`
+				UPDATE users
+				SET name = $1,
+					email = $2,
+					position = NULL,
+					iso3 = NULL,
+					password = '',
+					language = NULL,
+					secondary_languages = NULL,
+					last_login = NULL,
+					rights = 0,
+					left_at = $3
+				WHERE uuid IN ($4:csv)
+			;`, [ placeholderName, placeholderEmail, date ?? now, id, uuid, rights ])
+			: DB.pgp.as.format(`
+				UPDATE users
+				SET rights = 0,
+					left_at = $1
+				WHERE uuid IN ($2:csv)
+					AND (uuid IN (
+						SELECT contributor FROM cohorts
+						WHERE host = $3
+					) OR $4 > 2)
+			;`, [ date, id, uuid, rights ]);
+	
 		let teamsql = undefined
 		if (modules.some(d => d.type === 'teams' && d.rights.write <= rights)) {
 			teamsql = DB.pgp.as.format(`
@@ -42,7 +65,18 @@ module.exports = (req, res) => {
 			cron.schedule(`${min} ${hour} ${day} ${month} *`, function () {
 				DB.conn.tx(t => {
 					return t.none(usersql)
-					.then(_ => {
+					.then(async _ => {
+
+						// Delete all users' device records
+						await t.none(`DELETE FROM trusted_devices WHERE user_uuid IN ($1:csv);`, [id]);
+
+						// Delete all users' session records 
+						await sessionupdate({
+							conn: t,
+							whereClause: `sess ->> 'uuid' IN ($1:csv)`,
+							queryValues: [id]
+						});
+
 						if (teamsql) {
 							return t.none(teamsql)
 							.then(_ => {
@@ -61,16 +95,35 @@ module.exports = (req, res) => {
 						}
 					}).catch(err => console.log(err))
 				}).then(_ => {
+					if(is_api_call) {
+						return res.status(200).json({
+							status: 200,
+							message: 'User removal scheduled successfully.'
+						})
+					}
+					
 					redirectBack(req, res)
 				}).catch(err => console.log(err))
 			})
 		} else {
 			DB.general.tx(t => {
 				return t.none(usersql)
-				.then(_ => {
+				.then(async _ => {
+
+					// Delete all users' device records
+					await t.none(`DELETE FROM trusted_devices WHERE user_uuid IN ($1:csv);`, [id]);
+
+					// Delete all users' session records 
+					await sessionupdate({
+						conn: t,
+						whereClause: `sess ->> 'uuid' IN ($1:csv)`,
+						queryValues: [id]
+					});
+
 					if (teamsql) {
 						return t.none(teamsql)
-						.then(_ => {
+						.then(async _ => {
+
 							return t.none(`
 								DELETE FROM teams t
 								WHERE t.host = $1
@@ -86,6 +139,12 @@ module.exports = (req, res) => {
 					}
 				}).catch(err => console.log(err))
 			}).then(_ => {
+				if(is_api_call) {
+					return res.status(200).json({
+						status: 200,
+						message: 'User removed successfully.'
+					})
+				}
 				redirectBack(req, res)
 			}).catch(err => console.log(err))
 		}
@@ -119,6 +178,12 @@ module.exports = (req, res) => {
 			.catch(err => console.log(err))
 		} else res.redirect(referer)*/
 	} else {
+		if(is_api_call) {
+			return res.status(401).json({
+				status: 401,
+				message: 'Unauthorized action.'
+			})
+		}
 		redirectUnauthorized(req, res)
 	}
 }

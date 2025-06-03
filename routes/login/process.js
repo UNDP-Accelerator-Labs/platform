@@ -2,6 +2,7 @@ const { app_languages, modules, app_base_host, DB, app_title, is_staging } = inc
 const { datastructures, join, removeSubdomain, redirectUnauthorized, redirectError, checkOrigin } = include('routes/helpers/')
 const jwt = require('jsonwebtoken')
 const {deviceInfo, sendDeviceCode, extractPathValue, getPath } = require('./device-info')
+const { is } = require('useragent')
 
 module.exports = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token']
@@ -104,10 +105,12 @@ module.exports = (req, res, next) => {
 			}).catch(err => console.log(err))
 		} else redirectUnauthorized(req, res)
 	} else {
-		const { username, password, originalUrl, is_trusted } = req.body || {}
+		let { username, password, originalUrl, is_trusted, is_api_call = false } = req.body || {}
 		const { sessionID: sid } = req || {}
 		const urlParams = new URLSearchParams(originalUrl)
 		const original_app = urlParams.get('/login?app');
+
+		is_trusted = is_trusted === 'on' || is_trusted === true || is_trusted === 'true' 
 
 		if (!username || !password) {
 			req.session.errormessage = 'Please input your username and password.' // TO DO: TRANSLATE
@@ -162,6 +165,9 @@ module.exports = (req, res, next) => {
 				if (!result) {
 					req.session.errormessage = 'Invalid login credentails. ' + (req.session.attemptmessage || '');
 					req.session.attemptmessage = ''
+					if (is_api_call) {
+						return res.status(401).json({ status: 401, message: req.session.errormessage });
+					}
 					redirectUnauthorized(req, res)
 				} else {
 					const { language, rights } = result
@@ -221,6 +227,9 @@ module.exports = (req, res, next) => {
 								await Object.assign(req.session, datastructures.sessiondata(sess));
 								req.session.save(function(err) {
 									if(err) console.log(' err ', err)
+									if (is_api_call) {
+										return res.status(200).json({ status: 200, message: 'Login successful', redirecturl: originalUrl, user: result });
+									}
 									if(checkOrigin(redirecturl, origin_url)){
 										return res.redirect(redirecturl)
 									}
@@ -255,6 +264,11 @@ module.exports = (req, res, next) => {
 								await Object.assign(req.session, datastructures.sessiondata(sess))
 								req.session.save(function(err) {
 									if(err) console.log(' err ', err)
+
+									if (is_api_call) {
+										return res.status(200).json({ status: 200, message: 'Login successful', redirecturl: originalUrl, user: result });
+									}
+
 									if(checkOrigin(redirecturl, origin_url)){
 										return res.redirect(redirecturl)
 									}

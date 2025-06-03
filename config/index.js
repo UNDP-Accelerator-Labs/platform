@@ -45,6 +45,8 @@ const base_host = is_staging
   ? 'acclabs-staging.azurewebsites.net'
   : 'sdg-innovation-commons.org';
 exports.app_base_host = base_host;
+exports.base_host = base_host;
+
 exports.app_suite_url = is_staging
   ? `https://${base_host}/`
   : `https://www.${base_host}/`;

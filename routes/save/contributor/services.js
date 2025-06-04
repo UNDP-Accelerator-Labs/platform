@@ -149,7 +149,7 @@ exports.updateNewEmail = async (req, res, next) => {
         req.session.errormessage = 'Email changed successful.'
 
       if(req.session.uuid === uuid){
-        req.session.destroy()
+        // req.session.destroy()
         if (is_api_call) {
           return res.status(200).json({
             status: 200,

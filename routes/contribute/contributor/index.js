@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
 
 	is_api_call = is_api_call === 'true' || is_api_call === true
 
-	if (public) redirectUnauthorized(req, res)
+	if (public && !is_api_call) redirectUnauthorized(req, res)
 	else {
 		const { referer } = req.headers || {}
 		const { id, errormessage, u_errormessage } = req.query || {}
@@ -33,7 +33,6 @@ module.exports = async (req, res) => {
 					// const query = []
 					// for (const [key, value] of req.query) {
 					// 	query.push(`${key}=${value}`);
-					// }
 					const query = new URLSearchParams(req.query || {});
 					return res.redirect(`/${language}/${redirect}/contributor?${query.toString()}`)
 				} else {

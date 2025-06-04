@@ -3,6 +3,9 @@ const { checklanguage, datastructures, geo, join, redirectUnauthorized } = inclu
 
 module.exports = async (req, res) => {
 	const { uuid, rights, public } = req.session || {}
+	let { is_api_call } = req.query || {}
+
+	is_api_call = is_api_call === 'true' || is_api_call === true
 
 	if (public) redirectUnauthorized(req, res)
 	else {
@@ -16,8 +19,15 @@ module.exports = async (req, res) => {
 		DB.general.tx(async t => {
 			return check_authorization({ connection: t, id, uuid, rights, public })
 			.then(async result => {
-				const { authorized, redirect } = result
-				if (!authorized) {
+				const { authorized, redirect } = result || {}
+				if (!authorized && !is_api_call) {
+					if (is_api_call) {
+						return res.status(403).json({
+							status: 403,
+							success: false,
+							message: 'Unauthorized access',
+						})
+					}
 					redirectUnauthorized(req, res)
 				} else if (authorized && redirect && redirect !== activity) {
 					// const query = []
@@ -84,7 +94,7 @@ module.exports = async (req, res) => {
 							// GET BASIC INFO
 							batch1.push(t1.one(`
 								SELECT DISTINCT (u.uuid), u.name, u.email, u.position, u.iso3, u.language,
-									u.secondary_languages, u.rights, u.notifications, u.reviewer,
+									u.secondary_languages, u.rights, u.notifications, u.reviewer, created_at,
 
 									CASE WHEN u.uuid = $1
 										OR $2 > 2
@@ -222,7 +232,17 @@ module.exports = async (req, res) => {
 						const metadata = await datastructures.pagemetadata({ req })
 
 						return Object.assign(metadata, { data, countries, languages, teams, errormessage, trusted_devices, u_errormessage })
-					}).then(data => res.render('contribute/contributor/', data))
+					}).then(data => {
+						if (is_api_call) {
+							return res.status(200).json({
+								status: 200,
+								success: true,
+								data: data,
+							})
+						}
+
+						res.render('contribute/contributor/', data)
+					})
 					.catch(err => console.log(err))
 				}
 			}).catch(err => console.log(err))

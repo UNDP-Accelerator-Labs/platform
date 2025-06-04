@@ -36,7 +36,12 @@ module.exports = (req, res, next) => {
 
   const device = deviceInfo(req);
   const { sessionID: sid } = req || {};
-  const { __ucd_app, __puid, __cduid, origin_url, app } = extraData;
+  const { __ucd_app, __puid, __cduid, origin_url, app,
+    host_redirect_url,
+		host_redirect_failed_auth_url,
+		is_api_call,
+   } = extraData;
+
   //NEW USER DEFAULT VALUES
   const rights = 1;
   const iso3 = 'USA';
@@ -115,6 +120,9 @@ module.exports = (req, res, next) => {
               )
               .then(async (results) => {
                 if (!results) {
+                  if (is_api_call) {
+                    return res.redirect(host_redirect_failed_auth_url || '/');
+                  }
                   redirectUnauthorized(req, res)
                 } else {
                   const { language, rights, uuid } = results;
@@ -174,6 +182,11 @@ module.exports = (req, res, next) => {
                         if (err) {
                           console.log(' err ', err)
                         }
+
+                        if (is_api_call) {
+                          return res.redirect(host_redirect_url || redirecturl);
+                        }
+
                         if(checkOrigin(redirecturl)){
                             return res.redirect(redirecturl)
                         }
@@ -190,6 +203,9 @@ module.exports = (req, res, next) => {
                         if (err) {
                           console.log(' err ', err)
                         }
+                        if (is_api_call) {
+                          return res.redirect(host_redirect_url || redirecturl);
+                        }
                         if(checkOrigin(redirecturl)){
                             return res.redirect(redirecturl)
                         }
@@ -200,11 +216,19 @@ module.exports = (req, res, next) => {
               })
               .catch((error) => {
                 console.log(error);
+
+                if (is_api_call) {
+                  return res.redirect(host_redirect_failed_auth_url || '/');
+                }
                 redirectError(req, res)
               });
           })
           .catch((error) => {
             console.log(error);
+            if (is_api_call) {
+              return res.redirect(host_redirect_failed_auth_url || '/');
+            }
+
             redirectError(req, res)
           });
       });
@@ -212,6 +236,9 @@ module.exports = (req, res, next) => {
     .catch((error) => {
       // Handle authentication failure
       console.log(error);
+      if (is_api_call) {
+        return res.redirect(host_redirect_failed_auth_url || '/');
+      }
       redirectUnauthorized(req, res)
     });
 };

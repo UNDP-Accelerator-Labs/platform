@@ -212,7 +212,7 @@ module.exports = async (req, res) => {
 					const data = await Promise.all(sources.map(async d => {
 						// ANONYMIZE CONTRIBUTORS
 						// NOTE THIS id IS DISSOCIATED FROM COMMENTS
-						d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`;
+						// d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`;
 
 						// GET SNIPPET
 						d.snippet = parsers.getTxt(d)?.[0]
@@ -295,7 +295,7 @@ module.exports = async (req, res) => {
 						return (async () => {
 							// ANONYMIZE CONTRIBUTORS
 							// NOTE THIS id IS DISSOCIATED FROM COMMENTS
-							d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
+							// d.contributor_id = `c-${contributor_list.indexOf(d.contributor_id) + 1}`
 
 							// GET SNIPPET
 							d.snippet = parsers.getTxt(d)?.[0]

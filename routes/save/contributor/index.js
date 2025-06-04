@@ -1,17 +1,21 @@
 const { modules, app_suite_url, own_app_url, app_title, app_title_short, app_languages, DB, translations } = include('config/')
 const { email: sendemail, sessionupdate, redirectBack, redirectError } = include('routes/helpers/')
+const { error } = require('../..')
 const { isPasswordSecure, createResetLink } = require('../../login')
 const { updateRecord, confirmEmail } = require('./services')
 
 module.exports =async (req, res) => {
 	const { uuid, rights: session_rights, username, is_trusted, email: initiatorEmail } = req.session || {}
-	let { id, teams, new_teams, ...userinfo } = req.body || {}
+	let { id, teams, new_teams, fromBaseHost, ...userinfo  } = req.body || {}
 	let { new_name: name, new_email: email, new_position: position, new_password: password, iso3, language, rights, reviewer, email_notifications: notifications, secondary_languages } = userinfo || {}
 	if (teams && !Array.isArray(teams)) teams = [teams]
 	if (new_teams && !Array.isArray(new_teams)) new_teams = [new_teams]
 	if (secondary_languages && !Array.isArray(secondary_languages)) secondary_languages = [secondary_languages]
 
+	fromBaseHost = fromBaseHost === 'true' || fromBaseHost === true;
+
 	let logoutAll = false;
+	let errorMessage = '';
 
 	let redirect_url;
 	const { protocol } = req
@@ -24,11 +28,22 @@ module.exports =async (req, res) => {
 		let message = isPasswordSecure(password);
 		if (message.length) {
 			nextParams.set('errormessage', message);
+			//fromBaseHost is used to determine if the request is coming from the base host or not
+			if (fromBaseHost) {
+				return res.status(400).json({
+					status: 400,
+					message: message
+				});
+			}
 			return res.redirect(`${nextUrl.pathname}?${nextParams.toString()}`);
 		}
 	}
 	if (!id) {
-		password = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);  // we always create a random password
+		password = password ?? (Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10));  // we always create a random password
+		if(fromBaseHost){
+			rights = 1
+			language = 'en'
+		}
 		DB.general.tx(t => {
 			if (Object.keys(userinfo).length) {
 				return t.one(`
@@ -49,64 +64,92 @@ module.exports =async (req, res) => {
 				], d => d.uuid)
 				.then(result => {
 					const batch = []
-					batch.push(t.none(`
-						INSERT INTO cohorts (contributor, host)
-						VALUES ($1, $2)
-					;`, [ result, uuid ]))
+					//IF FROM BASE HOST, WE DO NOT CREATE A COHORT BECAUSE THE ACCOUNT IS SELF CREATED AND NOT CREATED BY SOMEONE ELSE
+					if(!fromBaseHost) {
+						batch.push(t.none(`
+							INSERT INTO cohorts (contributor, host)
+							VALUES ($1, $2)
+						;`, [ result, uuid ]))
 
 
-					if (modules.some(d => d.type === 'teams' && d.rights.write <= session_rights)) {
-						if (new_teams?.length > 0) {
-							const insert_teams = new_teams.map(d => {
-								const obj = {}
-								obj.host = uuid
-								obj.name = d
-								return obj
-							})
+						if (modules.some(d => d.type === 'teams' && d.rights.write <= session_rights)) {
+							if (new_teams?.length > 0) {
+								const insert_teams = new_teams.map(d => {
+									const obj = {}
+									obj.host = uuid
+									obj.name = d
+									return obj
+								})
 
-							const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`
-							batch.push(t.any(sql)
-							.then(results => {
-								const team_members = results.map(d => {
-									return [ result, uuid ].map(c => {
-										const obj = {}
-										obj.team = d.id
-										obj.member = c
-										return obj
-									})
-								}).flat()
+								const sql = `${DB.pgp.helpers.insert(insert_teams, [ 'host', 'name' ], 'teams')} RETURNING id;`
+								batch.push(t.any(sql)
+								.then(results => {
+									const team_members = results.map(d => {
+										return [ result, uuid ].map(c => {
+											const obj = {}
+											obj.team = d.id
+											obj.member = c
+											return obj
+										})
+									}).flat()
 
-								const sql = DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')
-								return t.none(sql)
-								.catch(err => console.log(err))
-							}).catch(err => console.log(err)))
-						}
-						if (teams?.length > 0) {
-							teams.forEach(d => {
-								batch.push(t.none(`
-									INSERT INTO team_members (team, member)
-									VALUES ($1, $2)
-								;`, [ d, result ]))
-							})
+									const sql = DB.pgp.helpers.insert(team_members, [ 'team', 'member' ], 'team_members')
+									return t.none(sql)
+									.catch(err => console.log(err))
+								}).catch(err => console.log(err)))
+							}
+							if (teams?.length > 0) {
+								teams.forEach(d => {
+									batch.push(t.none(`
+										INSERT INTO team_members (team, member)
+										VALUES ($1, $2)
+									;`, [ d, result ]))
+								})
+							}
 						}
 					}
 					return t.batch(batch)
 					.then(async _ => {
-						const own_app = new URL(own_app_url)
-						const resetLink = await createResetLink(own_app.protocol, own_app.hostname, email);
-						if (result !== uuid) {
-							// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
-							const temail = translations['email notifications'];
-							const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
-							const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
+						// SEND EMAIL TO THE NEW USER
+						// IF FROM  BASE HOST, WE DO NOT NEED TO SEND RESENT LINK AS THE USER IS CREATING THE ACCOUNT. HOWEVER, WE NEED TO SEND THE EMAIL NOTIFICATION
+						if(fromBaseHost) {
 							await sendemail({
 								to: email,
-								cc: initiatorEmail,
-								subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(platformName),
-								html: (temail['new user body'][language] ?? temail['new user body']['en'])(name, username, initiatorEmail, platformName, platformDesc, resetLink, own_app_url, app_suite_url),
-							})
-							return result
-						} else return result
+								subject: `Welcome to SDG Commons!`,
+								html: `
+									<p>
+									Hello ${name}!
+									</p><p>
+									Welcome to the <a href="${app_suite_url}">SDG Commons</a>.<br/>
+									We are excited to share with you the SDG Commons of the UNDP Accelerator Labs.
+									This platform is part of the
+									<a href="${app_suite_url}">SDG Innovation Commons Suite</a>. With your account
+									you have access to all its platforms.
+									</p>
+									The SDG Commons is a resource hub with data, insights, solutions and next practices for the Sustainable Development Goals (SDGs) powered by the UNDP Accelerator Labs. 
+									<p>
+									We appreciate your interest in advance and look forward to the possibility of collaborating closely on this initiative.
+									</p>
+								`,
+							});
+							return result;
+						}else {
+							const own_app = new URL(own_app_url)
+							const resetLink = await createResetLink(own_app.protocol, own_app.hostname, email);
+							if (result !== uuid) {
+								// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
+								const temail = translations['email notifications'];
+								const platformName = (translations['app title']?.[app_title_short]?.[language] ?? translations['app title']?.[app_title_short]?.['en']) ?? app_title;
+								const platformDesc = (translations['app desc']?.[app_title_short]?.[language] ?? translations['app desc']?.[app_title_short]?.['en']) ?? '';
+								await sendemail({
+									to: email,
+									cc: initiatorEmail,
+									subject: (temail['new user subject'][language] ?? temail['new user subject']['en'])(platformName),
+									html: (temail['new user body'][language] ?? temail['new user body']['en'])(name, username, initiatorEmail, platformName, platformDesc, resetLink, own_app_url, app_suite_url),
+								})
+								return result
+							} else return result
+						}
 					})
 					.catch(err => console.log(err))
 				}).catch(err => {
@@ -116,9 +159,26 @@ module.exports =async (req, res) => {
 				})
 			} else return null
 		}).then(result => {
-			if (result) res.redirect(`/${language}/edit/contributor?id=${result}`)
+			if (result) {
+				if( fromBaseHost) {
+					return res.status(200).json({
+						status: 200,
+						message: 'Account created successfully. Please proceed to login with your email and password.',
+						data: result
+					});
+				}
+
+				res.redirect(`/${language}/edit/contributor?id=${result}`)
+			}
 			else { // TELL THE USER TO LOG IN OR USE A DIFFERENT EMAIL
 				const message = 'It seems the email you want to use is already associated with an account. Please use a different email for the new account.' // TO DO: TRANSLATE
+				if (fromBaseHost) {
+					return res.status(400).json({
+						status: 400,
+						message: message
+					});
+				}
+				errorMessage = message;
 				nextParams.set('errormessage', message)
 				res.redirect(`${nextUrl.pathname}?${nextParams.toString()}`);
 			}
@@ -143,16 +203,20 @@ module.exports =async (req, res) => {
 
 						const u_user = await t.oneOrNone(`SELECT email, name FROM users WHERE uuid = $1`, [id])
 
+						//IF THE USER IS TRYING TO UPDATE THE EMAIL OR PASSWORD OR NAME, WE NEED TO CHECK IF THE USER IS TRUSTED AND LOG OUT EVERYWHERE
 						if(u_user?.email != email || update_pw?.length > 0 || u_user.name != name){
-							if (is_trusted) {
+							if (is_trusted || fromBaseHost) {
+								console.log('User is trusted or from base host, proceeding with update')
 								logoutAll = true;
 								//IF EMAIL CHANGES, SEND CONFIRM EMAIL BEFORE UPDATING EMAIL
 								if(u_user?.email != email){
-									confirmEmail({email, name: u_user.name, uuid: id, old_email: u_user?.email, req })
+									//TODO: UPDATE THE CONFIRM EMAIL LOGIC TO ALLOW CHANGE FROM BASE HOST
+									confirmEmail({email, name: u_user.name, uuid: id, old_email: u_user?.email, req, fromBaseHost })
 									if(!update_pw && u_user.name == name) logoutAll = false
 									message = 'An email has been sent to your email address. Please confirm the email to proceed with the email update.'
 									req.session.errormessage = message
-									nextParams.set('u_errormessage', message);
+
+									errorMessage = message
 									redirect_url = `${nextUrl.pathname}?${nextParams.toString()}`
 								}
 
@@ -177,7 +241,9 @@ module.exports =async (req, res) => {
 									redirectError(req, res)
 								})
 							} else {
-								nextParams.set('u_errormessage', 'This action can only be authorized on trusted devices. Please log in from a trusted device');
+								const message = 'This action can only be authorized on trusted devices. Please log in from a trusted device'
+								nextParams.set('u_errormessage', message);
+								errorMessage = message
 								redirect_url = `${nextUrl.pathname}?${nextParams.toString()}`
 							}
 						} else {
@@ -338,18 +404,31 @@ module.exports =async (req, res) => {
 					// SEND EMAIL IF THE CHANGES ARE NOT SELF-TRIGGERED
 					if (id !== uuid) {
 						// ALWAYS SEND EMAIL IN THIS CASE AS IT IS SOMEONE ELSE INTERVENING ON ACCOUNT INFORMATION
-						const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
+						const platformName = fromBaseHost ? 'SDG Commons' : translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 						await sendemail({
 							to: email,
 							subject: `[${platformName}] Your account information has been modified`,
-							html: `Your account information has been modified by ${username} via the <a href="${own_app_url}">${platformName}</a>.` // TO DO: TRANSLATE
+							html: `Your account information has been modified by ${username} via the <a href="${ fromBaseHost ? app_suite_url : own_app_url}">${platformName}</a>.` // TO DO: TRANSLATE
 						})
 						return null
 					} else return null
 				}).catch(err => console.log(err))
 			}).catch(err => console.log(err))
 		}).then(_ => {
-			if (redirect_url) res.redirect(redirect_url)
+			if (fromBaseHost) {
+				if(errorMessage?.length) {
+					return res.status(400).json({
+						status: 400,
+						message: errorMessage
+					});
+				}
+				return res.status(200).json({
+					status: 200,
+					message: 'Account updated successfully.',
+					data: id
+				});
+			}
+			else if (redirect_url) res.redirect(redirect_url)
 			else redirectBack(req, res)
 		}).catch(err => console.log(err))
 	}

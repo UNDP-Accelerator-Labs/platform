@@ -1,13 +1,18 @@
 const jwt = require("jsonwebtoken");
 const { email: sendEmail, sessionupdate, removeSubdomain, redirectUnauthorized } = include("routes/helpers/");
-const { DB, own_app_url, app_title, app_title_short, translations } = include("config/");
+const { DB, own_app_url, app_title, app_title_short, translations, base_host } = include("config/");
 
 exports.confirmEmail = async (_kwarg) => {
-  const { uuid, email, name, old_email, req } = _kwarg;
+  let { uuid, email, name, old_email, req, fromBaseHost } = _kwarg;
 
-  const { host } = req.headers || {};
+  fromBaseHost = fromBaseHost === true || fromBaseHost === 'true';
+
+  let { host } = req.headers || {};
   const mainHost = removeSubdomain(host);
   const protocol = req.protocol;
+  if (fromBaseHost) {
+    host = base_host;
+  }
 
   const token = await jwt.sign(
     { email, uuid, name, old_email, action: "confirm-email" },
@@ -16,7 +21,7 @@ exports.confirmEmail = async (_kwarg) => {
   );
 
   const confirmationLink = `${protocol}://${host}/confirm-email/${token}#`;
-  const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
+  const platformName = fromBaseHost ? 'SDG Commons' : translations['app title']?.[app_title_short]?.['en'] ?? app_title;
 
   // Send the email to the user
   // TO DO: translate
@@ -71,15 +76,25 @@ function verifyTokenFields(decoded, res) {
 
 exports.updateNewEmail = async (req, res, next) => {
   const { token } = req.params;
+  let { is_api_call } = req.query || {};
   const { referer } = req.headers || {}
+
+  is_api_call = is_api_call === 'true' || is_api_call === true;
 
   req.session.errormessage = "";
   jwt.verify(token, process.env.APP_SECRET, async function (err, decoded) {
     if (decoded) {
       if (!verifyTokenFields(decoded, res)) {
+        if (is_api_call) {
+          return res.status(401).json({
+            status: 401,
+            message: "Invalid token fields",
+          });
+        }
         return res.status(401).send("invalid token");
       }
       const { email, action, uuid, name, old_email } = decoded;
+      let errormessage = "";
 
       await DB.general
         .tx(async (t) => {
@@ -98,7 +113,7 @@ exports.updateNewEmail = async (req, res, next) => {
           });
         })
         .then(async () => {
-          const platformName = translations['app title']?.[app_title_short]?.['en'] ?? app_title;
+          const platformName = is_api_call ? 'SDG Commons' : translations['app title']?.[app_title_short]?.['en'] ?? app_title;
           await sendEmail({
             to: old_email,
             subject: `[${platformName}] Email Address Update Notification`,
@@ -115,17 +130,54 @@ exports.updateNewEmail = async (req, res, next) => {
                     </div>`,
           });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err)
+          errormessage = "Error updating email address. Please try again later.";
+        })
+
+      if (errormessage) {
+        req.session.errormessage = errormessage;
+        if (is_api_call) {
+          return res.status(500).json({
+            status: 500,
+            message: errormessage,
+          });
+        }
+        return redirectUnauthorized(req, res);
+      }
 
         req.session.errormessage = 'Email changed successful.'
 
       if(req.session.uuid === uuid){
-        req.session.destroy()
+        // req.session.destroy()
+        if (is_api_call) {
+          return res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Email changed successfully. Please log in again.",
+          });
+        }
         return redirectUnauthorized(req, res);
       }
-      else res.render(referer || '/');
+      else {
+        if (is_api_call) {
+          return res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Email changed successfully.",
+          });
+        }
+        // If the user is not logged in, redirect to the referer or home page
+        res.render(referer || '/');
+      }
     } else {
       req.session.errormessage = "Invalid or expired token.";
+      if (is_api_call) {
+        return res.status(401).json({
+          status: 401,
+          message: "Invalid or expired token.",
+        });
+      }
       return redirectUnauthorized(req, res);
     }
   });

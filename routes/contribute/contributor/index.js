@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
 			return check_authorization({ connection: t, id, uuid, rights, public })
 			.then(async result => {
 				const { authorized, redirect } = result || {}
-				if (!authorized) {
+				if (!authorized && !is_api_call) {
 					if (is_api_call) {
 						return res.status(403).json({
 							status: 403,

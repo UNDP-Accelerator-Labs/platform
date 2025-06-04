@@ -80,6 +80,7 @@ module.exports = async (req, res) => {
 					json_build_object(
 						'name', u.name, 
 						'iso3', u.iso3,
+						'id', p.owner,
 						'isUNDP', u.email LIKE '%@undp.org'
 					) AS creator,
 
@@ -169,6 +170,7 @@ module.exports = async (req, res) => {
 				json_build_object(
 					'name', u.name, 
 					'iso3', u.iso3,
+					'id', p.owner,
 					'isUNDP', u.email LIKE '%@undp.org'
 				) AS creator,
 

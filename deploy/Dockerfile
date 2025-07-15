@@ -1,4 +1,4 @@
-FROM node:16-slim
+FROM node:18-bullseye
 
 RUN apt-get update
 RUN apt-get -y upgrade

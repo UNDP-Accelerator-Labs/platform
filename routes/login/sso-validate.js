@@ -129,31 +129,31 @@ module.exports = (req, res, next) => {
                   const redirecturl = origin_url ?? getPath(rights, language, modules)
 
                   //SAVE SESSION TO AVOID INSERT ERROR FOR NEW USERS
-                  await req.session.save(function(err) {
-                        if (err) {
-                          console.log(' err ', err)
-                        }
-                  })
+                  // await req.session.save(function(err) {
+                  //       if (err) {
+                  //         console.log(' err ', err)
+                  //       }
+                  // })
 
-                  return t
-                    .none(
-                      `
-                                INSERT INTO trusted_devices (user_uuid, device_name, device_os, device_browser, last_login, session_sid, duuid1, duuid2, duuid3, is_trusted)
-                                VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, true)
-                                ON CONFLICT (user_uuid, device_os, device_browser, session_sid, duuid1, duuid2, duuid3 )
-                                DO UPDATE SET last_login = EXCLUDED.last_login`,
-                      [
-                        uuid,
-                        device.device,
-                        device.os,
-                        device.browser,
-                        sid,
-                        deviceGUID1,
-                        deviceGUID2,
-                        deviceGUID3,
-                      ],
-                    )
-                    .then(async() => {
+                  // return t
+                  //   .none(
+                  //     `
+                  //               INSERT INTO trusted_devices (user_uuid, device_name, device_os, device_browser, last_login, session_sid, duuid1, duuid2, duuid3, is_trusted)
+                  //               VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, $8, true)
+                  //               ON CONFLICT (user_uuid, device_os, device_browser, session_sid, duuid1, duuid2, duuid3 )
+                  //               DO UPDATE SET last_login = EXCLUDED.last_login`,
+                  //     [
+                  //       uuid,
+                  //       device.device,
+                  //       device.os,
+                  //       device.browser,
+                  //       sid,
+                  //       deviceGUID1,
+                  //       deviceGUID2,
+                  //       deviceGUID3,
+                  //     ],
+                  //   )
+                  //   .then(async() => {
                       const sessionExpiration = new Date(
                         Date.now() + 365 * 24 * 60 * 60 * 1000,
                       ); // 1 year from now
@@ -199,26 +199,26 @@ module.exports = (req, res, next) => {
                         }
                         else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
                       })
-                    })
-                    .catch(async (err) => {
-                      console.log(err);
-                      await Object.assign(
-                        req.session,
-                        datastructures.sessiondata(results),
-                      );
-                      req.session.save(function(err) {
-                        if (err) {
-                          console.log(' err ', err)
-                        }
-                        if (is_api_call) {
-                          return res.redirect(host_redirect_url || redirecturl);
-                        }
-                        if(checkOrigin(redirecturl)){
-                            return res.redirect(redirecturl)
-                        }
-                        else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
-                      })
-                    });
+                    // })
+                    // .catch(async (err) => {
+                    //   console.log(err);
+                    //   await Object.assign(
+                    //     req.session,
+                    //     datastructures.sessiondata(results),
+                    //   );
+                    //   req.session.save(function(err) {
+                    //     if (err) {
+                    //       console.log(' err ', err)
+                    //     }
+                    //     if (is_api_call) {
+                    //       return res.redirect(host_redirect_url || redirecturl);
+                    //     }
+                    //     if(checkOrigin(redirecturl)){
+                    //         return res.redirect(redirecturl)
+                    //     }
+                    //     else return res.redirect(`/${req.session.language}/edit/contributor?id=${req.session.uuid}`)
+                    //   })
+                    // });
                 }
               })
               .catch((error) => {

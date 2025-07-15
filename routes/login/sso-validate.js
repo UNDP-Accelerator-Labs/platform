@@ -128,6 +128,13 @@ module.exports = (req, res, next) => {
                   const { language, rights, uuid } = results;
                   const redirecturl = origin_url ?? getPath(rights, language, modules)
 
+                  //SAVE SESSION TO AVOID INSERT ERROR FOR NEW USERS
+                  await req.session.save(function(err) {
+                        if (err) {
+                          console.log(' err ', err)
+                        }
+                  })
+
                   return t
                     .none(
                       `

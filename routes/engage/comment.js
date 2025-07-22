@@ -4,16 +4,16 @@ const { email: sendEmail } = include('routes/helpers/');
 
 module.exports = (req, res) => {
     const { uuid, rights } = req.session || {}
-    const { object, id, message, source, action = 'add' } = req.body || {}
+    const { object, id, message, source, action = 'add', comment_id } = req.body || {}
 
     if (uuid) {
         if (action === 'delete') {
-            if (!id) return res.json({ status: 400, message: 'Comment ID is required for deletion.' });
+            if (!comment_id) return res.json({ status: 400, message: 'Comment ID is required for deletion.' });
 
             DB.conn.none(`
                 DELETE FROM comments
                 WHERE id = $1 AND (contributor = $2)
-            `, [id, uuid, rights])
+            `, [comment_id, uuid, rights])
                 .then(() => {
                     return res.json({ status: 200, message: 'Comment deleted successfully.' });
                 })

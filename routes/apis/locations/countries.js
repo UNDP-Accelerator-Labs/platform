@@ -102,7 +102,31 @@ module.exports = async (req, res) => {
 		return t.batch(batch)
 		.then(results => {
 			const [ su_a3, adm_a3 ] = results
-			const locations = join.concatunique.call(su_a3, [ adm_a3, 'country', 'latter' ])
+			let locations = su_a3.concat(adm_a3)
+			//PREVIOUS VERSION:  join.concatunique.call(su_a3, [ adm_a3, 'country', 'latter' ])
+			
+			//EQUIVALENCE HANDLING TO IDENTIFY COUNTRIES WITH SUBUNITS
+			// THE FILTERING ABOVE ENSURES THAT ONLY RELEVANT SUBUNITS ARE RETURN
+			if (locations.length !== array.unique.call(locations, { key: 'country' }).length) {
+				locations = locations.filter((value, index, self) => {
+						return (
+						value?.iso3 &&
+						self.findIndex((d) => d?.iso3 === value?.iso3) === index
+						);
+					})
+					.map((country) => {
+						// Find all sub_iso3 values in the original array that match this iso3 and are different
+						const subIso3List = locations
+						.flat()
+						.filter((c) => c.iso3 === country.iso3 && c.sub_iso3 && c.sub_iso3 !== c.iso3)
+						.map((c) => c.sub_iso3);
+
+						return {
+						...country,
+						equivalents: subIso3List,
+						};
+					});	
+			}
 
 			if (locations.length) {
 				return t.any(`

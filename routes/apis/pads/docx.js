@@ -454,7 +454,7 @@ module.exports = async (req, res) => {
 		function splitLinks (str) {
 		}
 
-		if (include_toc) {
+		if (single_doc && include_toc) {
 			// ADD TABLE OF CONTENTS
 			const toc = { children:
 				[ new TableOfContents('Summary', {
@@ -858,7 +858,7 @@ module.exports = async (req, res) => {
 
         let zip;
         if (open) zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
-        else zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+        else zip = spawn('zip',[ '-P', pw, '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
         zip.stdout.on('data', data => console.log(`stdout: ${data}`))
         zip.stderr.on('data', data => console.log(`stderr: ${data}`))
         zip.on('exit', code => {

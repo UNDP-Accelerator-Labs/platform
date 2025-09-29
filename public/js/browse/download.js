@@ -105,6 +105,17 @@ export async function setDownloadOptions() {
     opts.push({
       node: 'input',
       type: 'checkbox',
+      name: 'single_doc',
+      value: true,
+      placeholder: 'Combine into a single document', // TO DO: TRANSLATE
+      checked: true,
+      default: true,
+      classname: 'hide docx',
+      fn: resetDocXFeatures,
+    });
+    opts.push({
+      node: 'input',
+      type: 'checkbox',
       name: 'include_toc',
       value: true,
       placeholder: 'Include table of contents', // TO DO: TRANSLATE
@@ -320,6 +331,16 @@ export async function setDownloadOptions() {
         }); // THIS DOES NOT SEEM TO DO ANYTHING
         sel.selectAll('button').attr('disabled', deactivate ? true : null);
       });
+    }
+
+    function resetDocXFeatures(data) {
+      const { checked } = this;
+      const toc_opt = d3.select(`input[name=include_toc]`)
+      toc_opt.findAncestor('li').classed('hide', !checked);
+      if (!checked) {
+        toc_opt.node().checked = false;
+      }
+      // TO DO: HIDE ALSO THE CHAPTERING DROPDOWN
     }
     // function limitSelection(data) {
     //   const { name, type, form: formnode } = this;

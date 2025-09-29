@@ -3,8 +3,21 @@ const path = require('path')
 const fs = require('fs')
 const request = require('request').defaults({ encoding: null })
 const imgsize = require('image-size')
+const util = require('util')
 
-const { Document, SectionType, AlignmentType, UnderlineType, HeadingLevel, StyleLevel, Packer, Paragraph, TextRun, ImageRun, TableOfContents } = require('docx')
+const { 
+  Document, 
+  SectionType, 
+  AlignmentType, 
+  UnderlineType, 
+  HeadingLevel, 
+  StyleLevel, 
+  Packer, 
+  Paragraph, 
+  TextRun, 
+  ImageRun, 
+  TableOfContents 
+} = require('docx')
 
 const { app_title_short, app_storage, colors, metafields, DB } = include('config/')
 const { checklanguage, datastructures, parsers, array, join, geo } = include('routes/helpers/')
@@ -12,8 +25,17 @@ const { checklanguage, datastructures, parsers, array, join, geo } = include('ro
 const { filter } = require('../../browse/pads/')
 
 module.exports = async (req, res) => {
-	const { output, render, include_data, include_toc, chapters, standardize_structure } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
-	const { object } = req.params || {}
+	let { 
+		output, 
+		render, 
+    include_data, 
+    include_toc, 
+    chapters, 
+    standardize_structure,
+    single_doc, 
+  } = Object.keys(req.query)?.length ? req.query : Object.keys(req.body)?.length ? req.body : {}
+	if (!single_doc) single_doc = false;
+  const { object } = req.params || {}
 	const pw = req.session.email || null
 
 	// if (req.session.uuid) { // USER IS LOGGED IN
@@ -81,13 +103,13 @@ module.exports = async (req, res) => {
 		const open = results.every(d => d.status > 2)
 		let data = await join.users(results, [ language, 'owner' ])
 
-		if (chapters && chapters !== 'none') {
+		if (single_doc && chapters && chapters !== 'none') {
 			data = array.nest.call(data, { key: chapters })
 		} else {
 			data = [{ key: null, values: data }]
 		}
 
-		// TO DO: PROBABLY ONLY USE ONE SECTION BECUSE IN WORD, NEW SECTIONS FORCE PAGE BREAKS THAT CANNOT BE REMOVED EASILY
+		// TO DO: PROBABLY ONLY USE ONE SECTION BECAUSE IN WORD, NEW SECTIONS FORCE PAGE BREAKS THAT CANNOT BE REMOVED EASILY
 		let sections = await Promise.all(data.map(async d => {
 			return (async () => {
 				const arr = []
@@ -432,7 +454,7 @@ module.exports = async (req, res) => {
 		function splitLinks (str) {
 		}
 
-		if (include_toc) {
+		if (single_doc && include_toc) {
 			// ADD TABLE OF CONTENTS
 			const toc = { children:
 				[ new TableOfContents('Summary', {
@@ -447,8 +469,10 @@ module.exports = async (req, res) => {
 		}
 
 		// CREATE DOCUMENT
-		console.log('preping doc')
-		const doc = new Document({
+		let doc;
+		if (single_doc) {
+			console.log('preping single doc')
+			doc = new Document({
 			creator: username,
 			title: 'A collection of solutions', // TO DO: TRANSLATE
 			features: {
@@ -606,44 +630,248 @@ module.exports = async (req, res) => {
 				]
 			},
 			sections
-		})
+			})
+		} else {
+			console.log('preping mutliple docs')
+      doc = sections.map((d, i) => {
+        // data IS NECESSARILY ONLY ONE LEVEL DEEP SINCE THERE CAN BE NO CHAPTERING IN SINGLE FILES
+        // TO DO: CHAPTERING COULD BE USED TO GENERATE DIFFERENT SUBDIRs
+        const title = data[0].values[i].title;
+        const safe_title = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        const docx = new Document({
+					creator: username,
+					title: safe_title,
+					features: {
+						updateFields: true
+					},
+					styles: {
+						default: {
+							heading1: {
+								run: {
+									font: 'Noto Sans',
+									size: 48,
+									bold: true,
+									color: colors['dark-blue']
+								},
+								paragraph: {
+									spacing: {
+										before: 120,
+										after: 240,
+										line: 36 * 6
+									}
+								}
+							},
+							heading2: {
+								run: {
+									font: 'Noto Sans',
+									size: 32,
+									bold: true,
+									color: colors['dark-blue']
+								},
+								paragraph: {
+									spacing: {
+										before: 120,
+										after: 240,
+										line: 36 * 6
+									}
+								}
+							},
+							heading3: {
+								run: {
+									font: 'Noto Sans',
+									size: 28,
+									color: colors['mid-blue']
+								},
+								paragraph: {
+									spacing: {
+										before: 120,
+										after: 240,
+										line: 28 * 6
+									}
+								}
+							},
+							heading4: {
+								run: {
+									font: 'Noto Sans',
+									size: 20,
+									color: colors['light-grey']
+								},
+								paragraph: {
+									spacing: {
+										after: 120
+									}
+								}
+							},
+							listParagraph: {
+								run: {
+									font: 'Noto Sans',
+									size: 20
+								},
+								paragraph: {
+									spacing: {
+										// after: 120
+									}
+								}
+							},
+						},
+						paragraphStyles: [
+							{
+								id: 'main',
+								name: 'Main text style',
+								basedOn: 'Normal',
+								next: 'Normal',
+								quickFormat: true,
+								run: {
+									font: 'Noto Sans',
+									size: 20
+								},
+								paragraph: {
+									spacing: {
+										after: 240
+									}
+								}
+							},
+							{
+								id: 'caption',
+								name: 'Main text style',
+								basedOn: 'Main text style',
+								next: 'Main text style',
+								quickFormat: true,
+								run: {
+									font: 'Noto Sans',
+									color: colors['light-grey'],
+									size: 16
+								},
+								paragraph: {
+									spacing: {
+										after: 240
+									}
+								}
+							},
+							{
+								id: 'images',
+								name: 'Spacing for images',
+								basedOn: 'Main text style',
+								next: 'Main text style',
+								quickFormat: true,
+								paragraph: {
+									spacing: {
+										after: 360
+									}
+								}
+							},
+							{
+								id: 'hyperlink',
+								name: 'Hyperlink style',
+								basedOn: 'Main text style',
+								next: 'Main text style',
+								quickFormat: true,
+								run: {
+									color: colors['light-blue'],
+									underline: {
+										type: UnderlineType.SINGLE
+									}
+								},
+								paragraph: {
+									spacing: {
+										after: 360
+									}
+								}
+							},
+							{
+								id: 'toc',
+								name: 'Table of contents style',
+								basedOn: 'Main text style',
+								next: 'Main text style',
+								quickFormat: true,
+								run: {
+									font: 'Noto Sans',
+									size: 20,
+									color: colors['dark-blue'],
+									underline: {
+										type: UnderlineType.SINGLE
+									}
+								}
+							}
+						]
+					},
+					sections: [d]
+				});
+        return { safe_title, docx }
+			})
+		}
 
 		// RENDER DOCUMENT
 		if (render) {
-			console.log('rendering')
-			Packer.toBuffer(doc)
-			.then((buffer) => {
-				const p = path.join(basedir, `${app_title_short}.docx`)
-				fs.writeFileSync(p, buffer)
+			if (single_doc) {
+        console.log('rendering')
+  			Packer.toBuffer(doc)
+  			.then((buffer) => {
+  				const p = path.join(basedir, `${app_title_short}.docx`)
+  				fs.writeFileSync(p, buffer)
 
-				// IF OPEN, NO NEED TO ZIP
-				if (open) {
-					// DOWNLOAD THE FILE
-					// FOR docx MIME TYPE, SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-					res.setHeader('Content-type','application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-					res.sendFile(p, {}, function () {
-						fs.rmSync(p)
-					})
-				} else {
-					// var zip = spawn('zip',[ '-P', pw, 'archive.zip', path.relative(basedir, `${app_title_short}.docx`) ], { cwd: basedir })
-					var zip = spawn('zip',[ '-P', pw, 'archive.zip', `${app_title_short}.docx` ], { cwd: basedir })
-					// zip.stdin.on('data', (data) => { console.log(`stdin: ${data}`) })
-					zip.stdout.on('data', data => console.log(`stdout: ${data}`))
-					zip.stderr.on('data', data => console.log(`stderr: ${data}`))
-					// zip.on('error', err => console.log(err))
-					zip.on('exit', code => {
-						console.log(`zipped: ${code}`)
-						fs.rmSync(p)
-						console.log('file removed')
-						// DOWNLOAD THE FILE
-						res.setHeader('Content-type','application/zip')
-						res.sendFile(path.join(basedir, '/archive.zip'), {}, function () {
-							fs.rmSync(path.join(basedir, '/archive.zip'))
-						})
-					})
-				}
+  				// IF OPEN, NO NEED TO ZIP
+  				if (open) {
+  					// DOWNLOAD THE FILE
+  					// FOR docx MIME TYPE, SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+  					res.setHeader('Content-type','application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+  					res.sendFile(p, {}, function () {
+  						fs.rmSync(p)
+  					})
+  				} else {
+  					// var zip = spawn('zip',[ '-P', pw, 'archive.zip', path.relative(basedir, `${app_title_short}.docx`) ], { cwd: basedir })
+  					var zip = spawn('zip',[ '-P', pw, 'archive.zip', `${app_title_short}.docx` ], { cwd: basedir })
+  					// zip.stdin.on('data', (data) => { console.log(`stdin: ${data}`) })
+  					zip.stdout.on('data', data => console.log(`stdout: ${data}`))
+  					zip.stderr.on('data', data => console.log(`stderr: ${data}`))
+  					// zip.on('error', err => console.log(err))
+  					zip.on('exit', code => {
+  						console.log(`zipped: ${code}`)
+  						fs.rmSync(p)
+  						console.log('file removed')
+  						// DOWNLOAD THE FILE
+  						res.setHeader('Content-type','application/zip')
+  						res.sendFile(path.join(basedir, '/archive.zip'), {}, function () {
+  							fs.rmSync(path.join(basedir, '/archive.zip'))
+  						})
+  					})
+  				}
 
-			}).catch(err => console.log(err))
+  			}).catch(err => console.log(err))
+      } else {
+        // TO DO
+        const now = new Date()
+        var dir = path.join(basedir, `download-${+now}`)
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+
+        await Promise.all(doc.map(async d => {
+          const { safe_title, docx } = d || {};
+          await Packer.toBuffer(docx)
+          .then((buffer) => {
+            const p = path.join(dir, `${safe_title}.docx`)
+            fs.writeFileSync(p, buffer)
+            // WRITE THE FILE
+          })
+          return null;
+        }))
+
+        let zip;
+        if (open) zip = spawn('zip',[ '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+        else zip = spawn('zip',[ '-P', pw, '-r', 'archive.zip', path.relative(basedir, dir) ], { cwd: basedir })
+        zip.stdout.on('data', data => console.log(`stdout: ${data}`))
+        zip.stderr.on('data', data => console.log(`stderr: ${data}`))
+        zip.on('exit', code => {
+          console.log(`zipped: ${code}`)
+          fs.rmSync(dir, { recursive: true })
+          console.log('folder removed')
+          // DOWNLOAD THE FILE
+          res.setHeader('Content-type','application/zip')
+          res.sendFile(path.join(basedir, '/archive.zip'), {}, function () {
+            fs.rmSync(path.join(basedir, '/archive.zip'))
+          })
+        })
+      }
 		}
 
 	}).catch(err => console.log(err))

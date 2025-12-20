@@ -1,6 +1,6 @@
 // // EDIT THIS
 // GENERAL APP INFO
-exports.app_title = 'RBLAC Signals Scanning';
+exports.app_title = 'LAC Signals Scanning';
 exports.app_title_short = 'signals';
 exports.app_suite = 'acclab_platform';
 exports.app_suite_secret = process.env.APP_SUITE_SECRET || 'secret';
